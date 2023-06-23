@@ -1,0 +1,26 @@
+.o_field_conditional_questions {
+    width: 100%;
+    flex-flow: row wrap;
+
+    .badge {
+        flex: 0 0 auto;
+        margin: 1px 2px 1px 0;
+        border: 1px solid;
+        font-size: 12px;
+        user-select: none;
+        display: flex;
+        max-width: 100%;
+
+
+        .o_badge_text, .o_tag_badge_text {
+            @include o-text-overflow(inline-block);
+            max-width: 200px;
+            color: inherit;
+            line-height: 1.1;
+        }
+
+
+    }
+
+
+}

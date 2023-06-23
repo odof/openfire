@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_sale_crm_sale_order_start_state" model="ir.config_parameter">
+        <field name="key">of.sale.crm.sale.order.start_state</field>
+        <field name="value">quotation</field>
+    </record>
+
+</odoo>

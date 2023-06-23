@@ -1,5 +1,0 @@
-#. module: crm
-#: model:ir.actions.act_window,name:crm.crm_activity_action
-#: model:ir.ui.menu,name:crm.crm_activity_menu
-msgid "Activity types"
-msgstr "Types d'activité"

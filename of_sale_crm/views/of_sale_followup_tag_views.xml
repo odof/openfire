@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_followup_tag_form_view" model="ir.ui.view">
+        <field name="name">of.sale.followup.tag.form.view</field>
+        <field name="model">of.sale.followup.tag</field>
+        <field name="arch" type="xml">
+            <form string="Order tracking label">
+                <sheet>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="name"/>
+                        <field name="color" groups="base.group_no_one" widget="color_picker"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sale_followup_tag_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.followup.tag.tree.view</field>
+        <field name="model">of.sale.followup.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Order tracking labels">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="color" groups="base.group_no_one" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sale_followup_tag_action" model="ir.actions.act_window">
+        <field name="name">Order tracking labels</field>
+        <field name="res_model">of.sale.followup.tag</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_sale_followup_config_tag" name="Order tracking labels" parent="sale.menu_sales_config"
+        sequence="6" action="of_sale_followup_tag_action"/>
+
+</odoo>

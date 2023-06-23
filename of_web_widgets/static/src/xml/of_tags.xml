@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="of_web_widgets.OFTags" owl="1">
+        <t t-foreach="tags" t-as="tag" t-key="tag_index">
+            <span class="badge rounded-pill d-inline-flex align-items-center mw-100"><t t-esc="tag.text"/></span>
+        </t>
+    </t>
+</templates>

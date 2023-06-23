@@ -1,0 +1,46 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+import logging
+
+from odoo import fields, models
+
+logger = logging.getLogger(__name__)
+
+
+class OFSurveyQuestionAnswer(models.Model):
+    """A preconfigured answer for a question. This model stores values used
+    for
+
+      * simple choice, multiple choice: proposed values for the selection /
+        radio;
+
+    """
+
+    _name = 'of.survey.question.answer'
+    _rec_name = 'value'
+    _order = 'sequence, id'
+    _description = "Survey Label"
+
+    # question and question related fields
+    question_id = fields.Many2one(comodel_name='of.survey.question', string="Question", ondelete='cascade')
+
+    question_type = fields.Selection(related='question_id.question_type')
+    sequence = fields.Integer(string="Label Sequence order", default=10)
+    # answer related fields
+    value = fields.Char(string="Suggested value", translate=True, required=True)
+    value_image = fields.Image(string="Image", max_width=1024, max_height=1024)
+    value_image_filename = fields.Char(string="Image Filename")
+    is_correct = fields.Boolean(string="Correct")
+    is_default = fields.Boolean(string="Is default")
+
+    def action_button_check_suggested_answer_ids(self):
+        if answer_id := self.env.context.get('active_answer'):
+            if self.question_type == 'simple_choice':
+                for answer in self.question_id.suggested_answer_ids:
+                    answer.is_default = answer.id == answer_id
+            else:
+                self.is_default = True
+
+    def action_button_uncheck_suggested_answer_ids(self):
+        if self.env.context.get('active_answer'):
+            self.is_default = False

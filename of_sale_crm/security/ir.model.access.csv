@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_sale_followup_tag_manager,access.of.sale.followup.tag.manager,model_of_sale_followup_tag,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_followup_tag_my,access.of.sale.followup.tag.my,model_of_sale_followup_tag,sales_team.group_sale_salesman,1,0,0,0
+access_of_sale_followup_tag_user,access.of.sale.followup.tag.user,model_of_sale_followup_tag,base.group_user,1,0,0,0

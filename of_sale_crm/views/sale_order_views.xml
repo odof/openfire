@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="of_sale_crm_view_order_form" model="ir.ui.view">
+            <field name="name">of.sale.crm.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/header/button[@name='action_cancel']" position="replace">
+                    <button name="action_cancel" type="object" string="Cancel"
+                    attrs="{'invisible': ['|', ('state', 'not in', ['draft', 'sent','sale']),
+                    ('id', '=', False)]}"
+                    data-hotkey="z"/>
+                </xpath>
+                <xpath expr="/form/header/field[@name='state']" position="attributes">
+                    <attribute name="groups">of_sale_crm.group_of_estimate_sale_order_state,!of_sale_crm.group_of_quotation_sale_order_state</attribute>
+                </xpath>
+                <xpath expr="/form/header/field[@name='state']" position="after">
+                    <field name="state" invisible="1"/>  <!--  Keep on field always invisible, to avoid missing fields in {'invisible': [('state', ..., ...)]}  -->
+                    <field name="state" widget="statusbar" statusbar_visible="sent,sale" groups="of_sale_crm.group_of_quotation_sale_order_state,!of_sale_crm.group_of_estimate_sale_order_state"/>
+                </xpath>
+                <xpath expr="//button[1]" position="after">
+                    <button name="action_button_confirm_estimate" string="Confirm Estimate" type="object" states="draft" class="btn-primary"/>
+                </xpath>
+                <xpath expr="//div[hasclass('oe_title')]/h1" position="inside">
+                    <field name="of_customer_view" invisible ="1"/>
+                    <field name="of_priority" widget="priority" attrs="{'invisible': [('of_customer_view', '=', True)]}"/>
+                </xpath>
+                <xpath expr="//sheet/group/group[1]" position="inside">
+                    <field name="of_sent_quotation"/>
+                </xpath>
+                <xpath expr="//form//sheet//notebook//group[@name='technical']/../.." position="attributes">
+                    <attribute name="name">other_info</attribute>
+                </xpath>
+                <xpath expr="//group[@name='technical']" position="after">
+                    <group string="Divers" name="Misc">
+                        <field name="of_referred_id" />
+                    </group>
+                </xpath>
+                <xpath expr="//group[@name='sales_person']//field[@name='user_id']" position="after">
+                    <field name="of_canvasser_id"/>
+                </xpath>
+                <xpath expr="//page[2]" position="after">
+                    <page string="Follow-up" name="followup">
+                        <group name="followup_tags" col="4" colspan="2">
+                            <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_sale_order_quotation_form_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.quotation.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
+            <field name="arch" type="xml">
+                <!--  Display field  opportunity outside developer mode -->
+                <xpath expr="//field[@name='opportunity_id']" position="attributes">
+                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <!--
+            FIXME : This view should inherit `of_sale_report_view_order_form_inherit_sale_stock` in `of_sale_report`
+            This module is not integrated in this working branch yet, so we are moving field after a standard field.
+            Thoses field should be positionned after `of_installation_date` field.
+        -->
+        <record id="of_crm_of_sale_report_view_order_form_inherit_sale_stock" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='sale_shipping']" position="after">
+                    <group>
+                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                        <field name="of_force_laying_date"/>
+                        <field name="of_laying_week"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_sale_order_search_view" model="ir.ui.view">
+            <field name="name">of.crm.sale.order.search.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='draft']" position="replace">
+                    <filter string="Estimates" name="draft" domain="[('state', '=', 'draft')]" groups="!of_sale_crm.group_of_quotation_sale_order_state"/>
+                    <filter string="Quotations" name="draft" domain="[('state', '=', 'sent')]" groups="of_sale_crm.group_of_quotation_sale_order_state"/>
+                    <filter string="Sent Quotations" name="sent" domain="[('of_sent_quotation', '=', True)]"/>
+                    <filter string="Quotations" name="quotation" domain="[('state', '=', 'sent')]" groups="!of_sale_crm.group_of_quotation_sale_order_state"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_view_order_form" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='customer_notes']" position="after">
+                    <group col="4" colspan="4" name="followup_notes" string="Follow-up notes">
+                        <field name="of_notes" nolabel="1"/>
+                    </group>
+                </xpath>
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                        <field name="of_info"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_crm_of_sale_order_line_tree" model="ir.ui.view">
+            <field name="name">of.crm.of.sale.order.line.tree</field>
+            <field name="model">sale.order.line</field>
+            <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='price_subtotal']" position="after">
+                    <field name="of_amount_to_invoice"/>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

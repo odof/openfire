@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_crm_report_res_config_settings_view_form_crm" model="ir.ui.view">
+        <field name="name">of.sale.crm.report.res.config.settings.view.form.crm</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='crm_lead']" position="after">
+                <div class="col-lg-6 o_setting_box" id="convertion_funnel1">
+                    <div class="o_setting_left_pane">
+                        <field name="of_display_funnel_conversion1"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_display_funnel_conversion1"/>
+                        <div class="text-muted">
+                            Tunnel based on qualitative analysis of sales data.<br/>
+                            The reference value is the source opportunity.<br/>
+                            Only data linked to an opportunity is analyzed.<br/>
+                            Certain indicators are interpreted (number of quotations, quotation amount, etc.).
+                        </div>
+                        <field name="group_funnel_conversion1" class="oe_inline" invisible="1"/>
+                    </div>
+                </div>
+                <div class="col-lg-6 o_setting_box" id="convertion_funnel2">
+                    <div class="o_setting_left_pane">
+                        <field name="of_display_funnel_conversion2"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_display_funnel_conversion2"/>
+                        <div class="text-muted">
+                            Tunnel based on quantitative analysis of sales data.<br/>
+                            The reference value is the date of each event.<br/>
+                            Only data linked to an opportunity is analyzed.<br/>
+                            Certain indicators are interpreted (number of quotes, amount of quotes, etc.).
+                        </div>
+                        <field name="group_funnel_conversion2" class="oe_inline" invisible="1"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

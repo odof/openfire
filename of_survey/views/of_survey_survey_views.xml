@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_survey_survey_view_form" model="ir.ui.view">
+        <field name="name">of.survey.survey.view.form</field>
+        <field name="model">of.survey.survey</field>
+        <field name="arch" type="xml">
+            <form string="Survey" class="o_survey_form">
+                <field name="id" invisible="1"/>
+                <field name="question_ids" invisible="1"/>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="access_token" invisible="1"/>
+                    <div name="button_box" class="oe_button_box">
+                        <button name="action_button_open_test_survey" class="oe_stat_button" icon="fa-bars" type="object" attrs="{'invisible': [('access_token','=',False)]}">
+                            Test
+                        </button>
+                    </div>
+                    <div class="oe_title" style="width: 100%;">
+                        <label for="title" class="oe_edit_only" string="Survey Title"/>
+                        <h1>
+                            <field name="title" placeholder="e.g. Satisfaction Survey"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="survey_type"/>
+                            <field name="active" invisible="1"/>
+                            <field name="has_conditional_questions" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Questions" name="questions">
+                            <field name="question_and_page_ids" nolabel="1" widget="of_question_page_one2many" mode="tree,kanban" context="{'default_survey_id': active_id, 'default_questions_selection': questions_selection}">
+                                <tree decoration-bf="is_page">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="title" widget="of_survey_description_page"/>
+                                    <field name="background_image" invisible="1"/>
+                                    <field name="question_type" />
+                                    <field name="conditions"/>
+                                    <field name="is_page" invisible="1"/>
+                                    <field name="survey_id" invisible="1"/>
+                                    <field name="suggested_answer_ids" widget="of_tags" options="{'field_name': 'value'}"/>
+                                    <control>
+                                        <create name="add_question_control" string="Add a question"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_is_page': True, 'default_questions_selection': 'all'}"/>
+                                    </control>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Options" name="options">
+                            <group name="options">
+                                <group string="Questions" name="questions">
+                                    <field name="questions_selection" invisible="1"/>
+                                    <field name="questions_layout" widget="radio"/>
+                                    <field name="progression_mode" widget="radio" attrs="{'invisible': [('questions_layout', '=', 'one_page')]}"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Description" name="description">
+                            <field name="description" placeholder="e.g. &quot;The following Survey will help us...&quot;" nolabel="1"></field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_survey_survey_view_tree" model="ir.ui.view">
+        <field name="name">of.survey.survey.view.tree</field>
+        <field name="model">of.survey.survey</field>
+        <field name="arch" type="xml">
+            <tree string="Survey" js_class="of_survey_view_tree">
+                <field name="title"/>
+                <field name="survey_type"/>
+                <field name="active"/>
+                <!-- Tweak as icons aren't directly supported in xml -->
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_survey_survey_view_search" model="ir.ui.view">
+        <field name="name">of.survey.survey.search</field>
+        <field name="model">of.survey.survey</field>
+        <field name="arch" type="xml">
+            <search string="Survey">
+                <field string="Survey" name="title"/>
+                <field string="Question &amp; Pages" name="question_and_page_ids"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter invisible="1" string="Late Activities" name="activities_overdue"
+                    domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                    help="Show all records which has next action date is before today"/>
+                <filter invisible="1" string="Today Activities" name="activities_today"
+                    domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter invisible="1" string="Upcoming Activities" name="activities_upcoming_all"
+                    domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_action_survey_form" model="ir.actions.act_window">
+        <field name="name">Surveys</field>
+        <field name="res_model">of.survey.survey</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>
+                No Survey Found
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="OpenFire Surveys" id="menu_of_survey_form" action="of_action_survey_form" parent="menu_of_surveys_main" sequence="1"/>
+
+</odoo>

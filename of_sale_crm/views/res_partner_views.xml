@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_crm_view_partner_lead_warn_form" model="ir.ui.view">
+        <field name="name">of.sale.crm.res.partner.lead.warn.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_sale.of_view_res_partner_sale_warn_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//div[@name='of_div_sale_warn']" position="before">
+                <div name="of_div_lead_warn">
+                    <field name="of_is_lead_warn" nolabel="1" class="oe_inline"/> opportunities
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_crm_view_partner_form" model="ir.ui.view">
+        <field name="name">of.sale.crm.res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//div[hasclass('oe_title')]//div[hasclass('o_row')]" position="inside">
+                <div class="label label-success" attrs="{'invisible': [('of_customer_state', '!=', 'lead')]}">Prospect</div>
+            </xpath>
+            <xpath expr="//notebook//page[@name='sales_purchases']//group[@name='sale']//field[@name='user_id']" position="before">
+                <field name="customer_rank" invisible="1"/>
+                <field name="supplier_rank" invisible="1"/>
+                <field name="of_customer_state" required="1"
+                        attrs="{'invisible': [('customer_rank', '&lt;=', 0), ('supplier_rank', '&gt;', 0)], 'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_crm_res_partner_kanban_view" model="ir.ui.view">
+        <field name="name">of.sale.crm.res.partner.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban//field[@name='type']" position="after">
+                <field name="of_customer_state"/>
+            </xpath>
+            <xpath expr="//kanban//templates//strong[hasclass('oe_partner_heading')]" position="after">
+                <div t-if="record.of_customer_state.raw_value == 'lead'" class="label label-success">prospect</div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_crm_view_partner_tree" model="ir.ui.view">
+        <field name="name">of.crm.res.partner.tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field eval="8" name="priority"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_customer_state" invisible="1"/>
+            </xpath>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-info">of_customer_state=='lead'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_crm_view_res_partner_filter" model="ir.ui.view">
+        <field name="name">res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search//filter[@name='duplications']" position="before">
+                <filter string="Signed customers" name="confirmed" domain="[('customer_rank', '>', 0), ('parent_id', '=', False), ('of_customer_state', '=', 'customer')]"/>
+                <filter string="Prospects" name="lead" domain="[('customer_rank', '>', 0), ('parent_id', '=', False), ('of_customer_state', '=', 'lead')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_funnel_conversion1" model="res.groups">
+        <field name="name">Display of qualitative conversion tunnel</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_funnel_conversion2" model="res.groups">
+        <field name="name">Display of quantitative conversion tunnel</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+
+</odoo>

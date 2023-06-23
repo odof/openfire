@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_sale_objective_user,of.sale.objective.user,model_of_sale_objective,base.group_user,1,0,0,0
+access_of_sale_objective_manager,of.sale.objective.manager,model_of_sale_objective,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_objective_line_user,of.sale.objective.line.user,model_of_sale_objective_line,base.group_user,1,0,0,0
+access_of_sale_objective_line_manager,of.sale.objective.line.manager,model_of_sale_objective_line,sales_team.group_sale_manager,1,1,1,1

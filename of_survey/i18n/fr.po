@@ -1,0 +1,2116 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_survey
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-14 08:58+0000\n"
+"PO-Revision-Date: 2023-12-14 08:58+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_count
+msgid "# Questions"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_progression
+msgid "% completed"
+msgstr "% terminé"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "%s (copy)"
+msgstr "%s (copie)"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
+msgid "403: Forbidden"
+msgstr "403 : Interdit"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+msgid "<i class=\"fa fa-bar-chart\"/> Results"
+msgstr "<i class=\"fa fa-bar-chart\"/> Résultats"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<i class=\"fa fa-check-square-o fa-lg me-2\"/>answer"
+msgstr "<i class=\"fa fa-check-square-o fa-lg me-2\"/>réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<i class=\"fa fa-circle-o  fa-lg me-2\"/>answer"
+msgstr "<i class=\"fa fa-circle-o  fa-lg me-2\"/>réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+msgid "<i class=\"fa fa-close\"/> Close"
+msgstr "<i class=\"fa fa-close\"/> Fermer"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<i class=\"fa fa-dot-circle-o fa-lg me-2\"/>answer"
+msgstr "<i class=\"fa fa-dot-circle-o fa-lg me-2\"/>réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_button_form_view
+msgid "<i class=\"fa fa-fw fa-arrow-right\"/>Edit Survey"
+msgstr "<i class=\"fa fa-fw fa-arrow-right\"/>Modifier le Questionnaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<i class=\"fa fa-square-o fa-lg me-2\"/>answer"
+msgstr "<i class=\"fa fa-square-o fa-lg me-2\"/>réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
+"tooltip\"> or press Enter</span>"
+msgstr ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
+"tooltip\">ou appuyer sur Enter</span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\">\n"
+"                            <span id=\"enter-tooltip\">or press Enter</span>\n"
+"                        </span>"
+msgstr ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\">\n"
+"                            <span id=\"enter-tooltip\">ou appuyez sur Enter</span>\n"
+"                        </span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\">\n"
+"                        <span id=\"enter-tooltip\">or press Enter</span>\n"
+"                    </span>"
+msgstr ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\">\n"
+"                        <span id=\"enter-tooltip\">ou appuyer sur Enter</span>\n"
+"                    </span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_start
+msgid ""
+"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">or"
+" press Enter</span>"
+msgstr ""
+"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">ou"
+" appuyer sur Enter</span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_selection_key
+msgid ""
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
+"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
+"position-relative\">Key</span></span>"
+msgstr ""
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
+"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
+"position-relative\">Clé</span></span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+msgid ""
+"<span class=\"o_survey_session_answer_count\">0</span>\n"
+"                                     /"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid ""
+"<span>Name all the animals</span><br/>\n"
+"                                    <i class=\"fa fa-align-justify fa-4x\" role=\"img\" aria-label=\"Multiple lines\" title=\"Multiple Lines\"/>"
+msgstr ""
+"<span>Nommer tous les animaux</span><br/>\n"
+"                                    <i class=\"fa fa-align-justify fa-4x\" role=\"img\" aria-label=\"Multiple lines\" title=\"Lignes multiples\"/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid ""
+"<span>Name one animal</span><br/>\n"
+"                                    <i class=\"fa fa-minus fa-4x\" role=\"img\" aria-label=\"Single Line\" title=\"Single Line\"/>"
+msgstr ""
+"<span>Nommer un animal</span><br/>\n"
+"                                    <i class=\"fa fa-minus fa-4x\" role=\"img\" aria-label=\"Single Line\" title=\"Ligne unique\"/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
+msgid "<span>Waiting for attendees...</span>"
+msgstr "<span>En attente de participants...</span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<span>When is Christmas?</span><br/>"
+msgstr "<span>Quand est Noël ?</span><br/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<span>Which are yellow?</span><br/>"
+msgstr "<span>Lesquelles sont jaunes ?</span><br/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<span>Which is yellow?</span><br/>"
+msgstr "<span>Laquelle est jaune ?</span><br/>"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_positive_len_max
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_positive_len_min
+msgid "A length must be positive!"
+msgstr "Une longueur doit être positive !"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
+msgid "A problem has occurred"
+msgstr "Un problème est survenu"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#, python-format
+msgid "A question can either be skipped or answered, not both."
+msgstr "Une question peut être ignorée ou répondue, mais pas les deux."
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_conditional_question__operator__and
+msgid "AND"
+msgstr "ET"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__access_mode
+msgid "Access Mode"
+msgstr "Mode d'accès"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__access_token
+msgid "Access Token"
+msgstr "Jeton d'accès"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_survey_access_token_unique
+msgid "Access token should be unique"
+msgstr "Le jeton d'accès doit être unique"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_needaction
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_exception_decoration
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Activité exception décoration"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_state
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_state
+msgid "Activity State"
+msgstr "Status de l'activité"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_type_icon
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Add a question"
+msgstr "Ajouter une question"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Add a section"
+msgstr "Ajouter une section"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
+#, python-format
+msgid "Add condition"
+msgstr "Ajouter une condition"
+
+#. module: of_survey
+#: model:res.groups,name:of_survey.group_of_survey_manager
+msgid "Administrator"
+msgstr "Administrateur"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__questions_selection__all
+msgid "All questions"
+msgstr "Toutes les questions"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_user_input_unique_token
+msgid "An access token must be unique!"
+msgstr "Un jeton d'accès doit être unique !"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+msgid "Answer"
+msgstr "Réponse"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__answer_type
+msgid "Answer Type"
+msgstr "Type de réponse"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__answer_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__user_input_line_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__user_input_line_ids
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+msgid "Answers"
+msgstr "Réponses"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_answer_count
+msgid "Answers Count"
+msgstr "Nombre de réponses"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__access_mode__public
+msgid "Anyone with the link"
+msgstr "Toute personne avec le lien"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_attachment_count
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__nickname
+msgid ""
+"Attendee nickname, mainly used to identify them in the survey session "
+"leaderboard."
+msgstr ""
+"Surnom du participant, principalement utilisé pour l'identifier dans le "
+"classement de la session de Questionnaire."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+msgid "Attendees are answering the question..."
+msgstr "Les participants répondent à la question..."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__background_image
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image
+msgid "Background Image"
+msgstr "Image d'arrière-plan"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__background_image_url
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image_url
+msgid "Background Url"
+msgstr "URL de l'arrière-plan"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Choices"
+msgstr "Choix"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__color
+msgid "Color Index"
+msgstr "Couleur"
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.action_of_survey_question_form
+msgid "Come back once you have added questions to your Surveys."
+msgstr ""
+"Revenez une fois que vous avez ajouté des questions à vos Questionnaires."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__comments_message
+msgid "Comment Message"
+msgstr "Commentaire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__comment_count_as_answer
+msgid "Comment is an answer"
+msgstr "Le commentaire est une réponse"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input__state__done
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Completed"
+msgstr "Terminé"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__is_conditional
+msgid "Conditional Display"
+msgstr "Affichage conditionnel"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__conditional_domain
+msgid "Conditional Domain"
+msgstr "Domaine conditionnel"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__conditional_questions
+msgid "Conditional questions"
+msgstr "Questions conditionnelles"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__conditions
+msgid "Conditions"
+msgstr ""
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Congratulations! You are now ready to collect feedback like a pro :-)"
+msgstr ""
+"Toutes nos félicitations ! Vous êtes maintenant prêt à recueillir des "
+"feedbacks comme un pro :-)"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Constraints"
+msgstr "Contraintes"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__partner_id
+msgid "Contact"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__has_conditional_questions
+msgid "Contains conditional questions"
+msgstr "Contient des questions conditionnelles"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid "Continue"
+msgstr "Continuer"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
+msgid "Continue here"
+msgstr "Continuer ici"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_session_manage.js:0
+#, python-format
+msgid "Copied !"
+msgstr "Copié !"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__is_correct
+msgid "Correct"
+msgstr "Bonne réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Correct Answer"
+msgstr "Bonne réponse"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__answer_date
+msgid "Correct date answer"
+msgstr "Réponse date correcte"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__answer_date
+msgid "Correct date answer for this question."
+msgstr "Réponse de date correcte pour cette question."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "Creating test token is not allowed for you."
+msgstr "La création d'un jeton de test n'est pas autorisée pour vous."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid ""
+"Creating token for anybody else than employees is not allowed for internal "
+"surveys."
+msgstr ""
+"La création de jeton pour toute personne autre que les employés n'est pas "
+"autorisée pour les Questionnaires internes."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "Creating token for closed/archived surveys is not allowed."
+msgstr ""
+"La création de jetons pour les Questionnaires fermés/archivés n'est pas "
+"autorisée."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid ""
+"Creating token for external people is not allowed for surveys requesting "
+"authentication."
+msgstr ""
+"La création de jeton pour des personnes externes n'est pas autorisée pour "
+"les Questionnaires demandant une authentification."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_id
+msgid "Current Question"
+msgstr "Question actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_start_time
+msgid "Current Question Start Time"
+msgstr "Heure de début de la question actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_start_time
+msgid "Current Session Start Time"
+msgstr "Heure de début de la session actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__date
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__date
+msgid "Date"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_date
+msgid "Date answer"
+msgstr "Date de la réponse"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__default_date
+msgid "Default Date"
+msgstr "Date par défaut"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__default_text
+msgid "Default Text"
+msgstr "Texte par défaut"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__description
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__description
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Description"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.survey_user_input_line_action
+#: model:ir.ui.menu,name:of_survey.of_menu_survey_response_line_form
+msgid "Detailed Answers"
+msgstr "Réponses détaillées"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__progression_mode
+msgid "Display Progress as"
+msgstr "Afficher la progression comme"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
+msgid "Edit in backend"
+msgstr "Editer dans le backend"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__email
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Email"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__description_done
+msgid "End Message"
+msgstr "Message de fin"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__end_datetime
+msgid "End date and time"
+msgstr "Date et heure de fin"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "Enter Session Code"
+msgstr "Entrer le code de la session"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__constr_error_msg
+msgid "Error message"
+msgstr "Message d'erreur"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Exclude Tests"
+msgstr "Exclure les tests"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_session_manage.js:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#, python-format
+msgid "Final Leaderboard"
+msgstr "Classement final"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_follower_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_partner_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_type_icon
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__text_box
+msgid "Free Text"
+msgstr "Texte libre"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_text_box
+msgid "Free Text answer"
+msgstr "Réponse en texte libre"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Group By"
+msgstr "Regrouper par"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__has_message
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Help Participants know what to write"
+msgstr "Aidez les participants à savoir quoi écrire"
+
+#. module: of_survey
+#: model:ir.module.category,description:of_survey.module_category_marketing_of_surveys
+msgid "Helps you manage your OpenFire survey"
+msgstr "Vous aide à gérer votre Questionnaire OpenFire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__id
+msgid "ID"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_exception_icon
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_exception_icon
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__access_token
+msgid "Identification token"
+msgstr "Jeton d'identification"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__progression_mode
+msgid ""
+"If Number is selected, it will display the number of questions answered on "
+"the total number of question to answer."
+msgstr ""
+"Si Nombre est sélectionné, il affichera le nombre de questions auxquelles "
+"vous avez répondu par rapport au nombre total de questions auxquelles il "
+"faut encore répondre."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_needaction
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_error
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_email
+msgid ""
+"If checked, this option will save the user's answer as its email address."
+msgstr ""
+"Si cochée, cette option enregistrera la réponse de l'utilisateur sous son "
+"adresse email."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_nickname
+msgid "If checked, this option will save the user's answer as its nickname."
+msgstr ""
+"Si coché, cette option enregistrera la réponse de l'utilisateur sous son "
+"surnom."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__is_conditional
+msgid ""
+"If checked, this question will be displayed only\n"
+"        if the specified conditional answer have been selected in a previous question"
+msgstr ""
+"Si coché, cette question sera affichée uniquement\n"
+"si la réponse conditionnelle spécifiée a été sélectionnée dans une question précédente"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_can_go_back
+msgid "If checked, users can go back to previous pages."
+msgstr "Si coché, les utilisateurs peuvent revenir aux pages précédentes."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_login_required
+msgid ""
+"If checked, users have to login before answering even with a valid token."
+msgstr ""
+"Si coché, les utilisateurs doivent se connecter avant de répondre, même avec"
+" un jeton valide."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "If other, please specify:"
+msgstr "Si autre, veuillez préciser :"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__questions_selection
+msgid ""
+"If randomized is selected, add the number of random questions next to the "
+"section."
+msgstr ""
+"Si aléatoire est sélectionné, ajoutez le nombre de questions aléatoires à "
+"côté de la section."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__questions_selection
+msgid ""
+"If randomized is selected, you can configure the number of random questions "
+"by section. This mode is ignored in live session."
+msgstr ""
+"Si aléatoire est sélectionné, vous pouvez configurer le nombre de questions "
+"aléatoires par section. Ce mode est ignoré dans la session en direct."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_image
+msgid "Image"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_image_filename
+msgid "Image Filename"
+msgstr "Nom du fichier image"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_image_zoomer_templates.xml:0
+#, python-format
+msgid "Image Zoom Dialog"
+msgstr "Boite de dialogue du zoom sur image"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input__state__in_progress
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "In Progress"
+msgstr "En cours"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_email
+msgid "Input must be an email"
+msgstr "La saisie doit contenir une adresse email"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__intervention_survey
+msgid "Intervention Survey"
+msgstr "Questionnaire d'intervention"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__invite_token
+msgid "Invite token"
+msgstr "Jeton d'invitation"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__access_mode__token
+msgid "Invited people only"
+msgstr "Personnes invitées uniquement"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_is_follower
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__is_page
+msgid "Is a page?"
+msgstr "Est une page ?"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__is_default
+msgid "Is default"
+msgstr "Est par défaut"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__is_session_answer
+msgid "Is in a Session"
+msgstr "Est dans une session"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__is_session_answer
+msgid "Is that user input part of a survey session or not."
+msgstr ""
+"Cette entrée de l'utilisateur fait-elle partie d'un Questionnaire ou non ?"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "Join Session"
+msgstr "Rejoindre la session"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__sequence
+msgid "Label Sequence order"
+msgstr "Ordre séquentiel d'étiquette"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__suggested_answer_ids
+msgid "Labels used for proposed choices: simple choice, multiple choice"
+msgstr ""
+"Étiquettes utilisées pour les choix proposés : choix simple, choix multiple "
+"et colonnes de matrice"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__last_displayed_page_id
+msgid "Last displayed question/page"
+msgstr "Dernière question/page affichée"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Late Activities"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "Launch Session"
+msgstr "Lancer la session"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Layout"
+msgstr "Agencement"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__lead_opportunity
+msgid "Lead/Opportunity"
+msgstr "Piste/Opportunité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+msgid "Leaderboard"
+msgstr "Classement"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Let's get started!"
+msgstr "Commençons !"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Let's have a look at your answers!"
+msgstr "Jetons un œil à vos réponses !"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Let's open the survey you just submitted."
+msgstr "Ouvrons le Questionnaire que vous venez de soumettre."
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Load a <b>sample Survey</b> to get started quickly."
+msgstr "Chargez <b>un exemple de Questionnaire</b> pour commencer rapidement."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_auth_required
+msgid "Login required"
+msgstr "Authentification requise"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_main_attachment_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Pièce jointe principale"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__constr_mandatory
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Mandatory Answer"
+msgstr "Réponse obligatoire"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_date
+msgid "Max date cannot be smaller than min date!"
+msgstr "La date maximale ne peut pas être inférieure à la date minimale !"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_datetime
+msgid "Max datetime cannot be smaller than min datetime!"
+msgstr "La date maximale ne peut pas être inférieure à la date minimale !"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_length
+msgid "Max length cannot be smaller than min length!"
+msgstr "La longueur maximale ne peut pas être inférieure à la longueur minimale !"
+
+#. module: of_survey
+#: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_float
+msgid "Max value cannot be smaller than min value!"
+msgstr "La valeur maximale ne peut pas être inférieure à la valeur minimale !"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_max_date
+msgid "Maximum Date"
+msgstr "Date maximum"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_max_datetime
+msgid "Maximum Datetime"
+msgstr "Datetime maximum"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_length_max
+msgid "Maximum Text Length"
+msgstr "Longueur de texte maximale"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_max_float_value
+msgid "Maximum value"
+msgstr "Valeur maximale"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
+msgid "Maybe you were looking for"
+msgstr "Peut-être cherchiez-vous"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_has_error
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_min_date
+msgid "Minimum Date"
+msgstr "Date minimum"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_min_datetime
+msgid "Minimum Datetime"
+msgstr "Datetime minimum"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_length_min
+msgid "Minimum Text Length"
+msgstr "Longueur de texte minimale"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_min_float_value
+msgid "Minimum value"
+msgstr "Valeur minimale"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__text_box
+msgid "Multiple Lines Text Box"
+msgstr "Zone de texte à plusieurs lignes"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Multiple choice with multiple answers"
+msgstr "Choix multiple avec plusieurs réponses"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Multiple choice with one answer"
+msgstr "Choix multiple avec une seule réponse"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__multiple_choice
+msgid "Multiple choice: multiple answers allowed"
+msgstr "Choix multiple : plusieurs réponses autorisées"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__simple_choice
+msgid "Multiple choice: only one answer"
+msgstr "Choix multiple : une seule réponse"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__my_activity_date_deadline
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "New"
+msgstr "Nouveau"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_calendar_event_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_date_deadline
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de l'activité suivante"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_summary
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_type_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__nickname
+msgid "Nickname"
+msgstr "Surnom"
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.action_of_survey_question_form
+msgid "No Questions yet!"
+msgstr "Pas encore de questions !"
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.of_action_survey_form
+msgid "No Survey Found"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.action_survey_user_input
+msgid "No answers yet!"
+msgstr "Pas encore de réponses !"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
+msgid "No question yet, come back later."
+msgstr "Pas encore de question, revenez plus tard."
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.survey_question_answer_action
+msgid "No survey labels found"
+msgstr "Pas d'étiquettes de Questionnaire trouvées"
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.survey_user_input_line_action
+msgid "No user input lines found"
+msgstr "Aucune ligne de saisie pour l'utilisateur trouvée"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input__state__new
+msgid "Not started yet"
+msgstr "Pas encore commencé"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Now, use this shortcut to go back to the survey."
+msgstr "Maintenant, utilisez ce raccourci pour revenir au Questionnaire."
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__progression_mode__number
+msgid "Number"
+msgstr "Nombre"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_needaction_counter
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_has_error_counter
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_needaction_counter
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_error_counter
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_conditional_question__operator__or
+msgid "OR"
+msgstr "OU"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__questions_layout__page_per_question
+msgid "One page per question"
+msgstr "Une page par question"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__questions_layout__page_per_section
+msgid "One page per section"
+msgstr "Une page par section"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__questions_layout__one_page
+msgid "One page with all the questions"
+msgstr "Une page avec toutes les questions"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Only a single question left!"
+msgstr "Plus qu'une seule question !"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "Oops! No survey matches this code."
+msgstr "Oups ! Aucun Questionnaire ne correspond à ce code."
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/question_page/description_page_field.xml:0
+#, python-format
+msgid "Open section"
+msgstr "Section ouverte"
+
+#. module: of_survey
+#: model:ir.module.category,name:of_survey.module_category_marketing_of_surveys
+msgid "OpenFire Survey"
+msgstr "Questionnaire OpenFire"
+
+#. module: of_survey
+#: model:ir.ui.menu,name:of_survey.menu_of_survey_form
+#: model:ir.ui.menu,name:of_survey.menu_of_surveys_main
+msgid "OpenFire Surveys"
+msgstr "Questionnaires"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__operator
+msgid "Operator"
+msgstr "Opérateur"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Options"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__page_id
+msgid "Page"
+msgstr ""
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "Page id is needed for question layout 'page_per_section'"
+msgstr "L'identifiant de la page est nécessaire pour la mise en page 'page_par_section'"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__page_ids
+msgid "Pages"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__questions_layout
+msgid "Pagination"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Participant"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.action_survey_user_input
+#: model:ir.ui.menu,name:of_survey.menu_of_survey_type_form1
+msgid "Participations"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid "Pay attention to the host screen until the next question."
+msgstr "Soyez attentif à l'écran de votre hôte jusqu'à la prochaine question."
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__progression_mode__percent
+msgid "Percentage left"
+msgstr "Pourcentage restant"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__question_placeholder
+msgid "Placeholder"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
+msgid ""
+"Please make sure you have at least one question in your survey. You also "
+"need at least one section if you chose the \"Page per section\" layout.<br/>"
+msgstr ""
+"Veuillez vous assurer d'avoir au moins une question dans votre "
+"Questionnaire. Vous avez également besoin d'au moins une section si vous "
+"avez choisi la mise en page \"Page par section\". <br/>"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__predefined_question_ids
+msgid "Predefined Questions"
+msgstr "Questions prédéfinies"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+msgid "Print"
+msgstr "Imprimer"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__question_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_id
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Question"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Question & Pages"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_form
+msgid "Question Answer Form"
+msgstr "Formulaire de réponse aux questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_answer_count
+msgid "Question Answers Count"
+msgstr "Nombre de réponses aux questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__questions_selection
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__questions_selection
+msgid "Question Selection"
+msgstr "Sélection de questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__question_type
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_type
+msgid "Question Type"
+msgstr "Type de question"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "Question id is needed for question layout 'page_per_question'"
+msgstr ""
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#, python-format
+msgid "Question type should be empty for these pages: %s"
+msgstr "Le type de question doit être vide pour ces pages : %s"
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.action_of_survey_question_form
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__question_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_ids
+#: model:ir.ui.menu,name:of_survey.of_menu_of_survey_question_form1
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Questions"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.ui.menu,name:of_survey.of_survey_menu_questions
+msgid "Questions & Answers"
+msgstr "Questions & Réponses"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Ready to change the way you <b>gather data</b>?"
+msgstr "Prêt à changer votre façon de <b>collecter des données</b> ?"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_login_required
+msgid "Require Login"
+msgstr "Connexion requise"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__user_id
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_user_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__save_as_email
+msgid "Save as user email"
+msgstr "Enregistrer comme email de l'utilisateur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__save_as_nickname
+msgid "Save as user nickname"
+msgstr "Enregistrer comme surnom de l'utilisateur"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search
+msgid "Search Label"
+msgstr "Chercher une étiquette"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+msgid "Search Question"
+msgstr "Chercher une question"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Search Survey User Inputs"
+msgstr "Rechercher des entrées des utilisateurs du Questionnaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
+msgid "Search User input lines"
+msgstr "Chercher une ligne d'entrée utilisateur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__page_id
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Section"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_and_page_ids
+msgid "Sections and Questions"
+msgstr "Sections et Questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__sequence
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__comments_allowed
+msgid "Show Comments Field"
+msgstr "Afficher le champ Commentaires"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
+#, python-format
+msgid "Show Question if"
+msgstr "Afficher la question si"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Show all records which has next action date is before today"
+msgstr "Afficher tous les enregistrements dont la date de la prochaine action est antérieure à aujourd'hui"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__char_box
+msgid "Single Line Text Box"
+msgstr "Zone de texte à une ligne"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__skipped
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_page_print
+#, python-format
+msgid "Skipped"
+msgstr "Ignoré"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_start
+msgid "Start Survey"
+msgstr "Démarrer le Questionnaire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__start_datetime
+msgid "Start date and time"
+msgstr "Date et heure de début"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_state
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid "Submit"
+msgstr "Soumettre"
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.survey_question_answer_action
+#: model:ir.ui.menu,name:of_survey.of_menu_survey_label_form1
+msgid "Suggested Values"
+msgstr "Valeurs suggérées"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__suggested_answer_id
+msgid "Suggested answer"
+msgstr "Réponse suggérée"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value
+msgid "Suggested value"
+msgstr "Valeur suggérée"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__suggestion
+msgid "Suggestion"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__survey_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__survey_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__survey_id
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_tree
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Survey"
+msgstr "Questionnaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_response_line_view_tree
+msgid "Survey Answer Line"
+msgstr "Ligne de réponses au Questionnaire"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_conditional_question
+msgid "Survey Conditional Question"
+msgstr "Question conditionnelle du Questionnaire"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_question_answer
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_tree
+msgid "Survey Label"
+msgstr "Étiquette du Questionnaire"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input.py:0
+#, python-format
+msgid "Survey Participant"
+msgstr "Participant du Questionnaire"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_question
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_tree
+msgid "Survey Question"
+msgstr "Question du Questionnaire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__title
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Survey Title"
+msgstr "Nom"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__survey_type
+msgid "Survey Type"
+msgstr "Type de Questionnaire"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_user_input
+msgid "Survey User Input"
+msgstr "Entrée utilisateur du Questionnaire"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_user_input_line
+msgid "Survey User Input Line"
+msgstr "Ligne d'entrée utilisateur du Questionnaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_tree
+msgid "Survey User inputs"
+msgstr "Entrées utilisateur du Questionnaire"
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.of_action_survey_form
+msgid "Surveys"
+msgstr "Questionnaires"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_button_retake
+msgid "Take Again"
+msgstr "Refaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Test"
+msgstr "Tester"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__test_entry
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+msgid "Test Entry"
+msgstr "Entrée test"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_survey.py:0
+#, python-format
+msgid "Test Survey"
+msgstr "Questionnaire de test"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
+msgid "Tests Only"
+msgstr "Uniquement les tests"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__char_box
+msgid "Text"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_char_box
+msgid "Text answer"
+msgstr "Réponse texte"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_done
+msgid "Thank you!"
+msgstr "Merci !"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#, python-format
+msgid "The answer must be in the right type"
+msgstr "La réponse doit être du bon type"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#, python-format
+msgid "The answer you entered is not valid."
+msgstr "La réponse saisie n'est pas valide."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/tests/test_survey.py:0
+#, python-format
+msgid "The condition of Q3 is not activated and should be"
+msgstr "La condition de Q3 n'est pas activée et devrait l'être"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/tests/test_survey.py:0
+#, python-format
+msgid "The condition of Q4 is activated and should not be"
+msgstr "La condition de Q4 est activée et ne devrait pas l'être"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/tests/test_survey.py:0
+#, python-format
+msgid "The condition of Q4 is not activated and should be"
+msgstr "La condition de Q4 n'est pas activée et devrait l'être"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_id
+msgid "The current question of the survey session."
+msgstr "La question actuelle du Questionnaire."
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "The date you selected is greater than the maximum date: "
+msgstr ""
+"La date que vous avez sélectionnée est supérieure à la date maximale :"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "The date you selected is lower than the minimum date: "
+msgstr ""
+"La date que vous avez sélectionnée est inférieure à la date minimale :"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__description
+msgid ""
+"The description will be displayed on the home page of the survey. You can "
+"use this to give the purpose and guidelines to your candidates before they "
+"start it."
+msgstr ""
+"La description sera affichée sur la page d'accueil du Questionnaire. Vous "
+"pouvez l'utiliser pour donner le but et les directives à vos candidats avant"
+" qu'ils ne commencent."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
+msgid "The page you were looking for could not be authorized."
+msgstr "Vous n'êtes pas autorisé à accéder à la page que vous recherchez."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "The session did not start yet."
+msgstr "La session n'a pas encore commencé."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_start
+msgid "The session will begin automatically when the host starts."
+msgstr "La session commencera automatiquement au démarrage de l'hôte."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/controllers/main.py:0
+#, python-format
+msgid "The survey has already started."
+msgstr "Le Questionnaire a déjà commencé."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_start_time
+msgid ""
+"The time at which the current question has started, used to handle the timer"
+" for attendees."
+msgstr ""
+"L'heure à laquelle la question en cours a commencé, utilisée pour gérer le "
+"minuteur des participants."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
+msgid "There was an error during the validation of the survey."
+msgstr "Une erreur s'est produite lors de la validation du Questionnaire."
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/tests/test_survey.py:0
+#, python-format
+msgid "This answer must be an email address"
+msgstr "La réponse doit être une adresse email"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "This answer must be an email address."
+msgstr "Cette réponse doit être une adresse email."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_button_form_view
+msgid "This is a Test Survey."
+msgstr "Ceci est un Questionnaire test."
+
+#. module: of_survey
+#. odoo-python
+#. odoo-javascript
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#: code:addons/of_survey/tests/test_survey.py:0
+#, python-format
+msgid "This is not a date"
+msgstr "Ceci n'est pas une date"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__description_done
+msgid "This message will be displayed when survey is completed"
+msgstr "Ce message sera affiché lorsque le Questionnaire est terminé"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#, python-format
+msgid "This question requires an answer."
+msgstr "Cette question requiert une réponse."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_page_print
+msgid "This question was skipped"
+msgstr "Cette question a été ignorée"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_closed_expired
+msgid "This survey is now closed. Thank you for your interest !"
+msgstr "Ce Questionnaire est maintenant terminé. Merci pour votre intérêt !"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_auth_required
+msgid "This survey is open only to registered people. Please"
+msgstr "Ce Questionnaire n'est ouvert qu'aux utilisateurs inscrits. Veuillez"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__time_limit
+msgid "Time limit (seconds)"
+msgstr "Limite de temps (secondes)"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__title
+msgid "Title"
+msgstr "Titre"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
+msgid "To join:"
+msgstr "À rejoindre :"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
+msgid ""
+"To take this survey, please close all other tabs on <strong class=\"text-"
+"danger\"/>."
+msgstr ""
+"Pour répondre à ce Questionnaire, veuillez fermer tous les autres onglets "
+"sur <strong class=\"text-danger\"/>."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Today Activities"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__triggering_question_id
+msgid "Triggering Question"
+msgstr "Question déclenchante"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+msgid "Type"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_exception_decoration
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__suggested_answer_ids
+msgid "Types of answers"
+msgstr "Réponses"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+msgid "Upcoming Activities"
+msgstr ""
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Use the breadcrumbs to quickly go back to the dashboard."
+msgstr "Utilisez le fil d'Ariane pour revenir rapidement au tableau de bord."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__description
+msgid ""
+"Use this field to add additional explanations about your question or to "
+"illustrate it with pictures or a video"
+msgstr ""
+"Utilisez ce champ pour ajouter des explications supplémentaires à propos de "
+"votre question ou pour l'illustrer avec des images ou une vidéo"
+
+#. module: of_survey
+#: model:res.groups,name:of_survey.group_of_survey_user
+msgid "User"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__user_input_id
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
+msgid "User Input"
+msgstr "Entrée pour l'utilisateur"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_form
+msgid "User input line details"
+msgstr "Détails de la ligne d'entrée utilisateur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__user_input_ids
+msgid "User responses"
+msgstr "Réponses de l'utilisateur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_can_go_back
+msgid "Users can go back"
+msgstr "Les utilisateurs peuvent revenir en arrière"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_can_signup
+msgid "Users can signup"
+msgstr "Les utilisateurs peuvent s'inscrire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_required
+msgid "Validate entry"
+msgstr "Valider l'entrée"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_error_msg
+msgid "Validation Error message"
+msgstr "Message d'erreur de validation"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
+msgid ""
+"We have registered your answer! Please wait for the host to go to the next "
+"question."
+msgstr ""
+"Nous avons enregistré votre réponse ! Veuillez attendre que l'hôte passe à "
+"la question suivante."
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
+#, python-format
+msgid "Whenever you pick an answer, Odoo saves it for you."
+msgstr ""
+"Chaque fois que vous choisissez une réponse, Odoo l'enregistre pour vous."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid ""
+"YYYY-MM-DD\n"
+"                                        <i class=\"fa fa-calendar\" role=\"img\" aria-label=\"Calendar\" title=\"Calendar\"/>"
+msgstr ""
+"AAAA-MM-JJ\n"
+"                                        <i class=\"fa fa-calendar\" role=\"img\" aria-label=\"Calendar\" title=\"Calendrier\"/>"
+
+#. module: of_survey
+#: model_terms:ir.actions.act_window,help:of_survey.action_survey_user_input
+msgid ""
+"You can share your links through different means: email, invite shortcut, "
+"live presentation, ..."
+msgstr ""
+"Vous pouvez partager vos liens par différents moyens : email, raccourci "
+"d'invitation, présentation en direct, ..."
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_image_zoomer_templates.xml:0
+#, python-format
+msgid "Zoom in"
+msgstr "Zoomer"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_image_zoomer_templates.xml:0
+#, python-format
+msgid "Zoom out"
+msgstr "Dézoomer"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_image_zoomer_templates.xml:0
+#, python-format
+msgid "Zoomed Image"
+msgstr "Image zoomée"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
+#, python-format
+msgid "answer"
+msgstr "répond"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_progression
+msgid "answered"
+msgstr "répondu"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_image_zoomer_templates.xml:0
+#, python-format
+msgid "close"
+msgstr "fermer"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "e.g. \"The following Survey will help us...\""
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "e.g. \"What is the...\""
+msgstr "par ex. \"Quel est le...\""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
+msgid "e.g. 4812"
+msgstr "par ex. 4812"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "e.g. Guidelines, instructions, picture, ... to help attendees answer"
+msgstr ""
+"par ex. Lignes directrices, instructions, image, ... pour aider les "
+"participants à répondre"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "e.g. Satisfaction Survey"
+msgstr ""
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#, python-format
+msgid "if "
+msgstr "Si "
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_auth_required
+msgid "log in"
+msgstr "vous identifier"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_progression
+msgid "of"
+msgstr "de"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "or press CTRL+Enter"
+msgstr "ou appuyez sur CTRL+Enter"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "or press Enter"
+msgstr "ou appuyez sur Enter"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "or press ⌘+Enter"
+msgstr "ou appuyez sur ⌘+Enter"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_progression
+msgid "pages"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_closed_expired
+msgid "survey expired"
+msgstr "Questionnaire expiré"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
+msgid "survey is empty"
+msgstr "le Questionnaire est vide"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
+#, python-format
+msgid "the question"
+msgstr "la question"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
+msgid "this page"
+msgstr "cette page"

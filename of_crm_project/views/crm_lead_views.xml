@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_project_crm_lead_view_form" model="ir.ui.view">
+        <field name="name">of.crm.project.crm.lead.form.view</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- "Notebook" part -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Partner" colspan="2">
+                    <group>
+                        <group string="Customer" name="customer">
+                            <field name="of_interlocutor"/>
+                            <field name="of_decision_maker"/>
+                        </group>
+                        <group string="Externals" name="externals">
+                            <field name="of_architect"/>
+                            <field name="of_labor_force"/>
+                            <field name="of_prime_contractor"/>
+                            <field name="of_engineering_office"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="project" string="Project">
+                    <group>
+                        <group>
+                            <field name="of_survey_id" domain="[('survey_type','=','lead_opportunity')]"/>
+                        </group>
+                        <group attrs="{'invisible': [('of_survey_id','=',False)]}">
+                            <button class="btn btn-primary" name="open_survey" type="object" string="Reply"/>
+                        </group>
+                    </group>
+
+                    <field name="of_question_answers_ids">
+                        <tree create="false" edit="false" delete="false" decoration-info="is_page">
+                            <field name="question_id"/>
+                            <field name="answers"/>
+                            <field name="is_page" invisible="1"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <field name="question_id" readonly="1"/>
+                                <field name="answers" readonly="1"/>
+                            </group>
+                        </form>
+                    </field>
+
+                    <group>
+                        <field name="of_survey_user_input" invisible="1"/>
+                    </group>
+                </page>
+            </xpath>
+            <!-- /"Notebook" part -->
+        </field>
+    </record>
+
+    <record id="of_crm_lead_view_form" model="ir.ui.view">
+        <field name="name">of.crm.project.lead.form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="of_crm.of_crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='opportunity_followup']//label[@for='date_deadline']" position="before">
+                <field name="of_date_project"/>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem name="Surveys" id="menu_of_survey_survey_form_crm" action="of_survey.of_action_survey_form" parent="crm.crm_menu_config" sequence="11"/>
+
+</odoo>

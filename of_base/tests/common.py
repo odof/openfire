@@ -30,18 +30,20 @@ class TestOFBaseCommon(TransactionCase):
         )
 
         # Customer data
-        cls.customer_a = cls.env['res.partner'].create(
+        cls.customer_a = cls.create_partner(
             {
                 'name': "Partner A",
                 'company_id': cls.company_fr.id,
                 'customer_rank': 1,
+                'email': 'test-customer-a@openfire.fr',
             }
         )
-        cls.supplier_a = cls.env['res.partner'].create(
+        cls.supplier_a = cls.create_partner(
             {
                 'name': "Supplier A",
                 'company_id': cls.company_fr.id,
                 'supplier_rank': 1,
+                'email': 'test-supplier-a@openfire.fr',
             }
         )
         cls.supplier_b = cls.env['res.partner'].create(
@@ -60,4 +62,6 @@ class TestOFBaseCommon(TransactionCase):
     def create_partner(cls, values):
         if 'company_id' not in values:
             values['company_id'] = cls.company_fr.id
+        if 'email' not in values:
+            values['email'] = 'test-partner@openfire.fr'
         return cls.env['res.partner'].create(values)

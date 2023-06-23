@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="of_survey.ConditionalQuestionsQuestion" owl="1">
+        <select name="question" class="o_input" t-on-change="(ev) => this.onChangeQuestion(ev,conditional)">
+            <option value="0"></option>
+            <t t-foreach="questions" t-as="question" t-key="question.data.id">
+                <t t-if="conditional.data.question_id">
+                    <t t-if="question.data.id != conditional.data.question_id[0]">
+                        <t t-if="conditional.data.triggering_question_id and conditional.data.triggering_question_id[0] == question.data.id">
+                            <option t-att-value="question.data.id" selected="selected"><t t-esc="question.data.title"/></option>
+                        </t>
+                        <t t-else="">
+                            <option t-att-value="question.data.id"><t t-esc="question.data.title"/></option>
+                        </t>
+                    </t>
+                </t>
+                <t t-else="">
+                    <option t-att-value="question.data.id"><t t-esc="question.data.title"/></option>
+                </t>
+            </t>
+        </select>
+    </t>
+
+    <t t-name="of_survey.ConditionalQuestionsAnswers" owl="1">
+        <div class="row">
+            <div class="col-5">
+                <t t-if="conditional.data.triggering_question_id">
+                    <select name="answers" class="o_input" t-on-change="(ev) => this.onChangeAnswer(ev,conditional)">
+                        <option value="0"></option>
+                        <t t-foreach="suggested_answers[conditional.data.triggering_question_id[0]]" t-as="answer_id" t-key="answer_id_index">
+                            <option t-att-value="answer_id"><t t-esc="all_answers[answer_id]"/></option>
+                        </t>
+                     </select>
+                </t>
+            </div>
+            <div class="col-7">
+                <t t-foreach="conditional.data.answer_ids.records" t-as="answer" t-key="answer_index">
+                <span class="badge rounded-pill d-inline-flex align-items-center mw-100"><t t-esc="all_answers[answer.data.id]"/> <a href="#" style="margin-left: 5px" class="fa fa-times" t-on-click.stop.prevent="(ev) => this.onDeleteAnswer(ev,answer,conditional)"/></span>
+                </t>
+            </div>
+        </div>
+    </t>
+
+
+    <t t-name="of_survey.ConditionalQuestions" owl="1">
+        <t t-foreach="conditionals" t-as="conditional" t-key="conditional.id">
+            <t t-if="conditional_first">
+                <div class="row">
+                    <div class="col-2 offset-1"><span class="o_form_label">Show Question if</span></div>
+                    <div class="col-2">
+                        <t t-call="of_survey.ConditionalQuestionsQuestion"/>
+                    </div>
+                    <div class="col-1">
+                        <span class="o_form_label">answer</span>
+                    </div>
+
+                    <div class="col-4">
+                        <t t-call="of_survey.ConditionalQuestionsAnswers"/>
+                    </div>
+                    <div class="col-1">
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.DeleteCondition(ev,conditional)" ><i class="fa fa-trash-o"></i></a>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <div class="row">
+                    <div class="col-1">
+                        <select name="operator" class="o_input" t-on-change.stop.prevent="(ev) => this.onChangeOperator(ev,conditional)">
+                            <t t-foreach="operators" t-as="operator" t-key="operator_index">
+                                <t t-if="conditional.data.operator">
+                                    <t t-if="conditional.data.operator == operator">
+                                        <option t-att-value="operator" selected="selected"><t t-esc="operator"/></option>
+                                    </t>
+                                    <t t-else="">
+                                        <option t-att-value="operator"><t t-esc="operator"/></option>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <option t-att-value="operator"><t t-esc="operator"/></option>
+                                </t>
+                            </t>
+                         </select>
+                    </div>
+                    <div class="col-2">
+                        <span class="o_form_label">the question</span>
+                    </div>
+                    <div class="col-2">
+                        <t t-call="of_survey.ConditionalQuestionsQuestion"/>
+                    </div>
+                    <div class="col-1">
+                        <span class="o_form_label">answer</span>
+                    </div>
+                    <div class="col-4">
+                        <t t-call="of_survey.ConditionalQuestionsAnswers"/>
+                    </div>
+                    <div class="col-1">
+                        <a href="#" t-on-click.stop.prevent="DeleteCondition"><i class="fa fa-trash-o"></i></a>
+                    </div>
+                </div>
+            </t>
+
+        </t>
+        <div class="row">
+            <div class="col-2"><a href="#" t-on-click.stop.prevent="AddCondition">Add condition</a></div>
+        </div>
+    </t>
+</templates>

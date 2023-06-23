@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="survey_fill_form_start" inherit_id="of_survey.survey_fill_form_start">
+        <xpath expr="//button" position="after">
+            <div class="show_start" t-attf-data-show="{{survey.show_start and 'yes' or 'no'}}"/>
+        </xpath>
+    </template>
+
+    <template id="survey_fill_form_done" inherit_id="of_survey.survey_fill_form_done">
+        <xpath expr="//div[@t-field='survey.description_done']" position="after">
+            <div class="row">
+                <div class="col">
+                    <div>
+                        <p>
+                            <a role="button" t-if="answer.lead_id"
+                                class="btn btn-primary btn-lg btn-end"
+                                t-attf-href="/web#id={{answer.lead_id.id}}&amp;model=crm.lead&amp;view_type=form">Finish</a>
+                            <a role="button" t-else=""
+                            class="btn btn-primary btn-lg btn-end"
+                            t-attf-href="/web#id={{survey.id}}&amp;model=of.survey.survey&amp;view_type=form">Finish</a>
+
+                            </p>
+                            <div class="show_end" t-attf-survey-id="{{survey.id}}" t-attf-crm-lead-id="{{answer.lead_id.id}}"
+                                t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}" t-attf-action-id="{{request.env.ref('crm.crm_lead_action_pipeline').id}}"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
