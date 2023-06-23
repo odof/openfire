@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Res Groups -->
+
+    <record id="group_of_eco_contribution" model="res.groups">
+        <field name="name">(OF) Configuration des éco-contributions</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Permet d'avoir accès à la configuration des éco-contribution</field>
+    </record>
+
+</odoo>
