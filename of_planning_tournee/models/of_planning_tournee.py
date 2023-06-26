@@ -57,9 +57,9 @@ class OFPlanningTournee(models.Model):
     date_min = fields.Date(related='date', string="Date min")
     date_max = fields.Date(related='date', string="Date max")
     state = fields.Selection(selection=[
-        ('draft', "Draft"),
-        ('full', "Full"),
-        ('confirmed', "Confirmed")], string="State", index=True, readonly=True, default='draft',
+        ('1-draft', "Draft"),
+        ('2-full', "Full"),
+        ('3-confirmed', "Confirmed")], string="State", index=True, readonly=True, default='1-draft',
         track_visibility='onchange', copy=False,
         help=" * 'Draft' : With remaining available slots, unconfirmed.\n"
              " * 'Full' : No slots available.\n"
@@ -835,16 +835,16 @@ class OFPlanningTournee(models.Model):
         """ Set the tour state to 'draft' if it is flagged as 'incomplete' and if the tour state is 'full'.
         We don't want to set the tour state to 'draft' if it is already at 'draft' or 'confirmed'.
         """
-        tours = self.filtered(lambda t: not t.is_full and t.state == 'full')
-        tours and tours.write({'state': 'draft'})
+        tours = self.filtered(lambda t: not t.is_full and t.state == '2-full')
+        tours and tours.write({'state': '1-draft'})
 
     @api.multi
     def _set_tour_to_full(self):
         """ Set the tour state to 'full' if it is flagged as 'complete' and if the tour state is 'draft'.
         We don't want to set the tour state to 'full' if it is already at 'full' or 'confirmed'.
         """
-        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == 'draft')
-        tours and tours.write({'state': 'full'})
+        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == '1-draft')
+        tours and tours.write({'state': '2-full'})
 
     @api.multi
     def _populate_tour_lines(self, delete_all=False, reset_sequence=True):
@@ -1076,21 +1076,21 @@ class OFPlanningTournee(models.Model):
         """ Confirm the tour.
         """
         self.ensure_one()
-        self.write({'state': 'confirmed'})
+        self.write({'state': '3-confirmed'})
 
     @api.multi
     def action_set_back_draft(self):
         """ Set the tour as fradt.
         """
         self.ensure_one()
-        self.write({'state': 'draft'})
+        self.write({'state': '1-draft'})
 
     @api.multi
     def action_set_back_full(self):
         """ Set the tour as full.
         """
         self.ensure_one()
-        self.write({'state': 'full'})
+        self.write({'state': '2-full'})
 
     @api.multi
     def action_ignore_alert_optimization_update(self):

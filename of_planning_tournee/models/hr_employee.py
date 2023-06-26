@@ -28,7 +28,7 @@ class HrEmployee(models.Model):
         if employees_address_changed:
             tours_to_update = self.env['of.planning.tournee'].search([
                 ('employee_id', 'in', employees_address_changed.ids),
-                ('state', '!=', 'confirmed'),
+                ('state', '!=', '3-confirmed'),
                 ('date', '>=', fields.Date.today()),
             ])
             # write address on tours will trigger a recomputation of OSRM route
