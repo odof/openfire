@@ -2,6 +2,9 @@
 <odoo>
 
     <template id="of_report_picking" inherit_id="stock.report_picking">
+        <xpath expr="//table[@t-if='o.pack_operation_ids']" position="before">
+            <h3>Produits réservés</h3>
+        </xpath>
         <xpath expr="//table[@t-if='o.pack_operation_ids']/thead/tr" position="inside">
             <th name="operation_state">
                 <strong>État</strong>
@@ -36,6 +39,7 @@
             </td>
         </xpath>
         <xpath expr="//table[@t-if='o.pack_operation_ids']" position="after">
+            <h3>Produits non réservés</h3>
             <t t-set="of_check" t-value="o.move_lines.filtered('of_check')"/>
             <table class="table table-condensed" t-if="o.move_lines">
                 <thead>
@@ -46,7 +50,7 @@
                         <th class="text-right"><strong>Qté(s) dispo(s)</strong></th>
                         <th><strong>Origine</strong></th>
                         <th t-if="of_check"><strong>Commande d'achat liée</strong></th>
-                        <th><strong>Etat</strong></th>
+                        <th><strong>État</strong></th>
                     </tr>
                 </thead>
                 <tbody>
