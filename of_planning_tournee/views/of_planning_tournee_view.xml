@@ -14,9 +14,9 @@
                 <header>
                     <button string="Confirm" name="action_confirm_tour" type="object" class="oe_highlight" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
                     <button string="Set back to draft" name="action_set_back_draft" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
-                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', 'draft')]}"/>
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', '1-draft')]}"/>
                     <button string="Set back to full" name="action_set_back_full" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
-                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', 'confirmed')]}"/>
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', '3-confirmed')]}"/>
                     <button string="Optimize" name="action_optimize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
                         groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
                     <button string="Reorganize" name="action_reorganize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
@@ -99,7 +99,7 @@
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
             <tree decoration-danger="(state=='full' or is_full==True) or is_blocked==True" decoration-warning="need_optimization_update"
-                    decoration-success="is_optimized" decoration-muted="state=='confirmed'" create="false" edit="false">
+                    decoration-success="is_optimized" decoration-muted="state=='3-confirmed'" create="false" edit="false">
                 <button icon="fa-exclamation-triangle" name="dummy" string="Need optimization update" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}" />
                 <button icon="fa-check" name="dummy" string="Optimized" attrs="{'invisible': [('is_optimized', '=', False)]}"/>
                 <field name="weekday"/>
