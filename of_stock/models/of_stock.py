@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import time
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 from odoo import api, fields, models, _, SUPERUSER_ID
 from odoo.tools import float_utils
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -10,10 +14,6 @@ from odoo.addons.stock.models.stock_inventory import Inventory
 from odoo.addons.stock.models.stock_quant import Quant
 from odoo.addons.stock.models.stock_move import StockMove
 import odoo.addons.decimal_precision as dp
-
-import time
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 
 @api.multi
@@ -1579,14 +1579,22 @@ class StockProductionLot(models.Model):
     @api.multi
     def name_get(self):
         location_id = self._context.get('prio_location_id')
+        internal = self._context.get('search_internal')
         if location_id:
             result = []
             for prod_lot in self:
                 est_prio = location_id in prod_lot.quant_ids.mapped('location_id').ids
-                result.append((prod_lot.id, "%s%s%s" % ('' if est_prio else '(',
-                                                        prod_lot.name,
-                                                        '' if est_prio else ')')))
+                name = "%s%s%s%s" % ('' if est_prio else '(', prod_lot.name, '' if est_prio else ')',
+                                     internal and prod_lot.of_internal_serial_number and \
+                                    " - " + prod_lot.of_internal_serial_number or '')
+                result.append((prod_lot.id, name))
             return result
+        elif internal:
+            result = []
+            for prod_lot in self:
+                name = "%s%s" % (prod_lot.name, internal and prod_lot.of_internal_serial_number and \
+                                 " - " + prod_lot.of_internal_serial_number or '')
+                result.append((prod_lot.id, name))
         return super(StockProductionLot, self).name_get()
 
     @api.model
@@ -1608,6 +1616,13 @@ class StockProductionLot(models.Model):
                 limit) or []
             return res
         return super(StockProductionLot, self).name_search(name, args, operator, limit)
+
+    @api.model
+    def _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        if self._context.get('search_internal') and name:
+            # name will be added to args in the super
+            args += ['|', ('of_internal_serial_number', operator, name)]
+        return super(StockProductionLot, self)._name_search(name, args, operator, limit, name_get_uid)
 
     @api.multi
     def generate_missing_internal_serial_number(self):

@@ -103,7 +103,7 @@
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_lot_serial_management', '=', True)]}</attribute>
-                <attribute name="context">{'prio_location_id': location_id}</attribute>
+                <attribute name="context">{'prio_location_id': location_id, 'search_internal': True}</attribute>
             </xpath>
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='product_qty']" position="after">
                 <field name="of_inventory_gap"/>
