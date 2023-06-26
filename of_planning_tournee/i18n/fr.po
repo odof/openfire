@@ -1560,6 +1560,11 @@ msgid "Search type"
 msgstr "Type de recherche"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_sector_kanban_names
+msgid "Sector names"
+msgstr "Noms des secteurs"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tour_planning_mass_sector_assignation_wizard_sector_id
 msgid "Sector to assign"
 msgstr "Secteur à assigner"

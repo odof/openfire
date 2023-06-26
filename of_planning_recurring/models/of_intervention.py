@@ -657,7 +657,7 @@ class OFPlanningIntervention(models.Model):
         """ Remove interventions from the tours lines where they are attached to.
         Only tours that are not done and that are in the future are updated.
         """
-        tours = self.mapped('tournee_ids').filtered(lambda t: t.state != 'done' and t.date >= fields.Date.today())
+        tours = self.mapped('tournee_ids').filtered(lambda t: t.date >= fields.Date.today())
         tours.mapped('tour_line_ids').filtered(lambda l: l.intervention_id in self).unlink()
         tours.action_compute_osrm_data()
 
@@ -666,7 +666,7 @@ class OFPlanningIntervention(models.Model):
         """ Add interventions to the tours lines.
         Only tours that are not done and that are in the future are updated.
         """
-        tours = self.mapped('tournee_ids').filtered(lambda t: t.state != 'done' and t.date >= fields.Date.today())
+        tours = self.mapped('tournee_ids').filtered(lambda t: t.date >= fields.Date.today())
         tours._populate_tour_lines()
         tours.action_compute_osrm_data()
 

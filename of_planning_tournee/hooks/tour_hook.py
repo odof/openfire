@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import logging
 from odoo import api, models
@@ -125,3 +126,14 @@ class HookOFPlanningTour(models.Model):
         # Remove the old field 'secteur_id'
         _logger.info("* Remove the old field 'secteur_id'")
         self._cr.execute('ALTER TABLE of_planning_tournee DROP COLUMN secteur_id;')
+
+    @api.model
+    def _update_version_10_0_4_0_0_hook(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_planning_tournee'), ('state', 'in', ['installed', 'to upgrade'])])
+        if module_self and module_self.latest_version and module_self.latest_version < '10.0.4.0.0':
+            # passage aux nouveaux états
+            cr = self._cr
+            cr.execute("UPDATE of_planning_tournee SET state = '1-draft' WHERE state = 'draft'")
+            cr.execute("UPDATE of_planning_tournee SET state = '2-full' WHERE state = 'full'")
+            cr.execute("UPDATE of_planning_tournee SET state = '3-confirmed' WHERE state = 'confirmed'")

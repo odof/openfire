@@ -14,9 +14,9 @@
                 <header>
                     <button string="Confirm" name="action_confirm_tour" type="object" class="oe_highlight" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
                     <button string="Set back to draft" name="action_set_back_draft" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
-                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', 'draft')]}"/>
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', '1-draft')]}"/>
                     <button string="Set back to full" name="action_set_back_full" type="object" groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"
-                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', 'confirmed')]}"/>
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', '3-confirmed')]}"/>
                     <button string="Optimize" name="action_optimize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
                         groups="of_planning.group_planning_intervention_responsible, of_planning.group_planning_intervention_manager"/>
                     <button string="Reorganize" name="action_reorganize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
@@ -98,8 +98,8 @@
         <field name="name">of.planning.tournee.tree</field>
         <field name="model">of.planning.tournee</field>
         <field name="arch" type="xml">
-            <tree decoration-danger="(state=='full' or is_full==True) or is_blocked==True" decoration-warning="need_optimization_update" 
-                    decoration-success="is_optimized" decoration-muted="state=='confirmed'" create="false" edit="false">
+            <tree decoration-danger="(state=='full' or is_full==True) or is_blocked==True" decoration-warning="need_optimization_update"
+                    decoration-success="is_optimized" decoration-muted="state=='3-confirmed'" create="false" edit="false">
                 <button icon="fa-exclamation-triangle" name="dummy" string="Need optimization update" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}" />
                 <button icon="fa-check" name="dummy" string="Optimized" attrs="{'invisible': [('is_optimized', '=', False)]}"/>
                 <field name="weekday"/>
@@ -121,6 +121,34 @@
         </field>
     </record>
 
+    <record id="of_planning_tournee_view_kanban" model="ir.ui.view">
+        <field name="name">of.planning.tournee.view.kanban</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state">
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="sector_kanban_names"/>
+                <field name="weekday"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong class="oe_partner_heading"><field name="weekday"/>&amp;nbsp;<field name="date"/></strong>
+                                <div>
+                                    <field name="employee_id"/>
+                                </div>
+                                <div class="o_kanban_footer">
+                                    <field name="sector_kanban_names" class="oe_right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="of_planning_tournee_view_filter" model="ir.ui.view">
         <field name="name">of.planning.tournee.filter</field>
         <field name="model">of.planning.tournee</field>
@@ -131,7 +159,7 @@
                     <field name="date_min" filter_domain="[('date','&gt;=',self)]"/>
                     <field name="date_max" filter_domain="[('date','&lt;=',self)]"/>
                     <field name="employee_id"/>
-                    <field name="sector_ids"/>
+                    <field name="sector_ids" filter_domain="[('sector_ids.name','ilike',self)]"/>
                     <field name="zip_id"/>
                     <separator/>
                     <filter name="not_full" string="Not full" icon="terp-accessories-archiver" domain="[('is_full', '=', False)]"/>
@@ -139,7 +167,18 @@
                     <filter name="not_empty" string="Not empty" domain="[('count_interventions', '>', 0)]"/>
                     <!-- "ignore_alert_optimization_update" not in domain to be able to see the tours that need to be optimized even if the user ignored alert  -->
                     <filter name="need_optimization_update" string="Need optimization update" domain="[('need_optimization_update', '=', True)]"/>
+                    <separator/>
+                    <filter string="Semaine en cours" name="this_week"
+                            domain="[('date', u'&gt;=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                     ('date', u'&lt;', (context_today() + relativedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="Mois en cours" name="this_month"
+                            domain="[('date', u'&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                     ('date', u'&lt;', (context_today() + relativedelta(months=1, day=1)).strftime('%Y-%m-%d'))]"/>
+
                 </group>
+                <group expand="0" string="Regrouper par..." name="group_by">
+                   <filter string="Secteur" icon="terp-partner" domain="[]" context="{'group_by' : 'gb_sector_id'}"/>
+               </group>
              </search>
         </field>
     </record>
@@ -333,7 +372,7 @@
         <field name="name">Préparation des tournées</field>
         <field name="res_model">of.planning.tournee</field>
         <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,form,kanban,pivot</field>
         <field name="view_id" ref="of_planning_tournee.of_planning_tournee_view_tree"/>
         <field name="context">{'search_default_filter_incomplet':1}</field>
     </record>

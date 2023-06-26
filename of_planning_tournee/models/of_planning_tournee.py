@@ -38,7 +38,7 @@ WEEKDAYS_TR = {
 
 class OFPlanningTournee(models.Model):
     _name = 'of.planning.tournee'
-    _inherit = 'of.map.view.mixin'
+    _inherit = ['of.map.view.mixin', 'of.readgroup']
     _description = "Tour"
     _order = 'date DESC'
 
@@ -57,9 +57,9 @@ class OFPlanningTournee(models.Model):
     date_min = fields.Date(related='date', string="Date min")
     date_max = fields.Date(related='date', string="Date max")
     state = fields.Selection(selection=[
-        ('draft', "Draft"),
-        ('full', "Full"),
-        ('confirmed', "Confirmed")], string="State", index=True, readonly=True, default='draft',
+        ('1-draft', "Draft"),
+        ('2-full', "Full"),
+        ('3-confirmed', "Confirmed")], string="State", index=True, readonly=True, default='1-draft',
         track_visibility='onchange', copy=False,
         help=" * 'Draft' : With remaining available slots, unconfirmed.\n"
              " * 'Full' : No slots available.\n"
@@ -74,6 +74,7 @@ class OFPlanningTournee(models.Model):
     sector_ids = fields.Many2many(
         comodel_name='of.secteur', relation='tour_sector_rel', column1='tour_id', column2='sector_id',
         string="Sectors", domain="[('type', 'in', ['tech', 'tech_com'])]")
+    sector_kanban_names = fields.Text(string=u"Sector names", compute='_compute_sector_kanban_names')
     zip_id = fields.Many2one(comodel_name='res.better.zip', string=u"Ville")
     epi_lat = fields.Float(string=u'Épicentre Lat', digits=(12, 12))
     epi_lon = fields.Float(string=u'Épicentre Lon', digits=(12, 12))
@@ -114,6 +115,11 @@ class OFPlanningTournee(models.Model):
     additional_records = fields.Text(compute='_compute_additional_records', string="Additionnal records")
     map_tour_line_ids = fields.One2many(
         comodel_name='of.planning.tour.line', compute='_compute_map_tour_line_ids', string="Tour lines")
+
+    # Pour recherche
+    gb_sector_id = fields.Many2one(
+        comodel_name='of.secteur', compute=lambda *a, **k: {}, search='_search_gb_sector_id', string=u"Secteur",
+        of_custom_groupby=True)
 
     _sql_constraints = [
         ('date_employee_uniq', 'unique (date,employee_id)',
@@ -258,6 +264,14 @@ class OFPlanningTournee(models.Model):
         for tour in self:
             lines = tour.mapped('tour_line_ids.sequence')
             tour.max_line_sequence = lines and max(lines) or 0
+
+    @api.depends('sector_ids')
+    def _compute_sector_kanban_names(self):
+        for record in self:
+            record.sector_kanban_names = " - ".join([sector.name for sector in record.sector_ids])
+
+    def _search_gb_sector_id(self, operator, value):
+        return [('sector_ids', operator, value)]
 
     @api.onchange('zip_id')
     def _onchange_zip_id(self):
@@ -821,16 +835,16 @@ class OFPlanningTournee(models.Model):
         """ Set the tour state to 'draft' if it is flagged as 'incomplete' and if the tour state is 'full'.
         We don't want to set the tour state to 'draft' if it is already at 'draft' or 'confirmed'.
         """
-        tours = self.filtered(lambda t: not t.is_full and t.state == 'full')
-        tours and tours.write({'state': 'draft'})
+        tours = self.filtered(lambda t: not t.is_full and t.state == '2-full')
+        tours and tours.write({'state': '1-draft'})
 
     @api.multi
     def _set_tour_to_full(self):
         """ Set the tour state to 'full' if it is flagged as 'complete' and if the tour state is 'draft'.
         We don't want to set the tour state to 'full' if it is already at 'full' or 'confirmed'.
         """
-        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == 'draft')
-        tours and tours.write({'state': 'full'})
+        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == '1-draft')
+        tours and tours.write({'state': '2-full'})
 
     @api.multi
     def _populate_tour_lines(self, delete_all=False, reset_sequence=True):
@@ -1062,21 +1076,21 @@ class OFPlanningTournee(models.Model):
         """ Confirm the tour.
         """
         self.ensure_one()
-        self.write({'state': 'confirmed'})
+        self.write({'state': '3-confirmed'})
 
     @api.multi
     def action_set_back_draft(self):
         """ Set the tour as fradt.
         """
         self.ensure_one()
-        self.write({'state': 'draft'})
+        self.write({'state': '1-draft'})
 
     @api.multi
     def action_set_back_full(self):
         """ Set the tour as full.
         """
         self.ensure_one()
-        self.write({'state': 'full'})
+        self.write({'state': '2-full'})
 
     @api.multi
     def action_ignore_alert_optimization_update(self):
@@ -1198,3 +1212,24 @@ class OFPlanningTournee(models.Model):
                 'Done. Cron generate tour for new employees %s. Next call is still scheduled on %s' % (
                     new_employees, cron_generate_nextcall))
         return True
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        # Ajout de la possibilité de regrouper par employé
+        if gb != 'gb_sector_id':
+            return super(OFPlanningTournee, self)._read_group_process_groupby(gb, query)
+
+        alias, _ = query.add_join(
+            (self._table, 'tour_sector_rel', 'id', 'tour_id', 'sector_ids'),
+            implicit=False, outer=True,
+        )
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': '"%s".sector_id' % (alias,)
+        }
