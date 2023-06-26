@@ -2,6 +2,9 @@
 <odoo>
 
     <template id="of_report_picking" inherit_id="stock.report_picking">
+        <xpath expr="//table[@t-if='o.pack_operation_ids']" position="before">
+            <h3>Produits réservés</h3>
+        </xpath>
         <xpath expr="//table[@t-if='o.pack_operation_ids']/thead/tr" position="inside">
             <th name="operation_state">
                 <strong>État</strong>
@@ -22,6 +25,60 @@
             <td groups="of_sale_stock.group_description_BL_variant">
                 <span t-field="pack_operation.move_name"/>
             </td>
+        </xpath>
+        <!-- Affichage conditionnel de la colonne contrôle -->
+        <xpath expr="//table[@t-if='o.pack_operation_ids']//th[last()]" position="after">
+            <t t-set="of_check" t-value="o.pack_operation_ids.filtered('move_id.of_check')"/>
+            <th t-if="of_check">
+                <strong>Commande d'achat liée</strong>
+            </th>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']//td[last()]" position="after">
+            <td t-if="of_check">
+                <span t-esc="pack_operation.move_id.of_procurement_purchase_line_id and pack_operation.move_id.of_procurement_purchase_line_id.order_id.name if pack_operation.move_id.of_check else ''"/>
+            </td>
+        </xpath>
+        <xpath expr="//table[@t-if='o.pack_operation_ids']" position="after">
+            <h3>Produits non réservés</h3>
+            <t t-set="of_check" t-value="o.move_lines.filtered('of_check')"/>
+            <table class="table table-condensed" t-if="o.move_lines">
+                <thead>
+                    <tr>
+                        <th><strong>Article</strong></th>
+                        <th><strong>Description</strong></th>
+                        <th class="text-right"><strong>Quantité</strong></th>
+                        <th class="text-right"><strong>Qté(s) dispo(s)</strong></th>
+                        <th><strong>Origine</strong></th>
+                        <th t-if="of_check"><strong>Commande d'achat liée</strong></th>
+                        <th><strong>État</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr t-foreach="o.move_lines" t-as="move">
+                        <td>
+                            <span t-field="move.product_id.name"/>
+                        </td>
+                        <td>
+                            <span t-field="move.name"/>
+                        </td>
+                        <td>
+                            <span t-field="move.product_uom_qty"/>
+                        </td>
+                        <td>
+                            <span t-field="move.of_available_qty"/>
+                        </td>
+                        <td>
+                            <span t-field="move.origin"/>
+                        </td>
+                        <td t-if="of_check">
+                            <span t-esc="move.of_procurement_purchase_line_id and move.of_procurement_purchase_line_id.order_id.name if move.of_check else ''"/>
+                        </td>
+                        <td>
+                            <span t-field="move.state"/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </xpath>
     </template>
 
