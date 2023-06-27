@@ -13,10 +13,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
@@ -45,10 +45,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
@@ -77,10 +77,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
@@ -109,10 +109,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
@@ -182,10 +182,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="l.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
@@ -228,10 +228,10 @@
                         <span/>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_subtotal">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
                     </td>
                     <td class="text-right" groups="sale.group_show_price_total">
-                        <i><span t-field="comp.product_id.of_eco_contribution_id.price" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
                     </td>
                     <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
                         <span/>
