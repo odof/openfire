@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="of_account.report_overdue_document" inherit_id="account.report_overdue_document">
+    <xpath expr="//span[@t-field='o.name']/.." position="before">
+        <t t-if="o.title and o.invoice_ids.pdf_afficher_civilite()">
+            <span t-field="o.title"/>
+        </t>
+    </xpath>
+</template>
+</odoo>
