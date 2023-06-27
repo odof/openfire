@@ -210,7 +210,19 @@ class OfPlanningIntervention(models.Model):
             intervention: intervention.get_date_tournees() for intervention in duration_changed | force_date_changed
         }
 
+        if 'employee_ids' in vals:
+            tournee_obj = tour_to_update = self.env['of.planning.tournee']
+            new_employee_val = vals['employee_ids'] and vals['employee_ids'][0] and vals['employee_ids'][0][2]
+            for intervention in self:
+                # Si les intervenants ont été modifié, on met à jour les tournées qui contiennent cette interventions
+                intervention_employee_updated = intervention.employee_ids.ids != new_employee_val
+                if intervention_employee_updated:
+                    tour_to_update = tour_to_update | tournee_obj.search(
+                        [('tour_line_ids.intervention_id', '=', intervention.id)])
+
         res = super(OfPlanningIntervention, self).write(vals)
+        if 'employee_ids' in vals:
+            tour_to_update._populate_tour_lines()
 
         if ('date' in vals or 'employee_ids' in vals) and self.mapped('tournee_ids').filtered('is_blocked'):
             raise ValidationError(u"Un des intervenants a déjà une tournée bloquée sur ce créneau")

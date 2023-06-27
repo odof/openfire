@@ -94,6 +94,30 @@
         </field>
     </record>
 
+    <record id="of_planning_tournee_view_form_manual_creation" model="ir.ui.view">
+        <field name="name">of.planning.tournee.form.manual.creation</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="groups_id" eval="[(4, ref('of_planning_tournee.group_planning_tournee_manual_creation'))]"/>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tournee_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">true</attribute>
+                <attribute name="delete">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="before">
+                <field name="creating" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+                <attribute name="attrs">{'readonly': [('creating', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="readonly">0</attribute>
+                <attribute name="attrs">{'readonly': [('creating', '=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_planning_tournee_view_tree" model="ir.ui.view">
         <field name="name">of.planning.tournee.tree</field>
         <field name="model">of.planning.tournee</field>
@@ -118,6 +142,19 @@
                 <field name="ignore_alert_optimization_update" invisible="1"/>
                 <field name="count_interventions"/>
             </tree>
+        </field>
+    </record>
+
+    <record id="of_planning_tournee_view_tree_manual_creation" model="ir.ui.view">
+        <field name="name">of.planning.tournee.tree.manual.creation</field>
+        <field name="model">of.planning.tournee</field>
+        <field name="groups_id" eval="[(4, ref('of_planning_tournee.group_planning_tournee_manual_creation'))]"/>
+        <field name="inherit_id" ref="of_planning_tournee.of_planning_tournee_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">true</attribute>
+                <attribute name="delete">true</attribute>
+            </xpath>
         </field>
     </record>
 
