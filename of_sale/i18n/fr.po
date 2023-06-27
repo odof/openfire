@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-16 11:32+0000\n"
-"PO-Revision-Date: 2023-06-16 11:32+0000\n"
+"POT-Creation-Date: 2023-06-27 12:42+0000\n"
+"PO-Revision-Date: 2023-06-27 12:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -187,6 +187,11 @@ msgid "<span>Unit Price</span>"
 msgstr "<span>Prix unitaire</span>"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "<strong>Total</strong>"
+msgstr "<strong>Total</strong>"
+
+#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
 msgid "Add"
 msgstr "Ajouter"
@@ -344,6 +349,11 @@ msgstr ""
 "Choisissez le mode de la date de confirmation de la commande de vente."
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "City"
+msgstr "Ville"
+
+#. module: of_sale
 #: model:ir.model,name:of_sale.model_res_company
 msgid "Companies"
 msgstr "Sociétés"
@@ -404,6 +414,7 @@ msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_partner_id
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "Customer"
 msgstr "Client"
 
@@ -453,6 +464,11 @@ msgstr "Vue client/fournisseur"
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
 msgid "Customize the background color and the font of your sections headings"
 msgstr "Customisez la couleur de fond et la police de vos titres de section"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "Date"
+msgstr "Date"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
@@ -883,6 +899,11 @@ msgid "Nothing to Invoice"
 msgstr ""
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "Number"
+msgstr "Numéro"
+
+#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
 msgid "Object(s)"
 msgstr "Objet(s)"
@@ -920,7 +941,7 @@ msgid ""
 "category."
 msgstr ""
 "Seul l'administrateur a le droit de placer des articles dans la catégorie "
-"des acomptes.
+"des acomptes"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
@@ -968,6 +989,11 @@ msgstr "Qté(s) commandée(s)"
 #: model:ir.model.fields.selection,name:of_sale.selection__sale_order_line__of_invoice_policy__order
 msgid "Ordered quantities"
 msgstr "Quantités commandées"
+
+#. module: of_sale
+#: model:ir.actions.report,name:of_sale.of_report_sale_order_list
+msgid "Orders List"
+msgstr "Liste des commandes"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_account_res_config_settings_view_form
@@ -1194,6 +1220,11 @@ msgid "Sum of the unpaid amount of the deposit invoices and the final invoice"
 msgstr "Somme du montant non payé des factures d'acompte et de la facture finale"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "State"
+msgstr "État"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_tax_country_id
 msgid "Tax Country"
 msgstr "Pays de taxe"
@@ -1202,6 +1233,16 @@ msgstr "Pays de taxe"
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
 msgid "Taxes"
 msgstr ""
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "Taxes excl."
+msgstr "HT"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
+msgid "Taxes incl."
+msgstr "TTC"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
