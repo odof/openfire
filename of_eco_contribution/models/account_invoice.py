@@ -52,23 +52,33 @@ class AccountInvoiceLine(models.Model):
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
+    of_unit_eco_contribution = fields.Float(
+        string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
-    @api.depends('product_id', 'quantity', 'uom_id', 'kit_id', 'of_is_kit')
+    @api.depends('product_id', 'quantity', 'uom_id', 'kit_id', 'of_is_kit', 'sale_line_ids')
     def _compute_of_total_eco_contribution(self):
         for record in self:
-            if record.of_is_kit:
+            contribution = record.product_id.of_eco_contribution_id
+            # Cas spécial du conditionnement.
+            # Dans les cas de conditionnement par unité/tonne, le montant de contribution dépend du conditionnement.
+            # Comme on ne reprend pas tout le calcul de condiotionnement sur la facture, on doit récupérer les valeurs
+            # de la commande
+            if record.product_id.of_packaging_unit and contribution.type in ['ton', 'unit'] and \
+                    len(record.sale_line_ids) == 1 and record.sale_line_ids.of_product_qty_brut:
+                record.of_unit_eco_contribution = record.sale_line_ids.of_unit_eco_contribution
+                record.of_total_eco_contribution = record.sale_line_ids.of_total_eco_contribution
+            elif record.of_is_kit:
                 record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution
             elif record.product_id.of_eco_contribution_id:
-                contribution = record.product_id.of_eco_contribution_id
                 original_uom = record.product_id.uom_id
                 current_uom = record.uom_id
                 qty = current_uom._compute_quantity(record.quantity, original_uom, round=False)
                 if contribution.type == 'ton':
-                    record.of_total_eco_contribution = qty * contribution.price * \
-                                                       record.product_id.weight / 1000.0
+                    eco_contribution = contribution.price * record.product_id.weight / 1000.0
                 else:
-                    record.of_total_eco_contribution = qty * contribution.price
-
+                    eco_contribution = contribution.price
+                record.of_unit_eco_contribution = eco_contribution
+                record.of_total_eco_contribution = qty * eco_contribution
 
 
 class OfAccountInvoiceKit(models.Model):
@@ -88,6 +98,8 @@ class OfAccountInvoiceKitLine(models.Model):
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
+    of_unit_eco_contribution = fields.Float(
+        string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
     @api.depends('product_id', 'qty_per_kit', 'product_uom_id', 'kit_id.invoice_line_id.quantity')
     def _compute_of_total_eco_contribution(self):
@@ -96,10 +108,11 @@ class OfAccountInvoiceKitLine(models.Model):
                 contribution = record.product_id.of_eco_contribution_id
                 original_uom = record.product_id.uom_id
                 current_uom = record.product_uom_id
-                base_qty = record.qty_per_kit * record.kit_id.order_line_id.product_uom_qty
+                base_qty = record.qty_per_kit * record.kit_id.invoice_line_id.quantity
                 qty = current_uom._compute_quantity(base_qty, original_uom, round=False)
                 if contribution.type == 'ton':
-                    record.of_total_eco_contribution = qty * contribution.price * \
-                                                       record.product_id.weight / 1000.0
+                    eco_contribution = contribution.price * record.product_id.weight / 1000.0
                 else:
-                    record.of_total_eco_contribution = qty * contribution.price
+                    eco_contribution = contribution.price
+                record.of_unit_eco_contribution = eco_contribution
+                record.of_total_eco_contribution = qty * eco_contribution

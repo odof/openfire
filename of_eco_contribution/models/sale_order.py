@@ -32,6 +32,8 @@ class SaleOrderLine(models.Model):
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
+    of_unit_eco_contribution = fields.Float(
+        string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
     @api.depends('product_id', 'product_uom_qty', 'product_uom', 'kit_id.of_total_eco_contribution', 'of_is_kit')
     def _compute_of_total_eco_contribution(self):
@@ -40,14 +42,18 @@ class SaleOrderLine(models.Model):
                 record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution
             elif record.product_id.of_eco_contribution_id:
                 contribution = record.product_id.of_eco_contribution_id
-                original_uom = record.product_id.uom_id
-                current_uom = record.product_uom
-                qty = current_uom._compute_quantity(record.product_uom_qty, original_uom, round=False)
-                if contribution.type == 'ton':
-                    record.of_total_eco_contribution = qty * contribution.price * \
-                                                       record.product_id.weight / 1000.0
+                if record.product_id.of_packaging_unit and contribution.type in ['ton', 'unit']:
+                    qty = record.of_product_qty_brut
                 else:
-                    record.of_total_eco_contribution = qty * contribution.price
+                    original_uom = record.product_id.uom_id
+                    current_uom = record.product_uom
+                    qty = current_uom._compute_quantity(record.product_uom_qty, original_uom, round=False)
+                if contribution.type == 'ton':
+                    eco_contribution = contribution.price * record.product_id.weight / 1000.0
+                else:
+                    eco_contribution = contribution.price
+                record.of_unit_eco_contribution = eco_contribution
+                record.of_total_eco_contribution = qty * eco_contribution
 
 
 class OfSaleOrderKit(models.Model):
@@ -67,6 +73,8 @@ class OfSaleOrderKitLine(models.Model):
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
+    of_unit_eco_contribution = fields.Float(
+        string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
     @api.depends('product_id', 'qty_per_kit', 'product_uom_id', 'kit_id.order_line_id.product_uom_qty')
     def _compute_of_total_eco_contribution(self):
@@ -78,7 +86,9 @@ class OfSaleOrderKitLine(models.Model):
                 base_qty = record.qty_per_kit * record.kit_id.order_line_id.product_uom_qty
                 qty = current_uom._compute_quantity(base_qty, original_uom, round=False)
                 if contribution.type == 'ton':
-                    record.of_total_eco_contribution = qty * contribution.price * \
-                                                       record.product_id.weight / 1000.0
+                    eco_contribution = contribution.price * record.product_id.weight / 1000.0
                 else:
-                    record.of_total_eco_contribution = qty * contribution.price
+                    eco_contribution = contribution.price
+                record.of_unit_eco_contribution = eco_contribution
+                record.of_total_eco_contribution = qty * eco_contribution
+
