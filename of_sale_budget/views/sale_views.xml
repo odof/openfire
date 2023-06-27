@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_planning_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.budget.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_planning.of_sale_planning_sale_order_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_duration_total']/.." position="after">
+                <field name="of_hour_worksite_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_view_order_form" model="ir.ui.view">
+        <field name="name">of.sale.order.view.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Budget">
+                    <button icon="fa-refresh" class="btn btn-lg oe_link" name="action_of_budget_ids" type="object" style ="position: absolute; left: 125px; margin-top: 22px;"/>
+                    <group string="Budget">
+                        <field name="of_budget_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                    <group string="Frais indirects">
+                        <field name="of_indirect_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                    <group string="Frais de main d'oeuvre">
+                        <field name="of_labor_cost_ids" mode="tree" options="{'reload_on_button': true}" nolabel="1" context="{'default_order_id': active_id}"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_margin_sale_order_line" model="ir.ui.view">
+        <field name="name">of.sale.budget.sale.order.line</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_margin_sale_order_line"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                <field name="of_labor_cost"/>
+                <field name="of_total_labor_cost"/>
+                <field name="of_theorical_price"/>
+                <field name="of_theorical_coef"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="priority">100</field>
+        <field name="inherit_id" ref="of_sale_quote_template.of_sale_quote_template_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_layout_category_ids']/tree" position="replace">
+                <tree string="Sale Layout Category" decoration-bf="depth==0" decoration-muted="depth>1" create="false" editable="bottom">
+                    <field name="id" invisible="1"/>
+                    <field name="depth" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="quote_section_line_id" invisible="1"/>
+                    <field name="order_id" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <field name="sequence_name"/>
+                    <field name="name"/>
+                    <field name="parent_id" domain="[('order_id', '=', order_id), '!', ('id', 'child_of', id)]" options="{'no_create': True, 'no_edit': True}"/>
+                    <field name="cout" widget="monetary"/>
+                    <field name="of_duration" widget="float_time"/>
+                    <field name="labor_cost"/>
+                    <field name="cost_subcontracted_service"/>
+                    <field name="total_labor_cost"/>
+                    <field name="theorical_price"/>
+                    <field name="theorical_coef"/>
+                    <field name="prix_vente" widget="monetary"/>
+                    <field name="pc_prix_vente"/>
+                    <field name="invoice_status" attrs="{'invisible': [('state', 'not in', ['sale', 'done'])]}"/>
+                    <button string="Lignes de commande" name="action_wizard_order_lines" type="object" class="oe_highlight"/>
+                    <button icon="fa-files-o" name="action_duplicate" type="object" help="Dupliquer cette ligne"/>
+                    <button icon="fa-arrows" name="action_move" type="object" help="Déplacer cette ligne"/>
+                    <button icon="fa-plus" name="action_add" type="object" help="Ajouter une sous section à cette ligne"/>
+                </tree>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_layout_category_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.layout.category.view.form</field>
+        <field name="model">of.sale.order.layout.category</field>
+        <field name="inherit_id" ref="of_sale_planning.view_of_sale_order_layout_category_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_duration_per_unit']" position="after">
+                <field name="of_hour_worksite_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_layout_category_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.order.layout.category.view.tree</field>
+        <field name="model">of.sale.order.layout.category</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_of_sale_order_layout_category_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="theorical_price"/>
+                <field name="theorical_coef"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
