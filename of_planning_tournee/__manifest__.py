@@ -28,6 +28,7 @@
     'data': [
         'data/ir_cron.xml',
         'security/ir.model.access.csv',
+        'security/of_planning_tournee_security.xml',
         'views/of_planning_intervention_view.xml',
         'views/of_planning_tournee_view.xml',
         'views/of_service_parc_views.xml',

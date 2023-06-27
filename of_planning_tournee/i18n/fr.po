@@ -2220,3 +2220,8 @@ msgstr "Équipe d'intervention"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_employee_other_ids
 msgid "Équipiers"
 msgstr "Équipiers"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_creating
+msgid "Creating"
+msgstr "Création en cours"
