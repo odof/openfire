@@ -154,7 +154,7 @@ class OFPlanningTourneeLine(models.Model):
                 sequence = line.sequence - 1
                 color_index = last_index + color_padding if sequence > 0 else last_index
                 last_index = color_index
-                line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[color_index]
+                line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[min(color_index, len(AVAILABLE_COLORS_TOUR_LINES)-1)]
 
     @api.multi
     def _get_time_slot_intervention_label(self, force_date=None, force_start_hour=None, force_end_hour=None):

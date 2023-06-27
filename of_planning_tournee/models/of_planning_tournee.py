@@ -120,6 +120,8 @@ class OFPlanningTournee(models.Model):
     gb_sector_id = fields.Many2one(
         comodel_name='of.secteur', compute=lambda *a, **k: {}, search='_search_gb_sector_id', string=u"Secteur",
         of_custom_groupby=True)
+    # Verify if we are currently creating the record
+    creating = fields.Boolean(string=u"Creating", compute='_compute_creating')
 
     _sql_constraints = [
         ('date_employee_uniq', 'unique (date,employee_id)',
@@ -270,6 +272,12 @@ class OFPlanningTournee(models.Model):
         for record in self:
             record.sector_kanban_names = " - ".join([sector.name for sector in record.sector_ids])
 
+    # can't put id in depends
+    @api.depends('employee_id')
+    def _compute_creating(self):
+        for record in self:
+            record.creating = not isinstance(record.id, int) and not hasattr(record, '_origin')
+
     def _search_gb_sector_id(self, operator, value):
         return [('sector_ids', operator, value)]
 
@@ -278,6 +286,11 @@ class OFPlanningTournee(models.Model):
         if self.zip_id:
             self.epi_lat = self.zip_id.geo_lat
             self.epi_lon = self.zip_id.geo_lng
+
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        self.start_address_id = self.employee_id.of_address_depart_id.id
+        self.return_address_id = self.employee_id.of_address_retour_id.id
 
     @api.multi
     def _get_linked_interventions(self):
@@ -858,6 +871,10 @@ class OFPlanningTournee(models.Model):
         for tour in self:
             if delete_all:
                 tour.tour_line_ids.sudo().unlink()
+            # get the interventions that should not be in the tour anymore
+            interventions_to_remove = self._get_interventions_to_remove(tour)
+            if interventions_to_remove and tour.date >= fields.Date.today():
+                tour.write({'tour_line_ids': [(5, 0, interventions_to_remove.ids)]})
             # get the interventions that are not already in the tour
             interventions = self._get_interventions_to_add(tour)
             if interventions and tour.date >= fields.Date.today() or self._context.get('force_restore'):
@@ -874,6 +891,12 @@ class OFPlanningTournee(models.Model):
         """
         interventions = tour._get_linked_interventions()
         return interventions - tour.tour_line_ids.mapped('intervention_id')
+
+    def _get_interventions_to_remove(self, tour):
+        """ Get the interventions that should not be in the tour anymore.
+        """
+        interventions = tour._get_linked_interventions()
+        return tour.tour_line_ids.mapped('intervention_id') - interventions
 
     @api.multi
     def copy(self, default=None):

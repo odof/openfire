@@ -313,7 +313,7 @@ class OFTourPlanningOptimizationLineWizard(models.TransientModel):
             sequence = int(line.new_index) - 1 if int(line.new_index) > 0 else 0
             color_index = last_index + color_padding if sequence > 0 else last_index
             last_index = color_index
-            line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[color_index]
+            line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[min(color_index, len(AVAILABLE_COLORS_TOUR_LINES)-1)]
 
     @api.model
     def custom_get_color_map(self):

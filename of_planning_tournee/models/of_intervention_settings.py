@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
@@ -73,6 +74,10 @@ class OfInterventionSettings(models.TransientModel):
     tour_day_ids = fields.Many2many(
         comodel_name='of.jours', relation='intervention_settings_tour_days_rel', string="Tours // Days",
         help="Create tours for these days only", default=lambda self: self._default_day_ids())
+    group_of_planning_tournee_manual_creation = fields.Boolean(
+        string=u"(OF) Création manuelle des tournées autorisée",
+        implied_group='of_planning_tournee.group_planning_tournee_manual_creation', group='base.group_user',
+        help=u"Rend disponible la création dans la vue des tournées.")
 
     @api.onchange('enable_quick_scheduling')
     def _onchange_enable_quick_scheduling(self):

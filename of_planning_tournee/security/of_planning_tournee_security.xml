@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <record id="group_planning_tournee_manual_creation" model="res.groups">
+        <field name="name">Création manuelle des tournées</field>
+        <field name="category_id" ref="of_planning.of_planning_intervention_category"/>
+    </record>
+
+</odoo>
