@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_conditionnement.of_conditionnement_sale_order_form_view"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/form//field[@name='of_packaging_unit']" position="after">
+                <field name="of_total_eco_contribution"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_untaxed']" position="before">
+                <button name="recompute_eco_contribution" states="draft,sent" string="Recalculer éco-contribution" type="object" colspan="2" class="pull-right"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_untaxed']" position="after">
+                <field name="of_total_eco_contribution" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('of_total_eco_contribution', '&lt;=', 0.0)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
