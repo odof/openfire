@@ -874,7 +874,7 @@ class OFPlanningTournee(models.Model):
             # get the interventions that should not be in the tour anymore
             interventions_to_remove = self._get_interventions_to_remove(tour)
             if interventions_to_remove and tour.date >= fields.Date.today():
-                tour.write({'tour_line_ids': [(5, 0, interventions_to_remove.ids)]})
+                tour.sudo().write({'tour_line_ids': [(5, 0, interventions_to_remove.ids)]})
             # get the interventions that are not already in the tour
             interventions = self._get_interventions_to_add(tour)
             if interventions and tour.date >= fields.Date.today() or self._context.get('force_restore'):
