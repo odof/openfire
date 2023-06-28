@@ -541,6 +541,9 @@ class StockMove(models.Model):
     def _compute_of_check(self):
         stock_move_obj = self.env['stock.move']
         for move in self:
+            if not move.of_procurement_purchase_line_id:
+                move.of_check = False
+                continue
             purchase_stock_move = stock_move_obj.search(
                 [('purchase_line_id', '=', move.of_procurement_purchase_line_id.id)])
             if purchase_stock_move:
