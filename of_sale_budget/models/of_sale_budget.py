@@ -295,11 +295,11 @@ class SaleOrderLine(models.Model):
             line.of_total_labor_cost = line.of_labor_cost + (line.purchase_price * line.product_uom_qty)
 
     @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
-                 'of_duration', 'purchase_price', 'product_uom_qty',
+                 'of_duration_total', 'purchase_price', 'product_uom_qty',
                  'order_id.of_budget_ids', 'order_id.of_budget_ids.margin_coeff')
     def _compute_of_theorical_prices(self):
         for line in self:
-            labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration
+            labor_cost = line.of_hour_worksite_id.hourly_cost * line.of_duration_total
             total_cost = labor_cost + (line.purchase_price * line.product_uom_qty)
             budget_lines = line.order_id.of_budget_ids
             # Si ligne en sous-traitance : [Qté * purchase_price * Coeff sous-traitance]
