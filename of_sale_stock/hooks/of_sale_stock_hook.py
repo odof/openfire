@@ -13,10 +13,10 @@ class OFSaleStockHook(models.AbstractModel):
         actions_todo = module_self and module_self.latest_version < '10.0.2.0.0' or False
         if actions_todo:
             cr = self._cr
-            cr.execute('ALTER TABLE "%s" ADD COLUMN IF NOT EXISTS "%s" %s' % ('stock_move',
+            cr.execute('ALTER TABLE "%s" ADD COLUMN "%s" %s' % ('stock_move',
                                                                 'of_procurement_purchase_line_id',
                                                                 'int4'))
-            cr.execute('ALTER TABLE "%s" ADD COLUMN IF NOT EXISTS "%s" %s' % ('stock_move', 'of_check', 'bool'))
+            cr.execute('ALTER TABLE "%s" ADD COLUMN "%s" %s' % ('stock_move', 'of_check', 'bool'))
 
 
     def _init_field_procurement_purchase(self):
