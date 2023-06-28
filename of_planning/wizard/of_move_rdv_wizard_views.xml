@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_move_rdv_wizard_view_form" model="ir.ui.view" >
+        <field name="name">of.move.rdv.wizard.view.form</field>
+        <field name="model">of.move.rdv.wizard</field>
+        <field name="arch" type="xml" >
+            <form string="Éditions des interventions">
+                <group>
+                    <field name="employee_ids" widget="many2many_tags" options="{'no_create': True, 'no_edit': True}"/>
+                    <field name="verif_dispo"/>
+                    <field name="forcer_dates"/>
+                </group>
+                <field name="intervention_ids" nolabel="1" readonly="1">
+                    <tree limit="5">
+                        <field name="display_name"/>
+                        <field name="date"/>
+                        <field name="date_deadline"/>
+                        <field name="state"/>
+                    </tree>
+                </field>
+                <footer>
+                    <button string="Éditer" name="change_employee_for_interventions" type="object" class="btn-primary"/>
+                    <button string="Annuler" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_action_move_wizard" model="ir.actions.server">
+        <field name="name">Édition des interventions</field>
+        <field name="condition">True</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_of_planning_intervention" />
+        <field name="state">code</field>
+        <field name="code">action = records.action_move_intervention_wizard()</field>
+    </record>
+
+    <record model="ir.values" id="of_planning_intervention_action_move_wizard_value">
+        <field name="name">of_planning_intervention_action_move_wiard_value</field>
+        <field name="action_id" ref="of_planning_intervention_action_move_wizard" />
+        <field name="value" eval="'ir.actions.server,' + str(ref('of_planning_intervention_action_move_wizard'))" />
+        <field name="key">action</field>
+        <field name="model_id" ref="model_of_planning_intervention" />
+        <field name="model">of.planning.intervention</field>
+        <field name="key2">client_action_multi</field>
+    </record>
+
+</odoo>
