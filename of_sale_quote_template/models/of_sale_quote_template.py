@@ -1168,7 +1168,7 @@ class SaleOrder(models.Model):
                 report_pages[-1].append({
                     'name': category and "%s%s - %s" % (
                         '&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
-                    'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
+                    'subtotal': category and category.prix_vente or 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
                     'color': category and category.get_color('sale.order') or section_color
@@ -1399,7 +1399,7 @@ class AccountInvoice(models.Model):
                 report_pages[-1].append({
                     'name': category and "%s%s - %s" % (
                         '&#160;' * 3 * category.depth, category.sequence_name, category.name) or _('Uncategorized'),
-                    'subtotal': category and category.prix_vente if len(list(lines)) else 0.0,
+                    'subtotal': category and category.prix_vente or 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
                     'color': category and category.get_color('account.invoice') or section_color
