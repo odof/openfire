@@ -2047,6 +2047,18 @@ class OfPlanningIntervention(models.Model):
         name = name and " ".join(name) or "Intervention"
         return name
 
+    @api.multi
+    def action_move_intervention_wizard(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': u"Éditions des interventions",
+            'res_model': 'of.move.rdv.wizard',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_intervention_ids': self._ids}
+        }
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"

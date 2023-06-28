@@ -50,6 +50,7 @@ Inclut la gestion des équipes d'intervention.
         'report/of_planning_rapport_intervention.xml',
         'data/data.xml',
         'wizard/message_invoice.xml',
+        'wizard/of_move_rdv_wizard_views.xml',
         'views/of_planning_intervention_view.xml',
         'views/of_res_config_views.xml',
         'views/of_planning_report_view.xml',
