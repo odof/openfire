@@ -12,6 +12,7 @@
                     <field name="of_picking_rollback_delay" class="oe_inline"/>
                     <span>minutes après la validation par le transporteur</span>
                 </div>
+                <field name="of_picking_backorder"/>
             </xpath>
         </field>
     </record>
