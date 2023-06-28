@@ -34,7 +34,7 @@ class GestionPrix(models.TransientModel):
 class GestionPrixLine(models.TransientModel):
     _inherit = 'of.sale.order.gestion.prix.line'
 
-    duration = fields.Float(related='order_line_id.of_duration', string=u"Nombre d'heures", readonly=True)
+    duration = fields.Float(related='order_line_id.of_duration_total', string=u"Nombre d'heures", readonly=True)
     hour_worksite_id = fields.Many2one(
         related='order_line_id.of_hour_worksite_id', string=u"Type d'heures", readonly=True)
 
@@ -75,7 +75,7 @@ class GestionPrixLayoutCategory(models.TransientModel):
     def _compute_duration(self):
         for categ in self:
             order_lines = categ.line_ids.mapped('order_line_id')
-            categ.duration = sum(order_lines.mapped('of_duration'))
+            categ.duration = sum(order_lines.mapped('of_duration_total'))
 
     @api.depends('line_ids')
     def _compute_price(self):
