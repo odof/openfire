@@ -301,7 +301,7 @@
                     </table>
                 </div>
             </div>
-            <div class="row" style="page-break-inside:avoid;" name="echeances">
+            <div class="row" style="page-break-inside:avoid;" name="echeances" t-if="doc.of_echeance_line_ids">
                 <div class="col-xs-6" t-if="pdf_payment_schedule" string="Échéances">
                     <t t-set="show_ech_name" t-value="bool(doc.of_echeance_line_ids.filtered('date'))"/>
                     <table class="table table-condensed">
