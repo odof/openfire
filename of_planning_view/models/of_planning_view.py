@@ -469,6 +469,8 @@ class OFInterventionConfiguration(models.TransientModel):
         super(OFInterventionConfiguration, self)._auto_init()
         if self.env['ir.values'].get_default('of.intervention.settings', 'planningview_intervention_state') is None:
             self.env['ir.values'].set_default('of.intervention.settings', 'planningview_intervention_state', 'confirm')
+        if self.env['ir.values'].get_default('of.intervention.settings', 'planningview_search_results_number') is None:
+            self.env['ir.values'].set_default('of.intervention.settings', 'planningview_search_results_number', 25)
 
     planningview_employee_exclu_ids = fields.Many2many(
         'hr.employee', string=u"(OF) Exculsion d'intervenants", help=u"Employés à NE PAS montrer en vue planning",
@@ -481,8 +483,10 @@ class OFInterventionConfiguration(models.TransientModel):
     planningview_time_line = fields.Char(
         string="(OF) lignes d'heures", help=u"Entrez les heures sous forme d'entiers séparées par des virgules")
     planningview_intervention_state = fields.Selection(
-        selection=[('draft', u"Brouillon"),('confirm', u"Confirmé")],
+        selection=[('draft', u"Brouillon"), ('confirm', u"Confirmé")],
         string=u"(OF) État des RDV en passant par la recherche de DI", default='confirm', required=True)
+    planningview_search_results_number = fields.Integer(
+        string=u"(OF) Nombre de résultats calculés par défaut lors de la recherche de DI", required=True)
 
     @api.onchange('planningview_calendar')
     def _onchange_planningview_calendar(self):
@@ -543,6 +547,11 @@ class OFInterventionConfiguration(models.TransientModel):
     def set_planningview_intervention_state_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'planningview_intervention_state', self.planningview_intervention_state)
+
+    @api.multi
+    def set_planningview_search_results_number(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'planningview_search_results_number', self.planningview_search_results_number)
 
 
 class IrUIView(models.Model):

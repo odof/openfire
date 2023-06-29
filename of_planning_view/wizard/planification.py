@@ -799,6 +799,10 @@ class OfPlanifCreneauProp(models.TransientModel):
         routing_base_url = config.get("of_routing_base_url", "")
         routing_version = config.get("of_routing_version", "")
         routing_profile = config.get("of_routing_profile", "")
+        search_results_number = self.env['ir.values'].get_default(
+            'of.intervention.settings', 'planningview_search_results_number')
+        if search_results_number is None:
+            search_results_number = 25
 
         for indice in range(len(self)):
             a_planifier = self[indice]
@@ -807,7 +811,7 @@ class OfPlanifCreneauProp(models.TransientModel):
                 continue
             res = {}
             if not orthodromique:
-                if compteur >= 25:
+                if search_results_number and compteur >= search_results_number:
                     break
                 if not (routing_base_url and routing_version and routing_profile):
                     query = "null"
