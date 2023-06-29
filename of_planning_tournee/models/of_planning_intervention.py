@@ -30,12 +30,20 @@ class OfPlanningIntervention(models.Model):
                     ('date', '=', intervention.date[:10])])
                 intervention.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
 
+    def _compute_tour_data_state_values(self):
+        return ['cancel', 'being_optimized']
+
     @api.multi
     def _compute_tour_data(self):
         if self._context.get('active_tour_id'):
             tour = self.env['of.planning.tournee'].browse(self._context.get('active_tour_id'))
             address_dict = {}
-            for idx, inter in enumerate(tour._get_linked_interventions(), 1):
+            tour_interventions = self.search([
+                ('employee_ids', 'in', tour.employee_id.id),
+                ('date', '<=', tour.date),
+                ('date_deadline', '>=', tour.date),
+                ('state', 'not in', self._compute_tour_data_state_values())], order='date')
+            for idx, inter in enumerate(tour_interventions, 1):
                 if not address_dict.get(inter.address_id.id):
                     address_dict[inter.address_id.id] = {inter: idx}
                 else:
