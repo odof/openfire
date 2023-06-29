@@ -295,20 +295,21 @@ class SaleOrderLine(models.Model):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
         inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for line in self:
-            if line.of_invoice_policy == 'ordered_delivery':
-                # Cas particulier pour les commandes qui ne contiennent que des lignes de type service
-                # On ne calcule pas la date de facturation prévisionnelle
-                if not inclure_service:
-                    non_service_kit_lines = line.mapped('order_id.order_line.kit_id.kit_line_ids.product_id').filtered(
-                        lambda p: p.type !=  'service')
-                    if not non_service_kit_lines:
-                        continue
+            if line.of_invoice_policy == 'ordered_delivery' and line.of_is_kit:
+                # Cas particulier pour les kits qui ne contiennent que des composants de type service non inclues
+                # dans le BL
+                # On reprend la même date de facturation prévisionnelle que celle de la commande
+                if not line.kit_id.kit_line_ids.mapped('product_id').filtered(lambda p: p.type != 'service') and \
+                        not inclure_service:
+                    pickings = line.order_id.picking_ids.filtered(
+                        lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                    if pickings:
+                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+                    continue
 
-                moves = False
-                if line.of_is_kit:
-                    # Cas général
-                    moves = line.kit_id.kit_line_ids.mapped('procurement_ids').mapped('move_ids')
-                    moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
+                # Cas général
+                moves = line.kit_id.kit_line_ids.mapped('procurement_ids.move_ids')
+                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
 
                 if moves:
                     to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
@@ -318,12 +319,6 @@ class SaleOrderLine(models.Model):
                     else:
                         line.of_invoice_date_prev = fields.Date.to_string(
                             fields.Date.from_string(moves[-1].date_expected))
-                elif line.product_id.type == 'service' and not inclure_service:
-                    # si il reste des lignes de type service sans date de facturation prévue elles seront gérées ici
-                    pickings = line.mapped('order_id.picking_ids').sorted(
-                        'min_date', True).filtered(lambda p: p.state != 'cancel')
-                    if pickings:
-                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
 
     @api.onchange('of_pricing')
     def _onchange_of_pricing(self):
