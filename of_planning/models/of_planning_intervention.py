@@ -1081,15 +1081,17 @@ class OfPlanningIntervention(models.Model):
             if not self.fiscal_position_id:
                 self.fiscal_position_id = address.commercial_partner_id.property_account_position_id
             # Pour les objets du planning, le choix de la société se fait par un paramètre de config
-            company_choice = self.env['ir.values'].get_default(
-                'of.intervention.settings', 'company_choice') or 'contact'
-            if company_choice == 'contact' and self.address_id.company_id:
-                self.company_id = address.company_id.id
-            elif company_choice == 'contact' and self.partner_id and self.partner_id.company_id:
-                self.company_id = self.partner_id.company_id.id
-            # en mode contact avec un contact sans société, ou en mode user
-            else:
-                self.company_id = self.env.user.company_id.id
+            # Sauf quand on viens du portail
+            if not self._context.get('from_portal'):
+                company_choice = self.env['ir.values'].get_default(
+                    'of.intervention.settings', 'company_choice') or 'contact'
+                if company_choice == 'contact' and self.address_id.company_id:
+                    self.company_id = address.company_id.id
+                elif company_choice == 'contact' and self.partner_id and self.partner_id.company_id:
+                    self.company_id = self.partner_id.company_id.id
+                # en mode contact avec un contact sans société, ou en mode user
+                else:
+                    self.company_id = self.env.user.company_id.id
             if not self.partner_id:
                 if address.parent_id:
                     address = address.parent_id
