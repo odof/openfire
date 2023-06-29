@@ -33,11 +33,11 @@ class Base(models.AbstractModel):
             file_ext = ''
             img_src = ''
             mimetype = ''
-            if image['src'].startswith('data:image/png;base64,'):
+            if image.has_attr('src') and image['src'].startswith('data:image/png;base64,'):
                 file_ext = '.png'
                 img_src = image['src'][22:]
                 mimetype = 'image/png'
-            elif image['src'].startswith('data:image/jpeg;base64,'):
+            elif image.has_attr('src') and image['src'].startswith('data:image/jpeg;base64,'):
                 file_ext = '.jpg'
                 img_src = image['src'][23:]
                 mimetype = 'image/jpeg'
