@@ -174,13 +174,14 @@ class SaleOrderLine(models.Model):
         inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for line in self:
             if line.of_invoice_policy == 'ordered_delivery':
-                # Cas particulier pour les commandes qui ne contiennent que des lignes de type service
-                # On ne calcule pas la date de facturation prévisionnelle
-                if not inclure_service:
-                    non_service_order_lines = line.mapped('order_id.order_line.product_id').filtered(
-                        lambda ol: ol.type != 'service')
-                    if not non_service_order_lines:
-                        continue
+                # Cas particulier pour les lignes de type service non inclues dans le BL
+                # On reprend la même date de facturation prévisionnelle que celle de la commande
+                if line.product_id.type == 'service' and not inclure_service:
+                    pickings = line.order_id.picking_ids.filtered(
+                        lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                    if pickings:
+                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+                    continue
 
                 # Cas général
                 moves = line.procurement_ids.mapped('move_ids')
@@ -194,11 +195,6 @@ class SaleOrderLine(models.Model):
                     else:
                         line.of_invoice_date_prev = fields.Date.to_string(
                             fields.Date.from_string(moves[-1].date_expected))
-                elif line.product_id.type == 'service' and not inclure_service:
-                    pickings = line.mapped('order_id.picking_ids').sorted(
-                        'min_date', True).filtered(lambda p: p.state != 'cancel')
-                    if pickings:
-                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
     def _compute_of_stock_moves_state(self):

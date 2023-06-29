@@ -472,7 +472,6 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         self.of_update_dates_echeancier()
-        self.mapped('order_line').filtered(lambda ol: not ol.of_invoice_date_prev)._compute_of_invoice_date_prev()
         return res
 
     @api.multi
