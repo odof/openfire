@@ -54,6 +54,10 @@
                         <field name="planningview_intervention_state" class="oe_inline"/>
                         <span></span>
                     </div>
+                    <label for="planningview_search_results_number"/>
+                    <div name="planningview_search_results_number">
+                        <field name="planningview_search_results_number" class="oe_inline"/>
+                    </div>
                 </group>
             </xpath>
         </field>
