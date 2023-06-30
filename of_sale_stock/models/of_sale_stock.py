@@ -520,6 +520,14 @@ class ProcurementOrder(models.Model):
                 return True
         return res
 
+    @api.multi
+    def make_po(self):
+        res = super(ProcurementOrder, self).make_po()
+        for procurement in self:
+            if procurement.move_dest_id:
+                procurement.move_dest_id.of_procurement_purchase_line_id = procurement.purchase_line_id.id
+        return res
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
@@ -533,19 +541,10 @@ class StockMove(models.Model):
     of_unit_cost = fields.Float(
         compute='_compute_of_unit_cost', string=u"Coût unitaire", digits=dp.get_precision('Product Price'), store=True)
     of_procurement_purchase_id = fields.Many2one(comodel_name='purchase.order',
-        string="Commande d'achat lié", related='of_procurement_purchase_line_id.order_id', readonly=True)
+        string=u"Commande d'achat lié", related='of_procurement_purchase_line_id.order_id', readonly=True)
     of_procurement_purchase_line_id = fields.Many2one(
-        comodel_name='purchase.order.line', string="Ligne de commande d'achat lié",
-        compute='_compute_of_procurement_purchase_line_id', store=True)
-    of_check = fields.Boolean(string="Contrôle", compute='_compute_of_check', store=True, readonly=True)
-
-    @api.depends('state')
-    def _compute_of_procurement_purchase_line_id(self):
-        stock_move_obj = self.env['stock.move']
-        for move in self:
-            move_dest = stock_move_obj.search([('move_dest_id', '=', move.id)])
-            if move_dest:
-                move.of_procurement_purchase_line_id = move_dest[0].purchase_line_id.id
+        comodel_name='purchase.order.line', string=u"Ligne de commande d'achat lié", readonly=True)
+    of_check = fields.Boolean(string=u"Contrôle", compute='_compute_of_check', store=True, readonly=True)
 
     @api.depends('of_procurement_purchase_line_id', 'reserved_quant_ids')
     def _compute_of_check(self):
