@@ -69,7 +69,8 @@ class OFSaleConfiguration(models.TransientModel):
     group_product_variant_specific_price = fields.Selection(selection=[
         (0, u"Handle pricing by attribute"),
         (1, u"Handle pricing by variant")], string=u"(OF) Product variant pricing",
-        implied_group='of_product.group_product_variant_specific_price')
+        implied_group='of_product.group_product_variant_specific_price',
+        group='base.group_portal,base.group_user,base.group_public')
 
 
     @api.multi
