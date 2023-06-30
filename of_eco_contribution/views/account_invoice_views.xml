@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_invoice_view_form" model="ir.ui.view">
+        <field name="name">account.invoice.view.form</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_untaxed']" position="after">
+                <field name="of_total_eco_contribution" widget="monetary" options="{'currency_field': 'currency_id'}" attrs="{'invisible': [('of_total_eco_contribution', '&lt;=', 0.0)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_invoice_line_view_form" model="ir.ui.view">
+        <field name="name">account.invoice.line.view.form</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_unit']" position="after">
+                <field name="of_total_eco_contribution"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="account_invoice_report" inherit_id="of_sale_quote_template.of_report_invoice_layouted">
+        <!-- Ligne d'articles sans kit ou kit en mode display != 'expand', sans group catégorie -->
+        <xpath expr="//table[@groups='!sale.group_sale_layout']//tbody//tr" position="inside">
+            <t t-if="o.of_price_printing in ['order_line'] and (not l.of_is_kit or (l.of_is_kit and o.of_kit_display_mode != 'expand')) and l.of_total_eco_contribution">
+                <tr name="eco_contribution_invoice_line">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Ligne de kit en mode display == 'expand', sans group catégorie -->
+        <xpath expr="//t[@name='comp_no_layout']" position="inside">
+            <t t-if="comp.of_total_eco_contribution">
+                <tr name="eco_contribution_kit_expand">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Ligne d'articles sans kit ou kit en mode display != 'expand', avec group catégorie -->
+        <xpath expr="//t[@groups='sale.group_sale_layout']//t[@t-as='l']/tr" position="after">
+            <t t-if="o.of_price_printing in ['order_line'] and (not l.of_is_kit or (l.of_is_kit and o.of_kit_display_mode != 'expand')) and l.of_total_eco_contribution">
+                <tr name="eco_contribution_invoice_line_layouted">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Ligne de kit en mode display == 'expand', avec group catégorie -->
+        <xpath expr="//t[@name='comp_layout']" position="inside">
+            <t t-if="comp.of_total_eco_contribution">
+                <tr name="eco_contribution_kit_expand_layouted">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Sections avancées -->
+        <xpath expr="//t[@name='layout_subtotal']" position="after">
+            <t t-set="eco_contribution" t-value="0"/>
+            <t t-foreach="layout_category['lines']" t-as="l">
+                <t t-set="eco_contribution" t-value="eco_contribution + l.of_total_eco_contribution"/>
+            </t>
+            <tr t-if="eco_contribution and o.of_price_printing in ['layout_category_with_products', 'layout_category']" class="text-right" name="eco_contribution_advanced_layout_category">
+                <td groups="of_sale.group_of_sale_print_one_image"/>
+                <td colspan="100">
+                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;:</span>
+                    <span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                </td>
+            </tr>
+        </xpath>
+        <xpath expr="//div[@name='summary']//tbody//tr" position="after">
+            <t t-set="eco_contribution" t-value="0"/>
+            <t t-if="layout_category and layout_category['lines']">
+                <t t-foreach="layout_category['lines']" t-as="l">
+                    <t t-set="eco_contribution" t-value="l and eco_contribution + l.of_total_eco_contribution or eco_contribution"/>
+                </t>
+            </t>
+            <tr t-if="eco_contribution" name="summary_eco_contribution">
+                <td><i>dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</i></td>
+                <td class="text-right">
+                    <i><span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
+                </td>
+            </tr>
+        </xpath>
+        <!-- Faire apparaitre dans le total -->
+        <xpath expr="//tr[@name='total_ht']" position="after">
+            <tr t-if="o.of_total_eco_contribution" name="eco_contribution_total">
+                <td>dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</td>
+                <td class="text-right">
+                    <span t-field="o.of_total_eco_contribution" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                </td>
+            </tr>
+        </xpath>
+    </template>
+
+
+    <template id="sale_order_report" inherit_id="of_sale_quote_template.of_report_saleorder_document">
+        <!-- Ligne d'articles sans kit ou kit en mode display != 'expand' -->
+        <xpath expr="//t[@t-as='l']/tr" position="after">
+            <t t-if="doc.of_price_printing in ['order_line'] and (not l.of_is_kit or (l.of_is_kit and doc.of_kit_display_mode != 'expand')) and l.of_total_eco_contribution">
+                <tr name="eco_contribution_order_line">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="l.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Sections avancées -->
+        <xpath expr="//t[@name='layout_subtotal']" position="after">
+            <t t-set="eco_contribution" t-value="0"/>
+            <t t-foreach="layout_category['lines']" t-as="l">
+                <t t-set="eco_contribution" t-value="eco_contribution + l.of_total_eco_contribution"/>
+            </t>
+            <tr t-if="eco_contribution and doc.of_price_printing in ['layout_category_with_products', 'layout_category']" class="text-right" name="eco_contribution_advanced_layout_category">
+                <td groups="of_sale.group_of_sale_print_one_image"/>
+                <td colspan="100">
+                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;:</span>
+                    <span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                </td>
+            </tr>
+        </xpath>
+        <!-- Ligne de kit en mode display == 'expand' -->
+        <xpath expr="//t[@t-as='comp']/tr" position="inside">
+            <t t-if="comp.of_total_eco_contribution">
+                <tr name="eco_contribution_kit_expand">
+                    <td groups="of_sale.group_of_sale_print_one_image"/>
+                    <td>
+                        <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span></i>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_unit_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
+                        <span/>
+                    </td>
+                    <td class="text-right">
+                        <span/>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_subtotal">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                    <td class="text-right" groups="sale.group_show_price_total">
+                        <i><span t-field="comp.of_total_eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <!-- Sections avancées -->
+        <xpath expr="//div[@name='summary']//tbody//tr" position="after">
+            <t t-set="eco_contribution" t-value="0"/>
+            <t t-if="layout_category and layout_category['lines']">
+                <t t-foreach="layout_category['lines']" t-as="l">
+                    <t t-set="eco_contribution" t-value="eco_contribution + l.of_total_eco_contribution"/>
+                </t>
+            </t>
+            <tr t-if="eco_contribution" name="summary_eco_contribution">
+                <td><i>dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</i></td>
+                <td class="text-right">
+                    <i><span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
+                </td>
+            </tr>
+        </xpath>
+        <xpath expr="//tr[@name='total_ht']" position="after">
+            <tr t-if="doc.of_total_eco_contribution" name="eco_contribution_total">
+                <td>dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</td>
+                <td class="text-right">
+                    <span t-field="doc.of_total_eco_contribution" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                </td>
+            </tr>
+        </xpath>
+    </template>
+</odoo>
