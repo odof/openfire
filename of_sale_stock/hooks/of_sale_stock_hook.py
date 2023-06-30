@@ -27,13 +27,9 @@ class OFSaleStockHook(models.AbstractModel):
             # compute les champs of_procurement_purchase_line_id et of_check
             cr.execute("""
                 UPDATE stock_move AS sm
-                SET of_procurement_purchase_line_id = (
-                    SELECT purchase_line_id
-                    FROM procurement_order
-                    WHERE move_dest_id = sm.id
-                    LIMIT 1
-                )
-                WHERE state NOT IN ('done', 'cancel');""")
+                SET of_procurement_purchase_line_id = po.purchase_line_id
+                FROM procurement_order AS po
+                WHERE po.move_dest_id = sm.id""")
 
             cr.execute("""
                 UPDATE  stock_move                          SM1
