@@ -390,7 +390,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     @api.multi
     @api.depends(
         'duree', 'intervention_ids', 'recurrence', 'intervention_ids.state', 'date_next', 'mois_ids',
-        'tache_id', 'tache_id.fourchette_planif')
+        'tache_id', 'tache_id.fourchette_planif', 'intervention_ids.date')
     def _compute_durees(self):
         for service in self:
             # Dans cette fonction, les affectations sont très coûteuses, car elles impliquent un grand nombre de
