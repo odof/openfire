@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_invoice_report_view_search" model="ir.ui.view">
+        <field name="name">account.invoice.report.view.search</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@expand='1']/separator" position="before">
+                <field string="Éco-organisme" name="of_eco_organism_id" context="{'group_by' : 'of_eco_organism_id'}"/>
+                <field string="Éco-contribution" name="of_eco_contribution_id" context="{'group_by' : 'of_eco_contribution_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_invoice_report_view_pivot" model="ir.ui.view">
+        <field name="name">account.invoice.report.view.pivot</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_total']" position="after">
+                <field name="of_total_eco_contribution" type="measure"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

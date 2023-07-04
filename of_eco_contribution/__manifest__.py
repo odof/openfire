@@ -25,6 +25,7 @@ Gestion des Éco contributions
         'views/sale_order_views.xml',
         'views/account_invoice_views.xml',
         'report/of_eco_contribution_templates.xml',
+        'report/account_invoice_report_views.xml',
     ],
     'installable': True,
     'application': False,

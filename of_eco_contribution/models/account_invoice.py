@@ -55,6 +55,9 @@ class AccountInvoiceLine(models.Model):
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
     of_unit_eco_contribution = fields.Float(
         string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
+    of_eco_contribution_id = fields.Many2one(
+        comodel_name='of.eco.contribution', string=u"Éco-contribution", compute='_compute_of_eco_contribution_id',
+        store=True)
 
     @api.depends('product_id', 'quantity', 'uom_id', 'kit_id', 'of_is_kit')
     def _compute_of_total_eco_contribution(self):
@@ -75,6 +78,11 @@ class AccountInvoiceLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
+
+    @api.depends('of_total_eco_contribution', 'product_id')
+    def _compute_of_eco_contribution_id(self):
+        for record in self:
+            record.of_eco_contribution_id = record.product_id.of_eco_contribution_id
 
 
 class OfAccountInvoiceKit(models.Model):
