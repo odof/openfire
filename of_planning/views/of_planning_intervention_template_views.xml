@@ -29,7 +29,7 @@
                         <group name="general_two"/>
                     </group>
                     <notebook>
-                        <page string="Configuration">
+                        <page name="configuration" string="Configuration">
                             <group>
                                 <field name="sequence_id" colspan="2"/>
                                 <field name="send_reports" colspan="2"/>
