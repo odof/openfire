@@ -157,6 +157,7 @@ class ProductProduct(models.Model):
     @api.model
     def of_datastore_get_fields_to_not_empty(self):
         result = [
+            'barcode',
             'norme_id',
             'ecotax_amount',
         ]
@@ -195,7 +196,7 @@ class ProductProduct(models.Model):
                 return self_obj.browse(result._ids)
 
         # L'import d'articles via le tarif centralisé fait abstraction des droits de l'utilisateur.
-        # En effets, les articles distants sont utilisables comme si ils étaient déjà présents sur la base.
+        # En effet, les articles distants sont utilisables comme s'ils étaient déjà présents sur la base.
         self_obj = self_obj.sudo()
 
         fields_to_read = self.of_datastore_get_import_fields()
@@ -203,7 +204,7 @@ class ProductProduct(models.Model):
         for product_data in sorted(
                 self._of_read_datastore(fields_to_read, create_mode=True),
                 key=lambda vals: vals['of_is_kit']):
-            # Les kits sont ajoutés en dernier pour éviter d'importer des composants après qu'ils aient été
+            # Les kits sont ajoutés en dernier pour éviter d'importer des composants après qu'ils ont été
             # importés par le kit.
             result += self_obj.create(product_data)
         return result
