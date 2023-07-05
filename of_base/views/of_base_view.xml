@@ -227,7 +227,7 @@
                 <field name="vat"/>
             </xpath>
             <xpath expr="//notebook/page[1]/group[1]" position="inside">
-                <group string="Divers">
+                <group string="Divers" name="misc">
                     <field name="of_general_id"/>
                     <field name="of_accounting_id"/>
                     <field name="vat_check_vies"/>
