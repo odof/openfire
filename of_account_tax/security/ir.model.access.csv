@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_account_tax_account_internal_user,of.account.tax.account internal user,model_of_account_tax_account,base.group_user,1,0,0,0
+access_of_account_tax_account_user,of.account.tax.account user,model_of_account_tax_account,account.group_account_invoice,1,0,0,0
+access_of_account_tax_account_accountant,of.account.tax.account accountant,model_of_account_tax_account,account.group_account_manager,1,1,1,1
