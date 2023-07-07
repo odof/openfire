@@ -355,4 +355,12 @@
         </xpath>
     </template>
 
+    <template id="products" inherit_id="website_sale.products">
+        <xpath expr="//div[@id='wrap']" position="before">
+            <t t-if="search or attrib_set">
+                <meta name="robots" content="noindex, nofollow"/>
+            </t>
+        </xpath>
+    </template>
+
 </odoo>
