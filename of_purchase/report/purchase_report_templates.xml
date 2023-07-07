@@ -165,12 +165,12 @@
         <xpath expr="//table/thead/tr/th[2]" position="attributes">
             <attribute name="name">date_planned</attribute>
             <attribute name="invisible">0</attribute>
-            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+            <attribute name="t-if">any([l.date_planned != o.date_planned for l in o.order_line])</attribute>
         </xpath>
         <xpath expr="//table/tbody/tr/td[2]" position="attributes">
             <attribute name="name">date_planned</attribute>
             <attribute name="invisible">0</attribute>
-            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+            <attribute name="t-if">any([l.date_planned != o.date_planned for l in o.order_line])</attribute>
         </xpath>
     </template>
 
@@ -180,12 +180,12 @@
         <xpath expr="//table/thead/tr/th[3]" position="attributes">
             <attribute name="name">date_planned</attribute>
             <attribute name="invisible">0</attribute>
-            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+            <attribute name="t-if">any([l.date_planned != o.date_planned for l in o.order_line])</attribute>
         </xpath>
         <xpath expr="//table/tbody/tr/td[3]" position="attributes">
             <attribute name="name">date_planned</attribute>
             <attribute name="invisible">0</attribute>
-            <attribute name="t-if">any([l.date_planned != docs.date_planned for l in docs.order_line])</attribute>
+            <attribute name="t-if">any([l.date_planned != o.date_planned for l in o.order_line])</attribute>
         </xpath>
         <!-- Retrait des prix pour la commande sans prix (interroger docs et non o, car le context de o a été écrasé dans la vue parente) -->
         <!-- Titres du tableau -->
