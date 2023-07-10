@@ -39,9 +39,10 @@
             </td>
         </xpath>
         <xpath expr="//table[@t-if='o.pack_operation_ids']" position="after">
-            <h3>Produits non réservés</h3>
             <t t-set="of_check" t-value="o.move_lines.filtered('of_check')"/>
-            <table class="table table-condensed" t-if="o.move_lines">
+            <t t-set="unreserved_lines" t-value="o.move_lines.filtered(lambda ml: not ml.linked_move_operation_ids or ml.linked_move_operation_ids and sum(ml.mapped('linked_move_operation_ids.operation_id.product_qty')) &lt; ml.product_uom_qty)"/>
+            <h3 t-if="unreserved_lines">Produits non réservés</h3>
+            <table class="table table-condensed" t-if="unreserved_lines">
                 <thead>
                     <tr>
                         <th><strong>Article</strong></th>
@@ -54,7 +55,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr t-foreach="o.move_lines" t-as="move">
+                    <tr t-foreach="unreserved_lines" t-as="move">
                         <td>
                             <span t-field="move.product_id.name"/>
                         </td>
@@ -62,7 +63,8 @@
                             <span t-field="move.name"/>
                         </td>
                         <td>
-                            <span t-field="move.product_uom_qty"/>
+                            <span t-if="move.linked_move_operation_ids" t-esc="move.product_uom_qty - sum(move.mapped('linked_move_operation_ids.operation_id.product_qty'))"/>
+                            <span t-else="" t-field="move.product_uom_qty"/>
                         </td>
                         <td>
                             <span t-field="move.of_available_qty"/>
