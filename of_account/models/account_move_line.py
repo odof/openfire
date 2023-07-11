@@ -105,6 +105,12 @@ class AccountMoveLine(models.Model):
     # Compute methods
     # ----------------------------------------------------------
 
+    @api.depends('product_id')
+    def _compute_name(self):
+        if self._context.get('of_only_default_code'):
+            self = self.with_context(of_only_default_code=False)
+        super(AccountMoveLine, self)._compute_name()
+
     @api.depends('name', 'move_id.state')
     def _compute_of_name(self):
         for line in self:

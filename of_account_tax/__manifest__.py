@@ -1,24 +1,27 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'OpenFire / Taxes',
-    'author': 'OpenFire',
-    'version': '10.0.1.0.0',
-    'category': 'Accounting',
-    'summary': 'OpenFire Taxes',
-    'description': u"""
-Gestion des taxes OpenFire
-==========================
-
-Le système de taxes OpenFire ajoute une taxe par défaut dans les positions fiscales, qui intervient lorsqu'aucune taxe n'est définie dans le produit ni dans sa catégorie de produit.
-
-Une table de correspondance de comptes comptables est également ajoutée au niveau des taxes et est utilisée au niveau des lignes de factures.
-""",
-    'depends': ['account', 'sale', 'purchase'],
+    'name': "OpenFire / Taxes",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Personnalisation de la gestion des taxes",
+    'description': "",
+    'depends': [
+        'of_account',
+        'of_sale',
+        'purchase'
+    ],
     'data': [
-        'views/of_account_tax_view.xml',
+        'views/account_fiscal_position_views.xml',
+        'views/account_tax_views.xml',
+        'views/sale_order_views.xml',
+        'views/sale_order_views.xml',
         'security/ir.model.access.csv',
     ],
     'installable': True,
+    'application': False,
     'auto_install': False,
 }

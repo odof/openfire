@@ -36,6 +36,7 @@ class TestOFAccountCommon(TransactionCase):
                 'name': "Openfire FR",
                 'currency_id': cls.env.ref('base.EUR').id,
                 'country_id': cls.env.ref('base.fr').id,
+                'account_fiscal_country_id': cls.env.ref('base.fr').id,
             }
         )
         cls.env.user.company_ids |= cls.company_fr
@@ -75,6 +76,7 @@ class TestOFAccountCommon(TransactionCase):
                 },
             ]
         )
+        cls.company_fr.account_sale_tax_id = cls.tax_base
 
         cls.fiscal_pos_5_5, cls.fiscal_pos_10, cls.fiscal_pos_20 = cls.env['account.fiscal.position'].create(
             [
@@ -83,18 +85,21 @@ class TestOFAccountCommon(TransactionCase):
                     'auto_apply': True,
                     'country_id': cls.env.ref('base.fr').id,
                     'tax_ids': [Command.create({'tax_src_id': cls.tax_base.id, 'tax_dest_id': cls.tax_5_5.id})],
+                    'company_id': cls.company_fr.id,
                 },
                 {
                     'name': "Test Fiscal Position 10.0 %",
                     'auto_apply': True,
                     'country_id': cls.env.ref('base.fr').id,
                     'tax_ids': [Command.create({'tax_src_id': cls.tax_base.id, 'tax_dest_id': cls.tax_10.id})],
+                    'company_id': cls.company_fr.id,
                 },
                 {
                     'name': "Test Fiscal Position 20.0 %",
                     'auto_apply': True,
                     'country_id': cls.env.ref('base.fr').id,
                     'tax_ids': [Command.create({'tax_src_id': cls.tax_base.id, 'tax_dest_id': cls.tax_20.id})],
+                    'company_id': cls.company_fr.id,
                 },
             ]
         )

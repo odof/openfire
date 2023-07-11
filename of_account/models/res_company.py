@@ -12,3 +12,7 @@ class ResCompany(models.Model):
         help="Set a default payment term for deposits invoices (e.g. 50% on order, 50% on delivery)."
         "This payment terms will replace that of the order when the deposit invoice is created.",
     )
+
+    def _of_filter_taxes(self, taxes):
+        """Filter taxes to only keep those that are configured for the company."""
+        return taxes.filtered(lambda t: t.company_id == self)

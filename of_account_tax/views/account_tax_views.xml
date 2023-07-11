@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_view_tax_form" model="ir.ui.view">
+        <field name="name">of.account.tax.form</field>
+        <field name="model">account.tax</field>
+        <field name="inherit_id" ref="account.view_tax_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='advanced_options']" position="after">
+                <page string="Accounts allocation" name="accounts_allocation">
+                    <field name="of_account_ids" widget="one2many_list" nolabel="1">
+                        <tree string="Accounts allocation" editable="bottom">
+                            <field name="account_src_id"/>
+                            <field name="account_dest_id"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
