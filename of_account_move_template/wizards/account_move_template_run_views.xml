@@ -20,7 +20,7 @@
                 <group name="options" attrs="{'invisible':[('state','!=','template_selected')]}">
                     <field name="of_date_start"/>
                     <field name="of_recurring"/>
-               </group>
+                </group>
                 <group name="recurring" attrs="{'invisible':[('of_recurring','!=',True)]}">
                     <group name="recurring_first">
                         <label for="of_rec_interval"/>
@@ -45,6 +45,7 @@
         <field name="model">account.move.template.run</field>
         <field name="arch" type="xml">
             <form string="Move Template" >
+                <field name="company_id" invisible="1"/>
                 <field name="template_id" invisible="1"/>
                 <field name="of_template_ids" invisible="1"/>
                 <group>
