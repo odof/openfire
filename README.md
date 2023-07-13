@@ -13,7 +13,7 @@ La branche Openfire 16 dépend de certains modules OCA
 
 | Nom du module | Repository OCA | Repository ODOF |
 |---   |---   |---   |
-| base_multi_image | https://github.com/OCA/server-tools | https://github.com/odof/server-tools.git |
+| base_multi_image <br>base_view_inheritance_extension | https://github.com/OCA/server-tools | https://github.com/odof/server-tools.git |
 | web_chatter_position | https://github.com/OCA/web | - |
 | remove_odoo_enterprise | https://github.com/OCA/server-brand | - |
 | product_multi_image | https://github.com/OCA/product-attribute | https://github.com/odof/product-attribute.git |
