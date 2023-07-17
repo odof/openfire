@@ -16,7 +16,7 @@ from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
 import odoo.addons.decimal_precision as dp
-from odoo.addons.of_utils.models.of_utils import float_2_heures_minutes, compare_date, hours_to_strs
+from odoo.addons.of_utils.models.of_utils import float_2_heures_minutes, hours_to_strs
 
 
 @api.model
@@ -1076,7 +1076,6 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('address_id')
     def _onchange_address_id(self):
-        name = False
         address = self._context.get('from_portal') and self.address_id.sudo() or self.address_id
         if address:
             if not self.fiscal_position_id:
