@@ -1111,7 +1111,9 @@ class OfPlanningIntervention(models.Model):
         if (self.state == "draft" or
                 (self.state == 'confirm' and self._context.get('of_intervention_wizard'))) and \
                 template and not self._context.get('of_import_service_lines'):
-            if template.tache_id:
+            if template.tache_id and not self._context.get('of_from_contact_form'):
+                # We don't want to rechange task if user has changed it manually after the template selection
+                # when creating an intervention from a Contact
                 self.tache_id = template.tache_id
             # On change la position fiscale par celle du modèle si celle présente n'est pas sur la même société
             # comptable que le RDV ou si il n'y en a pas ET qu'il n'y a pas de lien vers une commande
@@ -1125,7 +1127,7 @@ class OfPlanningIntervention(models.Model):
             if template_accounting.fiscal_position_id and not self.lien_commande and \
                     (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = template_accounting.fiscal_position_id
-            if not self._context.get('of_intervention_wizard', False):
+            if not self._context.get('of_intervention_wizard', False) or self._context.get('of_from_contact_form'):
                 new_lines = self.line_ids or intervention_line_obj
                 for line in template.line_ids:
                     data = line.get_intervention_line_values()

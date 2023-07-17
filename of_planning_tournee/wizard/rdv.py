@@ -155,6 +155,7 @@ class OfTourneeRdv(models.TransientModel):
     origin_intervention_id = fields.Many2one(comodel_name='of.planning.intervention', string="Origin intervention")
     tache_id = fields.Many2one(
         comodel_name='of.planning.tache', string=u"Tâche", required=True, default=lambda s: s._default_planning_task())
+    template_id = fields.Many2one(comodel_name='of.planning.intervention.template', string="Intervention template")
     creer_recurrence = fields.Boolean(
         string=u"Créer récurrence?",
         help=u"Créera une intervention récurrente s'il n'en existe pas déjà une associée à ce RDV.")
@@ -500,6 +501,13 @@ class OfTourneeRdv(models.TransientModel):
         }
         self.update(vals)
 
+    @api.onchange('template_id')
+    def _onchange_template_id(self):
+        if not self.template_id:
+            return
+        template = self.template_id
+        self.update({'tache_id': template.tache_id})
+
     @api.onchange('tache_id')
     def _onchange_tache_id(self):
         """Affecte creer_recurrence, duree et pre_employee_ids"""
@@ -656,7 +664,8 @@ class OfTourneeRdv(models.TransientModel):
             intervention.with_context(  # Charger les lignes de facturation
                 of_import_service_lines=True)._onchange_service_id()
             intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
-            intervention.with_context(of_intervention_wizard=True).onchange_template_id()  # Load questionnary lines
+            # Load questionnary lines and more if coming from `res.partner` object
+            intervention.with_context(of_intervention_wizard=True, of_from_contact_form=True).onchange_template_id()
 
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
         # Creation/mise à jour du service si creer_recurrence
@@ -1155,9 +1164,9 @@ class OfTourneeRdv(models.TransientModel):
         self.ensure_one()
         service = self.service_id
         if service and service.template_id:
-            template = service.template_id
+            template_id = service.template_id.id
         else:
-            template = False
+            template_id = self.template_id.id or False
 
         tag_ids = \
             [(4, tag.id) for tag in service.tag_ids] \
@@ -1170,7 +1179,7 @@ class OfTourneeRdv(models.TransientModel):
             'partner_id': self.partner_id.id,
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
-            'template_id': template and template.id,
+            'template_id': template_id,
             'service_id': service.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
             'tag_ids': tag_ids,

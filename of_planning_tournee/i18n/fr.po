@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 14:23+0000\n"
-"PO-Revision-Date: 2023-04-07 14:23+0000\n"
+"POT-Creation-Date: 2023-07-17 11:56+0000\n"
+"PO-Revision-Date: 2023-07-17 11:56+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -58,7 +58,7 @@ msgid "<i class=\"oe_grey\">/!\\ Be careful, this can affect the performance of 
 msgstr "<i class=\"oe_grey\">/!\\ Attention, la planification rapide peut entamer la performance de votre base de données</i>"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:444
+#: code:addons/of_planning_tournee/wizard/rdv.py:442
 #, python-format
 msgid "<span style=\"font-size: x-small;font-weight: bold;%s\">Tour of %s, on %s</span>"
 msgstr "<span style=\"font-size: x-small;font-weight: bold;%s\">Tournée de %s, le %s</span>"
@@ -128,7 +128,7 @@ msgid "Allows you to display the table of available time slots by date in the pl
 msgstr "Permet d'afficher le tableau des créneaux disponibles par date dans l'encart de planification"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:507
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:534
 #, python-format
 msgid "An error has occured during the connection to the OSRM server : %s"
 msgstr "Une erreur s'est produite lors de la connexion au serveur OSRM : %s"
@@ -448,14 +448,14 @@ msgid "Demande d'intervention"
 msgstr "Demande d'intervention"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:397
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:424
 #, python-format
 msgid "Departure"
 msgstr "Départ"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:397
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:408
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:424
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:435
 #, python-format
 msgid "Departure/Return"
 msgstr "Départ/Retour"
@@ -657,7 +657,7 @@ msgid "Employee"
 msgstr "Employé"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:633
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:660
 #, python-format
 msgid "Employee \"%s\" has no working hours for this day.\n"
 ""
@@ -665,7 +665,7 @@ msgstr "L'employé \"%s\" n'a pas d'heures de travail pour ce jour.\n"
 ""
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:739
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:766
 #, python-format
 msgid "Employee \"%s\" has no working hours.\n"
 "Please set the working hours before optimizing/reorganizing the tour"
@@ -680,7 +680,7 @@ msgid "Employees"
 msgstr "Employés"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:734
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:761
 #, python-format
 msgid "Employees \"%s\" have no working hours.\n"
 "Please set the working hours before optimizing/reorganizing the tour"
@@ -693,7 +693,7 @@ msgid "Enable quick scheduling"
 msgstr "Activer la planification rapide"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:505
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:532
 #, python-format
 msgid "Error connecting to OSRM server, please try again later.\n"
 "\n"
@@ -888,7 +888,12 @@ msgid "Intervention"
 msgstr "Intervention"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:1050
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_template_id
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_planning_tournee
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:1090
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_intervention_ids
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
 #, python-format
@@ -1321,7 +1326,7 @@ msgid "Plan Intervention"
 msgstr "Planifier intervention"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_intervention.py:383
+#: code:addons/of_planning_tournee/models/of_planning_intervention.py:457
 #, python-format
 msgid "Plan again"
 msgstr "Re-planifier"
@@ -1333,10 +1338,10 @@ msgstr "Planifier une intervention"
 
 #. module: of_planning_tournee
 #: code:addons/of_planning_tournee/models/of_service.py:36
-#: code:addons/of_planning_tournee/models/res_partner.py:27
-#: code:addons/of_planning_tournee/models/res_partner.py:57
-#: code:addons/of_planning_tournee/wizard/rdv.py:586
-#: code:addons/of_planning_tournee/wizard/rdv.py:615
+#: code:addons/of_planning_tournee/models/res_partner.py:30
+#: code:addons/of_planning_tournee/models/res_partner.py:60
+#: code:addons/of_planning_tournee/wizard/rdv.py:591
+#: code:addons/of_planning_tournee/wizard/rdv.py:620
 #, python-format
 msgid "Plan intervention"
 msgstr "Planifier intervention"
@@ -1367,19 +1372,19 @@ msgid "Planning d'intervention OpenFire"
 msgstr "Planning d'intervention OpenFire"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:784
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:811
 #, python-format
 msgid "Please geolocate all addresses before optimizing/reorganising the tour."
 msgstr "Veuillez géolocaliser toutes les adresses avant de optimiser/reorganiser le tour."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:765
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:792
 #, python-format
 msgid "Please set the return address before optimizing/reorganizing the tour."
 msgstr "Veuillez indiquer l'adresse de retour avant d'optimiser ou de réorganiser la tournée."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:763
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:790
 #, python-format
 msgid "Please set the start address before optimizing/reorganizing the tour."
 msgstr "Veuillez définir l'adresse de départ avant d'optimiser/réorganiser la tournée."
@@ -1501,7 +1506,7 @@ msgid "Restore tour"
 msgstr "Restaurer la tournée"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:408
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:435
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
 #, python-format
@@ -1802,19 +1807,19 @@ msgid "The Geodata of an intervention have changed since the last optimization. 
 msgstr "Les géodonnées d'une intervention ont changé depuis la dernière optimisation. Vous devez envisager de ré-optimiser la tournée."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_intervention_settings.py:87
+#: code:addons/of_planning_tournee/models/of_intervention_settings.py:92
 #, python-format
 msgid "The Number of results must be positive and can't exceed 30."
 msgstr "Le nombre de résultats doit être positif et ne peut pas dépasser plus de 30."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:724
+#: code:addons/of_planning_tournee/wizard/rdv.py:730
 #, python-format
 msgid "The company address is not geocoded, please geocode it to plan an intervention. If an employee's address is not geocoded, we will use the company address instead to plan the intervention."
 msgstr "L'adresse de l'entreprise n'est pas géocodée, merci de la géocoder pour planifier une intervention. Si l'adresse d'un employé n'est pas géocodée, nous utiliserons plutôt l'adresse de l'entreprise pour planifier l'intervention."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_intervention_settings.py:92
+#: code:addons/of_planning_tournee/models/of_intervention_settings.py:97
 #, python-format
 msgid "The number of days for the tours creation must be positive and can't exceed 180"
 msgstr "Le nombre de jours pour la création des tournées doit être positif et ne peut pas dépasser 180."
@@ -1830,13 +1835,13 @@ msgid "The optimized total duration of the tour, that includes the duration from
 msgstr "La durée totale optimisée de la tournée, qui comprend la durée depuis l'adresse de départ et jusqu'à l'adresse d'arrivée (h)."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:223
+#: code:addons/of_planning_tournee/wizard/rdv.py:230
 #, python-format
 msgid "The value of 'Search period (in days)' must be between 1 and 45"
 msgstr "La valeur de 'Période de recherche (en jours)' doit être comprise entre 1 et 45"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_intervention.py:359
+#: code:addons/of_planning_tournee/models/of_planning_intervention.py:433
 #: code:addons/of_planning_tournee/models/of_service.py:15
 #: code:addons/of_planning_tournee/models/res_partner.py:14
 #, python-format
@@ -2097,31 +2102,31 @@ msgid "Workers"
 msgstr "Intervenants"
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:873
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:911
 #, python-format
 msgid "You can't duplicate a tour."
 msgstr "Vous ne pouvez pas dupliquer une tournée."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:987
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:1027
 #, python-format
 msgid "You can't optimize an empty tour."
 msgstr "Il n'est pas possible d'optimiser une tournée vide."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:1019
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:1059
 #, python-format
 msgid "You can't reorganize an empty tour."
 msgstr "Il n'est pas possible de reorganiser une tournée vide."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/wizard/rdv.py:719
+#: code:addons/of_planning_tournee/wizard/rdv.py:725
 #, python-format
 msgid "You must set a duration to search for available time slots."
 msgstr "Vous devez définir une durée pour rechercher les créneaux disponibles."
 
 #. module: of_planning_tournee
-#: code:addons/of_planning_tournee/models/of_planning_tournee.py:780
+#: code:addons/of_planning_tournee/models/of_planning_tournee.py:807
 #, python-format
 msgid "You must set the address of all interventions before optimizing/reorganising the tour."
 msgstr "Vous devez paramétrer l'adresse de toutes les interventions avant de optimiser/reorganiser le tour."
