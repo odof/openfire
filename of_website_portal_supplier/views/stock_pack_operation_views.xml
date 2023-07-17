@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="stock_pack_operation_view_form" model="ir.ui.view">
+        <field name="name">of.website.portal.supplier.stock.pack.operation.view.form</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_details_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='qty_to']/group[1]" position="inside">
+                <field name="of_shipped_qty"/>
+                <field name="of_expected_shipment_date"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_pack_operation_lot_view_form" model="ir.ui.view">
+        <field name="name">of.website.portal.supplier.stock.pack.operation.lot.view.form</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pack_lot_ids']/tree" position="inside">
+                <field name="of_shipped_qty"/>
+                <field name="of_expected_shipment_date"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="website_config_settings_view_form" model="ir.ui.view">
+        <field name="name">website.config.settings.view.form</field>
+        <field name="model">website.config.settings</field>
+        <field name="inherit_id" ref="of_website_portal.of_website_portal_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='portals']" position="inside">
+                <label for="of_picking_rollback_delay_minutes_supplier"/>
+                <div>
+                    <field name="of_picking_rollback_delay_minutes_supplier" class="oe_inline"/>
+                    <span>minutes après la validation par le fournisseur</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

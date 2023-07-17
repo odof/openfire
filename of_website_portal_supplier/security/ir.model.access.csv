@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_stock_picking_supplier,access.of.stock.picking.supplier,stock.model_stock_picking,of_website_portal_supplier.group_of_supplier_portal,1,1,0,0
+access_of_stock_pack_operation_supplier,access.of.stock.pack.operation.supplier,stock.model_stock_pack_operation,of_website_portal_supplier.group_of_supplier_portal,1,1,0,0
+access_of_stock_pack_operation_lot_supplier,access.of.stock.pack.operation.lot.supplier,stock.model_stock_pack_operation_lot,of_website_portal_supplier.group_of_supplier_portal,1,1,0,0
+access_of_stock_warehouse_supplier,access.of.stock.warehouse.supplier,stock.model_stock_warehouse,of_website_portal_supplier.group_of_supplier_portal,1,0,0,0
+access_of_product_product_supplier,access.of.product.product.supplier,product.model_product_product,of_website_portal_supplier.group_of_supplier_portal,1,0,0,0
+access_of_product_template_supplier,access.of.product.template.supplier,product.model_product_template,of_website_portal_supplier.group_of_supplier_portal,1,0,0,0
+access_of_product_brand_supplier,access.of.product.brand.supplier,of_product_brand.model_of_product_brand,of_website_portal_supplier.group_of_supplier_portal,1,0,0,0
+access_of_stock_production_lot_supplier,access.of.stock.production.lot.supplier,stock.model_stock_production_lot,of_website_portal_supplier.group_of_supplier_portal,1,0,0,0

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="stock_picking_view_search" model="ir.ui.view">
+        <field name="name">of.website.portal.supplier.stock.picking.internal.search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter name="of_shipped_by_supplier" string="Expédié par le fournisseur" domain="[('of_shipped_by_supplier','=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_picking_view_form" model="ir.ui.view">
+        <field name="name">of.website.portal.supplier.stock.picking.view.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pack_operation_product_ids']/tree/field[@name='qty_done']" position="after">
+                <field name="of_shipped_qty"/>
+                <field name="of_expected_shipment_date"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="before">
+                <field name="of_shipment_date"/>
+                <field name="of_shipped_by_supplier"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
