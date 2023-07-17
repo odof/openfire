@@ -65,19 +65,21 @@ class OFRecomputeGetPartnersWizard(models.TransientModel):
     @api.multi
     def recompute_partners(self):
         muk_directory_obj = self.env['muk_dms.directory']
+        domain = [('parent_directory', '!=', False)]
         if self.partner_ids:
-            main_directories = muk_directory_obj.search([('of_partner_id', 'in', self.partner_ids._ids)])
+            domain += [('of_partner_id', 'in', self.partner_ids._ids)]
         else:
-            main_directories = muk_directory_obj.search([('of_partner_id', '!=', False)])
+            domain += [('of_partner_id', '!=', False)]
+        main_directories = muk_directory_obj.search(domain)
 
         for partner_directory in main_directories:
             current_directories = partner_directory
             while current_directories:
                 # recompute current directories before children, they may need the path
                 if self.field_directory_ids:
-                    for field_name in self.field_directory_ids.mapped('name'):
-                        current_directories._recompute_todo(current_directories._fields[field_name])
-                    current_directories.recompute()
+                    # if field_directory_ids is not False then we know relational_path
+                    # need to be recomputed as it is the only field available
+                    current_directories._compute_relational_path()
                 # recompute files in current directories
                 if self.field_file_ids:
                     files = current_directories.mapped('files')
@@ -85,4 +87,3 @@ class OFRecomputeGetPartnersWizard(models.TransientModel):
                         files._recompute_todo(files._fields[field_name])
                     files.recompute()
                 current_directories = current_directories.mapped('child_directories')
-
