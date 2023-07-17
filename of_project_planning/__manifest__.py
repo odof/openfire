@@ -46,6 +46,7 @@ Fonctionnalités
         'views/of_project_planning_views.xml',
         'views/of_project_views.xml',
         'views/of_hr_timesheet_views.xml',
+        'views/templates.xml',
         'security/ir.model.access.csv',
         'hooks/hook_views.xml',
     ],
