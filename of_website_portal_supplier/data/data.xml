@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_tab_shipment" model="of.tab">
+        <field name="name">Expédition</field>
+        <field name="code">shipment</field>
+    </record>
+
+    <record id="ir_cron_supplier_picking_shipment" model="ir.cron">
+        <field name="name">Expédition des BL de fournisseurs</field>
+        <field name="model">stock.picking</field>
+        <field name="function">cron_ship_picking_from_suppliers</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+        <field name="nextcall">2023-07-20 00:00:00</field>
+        <field name="numbercall">-1</field>
+        <field name="active">true</field>
+        <field name="args">()</field>
+    </record>
+
+</odoo>
