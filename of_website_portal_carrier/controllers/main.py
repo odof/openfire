@@ -244,7 +244,7 @@ class WebsiteAccount(website_account):
 
         pack_ids = [int(key) for key in kw.keys()]
         packs = receipt.sudo().pack_operation_product_ids.filtered(lambda p: p.id in pack_ids)
-        pdf = request.env['report'].sudo().get_pdf(packs.ids, 'of_website_portal_carrier.report_receipt_label')
+        pdf = request.env['report'].sudo().get_pdf(packs.ids, 'of_website_portal.report_label')
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
             ('Content-Disposition', 'attachment; filename=Etiquette.pdf;')
@@ -257,7 +257,7 @@ class WebsiteAccount(website_account):
         if not pack:
             return request.render('website.403')
 
-        pdf = request.env['report'].sudo().get_pdf([pack_id], 'of_website_portal_carrier.report_receipt_label')
+        pdf = request.env['report'].sudo().get_pdf([pack_id], 'of_website_portal.report_label')
         pdfhttpheaders = [
             ('Content-Type', 'application/pdf'), ('Content-Length', len(pdf)),
             ('Content-Disposition', 'attachment; filename=Etiquette.pdf;')

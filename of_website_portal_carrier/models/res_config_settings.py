@@ -17,7 +17,7 @@ class WebsiteConfigSettings(models.TransientModel):
             self.env['ir.values'].sudo().set_default('website.config.settings', 'of_picking_backorder', 'choice')
         return res
 
-    of_picking_rollback_delay = fields.Integer(string=u"(OF) Délais de modification des BR")
+    of_picking_rollback_delay = fields.Integer(string=u"(OF) Délais de modification des BR pour les transporteurs")
     of_picking_backorder = fields.Selection(selection=[
         ('choice', u"Choix"),
         ('auto', u"Automatique"),

@@ -147,4 +147,14 @@
         </xpath>
     </template>
 
+    <template id="of_portal_layout" inherit_id="website_portal.portal_layout">
+        <xpath expr="//div[@id='wrap']//div[@class='col-md-8']" position="attributes">
+            <attribute name="class"></attribute>
+            <attribute name="t-att-class">'col-md-12' if no_sidebar else 'col-md-8'</attribute>
+        </xpath>
+        <xpath expr="//div[@id='o_my_sidebar']" position="attributes">
+            <attribute name="t-if">not no_sidebar</attribute>
+        </xpath>
+    </template>
+
 </odoo>

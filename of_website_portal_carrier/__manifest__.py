@@ -25,7 +25,6 @@ Module OpenFire pour le portail transporteur du site internet
         'views/of_website_portal_carrier_views.xml',
         'views/res_config_settings_views.xml',
         'templates/template_views.xml',
-        'reports/report_stock_picking.xml',
     ],
     'qweb': [
     ],
