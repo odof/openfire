@@ -58,6 +58,12 @@ class MailComposer(models.TransientModel):
     @api.multi
     def send_mail_action(self):
         res = super(MailComposer, self.with_context(mail_notify_author=self.template_id and self.template_id.of_copie_expediteur)).send_mail_action()
+
+        message_followers = self.env['sale.order'].sudo().mapped('message_follower_ids')
+
+        print "coucou"
+        print len(self.partner_ids)
+        print len(message_followers)
         return res
 
 

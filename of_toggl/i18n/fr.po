@@ -1,0 +1,130 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_toggl
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-01 08:15+0000\n"
+"PO-Revision-Date: 2023-03-01 08:15+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_res_users_toggl_token
+msgid "API Token"
+msgstr "Token API"
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_import_time_entry_wizard
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_import_time_entry_wizard_date_from
+msgid "Date From"
+msgstr "Date de Début"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_import_time_entry_wizard_date_to
+msgid "Date To"
+msgstr "Date de Fin"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_res_users_of_default_toggl_project_id
+msgid "Default Project"
+msgstr "Projet par défaut"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_toggl_mapping_line_pid_toggl
+msgid "ID Toggl Project"
+msgstr "ID du projet Toggl"
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_import_time_entry_wizard
+msgid "Import"
+msgstr "Importer"
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_users_form
+msgid "Import My Projects"
+msgstr "Importer mes projets"
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_existing_time_entry_wizard
+msgid "Import New Ones"
+msgstr "Importer les Nouvelles"
+
+#. module: of_toggl
+#: code:addons/of_toggl/models/of_import_time_toggl_wizard.py:71
+#, python-format
+msgid "No Lines to Import"
+msgstr "Pas de lignes à importer"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_toggl_mapping_line_project_id
+msgid "Odoo Project"
+msgstr "Projet Odoo"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_toggl_mapping_line_pname_toggl
+msgid "Project Name"
+msgstr "Nom du projet"
+
+#. module: of_toggl
+#: code:addons/of_toggl/models/res_users.py:43
+#: code:addons/of_toggl/models/of_import_time_toggl_wizard.py:66
+#: code:addons/of_toggl/models/of_import_time_toggl_wizard.py:112
+#: code:addons/of_toggl/models/of_import_time_toggl_wizard.py:157
+#, python-format
+msgid "Request failed!"
+msgstr "Requête échouée !"
+
+#. module: of_toggl
+#: model:ir.actions.act_window,name:of_toggl.action_import_time_entry_menu
+#: model:ir.ui.menu,name:of_toggl.menu_import_time_entry
+msgid "Time Entry Import"
+msgstr "Import des Feuilles de Temps"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_account_analytic_line_of_teid_toggl
+msgid "Toggl ID"
+msgstr "ID Toggl"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_res_users_of_toggl_mapping_ids
+#: model:ir.ui.view,arch_db:of_toggl.view_users_form
+msgid "Toggl Mapping Lines"
+msgstr "Lignes de mapping Toggl"
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_existing_time_entry_wizard
+msgid "Update And Import"
+msgstr "Mettre à jour et Importer"
+
+#. module: of_toggl
+#: model:ir.model.fields,field_description:of_toggl.field_of_toggl_mapping_line_user_id
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_toggl
+#: code:addons/of_toggl/models/res_users.py:34
+#, python-format
+msgid "You can only modify Toggl informations from your user profile."
+msgstr "Vous ne pouvez modifier que les informations Toggl de votre profil utilisateur."
+
+#. module: of_toggl
+#: model:ir.ui.view,arch_db:of_toggl.view_existing_time_entry_wizard
+msgid "<span>You have already imported Toggl Timesheets, What do you want to do ?</span>"
+msgstr "<span>Vous avez déjà importé des feuilles de temps Toggl, que voulez vous faire ?</span>"
+
+#. module: of_toggl
+#: code:addons/of_toggl/models/res_users.py:36
+#, python-format
+msgid "You must specify an API Token to import projects."
+msgstr "Vous devez spécifier un token API pour importer vos projets."
