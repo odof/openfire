@@ -31,9 +31,19 @@ msgid "# Interventions"
 msgstr "# Interventions"
 
 #. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_kanban
+msgid "&amp;nbsp;"
+msgstr "&amp;nbsp;"
+
+#. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_form
 msgid "(Ignore that message)"
 msgstr "(Ignorer ce message)"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_group_of_planning_tournee_manual_creation
+msgid "(OF) Création manuelle des tournées autorisée"
+msgstr "(OF) Création manuelle des tournées autorisée"
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_tour_planning_area_mass_assignation_wizard_view_form
@@ -323,6 +333,16 @@ msgstr "Créé par"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_line_create_date
 msgid "Created on"
 msgstr "Créé le"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_creating
+msgid "Creating"
+msgstr "Création en cours"
+
+#. module: of_planning_tournee
+#: model:res.groups,name:of_planning_tournee.group_planning_tournee_manual_creation
+msgid "Création manuelle des tournées"
+msgstr "Création manuelle des tournées"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tournee_rdv_creer_recurrence
@@ -1115,6 +1135,11 @@ msgid "Mobile"
 msgstr "Mobile"
 
 #. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_filter
+msgid "Mois en cours"
+msgstr "Mois en cours"
+
+#. module: of_planning_tournee
 #: selection:of.planning.tournee,weekday:0
 #: selection:of.tournee.rdv.line,weekday:0
 msgid "Monday"
@@ -1475,9 +1500,19 @@ msgid "Rechercher"
 msgstr "Rechercher"
 
 #. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_filter
+msgid "Regrouper par..."
+msgstr "Regrouper par..."
+
+#. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_tour_planning_optimization_wizard_view_form
 msgid "Relaunch"
 msgstr "Relancer"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,help:of_planning_tournee.field_of_intervention_settings_group_of_planning_tournee_manual_creation
+msgid "Rend disponible la création dans la vue des tournées."
+msgstr "Rend disponible la création dans la vue des tournées."
 
 #. module: of_planning_tournee
 #: model:ir.ui.view,arch_db:of_planning_tournee.of_tour_planning_reorganization_wizard_view_form
@@ -1565,6 +1600,12 @@ msgid "Search type"
 msgstr "Type de recherche"
 
 #. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_gb_sector_id
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_filter
+msgid "Secteur"
+msgstr "Secteur"
+
+#. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_sector_kanban_names
 msgid "Sector names"
 msgstr "Noms des secteurs"
@@ -1595,6 +1636,11 @@ msgstr "Secteurs"
 #: model:ir.ui.view,arch_db:of_planning_tournee.view_rdv_intervention_wizard
 msgid "Select and confirm this slot"
 msgstr "Sélectionner et confirmer ce créneau"
+
+#. module: of_planning_tournee
+#: model:ir.ui.view,arch_db:of_planning_tournee.of_planning_tournee_view_filter
+msgid "Semaine en cours"
+msgstr "Semaine en cours"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_sequence
@@ -2225,8 +2271,3 @@ msgstr "Équipe d'intervention"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_employee_other_ids
 msgid "Équipiers"
 msgstr "Équipiers"
-
-#. module: of_planning_tournee
-#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_creating
-msgid "Creating"
-msgstr "Création en cours"

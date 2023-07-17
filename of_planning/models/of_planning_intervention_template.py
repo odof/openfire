@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, models, fields, SUPERUSER_ID, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError
 import odoo.addons.decimal_precision as dp
 import os
 import base64
@@ -16,36 +17,6 @@ class OfPlanningInterventionTemplate(models.Model):
     _name = 'of.planning.intervention.template'
     _order = 'sequence'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """ A supprimer après mise en ligne
-            Les anciens template n'ont plus besoin d'exister vu les modifications
-        """
-        res = super(OfPlanningInterventionTemplate, self)._auto_init()
-        module_self = self.env['ir.module.module'].search(
-            [('name', '=', 'of_planning'), ('state', 'in', ['installed', 'to upgrade'])])
-        if module_self:
-            # installed_version est trompeur, il contient la version en cours d'installation
-            # on utilise donc latest version à la place
-            version = module_self.latest_version
-            if version < '10.0.1.1.1':
-                cr = self.env.cr
-                cr.execute('''
-INSERT INTO of_planning_intervention_template_line (template_id, product_id, qty, price_unit, name)
-SELECT templ.id, prod.id, 1, prodtemp.list_price, prodtemp.name 
-FROM of_planning_intervention_template AS templ
-    INNER JOIN of_planning_tache tache
-    ON tache.id = templ.tache_id
-    LEFT JOIN of_planning_intervention_template_line AS line
-    ON line.template_id = templ.id AND line.product_id = tache.product_id
-    INNER JOIN product_product AS prod
-    ON prod.id = tache.product_id
-    INNER JOIN product_template AS prodtemp
-    ON prodtemp.id = prod.product_tmpl_id
-WHERE line.id IS NULL
-                ''')
-        return res
-
     @api.model
     def _get_default_template_values(self):
         res = self._get_default_template_values_fi()
@@ -54,7 +25,8 @@ WHERE line.id IS NULL
 
     @api.model
     def _get_default_template_values_fi(self):
-        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         values = {}
         if default_template:
             copy = default_template.copy_data()[0] or {}
@@ -66,7 +38,8 @@ WHERE line.id IS NULL
 
     @api.model
     def _get_default_template_values_ri(self):
-        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         values = {}
         if default_template:
             copy = default_template.copy_data()[0] or {}
@@ -141,7 +114,6 @@ WHERE line.id IS NULL
     fi_order_of_date_vt = fields.Boolean(string="Date VT")
     fi_order_totals = fields.Boolean(string="Totaux")
     fi_order_of_notes_intervention = fields.Boolean(string="Notes d'intervention")
-
 
     # Produits et travaux (lignes de commande)
     fi_products = fields.Boolean(string="PRODUITS ET TRAVAUX")
@@ -226,7 +198,8 @@ WHERE line.id IS NULL
 
     @api.depends()
     def _compute_is_default_template(self):
-        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if default_template:
             default_template.is_default_template = True
 
@@ -262,7 +235,7 @@ WHERE line.id IS NULL
                 'implementation': 'no_gap',
                 'prefix': template.code,
                 'padding': 4,
-                }
+            }
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
 
     @api.onchange('tache_id')
@@ -282,7 +255,7 @@ WHERE line.id IS NULL
                 self.line_ids |= new_line
 
     @api.onchange('fi_default')
-    def _onchange_ri_default(self):
+    def _onchange_fi_default(self):
         if self.fi_default:
             self.update(self._get_default_template_values_fi())
 
@@ -344,7 +317,8 @@ WHERE line.id IS NULL
         if vals.get('ri_default', False):
             vals.update(self._get_default_template_values_ri())
         res = super(OfPlanningInterventionTemplate, self).write(vals)
-        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if default_template and default_template in self:
             others = self.search([('id', '!=', default_template.id), ('fi_default', '=', True)])
             others.write(self._get_default_template_values_fi())
@@ -354,11 +328,11 @@ WHERE line.id IS NULL
 
     @api.multi
     def unlink(self):
-        default_template = self.env.ref('of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+        default_template = self.env.ref(
+            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if default_template and default_template in self and self.env.uid != SUPERUSER_ID:
             raise UserError(u"Impossible de supprimer le modèle d'intervention par défaut")
-        res = super(OfPlanningInterventionTemplate, self).unlink()
-        return res
+        return super(OfPlanningInterventionTemplate, self).unlink()
 
     @api.multi
     def copy(self, default=None):
@@ -505,7 +479,7 @@ class OfPlanningInterventionTemplateLine(models.Model):
             'price_unit': self.price_unit,
             'qty': self.qty,
             'name': self.name,
-            }
+        }
 
 
 class IrModelData(models.Model):
@@ -516,12 +490,12 @@ class IrModelData(models.Model):
     @api.model
     def _update(self, model, module, values, xml_id=False, store=True, noupdate=False, mode='init', res_id=False):
         res = super(IrModelData, self)._update(
-                model=model, module=module, values=values, xml_id=xml_id, store=store, noupdate=noupdate, mode=mode,
-                res_id=res_id)
+            model=model, module=module, values=values, xml_id=xml_id, store=store, noupdate=noupdate, mode=mode,
+            res_id=res_id)
         if xml_id == 'of_planning_default_intervention_template':
             template_obj = self.env['of.planning.intervention.template']
             default_template = self.env.ref(
-                    'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
+                'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
             if default_template:
                 others = template_obj.search([('id', '!=', default_template.id), ('fi_default', '=', True)])
                 others.write(template_obj._get_default_template_values_fi())
