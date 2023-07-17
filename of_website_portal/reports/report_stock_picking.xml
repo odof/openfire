@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
-    <record id="receipt_label_paperformat" model="report.paperformat">
+    <record id="label_paperformat" model="report.paperformat">
         <field name="name">Format étiquette 12x10</field>
         <field name="default" eval="True"/>
         <field name="format">custom</field>
@@ -17,58 +17,58 @@
         <field name="dpi">90</field>
     </record>
 
-    <report id="receipt_label_report"
+    <report id="label_report"
             model="stock.pack.operation"
             string="Étiquette"
             report_type="qweb-pdf"
-            name="of_website_portal_carrier.report_receipt_label"
-            file="of_website_portal_carrier.report_receipt_label"
-            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+            name="of_website_portal.report_label"
+            file="of_website_portal.report_label"
+            paperformat="of_website_portal.label_paperformat"
     />
 
-    <template id="report_receipt_label">
+    <template id="report_label">
         <t t-call="report.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="of_website_portal_carrier.report_receipt_label_document" t-lang="doc.picking_id.sudo().partner_id.lang"/>
+                <t t-call="of_website_portal.report_label_document" t-lang="doc.picking_id.sudo().partner_id.lang"/>
             </t>
         </t>
     </template>
 
-    <report id="receipt_stock_picking_label_report"
+    <report id="stock_picking_label_report"
             model="stock.picking"
             string="Étiquettes"
             report_type="qweb-pdf"
-            name="of_website_portal_carrier.report_stock_picking_receipt_label"
-            file="of_website_portal_carrier.report_stock_picking_receipt_label"
-            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+            name="of_website_portal.report_stock_picking_label"
+            file="of_website_portal.report_stock_picking_label"
+            paperformat="of_website_portal.label_paperformat"
     />
 
-    <template id="report_stock_picking_receipt_label">
+    <template id="report_stock_picking_label">
         <t t-call="report.html_container">
             <t t-foreach="docs.mapped('pack_operation_product_ids')" t-as="doc">
-                <t t-call="of_website_portal_carrier.report_receipt_label_document" t-lang="doc.picking_id.partner_id.lang"/>
+                <t t-call="of_website_portal.report_label_document" t-lang="doc.picking_id.partner_id.lang"/>
             </t>
         </t>
     </template>
 
-    <report id="receipt_stock_production_lot_label_report"
+    <report id="stock_production_lot_label_report"
             model="stock.production.lot"
             string="Étiquettes"
             report_type="qweb-pdf"
-            name="of_website_portal_carrier.report_stock_production_lot_receipt_label"
-            file="of_website_portal_carrier.report_stock_production_lot_receipt_label"
-            paperformat="of_website_portal_carrier.receipt_label_paperformat"
+            name="of_website_portal.report_stock_production_lot_label"
+            file="of_website_portal.report_stock_production_lot_label"
+            paperformat="of_website_portal.label_paperformat"
     />
 
-    <template id="report_stock_production_lot_receipt_label">
+    <template id="report_stock_production_lot_label">
         <t t-call="report.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="of_website_portal_carrier.report_receipt_lot_label_document" t-lang="user.lang"/>
+                <t t-call="of_website_portal.report_lot_label_document" t-lang="user.lang"/>
             </t>
         </t>
     </template>
 
-    <template id="report_receipt_lot_label_document">
+    <template id="report_lot_label_document">
         <div class="page" style="page-break-after: always; font-size: 22px;">
             <div class="row text-center">
                 <div class="col-xs-6" style="height: 80px; margin-top: 30px;">
@@ -93,14 +93,14 @@
         </div>
     </template>
 
-    <template id="report_receipt_label_document">
+    <template id="report_label_document">
         <t t-if="doc.pack_lot_ids">
             <t t-foreach="doc.pack_lot_ids" t-as="lot">
-                <t t-call="of_website_portal_carrier.label_template"/>
+                <t t-call="of_website_portal.label_template"/>
             </t>
         </t>
         <t t-else="">
-            <t t-call="of_website_portal_carrier.label_template"/>
+            <t t-call="of_website_portal.label_template"/>
         </t>
     </template>
 

@@ -76,234 +76,191 @@
     </template>
 
     <template id="of_website_portal_portal_my_receipt" name="My Receipt">
-        <t t-call="website.layout">
-            <div class="container mt16">
-                <div class="navbar navbar-default">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#oe-help-navbar-collapse">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="/my/home">
-                            My Account
-                        </a>
-                    </div>
-                    <div class="collapse navbar-collapse" id="oe-help-navbar-collapse">
-                        <ul class="nav navbar-nav o_portal_submenu">
-                            <li t-if="'contract' in tabs">
-                                <a href="/my/contracts">Contracts</a>
-                            </li>
-                            <li t-if="'quotation' in tabs">
-                                <a href="/my/quotes">Quotes</a>
-                            </li>
-                            <li t-if="'order' in tabs">
-                                <a href="/my/orders">Orders</a>
-                            </li>
-                            <li t-if="'invoice' in tabs">
-                                <a href="/my/invoices">Invoices</a>
-                            </li>
-                            <li t-if="'delivery' in tabs">
-                                <a href="/my/deliveries">Livraisons</a>
-                            </li>
-                            <li t-if="'receipt' in tabs">
-                                <a href="/my/receipts">Réceptions</a>
-                            </li>
-                            <li t-if="'service' in tabs">
-                                <a href="/my/services">Demande d'intervention</a>
-                            </li>
-                            <li groups="base.group_portal,base.group_user">
-                                <a href="/my/documents">Mes documents</a>
-                            </li>
-                        </ul>
+        <t t-call="website_portal.portal_layout">
+            <t t-set="no_sidebar" t-value="True" />
+            <t t-if="request.params.get('error')">
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger" role="alert">
+                            <a href="#" class="alert-link">Une erreur s'est produite</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="wrap">
-                <t t-if="request.params.get('error')">
-                    <div class="container">
-                        <div class="col-md-12">
-                            <div class="alert alert-danger" role="alert">
-                                <a href="#" class="alert-link">Une erreur s'est produite</a>
-                            </div>
-                        </div>
-                    </div>
-                </t>
-                <t t-if="request.params.get('modal')">
-                    <t t-set="no_choice" t-value="receipt.env['ir.values'].get_default('website.config.settings', 'of_picking_backorder') != 'choice'"/>
-                    <div id="modal_create_backorder" class="modal fade in mt64" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <form t-att-action="'/my/receipt/%s' % receipt.id" method="post" data-model_name="stock.picking">
-                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                        <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                                    </form>
-                                    <h4 class="modal-title" id="myModalLabel">
-                                        <t t-if="no_choice">Créer un reliquat</t>
-                                        <t t-else="">Créer un reliquat ?</t>
-                                    </h4>
-                                </div>
-                                <div class="modal-body mb32">
-                                    <div>Vous avez traité moins d'articles que la demande initiale.</div>
-                                    <div class="text-muted" >
-                                        <t t-if="no_choice">Vous êtes sur le point de créer un reliquat.</t>
-                                        <t t-else="">Créer un reliquat, si vous prévoyez de traiter les produits restants plus tard. Ne créez pas de reliquat si vous n'allez jamais livrer le solde.</t>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <form class="ml8 pull-right" t-att-action="'/my/receipt/%s' % receipt.id" method="post" data-model_name="stock.picking">
-                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                        <button type="submit" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
-                                    </form>
-                                    <form class="ml8 pull-right" t-att-action="'/my/receipt/%s/no_backorder/%s' % (receipt.id, wizard.id)" method="post" data-model_name="stock.backorder.confirmation"
-                                          t-att-hidden="no_choice">
-                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                        <button type="submit" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Pas de reliquat</button>
-                                    </form>
-                                    <form class="ml8 pull-right" t-att-action="'/my/receipt/%s/create_backorder/%s' % (receipt.id, wizard.id)" method="post" data-model_name="stock.backorder.confirmation">
-                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                        <button type="submit" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">
-                                            <t t-if="no_choice">OK</t>
-                                            <t t-else="">Créer un reliquat</t>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </t>
-                <div id="modal_pdf" class="modal fade mt64" tabindex="-1" role="dialog" aria-labelledby="printModal">
+            </t>
+            <t t-if="request.params.get('modal')">
+                <t t-set="no_choice" t-value="receipt.env['ir.values'].get_default('website.config.settings', 'of_picking_backorder') != 'choice'"/>
+                <div id="modal_create_backorder" class="modal fade in mt64" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
-                            <form t-att-action="'/my/receipt/pdf/%s/' % receipt.id" method="post" data-model_name="stock.picking">
-                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                <div class="modal-header">
+                            <div class="modal-header">
+                                <form t-att-action="'/my/receipt/%s' % receipt.id" method="post" data-model_name="stock.picking">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                                    <h4 class="modal-title" id="printModal">Quelles lignes souhaitez vous imprimer ?</h4>
+                                </form>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    <t t-if="no_choice">Créer un reliquat</t>
+                                    <t t-else="">Créer un reliquat ?</t>
+                                </h4>
+                            </div>
+                            <div class="modal-body mb32">
+                                <div>Vous avez traité moins d'articles que la demande initiale.</div>
+                                <div class="text-muted" >
+                                    <t t-if="no_choice">Vous êtes sur le point de créer un reliquat.</t>
+                                    <t t-else="">Créer un reliquat, si vous prévoyez de traiter les produits restants plus tard. Ne créez pas de reliquat si vous n'allez jamais livrer le solde.</t>
                                 </div>
-
-                                <div class="modal-body mb32">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr class="active">
-                                                <th style="width: 30px;">
-                                                    <input id="check_all" type="checkbox" class="form-control"/>
-                                                </th>
-                                                <th>Marque</th>
-                                                <th>Produit</th>
-                                                <th>Opération</th>
-                                                <th class="text-right">Qté prévue</th>
-                                                <th class="text-right">Qté reçue</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <t t-foreach="receipt.pack_operation_product_ids" t-as="line">
-                                                <tr>
-                                                    <td>
-                                                        <input t-att-name="line.id" type="checkbox" class="form-control"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-esc="line.product_id.brand_id.name"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-esc="line.product_id.name"/>
-                                                    </td>
-                                                    <td>
-                                                        <span t-esc="line.move_name"/>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span t-esc="line.product_qty"/>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span t-esc="line.qty_done"/>
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
-                                    <button type="submit" class="btn btn-primary">Imprimer</button>
-                                </div>
-                            </form>
+                            </div>
+                            <div class="modal-footer">
+                                <form class="ml8 pull-right" t-att-action="'/my/receipt/%s' % receipt.id" method="post" data-model_name="stock.picking">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
+                                </form>
+                                <form class="ml8 pull-right" t-att-action="'/my/receipt/%s/no_backorder/%s' % (receipt.id, wizard.id)" method="post" data-model_name="stock.backorder.confirmation"
+                                      t-att-hidden="no_choice">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Pas de reliquat</button>
+                                </form>
+                                <form class="ml8 pull-right" t-att-action="'/my/receipt/%s/create_backorder/%s' % (receipt.id, wizard.id)" method="post" data-model_name="stock.backorder.confirmation">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">
+                                        <t t-if="no_choice">OK</t>
+                                        <t t-else="">Créer un reliquat</t>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="container mb64">
-                    <div class="col-md-12">
-                        <h3 class="page-header">
-                            <a href="/my/receipts">
-                                Vos réceptions
-                            </a>
-                        </h3>
-                        <h4>
-                            <span t-esc="receipt.name"/>
-                        </h4>
-                        <div class="text-center mb8">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Imprimer <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item btn" onclick="$('#modal_pdf').modal('show')">Étiquettes d'articles</a>
-                                    </li>
-                                </ul>
+            </t>
+            <div id="modal_pdf" class="modal fade mt64" tabindex="-1" role="dialog" aria-labelledby="printModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form t-att-action="'/my/receipt/pdf/%s/' % receipt.id" method="post" data-model_name="stock.picking">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header">
+                                <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title" id="printModal">Quelles lignes souhaitez vous imprimer ?</h4>
                             </div>
-                        </div>
 
-                        <form t-att-action="'/my/receipt/%s/validate' % receipt.id" method="post" data-model_name="stock.picking" class="s_website_form" enctype="multipart/form-data">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr class="active">
-                                        <th>Marque</th>
-                                        <th>Produit</th>
-                                        <th>Opération</th>
-                                        <th>N° série</th>
-                                        <th class="text-right">Qté prévue</th>
-                                        <th class="text-right" style="width: 100px;">Qté reçue</th>
-                                        <th class="text-right">Étiquette</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="receipt.pack_operation_product_ids" t-as="line">
-                                        <t t-if="line.product_id.tracking == 'serial'">
-                                            <t t-foreach="line.pack_lot_ids" t-as="lot">
-                                                <t t-call="of_website_portal_carrier.receipt_line_template"/>
-                                            </t>
-                                            <t t-foreach="range(int(line.product_qty - len(line.pack_lot_ids)))" t-as="qty">
-                                                <t t-call="of_website_portal_carrier.receipt_line_template"/>
-                                            </t>
+                            <div class="modal-body mb32">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr class="active">
+                                            <th style="width: 30px;">
+                                                <input id="check_all" type="checkbox" class="form-control"/>
+                                            </th>
+                                            <th>Marque</th>
+                                            <th>Produit</th>
+                                            <th>Opération</th>
+                                            <th class="text-right">Qté prévue</th>
+                                            <th class="text-right">Qté reçue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="receipt.pack_operation_product_ids" t-as="line">
+                                            <tr>
+                                                <td>
+                                                    <input t-att-name="line.id" type="checkbox" class="form-control"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.product_id.brand_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.product_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.move_name"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="line.product_qty"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="line.qty_done"/>
+                                                </td>
+                                            </tr>
                                         </t>
-                                        <t t-else="">
-                                            <t t-call="of_website_portal_carrier.receipt_line_template"/>
-                                        </t>
-                                    </t>
-                                </tbody>
-                            </table>
-                            <tr t-if="receipt.of_error_message">
-                                <td>
-                                    <span style="color: red;" t-field="receipt.of_error_message"/>
-                                </td>
-                            </tr>
-                            <div style="text-align: right;">
-                                <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Valider</button>
-                                </t>
-                                <t t-elif="receipt.state != 'done' and receipt.of_carrier_validation_date">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <input type="hidden" name="rollback" t-att-value="True"/>
-                                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Modifier</button>
-                                </t>
-                                <t t-else="">
-                                    <div class="btn btn-success">Validé</div>
-                                </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
+                                <button type="submit" class="btn btn-primary">Imprimer</button>
                             </div>
                         </form>
                     </div>
+                </div>
+            </div>
+            <div class="container mb64">
+                <div class="col-md-12">
+                    <h3 class="page-header">
+                        <a href="/my/receipts">
+                            Vos réceptions
+                        </a>
+                    </h3>
+                    <h4>
+                        <span t-esc="receipt.name"/>
+                    </h4>
+                    <div class="text-center mb8">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Imprimer <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item btn" onclick="$('#modal_pdf').modal('show')">Étiquettes d'articles</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form t-att-action="'/my/receipt/%s/validate' % receipt.id" method="post" data-model_name="stock.picking" class="s_website_form" enctype="multipart/form-data">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="active">
+                                    <th>Marque</th>
+                                    <th>Produit</th>
+                                    <th>Opération</th>
+                                    <th>N° série</th>
+                                    <th class="text-right">Qté prévue</th>
+                                    <th class="text-right" style="width: 100px;">Qté reçue</th>
+                                    <th class="text-right">Étiquette</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="receipt.pack_operation_product_ids" t-as="line">
+                                    <t t-if="line.product_id.tracking == 'serial'">
+                                        <t t-foreach="line.pack_lot_ids" t-as="lot">
+                                            <t t-call="of_website_portal_carrier.receipt_line_template"/>
+                                        </t>
+                                        <t t-foreach="range(int(line.product_qty - len(line.pack_lot_ids)))" t-as="qty">
+                                            <t t-call="of_website_portal_carrier.receipt_line_template"/>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-call="of_website_portal_carrier.receipt_line_template"/>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <tr t-if="receipt.of_error_message">
+                            <td>
+                                <span style="color: red;" t-field="receipt.of_error_message"/>
+                            </td>
+                        </tr>
+                        <div style="text-align: right;">
+                            <t t-if="receipt.state != 'done' and not receipt.of_carrier_validation_date">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Valider</button>
+                            </t>
+                            <t t-elif="receipt.state != 'done' and receipt.of_carrier_validation_date">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="rollback" t-att-value="True"/>
+                                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_create_backorder">Modifier</button>
+                            </t>
+                            <t t-else="">
+                                <div class="btn btn-success">Validé</div>
+                            </t>
+                        </div>
+                    </form>
                 </div>
             </div>
         </t>
