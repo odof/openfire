@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="group_of_supplier_portal" model="res.groups">
+        <field name="name">Groupe portail fournisseur</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- Profile -->
+    <record id="res_users_portal_supplier" model="res.users">
+        <field name="name">Fournisseur</field>
+        <field name="login">supplier</field>
+        <field name="of_is_user_profile" eval="1"/>
+        <field name="groups_id" eval="[(6,0,[ref('base.group_portal'), ref('of_website_portal_supplier.group_of_supplier_portal')])]"/>
+        <field name="of_field_ids" eval="[(6,0,[
+            ref('base.field_res_users_groups_id'),
+            ref('of_website_portal.field_res_users_of_tab_ids'),
+            ref('of_website_portal.field_res_users_of_pricelist_id'),
+            ref('of_website_portal.field_res_users_of_fiscal_position_id'),
+        ])]"/>
+        <field name="of_tab_ids" eval="[(6,0,[
+            ref('of_website_portal_supplier.of_tab_shipment'),
+        ])]"/>
+        <field name="of_pricelist_id" ref="product.list0"/>
+        <field name="of_fiscal_position_id" eval="False"/>
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Ir Rules -->
+    <record id="of_stock_picking_supplier_rule" model="ir.rule">
+        <field name="name">OF Bon de réception Fournisseur</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="domain_force">[('partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_supplier.group_of_supplier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="of_stock_pack_operation_supplier_rule" model="ir.rule">
+        <field name="name">OF Stock Pack Operation Fournisseur</field>
+        <field name="model_id" ref="stock.model_stock_pack_operation"/>
+        <field name="domain_force">[('picking_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_supplier.group_of_supplier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="of_stock_pack_operation_lot_supplier_rule" model="ir.rule">
+        <field name="name">OF Stock Pack Operation Lot Fournisseur</field>
+        <field name="model_id" ref="stock.model_stock_pack_operation_lot"/>
+        <field name="domain_force">[('operation_id.picking_id.partner_id', '=', user.partner_id.id)]</field>
+        <field name="groups" eval="[(4, ref('of_website_portal_supplier.group_of_supplier_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,248 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_website_portal_supplier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-20 15:25+0000\n"
+"PO-Revision-Date: 2023-07-20 15:25+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_portal_supplier
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_website_config_settings_of_picking_rollback_delay_minutes_supplier
+msgid "(OF) Délais de modification des BR pour les fournisseurs"
+msgstr "(OF) Délais de modification des BR pour les fournisseurs"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "<span>Diviser</span>"
+msgstr "<span>Diviser</span>"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.website_config_settings_view_form
+msgid "<span>minutes après la validation par le fournisseur</span>"
+msgstr "<span>minutes après la validation par le fournisseur</span>"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Annuler"
+msgstr "Annuler"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Date d'expédition"
+msgstr "Date d'expédition"
+
+#. module: of_website_portal_supplier
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_pack_operation_lot_of_expected_shipment_date
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_pack_operation_of_expected_shipment_date
+msgid "Date d’expédition prévue"
+msgstr "Date d’expédition prévue"
+
+#. module: of_website_portal_supplier
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_picking_of_shipment_date
+msgid "Date d’expédition réelle"
+msgstr "Date d’expédition réelle"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Date prévue"
+msgstr "Date prévue"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Date prévue :"
+msgstr "Date prévue :"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Diviser"
+msgstr "Diviser"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Division du bon de transfert"
+msgstr "Division du bon de transfert"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "En attente"
+msgstr "En attente"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Expédier"
+msgstr "Expédier"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.stock_picking_view_search
+msgid "Expédier par le fournisseur"
+msgstr "Expédier par le fournisseur"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.portal_my_home_menu_sale_b2c
+msgid "Expéditions"
+msgstr "Expéditions"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Expédié"
+msgstr "Expédié"
+
+#. module: of_website_portal_supplier
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_picking_of_shipped_by_supplier
+msgid "Expédié par le fournisseur"
+msgstr "Expédié par le fournisseur"
+
+#. module: of_website_portal_supplier
+#: model:res.groups,name:of_website_portal_supplier.group_of_supplier_portal
+msgid "Groupe portail fournisseur"
+msgstr "Groupe portail fournisseur"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.portal_my_home_sale_b2c
+msgid "Il n'y a actuellement pas d'expéditions pour votre compte."
+msgstr "Il n'y a actuellement pas d'expéditions pour votre compte."
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Imprimer"
+msgstr "Imprimer"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Imprimer <span class=\"caret\"/>"
+msgstr "Imprimer <span class=\"caret\"/>"
+
+#. module: of_website_portal_supplier
+#: model:ir.model,name:of_website_portal_supplier.model_stock_pack_operation_lot
+msgid "Lot/Serial number for pack ops"
+msgstr "Lot/Serial number for pack ops"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Marque"
+msgstr "Marque"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Modifier"
+msgstr "Modifier"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "N° série"
+msgstr "N° série"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "N° série interne"
+msgstr "N° série interne"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Opération"
+msgstr "Opération"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Origine"
+msgstr "Origine"
+
+#. module: of_website_portal_supplier
+#: model:ir.model,name:of_website_portal_supplier.model_stock_pack_operation
+msgid "Packing Operation"
+msgstr "Colisage"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Produit"
+msgstr "Produit"
+
+#. module: of_website_portal_supplier
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_pack_operation_lot_of_shipped_qty
+#: model:ir.model.fields,field_description:of_website_portal_supplier.field_stock_pack_operation_of_shipped_qty
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Qté expédiée"
+msgstr "Qté expédiée"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Qté prévue"
+msgstr "Qté prévue"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Qté reçue"
+msgstr "Qté reçue"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Quelles lignes souhaitez vous imprimer ?"
+msgstr "Quelles lignes souhaitez vous imprimer ?"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Référence"
+msgstr "Référence"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Sauvegarder les informations d'expédition"
+msgstr "Sauvegarder les informations d'expédition"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Société"
+msgstr "Société"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+msgid "Statut"
+msgstr "Statut"
+
+#. module: of_website_portal_supplier
+#: model:ir.model,name:of_website_portal_supplier.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Une erreur s'est produite"
+msgstr "Une erreur s'est produite"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Validé"
+msgstr "Validé"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipments
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.portal_my_home_sale_b2c
+msgid "Vos expéditions"
+msgstr "Vos expéditions"
+
+#. module: of_website_portal_supplier
+#: model:ir.model,name:of_website_portal_supplier.model_website_config_settings
+msgid "website.config.settings"
+msgstr "website.config.settings"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Étiquette"
+msgstr "Étiquette"
+
+#. module: of_website_portal_supplier
+#: model:ir.ui.view,arch_db:of_website_portal_supplier.of_website_portal_portal_my_shipment
+msgid "Étiquettes d'articles"
+msgstr "Étiquettes d'articles"
+

@@ -1,0 +1,336 @@
+<odoo>
+
+    <template id="portal_my_home_menu_sale_b2c" inherit_id="of_website_portal.portal_my_home_menu_sale_b2c">
+        <xpath expr="//a[@href='/my/deliveries']/.." position="after">
+            <li t-if="'shipment' in tabs">
+                <a href="/my/shipments">Expéditions</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_sale_b2c" inherit_id="of_website_portal.portal_my_home_sale_b2c">
+        <xpath expr="//a[@href='/my/deliveries']/.." position="after">
+            <h3 class="page-header" t-if="'shipment' in tabs">
+                <a href="/my/shipments">Vos expéditions
+                    <small class="ml8">
+                        <t t-if="shipment_count">
+                            <span class="badge"><t t-esc="shipment_count"/></span>
+                        </t>
+                        <t t-if="not shipment_count">
+                            Il n'y a actuellement pas d'expéditions pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <template id="of_website_portal_portal_my_shipments" name="My Shipments">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos expéditions</h3>
+            <t t-if="not shipments">
+                <p>Il n'y a actuellement pas d'expéditions pour votre compte.</p>
+            </t>
+            <t t-if="shipments">
+                <table class="table table-hover" id="shipment_table">
+                    <thead>
+                        <tr class="active">
+                            <th>Société</th>
+                            <th>Référence</th>
+                            <th>Date prévue</th>
+                            <th>Origine</th>
+                            <th>Statut</th>
+                            <th style="display: none;">N° série interne</th>
+                        </tr>
+                    </thead>
+                    <t t-foreach="shipments" t-as="shipment">
+                        <tr>
+                            <td>
+                                <span t-esc="shipment.company_id.name"/>
+                            </td>
+                            <td>
+                                <a t-att-href="'/my/shipment/'+str(shipment.id)" t-att-title="shipment.display_name">
+                                    <span t-esc="shipment.display_name"/>
+                                </a>
+                            </td>
+                            <td t-att-data-order="shipment.min_date">
+                                <span t-esc="shipment.min_date" style="display: none;"/> <span t-esc="shipment.min_date" t-options="{'widget': 'date'}"/>
+                            </td>
+                            <td>
+                                <span t-field="shipment.origin"/>
+                            </td>
+                            <td>
+                                <span t-if="shipment.of_shipped_by_supplier">Expédié</span>
+                                <span t-else="">En attente</span>
+                            </td>
+                            <td style="display: none;">
+                                <span t-esc="shipment.sudo().mapped('pack_operation_product_ids.pack_lot_ids.lot_id.of_internal_serial_number')"/>
+                            </td>
+                        </tr>
+                    </t>
+                </table>
+                <div t-if="pager" class="o_portal_pager text-center">
+                    <t t-call="website.pager" />
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_website_portal_portal_my_shipment" name="My Shipment">
+        <t t-call="website_portal.portal_layout">
+            <t t-set="no_sidebar" t-value="True" />
+            <t t-if="request.params.get('error')">
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger" role="alert">
+                            <a href="#" class="alert-link">Une erreur s'est produite</a>
+                        </div>
+                    </div>
+                </div>
+            </t>
+            <t t-if="request.params.get('modal')">
+                <div id="modal_divide_picking" class="modal fade in mt64" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <form t-att-action="'/my/shipment/%s' % shipment.id" method="post" data-model_name="stock.picking">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                </form>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    <span>Diviser</span>
+                                </h4>
+                            </div>
+                            <div class="modal-body mb32">
+                                <div>
+                                    <span>
+                                        Vous allez procéder à une expédition inférieure au bon de reception initial. Vous devez passer par une division du bon de transfert.<br/>
+                                        Si vous souhaitez continuer, cliquer sur Diviser, sinon sur Annuler.
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <form class="ml8 pull-right" t-att-action="'/my/shipment/%s' % shipment.id" method="post" data-model_name="stock.picking">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
+                                </form>
+                                <form class="ml8 pull-right" t-att-action="'/my/shipment/%s/divide_picking/%s' % (shipment.id, wizard.id)" method="post" data-model_name="of.delivery.division.wizard">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Diviser</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+            <div id="modal_pdf" class="modal fade mt64" tabindex="-1" role="dialog" aria-labelledby="printModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form t-att-action="'/my/shipment/pdf/%s/' % shipment.id" method="post" data-model_name="stock.picking">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-header">
+                                <button type="submit" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title" id="printModal">Quelles lignes souhaitez vous imprimer ?</h4>
+                            </div>
+
+                            <div class="modal-body mb32">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr class="active">
+                                            <th style="width: 30px;">
+                                                <input id="check_all" type="checkbox" class="form-control"/>
+                                            </th>
+                                            <th>Marque</th>
+                                            <th>Produit</th>
+                                            <th>Opération</th>
+                                            <th class="text-right">Qté prévue</th>
+                                            <th class="text-right">Qté reçue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="shipment.pack_operation_product_ids" t-as="line">
+                                            <tr>
+                                                <td>
+                                                    <input t-att-name="line.id" type="checkbox" class="form-control"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.product_id.brand_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.product_id.name"/>
+                                                </td>
+                                                <td>
+                                                    <span t-esc="line.move_name"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="line.product_qty"/>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="line.qty_done"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Annuler</button>
+                                <button type="submit" class="btn btn-primary">Imprimer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="container mb64">
+                <div class="col-md-12">
+                    <h3 class="page-header">
+                        <a href="/my/shipments">
+                            Vos expéditions
+                        </a>
+                    </h3>
+                    <h4 style="display: flex;">
+                        <span t-esc="shipment.name" style="margin: auto;margin-left: 0;"/> <span>Date prévue : <span t-esc="shipment.min_date" t-options="{'widget': 'date'}"/></span>
+                    </h4>
+                    <div class="text-center mb8">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Imprimer <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item btn" onclick="$('#modal_pdf').modal('show')">Étiquettes d'articles</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form t-att-action="'/my/shipment/%s/validate' % shipment.id" method="post" data-model_name="stock.picking" class="s_website_form" enctype="multipart/form-data">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="active">
+                                    <th>Marque</th>
+                                    <th>Produit</th>
+                                    <th>Opération</th>
+                                    <th class="text-right">N° série</th>
+                                    <th class="text-right">Date d'expédition</th>
+                                    <th class="text-right">Qté prévue</th>
+                                    <th class="text-right" style="width: 100px;">Qté expédiée</th>
+                                    <th class="text-right">Étiquette</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="shipment.pack_operation_product_ids" t-as="line">
+                                    <t t-if="line.product_id.tracking == 'serial'">
+                                        <t t-foreach="line.pack_lot_ids" t-as="lot">
+                                            <t t-call="of_website_portal_supplier.shipment_line_template"/>
+                                        </t>
+                                        <t t-foreach="range(int(line.product_qty - len(line.pack_lot_ids)))" t-as="qty">
+                                            <t t-call="of_website_portal_supplier.shipment_line_template"/>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-call="of_website_portal_supplier.shipment_line_template"/>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div style="text-align: right;">
+                            <t t-if="shipment.state != 'done' and not shipment.of_shipment_date">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <button type="submit" class="btn" data-toggle="modal" data-target=".modal_divide_picking"
+                                        t-att-formaction="'/my/shipment/%s/save' % shipment.id">Sauvegarder les informations d'expédition</button>
+                                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_divide_picking">Expédier</button>
+                            </t>
+                            <t t-elif="shipment.state != 'done' and shipment.of_shipment_date and not shipment.of_shipped_by_supplier">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="rollback" t-att-value="True"/>
+                                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target=".modal_divide_picking">Modifier</button>
+                            </t>
+                            <t t-else="">
+                                <div class="btn btn-success">Validé</div>
+                            </t>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="shipment_line_template">
+        <tr>
+            <td>
+                <span t-esc="line.product_id.brand_id.name"/>
+            </td>
+            <td>
+                <span t-esc="line.product_id.name"/>
+            </td>
+            <td>
+                <span t-esc="line.move_name"/>
+            </td>
+            <td class="text-right">
+                <span t-esc="lot and lot.lot_id and (lot.lot_id.of_internal_serial_number or lot.lot_id.name)"/>
+            </td>
+            <td class="text-right">
+                <t t-if="line.product_id.tracking == 'serial'">
+                    <t t-if="shipment.state != 'done' and not shipment.of_shipment_date">
+                        <t t-if="lot">
+                            <input t-att-name="'date-stock.pack.operation.lot-%s' % lot.id" type="date" t-attf-value="#{lot.of_expected_shipment_date or False}" class="form-control shipment_datepicker" style="width: 150px;"/>
+                        </t>
+                        <t t-else="">
+                            <input t-att-name="'date-stock.pack.operation-%s' % line.id" type="date" t-attf-value="#{line.of_expected_shipment_date or False}" class="form-control shipment_datepicker" style="width: 150px;"/>
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="lot.of_expected_shipment_date" t-options="{'widget': 'date'}"/>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-if="shipment.state != 'done' and not shipment.of_shipment_date">
+                        <input t-att-name="'date-stock.pack.operation-%s' % line.id" type="date" t-attf-value="#{line.of_expected_shipment_date or False}" class="form-control shipment_datepicker" style="width: 150px;"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="line.of_expected_shipment_date" t-options="{'widget': 'date'}"/>
+                    </t>
+                </t>
+            </td>
+            <td class="text-right">
+                <t t-if="line.product_id.tracking == 'serial'">
+                    <span t-esc="1"/>
+                </t>
+                <t t-else="">
+                    <span t-esc="line.product_qty"/>
+                </t>
+            </td>
+            <td class="text-right" style="width: 100px;">
+                <t t-if="line.product_id.tracking == 'serial'">
+                    <t t-if="lot">
+                        <!-- Deux input avec le même name,
+                             si la checkbox est coché -> renvoi 'on'
+                             si la checkbox n'est pas cochée -> renvoi '0'
+                             Permet de prendre en compte le fait que la checkbox est décochée (autrement ne renvoi rien)
+                             l'ordre est important, si le champ hidden est en premier renvoi toujours '0' -->
+                        <input t-att-name="'qty-stock.pack.operation.lot-%s' % lot.id" type="checkbox" t-att-checked="lot.of_shipped_qty and 'checked' or None" t-att-disabled="shipment.of_shipment_date"/>
+                        <input t-att-name="'qty-stock.pack.operation.lot-%s' % lot.id" type="hidden" value="0"/>
+                    </t>
+                    <t t-else="">
+                        <input type="checkbox" disabled="disabled"/>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-if="shipment.state != 'done' and not shipment.of_shipment_date">
+                        <input t-att-name="'qty-stock.pack.operation-%s' % line.id" type="number" min="0" t-att-max="line.product_qty" t-attf-value="#{line.of_shipped_qty or 0}" class="form-control" style="width: 80px;"/>
+                    </t>
+                    <t t-else="">
+                        <span t-esc="line.of_shipped_qty"/>
+                    </t>
+                </t>
+            </td>
+            <td class="text-right">
+                <a t-att-href="'/my/shipment/pdf/line/'+str(line.id)" t-att-title="line.move_name">
+                    <i class="fa fa-print"/>
+                </a>
+            </td>
+        </tr>
+    </template>
+
+</odoo>
