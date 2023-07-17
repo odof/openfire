@@ -79,6 +79,7 @@ class OfPeriodePlanifiee(models.Model):
 
     planification_alert = fields.Boolean(string=u"Alerte de planification", compute='_compute_planification')
     planification_ok = fields.Boolean(string=u"Planification OK", compute='_compute_planification')
+    planification_exceed = fields.Boolean(string=u"Trop de planification", compute='_compute_planification')
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
@@ -157,7 +158,7 @@ class OfPeriodePlanifiee(models.Model):
                 date = datetime.strptime(periode.premier_jour, "%Y-%m-%d")
                 if periode.type == 'semaine':
                     week_nb = date.isocalendar()[1]
-                    periode.name = "S%02d - %s" % (week_nb, date.strftime('%Y'))
+                    periode.name = "S%02d - %s" % (week_nb, date.strftime('%b %Y'))
                 if periode.type == 'mois':
                     periode.name = date.strftime('%B - %Y')
 
@@ -206,8 +207,10 @@ class OfPeriodePlanifiee(models.Model):
         Permet de calculer le niveau de planification (alerte ou OK)
         """
         for period in self:
-            period.planification_alert = period.technicien_ids.filtered(lambda tech: tech.temps_restant_task < 0.0)
-            period.planification_ok = not period.technicien_ids.filtered(lambda tech: tech.temps_restant_task != 0.0)
+            period.planification_alert = period.technicien_ids.filtered(lambda tech: tech.occupation_rate < 50.0)
+            period.planification_ok = not period.technicien_ids.filtered(
+                lambda tech: tech.occupation_rate < 90.0 or tech.occupation_rate > 100.0)
+            period.planification_exceed = period.technicien_ids.filtered(lambda tech: tech.occupation_rate > 100.0)
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
@@ -229,15 +232,17 @@ class OfPeriodePlanifiee(models.Model):
 class OfPeriodePlanifieeTechnicien(models.Model):
     _name = "of.periode.planifiee.technicien"
 
-    periode_id = fields.Many2one('of.periode.planifiee')
-    user_id = fields.Many2one('res.users', string=u"Ressource", required=True)
+    periode_id = fields.Many2one(comodel_name='of.periode.planifiee', string=u"Période")
+    user_id = fields.Many2one(comodel_name='res.users', string=u"Ressource", required=True)
     type = fields.Selection(
         selection=[('tech', u"Technique"), ('cust', u"Client")], string=u"Type")
     temps_de_travail = fields.Float(string="Temps de travail", required=True)
-    temps_restant_task = fields.Float(string=u'Temps restant à affecter (tâches)', compute="_compute_temps_restant")
+    temps_restant_task = fields.Float(string=u'Temps restant à affecter (tâches)', compute='_compute_temps_restant')
     temps_restant_categ = fields.Float(
-        string=u"Temps restant à affecter (catégories)", compute="_compute_temps_restant")
-    temps_effectue = fields.Float(string=u"Temps effectué", compute="_compute_temps_restant")
+        string=u"Temps restant à affecter (catégories)", compute='_compute_temps_restant')
+    temps_effectue = fields.Float(string=u"Temps réalisé", compute='_compute_temps_restant')
+    assigned_duration = fields.Float(string=u"Temps affecté", compute='_compute_temps_restant')
+    occupation_rate = fields.Float(string=u"Taux d'occupation (%)", compute='_compute_temps_restant')
     category_ids = fields.One2many('of.periode.planifiee.category', 'technicien_id', copy=True)
     name = fields.Char(string='Nom', related='user_id.name', readonly=True)
     task_planning_ids = fields.Many2many(
@@ -251,11 +256,16 @@ class OfPeriodePlanifieeTechnicien(models.Model):
         """
         activity_obj = self.env['account.analytic.line']
         for tech in self:
+            tech.temps_restant_categ = tech.temps_de_travail - sum(tech.category_ids.mapped('temps_prevu'))
+            task_plannings = self.env['of.project.task.planning'].search(
+                [('period_id', '=', tech.periode_id.id), ('user_id', '=', tech.user_id.id)])
+            tech.assigned_duration = sum(task_plannings.mapped('duration'))
+            tech.temps_restant_task = tech.temps_de_travail - tech.assigned_duration
             if tech.temps_de_travail:
-                tech.temps_restant_categ = tech.temps_de_travail - sum(tech.category_ids.mapped('temps_prevu'))
-                task_plannings = self.env['of.project.task.planning'].search(
-                    [('period_id', '=', tech.periode_id.id), ('user_id', '=', tech.user_id.id)])
-                tech.temps_restant_task = tech.temps_de_travail - sum(task_plannings.mapped('duration'))
+                tech.occupation_rate = (tech.assigned_duration / tech.temps_de_travail) * 100.0
+            else:
+                # Special case for "To affect" ressource
+                tech.occupation_rate = 100.0
             if not isinstance(tech.periode_id.id, models.NewId) and tech.user_id:
                 activities = activity_obj.search(
                     [('date', '>=', tech.periode_id.premier_jour),
@@ -305,6 +315,48 @@ class OfPeriodePlanifieeTechnicien(models.Model):
         if 'periode_id' in vals and not vals.get('periode_id', False):
             del vals['periode_id']
         res = super(OfPeriodePlanifieeTechnicien, self).write(vals)
+        return res
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        if 'temps_de_travail' not in fields:
+            fields.append('temps_de_travail')
+        if 'assigned_duration' not in fields:
+            fields.append('assigned_duration')
+        res = super(OfPeriodePlanifieeTechnicien, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        for line in res:
+            line_domain = '__domain' in line and line['__domain'] or domain
+            if 'temps_restant_categ' in fields:
+                records = self.env['of.periode.planifiee.technicien'].search(line_domain)
+                line['temps_restant_categ'] = \
+                    line.get('temps_de_travail', 0.0) - sum(records.mapped('category_ids.temps_prevu'))
+            if 'assigned_duration' in fields:
+                records = self.env['of.periode.planifiee.technicien'].search(line_domain)
+                task_plannings = self.env['of.project.task.planning'].search(
+                    [('period_id', 'in', records.mapped('periode_id.id')),
+                     ('user_id', 'in', records.mapped('user_id.id'))])
+                line['assigned_duration'] = sum(task_plannings.mapped('duration'))
+            if 'temps_restant_task' in fields:
+                if 'temps_de_travail' in line and line['temps_de_travail'] is not None and \
+                        'assigned_duration' in line and line['assigned_duration'] is not None:
+                    line['temps_restant_task'] = line['temps_de_travail'] - line['assigned_duration']
+            if 'occupation_rate' in fields:
+                if 'assigned_duration' in line and line['assigned_duration'] is not None and \
+                        line.get('temps_de_travail', False):
+                    line['occupation_rate'] = (line['assigned_duration'] / line['temps_de_travail']) * 100.0
+                else:
+                    line['occupation_rate'] = False
+            if 'temps_effectue' in fields:
+                records = self.env['of.periode.planifiee.technicien'].search(line_domain)
+                activities = self.env['account.analytic.line']
+                for record in records:
+                    activities |= self.env['account.analytic.line'].search(
+                        [('date', '>=', record.periode_id.premier_jour),
+                         ('date', '<=', record.periode_id.dernier_jour),
+                         ('user_id', '=', record.user_id.id)])
+                line['temps_effectue'] = sum(activities.mapped('unit_amount'))
+
         return res
 
 

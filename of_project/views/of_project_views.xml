@@ -8,7 +8,7 @@
     <record id="of_project_project_form_view" model="ir.ui.view">
         <field name="name">of_project.project.form.view</field>
         <field name="model">project.project</field>
-        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="inherit_id" ref="project_description.project_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header>
@@ -23,6 +23,14 @@
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="before">
                 <field name="of_sale_id"/>
+            </xpath>
+            <xpath expr="//page[@name='description_page']" position="after">
+                <page name="newsflash" string="Flash info">
+                    <i class="oe_grey">Informations affichées sur la vignette Kanban</i>
+                    <br/>
+                    <br/>
+                    <field name="of_newsflash"/>
+                </page>
             </xpath>
         </field>
     </record>
@@ -49,7 +57,7 @@
                 <field name="of_tag_ids"/>
                 <field name="partner_id"/>
                 <field name="of_sale_id"/>
-                <field name="description"/>
+                <field name="of_newsflash"/>
                 <field name="of_planned_hours"/>
             </xpath>
             <xpath expr="//div[@class='o_kanban_card_content o_visible']" position="before">
@@ -71,9 +79,12 @@
                 <div name="of_planned_hours">
                     Durée Prévue :<field name="of_planned_hours" widget="float_time"/>
                 </div>
-                <div name="description" t-if="record.description.raw_value" style="max-height:310px;overflow:hidden;text-overflow:ellipsis;">
-                    <t t-raw="record.description.raw_value"/>
+                <div name="newsflash" t-if="record.of_newsflash.raw_value" style="max-height:310px;overflow:hidden;text-overflow:ellipsis;">
+                    <t t-raw="record.of_newsflash.raw_value"/>
                 </div>
+            </xpath>
+            <xpath expr="//div[@class='o_project_kanban_boxes']//a[1]" position="before">
+                <a type="open" style="display: none;"/>
             </xpath>
         </field>
     </record>
