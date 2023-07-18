@@ -112,6 +112,9 @@ class OfPlanifCreneau(models.TransientModel):
         help=u"Remplir pour restreindre la recherche à certaines catégories de tâches")
     pre_tache_ids = fields.Many2many(
         'of.planning.tache', string=u"Tâches", help=u"Remplir pour restreindre la recherche à certaines tâches")
+    tag_ids = fields.Many2many(
+        comodel_name='of.planning.tag', string=u"Étiquettes",
+        help=u"Remplir pour restreindre la recherche à certaines étiquettes")
     ignorer_duree = fields.Boolean(
         string=u"Ignorer durée", help=u"Cochez pour proposer aussi les interventions plus longues que le créneau")
 
@@ -474,6 +477,9 @@ class OfPlanifCreneau(models.TransientModel):
                         service_domain.append(('address_zip', '<=', zip_range.cp_max))
             # Recherche sur les DI du secteurs
             service_domain.append(('secteur_tech_id', '=', self.secteur_id.id))
+        if self.tag_ids:
+            service_domain.append(('tag_ids', 'in', self.tag_ids.ids))
+
         # services
         services = self.env['of.service'].search(service_domain).filter_state_poncrec_date(date_eval=self.date_creneau)
         rayon_max = self.rayon_max  # * 1.3  # approximation
@@ -643,6 +649,7 @@ class OfPlanifCreneauProp(models.TransientModel):
     # Rubrique Description
     description_rdv = fields.Text(related='creneau_id.description_rdv')
     tooltip_description = fields.Text(string="Description survol", compute='_compute_tooltip_description')
+    service_note = fields.Text(string=u"Notes", related='service_id.note')
 
     # Vue liste
     fait = fields.Boolean(string=u"déjà calculé")
