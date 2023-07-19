@@ -87,3 +87,14 @@ class OFRecomputeGetPartnersWizard(models.TransientModel):
                         files._recompute_todo(files._fields[field_name])
                     files.recompute()
                 current_directories = current_directories.mapped('child_directories')
+
+    @api.multi
+    def recompute_parent_directories(self):
+        muk_directory_obj = self.env['muk_dms.directory']
+        domain = [('parent_directory', '!=', False)]
+        if self.partner_ids:
+            domain += [('of_partner_id', 'in', self.partner_ids._ids)]
+        else:
+            domain += [('of_partner_id', '!=', False)]
+        main_directories = muk_directory_obj.search(domain)
+        main_directories._parent_store_compute()

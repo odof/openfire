@@ -14,6 +14,7 @@
                 </group>
                 <footer>
                     <button string="Recalculer les infos GED" name="recompute_partners" type="object" class="btn-primary"/>
+                    <button string="Corriger calcul smart button" name="recompute_parent_directories" type="object" class="btn-primary"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
                 </footer>
             </form>
