@@ -32,6 +32,8 @@
                                 <field name="report_id" attrs="{'readonly': [('type', '!=', 'qweb')], 'required': [('type', '=', 'qweb')]}"
                                        domain="[('report_type', '=', 'qweb-pdf'), ('model', '=', model)]"/>
                                 <field name="combined_document_id" attrs="{'readonly': [('type', '!=', 'doc')], 'required': [('type', '=', 'doc')]}"/>
+                                <field name="expr" attrs="{'required': [('expr_model', '!=', False)]}"/>
+                                <field name="expr_model" attrs="{'required': [('expr', '!=', False)]}"/>
                                 <field name="copy_nb"/>
                             </tree>
                         </field>
