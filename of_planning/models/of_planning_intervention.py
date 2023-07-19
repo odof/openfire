@@ -508,7 +508,7 @@ class OfPlanningIntervention(models.Model):
     category_id = fields.Many2one(related='tache_id.category_id', string=u"Catégorie d'employé")
     # pour faire des stats sur comment sont créés les RDVs
     origin_interface = fields.Char(string=u"Origine création", default=u"Manuelle")
-    cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True)
+    cleantext_intervention = fields.Text(compute='_compute_cleantext_intervention', store=True, compute_sudo=True)
     interv_before_id = fields.Many2one(
         'of.planning.intervention', compute="_compute_interventions_before_after", store=True, compute_sudo=True)
     interv_after_id = fields.Many2one(
