@@ -14,7 +14,7 @@ Module de modification des droits
 """,
     'website': "www.openfire.fr",
     'depends': [
-        'of_crm',
+        'of_sale_kanban',
         'of_project_issue',
         'of_service',
         'of_parc_installe',
