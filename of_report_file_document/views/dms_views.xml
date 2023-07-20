@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="muk_dms_file_view_form" model="ir.ui.view">
+        <field name="name">muk.dms.file.view.form</field>
+        <field name="model">muk_dms.file</field>
+        <field name="inherit_id" ref="of_document.of_document_dms_file_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='relational_path']/.." position="replace">
+                <group>
+                    <group>
+                        <field name="relational_path" widget="dms_relpath"/>
+                    </group>
+                    <group>
+                        <field name="of_document_type_id"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_activity_view_form" model="ir.ui.view">
+        <field name="name">crm.activity.view.form</field>
+        <field name="model">crm.activity</field>
+        <field name="inherit_id" ref="of_crm.of_crm_crm_activity_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_load_attachment']" position="after">
+                <field name="of_document_type_id" attrs="{'invisible': [('of_load_attachment', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

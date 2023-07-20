@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Document Type Views -->
+
+    <record id="of_document_type_view_tree" model="ir.ui.view">
+        <field name="name">of.document.type.view.tree</field>
+        <field name="model">of.document.type</field>
+        <field name="arch" type="xml">
+            <tree string="Types de document" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_document_type_action" model="ir.actions.act_window">
+        <field name="name">Types de document</field>
+        <field name="res_model">of.document.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="of_document_type_menu" name="Types de document" parent="muk_dms.cat_menu_muk_dms_config"
+              sequence="15" action="of_document_type_action"/>
+
+</odoo>
