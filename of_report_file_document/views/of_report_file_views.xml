@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- OF Report File Views -->
+
+    <record id="of_report_file_view_form" model="ir.ui.view">
+        <field name="name">of.report.file.view.form</field>
+        <field name="model">of.report.file</field>
+        <field name="inherit_id" ref="of_report_file.of_report_file_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='combined_document_id']" position="after">
+                <field name="document_type_id" attrs="{'readonly': [('type', '!=', 'ged')], 'required': [('type', '=', 'ged')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

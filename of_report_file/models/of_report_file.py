@@ -105,7 +105,7 @@ class OFReportFileLine(models.Model):
                 self.model = self.report_file_id.model_id.model
 
     @api.multi
-    def get_combined_doc(self, doc, obj):
+    def get_combined_doc(self, doc, record):
         self.ensure_one()
         data = []
         if doc.file:
@@ -118,7 +118,7 @@ class OFReportFileLine(models.Model):
                     [('res_model', '=', doc._name),
                      ('res_field', '=', 'file'),
                      ('res_id', '=', doc.id)])
-                datas = dict(self.env['of.compose.mail'].eval_champs(obj, doc.chp_ids))
+                datas = dict(self.env['of.compose.mail'].eval_champs(record, doc.chp_ids))
                 file_path = self.env['ir.attachment']._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
@@ -134,6 +134,23 @@ class OFReportFileLine(models.Model):
                 data.append(encoded_file)
         return data and base64.b64decode(data[0]) or False
 
+    @api.multi
+    def get_doc_data(self, model_name, record_ids):
+        self.ensure_one()
+        result = False
+        if self.type == 'qweb':
+            result = self.env['report'].get_pdf(record_ids, self.report_id.report_name)
+        elif self.type == 'doc':
+            records = self.env[model_name].browse(record_ids)
+            result = self.get_combined_doc(self.combined_document_id, records)
+        if result:
+            final_result = []
+            for i in range(self.copy_nb):
+                final_result.append(result)
+            return final_result
+        else:
+            return False
+
 
 class Report(models.Model):
     _inherit = 'report'
@@ -147,24 +164,18 @@ class Report(models.Model):
             tmp_results = []
 
             for line in report_file.report_file_line_ids:
-                tmp_result = False
-                obj_ids = docids
+                record_ids = docids
                 model_name = report_file.model_id.model
                 if line.expr:
-                    objs = self.env[report_file.model_id.model].browse(docids)
-                    res = safe_eval(line.expr, {'record': objs, 'self': self})
-                    obj_ids = res.ids
+                    record = self.env[report_file.model_id.model].browse(docids)
+                    res = safe_eval(line.expr, {'record': record, 'self': self})
+                    record_ids = res.ids
                     model_name = line.expr_model
 
-                if line.type == 'qweb':
-                    tmp_result = super(Report, self).get_pdf(obj_ids, line.report_id.report_name, html=html, data=data)
-                elif line.type == 'doc':
-                    obj = self.env[model_name].browse(obj_ids)
-                    tmp_result = line.get_combined_doc(line.combined_document_id, obj)
+                tmp_result = line.get_doc_data(model_name, record_ids)
 
                 if tmp_result:
-                    for i in range(line.copy_nb):
-                        tmp_results.append(tmp_result)
+                    tmp_results += tmp_result
 
             result = tmp_results and tmp_results[0] or False
             file_paths = []
