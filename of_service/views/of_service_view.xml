@@ -437,6 +437,7 @@
                 <field name="titre"/>
                 <field name="address_id"/>
                 <field name="address_zip" string="CP"/>
+                <field name="address_city"/>
                 <field name="tache_id"/>
                 <field name="tag_ids" widget="many2one"/>
                 <field name="mois_ids"/>
