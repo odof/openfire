@@ -48,7 +48,7 @@ class OFReportFile(models.Model):
             'report_name': 'of_report_file.report_file_%04d' % record.id,
             'report_type': 'qweb-pdf',
             'model': record.model_id.model,
-            })
+        })
         report.create_action()
         record.corresponding_report_id = report
         return record
@@ -171,6 +171,8 @@ class Report(models.Model):
                     res = safe_eval(line.expr, {'record': record, 'self': self})
                     record_ids = res.ids
                     model_name = line.expr_model
+                    if not record_ids and line.type == 'qweb':
+                        continue
 
                 tmp_result = line.get_doc_data(model_name, record_ids)
 
