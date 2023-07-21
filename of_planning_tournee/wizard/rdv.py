@@ -665,7 +665,10 @@ class OfTourneeRdv(models.TransientModel):
                 of_import_service_lines=True)._onchange_service_id()
             intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
             # Load questionnary lines and more if coming from `res.partner` object
-            intervention.with_context(of_intervention_wizard=True, of_from_contact_form=True).onchange_template_id()
+            intervention.with_context(
+                of_intervention_wizard=True,
+                of_from_contact_form=self.source_model == 'res.partner' and not self.service_id
+            ).onchange_template_id()
 
         contract_custom = self.sudo().env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
         # Creation/mise à jour du service si creer_recurrence
