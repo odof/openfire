@@ -52,6 +52,9 @@ class AccountInvoiceReport(models.Model):
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(AccountInvoiceReport, self)._read_group_raw(domain, fields, groupby, offset, limit, orderby, lazy)
+        # Si aucune données de facturation, on retourne tel quel
+        if not res:
+            return res
         time_groupbys = ('date:month', 'date:year', 'date')
         # Les deltas dépendent d'un champ qui doit être calculé
         diff_percent = [vals for vals in (('of_diff_price', 'price_total'),
@@ -89,7 +92,8 @@ class AccountInvoiceReport(models.Model):
                         for field1, field2 in diff:
                             r[field1] = r[field2] - values[period_prec][other][field2]
                         for field1, field2 in diff_percent:
-                            r[field1] = ((r[field2] / values[period_prec][other][field2] - 1)) * 100 if values[period_prec][other][field2] else 100
+                            r[field1] = ((r[field2] / values[period_prec][other][field2] - 1)) * 100 \
+                                if values[period_prec][other][field2] else 100
                 period_prec = period
 
         return res
