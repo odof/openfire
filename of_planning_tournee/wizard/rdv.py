@@ -484,6 +484,7 @@ class OfTourneeRdv(models.TransientModel):
             'description': "\n".join(notes),
             'tache_id': service.tache_id,
             'partner_address_id': service.address_id,
+            'template_id': service.template_id.id
         }
         self.update(vals)
 
