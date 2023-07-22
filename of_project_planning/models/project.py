@@ -12,15 +12,19 @@ class Project(models.Model):
     of_total_planned_hours = fields.Float(string=u"Durée planifiée", compute='_compute_time')
     of_total_done_hours = fields.Float(string=u"Durée réalisée", compute='_compute_time')
     of_ressources = fields.Text(string=u"Ressources", compute='_compute_of_ressources')
+    of_progress_rate = fields.Float(
+        string=u"Taux d'avancement (%)", compute='_compute_of_progress_rate', store=True, digits=(16, 2))
+    of_consumption_rate = fields.Float(
+        string=u"Taux de consommation (%)", compute='_compute_of_consumption_rate', store=True, digits=(16, 2))
 
-    @api.depends('task_ids', 'task_ids.of_planned_hours', 'task_ids.effective_hours')
+    @api.depends('tasks', 'tasks.of_planned_hours', 'tasks.effective_hours')
     def _compute_time(self):
         """
         Calcul les temps consolidés d'un projet en fonction des temps de ses tâches
         """
         for project in self:
-            project.of_total_planned_hours = sum(project.task_ids.mapped('of_planned_hours'))
-            project.of_total_done_hours = sum(project.task_ids.mapped('effective_hours'))
+            project.of_total_planned_hours = sum(project.tasks.mapped('of_planned_hours'))
+            project.of_total_done_hours = sum(project.tasks.mapped('effective_hours'))
 
     @api.depends('task_ids', 'task_ids.of_planning_ids', 'task_ids.of_planning_ids.user_id')
     def _compute_of_ressources(self):
@@ -31,6 +35,27 @@ class Project(models.Model):
             for user in all_ressources:
                 ressources.append({'id': user.id, 'name': user.name})
             project.of_ressources = json.dumps(ressources) if ressources else False
+
+    @api.depends('tasks', 'tasks.of_progress_rate', 'tasks.of_planned_hours')
+    def _compute_of_progress_rate(self):
+        for project in self:
+            total_planned_duration = sum(project.mapped('tasks.of_planned_hours'))
+            if total_planned_duration:
+                total_progress = sum(
+                    [(task.of_planned_hours * task.of_progress_rate / 100.0) for task in project.tasks])
+                project.of_progress_rate = (total_progress / total_planned_duration) * 100.0
+            else:
+                project.of_progress_rate = 0
+
+    @api.depends('tasks', 'tasks.of_done_hours', 'tasks.of_planned_hours')
+    def _compute_of_consumption_rate(self):
+        for project in self:
+            total_planned_duration = sum(project.mapped('tasks.of_planned_hours'))
+            if total_planned_duration:
+                total_consumption = sum(project.mapped('tasks.of_done_hours'))
+                project.of_consumption_rate = (total_consumption / total_planned_duration) * 100.0
+            else:
+                project.of_consumption_rate = 0
 
 
 class ProjectTask(models.Model):
@@ -91,6 +116,9 @@ class ProjectTask(models.Model):
         comodel_name='of.project.task.planning', inverse_name='task_id', string=u"Activités planifiées")
     # rendre le champ compute
     of_user_ids = fields.Many2many(compute='_compute_of_user_ids', store=True)
+    of_progress_rate = fields.Integer(string=u"Taux d'avancement (%)")
+    of_consumption_rate = fields.Float(
+        string=u"Taux de consommation (%)", compute='_compute_of_consumption_rate', store=True, digits=(16, 2))
 
     def _search_of_gb_period_id(self, operator, value):
         return [('of_planning_ids.period_id', operator, value)]
@@ -146,6 +174,14 @@ class ProjectTask(models.Model):
         for task in self:
             task.of_user_ids = task.of_planning_ids.mapped('user_id')
 
+    @api.depends('of_planned_hours', 'of_analytic_line_ids', 'of_analytic_line_ids.unit_amount')
+    def _compute_of_consumption_rate(self):
+        for task in self:
+            if task.of_planned_hours:
+                task.of_consumption_rate = (task.of_done_hours / task.of_planned_hours) * 100.0
+            else:
+                task.of_consumption_rate = 0
+
     @api.onchange('of_planning_ids', 'of_planning_ids.period_id')
     def onchange_of_planning_ids(self):
         """
@@ -178,3 +214,31 @@ class ProjectTask(models.Model):
             'tz_convert': False,
             'qualified_field': '"%s".%s' % (alias, field_name)
         }
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        res = super(ProjectTask, self).read_group(
+            domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        for line in res:
+            if 'of_progress_rate' in fields:
+                line_domain = '__domain' in line and line['__domain'] or domain
+                records = self.env['project.task'].search(line_domain)
+                if len(records) > 1:
+                    total_planned_duration = sum(records.mapped('of_planned_hours'))
+                    if total_planned_duration:
+                        total_progress = sum([(rec.of_planned_hours * rec.of_progress_rate / 100.0) for rec in records])
+                        line['of_progress_rate'] = (total_progress / total_planned_duration) * 100.0
+                    else:
+                        line['of_progress_rate'] = False
+            if 'of_consumption_rate' in fields:
+                line_domain = '__domain' in line and line['__domain'] or domain
+                records = self.env['project.task'].search(line_domain)
+                if len(records) > 1:
+                    total_planned_duration = sum(records.mapped('of_planned_hours'))
+                    if total_planned_duration:
+                        total_consumption = sum(records.mapped('of_done_hours'))
+                        line['of_consumption_rate'] = (total_consumption / total_planned_duration) * 100.0
+                    else:
+                        line['of_consumption_rate'] = False
+
+        return res

@@ -64,7 +64,46 @@
                 <separator/>
                 <filter string="À venir" name="incoming"
                         domain="[('period_id.dernier_jour', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="4 prochains mois" name="4next_month"
+                        domain="[('period_id.dernier_jour', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('period_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=4)).strftime('%Y-%m-%d'))]"/>
             </search>
+        </field>
+    </record>
+
+    <record id="of_project_task_planning_view_kanban" model="ir.ui.view">
+        <field name="name">of.project.task.planning.view.kanban</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="period_id" group_create="false" group_edit="false" group_delete="false" create="false" delete="false" drag_group="false"
+                    class="o_kanban_small_column">
+                <field name="color"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="duration"/>
+                <field name="user_id"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click" t-attf-style="background-color: #{record.color.raw_value};">
+                            <div class="o_kanban_content">
+                                <div class="o_kanban_card_content" style="width: 100%;">
+                                    <strong><field name="project_id"/></strong>
+                                    <br/>
+                                    <field name="task_id"/>
+                                </div>
+                                <div class="oe_kanban_bottom_left">
+                                    <br/>
+                                    <span style="display: flex;">Durée :&amp;nbsp;<field name="duration" widget="float_time"/></span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <img t-att-src="kanban_image('res.users', 'image_small', record.user_id.raw_value)"
+                                         t-att-title="record.user_id.value" width="36" height="36" class="oe_kanban_avatar pull-right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
@@ -73,16 +112,27 @@
         <field name="model">of.project.task.planning</field>
         <field name="arch" type="xml">
             <pivot string="Activités planifiées">
-                <field name="period_id" type="row"/>
+                <field name="period_id" type="col"/>
+                <field name="user_id" type="row"/>
                 <field name="duration" type="measure"/>
+                <field name="occupation_rate" type="measure"/>
+                <field name="done_duration" type="measure"/>
             </pivot>
+        </field>
+    </record>
+
+    <record id="of_project_task_planning_view_timeline" model="ir.ui.view">
+        <field name="name">of.project.task.planning.view.timeline</field>
+        <field name="model">of.project.task.planning</field>
+        <field name="arch" type="xml">
+            <timeline date_start="period_start_date" date_stop="period_end_date" default_group_by="user_id"/>
         </field>
     </record>
 
     <record id="of_project_task_planning_action" model="ir.actions.act_window">
         <field name="name">Activités planifiées</field>
         <field name="res_model">of.project.task.planning</field>
-        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_mode">tree,kanban,pivot,timeline,form</field>
         <field name="search_view_id" ref="of_project_task_planning_search_view"/>
         <field name="context">{'search_default_my_activities': 1,
                                'search_default_incoming': 1,
@@ -108,6 +158,7 @@
                             <field name="timesheet_type"/>
                             <field name="sequence"/>
                             <field name="active"/>
+                            <field name="color" widget="color"/>
                         </group>
                     </group>
                 </sheet>

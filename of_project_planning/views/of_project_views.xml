@@ -13,12 +13,17 @@
             <xpath expr="//field[@name='name']" position="before">
                 <field name="of_total_planned_hours"/>
                 <field name="of_total_done_hours"/>
+                <field name="of_progress_rate"/>
+                <field name="of_consumption_rate"/>
                 <field name="of_ressources"/>
             </xpath>
+            <xpath expr="//div[@name='of_planned_hours']" position="replace"/>
             <xpath expr="//div[@class='o_kanban_primary_left']" position="inside">
                 <div style="margin-top: 10px;">
-                    <span style="display: flex;">Durée prévue :<field name="of_total_planned_hours" widget="float_time"/></span>
-                    <span style="display: flex;">Durée réalisée :<field name="of_total_done_hours" widget="float_time"/></span>
+                    <span style="display: flex;">Durée prévue :&amp;nbsp;<field name="of_total_planned_hours" widget="float_time"/></span>
+                    <span style="display: flex;">Durée réalisée :&amp;nbsp;<field name="of_total_done_hours" widget="float_time"/></span>
+                    <span style="display: flex;">Taux d'avancement :&amp;nbsp;<field name="of_progress_rate"/>%</span>
+                    <span style="display: flex;">Taux de consommation :&amp;nbsp;<field name="of_consumption_rate"/>%</span>
                 </div>
                 <div style="margin-top: 10px;">
                     <t t-value="JSON.parse(record.of_ressources.raw_value)" t-set="ressources"/>
@@ -77,6 +82,10 @@
                     <field name="of_done_validation_hours" widget="float_time" nolabel="1" class="oe_inline"/>
                     <i class="oe_grey oe_inline"> de validation</i>
                 </div>
+            </xpath>
+            <xpath expr="//field[@name='progress']" position="after">
+                <field name="of_progress_rate"/>
+                <field name="of_consumption_rate"/>
             </xpath>
             <xpath expr="//page[@name='description_page']" position="after">
                 <page name="planning_page" string="Planification">

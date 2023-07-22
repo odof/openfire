@@ -35,6 +35,30 @@
             <xpath expr="//button[@name='send_survey']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//header" position="inside">
+                <field name="of_is_closed" invisible="1"/>
+                <button type="object" name="send_ar" string="Envoyer AR"
+                        confirm="Êtes-vous sûr de vouloir envoyer un accusé de réception ?"
+                        attrs="{'invisible':[('of_is_closed', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--*****************************************************************************************-->
+    <!--**************************** Website Support Ticket Compose *****************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="website_support_ticket_compose_view_form" model="ir.ui.view">
+        <field name="name">website.support.ticket.compose.view.form</field>
+        <field name="model">website.support.ticket.compose</field>
+        <field name="inherit_id" ref="website_support.website_support_ticket_compose_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='template_id']/.." position="attributes">
+                <attribute name="col">4</attribute>
+            </xpath>
+            <xpath expr="//field[@name='template_id']" position="before">
+                <field name="attachment_ids" widget="many2many_binary" string="Joindre un fichier" nolabel="1" colspan="2"/>
+            </xpath>
         </field>
     </record>
 
