@@ -2,14 +2,14 @@
 <odoo>
 
     <!--*****************************************************************************************-->
-    <!--***************************************Période planifiée*********************************-->
+    <!--*********************************** Période planifiée ***********************************-->
     <!--*****************************************************************************************-->
 
-        <record id="view_of_periode_planifiee_form" model="ir.ui.view">
+    <record id="view_of_periode_planifiee_form" model="ir.ui.view">
         <field name="name">of.periode.planifiee.form</field>
         <field name="model">of.periode.planifiee</field>
         <field name="arch" type="xml">
-            <form string="Périodes planifiées">
+            <form string="Période planifiée">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
                         <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
@@ -29,70 +29,18 @@
                     <notebook>
                         <page string="Ressources">
                             <field name="technicien_ids">
-                                <form>
-                                    <div class="oe_title">
-                                        <h1><field name="user_id" domain="[('share', '=', False)]" placeholder="Ressource"/></h1>
-                                    </div>
-                                    <group>
-                                        <group>
-                                            <field name="periode_id" invisible="1"/>
-                                            <field name="type"/>
-                                            <field name="temps_de_travail" widget="float_time"/>
-                                            <field name="temps_restant_categ" widget="float_time"/>
-                                            <field name="temps_restant_task" widget="float_time"/>
-                                            <field name="temps_effectue" widget="float_time"/>
-                                        </group>
-                                    </group>
-                                    <notebook>
-                                        <page string="Planification">
-                                            <field name="task_planning_ids" widget="one2many">
-                                                <tree editable="bottom">
-                                                    <field name="project_id"/>
-                                                    <field name="task_id"/>
-                                                    <field name="task_stage_id"/>
-                                                    <field name="type_id"/>
-                                                    <field name="duration"/>
-                                                    <field name="notes"/>
-                                                    <field name="state"/>
-                                                </tree>
-                                                <form>
-                                                    <group>
-                                                        <group>
-                                                            <field name="project_id"/>
-                                                            <field name="task_id"/>
-                                                            <field name="task_stage_id"/>
-                                                            <field name="type_id"/>
-                                                        </group>
-                                                        <group>
-                                                            <field name="state"/>
-                                                            <field name="duration"/>
-                                                            <field name="notes"/>
-                                                        </group>
-                                                    </group>
-                                                </form>
-                                            </field>
-                                        </page>
-                                        <page string="Catégories">
-                                            <field name="category_ids">
-                                                <tree editable="bottom" default_order="name">
-                                                    <field name="name" invisible="1"/>
-                                                    <field name="categorie_id"/>
-                                                    <field name="temps_prevu" widget="float_time"/>
-                                                    <field name="temps_restant" widget="float_time"/>
-                                                    <field name="periode_id" invisible="1"/>
-                                                </tree>
-                                            </field>
-                                        </page>
-                                    </notebook>
-                                </form>
-                                <tree colors="darkred:temps_effectue&gt;temps_de_travail;
-                                darkolivegreen:temps_effectue==temps_de_travail" default_order="name">
+                                <tree colors="red:occupation_rate&lt;50.0;
+                                              green:90.0&lt;=occupation_rate&lt;=100.0;
+                                              orange:occupation_rate&gt;100.0;"
+                                      default_order="name">
                                     <field name="name" invisible="1"/>
                                     <field name="user_id"  domain="[('share', '=', False)]"/>
                                     <field name="type"/>
                                     <field name="temps_de_travail" widget="float_time"/>
                                     <field name="temps_restant_categ" widget="float_time"/>
                                     <field name="temps_restant_task" widget="float_time"/>
+                                    <field name="assigned_duration" widget="float_time"/>
+                                    <field name="occupation_rate"/>
                                     <field name="temps_effectue" widget="float_time"/>
                                 </tree>
                             </field>
@@ -108,7 +56,7 @@
         <field name="model">of.periode.planifiee</field>
         <field name="arch" type="xml">
             <tree string="Périodes planifiées"
-                  colors="green: planification_ok; darkred: planification_alert">
+                  colors="green: planification_ok; red: planification_alert; orange: planification_exceed">
                 <field name="planification_alert" invisible="1"/>
                 <field name="planification_ok" invisible="1"/>
                 <field name="name"/>
@@ -149,13 +97,163 @@
     </record>
 
     <record id="action_view_periode_planifiee" model="ir.actions.act_window">
-        <field name="name">Période planifiées</field>
+        <field name="name">Périodes planifiées</field>
         <field name="res_model">of.periode.planifiee</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'search_default_incoming': 1}</field>
         <field name="search_view_id" ref="view_of_periode_planifiee_search"/>
     </record>
 
-    <menuitem action="action_view_periode_planifiee" id="menu_action_view_periode_planifiee" parent="project.menu_project_management" sequence="1"/>
+    <menuitem action="action_view_periode_planifiee" id="menu_action_view_periode_planifiee"
+              parent="project.menu_project_management" sequence="7"/>
+
+
+    <!--*****************************************************************************************-->
+    <!--****************************** Lignes de période planifiée ******************************-->
+    <!--*****************************************************************************************-->
+
+    <record id="of_periode_planifiee_technicien_view_form" model="ir.ui.view">
+        <field name="name">of.periode.planifieee.technicien.view.form</field>
+        <field name="model">of.periode.planifiee.technicien</field>
+        <field name="arch" type="xml">
+            <form string="Ligne de période planifiée">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="user_id" domain="[('share', '=', False)]" placeholder="Ressource"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="periode_id" invisible="1"/>
+                            <field name="type"/>
+                            <field name="temps_de_travail" widget="float_time"/>
+                            <field name="temps_restant_categ" widget="float_time"/>
+                            <field name="temps_restant_task" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="assigned_duration" widget="float_time"/>
+                            <field name="occupation_rate"/>
+                            <field name="temps_effectue" widget="float_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Planification">
+                            <field name="task_planning_ids" widget="one2many">
+                                <tree editable="bottom">
+                                    <field name="project_id"/>
+                                    <field name="task_id"/>
+                                    <field name="task_stage_id"/>
+                                    <field name="type_id"/>
+                                    <field name="duration"/>
+                                    <field name="notes"/>
+                                    <field name="state"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="project_id"/>
+                                            <field name="task_id"/>
+                                            <field name="task_stage_id"/>
+                                            <field name="type_id"/>
+                                        </group>
+                                        <group>
+                                            <field name="state"/>
+                                            <field name="duration"/>
+                                            <field name="notes"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Catégories">
+                            <field name="category_ids">
+                                <tree editable="bottom" default_order="name">
+                                    <field name="name" invisible="1"/>
+                                    <field name="categorie_id"/>
+                                    <field name="temps_prevu" widget="float_time"/>
+                                    <field name="temps_restant" widget="float_time"/>
+                                    <field name="periode_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_periode_planifiee_technicien_view_tree" model="ir.ui.view">
+        <field name="name">of.periode.planifieee.technicien.view.tree</field>
+        <field name="model">of.periode.planifiee.technicien</field>
+        <field name="arch" type="xml">
+            <tree string="Lignes de période planifiée"
+                  colors="red:occupation_rate&lt;50.0;
+                          green:90.0&lt;=occupation_rate&lt;=100.0;
+                          orange:occupation_rate&gt;100.0;">
+                <field name="user_id"/>
+                <field name="periode_id"/>
+                <field name="temps_de_travail" widget="float_time"/>
+                <field name="assigned_duration" widget="float_time"/>
+                <field name="occupation_rate"/>
+                <field name="temps_restant_task" widget="float_time"/>
+                <field name="temps_effectue" widget="float_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_periode_planifiee_technicien_view_search" model="ir.ui.view">
+        <field name="name">of.periode.planifieee.technicien.view.search</field>
+        <field name="model">of.periode.planifiee.technicien</field>
+        <field name="arch" type="xml">
+            <search string="Lignes de période planifiée">
+                <field name="user_id"/>
+                <field name="periode_id"/>
+                <field name="type"/>
+                <filter name="incoming" string="À venir" domain="[('periode_id.dernier_jour', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('periode_id.dernier_jour', '&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('periode_id.premier_jour', '&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('periode_id.dernier_jour', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('periode_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois suivant" name="next_month"
+                        domain="[('periode_id.dernier_jour', u'&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('periode_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d'))]"/>
+                <filter string="4 prochains mois" name="4next_month"
+                        domain="[('periode_id.dernier_jour', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('periode_id.premier_jour', u'&lt;', (context_today() + relativedelta(day=1,months=4)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Regrouper par...">
+                    <filter string="Ressource" name="groupby_user" domain="[]" context="{'group_by':'user_id'}"/>
+                    <filter string="Période" name="groupby_period" domain="[]" context="{'group_by':'periode_id'}"/>
+                    <filter string="Type" name="groupby_type" domain="[]" context="{'group_by':'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_periode_planifiee_technicien_view_pivot" model="ir.ui.view">
+        <field name="name">of.periode.planifieee.technicien.view.pivot</field>
+        <field name="model">of.periode.planifiee.technicien</field>
+        <field name="arch" type="xml">
+            <pivot string="Lignes de période planifiée">
+                <field name="periode_id" type="col"/>
+                <field name="user_id" type="row"/>
+                <field name="occupation_rate" type="measure"/>
+                <field name="assigned_duration" type="measure"/>
+                <field name="temps_restant_task" type="measure"/>
+                <field name="temps_effectue" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_periode_planifiee_technicien_action" model="ir.actions.act_window">
+        <field name="name">Lignes de période planifiée</field>
+        <field name="res_model">of.periode.planifiee.technicien</field>
+        <field name="view_mode">tree,pivot,form</field>
+        <field name="context">{'search_default_incoming': 1}</field>
+        <field name="search_view_id" ref="of_periode_planifiee_technicien_view_search"/>
+    </record>
+
+    <menuitem id="of_periode_planifiee_technicien_menu" action="of_periode_planifiee_technicien_action"
+              parent="project.menu_project_management" sequence="8"/>
 
 </odoo>

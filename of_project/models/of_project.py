@@ -44,6 +44,7 @@ class Project(models.Model):
     of_task_total_priority = fields.Integer(
         string=u"Priorité totale des tâches", compute='_compute_of_task_total_priority', store=True)
     of_planned_hours = fields.Float(string=u"Durée initiale", compute='_compute_planned_hours')
+    of_newsflash = fields.Html(string=u"Flash info")
 
     @api.depends('task_ids', 'task_ids.stage_id', 'task_ids.stage_id.state')
     def _compute_of_state(self):
