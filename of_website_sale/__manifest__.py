@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 {
     'name': u"OpenFire / E-commerce",
-    'version': "10.0.2.0.0",
+    'version': "10.0.2.1.1",
     'author': "OpenFire",
     'license': "",
     'category': "OpenFire",
@@ -25,6 +26,7 @@ Module OpenFire pour e-commerce
         'views/product_views.xml',
         'views/payment_views.xml',
         'views/templates.xml',
+        'hooks/post_hook.xml',
     ],
     'qweb': [
     ],
