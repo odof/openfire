@@ -33,7 +33,6 @@ FieldMany2One.include({
                 this.set({"geo_lat": this.field_manager.get_field_value(this.geo_lat_field)});
                 this.set({"geo_lng": this.field_manager.get_field_value(this.geo_lng_field)});
                 this.set({"geocoding": this.field_manager.get_field_value(this.geocoding_field)});
-                console.log("on passe par ici ?", this.field_manager.get_field_value(this.geo_lat_field));
             }else{
                 this.set_geo_values();
             }
