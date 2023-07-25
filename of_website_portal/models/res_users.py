@@ -13,8 +13,8 @@ class ResUsers(models.Model):
         module_self = self.env['ir.module.module'].search(
             [('name', '=', 'of_website_portal'), ('state', 'in', ['installed', 'to upgrade'])])
         actions_todo = module_self and module_self.latest_version < '10.0.2.1.0' or False
+        cr = self._cr
         if actions_todo:
-            cr = self._cr
             # On désactive les profils utilisateurs portail
             cr.execute("""
                 UPDATE  res_users ru
@@ -69,7 +69,16 @@ class ResUsers(models.Model):
     of_fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string=u"Position fiscale par défaut")
     of_tab_ids = fields.Many2many(
-        comodel_name='of.tab', relation='res_users_of_tab_rel', column1='user_id', column2='tab_id', string="Onglets")
+        comodel_name='of.tab', relation='res_users_of_tab_rel', column1='user_id', column2='tab_id', string="Onglets",
+        default=lambda r: r._get_default_tab_ids())
+
+    @api.model
+    def _get_default_tab_ids(self):
+        tabs = [
+            self.env.ref('of_website_portal.of_tab_contract', raise_if_not_found=False),
+            self.env.ref('of_website_portal.of_tab_intervention', raise_if_not_found=False),
+        ]
+        return [(4, tab.id) for tab in tabs if tab]
 
     @api.model
     def deactivate_portal_users(self):

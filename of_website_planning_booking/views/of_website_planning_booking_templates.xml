@@ -79,12 +79,14 @@
             <li t-att-class="step_number==10 and 'text-primary' or 'text-muted'" id="step_parc">
                 <t t-if="step_number&gt;10">
                     <a href="/new_booking/installed_park_select" class="text-primary">
-                        Équipement
+                        <span t-if="service_list or request.session.get('rdv_service_id')">Contrat</span>
+                        <span t-else="">Équipement</span>
                         <span class="chevron"/>
                     </a>
                 </t>
                 <t t-if="not step_number&gt;10">
-                    Équipement
+                    <span t-if="service_list or request.session.get('rdv_service_id')">Contrat</span>
+                    <span t-else="">Équipement</span>
                     <span class="chevron"/>
                 </t>
             </li>
@@ -151,8 +153,22 @@
                 <div class="container oe_website_sale">
                     <div class="row">
                         <t t-call="of_website_planning_booking.new_booking_breadcrumb_trail"/>
-                        <h1 class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
-                        <t t-if="display_add_button">
+                        <h1 t-if="service_list and parc_installe_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat ou mon équipement</h1>
+                        <h1 t-elif="service_list" class="col-md-10 page-header text-primary">Sélectionner mon contrat</h1>
+                        <h1 t-else="" class="col-md-10 page-header text-primary">Sélectionner mon équipement</h1>
+                        <t t-if="service_list and parc_installe_list and display_add_button">
+                            <b><span class="col-md-10">Séletionnez le contrat ou l'équipement pour lequel vous souhaitez prévoir une intervention, ou ajoutez un nouvel équipement.</span></b>
+                        </t>
+                        <t t-elif="service_list and parc_installe_list">
+                            <b><span class="col-md-10">Séletionnez le contrat ou l'équipement pour lequel vous souhaitez prévoir une intervention.</span></b>
+                        </t>
+                        <t t-elif="service_list and display_add_button">
+                            <b><span class="col-md-10">Séletionnez le contrat pour lequel vous souhaitez prévoir une intervention, ou ajoutez un nouvel équipement.</span></b>
+                        </t>
+                        <t t-elif="service_list">
+                            <b><span class="col-md-10">Séletionnez le contrat pour lequel vous souhaitez prévoir une intervention.</span></b>
+                        </t>
+                        <t t-elif="display_add_button">
                             <b><span class="col-md-10">Vous avez au moins un équipement installé chez vous, sélectionnez celui pour lequel vous souhaitez prévoir une intervention, ou ajoutez en un nouveau.</span></b>
                         </t>
                         <t t-else="">
@@ -161,41 +177,69 @@
                         <div class="clearfix"/>
                         <br/>
                         <form action="/new_booking/installed_park_select" method="post">
-                            <div t-attf-class="form-group form-field o_website_form_required_custom col-md-6 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
+                            <div t-if="service_list" t-attf-class="form-group col-md-7 #{error_dict.get('service_id') and 'has-error' or ''} ">
+                                <label class="control-label label-optional" for="service_id">Contrat d'entretien</label>
+                                <select id="service_id" name="service_id" class="form-control">
+                                    <option value="">Entretien non contractuel</option>
+                                    <t t-foreach="service_list" t-as="s">
+                                        <option t-att-value="s.id"
+                                                t-att-selected="s.id == (service and service.id or -1)">
+                                            <t t-esc="s.website_planning_booking_name()"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div t-if="parc_installe_list" t-attf-class="form-group form-field col-md-7 #{error_dict.get('parc_installe_id') and 'has-error' or ''}">
+                                <label class="control-label label-optional" for="parc_installe_id">Équipement</label>
                                 <select id="parc_installe_id" name="parc_installe_id" class="form-control">
                                     <option value="">La référence de votre équipement...</option>
                                     <t t-foreach="parc_installe_list" t-as="pi">
                                         <option t-att-value="pi.id"
                                                 t-att-selected="pi.id == parc_installe_id">
-                                            <t t-esc="pi.modele"/>
-                                            <t t-if="pi.modele and pi.name" t-esc="'-'"/>
-                                            <t t-esc="pi.name"/>
+                                            <t t-esc="pi.get_website_name()"/>
                                         </option>
                                     </t>
                                 </select>
+                            </div>
+                            <div class="form-group col-md-10">
+                                <span t-if="service_list and parc_installe_list"> ATTENTION : sélectionner un contrat va automatiquement sélectionner l'équipement associé et inversement.
+                                    <br/>Si vous renseignez un contrat sans équipement, la valeur de l'équipement sera "La référence de votre équipement...""
+                                    <br/>Si vous renseignez un équipement qui n'est lié a aucun contrat, la valeur du contrat sera "Entretien non contractuel"
+
+                                </span>
+                                <span t-if="service_list and parc_installe_list and (error_dict.get('service_id') or error_dict.get('parc_installe_id'))" t-attf-style="#{(error_dict.get('service_id') or error_dict.get('parc_installe_id')) and 'color: red' or ''}">
+                                    <br/>Au moins une des deux informations demandées doit être renseignée.
+                                </span>
                             </div>
                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                             <input type="hidden" name="submitted" value="1"/>
                             <input type="hidden" name="current_step" t-att-value="current_step"/>
                             <div class="clearfix" />
-                            <div class="mt32 mb64 pull-right" name="buttons">
-                                <t t-if="display_add_button">
-                                    <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
-                                            name="create" value="address_create">
-                                        Ajouter un équipement
+                            <div class="mt32 mb64" name="buttons">
+                                <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default pull-left">
+                                    Annuler
+                                </a>
+                                <div class="pull-right">
+                                    <t t-if="display_add_button">
+                                        <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
+                                                name="create" value="address_create">
+                                            Ajouter un équipement
+                                        </button>
+                                        <t t-if="parc_installe_list">
+                                                &amp;nbsp;&amp;nbsp;&amp;nbsp;/&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                                <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
+                                                        name="update" value="address_update">
+                                                    Modifier un équipement
+                                                </button>
+                                        </t>
+                                            &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                                        </t>
+                                    <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
+                                            name="next_step" value="address_select">
+                                        Suivant
+                                        <span class="fa fa-long-arrow-right"/>
                                     </button>
-                                    &amp;nbsp;&amp;nbsp;&amp;nbsp;/&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                                    <button type="submit" class="btn btn-default a-submit a-submit-disable a-submit-loading"
-                                            name="update" value="address_update">
-                                        Modifier un équipement
-                                    </button>
-                                    &amp;nbsp;&amp;nbsp;&amp;nbsp;ou&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                                </t>
-                                <button type="submit" class="btn btn-primary a-submit a-submit-disable a-submit-loading"
-                                        name="next_step" value="address_select">
-                                    Suivant
-                                    <span class="fa fa-long-arrow-right"/>
-                                </button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -309,6 +353,9 @@
                                 <span class="fa fa-long-arrow-left"/>
                                 Retour
                             </a>
+                            <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default">
+                                Annuler
+                            </a>
                             <button type="submit"
                                     class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
                                     name="next_step" value="address_select">
@@ -355,8 +402,11 @@
                                     <span class="fa fa-long-arrow-left"/>
                                     Retour
                                 </a>
+                                <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default">
+                                    Annuler
+                                </a>
                                 <span name="buttons_right" class="pull-right">
-                                    <t t-if="not parc_installe.site_adresse_id">
+                                    <t t-if="(service and not service.address_id) or (parc_installe and not parc_installe.site_adresse_id)">
                                         <form action="/new_booking/address_create_edit" method="post" style="display:inline-block">
                                             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                             <input type="hidden" name="mode" value="new"/>
@@ -480,6 +530,9 @@
                                 <span class="fa fa-long-arrow-left"/>
                                 Retour
                             </a>
+                            <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default mb32">
+                                Annuler
+                            </a>
                             <button type="submit"
                                     class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
                                     name="next_step" value="address_select">
@@ -546,6 +599,9 @@
                                 <span class="fa fa-long-arrow-left"/>
                                 Retour
                             </a>
+                            <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default mb32">
+                                Annuler
+                            </a>
                             <a class="btn btn-primary a-submit a-submit-disable a-submit-loading pull-right">
                                 Suivant
                                 <span class="fa fa-long-arrow-right"/>
@@ -577,7 +633,7 @@
                     <form action="/new_booking/service" method="post" class="checkout_autoformat">
                         <div t-attf-class="form-group #{error_dict.get('tache_id') and 'has-error' or ''} col-md-10">
                             <label class="control-label label-optional" for="tache_id">Prestation *</label>
-                            <select id="tache_id" name="tache_id" class="form-control">
+                            <select id="tache_id" name="tache_id" class="form-control" t-att-disabled="request.session.get('rdv_service_id') and 1 or 0">
                                 <option value="">Prestation...</option>
                                 <t t-foreach="tache_list" t-as="t">
                                     <option t-att-value="t.id"
@@ -587,6 +643,13 @@
                                 </t>
                             </select>
                         </div>
+                        <t t-if="display_price">
+                            <div class="clearfix"/>
+                            <div class="form-group  col-md-5">
+                                <label class="control-label label-optional" for="tache_price">Prix de la prestation</label>
+                                <input type="text" id="tache_price" class="form-control" t-att-value="tache_price or '0.0 €'" readonly="1"/>
+                            </div>
+                        </t>
                         <div class="clearfix"/>
                         <div t-attf-class="form-group #{error_dict.get('date_recherche_debut') and 'has-error' or ''} col-md-5">
                             <label class="control-label label-optional" for="date_recherche_debut">
@@ -605,6 +668,9 @@
                                class="btn btn-default mb32">
                                 <span class="fa fa-long-arrow-left"/>
                                 Retour
+                            </a>
+                            <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default mb32">
+                                Annuler
                             </a>
                             <button type="submit"
                                     class="btn btn-primary pull-right a-submit a-submit-disable a-submit-loading"
@@ -647,6 +713,9 @@
                         <a href="/new_booking/service" class="btn btn-default">
                             <span class="fa fa-long-arrow-left"/>
                             Retour
+                        </a>
+                        <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default">
+                            Annuler
                         </a>
                         <span name="buttons_right" class="pull-right" t-if="creneau_selected">
                             <t t-if="not nomore_load">
@@ -691,10 +760,18 @@
                         </t>
                     </div>
                     <div class="clearfix"/>
-                    <h2 class="col-md-10">Mon équipement</h2>
-                    <div class="col-md-4 one_kanban">
-                        <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
-                    </div>
+                    <t t-if="service">
+                        <h2 class="col-md-10">Mon contrat</h2>
+                        <div class="col-md-4 one_kanban">
+                            <t t-call="of_website_planning_booking.new_booking_service_kanban"/>
+                        </div>
+                    </t>
+                    <t t-if="parc_installe">
+                        <h2 class="col-md-10">Mon équipement</h2>
+                        <div class="col-md-4 one_kanban">
+                            <t t-call="of_website_planning_booking.new_booking_device_kanban"/>
+                        </div>
+                    </t>
                     <div class="clearfix"/>
                     <h2 class="col-md-10">Mon rendez-vous</h2>
                     <div class="col-md-4 one_kanban">
@@ -740,6 +817,9 @@
                             <a href="/new_booking/slot" class="btn btn-default">
                                 <span class="fa fa-long-arrow-left"/>
                                 Retour
+                            </a>
+                            <a t-if="request.session.get('rdv_id', False)" href="/my/home" class="btn btn-default">
+                                Annuler
                             </a>
                             <span name="buttons_right" class="pull-right">
                                     <input type="hidden" name="csrf_token"
@@ -843,6 +923,17 @@
         </div>
     </template>
 
+    <!-- OF Website Planning Booking - Kanban contrat -->
+    <template id="new_booking_service_kanban" name="Prise de RDV en ligne - Service Kanban">
+        <div class="panel panel-default of_border_primary">
+            <div class='panel-body'>
+                <div>
+                    <b t-esc="service.website_planning_booking_name()"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <!-- OF Website Planning Booking - Kanban Device -->
     <template id="new_booking_device_kanban" name="Prise de RDV en ligne - Équipement Kanban">
         <div class="panel panel-default of_border_primary">
@@ -865,5 +956,99 @@
             </div>
         </div>
     </template>
+
+    <template id="of_website_planning_booking_portal_my_of_contracts" name="OF My Contracts" inherit_id="of_website_portal.of_website_portal_portal_my_of_contracts" priority="25">
+        <xpath expr="//table/thead/tr" position="inside">
+            <th></th>
+        </xpath>
+        <xpath expr="//table/t/tr" position="inside">
+            <td>
+                <form action="/new_booking/service" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="contract" t-att-value="contract.id"/>
+                    <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre RDV</button>
+                </form>
+            </td>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_portal_my_rdvs" name="OF My RDVs" inherit_id="of_website_portal.of_website_portal_portal_my_rdvs">
+        <xpath expr="//form[@name='rdv_cancelable']" position="before">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable" style="margin-right: 5px;">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                <button type="submit"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary btn-xs loading' or 'btn btn-default btn-xs loading disabled of-no-click'"
+                        t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
+                    <i class="fa fa-pencil"/>
+                </button>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv" name="OF RDV" inherit_id="of_website_portal.of_website_portal_website_rdv">
+        <xpath expr="//form[@name='rdv_cancelable']" position="before">
+            <form action="/new_booking/service" method="post" enctype="multipart/form-data" name="rdv_editable" style="margin: auto;">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="rdv_id" t-att-value="rdv.id"/>
+                <button type="submit"
+                        t-att-class="rdv.website_create and can_edit_from_website and 'btn btn-primary loading' or 'btn btn-default loading disabled of-no-click'"
+                        t-att-title="rdv.website_create and can_edit_from_website and 'Modifier' or 'Impossible de modifier ce RDV'">
+                    <i class="fa fa-pencil"/>&amp;nbsp;Modifier
+                </button>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv_cancel" name="OF My Contracts" inherit_id="of_website_portal.of_website_portal_website_rdv_cancel" priority="25">
+        <xpath expr="//form[@action='/my/home']" position="replace">
+            <form action="/rdv/cancel/confirmation" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="canceled_rdv_id" t-att-value="rdv.id"/>
+                <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Confirmer</button>
+            </form>
+        </xpath>
+    </template>
+
+    <template id="of_website_planning_booking_website_rdv_cancel_confirmation" name="OF Website Intervention">
+        <t t-call="website.layout">
+            <body data-spy="scroll" data-target=".navspy" data-offset="50">
+                <div class="container o_website_quote">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home" /></a></li>
+                                <li><a href="/my/rdvs">Mes interventions</a></li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <!-- Page content -->
+                        <div id="of_rdv_page_content" class="col-md-12">
+                            <!-- Intro -->
+                            <div id="of_rdv_introduction" class="page-header mt16">
+                                <h1>
+                                    <label>Annulation de rendez-vous - confirmation</label>
+                                </h1>
+                            </div>
+                            <div class="col-md-16 col-xs-16">
+                                <label>Votre rendez-vous a été annulé, vous pouvez reprendre rendez-vous.</label>
+                            </div>
+                            <div class="oe_structure" />
+                        </div>
+                    </div>
+                    <form t-attf-action="/new_booking/installed_park_select" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Prendre rendez-vous</button>
+                    </form>
+                    <form action="/my/home" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <button type="submit" class="btn btn-default btn-xs a-submit a-submit-disable a-submit-loading" style="margin-top: 10px;">Fermer</button>
+                    </form>
+                </div>
+            </body>
+        </t>
+    </template>
+
 
 </odoo>

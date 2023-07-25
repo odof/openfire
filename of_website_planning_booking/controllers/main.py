@@ -9,7 +9,7 @@ from collections import OrderedDict
 
 from odoo import http, tools, fields
 from odoo.http import request
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, AccessError
 from odoo.tools.float_utils import float_compare
 from odoo.addons.of_utils.models.of_utils import hours_to_strs
 from odoo.addons.website_portal.controllers.main import website_account
@@ -57,6 +57,10 @@ class OFWebsitePlanningBooking(http.Controller):
         # L'utilisateur n'est pas connecté -> on le redirige sur la page de connexion
         if request.env.uid == request.website.user_id.id:
             return request.redirect('/web/login')
+        if not request.env.user.of_online_booking:
+            values = {'message': u"Vous n'êtes pas éligible à la prise de rendez-vous en ligne, "
+                                 u"contactez votre magasin pour prendre rendez-vous."}
+            return request.render('of_website_planning_booking.new_booking_sorry', values)
         step_number = STEP_NAME_NUMBER[step] or 0
         # À ce stade, le partenaire est nécessaire
         if step_number > 0 and not request.session.get('booking_partner_id'):
@@ -64,7 +68,7 @@ class OFWebsitePlanningBooking(http.Controller):
         partner = request.env['res.partner'].sudo().browse(request.session.get('booking_partner_id'))
         # Si le partenaire n'a pas de parc installé, on le redirige directement sur la page de création de
         # parc installé si l'option est activé ou vers la page d'inposibilité
-        if step == 'installed_park_select' and not partner.of_parc_installe_ids:
+        if step == 'installed_park_select' and not partner.of_parc_installe_ids and not partner.recurrent_ids:
             if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_creation'):
                 return request.redirect('/new_booking/installed_park_create')
             else:
@@ -75,8 +79,9 @@ class OFWebsitePlanningBooking(http.Controller):
         if step == 'address_select' and not partner.street:
             request.params['mode'] = 'new'
             return request.redirect('/new_booking/address_create_edit')
-        # À ce stade, le parc installé est nécessaire
-        if step_number >= 20 and not request.session.get('booking_parc_installe_id'):
+        # À ce stade, le parc installé ou contrat sont nécessaire
+        if step_number >= 20 and not request.session.get('booking_parc_installe_id') and \
+           not request.session.get('rdv_service_id'):
             return request.redirect('/new_booking/installed_park_select')
         # À ce stade, l'adresse est nécessaire
         if step_number >= 30 and not request.session.get('rdv_site_adresse_id'):
@@ -99,6 +104,9 @@ class OFWebsitePlanningBooking(http.Controller):
     @http.route(['/new_booking'], type='http', auth='user', website=True)
     def new_booking(self, **kw):
         redirection = self.get_redirection('new')
+        # Reset de la valeur si l'utilisateur n'est pas allé au bout de la modification d'un RDV et va vers
+        # la prise de RDV
+        request.session['rdv_id'] = False
         if redirection:
             return redirection
 
@@ -123,8 +131,9 @@ class OFWebsitePlanningBooking(http.Controller):
         # Le formulaire de l'étape sélection d'équipement a été soumis -> traitement
         if 'submitted' in values:
             values.pop('submitted')
-            if not values.get('parc_installe_id') and not values.get('create'):
+            if not values.get('parc_installe_id') and not values.get('create') and not values.get('service_id'):
                 error['parc_installe_id'] = True
+                error['service_id'] = True
             else:
                 validated = True
 
@@ -135,7 +144,13 @@ class OFWebsitePlanningBooking(http.Controller):
                 # On redirige vers le formulaire de création de parc installé
                 request.session.pop('booking_parc_installe_id', None)
                 return request.redirect('/new_booking/installed_park_create')
-            request.session['booking_parc_installe_id'] = int(values['parc_installe_id'])
+            # Passage a False au cas où on a un reliquat d'une autre tentative
+            request.session['booking_parc_installe_id'] = False
+            request.session['rdv_service_id'] = False
+            if values.get('parc_installe_id'):
+                request.session['booking_parc_installe_id'] = int(values['parc_installe_id'])
+            if values.get('service_id'):
+                request.session['rdv_service_id'] = int(values['service_id'])
             if values.get('update'):
                 # On redirige vers le formulaire de MAJ du parc installé
                 return request.redirect('/new_booking/installed_park_create')
@@ -147,10 +162,29 @@ class OFWebsitePlanningBooking(http.Controller):
         # Arrivée sur la page ou erreur intermédiaire
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
         values['parc_installe_list'] = request.env.user.partner_id.of_parc_installe_ids
+        service_type = request.env.ref('of_service.of_service_type_maintenance', raise_if_not_found=False)
+        values['service_list'] = request.env['of.service'].search([
+            ('type_id', '=', service_type.id),
+            ('base_state', '=', 'calculated'),
+            ('recurrence', '=', True),
+            '|',
+            ('partner_id', 'child_of', request.env.user.partner_id.id),
+            ('address_id', 'child_of', request.env.user.partner_id.id),
+        ])
 
         if values.get('parc_installe_list'):
             # Si la session a déjà un parc installé. Exemple clic sur 'retour' à l'étape adresse
             values['parc_installe_id'] = request.session.get('booking_parc_installe_id')
+
+        if not values.get('service_id') and request.session.get('rdv_service_id'):
+            values['service'] = request.env['of.service'].browse(request.session.get('rdv_service_id'))
+        else:
+            values['service'] = 'service_id' in values and values['service_id'] != '' and \
+                                request.env['of.service'].browse(int(values['service_id']))
+
+        if not values['service'] and len(values['service_list']) == 1:
+            values['service'] = values['service_list']
+            values['tache'] = values['service'].tache_id
 
         # Création d'un parc installé extérieur
         if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_creation'):
@@ -265,8 +299,8 @@ class OFWebsitePlanningBooking(http.Controller):
         values['product_category'] = 'product_category_id' in values and values['product_category_id'] != '' and \
                                      request.env['product.category'].browse(int(values['product_category_id'])) or \
                                      parc_installe.product_category_id
-        other_brand_id = request.env['ir.values'].sudo().get_default(
-            'of.intervention.settings', 'website_booking_default_product_brand_id')
+        other_brand_id = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+            .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
         values['brand'] = 'brand_id' in values and values['brand_id'] != '' and values['brand_id'] != 'Autre marque' \
                           and request.env['of.product.brand'].browse(int(values['brand_id'])) or parc_installe.brand_id
         values['brand_id'] = values.get('brand_id') or parc_installe.brand_id.id == other_brand_id and 'Autre marque'
@@ -324,22 +358,34 @@ class OFWebsitePlanningBooking(http.Controller):
         # Arrivée sur la page ou erreur intermédiaire
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
 
+        service = False
+        service_id = request.session.get('rdv_service_id')
+        if service_id:
+            service = request.env['of.service'].browse(service_id)
+        parc_installe = False
         parc_installe_id = request.session.get('booking_parc_installe_id')
-        parc_installe = request.env['of.parc.installe'].browse(parc_installe_id)
+        if parc_installe_id:
+            parc_installe = request.env['of.parc.installe'].browse(parc_installe_id)
         partner = request.env.user.partner_id
         # Le parc installé n'a pas d'adresse enregistrée -> on laisse le choix
-        if not parc_installe.site_adresse_id:
-            adresse_list = request.env['res.partner'].search([('id', 'child_of', partner.commercial_partner_id.id)])
-        else:
+        if service and service.address_id:
+            adresse_list = service.address_id
+        elif parc_installe and parc_installe.site_adresse_id:
             adresse_list = parc_installe.site_adresse_id
+        else:
+            adresse_list = request.env['res.partner'].search([('id', 'child_of', partner.commercial_partner_id.id)])
         if request.session.get('rdv_site_adresse_id') and \
                 request.session.get('rdv_site_adresse_id') not in adresse_list.ids:
             request.session['rdv_site_adresse_id'] = False
 
         values['adresse_list'] = adresse_list
         values['parc_installe'] = parc_installe
+        values['service'] = service
         values['site_adresse_id'] = request.session.get('rdv_site_adresse_id') or \
-            parc_installe.site_adresse_id.id or parc_installe.client_id.id
+            (service and service.address_id.id) or \
+            (parc_installe and parc_installe.site_adresse_id.id) or \
+            (service and service.partner_id.id) or \
+            (parc_installe and parc_installe.client_id.id)
         request.session['rdv_site_adresse_id'] = values['site_adresse_id']
 
         return request.render('of_website_planning_booking.new_booking_address_select', values)
@@ -462,7 +508,7 @@ class OFWebsitePlanningBooking(http.Controller):
         except Exception, e:
             _logger.error(
                 u"Erreur lors de l'affichage de la carte de l'adresse d'installation : %s" % tools.ustr(e))
-            return request.render("website.403")
+            return request.render('website.403')
 
         values.update({
             'googleAPIKey': google_maps_api_key,
@@ -477,6 +523,36 @@ class OFWebsitePlanningBooking(http.Controller):
     @http.route(['/new_booking/service'], type='http', auth='user', website=True)
     def new_booking_service(self, **kw):
         current_step = 'service'
+        if kw.get('contract'):
+            service = request.env['of.service'].browse(int(kw.get('contract')))
+            try:
+                service.check_access_rights('read')
+                service.check_access_rule('read')
+            except AccessError:
+                return request.render('website.403')
+            request.session['rdv_service_id'] = service.id
+            request.session['rdv_tache_id'] = service.tache_id.id
+            request.session['booking_partner_id'] = request.env.user.partner_id.id
+            if service.parc_installe_id:
+                request.session['booking_parc_installe_id'] = service.parc_installe_id.id
+            if service.address_id:
+                request.session['rdv_site_adresse_id'] =  service.address_id.id
+        if kw.get('rdv_id'):
+            rdv = request.env['of.planning.intervention'].browse(int(kw.get('rdv_id')))
+            try:
+                rdv.check_access_rights('read')
+                rdv.check_access_rule('read')
+            except AccessError:
+                return request.render("website.403")
+            request.session['rdv_service_id'] = rdv.service_id.id
+            request.session['rdv_tache_id'] = rdv.tache_id.id
+            request.session['booking_partner_id'] = rdv.partner_id.id
+            request.session['rdv_id'] = rdv.id
+            request.session['rdv_date_recherche_debut'] = rdv.date_date
+            if rdv.parc_installe_id:
+                request.session['booking_parc_installe_id'] = rdv.parc_installe_id.id
+            if rdv.address_id:
+                request.session['rdv_site_adresse_id'] =  rdv.address_id.id
 
         # Retour en arrière si les informations nécessaires ne sont pas présentes dans la session
         redirection = self.get_redirection(current_step)
@@ -487,6 +563,10 @@ class OFWebsitePlanningBooking(http.Controller):
         error = dict()
         validated = False
 
+        if request.session.get('rdv_service_id'):
+            service = request.env['of.service'].browse(request.session.get('rdv_service_id'))
+            values['tache_id'] = service.tache_id.id
+            values['tache_price'] = "%.2f €" % service.price_total
         # Le formulaire de l'étape localisation a été soumis -> traitement
         if 'submitted' in values:
             values.pop('submitted')
@@ -504,8 +584,8 @@ class OFWebsitePlanningBooking(http.Controller):
                     error['date_recherche_debut'] = True
                     error_message.append(u"La date de début de recherche doit être future.")
                 # La date de début doit être inférieur au paramètre de configuration
-                max_days = request.env['ir.values'].sudo().get_default(
-                    'of.intervention.settings', 'website_booking_open_days_number')
+                max_days = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                    .get_default('of.intervention.settings', 'website_booking_open_days_number')
                 max_search_date = fields.Date.from_string(fields.Date.today()) + timedelta(days=max_days)
                 if search_date > max_search_date:
                     error['date_recherche_debut'] = True
@@ -521,6 +601,8 @@ class OFWebsitePlanningBooking(http.Controller):
 
         if validated:
             request.session['rdv_tache_id'] = int(values['tache_id'])
+            if values.get('service_id'):
+                request.session['rdv_service_id'] = int(values['service_id'])
             request.session['rdv_date_recherche_debut'] = values['date_recherche_debut']
             # Marquer pour une nouvelle recherche. les perfs pourraient être améliorées en vérifiant
             # si l'adresse / la prestation / la date a effectivement changé depuis la denière recherche
@@ -531,7 +613,8 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Arrivée sur la page ou erreur intermédiaire
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
-        values['tache_list'] = request.env['of.planning.tache'].search([])
+        taches = request.env['of.planning.tache'].search([])
+        values['tache_list'] = taches
 
         # Si la session a déjà une tâche. Exemple clic sur 'retour' à l'étape creneau
         if not values.get('tache_id') and request.session.get('rdv_tache_id'):
@@ -544,6 +627,8 @@ class OFWebsitePlanningBooking(http.Controller):
         if not values.get('date_recherche_debut') and request.session.get('rdv_date_recherche_debut'):
             values['date_recherche_debut'] = request.session.get('rdv_date_recherche_debut')
 
+        values['display_price'] = request.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_tache_price') or False
         return request.render('of_website_planning_booking.new_booking_service', values)
 
     @http.route(['/new_booking/slot'], type='http', auth='user', website=True)
@@ -569,7 +654,8 @@ class OFWebsitePlanningBooking(http.Controller):
         values['step_number'] = STEP_NAME_NUMBER.get(current_step, 'new')
 
         # Recherche de créneaux
-        mode = request.env['ir.values'].sudo().get_default('of.intervention.settings', 'website_booking_slot_size')
+        mode = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+            .get_default('of.intervention.settings', 'website_booking_slot_size')
         compute = ''
 
         # Wizard de recherche
@@ -577,13 +663,14 @@ class OFWebsitePlanningBooking(http.Controller):
             # Il faut générer un nouveau wizard de recherche
             tache = request.env['of.planning.tache'].browse(request.session.get('rdv_tache_id'))
             wizard_vals = {
-                'company_id': request.website.company_id.id,
+                'company_id': request.env.user.company_id.id,
                 'partner_id': request.env.user.partner_id.id,
                 'partner_address_id': request.session.get('rdv_site_adresse_id'),
                 'tache_id': request.session.get('rdv_tache_id'),
                 'date_recherche_debut': request.session.get('rdv_date_recherche_debut'),
                 'duree': tache.duree,
                 'ignorer_geo': True,
+                'service_id': request.session.get('rdv_service_id'),
             }
             search_wizard = request.env['of.tournee.rdv'].create(wizard_vals)
             search_wizard._onchange_date_recherche_debut()
@@ -616,8 +703,8 @@ class OFWebsitePlanningBooking(http.Controller):
             address = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
 
             # Nombre de jours max ouverts à la réservation
-            max_days = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_open_days_number')
+            max_days = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_open_days_number')
             max_search_date = fields.Date.from_string(request.session.get('rdv_date_recherche_debut')) + \
                 timedelta(days=max_days)
             max_search_date = fields.Date.to_string(max_search_date)
@@ -727,8 +814,10 @@ class OFWebsitePlanningBooking(http.Controller):
                 request.session['rdv_search_wiz_id'] = False
                 request.session['rdv_date_recherche_debut'] = False
                 request.session['rdv_tache_id'] = False
+                request.session['rdv_service_id'] = False
                 request.session['rdv_site_address_id'] = False
                 request.session['booking_parc_installe_id'] = False
+                request.session['rdv_id'] = False
                 return request.redirect('/new_booking/thank_you')
             else:
                 return request.redirect('/new_booking/slot')
@@ -738,21 +827,27 @@ class OFWebsitePlanningBooking(http.Controller):
         values['company'] = request.website.company_id
         values['parc_installe'] = request.env['of.parc.installe'].browse(
             request.session.get('booking_parc_installe_id'))
+        values['service'] = request.env['of.service'].browse(
+            request.session.get('rdv_service_id'))
         values['adresse'] = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
         task = request.env['of.planning.tache'].browse(request.session.get('rdv_tache_id'))
         values['tache'] = task
         values['creneau'] = request.env['of.tournee.rdv.line.website'].browse(request.session.get('rdv_creneau_id')).\
             exists()
         # Calcul du prix de la prestation
-        pricelist = request.env.user.partner_id.property_product_pricelist or request.env.ref('product.list0', False)
-        price_unit = task.product_id.sudo().with_context(pricelist=pricelist.id).price
-        taxes = task.product_id.sudo().taxes_id
-        if request.env.user.partner_id.company_id:
-            taxes = taxes.filtered(lambda r: r.company_id == request.env.user.partner_id.company_id)
-        taxes = task.fiscal_position_id.sudo().map_tax(taxes, task.product_id, request.env.user.partner_id) or []
-        amounts = taxes.compute_all(
-            price_unit, pricelist.currency_id, 1.0, product=task.product_id, partner=request.env.user.partner_id)
-        values['price'] = amounts['total_included']
+        if values['service']:
+            values['price'] = values['service'].price_total
+        else:
+            pricelist = request.env.user.partner_id.property_product_pricelist or request.env.ref('product.list0', False)
+            price_unit = task.product_id.sudo().with_context(pricelist=pricelist.id).price
+            taxes = task.product_id.sudo().taxes_id
+            if request.env.user.partner_id.company_id:
+                taxes = taxes.filtered(lambda r: r.company_id == request.env.user.partner_id.company_id)
+            taxes = task.fiscal_position_id.sudo().map_tax(taxes, task.product_id, request.env.user.partner_id) or \
+                request.env['account.tax']
+            amounts = taxes.compute_all(
+                price_unit, pricelist.currency_id, 1.0, product=task.product_id, partner=request.env.user.partner_id)
+            values['price'] = amounts['total_included']
         values['company'] = request.website.company_id.sudo()
         values['terms'] = values.get('terms', False)
         values['opt_in'] = values.get('opt_in', False)
@@ -762,6 +857,19 @@ class OFWebsitePlanningBooking(http.Controller):
     @http.route(['/new_booking/thank_you'], type='http', auth='user', website=True)
     def new_booking_thank_you(self, **kw):
         return request.render('of_website_planning_booking.new_booking_thank_you')
+
+    @http.route(['/rdv/cancel/confirmation'], type='http', auth='user', website=True)
+    def of_portal_cancel_rdv(self, canceled_rdv_id, **kw):
+        rdv = request.env['of.planning.intervention'].search([('id', '=', int(canceled_rdv_id))]).sudo()
+        rdv.button_cancel()
+        # Envoyer l'email de confirmation
+        mail_template = request.env['ir.model.data'].sudo().get_object(
+            'of_website_portal', 'of_website_portal_rdv_cancellation_mail_template')
+        mail_id = mail_template.send_mail(rdv.id)
+        mail = request.env['mail.mail'].sudo().browse(mail_id)
+        mail.send()
+        return request.render(
+            'of_website_planning_booking.of_website_planning_booking_website_rdv_cancel_confirmation', {})
 
     def _create_parc_installe(self):
         vals = {}
@@ -784,8 +892,8 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Marque extérieur
         if request.params['brand_id'] == 'Autre marque':
-            vals['brand_id'] = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_default_product_brand_id')
+            vals['brand_id'] = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
             vals['note'] = u"Marque : %s" % request.params['extra_brand']
 
         vals['product_id'] = request.env.ref(
@@ -843,8 +951,8 @@ class OFWebsitePlanningBooking(http.Controller):
         parc_brand = parc_installe.brand_id
         param_brand_id = params.get('brand_id') and params['brand_id'] != 'Autre marque' and int(params['brand_id'])
         if params.get('brand_id') == 'Autre marque':
-            param_brand_id = request.env['ir.values'].sudo().get_default(
-                'of.intervention.settings', 'website_booking_default_product_brand_id')
+            param_brand_id = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                .get_default('of.intervention.settings', 'website_booking_default_product_brand_id')
         if param_brand_id and (not parc_brand or parc_brand.id != param_brand_id):
             update_vals['brand_id'] = param_brand_id
         if params.get('extra_brand') and params['extra_brand'] != parc_installe.website_extra_brand:
@@ -1000,6 +1108,8 @@ class OFWebsitePlanningBooking(http.Controller):
                 description += u"<br/>"
             description += u"Commentaires additionnels du client : %s" % request.params.get('comment')
 
+        booking_state = request.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_intervention_state')
         vals = {
             'name': u"Intervention",
             'parc_installe_id': parc_installe.id,
@@ -1008,8 +1118,8 @@ class OFWebsitePlanningBooking(http.Controller):
             'flexible': tache.flexible,
             'employee_ids': [(4, creneau_employee.employee_id.id, 0)],
             'duree': tache.duree,
-            'company_id': request.website.company_id.id,
-            'state': 'draft',
+            'company_id': adresse.company_id.id,
+            'state': booking_state,
             'fiscal_position_id': tache.fiscal_position_id.id or False,
             'verif_dispo': True,
             'line_ids': tache.product_id and [(0, 0, {'product_id': tache.product_id.id,
@@ -1021,6 +1131,8 @@ class OFWebsitePlanningBooking(http.Controller):
             'website_create': True,
             'description': description,
         }
+        if request.session.get('rdv_service_id'):
+            vals['service_id'] = request.session.get('rdv_service_id')
         # Le créneau de l'employé peut commencer avant le début d'aprem,
         # on fait donc un max pour s'assurer que le RDV soit pris l'aprem
         if creneau.name.lower() == 'après-midi':
@@ -1034,6 +1146,9 @@ class OFWebsitePlanningBooking(http.Controller):
                 time_str = hours_to_strs('time', debut_aprem_flo)
                 debut_local_dt = tz.localize(datetime.strptime(creneau.date + " %s:00" % time_str, "%Y-%m-%d %H:%M:%S"))
                 debut_dt = debut_local_dt.astimezone(pytz.utc).strftime("%Y-%m-%d %H:%M:%S")
+        # dans le cas du mode manuel, la date de début est déjà enregistrée
+        elif creneau.date_start:
+            debut_dt = creneau.date_start
         else:
             debut_dt = creneau_employee.debut_dt
         vals['date'] = debut_dt
@@ -1053,8 +1168,14 @@ class OFWebsitePlanningBooking(http.Controller):
             creneau_employee.button_select(sudo=True)
             vals = self._get_intervention_vals(creneau, creneau_employee)
             try:
-                intervention = interv_obj.create(vals)
+                if request.session.get('rdv_id'):
+                    intervention = interv_obj.browse(request.session['rdv_id'])
+                    intervention.write(vals)
+                else:
+                    intervention = interv_obj.create(vals)
                 intervention = intervention.with_context(from_portal=True)
+                if intervention.service_id:
+                    intervention.with_context(of_import_service_lines=True)._onchange_service_id()
                 if intervention.line_ids:
                     intervention.line_ids.compute_taxes()
                 # mettre à jour le nom du RDV

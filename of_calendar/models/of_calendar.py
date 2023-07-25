@@ -623,6 +623,16 @@ class OFHoraireSegment(models.Model):
             seg.date_fin = fields.Date.to_string(fin_da)
         seg_perm[-1].date_fin = False
 
+    @api.multi
+    def convert_segments_to_list(self):
+        result = []
+        for segment in self:
+            creneaux_dict = {i+1: [] for i in xrange(7)}
+            for creneau in segment.creneau_ids:
+                creneaux_dict[creneau.jour_number].append([creneau.heure_debut, creneau.heure_fin])
+            result.append([segment.date_deb, segment.date_fin, creneaux_dict])
+        return result
+
 
 class OFHorairesCreneau(models.Model):
     _name = "of.horaire.creneau"

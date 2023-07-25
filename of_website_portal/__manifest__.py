@@ -3,7 +3,7 @@
 
 {
     'name': u"OpenFire / Portail du site internet",
-    'version': '10.0.2.1.0',
+    'version': '10.0.2.2.0',
     'license': 'AGPL-3',
     'author': u"OpenFire",
     'category': u"OpenFire",
@@ -37,8 +37,10 @@ Module OpenFire pour le portail du site internet
         'views/of_website_portal_views.xml',
         'views/res_users_views.xml',
         'views/templates_views.xml',
+        'views/res_config_views.xml',
         'wizards/portal_user_wizard_views.xml',
         'templates/website_portal_sale_views.xml',
+        'data/post_update.xml',
     ],
     'qweb': [
     ],

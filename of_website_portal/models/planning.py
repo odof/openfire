@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 
@@ -9,6 +10,15 @@ class OFService(models.Model):
     _inherit = 'of.service'
 
     website_published = fields.Boolean(string=u"Publié sur le site internet", copy=False)
+
+    @api.multi
+    def button_valider(self):
+        # laisser le système calculer l'état
+        res = super(OFService, self).button_valider()
+        maintenance = self.env.ref('of_service.of_service_type_maintenance', raise_if_not_found=False)
+        if self.tache_id.website_published and maintenance and self.type_id.id == maintenance.id:
+            self.website_publish_button()
+        return res
 
     @api.multi
     def website_publish_button(self):
@@ -45,3 +55,18 @@ class OFPlanningTache(models.Model):
             if self.filtered(lambda t: t.website_published):
                 raise UserError(u"Vous ne pouvez pas supprimer la position fiscale d'une tâche publiée !")
         return super(OFPlanningTache, self).write(vals)
+
+
+class OFPlanningIntervention(models.Model):
+    _inherit = 'of.planning.intervention'
+
+    @api.multi
+    def can_edit_from_website(self):
+        self.ensure_one()
+        ir_values_obj = self.env['ir.values']
+        days = ir_values_obj.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit')
+        if days:
+            date_limit = fields.Date.to_string(fields.Date.from_string(fields.Date.today()) + relativedelta(days=days))
+            return self.date_date > date_limit
+        else:
+            return self.date_date > fields.Date.today()
