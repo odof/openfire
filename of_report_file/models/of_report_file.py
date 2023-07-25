@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+from odoo.tools.safe_eval import safe_eval
 
 import os
 import base64
@@ -86,14 +87,22 @@ class OFReportFileLine(models.Model):
     model = fields.Char(string=u"Nom du modèle")
     report_id = fields.Many2one(comodel_name='ir.actions.report.xml', string=u"Rapport PDF")
     combined_document_id = fields.Many2one(comodel_name='of.mail.template', string=u"Document joint")
+    expr = fields.Char(
+        string=u"Expression de sous-objet",
+        help=u"Expression python permettant de retrouver le sous-objet concerné par cet élément, "
+             u"utiliser le mot clé 'record' pour représenter l'objet depuis lequel le dossier est imprimé")
+    expr_model = fields.Char(string=u"Nom du modèle du sous-objet")
     copy_nb = fields.Integer(string=u"Nombre d'exemplaires", default=1)
 
-    @api.onchange('type')
+    @api.onchange('type', 'expr_model')
     def _onchange_type(self):
         self.report_id = False
         self.combined_document_id = False
         if self.type == 'qweb':
-            self.model = self.report_file_id.model_id.model
+            if self.expr_model:
+                self.model = self.expr_model
+            else:
+                self.model = self.report_file_id.model_id.model
 
     @api.multi
     def get_combined_doc(self, doc, obj):
@@ -139,10 +148,18 @@ class Report(models.Model):
 
             for line in report_file.report_file_line_ids:
                 tmp_result = False
+                obj_ids = docids
+                model_name = report_file.model_id.model
+                if line.expr:
+                    objs = self.env[report_file.model_id.model].browse(docids)
+                    res = safe_eval(line.expr, {'record': objs, 'self': self})
+                    obj_ids = res.ids
+                    model_name = line.expr_model
+
                 if line.type == 'qweb':
-                    tmp_result = super(Report, self).get_pdf(docids, line.report_id.report_name, html=html, data=data)
+                    tmp_result = super(Report, self).get_pdf(obj_ids, line.report_id.report_name, html=html, data=data)
                 elif line.type == 'doc':
-                    obj = self.env[report_file.model_id.model].browse(docids)
+                    obj = self.env[model_name].browse(obj_ids)
                     tmp_result = line.get_combined_doc(line.combined_document_id, obj)
 
                 if tmp_result:
