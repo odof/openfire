@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<templates>
+    <t t-extend="DMSTreeView">
+        <t t-jquery=".breadcrumb > li" t-operation="before">
+            <li class="document_breadcrumb" style="display: none;">
+                <a class="go_back_contacts">Contacts</a>
+            </li>
+            <li class="document_breadcrumb" style="display: none;">
+                <a class="go_back_customer"></a>
+            </li>
+        </t>
+    </t>
+</templates>

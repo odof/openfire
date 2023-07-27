@@ -58,6 +58,9 @@ Module basé sur les modules Muk DMS avec les ajouts/modifications suivantes :
         'wizards/mail_compose.xml',
         'wizards/of_recompute_ged_partners_wizard_views.xml',
     ],
+    "qweb": [
+        "static/src/xml/*.xml",
+    ],
     'installable': True,
     'application': True,
     'auto_install': False,
