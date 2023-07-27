@@ -3,8 +3,13 @@ odoo.define('of_document.documents', function (require) {
 
     var core = require('web.core');
     var session = require('web.session');
+    var dms_utils = require('muk_dms.utils');
     var framework = require('web.framework');
+    var Model = require("web.Model");
     var _t = core._t;
+
+    var Directories = new Model('muk_dms.directory', session.user_context);
+    var Files = new Model('muk_dms.file', session.user_context);
 
     var Dialog = require('web.Dialog');
 
@@ -152,6 +157,92 @@ odoo.define('of_document.documents', function (require) {
     }
 
     DocumentTreeView.include({
+
+        init: function(parent, context) {
+            this._super(parent, context);
+            this.name = 'Documents';
+            this.partner_filter = null;
+            if (context.context.partner_id) this.partner_ids = [context.context.partner_id];
+            if (context.context.partner_ids) this.partner_ids = context.context.partner_ids;
+            if (this.partner_ids) this.partner_filter = [['of_partner_id', 'in', this.partner_ids]];
+            this.splitter = false;
+        },
+
+        load_directories: function(self) {
+            var self = this;
+            var directories_query = $.Deferred();
+            Directories.query(['name', 'parent_directory', 'perm_read', 'perm_create',
+                    'perm_write', 'perm_unlink']).filter(self.partner_filter).all().then(function(directories) {
+                var data = [];
+                var directory_ids = _.map(directories, function(directory, index) {
+                    return directory.id;
+                });
+                _.each(directories, function(value, key, list) {
+                    data.push({
+                        id: "directory_" + value.id,
+                        parent: (value.parent_directory &&
+                                $.inArray(value.parent_directory[0], directory_ids) !== -1 ?
+                                        "directory_" + value.parent_directory[0] : "#"),
+                        text: value.name,
+                        icon: "fa fa-folder-o",
+                        type: "directory",
+                        data: {
+                            container: false,
+                            odoo_id: value.id,
+                            odoo_parent_directory: value.parent_directory[0],
+                            odoo_model: "muk_dms.directory",
+                            perm_read: value.perm_read,
+                            perm_create: value.perm_create,
+                            perm_write: value.perm_write,
+                            perm_unlink: value.perm_unlink,
+                        }
+                    });
+                });
+                directories_query.resolve(data, directory_ids);
+            });
+            return directories_query;
+        },
+
+        load_files: function(self, directory_ids) {
+            var self = this;
+            var files_query = $.Deferred();
+            Files.query(['name', 'mimetype', 'extension', 'directory',
+                         'size', 'perm_read','perm_create', 'perm_write',
+                         'perm_unlink']).filter(self.partner_filter).all().then(function(files) {
+                var data = [];
+                _.each(files, function(value, key, list) {
+                    if(!($.inArray(value.directory[0], directory_ids) !== -1)) {
+                        directory_ids.push(value.directory[0]);
+                        data.push(self.add_container_directory(self, value.directory[0], value.directory[1]));
+                    }
+                    data.push({
+                        id: "file," + value.id,
+                        parent: "directory_" + value.directory[0],
+                        text: value.name,
+                        icon: dms_utils.mimetype2fa(value.mimetype, {prefix: "fa fa-"}),
+                        type: "file",
+                        data: {
+                            odoo_id: value.id,
+                            odoo_parent_directory: value.directory[0],
+                            odoo_model: "muk_dms.file",
+                            filename: value.name,
+                            file_size: value.file_size,
+                            preview_link: value.link_preview,
+                            download_link: value.link_download,
+                            file_extension: value.file_extension,
+                            mime_type: value.mime_type,
+                            perm_read: value.perm_read,
+                            perm_create: value.perm_create,
+                            perm_write: value.perm_write,
+                            perm_unlink: value.perm_unlink,
+                        }
+                    });
+                });
+                files_query.resolve(data);
+            });
+            return files_query;
+        },
+
         load_view: function() {
             var self = this;
             $.when(self.load_directories(self)).done(function (directories, directory_ids) {
