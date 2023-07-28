@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="action_dms_documents" model="ir.actions.client">
-        <field name="context">{'partner_ids': [active_id]}</field>
-    </record>
-
     <record id="muk_dms.action_dms_file" model="ir.actions.act_window">
         <field name="view_mode">tree,kanban,form</field>
     </record>

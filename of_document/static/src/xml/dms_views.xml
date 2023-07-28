@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template t-extend="muk_dms.DMSTreeView">
+    <t t-jquery="button[class='open btn btn-sm btn-primary']" t-operation="before">
+        <button accesskey="P" class="go_back_customer btn btn-sm btn-primary" type="button">
+            Go back to customer
+        </button>
+    </t>
+</template>

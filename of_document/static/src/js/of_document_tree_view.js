@@ -160,12 +160,36 @@ odoo.define('of_document.documents', function (require) {
 
         init: function(parent, context) {
             this._super(parent, context);
+            this.events = _.extend(this.events, {
+                "click button.go_back_customer": "go_back_customer",
+            });
+            console.log(this.events);
             this.name = 'Documents';
             this.partner_filter = null;
-            if (context.context.partner_id) this.partner_ids = [context.context.partner_id];
-            if (context.context.partner_ids) this.partner_ids = context.context.partner_ids;
-            if (this.partner_ids) this.partner_filter = [['of_partner_id', 'in', this.partner_ids]];
+            if (context.context.partner_id) {
+              this.partner_ids = [context.context.partner_id];
+            }
+            if (context.context.partner_ids) {
+              this.partner_ids = context.context.partner_ids;
+            }
+            if (this.partner_ids) {
+              this.partner_filter = [['of_partner_id', 'in', this.partner_ids]];
+            }
             this.splitter = false;
+        },
+
+        go_back_customer: function() {
+            console.log('go_back_customer');
+            console.log(this.partner_ids);
+            var self = this;
+            this.do_action({
+                type: 'ir.actions.act_window',
+                res_model: 'res.partner',
+                res_id: self.partner_ids[0],
+                views: [[false, 'form']],
+                target: 'current',
+                context: session.user_context,
+            });
         },
 
         load_directories: function(self) {

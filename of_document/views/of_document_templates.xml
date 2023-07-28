@@ -5,4 +5,5 @@
             <script type="text/javascript" src="/of_document/static/src/js/of_document_tree_view.js"></script>
         </xpath>
     </template>
+
 </odoo>
