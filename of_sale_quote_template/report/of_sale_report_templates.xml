@@ -37,9 +37,9 @@
                             <tbody class="summary_tbody">
                                 <tr t-foreach="page" t-as="layout_category">
                                     <td>
-                                        <span>
+                                        <b><span>
                                             <t t-raw="layout_category['name']"/>
-                                        </span>
+                                        </span></b>
                                     </td>
                                     <td class="text-right">
                                         <t t-if="doc.of_price_printing == 'layout_category'">
@@ -52,7 +52,7 @@
                                         <t t-else="">
                                             <t t-set="subtotal" t-value="0"/>
                                         </t>
-                                        <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': doc.pricelist_id.currency_id}"/>
+                                        <b><span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': doc.pricelist_id.currency_id}"/></b>
                                     </td>
                                 </tr>
                             </tbody>
@@ -100,9 +100,9 @@
                             <tbody class="summary_tbody">
                                 <tr t-foreach="page" t-as="layout_category">
                                     <td>
-                                        <span>
+                                        <b><span>
                                             <t t-raw="layout_category['name']"/>
-                                        </span>
+                                        </span></b>
                                     </td>
                                     <td class="text-right">
                                         <t t-if="o.of_price_printing == 'layout_category'">
@@ -115,7 +115,7 @@
                                         <t t-else="">
                                             <t t-set="subtotal" t-value="0"/>
                                         </t>
-                                        <span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                        <b><span t-esc="subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></b>
                                     </td>
                                 </tr>
                             </tbody>
