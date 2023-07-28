@@ -20,7 +20,6 @@
         <xpath expr="//div[@name='client']//t[@t-if='pdf_customer_email and doc.partner_id.email']" position="after">
             <t t-if="doc.partner_id.siret"><span t-field="doc.partner_id.siret"/><br/></t>
         </xpath>
-
     </template>
 
 </odoo>

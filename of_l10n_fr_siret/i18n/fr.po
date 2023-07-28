@@ -42,7 +42,7 @@ msgstr "Afficher dans l'encart d'adresse principal"
 
 #. module: of_l10n_fr_siret
 #: selection:account.config.settings,pdf_partner_siret_display:0
-msgid "Display in main address inset and in additional information insert"
+msgid "Display in main address insert and in additional information insert"
 msgstr "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires"
 
 #. module: of_l10n_fr_siret

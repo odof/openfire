@@ -35,7 +35,7 @@ Fonctionnalités :
     'data': [
         'views/res_config_settings_views.xml',
         'views/res_partner_views.xml',
-        'views/account_invoice_settings_views.xml',
+        'views/account_config_settings_views.xml',
         'wizards/sale_set_printing_params_view.xml',
         'report/of_sale_report_template.xml',
         'report/of_account_invoice_template.xml'
