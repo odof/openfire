@@ -245,6 +245,8 @@ class AccountInvoice(models.Model):
                     lines_vals.append((line.of_get_line_name()[0], line.price_total))
                     total_amount += line.price_total
             total_vals = (group.subtotal_name, round_curr(total_amount))
+            if group.hide_amount_total and len(result['taxes'][0]) == 2:
+                result['taxes'][0].pop(1)
             result_total.append([lines_vals, total_vals])
         result['total'] = result_total
 
@@ -431,6 +433,7 @@ class OFInvoiceReportTotalGroup(models.Model):
     position = fields.Selection(
         [('0-ht', "Hors taxe"), ('1-ttc', "TTC")],
         string=u"Afficher dans les montants", required=True, default='1-ttc')
+    hide_amount_total = fields.Boolean(string=u"Cacher le montant TTC")
 
     @api.model
     def get_group_paiements(self):

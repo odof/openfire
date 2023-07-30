@@ -732,6 +732,8 @@ class SaleOrder(models.Model):
                     lines_vals.append((line.of_get_line_name()[0], line.price_total))
                     total_amount += line.price_total
             total_vals = (group.subtotal_name, round_curr(total_amount))
+            if group.hide_amount_total and len(result['taxes'][0]) == 2:
+                result['taxes'][0].pop(1)
             result_total.append([lines_vals, total_vals])
         result['total'] = result_total
 

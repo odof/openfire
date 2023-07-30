@@ -162,7 +162,7 @@
                                     <span class="pull-right text-right"><t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></span>
                                 </td>
                             </tr>
-                            <tr name="total_ttc" class="border-black">
+                            <tr name="total_ttc" class="border-black" t-if="len(total_group) > 1">
                                 <td><strong><t t-esc="total_group[1][0]"/></strong></td>
                                 <td class="text-right">
                                     <span t-esc="total_group[1][1]" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
