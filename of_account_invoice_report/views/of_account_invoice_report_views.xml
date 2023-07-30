@@ -37,6 +37,7 @@
                         </tree>
                     </field>
                     <field name="position"/>
+                    <field name="hide_amount_total" attrs="{'invisible': [('position', '!=', '1-ttc')]}"/>
                     <field name="invoice"/>
                     <field name="order"/>
                 </group>
