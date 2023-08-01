@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="altitude_1" model="of.calculation.altitude">
+        <field name="name">0 à 200</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="altitude_2" model="of.calculation.altitude">
+        <field name="name">201 à 400</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="altitude_3" model="of.calculation.altitude">
+        <field name="name">401 à 500</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <record id="altitude_4" model="of.calculation.altitude">
+        <field name="name">501 à 600</field>
+        <field name="sequence">4</field>
+    </record>
+
+    <record id="altitude_5" model="of.calculation.altitude">
+        <field name="name">601 à 700</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="altitude_6" model="of.calculation.altitude">
+        <field name="name">701 à 800</field>
+        <field name="sequence">6</field>
+    </record>
+
+    <record id="altitude_7" model="of.calculation.altitude">
+        <field name="name">801 à 900</field>
+        <field name="sequence">7</field>
+    </record>
+
+    <record id="altitude_8" model="of.calculation.altitude">
+        <field name="name">901 à 1000</field>
+        <field name="sequence">8</field>
+    </record>
+
+    <record id="altitude_9" model="of.calculation.altitude">
+        <field name="name">1001 à 1100</field>
+        <field name="sequence">9</field>
+    </record>
+
+    <record id="altitude_10" model="of.calculation.altitude">
+        <field name="name">1101 à 1200</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="altitude_11" model="of.calculation.altitude">
+        <field name="name">1201 à 1300</field>
+        <field name="sequence">11</field>
+    </record>
+
+    <record id="altitude_12" model="of.calculation.altitude">
+        <field name="name">1301 à 1400</field>
+        <field name="sequence">12</field>
+    </record>
+
+    <record id="altitude_13" model="of.calculation.altitude">
+        <field name="name">1401 à 1500</field>
+        <field name="sequence">13</field>
+    </record>
+
+    <record id="altitude_14" model="of.calculation.altitude">
+        <field name="name">1501 à 1600</field>
+        <field name="sequence">14</field>
+    </record>
+
+    <record id="altitude_15" model="of.calculation.altitude">
+        <field name="name">1601 à 1700</field>
+        <field name="sequence">15</field>
+    </record>
+
+    <record id="altitude_16" model="of.calculation.altitude">
+        <field name="name">1701 à 1800</field>
+        <field name="sequence">16</field>
+    </record>
+
+    <record id="altitude_17" model="of.calculation.altitude">
+        <field name="name">1801 à 1900</field>
+        <field name="sequence">17</field>
+    </record>
+
+    <record id="altitude_18" model="of.calculation.altitude">
+        <field name="name">1901 à 2000</field>
+        <field name="sequence">18</field>
+    </record>
+
+</odoo>

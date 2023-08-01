@@ -32,6 +32,7 @@ class OFCalculationHeatLoss(models.Model):
     construction_date_id = fields.Many2one(
         comodel_name='of.calculation.construction.date', string=u"Date de construction", required=True)
     better_g = fields.Boolean(string=u"Meilleur calcul G", compute='_compute_better_g')
+    message = fields.Text(string=u"Message", related='construction_date_id.message', readonly=True)
     department_id = fields.Many2one(
         comodel_name='of.calculation.department', string=u"Département", compute='_compute_department_id')
     available_altitude_ids = fields.Many2many(
@@ -306,6 +307,7 @@ class OFCalculationConstructionDate(models.Model):
     name = fields.Char(string=u"Nom", required=True)
     sequence = fields.Integer(string=u"Séquence")
     coefficient = fields.Float(string=u"Coefficient G", required=True)
+    message = fields.Text(string=u"Message")
 
 
 class OFCalculationDepartment(models.Model):
