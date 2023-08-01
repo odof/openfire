@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="construction_date_1" model="of.calculation.construction.date">
+        <field name="name">Maison passive (RT 2020)</field>
+        <field name="sequence">1</field>
+        <field name="coefficient">0.2</field>
+        <field name="message"></field>
+    </record>
+
+    <record id="construction_date_2" model="of.calculation.construction.date">
+        <field name="name">Maison BBC (aux normes RT 2012)</field>
+        <field name="sequence">2</field>
+        <field name="coefficient">0.6</field>
+        <field name="message">Une étude thermique réglementaire réalisée par un bureau d'étude est impérative à la réception des travaux. Il s'agit ici d'une estimation.</field>
+    </record>
+
+    <record id="construction_date_3" model="of.calculation.construction.date">
+        <field name="name">Maison aux normes RT 2005</field>
+        <field name="sequence">3</field>
+        <field name="coefficient">0.8</field>
+        <field name="message">Calcul effectué en bureau d'étude. Il s'agit ici d'une estimation.</field>
+    </record>
+
+    <record id="construction_date_4" model="of.calculation.construction.date">
+        <field name="name">Maison construite entre 2000 et 2005</field>
+        <field name="sequence">4</field>
+        <field name="coefficient">0.9</field>
+        <field name="message">Calcul effectué en bureau d'étude. Il s'agit ici d'une estimation.</field>
+    </record>
+
+    <record id="construction_date_5" model="of.calculation.construction.date">
+        <field name="name">Maison construite entre 1990 et 2000</field>
+        <field name="sequence">5</field>
+        <field name="coefficient">1.05</field>
+        <field name="message">Basé sur la méthode de calcul du G instaurée par la RT 1974.</field>
+    </record>
+
+    <record id="construction_date_6" model="of.calculation.construction.date">
+        <field name="name">Maison construite entre 1983 et 1990</field>
+        <field name="sequence">6</field>
+        <field name="coefficient">1.15</field>
+        <field name="message">Basé sur la méthode de calcul du G instaurée par la RT 1974.</field>
+    </record>
+
+    <record id="construction_date_7" model="of.calculation.construction.date">
+        <field name="name">Maison construite entre 1974 et 1982</field>
+        <field name="sequence">7</field>
+        <field name="coefficient">1.3</field>
+        <field name="message">Basé sur la méthode de calcul du G instaurée par la RT 1974.</field>
+    </record>
+
+    <record id="construction_date_8" model="of.calculation.construction.date">
+        <field name="name">Maison construite avant 1975</field>
+        <field name="sequence">8</field>
+        <field name="coefficient">1.5</field>
+        <field name="message">Basé sur la méthode de calcul du G instaurée par la RT 1974.</field>
+    </record>
+
+    <record id="construction_date_9" model="of.calculation.construction.date">
+        <field name="name">Maison non isolée</field>
+        <field name="sequence">9</field>
+        <field name="coefficient">1.8</field>
+        <field name="message">Basé sur la méthode de calcul du G instaurée par la RT 1974.</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="base_temperature_1" model="of.calculation.base.temperature">
+        <field name="temperature">-2</field>
+        <field name="sequence">1</field>
+    </record>
+
+    <record id="base_temperature_2" model="of.calculation.base.temperature">
+        <field name="temperature">-4</field>
+        <field name="sequence">2</field>
+    </record>
+
+    <record id="base_temperature_3" model="of.calculation.base.temperature">
+        <field name="temperature">-5</field>
+        <field name="sequence">3</field>
+    </record>
+
+    <record id="base_temperature_4" model="of.calculation.base.temperature">
+        <field name="temperature">-6</field>
+        <field name="sequence">4</field>
+    </record>
+
+    <record id="base_temperature_5" model="of.calculation.base.temperature">
+        <field name="temperature">-7</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="base_temperature_6" model="of.calculation.base.temperature">
+        <field name="temperature">-8</field>
+        <field name="sequence">6</field>
+    </record>
+
+    <record id="base_temperature_7" model="of.calculation.base.temperature">
+        <field name="temperature">-9</field>
+        <field name="sequence">7</field>
+    </record>
+
+    <record id="base_temperature_8" model="of.calculation.base.temperature">
+        <field name="temperature">-10</field>
+        <field name="sequence">8</field>
+    </record>
+
+    <record id="base_temperature_9" model="of.calculation.base.temperature">
+        <field name="temperature">-12</field>
+        <field name="sequence">9</field>
+    </record>
+
+    <record id="base_temperature_10" model="of.calculation.base.temperature">
+        <field name="temperature">-15</field>
+        <field name="sequence">10</field>
+    </record>
+
+</odoo>
