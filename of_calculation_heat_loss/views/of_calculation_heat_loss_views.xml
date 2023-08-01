@@ -64,6 +64,9 @@
                             <label for="estimated_power_text" string="Déperdition de chaleur" class="oe_highlight"
                                    style="padding: 10px; 1px solid blue !important;"/>
                             <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border:"/>
+                            <div class="oe_grey mt8" colspan="2">
+                                <field name="message"/>
+                            </div>
                         </group>
                     </group>
                     <i class="oe_grey">
@@ -101,6 +104,7 @@
                     <group>
                         <field name="name"/>
                         <field name="coefficient"/>
+                        <field name="message"/>
                     </group>
                 </sheet>
             </form>
@@ -241,6 +245,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="coefficient"/>
+                <field name="message"/>
             </tree>
         </field>
     </record>

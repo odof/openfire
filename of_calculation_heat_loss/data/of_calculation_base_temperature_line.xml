@@ -1,0 +1,682 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_1" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-2.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_2" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-3.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_3" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-4.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_4" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-4.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_5" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-5.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_6" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-6.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_7" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-4.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_8" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-5.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_9" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-6.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_10" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_11" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_12" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_13"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_13" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_14"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_14" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_15"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_15" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_16"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_16" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_17"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_17" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_18"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_18" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-5.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_19" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-6.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_20" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-7.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_21" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-7.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_22" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-8.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_23" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-8.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_24" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_25" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_26" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_27" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_28" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-6.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_29" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-7.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_30" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-8.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_31" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_32" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_33" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_34" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_35" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_36" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_37" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-7.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_38" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-8.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_39" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_40" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-8.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_41" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_42" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_43" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_44" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_45" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_46" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_47" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_48" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-16.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_49" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-17.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_50" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-18.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_51" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-19.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_52" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-9.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_53" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_54" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_55" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_56" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_57" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_58" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_59" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-16.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_60" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-17.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_61" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-18.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_62" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-19.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_63" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-20.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_64" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_13"/>
+        <field name="temperature">-21.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_65" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_14"/>
+        <field name="temperature">-22.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_66" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_15"/>
+        <field name="temperature">-23.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_67" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_16"/>
+        <field name="temperature">-24.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_68" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_17"/>
+        <field name="temperature">-25.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_69" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_18"/>
+        <field name="temperature">-26.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_70" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-10.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_71" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-11.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_72" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_73" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_74" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_75" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_76" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-16.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_77" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-17.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_78" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-18.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_79" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-19.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_80" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-20.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_81" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-21.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_82" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_13"/>
+        <field name="temperature">-22.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_83" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_14"/>
+        <field name="temperature">-23.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_84" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_15"/>
+        <field name="temperature">-24.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_85" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_16"/>
+        <field name="temperature">-25.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_86" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_17"/>
+        <field name="temperature">-26.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_87" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_18"/>
+        <field name="temperature">-27.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_88" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-12.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_89" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-13.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_90" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-14.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_91" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_92" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-16.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_93" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-17.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_94" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-18.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_95" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-19.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_96" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-20.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_97" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-21.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_98" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-22.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_99" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-23.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_100" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_13"/>
+        <field name="temperature">-24.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_101" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_1"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_102" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_2"/>
+        <field name="temperature">-15.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_103" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_3"/>
+        <field name="temperature">-16.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_104" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_4"/>
+        <field name="temperature">-17.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_105" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_5"/>
+        <field name="temperature">-18.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_106" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_6"/>
+        <field name="temperature">-19.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_107" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_7"/>
+        <field name="temperature">-20.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_108" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_8"/>
+        <field name="temperature">-21.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_109" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_9"/>
+        <field name="temperature">-22.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_110" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_10"/>
+        <field name="temperature">-23.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_111" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_11"/>
+        <field name="temperature">-24.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_112" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_12"/>
+        <field name="temperature">-25.0</field>
+    </record>
+
+    <record id="of_calculation_heat_loss.of_calculation_base_temperature_line_113" model="of.calculation.base.temperature.line">
+        <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
+        <field name="altitude_id" ref="of_calculation_heat_loss.altitude_13"/>
+        <field name="temperature">-25.0</field>
+    </record>
+
+</odoo>

@@ -3,7 +3,7 @@
 
 {
     'name': u"OpenFire / Calcul de déperdition de chaleur",
-    'version': "10.0.1.1.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'description': u"""
 Gestion du calcul de déperdition de chaleur
@@ -20,11 +20,11 @@ Gestion du calcul de déperdition de chaleur
     'data': [
         'security/ir.model.access.csv',
         'data/of_calculation_heat_loss_data.xml',
-        'data/of.calculation.construction.date.csv',
-        'data/of.calculation.base.temperature.csv',
-        'data/of.calculation.department.csv',
-        'data/of.calculation.altitude.csv',
-        'data/of.calculation.base.temperature.line.csv',
+        'data/of_calculation_altitude.xml',
+        'data/of_calculation_base_temperature.xml',
+        'data/of_calculation_base_temperature_line.xml',
+        'data/of_calculation_construction_date.xml',
+        'data/of_calculation_department.xml',
         'hooks/hook.xml',
         'views/of_calculation_heat_loss_views.xml',
         'views/of_parc_installe_views.xml',

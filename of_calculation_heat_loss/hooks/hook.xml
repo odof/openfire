@@ -2,5 +2,8 @@
 <odoo>
 
     <function model="of.calculation.heat.loss.hook" name="_update_version_10_0_1_1_0_hook"/>
+    <function model="of.calculation.heat.loss.hook" name="_update_version_10_0_2">
+        <value eval="[]"/>
+    </function>
 
 </odoo>
