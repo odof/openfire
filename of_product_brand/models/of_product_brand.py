@@ -219,6 +219,13 @@ class ProductTemplate(models.Model):
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
+    of_previous_brand_id = fields.Many2one('of.product.brand', compute='_compute_of_previous_brand_id')
+
+    @api.depends('default_code')
+    def _compute_of_previous_brand_id(self):
+        for product in self:
+            product.of_previous_brand_id = product.brand_id
+
     @api.constrains('default_code', 'brand_id', 'product_tmpl_id')
     def check_used_default_code(self):
         for product in self:
@@ -244,6 +251,8 @@ class ProductProduct(models.Model):
             }
             seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
             self.seller_ids = [(0, 0, seller_data)]
+        elif self.brand_id and len(self.seller_ids) == 1:
+            self.seller_ids.name = self.brand_id.partner_id
 
     @api.onchange('default_code')
     def _onchange_default_code(self):
