@@ -30,4 +30,14 @@
         <field name="value">https://openfire.fr</field>
     </record>
 
+    <record id="of_config_parameter_documentation" model="ir.config_parameter">
+        <field name="key">of.documentation</field>
+        <field name="value">https://documentation.openfire.fr/</field>
+    </record>
+
+    <record id="of_config_parameter_support" model="ir.config_parameter">
+        <field name="key">of.support</field>
+        <field name="value">https://www.openfire.fr/support/ticket/submit</field>
+    </record>
+
 </odoo>
