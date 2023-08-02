@@ -2319,3 +2319,10 @@ msgstr "Standard (défaut)"
 #: selection:sale.config.settings,group_product_variant_specific_price:0
 msgid "Handle pricing by variant"
 msgstr "Manuelle"
+
+#. module: of_sale
+#: model:ir.actions.act_window,name:sale.report_configuration_action
+#: model:ir.ui.view,arch_db:sale.report_configuration_form_view
+#: model:ir.ui.view,arch_db:sale.report_configuration_tree_view
+msgid "Report Configuration"
+msgstr "Sections de devis"
