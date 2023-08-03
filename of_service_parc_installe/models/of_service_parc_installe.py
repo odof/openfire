@@ -35,6 +35,7 @@ class OfService(models.Model):
         group_operator="avg")
     done_time = fields.Float(
         string=u"Temps de gestion (heures)", compute='_compute_done_time', store=True, group_operator="avg")
+    installation_date = fields.Date(string=u"Date de pose", related='parc_installe_id.date_installation', readonly=True)
 
     @api.depends('parc_installe_id.intervention_ids', 'address_id.intervention_address_ids',
                  'partner_id.intervention_address_ids')

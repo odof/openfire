@@ -35,6 +35,7 @@
                         <field name="parc_installe_id" context="{'address_prio_id': address_id or partner_id, 'default_client_id': partner_id}"/>
                         <field name="parc_installe_product_id"/>
                         <field name="parc_installe_site_adresse_id"/>
+                        <field name="installation_date"/>
                         <field name="parc_type_garantie"
                                attrs="{'invisible': [('type_id', '!=', %(of_service_parc_installe.of_service_type_sav)d)]}"/>
                         <field name="payer_mode"
