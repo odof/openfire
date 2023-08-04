@@ -1,9 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_planning_tournee_read,access.of.planning.tournee.intervention.read,model_of_planning_tournee,of_planning.group_planning_intervention_access,1,0,0,0
+access_of_planning_tournee_read,access.of.planning.tournee.intervention.read,model_of_planning_tournee,of_planning.group_planning_intervention_access,1,1,0,0
 access_of_planning_tournee_write,access.of.planning.tournee.write,model_of_planning_tournee,of_planning.group_planning_intervention_modification,1,1,1,0
 access_of_planning_tournee_responsible,access.of.planning.tournee.responsible,model_of_planning_tournee,of_planning.group_planning_intervention_responsible,1,1,1,0
 access_of_planning_tournee_manager,access.of.planning.tournee.intervention.manager,model_of_planning_tournee,of_planning.group_planning_intervention_manager,1,1,1,1
-access_of_planning_tour_line_read,access.of.planning.tour.line.read,model_of_planning_tour_line,of_planning.group_planning_intervention_access,1,0,0,0
-access_of_planning_tour_line_write,access.of.planning.tour.line.write,model_of_planning_tour_line,of_planning.group_planning_intervention_modification,1,1,1,0
+access_of_planning_tour_line_access,access.of.planning.tour.line.access,model_of_planning_tour_line,of_planning.group_planning_intervention_access,1,1,0,0
+access_of_planning_tour_line_create,access.of.planning.tour.line.create,model_of_planning_tour_line,of_planning.group_planning_intervention_modification,1,1,1,0
 access_of_planning_tour_line_responsible,access.of.planning.tour.line.responsible,model_of_planning_tour_line,of_planning.group_planning_intervention_responsible,1,1,1,0
 access_of_planning_tour_line_manager,access.of.planning.tour.line.manager,model_of_planning_tour_line,of_planning.group_planning_intervention_manager,1,1,1,1
