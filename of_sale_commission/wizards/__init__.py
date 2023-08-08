@@ -3,4 +3,5 @@
 
 from . import account_invoice_refund
 from . import of_sale_commi_pay
+from . import of_sale_order_add_quote
 from . import of_sale_order_gestion_prix
