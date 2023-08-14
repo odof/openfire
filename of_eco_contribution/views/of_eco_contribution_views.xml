@@ -8,6 +8,7 @@
             <tree string="Éco-organisme">
                 <field name="name"/>
                 <field name="account_id"/>
+                <field name="payable_account_id"/>
             </tree>
         </field>
     </record>
@@ -30,8 +31,11 @@
                         </h1>
                     </div>
                     <group>
-                        <group>
+                        <group name="left_side_one">
                             <field name="account_id"/>
+                        </group>
+                        <group name="right_side_one">
+                            <field name="payable_account_id"/>
                         </group>
                     </group>
                     <notebook>
