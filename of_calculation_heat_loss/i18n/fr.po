@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-23 15:57+0000\n"
-"PO-Revision-Date: 2023-05-23 15:57+0000\n"
+"POT-Creation-Date: 2023-08-24 07:44+0000\n"
+"PO-Revision-Date: 2023-08-24 07:44+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -114,6 +114,27 @@ msgid "Articles compatibles"
 msgstr "Articles compatibles"
 
 #. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_parent_attribute_id
+msgid "Attribut parent"
+msgstr "Attribut parent"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_heat_loss_attribute_action
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_attribute_menu
+msgid "Attributs de déperdition de chaleur"
+msgstr "Attributs de déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_attribute_ids
+msgid "Attributs enfants"
+msgstr "Attributs enfants"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_heat_loss_attribute
+msgid "Attributs pour un meilleur calcul du coefficient G"
+msgstr "Attributs pour un meilleur calcul du coefficient G"
+
+#. module: of_calculation_heat_loss
 #: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_heat_loss_action
 #: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_heat_loss
 #: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_menu
@@ -152,6 +173,7 @@ msgstr "Code postal du contact"
 
 #. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_coefficient
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_coefficient
 msgid "Coefficient G"
 msgstr "Coefficient G"
 
@@ -172,6 +194,7 @@ msgstr "Pays"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_create_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_create_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_create_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_create_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_create_uid
 msgid "Created by"
 msgstr "Créé par"
@@ -182,6 +205,7 @@ msgstr "Créé par"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_create_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_create_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_create_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_create_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_create_date
 msgid "Created on"
 msgstr "Créé le"
@@ -200,6 +224,11 @@ msgid "Date de construction :"
 msgstr "Date de construction :"
 
 #. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_description
+msgid "Description"
+msgstr "Description"
+
+#. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_order_id
 msgid "Devis / Bon de commande"
 msgstr "Devis / Bon de commande"
@@ -210,6 +239,7 @@ msgstr "Devis / Bon de commande"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_display_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_display_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_display_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_display_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_display_name
 msgid "Display Name"
 msgstr "Nom affiché"
@@ -244,9 +274,38 @@ msgstr "Hauteur sous plafond (en m) :"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_id
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_id
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_id
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_id
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_id
 msgid "ID"
 msgstr "ID"
+
+#. module: of_calculation_heat_loss
+#: selection:of.calculation.heat.loss,type:0
+#: selection:of.calculation.heat.loss.attribute,type:0
+msgid "IG1 - Volume >= 270 m³, 1 niveau"
+msgstr "IG1 - Volume >= 270 m³, 1 niveau"
+
+#. module: of_calculation_heat_loss
+#: selection:of.calculation.heat.loss,type:0
+#: selection:of.calculation.heat.loss.attribute,type:0
+msgid "IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"
+msgstr "IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"
+
+#. module: of_calculation_heat_loss
+#: selection:of.calculation.heat.loss.attribute,type:0
+msgid "IP1 - Volume < 270 m³, 1 niveau"
+msgstr "IP1 - Volume < 270 m³, 1 niveau"
+
+#. module: of_calculation_heat_loss
+#: selection:of.calculation.heat.loss,type:0
+msgid "IP1 - Volume < 270 m³, 1 niveau "
+msgstr "IP1 - Volume < 270 m³, 1 niveau "
+
+#. module: of_calculation_heat_loss
+#: selection:of.calculation.heat.loss,type:0
+#: selection:of.calculation.heat.loss.attribute,type:0
+msgid "IP2 - Volume < 270 m³, 2 niveaux"
+msgstr "IP2 - Volume < 270 m³, 2 niveaux"
 
 #. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude___last_update
@@ -255,6 +314,7 @@ msgstr "ID"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date___last_update
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department___last_update
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss___last_update
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute___last_update
 msgid "Last Modified on"
 msgstr "Dernière Modification le"
 
@@ -264,6 +324,7 @@ msgstr "Dernière Modification le"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_write_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_write_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_write_uid
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_write_uid
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_write_uid
 msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
@@ -274,6 +335,7 @@ msgstr "Dernière mise à jour par"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_write_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_write_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_write_date
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_write_date
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_write_date
 msgid "Last Updated on"
 msgstr "Dernière mise à jour le"
@@ -300,11 +362,22 @@ msgid "Lignes de température"
 msgstr "Lignes de température"
 
 #. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_better_g
+msgid "Meilleur calcul G"
+msgstr "Meilleur calcul G"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute1_id
+msgid "Murs"
+msgstr "Murs"
+
+#. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_altitude_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_construction_date_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_department_name
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_name
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_name
 msgid "Nom"
 msgstr "Nom"
@@ -313,6 +386,11 @@ msgstr "Nom"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_name
 msgid "Nom du contact"
 msgstr "Nom du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_floor_number
+msgid "Nombre de niveaux"
+msgstr "Nombre de niveaux"
 
 #. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_number
@@ -330,7 +408,6 @@ msgid "Outil de simulation - Estimation de la puissance requise de l'appareil"
 msgstr "Outil de simulation - Estimation de la puissance requise de l'appareil"
 
 #. module: of_calculation_heat_loss
-#: model:ir.model,name:of_calculation_heat_loss.model_of_parc_installe
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_parc_installe_id
 msgid "Parc installé"
 msgstr "Parc installé"
@@ -339,6 +416,11 @@ msgstr "Parc installé"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_country_id
 msgid "Pays"
 msgstr "Pays"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute3_id
+msgid "Plancher bas"
+msgstr "Plancher bas"
 
 #. module: of_calculation_heat_loss
 #: model:ir.model,name:of_calculation_heat_loss.model_product_template
@@ -397,11 +479,6 @@ msgstr "Séquence"
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_base_temperature_line_base_temperature_id
 msgid "Site"
 msgstr "Site"
-
-#. module: of_calculation_heat_loss
-#: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
-msgid "State"
-msgstr "État"
 
 #. module: of_calculation_heat_loss
 #: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
@@ -480,9 +557,35 @@ msgid "Température extérieure de base ramenée au niveau de la mer"
 msgstr "Température extérieure de base ramenée au niveau de la mer"
 
 #. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute2_id
+msgid "Toiture"
+msgstr "Toiture"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_type
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_type
+msgid "Type de coefficient"
+msgstr "Type de coefficient"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_coefficient
+msgid "Valeur du G"
+msgstr "Valeur du G"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_attribute_valeur_k
+msgid "Valeur du K"
+msgstr "Valeur du K"
+
+#. module: of_calculation_heat_loss
 #: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_partner_city
 msgid "Ville du contact"
 msgstr "Ville du contact"
+
+#. module: of_calculation_heat_loss
+#: model:ir.model.fields,field_description:of_calculation_heat_loss.field_of_calculation_heat_loss_volume
+msgid "Volume"
+msgstr "Volume"
 
 #. module: of_calculation_heat_loss
 #: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
