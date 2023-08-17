@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import api, models
 
 
 class SaleOrder(models.Model):
@@ -38,5 +38,3 @@ class SaleOrder(models.Model):
                 limit) or []
             return res
         return super(SaleOrder, self).name_search(name, args, operator, limit)
-
-

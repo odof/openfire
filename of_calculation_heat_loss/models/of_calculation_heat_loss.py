@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import re
 import base64
 
-from odoo import models, fields, api
-from odoo.exceptions import UserError, ValidationError, RedirectWarning
+from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 
 class OFCalculationHeatLoss(models.Model):
@@ -29,8 +28,10 @@ class OFCalculationHeatLoss(models.Model):
     surface = fields.Float(
         string=u"Surface à chauffer (en m²)", help=u"Surface de la ou des pièces à chauffer", required=True)
     height = fields.Float(string=u"Hauteur de plafond (en m)", required=True)
+    volume = fields.Float(string=u"Volume", compute='_compute_volume', store=True)
     construction_date_id = fields.Many2one(
         comodel_name='of.calculation.construction.date', string=u"Date de construction", required=True)
+    better_g = fields.Boolean(string=u"Meilleur calcul G", compute='_compute_better_g')
     department_id = fields.Many2one(
         comodel_name='of.calculation.department', string=u"Département", compute='_compute_department_id')
     available_altitude_ids = fields.Many2many(
@@ -48,6 +49,33 @@ class OFCalculationHeatLoss(models.Model):
     product_ids = fields.Many2many(
         comodel_name='product.template', relation='of_calculation_heat_loss_product_template_rel',
         column1='calculation_id', column2='product_id', string="Articles compatibles", compute='_compute_product_ids')
+    floor_number = fields.Integer(string=u"Nombre de niveaux", default=1)
+    type = fields.Selection(
+        selection=[
+            ('IP1', u"IP1 - Volume < 270 m³, 1 niveau "),
+            ('IP2', u"IP2 - Volume < 270 m³, 2 niveaux"),
+            ('IG1', u"IG1 - Volume >= 270 m³, 1 niveau"),
+            ('IG2/3', u"IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"),
+        ],
+        string=u"Type de coefficient",
+        compute='_compute_type'
+    )
+    attribute1_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Murs")
+    attribute2_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Toiture")
+    attribute3_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Plancher bas")
+    coefficient = fields.Float(string=u"Coefficient G", compute='_compute_coefficient')
+
+    @api.constrains('floor_number')
+    def _check_floor_number(self):
+        if self.floor_number:
+            if self.floor_number < 1:
+                raise UserError(u"Le niveau minimum est 1.")
+            if self.volume < 270.0 and self.floor_number > 2:
+                raise UserError(u"Le calcul de déperdition de chaleur pour un volume inférieur à 270 m³ ne se fait que "
+                                u"sur 2 niveaux maximum.")
+            elif self.volume > 270.0 and self.floor_number > 3:
+                raise UserError(u"Le calcul de déperdition de chaleur pour un volume supérieur ou égal à 270 m³ ne se "
+                                u"fait que sur 3 niveaux maximum.")
 
     @api.depends('number', 'create_date')
     def _compute_name(self):
@@ -81,13 +109,71 @@ class OFCalculationHeatLoss(models.Model):
         product_obj = self.env['product.template']
         for rec in self:
             if rec.estimated_power:
-                products = product_obj.search([('of_puissance_nom_flo', '>=', rec.estimated_power/1000)])
+                products = product_obj.search([('of_puissance_nom_flo', '>=', rec.estimated_power / 1000)])
                 rec.product_ids = [(6, 0, products.ids)]
+
+    @api.multi
+    @api.depends('surface', 'height')
+    def _compute_volume(self):
+        for rec in self:
+            volume = rec.surface * rec.height
+            rec.volume = volume
+
+    @api.multi
+    @api.depends('construction_date_id')
+    def _compute_better_g(self):
+        ids = self.get_construction_date_for_better_g()
+        for rec in self:
+            rec.better_g = rec.construction_date_id.id in ids
+
+    @api.multi
+    @api.depends('floor_number', 'volume')
+    def _compute_type(self):
+        for rec in self:
+            if rec.volume and rec.volume < 270.0 and rec.floor_number > 0 and rec.floor_number <= 2:
+                rec.type = 'IP%s' % rec.floor_number
+            elif rec.volume and rec.volume >= 270.0 and rec.floor_number > 0 and rec.floor_number <= 3:
+                rec.type = 'IG%s' % (rec.floor_number > 1 and '2/3' or rec.floor_number)
+
+    @api.multi
+    @api.depends('attribute3_id', 'construction_date_id')
+    def _compute_coefficient(self):
+        for rec in self:
+            rec.coefficient = rec.better_g and rec.attribute3_id.coefficient or rec.construction_date_id.coefficient
 
     @api.multi
     @api.onchange('department_id')
     def _onchange_department_id(self):
         self.altitude_id = False
+
+    @api.multi
+    @api.onchange('volume')
+    def _onchange_volume(self):
+        if hasattr(self, '_origin') and self._origin.volume != self.volume and (
+            (self._origin.volume < 270.0 and self.volume >= 270.0) or
+            (self._origin.volume >= 270.0 and self.volume < 270.0)
+        ):
+            self.attribute1_id = False
+            self.attribute2_id = False
+            self.attribute3_id = False
+
+    @api.multi
+    @api.onchange('floor_number')
+    def _onchange_floor_number(self):
+        self._check_floor_number()
+        if hasattr(self, '_origin') and self._origin.floor_number != self.floor_number:
+            if not (self.volume >= 270.0 and self._origin.floor_number in [2, 3] and self.floor_number in [2, 3]):
+                self.attribute1_id = False
+
+    @api.multi
+    @api.onchange('attribute1_id')
+    def _onchange_attribute1_id(self):
+        self.attribute2_id = False
+
+    @api.multi
+    @api.onchange('attribute2_id')
+    def _onchange_attribute2_id(self):
+        self.attribute3_id = False
 
     @api.model
     def create(self, vals):
@@ -130,11 +216,11 @@ class OFCalculationHeatLoss(models.Model):
             if error:
                 continue
             reference_temperature = rec.base_temperature_line_id.temperature
-            estimated_power = rec.surface * rec.height * rec.construction_date_id.coefficient * (
-                    rec.temperature - reference_temperature)
+            estimated_power = rec.surface * rec.height * rec.get_coefficient_g() * (
+                rec.temperature - reference_temperature)
             rec.write({
                 'estimated_power': estimated_power,
-                'estimated_power_text': "%s %s" % (estimated_power/1000, "kWatt/h"),
+                'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt/h"),
             })
         if errors:
             return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")
@@ -165,7 +251,6 @@ class OFCalculationHeatLoss(models.Model):
     @api.multi
     def send_calculation(self):
         template_id = self.env.ref('of_calculation_heat_loss.email_template_calcul_deperdition')
-        email_values = {}
         today_str = fields.Date.today()
         # création du pdf et ajout dans les values, il sera automatiquement joint à l'email envoyé
         planning_pdf = self.env['report'].get_pdf(
@@ -179,11 +264,31 @@ class OFCalculationHeatLoss(models.Model):
             'res_id': self.id,
             'mimetype': 'application/x-pdf'
         })
-        email_values['attachment_ids'] = attachment.ids
+        email_values = {'attachment_ids': attachment.ids}
         # envoi immédiat de l'email
         template_id.send_mail(self.id, force_send=True, email_values=email_values)
 
         return True
+
+    @api.model
+    def get_construction_date_for_better_g(self):
+        construction_dates = [
+            self.env.ref('of_calculation_heat_loss.construction_date_4', raise_if_not_found=False),
+            self.env.ref('of_calculation_heat_loss.construction_date_5', raise_if_not_found=False),
+            self.env.ref('of_calculation_heat_loss.construction_date_6', raise_if_not_found=False),
+            self.env.ref('of_calculation_heat_loss.construction_date_7', raise_if_not_found=False),
+            self.env.ref('of_calculation_heat_loss.construction_date_8', raise_if_not_found=False),
+        ]
+        return [date.id for date in construction_dates if date]
+
+    @api.multi
+    def get_coefficient_g(self):
+        self.ensure_one()
+        return (
+            self.attribute3_id.coefficient
+            if self.better_g and self.attribute3_id.coefficient
+            else self.construction_date_id.coefficient
+        )
 
 
 class OFCalculationConstructionDate(models.Model):
@@ -255,3 +360,35 @@ class OFCalculationBaseTemperatureLine(models.Model):
     def _compute_name(self):
         for rec in self:
             rec.name = u"%s°C de %sm" % (rec.temperature, rec.altitude_id.name)
+
+
+class OFCalculationHeatLossAttribute(models.Model):
+    _name = 'of.calculation.heat.loss.attribute'
+    _description = u"Attributs pour un meilleur calcul du coefficient G"
+    _order = "type ASC, valeur_k DESC"
+
+    name = fields.Char(string=u"Nom", compute='_compute_name')
+    description = fields.Char(string=u"Description")
+    valeur_k = fields.Float(string=u"Valeur du K", required=True)
+    coefficient = fields.Float(string=u"Valeur du G")
+    type = fields.Selection(
+        selection=[
+            ('IP1', u"IP1 - Volume < 270 m³, 1 niveau"),
+            ('IP2', u"IP2 - Volume < 270 m³, 2 niveaux"),
+            ('IG1', u"IG1 - Volume >= 270 m³, 1 niveau"),
+            ('IG2/3', u"IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"),
+        ],
+        string=u"Type de coefficient",
+        required=True,
+    )
+    parent_attribute_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Attribut parent")
+    attribute_ids = fields.One2many(
+        comodel_name='of.calculation.heat.loss.attribute',
+        inverse_name='parent_attribute_id',
+        string=u"Attributs enfants"
+    )
+
+    @api.depends('description', 'valeur_k')
+    def _compute_name(self):
+        for rec in self:
+            rec.name = "%s - %s K" % (rec.description or "", rec.valeur_k)

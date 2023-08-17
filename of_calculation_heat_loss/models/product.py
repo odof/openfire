@@ -3,7 +3,7 @@
 
 import re
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class ProductTemplate(models.Model):
@@ -24,4 +24,3 @@ class ProductTemplate(models.Model):
 
                 if match:
                     record.of_puissance_nom_flo = float(match.group().replace(",", "."))
-
