@@ -76,12 +76,10 @@ class RepondreQuestionnaireWizard(models.TransientModel):
         elif self.question_id.answer_type == 'list':
             self.question_id.write({'definitive_answer': ', '.join([answer.name for answer in self.answer_ids])})
 
-        if self.question_id.condition_unmet:
-            self.question_id.write({'condition_unmet': False})
-
         return self.next_question()
 
     def next_question(self):
+        # todo: changer en fonction itérative au lieu de récursive
         self.question_id = self.question_ids and self.question_ids[0] or False
         self.question_ids -= self.question_id
         # On teste s'il y a des conditions
@@ -102,6 +100,8 @@ class RepondreQuestionnaireWizard(models.TransientModel):
                 self.question_id.write({'condition_unmet': True,
                                         'definitive_answer': False})
                 return self.next_question()
+            elif self.question_id.condition_unmet:
+                self.question_id.write({'condition_unmet': False})
         if self.question_id:
             self.write(self._convert_question_answer(self.question_id))
             return {"type": "ir.actions.do_nothing"}
