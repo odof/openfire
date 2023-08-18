@@ -228,8 +228,11 @@ class OfPlanningIntervention(models.Model):
         res = super(OfPlanningIntervention, self)._write(vals)
         if vals.get('state', '') == 'done':
             for intervention in self:
-                if intervention.question_ids and not all(
-                        [q.has_been_answered() for q in intervention.question_ids.filtered('required')]):
+                if any(
+                        q.required and
+                        not q.condition_unmet and
+                        not q.has_been_answered()
+                        for q in intervention.question_ids):
                     raise ValidationError(u"Au moins une question obligatoire n'a pas de réponse.")
         return res
 
