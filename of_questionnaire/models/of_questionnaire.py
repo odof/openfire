@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.safe_eval import safe_eval
 
 
 class OfQuestionnaire(models.Model):
@@ -224,12 +225,35 @@ class OfPlanningIntervention(models.Model):
         return interv_new
 
     @api.multi
+    def recompute_questions_condition_unmet(self):
+        for intervention in self:
+            ctx = {}
+            for question in intervention.question_ids:
+                if question.id_code:
+                    ctx[question.id_code] = question.definitive_answer
+                if question.condition:
+                    condition_code = question.condition_code
+                    condition_code = condition_code.replace(' = ', ' == ')
+                    condition_code = condition_code.replace(' et ', ' and ')
+                    condition_code = condition_code.replace(' ou ', ' or ')
+                    try:
+                        condition_unmet = not safe_eval(condition_code, ctx)
+                    except Exception:
+                        condition_unmet = True
+                    if condition_unmet != question.condition_unmet:
+                        question.condition_unmet = condition_unmet
+
+    @api.multi
     def _write(self, vals):
         res = super(OfPlanningIntervention, self)._write(vals)
         if vals.get('state', '') == 'done':
+            self.recompute_questions_condition_unmet()
             for intervention in self:
-                if intervention.question_ids and not all(
-                        [q.has_been_answered() for q in intervention.question_ids.filtered('required')]):
+                if any(
+                        q.required and
+                        not q.condition_unmet and
+                        not q.has_been_answered()
+                        for q in intervention.question_ids):
                     raise ValidationError(u"Au moins une question obligatoire n'a pas de réponse.")
         return res
 
