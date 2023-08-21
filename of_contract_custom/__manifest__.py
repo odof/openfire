@@ -53,6 +53,7 @@ Ligne d'indice :
         'of_project_issue',
         'of_base',
         'of_analytique',
+        'of_service_purchase',
     ],
     'category': 'OpenFire',
     'data': [
