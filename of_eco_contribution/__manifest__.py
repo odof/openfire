@@ -16,10 +16,10 @@ Gestion des Éco contributions
         'of_conditionnement',
         'of_sale_quote_template_kit',
     ],
-    'category': u"OpenFire",
     'data': [
         'security/of_sale_stock_security.xml',
         'security/ir.model.access.csv',
+        'views/account_config_settings_views.xml',
         'views/of_eco_contribution_views.xml',
         'views/product_views.xml',
         'views/sale_order_views.xml',

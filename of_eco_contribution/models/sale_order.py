@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import itertools
 import math
 
 from odoo import api, models, fields, _
@@ -23,11 +24,18 @@ class SaleOrder(models.Model):
         if not self_filtered:
             return
         lines = self_filtered.mapped('order_line')
-        kit_lines = lines.mapped('kit_id.kit_line_ids')
-        kit_lines._recompute_todo(kit_lines._fields['of_total_eco_contribution'])
-        kit_lines.recompute()
-        lines._recompute_todo(lines._fields['of_total_eco_contribution'])
-        lines.recompute()
+        if not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included'):
+            # Si l'éco contribution a été ajouté au prix unitaire de la ligne de commande,
+            # on la soustrait avant de la recalculer
+            lines._subtract_of_unit_eco_contribution()
+        lines.mapped('kit_id.kit_line_ids')._compute_of_total_eco_contribution()
+        lines._compute_of_total_eco_contribution()
+        if not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included'):
+            # Après avoir soustrait l'ancienne éco contribution, on ajoute la nouvelle
+            lines._add_of_unit_eco_contribution()
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -37,12 +45,22 @@ class SaleOrderLine(models.Model):
     of_unit_eco_contribution = fields.Float(
         string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
+    @api.onchange('product_id')
+    def product_id_change(self):
+        result = super(SaleOrderLine, self).product_id_change()
+        if not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included'):
+            # L'éco-contribution doit être incluse dans le prix unitaire
+            self.price_unit = self.price_unit + self.of_unit_eco_contribution
+        return result
+
     @api.depends('product_id', 'product_uom_qty', 'product_uom', 'kit_id.of_total_eco_contribution', 'of_is_kit',
                  'of_product_qty_brut')
     def _compute_of_total_eco_contribution(self):
         for record in self:
             if record.of_is_kit:
-                record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution
+                record.of_unit_eco_contribution = record.kit_id.of_total_eco_contribution
+                record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution * record.product_uom_qty
             elif record.product_id.of_eco_contribution_id:
                 contribution = record.product_id.of_eco_contribution_id
                 if record.product_id.of_packaging_unit and contribution.type in ['ton', 'unit']:
@@ -58,6 +76,16 @@ class SaleOrderLine(models.Model):
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
 
+    @api.multi
+    def _add_of_unit_eco_contribution(self):
+        for record in self.filtered(lambda r: r.of_unit_eco_contribution):
+            record.price_unit = record.price_unit + record.of_unit_eco_contribution
+
+    @api.multi
+    def _subtract_of_unit_eco_contribution(self):
+        for record in self.filtered(lambda r: r.of_unit_eco_contribution):
+            record.price_unit = record.price_unit - record.of_unit_eco_contribution
+
 
 class OfSaleOrderKit(models.Model):
     _inherit = 'of.saleorder.kit'
@@ -69,6 +97,23 @@ class OfSaleOrderKit(models.Model):
     def _compute_of_total_eco_contribution(self):
         for record in self:
             record.of_total_eco_contribution = sum(record.mapped('kit_line_ids.of_total_eco_contribution'))
+
+    @api.multi
+    @api.depends('kit_line_ids', 'of_total_eco_contribution')
+    def _compute_price_comps(self):
+        add_eco = not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included')
+        for kit in self:
+            price = 0.0
+            cost = 0.0
+            if kit.kit_line_ids:
+                for comp in kit.kit_line_ids:
+                    price += comp.price_unit * comp.qty_per_kit
+                    cost += comp.cost_unit * comp.qty_per_kit
+                if add_eco:
+                    price += kit.of_total_eco_contribution
+                kit.price_comps = price
+                kit.cost_comps = cost
 
 
 class OfSaleOrderKitLine(models.Model):

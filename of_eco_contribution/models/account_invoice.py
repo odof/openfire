@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import itertools
 import math
 
 from odoo import api, models, fields, _
@@ -59,12 +60,22 @@ class AccountInvoiceLine(models.Model):
         comodel_name='of.eco.contribution', string=u"Éco-contribution", compute='_compute_of_eco_contribution_id',
         store=True)
 
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        res = super(AccountInvoiceLine, self)._onchange_product_id()
+        if not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included'):
+            # L'éco-contribution doit être incluse dans le prix unitaire
+            self.price_unit = self.price_unit + self.of_unit_eco_contribution
+        return res
+
     @api.depends('product_id', 'quantity', 'uom_id', 'kit_id', 'of_is_kit')
     def _compute_of_total_eco_contribution(self):
         for record in self:
             contribution = record.product_id.of_eco_contribution_id
             if record.of_is_kit:
-                record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution
+                record.of_unit_eco_contribution = record.kit_id.of_total_eco_contribution
+                record.of_total_eco_contribution = record.kit_id.of_total_eco_contribution * record.quantity
             elif record.product_id.of_eco_contribution_id:
                 if record.product_id.of_packaging_unit and contribution.type in ['ton', 'unit']:
                     qty = int(math.ceil(round(record.quantity / record.product_id.of_packaging_unit, 3)))
@@ -84,6 +95,23 @@ class AccountInvoiceLine(models.Model):
         for record in self:
             record.of_eco_contribution_id = record.product_id.of_eco_contribution_id
 
+    @api.depends('kit_id.kit_line_ids', 'of_unit_eco_contribution')
+    def _compute_price_comps(self):
+        add_eco = not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included')
+        for line in self:
+            if line.of_is_kit:
+                uc_price = 0
+                uc_cost = 0
+                if line.kit_id:
+                    for comp in line.kit_id.kit_line_ids:
+                        uc_price += comp.price_unit * comp.qty_per_kit
+                        uc_cost += comp.cost_unit * comp.qty_per_kit
+                if add_eco:
+                    uc_price += line.of_unit_eco_contribution
+                line.price_comps = uc_price
+                line.cost_comps = uc_cost
+
 
 class OfAccountInvoiceKit(models.Model):
     _inherit = 'of.invoice.kit'
@@ -95,6 +123,23 @@ class OfAccountInvoiceKit(models.Model):
     def _compute_of_total_eco_contribution(self):
         for record in self:
             record.of_total_eco_contribution = sum(record.kit_line_ids.mapped('of_total_eco_contribution'))
+
+    @api.multi
+    @api.depends('kit_line_ids', 'of_total_eco_contribution')
+    def _compute_price_comps(self):
+        add_eco = not self.env['ir.values'].sudo().get_default(
+                'account.config.settings', 'of_eco_contribution_price_included')
+        for kit in self:
+            price = 0.0
+            cost = 0.0
+            if kit.kit_line_ids:
+                for comp in kit.kit_line_ids:
+                    price += comp.price_unit * comp.qty_per_kit
+                    cost += comp.cost_unit * comp.qty_per_kit
+                if add_eco:
+                    price += kit.of_total_eco_contribution
+                kit.price_comps = price
+                kit.cost_comps = cost
 
 
 class OfAccountInvoiceKitLine(models.Model):

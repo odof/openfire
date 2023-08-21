@@ -138,7 +138,7 @@
             <tr t-if="eco_contribution and o.of_price_printing in ['layout_category_with_products', 'layout_category']" class="text-right" name="eco_contribution_advanced_layout_category">
                 <td groups="of_sale.group_of_sale_print_one_image"/>
                 <td colspan="100">
-                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;:</span>
+                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span>
                     <span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': o.currency_id}"/></i>
                 </td>
             </tr>
@@ -211,7 +211,7 @@
             <tr t-if="eco_contribution and doc.of_price_printing in ['layout_category_with_products', 'layout_category']" class="text-right" name="eco_contribution_advanced_layout_category">
                 <td groups="of_sale.group_of_sale_print_one_image"/>
                 <td colspan="100">
-                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;:</span>
+                    <i><span style="padding: 0 8px;">dont&amp;nbsp;éco-contribution&amp;nbsp;PMCB&amp;nbsp;</span>
                     <span t-esc="eco_contribution" t-options="{'precision':2,'widget': 'monetary', 'display_currency': doc.currency_id}"/></i>
                 </td>
             </tr>
