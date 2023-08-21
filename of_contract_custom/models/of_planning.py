@@ -216,6 +216,13 @@ class OFService(models.Model):
             lines_data, error = super(OFService, self)._prepare_invoice_lines()
         return lines_data, error
 
+    @api.multi
+    def get_purchase_order_vals(self, supplier):
+        purchase_order_vals = super(OFService, self).get_purchase_order_vals(supplier)
+        if self.supplier_id:
+            purchase_order_vals['partner_id'] = self.supplier_id.id
+        return purchase_order_vals
+
 
 class OFServiceLine(models.Model):
     _inherit = 'of.service.line'
@@ -229,6 +236,22 @@ class OFServiceLine(models.Model):
         vals['of_contract_line_id'] = self.of_contract_line_id and self.of_contract_line_id.id or False
         vals['of_contract_product_id'] = self.of_contract_product_id and self.of_contract_product_id.id or False
         return vals
+
+    @api.multi
+    def prepare_po_line_vals(self, order):
+        po_line_vals = super(OFServiceLine, self).prepare_po_line_vals(order)
+        def get_date_planned(service):
+            date = service.intervention_ids and service.intervention_ids[0].date or False
+            if not date:
+                date = fields.Datetime.to_string(
+                    fields.Datetime.from_string(service.date_next) + relativedelta(hour=12))
+            return date
+        if self.of_contract_line_id:
+            service = self.service_id
+            po_line_vals['date_planned'] = get_date_planned(service)
+            po_line_vals['name'] = 'name' in po_line_vals and po_line_vals['name'] + "\n%s" % service.tache_id.name or \
+                                   service.tache_id.name
+        return po_line_vals
 
 
 class OfPlanningIntervention(models.Model):

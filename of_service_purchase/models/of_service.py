@@ -147,11 +147,8 @@ class OfService(models.Model):
         # Création de chaque CF
         for supplier, lines in lines_by_supplier.iteritems():
             # utilisation de new() pour trigger les onchanges facilement
-            purchase_order_new = purchase_obj.new({
-                'partner_id': supplier.id,
-                'customer_id': self.partner_id.id,
-                'origin': self.number,
-            })
+            purchase_order_vals = self.get_purchase_order_vals(supplier)
+            purchase_order_new = purchase_obj.new(purchase_order_vals)
             purchase_order_new.onchange_partner_id()
             order_values = purchase_order_new._convert_to_write(purchase_order_new._cache)
             purchase_order = purchase_obj.create(order_values)
@@ -173,6 +170,14 @@ class OfService(models.Model):
             res['res_id'] = purchase_orders.id
 
         return res
+
+    @api.multi
+    def get_purchase_order_vals(self, supplier):
+        return {
+            'partner_id': supplier.id,
+            'customer_id': self.partner_id.id,
+            'origin': self.number,
+        }
 
 
 class OfServiceLine(models.Model):
