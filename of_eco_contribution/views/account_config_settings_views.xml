@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_view_account_config_settings" model="ir.ui.view">
+        <field name="name">(OF) account settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="of_account.of_view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='rubrique_report']" position="before">
+                <group name="rubrique_report" string="Éco-contribution">
+                    <field name="of_eco_contribution_price_included"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
