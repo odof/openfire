@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "OpenFire / Contrat Custom",
-    "version": "10.0.2.0.0",
-    "author": "OpenFire",
+    'name': "OpenFire / Contrat Custom",
+    'version': '10.0.2.0.0',
+    'author': "OpenFire",
     'license': 'AGPL-3',
     'summary': u"Ajout des contrats OpenFire",
-    "description": u"""
+    'description': u"""
 Contrats OpenFire
 =================
 Création de nouveaux modèles:
@@ -43,18 +44,18 @@ Ligne d'indice :
  - Valeur d'indexation
 
 """,
-    "website": "www.openfire.fr",
-    "depends": [
-        "of_service_parc_installe",
-        "of_account",
-        "of_account_tax",
-        "of_planning_tournee",
-        "of_project_issue",
-        "of_base",
-        "of_analytique",
+    'website': "www.openfire.fr",
+    'depends': [
+        'of_service_parc_installe',
+        'of_account',
+        'of_account_tax',
+        'of_planning_tournee',
+        'of_project_issue',
+        'of_base',
+        'of_analytique',
     ],
-    "category": "OpenFire",
-    "data": [
+    'category': 'OpenFire',
+    'data': [
         'security/of_contract_custom_security.xml',
         'reports/of_contract_invoice_report_templates.xml',
         'reports/of_contract_custom_demande_intervention_templates.xml',

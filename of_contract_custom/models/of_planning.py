@@ -49,7 +49,7 @@ class OfPlanningPlannification(models.AbstractModel):
             self.tache_id = self.intervention_template_id.tache_id
 
 
-class OfService(models.Model):
+class OFService(models.Model):
     _name = 'of.service'
     _inherit = ['of.service', 'mail.thread']
 
@@ -94,7 +94,7 @@ class OfService(models.Model):
 
     @api.depends('contract_id', 'contract_id.invoice_ids')
     def _compute_invoice_ids(self):
-        super(OfService, self)._compute_invoice_ids()
+        super(OFService, self)._compute_invoice_ids()
         for service in self:
             if service.contract_id:
                 service.invoice_ids |= service.contract_id.invoice_ids
@@ -104,7 +104,7 @@ class OfService(models.Model):
 
     @api.onchange('address_id', 'tache_id')
     def _onchange_address_id(self):
-        super(OfService, self)._onchange_address_id()
+        super(OFService, self)._onchange_address_id()
         if self.address_id:
             if self.address_id.of_prestataire_id:
                 self.supplier_id = self.address_id.of_prestataire_id
@@ -139,7 +139,7 @@ class OfService(models.Model):
         if self.contract_line_id:
             context_vals['default_contract_line_id'] = self.contract_line_id.id
         action_context.update(context_vals)
-        return super(OfService, self).get_action_view_intervention_context(action_context)
+        return super(OFService, self).get_action_view_intervention_context(action_context)
 
     @api.multi
     def action_view_contract(self):
@@ -196,7 +196,7 @@ class OfService(models.Model):
 
     @api.multi
     def orderable_lines(self):
-        lines = super(OfService, self).orderable_lines()
+        lines = super(OFService, self).orderable_lines()
         if self._context.get('keep_contract_lines'):
             return lines
         return lines.filtered(lambda l: not l.of_contract_line_id)
@@ -213,7 +213,7 @@ class OfService(models.Model):
                 lines_data.append((0, 0, line_data))
                 error += line_error
         else:
-            lines_data, error = super(OfService, self)._prepare_invoice_lines()
+            lines_data, error = super(OFService, self)._prepare_invoice_lines()
         return lines_data, error
 
 
