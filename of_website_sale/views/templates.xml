@@ -363,4 +363,11 @@
         </xpath>
     </template>
 
+    <template id="product_price" inherit_id="website_sale.product_price">
+        <xpath expr="//span[@t-esc='website.currency_id.name']" position="after">
+            <span groups="of_website_sale.group_portal_b2c+!base.group_portal" class="oe_price">TTC</span>
+            <span groups="base.group_portal" class="oe_price">HT</span>
+        </xpath>
+    </template>
+
 </odoo>
