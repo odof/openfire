@@ -147,6 +147,13 @@ class OFCalculationHeatLoss(models.Model):
         self.altitude_id = False
 
     @api.multi
+    @api.onchange('order_id')
+    def _onchange_order_id(self):
+        if self.order_id:
+            self.lead_id = self.order_id.opportunity_id
+            self.parc_installe_id = self.order_id.of_parc_installe_ids and self.order_id.of_parc_installe_ids[0]
+
+    @api.multi
     @api.onchange('volume')
     def _onchange_volume(self):
         if hasattr(self, '_origin') and self._origin.volume != self.volume and (
