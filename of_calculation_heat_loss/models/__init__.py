@@ -4,5 +4,4 @@
 from . import of_calculation_heat_loss
 from . import crm_lead
 from . import sale
-from . import of_calculation_heat_loss
 from . import product
