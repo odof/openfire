@@ -10,6 +10,7 @@ from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
 from odoo.exceptions import UserError
 from odoo.models import regex_order
 from odoo.addons.of_utils.models.of_utils import get_selection_label
+import odoo.addons.decimal_precision as dp
 
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
@@ -948,6 +949,8 @@ class SaleOrderLine(models.Model):
         compute='_compute_of_product_attachment_computed_ids')
     # A supprimer après la prochaine màj
     of_product_attachment_computed = fields.Boolean(compute=lambda s: None)
+    of_purchase_price_readonly = fields.Float(
+        string='Cost', digits=dp.get_precision('Product Price'), compute='_compute_of_purchase_price_readonly')
 
     @api.model_cr_context
     def _auto_init(self):
@@ -1037,6 +1040,11 @@ class SaleOrderLine(models.Model):
                 moves = line.procurement_ids.mapped('move_ids').sorted('date_expected')
                 if moves:
                     line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(moves[0].date_expected))
+
+    @api.depends('purchase_price')
+    def _compute_of_purchase_price_readonly(self):
+        for line in self:
+            line.of_purchase_price_readonly = line.purchase_price
 
     @api.model
     def _search_of_gb_partner_tag_id(self, operator, value):

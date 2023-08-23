@@ -255,8 +255,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
                     <attribute name="groups">-base.group_user, of_sale.of_group_sale_marge_manager</attribute>
-                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
-                    <attribute name="readonly">1</attribute>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!-- Champ ajouté pour retirer le readonly de purchase_price, n'importe quel onchange sur le devis fait sauter le prix autrement -->
+                <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
+                    <field name="of_purchase_price_readonly" groups="-base.group_user, of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
                     <field name="of_seller_price" groups="of_sale.of_group_sale_marge_manager+sales_team.group_sale_manager"
@@ -276,7 +279,12 @@
             <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_purchase_price'))]"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
-                    <attribute name="readonly">0</attribute>
+                    <attribute name="attrs">{'invisible': [('of_client_view', '=', True)]}</attribute>
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='of_purchase_price_readonly']" position="attributes">
+                    <attribute name="attrs">{}</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
             </field>
         </record>
