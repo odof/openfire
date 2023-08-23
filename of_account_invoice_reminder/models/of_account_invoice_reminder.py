@@ -11,7 +11,7 @@ class AccountInvoice(models.Model):
         comodel_name='of.account.invoice.reminder.stage', string=u"Niveau de relance")
     of_reminder_state = fields.Selection(
         selection=[('to_do', u"À faire"), ('done', u"OK")], string=u"État de la relance")
-    of_last_reminder_sent_date = fields.Date(string=u"Date d'envoi de la dernière relance")
+    of_last_reminder_sent_date = fields.Date(string=u"Date d'envoi de la dernière relance", copy=False)
 
     @api.onchange('of_reminder_stage_id')
     def _onchange_of_reminder_stage_id(self):
@@ -19,6 +19,14 @@ class AccountInvoice(models.Model):
             self.of_reminder_state = 'to_do'
         else:
             self.of_reminder_state = False
+
+    @api.multi
+    def copy_data(self, default=None):
+        param_copy_reminder_date = self.env['ir.values'].get_default('account.config.settings', 'of_copy_reminder_date')
+        res = super(AccountInvoice, self).copy_data(default)
+        if param_copy_reminder_date:
+            res[0]['of_last_reminder_sent_date'] = self.of_last_reminder_sent_date
+        return res
 
     @api.model
     def manage_reminder(self):
