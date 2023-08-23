@@ -1139,7 +1139,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.onchange('partner_pricelist_id')
     def _onchange_partner_pricelist_id(self):
-        if self.partner_pricelist_id:
+        if self.partner_pricelist_id and not self._context.get('of_import_service_lines'):
             for line in self.line_ids:
                 product = line.product_id
                 line.price_unit = line._get_display_price(product)
