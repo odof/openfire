@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.account.invoice.reminder.hook" name="_init_account_config_settings_field">
+        <value eval="[]"/>
+    </function>
+
+</odoo>

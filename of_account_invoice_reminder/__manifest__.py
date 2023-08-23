@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': u"OpenFire / Relance Factures",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'license': "",
     'category': "OpenFire",
@@ -21,8 +21,10 @@ Mise en place d'un workflow de relance pour les factures.
         'data/of_account_invoice_reminder_data.xml',
         'views/of_account_invoice_reminder_views.xml',
         'views/res_partner_views.xml',
+        'views/res_config_settings_views.xml',
         'wizards/of_account_invoice_reminder_send_views.xml',
         'security/ir.model.access.csv',
+        'hooks/post_hook.xml',
     ],
     'installable': True,
     'application': False,

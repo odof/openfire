@@ -3,3 +3,4 @@
 
 from . import of_account_invoice_reminder
 from . import res_partner
+from . import res_config_settings

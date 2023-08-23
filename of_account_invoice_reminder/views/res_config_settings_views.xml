@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_config_settings_view_form" model="ir.ui.view">
+        <field name="name">account.config.settings.view.form</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_warning_account']" position="before">
+                <label for="of_copy_reminder_date"/>
+                <div name="of_copy_reminder_date">
+                    <field name="of_copy_reminder_date" class="oe_inline"/>
+                    <span  >Copier la date de dernière relance dans le cas d'une duplication de facture</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
