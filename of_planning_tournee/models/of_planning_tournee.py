@@ -995,9 +995,10 @@ class OFPlanningTournee(models.Model):
             for line in tour.tour_line_ids:
                 if reload:
                     line._update_line_data_from_intervention()
-                line._compute_line_data()  # keep line updated with the right data
-                line._update_osrm_data()
-            tour._compute_map_tour_line_ids()
+                with line.env.do_in_draft():
+                    line._compute_line_data()  # keep line updated with the right data
+                line.sudo()._update_osrm_data()
+        self._fields['map_tour_line_ids'].compute_value(self)
 
     @api.multi
     def action_restore_tour(self):

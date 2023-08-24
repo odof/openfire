@@ -113,7 +113,7 @@ class OfPlanningIntervention(models.Model):
     def update_tour_lines_data(self, tours):
         """ Updates tour lines data for the given tours
         """
-        for tour in tours:
+        for tour in tours.sudo():
             tour._populate_tour_lines()  # add this intervention to the tour lines if not already present
             tour._check_missing_osrm_data(force=True)
 
@@ -238,7 +238,7 @@ class OfPlanningIntervention(models.Model):
         # avoid multiple calls to create_tour/_recompute_todo if this is not necessary
         if not self._context.get('from_tour_wizard') and any(
                 field_name in vals for field_name in recompute_tournee_fields):
-            for intervention in self:
+            for intervention in self.sudo():
                 # La vérif de nécessité de création de tournée est faite directement dans la fonction _create_tour
                 intervention.create_tour()
 
@@ -249,10 +249,10 @@ class OfPlanningIntervention(models.Model):
             self.remove_from_tour(interventions_to_remove)
 
             # Updates tours data for interventions that have changed their hours
-            self.reorder_tour(hours_changed)
+            self.reorder_tour(hours_changed.sudo())
 
             # Updates tours data or reloads it if the geodata has changed or if the intervention has been reopened
-            self.resync_and_update_tour(geodata_changed)
+            self.sudo().resync_and_update_tour(geodata_changed)
         return res
 
     @api.multi
