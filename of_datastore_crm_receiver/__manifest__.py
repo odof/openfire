@@ -25,6 +25,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
     'data': [
         'security/ir.model.access.csv',
         'data/of_datastore_crm_data.xml',
+        'data/of_sanitize_query.xml',
         'views/crm_views.xml',
         'views/of_datastore_crm_views.xml',
     ],

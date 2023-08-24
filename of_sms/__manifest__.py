@@ -23,6 +23,7 @@ Module de SMS OpenFire
     'demo_xml' : [],
     'data': [
         'security/ir.model.access.csv',
+        'data/of_sanitize_query.xml',
         'data/of_sms_data.xml',
         'views/of_sms_views.xml',
         'wizard/of_sms_compose_views.xml',

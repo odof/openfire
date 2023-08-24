@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Connecteurs Google Agenda -->
+    <record id="sanitize_query_of_sms_account" model="of.sanitize.query">
+        <field name="query">UPDATE of_sms_account SET account_name = '', account_password = ''</field>
+    </record>
+
+    <!-- Connecteurs Google Agenda -->
+    <record id="sanitize_query_ir_values" model="of.sanitize.query">
+        <field name="query">DELETE FROM ir_values WHERE name IN ('alerte_interventions_equipes_veille', 'alerte_interventions_clients_veille') AND model = 'of.sms.config.settings'</field>
+    </record>
+
+</odoo>
