@@ -307,12 +307,9 @@ class OFPlanningTourneeLine(models.Model):
         :return: dict of data get from OSRM query that can be used to update the tour line
         :rtype: dict
         """
-        geojson_data = False
         endpoint_geojson_data = False
         endpoint_distance = 0
         endpoint_duration = 0
-        distance = 0
-        duration = 0
         coords_str = "%s,%s;%s,%s" % (self.previous_geo_lng, self.previous_geo_lat, self.geo_lng, self.geo_lat)
         full_query = '%s/%s?geometries=geojson&steps=true&overview=false' % (osrm_base_url, coords_str)
         steps, distance, duration = self._get_osrm_steps_data(full_query)
