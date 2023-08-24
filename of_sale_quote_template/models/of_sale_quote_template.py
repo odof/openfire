@@ -1342,6 +1342,15 @@ class SaleOrderLine(models.Model):
             'price_unit': self.price_unit,
             'name': self.product_id.name,
         })
+        # onchange réalisé notamment pour générer les kits si le module est installé
+        quote_line_new._onchange_product_id()
+        # Remettre certaines valeurs après le onchange
+        quote_line_new.update({
+            'product_uom_id': self.product_uom.id,
+            'product_uom_qty': self.product_uom_qty,
+            'price_unit': self.price_unit,
+            'name': self.product_id.name,
+        })
         return quote_line_new._convert_to_write(quote_line_new._cache)
 
 
