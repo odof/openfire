@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- ***  Modules Odoo de base  *** -->
+
+    <!-- Serveurs de mails sortants -->
+    <record id="sanitize_query_mail_server" model="of.sanitize.query">
+        <field name="query">UPDATE ir_mail_server SET smtp_host = 'none', smtp_port = '55555', smtp_pass = ''</field>
+    </record>
+
+    <!-- Serveurs de mails entrants -->
+    <record id="sanitize_query_fetchmail_server" model="of.sanitize.query">
+        <field name="query">UPDATE fetchmail_server SET active = False, server = 'pop_imap_inactif', port = '55555', password = 'none'</field>
+    </record>
+
+    <!-- Crons -->
+    <record id="sanitize_query_ir_cron" model="of.sanitize.query">
+        <field name="query">UPDATE ir_cron SET active = False</field>
+    </record>
+
+    <!-- ***  Autres modules, nécessitent une vérification d'existence des tables/champs  *** -->
+
+    <!-- Connecteurs Google Agenda - module odoo google_calendar -->
+    <record id="sanitize_query_google_calendar_users" model="of.sanitize.query">
+        <field name="query_if">SELECT 1 FROM information_schema.columns WHERE table_name = 'res_users' AND column_name = 'google_calendar_token_validity'</field>
+        <field name="query">UPDATE res_users SET google_calendar_token_validity = NULL, google_calendar_cal_id = NULL, google_calendar_rtoken = NULL, google_calendar_last_sync_date = NULL, google_calendar_token = NULL</field>
+    </record>
+    <record id="sanitize_query_google_calendar_config" model="of.sanitize.query">
+        <field name="query">UPDATE ir_config_parameter SET value = '' WHERE key IN ('google_calendar_client_id', 'google_calendar_client_secret')</field>
+    </record>
+
+    <!-- Clefs Google liées au site web - module odoo website -->
+    <record id="sanitize_query_website_google_analytics" model="of.sanitize.query">
+        <field name="query_if">SELECT 1 FROM information_schema.columns WHERE table_name = 'website' AND column_name = 'google_analytics_key'</field>
+        <field name="query">UPDATE website SET google_analytics_key = ''</field>
+    </record>
+    <record id="sanitize_query_website_google_maps" model="of.sanitize.query">
+        <field name="query">UPDATE ir_config_parameter SET value = '' WHERE key = 'google_maps_api_key'</field>
+    </record>
+
+    <!-- Intermédiaire de paiement Stripe - module odoo payment_stripe -->
+    <!-- En cas de besoin, récupérer une clef de tests -->
+    <record id="sanitize_query_payment_acquirer_stripe" model="of.sanitize.query">
+        <field name="query_if">SELECT 1 FROM information_schema.columns WHERE table_name = 'payment_acquirer' AND column_name = 'stripe_publishable_key'</field>
+        <field name="query">UPDATE payment_acquirer SET stripe_publishable_key = '', stripe_secret_key = '', environment = 'test' WHERE provider = 'stripe'</field>
+    </record>
+
+</odoo>

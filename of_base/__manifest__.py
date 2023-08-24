@@ -31,6 +31,7 @@ Personnalisation des fonctions de base Odoo :
 - Permet à l'auteur d'un mail de le recevoir en copie (par défaut odoo retire l'expéditeur de la liste des destinataires)
 - Nouvelle gestion des numéros de téléphone des partenaires avec formatage automatique des numéros
     -> Librairie Python phonenumbers nécessaire, pour installer : pip install phonenumbers
+- Ajout d'un groupe de droits autorisant à impacter le montant du contrat OpenFire
 
 Ajout d'un modèle servant de log interne :
 ------------------------------------------
@@ -55,6 +56,7 @@ Ajout d'un modèle servant de log interne :
     'data': [
         'data/report_paperformat.xml',
         'data/of_base_data.xml',
+        'data/of_sanitize_query.xml',
         'security/of_base_security.xml',
         'security/of_group_intranet_security.xml',
         'security/ir.model.access.csv',

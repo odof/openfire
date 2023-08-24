@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Inhibition des connecteurs -->
+    <record id="sanitize_query_datastore_receiver" model="of.sanitize.query">
+        <field name="query">UPDATE of_datastore_crm_receiver SET login = '', password = ''</field>
+    </record>
+
+</odoo>
