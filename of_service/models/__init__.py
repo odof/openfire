@@ -8,3 +8,4 @@ from . import report
 from . import ir_attachment
 from . import date_range
 from . import ir_ui_menu
+from . import mail_template
