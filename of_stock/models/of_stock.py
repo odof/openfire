@@ -606,8 +606,8 @@ class InventoryLine(models.Model):
 
     @api.onchange('product_id', 'product_qty')
     def _onchange_product_id_or_qty(self):
-        if self.product_id and self.product_id.tracking != 'none':
-            self.of_product_lot_serial_management = self.of_product_lot_serial_management_copy = True
+        self.of_product_lot_serial_management = self.of_product_lot_serial_management_copy \
+            = self.product_id and self.product_id.tracking != 'none'
         qty = self.product_qty
         if self.product_id and self.product_id.tracking == 'serial' and \
                 float_compare(qty, 0.0, 0) and float_compare(qty, 1.0, 0):
