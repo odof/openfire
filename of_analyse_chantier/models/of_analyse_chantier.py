@@ -49,14 +49,14 @@ class OfAnalyseChantierInherit(models.AbstractModel):
             }
 
     def _get_values_from_order_kit_lines(self):
-        order_lines = self.saleorder_kit_line_ids.mapped('kit_id.order_line_id')
-        invoice_lines = order_lines.mapped('invoice_lines')
+        order_line = self.saleorder_kit_line_ids.mapped('kit_id').order_line_id
+        invoice_lines = order_line.mapped('invoice_lines')
         invoice_kit_lines = invoice_lines.mapped('kit_id').mapped('kit_line_ids').filtered(
             lambda l: l.product_id.id == self.saleorder_kit_line_ids.mapped('product_id').id)
         return {
             'invoice_line_ids': [(6, 0, invoice_lines._ids)],
             'invoice_kit_line_ids': [(6, 0, invoice_kit_lines._ids)],
-            'order_line_ids': [(6, 0, order_lines._ids)],
+            'order_line_ids': [(6, 0, [order_line.id])],
             'qty_ordered': sum(self.saleorder_kit_line_ids.mapped('qty_total')),
             'qty_delivered': sum(self.saleorder_kit_line_ids.mapped('qty_delivered')),
             'qty_invoiced': sum(self.saleorder_kit_line_ids.filtered('invoiced').mapped('qty_total')) or 0,
@@ -79,12 +79,12 @@ class OfAnalyseChantierInherit(models.AbstractModel):
             }
 
     def _get_values_from_invoice_kit_lines(self):
-        invoice_lines = self.invoice_kit_line_ids.mapped('kit_id.invoice_line_id')
-        order_lines = invoice_lines.mapped('of_order_line_ids')
+        invoice_line = self.invoice_kit_line_ids.mapped('kit_id').invoice_line_id
+        order_lines = invoice_line.mapped('of_order_line_ids')
         order_kit_lines = order_lines.mapped('kit_id').mapped('kit_line_ids').filtered(
             lambda l: l.product_id.id == self.invoice_kit_line_ids.mapped('product_id').id)
         return {
-            'invoice_line_ids': [(6, 0, invoice_lines._ids)],
+            'invoice_line_ids': [(6, 0, [invoice_line.id])],
             'saleorder_kit_line_ids': [(6, 0, order_kit_lines._ids)],
             'order_line_ids': [(6, 0, order_lines._ids)],
             'qty_ordered': order_kit_lines and sum(order_kit_lines.mapped('qty_total')) or 0,
@@ -196,46 +196,14 @@ class OfAnalyseChantierInherit(models.AbstractModel):
         new_line = self.create(self.get_line_dict_from_pack_operation(operation, chantier))
         return new_line
 
-    def synchroniser(self, lines=[]):
+    def synchroniser(self):
         if self.invoice_kit_line_ids:
-            new_lines = []
-            for line in lines:
-                if line.id not in self.invoice_kit_line_ids._ids:
-                    new_lines.append((4, line.id))
-            if new_lines :
-                self.write({
-                    'invoice_kit_line_ids': new_lines
-                })
             self.update(self._get_values_from_invoice_kit_lines())
         elif self.invoice_line_ids:
-            new_lines = []
-            for line in lines:
-                if line.id not in self.invoice_line_ids._ids:
-                    new_lines.append((4, line.id))
-            if new_lines :
-                self.write({
-                    'invoice_line_ids': new_lines
-                })
             self.update(self._get_values_from_invoice_lines())
         elif self.saleorder_kit_line_ids:
-            new_lines = []
-            for line in lines:
-                if line.id not in self.saleorder_kit_line_ids._ids:
-                    new_lines.append((4, line.id))
-            if new_lines :
-                self.write({
-                    'saleorder_kit_line_ids': new_lines
-                })
             self.update(self._get_values_from_order_kit_lines())
         elif self.order_line_ids:
-            new_lines = []
-            for line in lines:
-                if line.id not in self.order_line_ids._ids:
-                    new_lines.append((4, line.id))
-            if new_lines :
-                self.write({
-                    'order_line_ids': new_lines
-                })
             self.update(self._get_values_from_order_lines())
         elif self.pack_operation_id:
             self.update(self._get_values_from_pack_operation())
@@ -318,8 +286,8 @@ class OfAnalyseChantierLine(models.AbstractModel):
         else:
             return
 
-    def synchroniser(self, lines=[]):
-        super(OfAnalyseChantierLine, self).synchroniser(lines=lines)
+    def synchroniser(self):
+        super(OfAnalyseChantierLine, self).synchroniser()
         self.onchange_methode_cout()
 
     def get_line_dict_from_order_lines(self, order_line, chantier):
@@ -631,10 +599,6 @@ class OfAnalyseChantier(models.Model):
         self.invoice_ids = invoices
         self.picking_ids = pickings
 
-        self.service_line_ids.unlink()
-        self.product_line_ids.unlink()
-        self.remise_ids.unlink()
-
 
         for product in products:
             if product.categ_id.id == categ_acompte:
@@ -646,19 +610,14 @@ class OfAnalyseChantier(models.Model):
                     lines = self.service_line_ids
                 else:
                     lines = self.product_line_ids
-            analyse_line = lines.filtered(lambda al: al.product_id.id == product.id and not al.pack_operation_id)
-            lines = []
-            if invoice_lines.filtered(lambda l: l.product_id.id == product.id):
-                lines = invoice_lines.filtered(lambda l: l.product_id.id == product.id)
-            elif order_lines.filtered(lambda l: l.product_id.id == product.id):
-                lines = order_lines.filtered(lambda l: l.product_id.id == product.id)
+            analyse_line = lines.filtered(lambda al: al.product_id.id == product.id)
             if not analyse_line:
                 if invoice_lines.filtered(lambda l: l.product_id.id == product.id):
-                    analyse_line.create_line_from_invoice_lines(lines, self)
+                    analyse_line.create_line_from_invoice_lines(invoice_lines.filtered(lambda l: l.product_id.id == product.id), self)
                 elif order_lines.filtered(lambda l: l.product_id.id == product.id):
-                    analyse_line.create_line_from_order_lines(lines, self)
+                    analyse_line.create_line_from_order_lines(order_lines.filtered(lambda l: l.product_id.id == product.id), self)
             else:
-                analyse_line.synchroniser(lines)
+                analyse_line.synchroniser()
 
         order_line_kit -= invoice_line_kit.mapped('of_order_line_ids')
 
@@ -675,13 +634,12 @@ class OfAnalyseChantier(models.Model):
                             lines = self.service_line_ids
                         else:
                             lines = self.product_line_ids
-                    analyse_line = lines.filtered(lambda al:
-                        al.product_id.id == product.id and not al.pack_operation_id)
-                    kit_lines = line.kit_id.kit_line_ids.filtered(lambda l: l.product_id.id == product.id)
+                    analyse_line = lines.filtered(lambda al: al.product_id.id == product.id)
                     if not analyse_line:
+                        kit_lines = line.kit_id.kit_line_ids.filtered(lambda l: l.product_id.id == product.id)
                         analyse_line.create_line_from_invoice_kit_lines(kit_lines, self)
                     else:
-                        analyse_line.synchroniser(kit_lines)
+                        analyse_line.synchroniser()
 
         for line in order_line_kit:
             if line.kit_id:
@@ -696,13 +654,12 @@ class OfAnalyseChantier(models.Model):
                             lines = self.service_line_ids
                         else:
                             lines = self.product_line_ids
-                    analyse_line = lines.filtered(
-                        lambda al: al.product_id.id == product.id and not al.pack_operation_id)
-                    kit_lines = line.kit_id.kit_line_ids.filtered(lambda l: l.product_id.id == product.id)
+                    analyse_line = lines.filtered(lambda al: al.product_id.id == product.id)
                     if not analyse_line:
+                        kit_lines = line.kit_id.kit_line_ids.filtered(lambda l: l.product_id.id == product.id)
                         analyse_line.create_line_from_order_kit_lines(kit_lines, self)
                     else:
-                        analyse_line.synchroniser(kit_lines)
+                        analyse_line.synchroniser()
 
 
         pack_operations = pickings.mapped('pack_operation_product_ids')
