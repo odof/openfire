@@ -95,25 +95,26 @@ class OfPlanningIntervention(models.Model):
 
         intervention = super(OfPlanningIntervention, self).create(vals)
 
-        tours = intervention.create_tour()
+        tour_list = intervention.create_tour()
 
         # Updates the tour lines data
-        self.update_tour_lines_data(tours)
+        self.update_tour_lines_data(tour_list)
         return intervention
 
     @api.multi
     def create_tour(self):
         self.ensure_one()
         # La vérif de nécessité de création de tournée est faite directement dans la fonction create_tour
-        tours = self._create_tour()
+        tour_list = self._create_tour()
         self._recompute_todo(self._fields['tournee_ids'])
-        return tours
+        return tour_list
 
     @api.model
-    def update_tour_lines_data(self, tours):
+    def update_tour_lines_data(self, tour_list):
         """ Updates tour lines data for the given tours
         """
-        for tour in tours.sudo():
+        for tour in tour_list:
+            tour = tour.sudo()
             tour._populate_tour_lines()  # add this intervention to the tour lines if not already present
             tour._check_missing_osrm_data(force=True)
 
