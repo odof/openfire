@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-14 10:06+0000\n"
-"PO-Revision-Date: 2023-04-14 10:06+0000\n"
+"POT-Creation-Date: 2023-08-25 13:49+0000\n"
+"PO-Revision-Date: 2023-08-25 13:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -53,6 +53,11 @@ msgid "Display Name"
 msgstr "Nom affiché"
 
 #. module: of_sale_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.res_config_settings_sale_printing_params_view_form
+msgid "Displays the Payment schedule in the report"
+msgstr "Affiche l'échéancier de paiement dans le rapport"
+
+#. module: of_sale_payment_schedule
 #. odoo-python
 #: code:addons/of_sale_payment_schedule/models/of_sale_payment_schedule.py:0
 #, python-format
@@ -63,6 +68,11 @@ msgstr "Échéance"
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__id
 msgid "ID"
 msgstr ""
+
+#. module: of_sale_payment_schedule
+#: model:ir.model,name:of_sale_payment_schedule.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
 
 #. module: of_sale_payment_schedule
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule____last_update
@@ -88,13 +98,6 @@ msgstr "Dernier paiement"
 #: model:ir.model.fields,field_description:of_sale_payment_schedule.field_of_sale_payment_schedule__name
 msgid "Name"
 msgstr "Nom"
-
-#. module: of_sale_payment_schedule
-#. odoo-python
-#: code:addons/of_sale_payment_schedule/models/sale_order.py:0
-#, python-format
-msgid "Payment #%s"
-msgstr "Paiement n°%s"
 
 #. module: of_sale_payment_schedule
 #: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.report_saleorder_document
@@ -134,6 +137,11 @@ msgid "Sale order"
 msgstr "Bon de commande"
 
 #. module: of_sale_payment_schedule
+#: model:ir.model,name:of_sale_payment_schedule.model_sale_advance_payment_inv
+msgid "Sales Advance Payment Invoice"
+msgstr "Facture de paiement d'avance"
+
+#. module: of_sale_payment_schedule
 #: model:ir.model,name:of_sale_payment_schedule.model_sale_order
 msgid "Sales Order"
 msgstr "Bon de commande"
@@ -150,7 +158,8 @@ msgid ""
 " payment terms. Do you want to continue ?"
 msgstr ""
 "Cette opération mettra à jour l'échéancier de paiement sur la base de la "
-"liste de prix actuelle et des conditions de paiement. Voulez-vous continuer ?"
+"liste de prix actuelle et des conditions de paiement. Voulez-vous continuer "
+"?"
 
 #. module: of_sale_payment_schedule
 #: model_terms:ir.ui.view,arch_db:of_sale_payment_schedule.of_sale_view_order_payment_schedule_form

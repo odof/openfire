@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Sale Payment Schedule",
+    'name': "OpenFire / Echéancier de paiement des ventes",
     'version': '16.0.1.0.0',
     'author': "OpenFire",
     'category': 'OpenFire',
@@ -16,6 +16,7 @@
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
         'views/of_sale_payment_schedule_views.xml',
+        'views/res_config_settings_views.xml',
         'reports/ir_actions_report_templates.xml',
     ],
     'installable': True,

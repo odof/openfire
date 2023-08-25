@@ -388,9 +388,9 @@
                                 <div class="text-muted">
                                     How product images are displayed in report
                                 </div>
-                                 <div class="content-group">
-                                     <field name="pdf_print_image_level" class="o_light_label" widget="radio"/>
-                                     <field name="module_of_sale_report_setting_product_multi_image" invisible="1"/>
+                                <div class="content-group">
+                                    <field name="pdf_print_image_level" class="o_light_label" widget="radio"/>
+                                    <field name="module_of_sale_report_setting_product_multi_image" invisible="1"/>
                                 </div>
                             </div>
                         </div>

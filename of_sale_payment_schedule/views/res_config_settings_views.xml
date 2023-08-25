@@ -6,7 +6,7 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="of_sale_report_setting.res_config_settings_sale_printing_params_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='pdf_price_taxinc']/../.." position="after">
+            <xpath expr="//field[@name='pdf_signatures_insert']/../.." position="before">
                 <div class="mt32">
                     <div class="o_setting_left_pane">
                         <field name="pdf_payment_schedule"/>
