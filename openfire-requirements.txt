@@ -4,3 +4,4 @@ pdfminer.six==20200726
 pypdftk==0.5
 pypdf==3.8.1
 astor==0.8.1
+phonenumbers==8.12.1
