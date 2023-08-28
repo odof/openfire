@@ -218,6 +218,10 @@ class OFParcInstalle(models.Model):
     def action_view_orders(self):
         action = self.env.ref('sale.action_quotations').read()[0]
         action['domain'] = [('id', 'in', self.sale_order_ids._ids)]
+        action['context'] = {
+            'default_of_parc_installe_ids': [(6, 0, self.ids)],
+            'default_partner_id': len(self) == 1 and self.client_id.id or False,
+        }
         return action
 
     @api.multi
