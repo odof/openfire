@@ -240,4 +240,12 @@ class SignupVerifyEmail(AuthSignupHome):
             qcontext["error"] = u"Veuillez renseigner un courriel valide."
             return request.render('auth_signup.signup', qcontext)
 
-        return super(SignupVerifyEmail, self).web_auth_signup(*args, **kw)
+        res = super(SignupVerifyEmail, self).web_auth_signup(*args, **kw)
+        # Si on est sur un utilisateur portail, renvoyer vers le site web
+        # Mise a jour de qcontext car il a changé
+        qcontext = self.get_auth_signup_qcontext()
+        is_portal = bool(request.env.user.groups_id.filtered('is_portal'))
+        if qcontext.get('login_success')  and is_portal and not qcontext.get('redirect'):
+            return http.redirect_with_hash('/')
+        return res
+
