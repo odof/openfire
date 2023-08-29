@@ -498,7 +498,7 @@ msgstr "Coût Total HT simulé"
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__sim_total_price_tax_excl
 msgid "Simulated total price excl. VAT"
-msgstr "Prix total TTC simulé"
+msgstr "Prix total HT simulé"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__sim_total_price_tax_incl
