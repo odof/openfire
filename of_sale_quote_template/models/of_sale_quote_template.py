@@ -747,10 +747,10 @@ class OfSaleOrderLayoutCategory(models.Model):
                 [('order_id', '=', self.order_id.id), ('id', 'child_of', layout_category.id)])
             sequence = sequence + number_of_child
 
-    def get_color(self, model):
+    def get_color(self, model, record=False):
         """Prend la couleur dans la configuration et l'éclaircit en fonction de la profondeur d'une section"""
         model_obj = self.env[model]
-        hex_color = model_obj.get_color_section()
+        hex_color = model_obj.get_color_section() if not record else record.get_color_section()
         rgb_hex = [hex_color[x:x + 2] for x in [1, 3, 5]]
         new_rgb_int = [int(hex_value, 16) + ((self.depth - 2) * 35) for hex_value in rgb_hex]
         new_rgb_int = [min([255, max([0, i])]) for i in new_rgb_int]  # make sure new values are between 0 and 255
@@ -1171,7 +1171,7 @@ class SaleOrder(models.Model):
                     'subtotal': category and category.prix_vente or 0.0,
                     'pagebreak': False,
                     'lines': list(lines),
-                    'color': category and category.get_color('sale.order') or section_color
+                    'color': category and category.get_color('sale.order', self) or section_color
                 })
 
         # Si les sections avancées ne sont pas configurées, on appelle le super()
