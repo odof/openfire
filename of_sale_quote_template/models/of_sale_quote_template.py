@@ -465,6 +465,31 @@ class OfSaleOrderLayoutCategory(models.Model):
     _description = u"Ligne de sections"
     _order = 'sequence'
 
+
+    @api.multi
+    def prepare_sqt_section_vals(self, quote_id):
+        self.ensure_one()
+        lines_to_create = []
+        for line in self.order_line_without_child_ids:
+            line_vals = {
+                'quote_id': quote_id,
+                'product_id': line.product_id,
+                'product_uom_id': line.product_uom.id,
+                'product_uom_qty': line.product_uom_qty,
+                'price_unit': line.price_unit,
+                'name': line.name,
+            }
+            lines_to_create.append((0, 0, line_vals))
+        sale_quote_template_obj = self.env['of.sale.quote.template.layout.category']
+        section_line_new = sale_quote_template_obj.new({
+            'sequence': self.sequence,
+            'name': self.name,
+            'parent_id': self.parent_id.id,
+            'quote_line_ids': lines_to_create
+        })
+        return section_line_new._convert_to_write(section_line_new._cache)
+
+
     @api.model
     def _get_domain_parent_id(self):
         order = self.env['sale.order'].browse(self._context.get('default_order_id'))
@@ -1284,8 +1309,9 @@ class SaleOrder(models.Model):
 
         lines_to_create = []
         for line in self.order_line:
-            line_vals = line.prepare_sqt_line_vals()
-            lines_to_create.append((0, 0, line_vals))
+            if not line.of_layout_category_id:
+                line_vals = line.prepare_sqt_line_vals()
+                lines_to_create.append((0, 0, line_vals))
 
         activities_to_create = []
         for line in self.of_crm_activity_ids:
@@ -1297,6 +1323,14 @@ class SaleOrder(models.Model):
             'of_sale_quote_tmpl_activity_ids': activities_to_create,
         })
         sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
+        sections_to_create = []
+        for section in self.of_layout_category_ids:
+            sections_vals = section.prepare_sqt_section_vals(sale_quote_template.id)
+            sections_to_create.append((0, 0, sections_vals))
+        sale_quote_template.write({
+            'of_section_line_ids': sections_to_create,
+        })
+
         return {
             'name': u"Modèle de devis",
             'view_mode': 'form',
