@@ -3,105 +3,40 @@
 from markupsafe import Markup
 
 from odoo.fields import Command
-from odoo.tests import Form, tagged
+from odoo.tests import Form
 from odoo.tools import float_compare
 
-from odoo.addons.of_account.tests.common import TestOFAccountCommon
+from odoo.addons.of_sale.tests.common import TestOFSaleCommon
 
 
-@tagged('post_install', '-at_install', 'openfire_custom')
-class TestOFPriceManagementWizard(TestOFAccountCommon):
+class TestOFPriceManagementWizard(TestOFSaleCommon):
     def setUp(self):
         super().setUp()
-
-    @classmethod
-    def create_company(cls, values):
-        return cls.env["res.company"].create(values)
-
-    @classmethod
-    def create_product(cls, values):
-        values.update({'type': 'consu', 'invoice_policy': 'order'})
-        product_template = cls.env["product.template"].create(values)
-        return product_template.product_variant_id
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         # Product and sale data
-        cls.category = (
-            cls.env['product.category']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'Test category',
-                }
-            )
-        )
-
-        cls.default_pricelist = (
-            cls.env['product.pricelist']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'default_pricelist',
-                    'currency_id': cls.company_fr.currency_id.id,
-                }
-            )
-        )
-
-        cls.product_brand = (
-            cls.env['of.product.brand']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'Test brand',
-                    'code': 'TB',
-                    'partner_id': cls.supplier_a.id,
-                }
-            )
-        )
-
         cls.of_product_1 = cls.create_product(
             {
                 'name': 'of_product_test_1',
-                'categ_id': cls.category.id,
                 'standard_price': 34.10,
                 'list_price': 66.0,
-                'type': 'consu',
-                'weight': 0.01,
-                'uom_id': cls.env.ref('uom.product_uom_unit').id,
-                'uom_po_id': cls.env.ref('uom.product_uom_unit').id,
-                'brand_id': cls.product_brand.id,
-                'default_code': 'TB_TEST_1',
-                'invoice_policy': 'order',
-                'expense_policy': 'cost',
-                'taxes_id': [Command.set([cls.tax_base.id])],
-                'supplier_taxes_id': [(6, 0, [])],
+                'default_code': 'BA_TEST_1',
             }
         )
         cls.of_product_2 = cls.create_product(
             {
                 'name': 'of_product_test_2',
-                'categ_id': cls.category.id,
                 'standard_price': 36.30,
                 'list_price': 71.00,
-                'type': 'consu',
-                'weight': 0.01,
-                'uom_id': cls.env.ref('uom.product_uom_unit').id,
-                'uom_po_id': cls.env.ref('uom.product_uom_unit').id,
-                'brand_id': cls.product_brand.id,
-                'default_code': 'TB_TEST_2',
-                'invoice_policy': 'order',
-                'expense_policy': 'no',
-                'taxes_id': [Command.set([cls.tax_base.id])],
-                'supplier_taxes_id': [(6, 0, [])],
+                'default_code': 'BA_TEST_2',
             }
         )
         cls.product_discount = cls.create_product(
             {
                 'name': 'of_product_discount',
-                'categ_id': cls.category.id,
                 'standard_price': 0.0,
                 'list_price': 0.0,
                 'type': 'service',

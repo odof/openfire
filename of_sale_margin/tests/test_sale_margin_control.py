@@ -1,52 +1,20 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.fields import Command
 from odoo.tools import float_compare
 
-from odoo.addons.of_account.tests.common import TestOFAccountCommon
+from odoo.addons.of_sale.tests.common import TestOFSaleCommon
 
 
-class TestOFSaleOrderMarginControl(TestOFAccountCommon):
+class TestOFSaleOrderMarginControl(TestOFSaleCommon):
     def setUp(self):
         super().setUp()
-
-    @classmethod
-    def create_company(cls, values):
-        return cls.env["res.company"].create(values)
-
-    @classmethod
-    def create_product(cls, values):
-        values.update({'type': 'consu', 'invoice_policy': 'order'})
-        product_template = cls.env["product.template"].create(values)
-        return product_template.product_variant_id
 
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        # User data
-        cls.user_salesman = cls.env['res.users'].create(
-            {
-                'name': 'user_salesman',
-                'login': 'user_salesman',
-                'email': 'user_salesman@openfire.fr',
-                'groups_id': [(6, 0, [cls.env.ref('sales_team.group_sale_salesman').id])],
-                'company_id': cls.company_fr.id,
-            }
-        )
-
-        cls.user_sale_manager = cls.env['res.users'].create(
-            {
-                'name': 'user_sale_manager',
-                'login': 'user_sale_manager',
-                'email': 'user_sale_manager@openfire.fr',
-                'groups_id': [(6, 0, [cls.env.ref('sales_team.group_sale_manager').id])],
-                'company_id': cls.company_fr.id,
-            }
-        )
-
-        # Product and sale data
-        cls.category = (
+        # Product data
+        cls.category_margin_45 = (
             cls.env['product.category']
             .with_company(cls.company_fr)
             .create(
@@ -58,66 +26,15 @@ class TestOFSaleOrderMarginControl(TestOFAccountCommon):
             )
         )
 
-        cls.default_pricelist = (
-            cls.env['product.pricelist']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'default_pricelist',
-                    'currency_id': cls.company_fr.currency_id.id,
-                }
-            )
-        )
-
-        cls.product_brand = (
-            cls.env['of.product.brand']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'Test brand',
-                    'code': 'TB',
-                    'partner_id': cls.supplier_a.id,
-                }
-            )
-        )
-
-        cls.of_product_1 = cls.create_product(
+        cls.product_margin_control = cls.create_product(
             {
-                'name': 'of_product_test_margin_1',
-                'categ_id': cls.category.id,
+                'name': 'Product Margin Control',
+                'categ_id': cls.category_margin_45.id,
                 'standard_price': 40,
                 'list_price': 150,
-                'type': 'consu',
-                'weight': 0.01,
-                'uom_id': cls.env.ref('uom.product_uom_unit').id,
-                'uom_po_id': cls.env.ref('uom.product_uom_unit').id,
-                'brand_id': cls.product_brand.id,
-                'default_code': 'TB_TEST_1',
-                'invoice_policy': 'order',
-                'expense_policy': 'cost',
-                'taxes_id': [Command.set([cls.tax_base.id])],
-                'supplier_taxes_id': [(6, 0, [])],
+                'default_code': 'BA_PMC_123',
             }
         )
-
-    def _prepare_sale_order_values(self):
-        return {
-            'partner_id': self.customer_a.id,
-            'partner_invoice_id': self.customer_a.id,
-            'partner_shipping_id': self.customer_a.id,
-            'pricelist_id': self.default_pricelist.id,
-            'fiscal_position_id': self.fiscal_pos_5_5.id,
-            'order_line': [
-                Command.create(
-                    {
-                        'product_id': self.of_product_1.id,
-                        'product_uom_qty': 1,
-                        'tax_id': self.tax_base,
-                        'price_unit': 50,
-                    }
-                ),
-            ],
-        }
 
     def _create_and_confirm_sale_order_as_user(self, margin_control=False, as_user=None):
         """Create a sale order and confirm it as a given user.
@@ -133,7 +50,7 @@ class TestOFSaleOrderMarginControl(TestOFAccountCommon):
 
         config = self.env['res.config.settings'].create({'of_sale_order_margin_control': margin_control})
         config.execute()
-        order_values = self._prepare_sale_order_values()
+        order_values = self._prepare_sale_order_values(product=self.product_margin_control, price_unit=50)
         sale_order = self.env['sale.order'].with_user(as_user).create(order_values)
         self.assertEqual(
             float_compare(sale_order.of_margin_percent, 20.0, precision_digits=2),

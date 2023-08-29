@@ -12,12 +12,35 @@ class TestOFAccountCommon(TransactionCase):
 
     @classmethod
     def create_company(cls, values):
-        return cls.env["res.company"].create(values)
+        return cls.env['res.company'].create(values)
 
     @classmethod
     def create_product(cls, values):
-        values.update({'type': 'consu', 'invoice_policy': 'order'})
-        product_template = cls.env["product.template"].create(values)
+        if 'categ_id' not in values:
+            values['categ_id'] = cls.product_category_a.id
+        if 'standard_price' not in values:
+            values['standard_price'] = 40
+        if 'list_price' not in values:
+            values['list_price'] = 100
+        if 'type' not in values:
+            values['type'] = 'consu'
+        if 'weight' not in values:
+            values['weight'] = 0.01
+        if 'uom_id' not in values:
+            values['uom_id'] = cls.env.ref('uom.product_uom_unit').id
+        if 'uom_po_id' not in values:
+            values['uom_po_id'] = cls.env.ref('uom.product_uom_unit').id
+        if 'brand_id' not in values:
+            values['brand_id'] = cls.product_brand_a.id
+        if 'invoice_policy' not in values:
+            values['invoice_policy'] = 'order'
+        if 'expense_policy' not in values:
+            values['expense_policy'] = 'cost'
+        if 'taxes_id' not in values:
+            values['taxes_id'] = [Command.set([cls.tax_base.id])]
+        if 'supplier_taxes_id' not in values:
+            values['supplier_taxes_id'] = [Command.set([])]
+        product_template = cls.env['product.template'].create(values)
         return product_template.product_variant_id
 
     @classmethod
@@ -118,4 +141,40 @@ class TestOFAccountCommon(TransactionCase):
                 'company_id': cls.company_fr.id,
                 'supplier_rank': 1,
             }
+        )
+
+        # Price list data
+        cls.default_pricelist = (
+            cls.env['product.pricelist']
+            .with_company(cls.company_fr)
+            .create(
+                {
+                    'name': 'Default pricelist (EUR)',
+                    'currency_id': cls.company_fr.currency_id.id,
+                }
+            )
+        )
+
+        # Brand data
+        cls.product_brand_a = (
+            cls.env['of.product.brand']
+            .with_company(cls.company_fr)
+            .create(
+                {
+                    'name': 'Brand A',
+                    'code': 'BA',
+                    'partner_id': cls.supplier_a.id,
+                }
+            )
+        )
+
+        # Product data
+        cls.product_category_a = (
+            cls.env['product.category']
+            .with_company(cls.company_fr)
+            .create(
+                {
+                    'name': 'Category A',
+                }
+            )
         )
