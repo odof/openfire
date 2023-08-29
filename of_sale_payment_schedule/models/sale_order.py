@@ -57,13 +57,13 @@ class SaleOrder(models.Model):
         pct = 0
         result = [Command.clear()]
         for i, line in enumerate(payment_terms, 1):
-            pct_left -= pct
+            pct_left -= pct if self.amount_untaxed > 0 else line['value_amount']
             amount = line['company_amount']
             pct = round(100 * amount / amount_total, 2) if amount_total else 0
 
             line_vals = {
                 'name': line['name'],
-                'percent': pct,
+                'percent': pct if self.amount_untaxed > 0 else line['value_amount'],
                 'amount': amount,
                 'date': line['date'],
             }
@@ -111,8 +111,9 @@ class SaleOrder(models.Model):
 
     def of_recompute_last_payment_schedule(self):
         for order in self:
-            if not order.of_payment_schedule_ids:
-                self.of_payment_schedule_ids = self._of_compute_payment_schedule()
+            # Only draft and sent orders can have their payment schedule recomputed totally
+            if order.state in ('draft', 'sent') and order._get_payment_schedule_needs_recompute():
+                order.of_payment_schedule_ids = order._of_compute_payment_schedule()
                 continue
 
             percent = 100.0

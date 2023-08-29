@@ -21,6 +21,7 @@ class AccountPaymentTerm(models.Model):
             'name': line.of_name,
             'date': line._get_due_date(date_ref),
             'has_discount': line.discount_percentage,
+            'value_amount': line.value_amount,
             'discount_date': None,
             'discount_amount_currency': 0.0,
             'discount_balance': 0.0,
@@ -38,7 +39,11 @@ class AccountPaymentTerm(models.Model):
         untaxed_amount,
         untaxed_amount_currency,
     ):
-        """Get the distribution of this payment term.
+        """Override of account.payment.term._compute_terms to add the call of `_get_compute_terms_line_vals` method to
+        allow to override it in custom modules.
+
+        Get the distribution of this payment term.
+
         :param date_ref: The move date to take into account
         :param currency: the move's currency
         :param company: the company issuing the move
