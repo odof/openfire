@@ -23,7 +23,15 @@ class TestOFSaleCommon(TestOFAccountCommon):
                 'company_id': cls.company_fr.id,
             }
         )
-
+        cls.user_sale_responsible = cls.env['res.users'].create(
+            {
+                'name': 'user_sale_responsible',
+                'login': 'user_sale_responsible',
+                'email': 'user_sale_responsible@openfire.fr',
+                'groups_id': [(6, 0, [cls.env.ref('of_sale.of_group_sale_responsible').id])],
+                'company_id': cls.company_fr.id,
+            }
+        )
         cls.user_sale_manager = cls.env['res.users'].create(
             {
                 'name': 'user_sale_manager',
@@ -34,6 +42,7 @@ class TestOFSaleCommon(TestOFAccountCommon):
             }
         )
 
+        # Product data
         cls.product_consu_a = cls.create_product(
             {
                 'name': 'Product Consu A',

@@ -54,14 +54,18 @@ class SaleOrderLine(models.Model):
     def _compute_of_is_price_unit_readonly(self):
         """Compute the value of of_is_price_unit_readonly field
 
-        Sales responsible and sales manager can modify the unit price of the sale order line.
-        If the user has the group of_can_modify_sale_price_unit, he can modify the unit price of the sale order line
-        only if the product is not forbidden to discount.
+        Sales manager can modify the unit price of the sale order line.
+        Sales responsible can modify the unit price of the sale order line only if he have the group
+            `group_of_can_modify_sale_price_unit`.
+        And other users can modifiy the unit price if they have group `group_of_can_modify_sale_price_unit` and product
+        is not forbidden to discount.
         """
         for line in self:
             of_is_price_unit_readonly = True
-            if self.env.user.has_group('of_sale_no_discount.of_group_sale_responsible') or self.env.user.has_group(
-                'sales_team.group_sale_manager'
+            if self.env.user.has_group('sales_team.group_sale_manager'):
+                of_is_price_unit_readonly = False
+            elif self.env.user.user_has_groups(
+                'of_sale.of_group_sale_responsible+of_sale_no_discount.group_of_can_modify_sale_price_unit'
             ):
                 of_is_price_unit_readonly = False
             elif self.env.user.has_group('of_sale_no_discount.group_of_can_modify_sale_price_unit'):

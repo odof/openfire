@@ -18,7 +18,12 @@
                 <attribute name="attrs">{'readonly': [('of_is_price_unit_readonly', '=', True)]}</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='of_discount_formula']" position="attributes">
-                <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                <attribute name="attrs">
+                    {
+                        'readonly': [('of_is_price_unit_readonly', '=', True)],
+                        'invisible': [('of_is_price_unit_readonly', '=', True), ('of_product_forbidden_discount', '=', True)]
+                    }
+                </attribute>
             </xpath>
         </field>
     </record>
