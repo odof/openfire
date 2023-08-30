@@ -173,7 +173,7 @@ class StockInventoryLine(models.Model):
         if self.env.user.has_group('of_sale_stock.group_of_inventory_real_value'):
             if not self.env['ir.values'].get_default('stock.config.settings', 'of_forcer_date_inventaire'):
                 for line in self:
-                    line.product_value = sum([x.qty * x.cost for x in line._get_quants()])
+                    line.product_value = sum(x.qty * x.cost for x in line._get_quants())
             else:
                 for line in self:
                     line.product_value = line.of_get_stock_history()[1]

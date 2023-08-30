@@ -43,6 +43,7 @@ Paramètres de ventes
         'report/of_report_deliveryslip.xml',
         'report/of_stock_reports.xml',
         'wizard/of_report_tableur_wizard_view.xml',
+        'wizard/of_stock_inventory_valuation_views.xml',
     ],
     'installable': True,
     'application': False,
