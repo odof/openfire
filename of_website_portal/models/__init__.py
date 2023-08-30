@@ -6,6 +6,7 @@ from . import planning
 from . import sale_order
 from . import res_config
 from . import res_users
+from . import res_company
 from . import website
 from . import res_partner
 from . import post_update

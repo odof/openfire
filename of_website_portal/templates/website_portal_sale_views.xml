@@ -157,4 +157,12 @@
         </xpath>
     </template>
 
+    <template id="contact" inherit_id="base.contact">
+        <xpath expr="//span[@t-esc='email']" position="replace">
+            <a itemprop="url" t-attf-href="mailto:#{email}">
+                <span itemprop="email" t-esc="email"/>
+            </a>
+        </xpath>
+    </template>
+
 </odoo>
