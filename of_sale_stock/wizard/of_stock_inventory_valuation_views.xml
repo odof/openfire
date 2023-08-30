@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_stock_inventory_valuation_view_form" model="ir.ui.view">
+        <field name="name">Inventaire valorisé</field>
+        <field name="model">of.stock.inventory.valuation</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="allowed_company_ids" invisible="1"/>
+                    <field name="company_id" options="{'no_open':True, 'no_create':True}"/>
+                    <field name="location_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="date"/>
+                    <field name="brand_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="categ_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="file_name" invisible="1"/>
+                    <field name="inventory_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                    <span attrs="{'invisible': [('file', '=', False)]}">
+                        Télécharger
+                        <field name="file" filename="file_name" readonly="1"/>
+                        ou
+                    </span>
+                    <button string="(Re)générer le document" name="action_generate_excel_file" type="object" class="btn-primary"/>
+                </footer>
+            </form>
+            </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_of_stock_inventory_valuation">
+        <field name="name">Inventaire valorisé</field>
+        <field name="res_model">of.stock.inventory.valuation</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem name="Rapport inventaire valorisé"
+              action="action_of_stock_inventory_valuation"
+              id="menu_of_stock_inventory_valuation"
+              parent="stock.menu_warehouse_report"
+              sequence="70"/>
+
+</odoo>

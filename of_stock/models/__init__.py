@@ -6,3 +6,4 @@ from . import stock_picking
 from . import procurement
 from . import sale
 from . import purchase
+from . import stock_history
