@@ -4,3 +4,4 @@
 from . import of_report_tableur_wizard
 from . import of_delivery_division_wizard
 from . import of_additional_delivery_wizard
+from . import of_stock_inventory_valuation
