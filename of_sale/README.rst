@@ -18,10 +18,14 @@ Clients
     - facturation sur les quantités livrées.
 
 
+Produits:
+---------
+
+* Modification de **la vue des produits ouverte par défaut depuis le menu "Ventes > Produits > Produits""**, c'est la vue liste qui est ouverte par défaut et non plus la vue kanban
+
+
 Ventes
 ------
-
-* Modification de **la vue des commandes ouverte par défaut depuis la fiche produit**, c'est la vue liste qui est ouverte par défaut et non plus la vue kanban
 
 * Mise en place du socle technique pour les vérifications à effectuer lors de la confirmation de commande
     - le bouton standard de confirmation de commande est remplacé par un bouton personnalisé qui permet de faire les vérifications et de confirmer la commande si tout est ok.
