@@ -512,15 +512,22 @@ class SaleOrder(models.Model):
     @api.multi
     def write(self, vals):
         mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
+        old_vendor_list = []
         if mail_subtype and vals.get('partner_id'):
             old_partner_ids = self.mapped('partner_id')._ids
+            # Récupération du vendeur des clients
+            for partner_id in old_partner_ids:
+                old_partner_id = self.env['res.partner'].browse(partner_id)
+                if old_partner_id.user_id.partner_id:
+                    old_vendor_list.append(old_partner_id.user_id.partner_id.id)
+            if old_vendor_list:
+                old_partner_ids = old_partner_ids + tuple(old_vendor_list)
         res = super(SaleOrder, self).write(vals)
         if mail_subtype and vals.get('partner_id'):
             # subscribe new partner and unsunscribe the old ones
             self.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
             message_followers = self.mapped('message_follower_ids')
-            message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids)\
-                             .write({'subtype_ids': [(3, mail_subtype.id)]})
+            message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids).unlink()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
