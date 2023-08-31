@@ -1136,6 +1136,7 @@ class SaleOrderLine(models.Model):
                 if self.product_id.product_tmpl_id.of_product_image_ids:
                     of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
                     self.of_product_image_ids = self.product_id.product_tmpl_id.of_product_image_ids
+                    res.setdefault('domain', {})
                     res['domain']['of_product_image_ids'] = [('id', 'in', of_product_image_ids.ids)]
             if self.env.user.has_group('of_sale.group_of_sale_print_attachment'):
                 attachment_ids = self.env['ir.attachment'].search(
