@@ -47,6 +47,34 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//div[@id='down_payments']" position="before">
+                <div class="col-12 col-lg-6 o_setting_box" id="of_grouped_invoicing">
+                    <div class="o_setting_left_pane">
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_grouped_invoicing"/>
+                        <div class="text-muted">
+                            Group invoicing on sale orders
+                        </div>
+                        <div class="mt16">
+                            <field name="of_grouped_invoicing" class="o_light_label" widget="radio" style="display: inline;" />
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//div[@id='down_payments']" position="after">
+                <div class="col-24 col-lg-6 o_setting_box" id="of_stop_payment_term_propagation">
+                    <div class="o_setting_left_pane">
+                        <field name="of_stop_payment_term_propagation"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_stop_payment_term_propagation"/>
+                        <div class="text-muted">
+                            If checked that will stop the propagation of the payment term from the sale order to the invoice
+                        </div>
+                    </div>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='deposit_default_product_id']/.." position="after">
                 <div class="text-muted">
                     (OF) Category of items used for down payments
@@ -98,30 +126,6 @@
                         <label for="of_allow_quote_addition"/>
                         <div class="text-muted">
                             Allow additional quotes to be added to sale orders
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-lg-6 o_setting_box" id="of_grouped_invoicing">
-                    <div class="o_setting_left_pane">
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="of_grouped_invoicing"/>
-                        <div class="text-muted">
-                            Group invoicing on sale orders
-                        </div>
-                        <div class="mt16">
-                            <field name="of_grouped_invoicing" class="o_light_label" widget="radio" style="display: inline;" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-24 col-lg-6 o_setting_box" id="of_stop_payment_term_propagation">
-                    <div class="o_setting_left_pane">
-                        <field name="of_stop_payment_term_propagation"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="of_stop_payment_term_propagation"/>
-                        <div class="text-muted">
-                            If checked that will stop the propagation of the payment term from the sale order to the invoice
                         </div>
                     </div>
                 </div>
