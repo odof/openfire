@@ -384,6 +384,7 @@
                 <filter string="Disponible" domain="[('of_stock_moves_state', '=', 'assigned')]"/>
                 <filter string="Fait" domain="[('of_stock_moves_state', '=', 'done')]"/>
                 <filter string="Annulé" domain="[('of_stock_moves_state', '=', 'cancel')]"/>
+                <filter string="Indéfini" domain="[('of_stock_moves_state', 'not in', ['draft','cancel','waiting','confirmed','assigned','done'])]"/>
                 <separator/>
                 <filter string="Produit stockable" domain="[('of_product_type', '=', 'product')]"/>
             </xpath>
