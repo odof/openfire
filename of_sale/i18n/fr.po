@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-27 12:42+0000\n"
-"PO-Revision-Date: 2023-06-27 12:42+0000\n"
+"POT-Creation-Date: 2023-08-31 13:15+0000\n"
+"PO-Revision-Date: 2023-08-31 13:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -31,18 +31,6 @@ msgstr "(OF) Catégorie d'articles utilisés pour les acomptes"
 #: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_validate_pickings_on_move
 msgid "(OF) Delivery notes management in Customer Invoice"
 msgstr "(OF) Gestion des bons de livraison dans la facture client"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
-msgid "(OF) Display subtotals taxes excl. by sales order line"
-msgstr ""
-"(OF) Affichage des sous-totaux taxes excluses par ligne de commande client"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
-msgid "(OF) Display subtotals taxes incl. by sales order line"
-msgstr ""
-"(OF) Affichage des sous-totaux taxes incluses par ligne de commande client"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_deposit_product_categ_id
@@ -189,7 +177,7 @@ msgstr "<span>Prix unitaire</span>"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "<strong>Total</strong>"
-msgstr "<strong>Total</strong>"
+msgstr ""
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
@@ -302,27 +290,10 @@ msgstr ""
 "confirmation de commande."
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_warn_block
-#: model:ir.model.fields,field_description:of_sale.field_res_users__of_warn_block
-msgid "Blocking"
-msgstr "Bloquant"
-
-#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_add_quote_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_confirmation_view_form
 msgid "Cancel"
 msgstr "Annuler"
-
-#. module: of_sale
-#. odoo-python
-#: code:addons/of_sale/monkeypatch.py:0
-#, python-format
-msgid ""
-"Cannot find a chart of accounts for this company, You should configure it. \n"
-"Please go to Account Configuration."
-msgstr ""
-"Impossible de trouver un plan comptable pour cette société. Il vous faut le configurer.\n"
-"Veuillez aller dans les configurations comptables"
 
 #. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_deposit_product_categ_id
@@ -468,7 +439,7 @@ msgstr "Customisez la couleur de fond et la police de vos titres de section"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
@@ -515,10 +486,20 @@ msgid "Display Name"
 msgstr ""
 
 #. module: of_sale
+#: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
+msgid "Display subtotals taxes excl. by sales order line"
+msgstr "Affichage des sous-totaux taxes excluses par ligne de commande client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_exclued_total_in_so_lines
 #: model:ir.model.fields,field_description:of_sale.field_res_config_settings__group_of_display_tax_exclued_total_in_so_lines
 msgid "Display subtotals taxes excl. per order line"
 msgstr "Afficher les sous-totaux HT par ligne de commande"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
+msgid "Display subtotals taxes incl. by sales order line"
+msgstr "Affichage des sous-totaux taxes incluses par ligne de commande client"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_inclued_total_in_so_lines
@@ -608,6 +589,11 @@ msgid "Down payment of %s%%"
 msgstr "Acompte de %s%%"
 
 #. module: of_sale
+#: model:mail.message.subtype,name:of_sale.mt_of_sale_mail_subscribtion
+msgid "E-Mail"
+msgstr "E-mail"
+
+#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
 msgid "Enable order line options"
 msgstr "Activer les options de la ligne de commande"
@@ -653,13 +639,6 @@ msgstr "Entièrement facturée"
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_sales_order_filter
 msgid "Fully invoicable"
 msgstr "Entièrement facturable"
-
-#. module: of_sale
-#. odoo-python
-#: code:addons/of_sale/monkeypatch.py:0
-#, python-format
-msgid "Go to the configuration panel"
-msgstr "Aller au panneau de configuration"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
@@ -745,17 +724,6 @@ msgid "Intervention notes"
 msgstr "Notes intervention"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner__invoice_warn
-#: model:ir.model.fields,field_description:of_sale.field_res_users__invoice_warn
-msgid "Invoice"
-msgstr "Facture"
-
-#. module: of_sale
-#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__invoice
-msgid "Invoice date"
-msgstr "Date de facture"
-
-#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
 msgid "Invoiced"
 msgstr ""
@@ -819,6 +787,12 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_last_order_date
+#: model:ir.model.fields,field_description:of_sale.field_res_users__of_last_order_date
+msgid "Last quote date"
+msgstr "Date du dernier devis"
+
+#. module: of_sale
 #. odoo-python
 #: code:addons/of_sale/wizard/of_sale_order_add_quote.py:0
 #, python-format
@@ -841,11 +815,6 @@ msgid "Locked"
 msgstr "Verrouillé"
 
 #. module: of_sale
-#: model:mail.message.subtype,name:of_sale.mt_of_sale_mail_subscribtion
-msgid "Mail"
-msgstr ""
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_product_category__of_main_product
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_main_product
 msgid "Main product"
@@ -865,7 +834,6 @@ msgstr "Manuel"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__message
-#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
 msgid "Message"
 msgstr ""
 
@@ -874,6 +842,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale.field_res_users__sale_warn_msg
 msgid "Message for Sales Order"
 msgstr "Message pour la commande client"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_ir_module_module
+msgid "Module"
+msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_account_bank_statement_line__of_picking_count
@@ -901,11 +874,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "Number"
 msgstr "Numéro"
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
-msgid "Object(s)"
-msgstr "Objet(s)"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
@@ -973,11 +941,6 @@ msgid "Order State"
 msgstr "État de la commande"
 
 #. module: of_sale
-#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__order
-msgid "Order date"
-msgstr "Date de commande"
-
-#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_tree
 msgid "Ordered qty(ies)"
 msgstr "Qté(s) commandée(s)"
@@ -1009,16 +972,6 @@ msgstr "Étiquette partenaire"
 #: model_terms:ir.ui.view,arch_db:of_sale.of_view_sales_order_line_filter
 msgid "Partner tags"
 msgstr "Étiquettes partenaire"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_account_payment_term_line
-msgid "Payment Terms Line"
-msgstr "Détail des conditions de paiement"
-
-#. module: of_sale
-#: model:ir.model.fields.selection,name:of_sale.selection__account_payment_term_line__of_option_date__previous
-msgid "Previous term"
-msgstr "Échéance précédente"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_price_date_display
@@ -1085,11 +1038,6 @@ msgstr "Étiquettes produit"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__quote_id
 msgid "Quote to add"
 msgstr "Devis à ajouter"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_account_payment_term_line__of_option_date
-msgid "Reference date"
-msgstr "Date de référence"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_sales_order_filter
@@ -1326,6 +1274,14 @@ msgstr ""
 "commande."
 
 #. module: of_sale
+#: model:ir.model.fields,help:of_sale.field_account_move_line__price_unit
+msgid ""
+"Unit price of the product. To enter without VAT or with VAT according to the"
+" invoice line."
+msgstr ""
+"Prix unitaire du produit. À saisir HT ou TTC selon la ligne de facture."
+
+#. module: of_sale
 #: model:ir.model.fields,help:of_sale.field_sale_order_line__of_price_unit_taxinc
 msgid "Unit price with taxes"
 msgstr "Prix unitaire TTC"
@@ -1353,25 +1309,6 @@ msgid "Validate linked Pickings"
 msgstr "Valider les BL liés"
 
 #. module: of_sale
-#. odoo-python
-#: code:addons/of_sale/monkeypatch.py:0
-#, python-format
-msgid "Warning for %s"
-msgstr "Avertissement pour %s"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_res_partner__of_is_warn
-#: model:ir.model.fields,field_description:of_sale.field_res_users__of_is_warn
-msgid "Warning on at least one object"
-msgstr "Avertissement sur au moins un objet"
-
-#. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_res_partner__invoice_warn
-#: model:ir.model.fields,help:of_sale.field_res_users__invoice_warn
-msgid "Warning type"
-msgstr "Type d'avertissement"
-
-#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
 msgid ""
 "Warning: We have changed the \"Line subtotals tax display\" option in the "
@@ -1388,11 +1325,6 @@ msgid ""
 msgstr ""
 "Avertissement : Nous avons changé l'option \"Affichage des sous-totaux de "
 "ligne\" dans les paramètres de comptabilité (de B2C à B2B)"
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
-msgid "Warnings"
-msgstr "Avertissements"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_of_sale_order_add_quote_wizard
@@ -1428,16 +1360,6 @@ msgstr "Vous devez d'abord configurer un article d'acompte"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
 msgid "days"
-msgstr ""
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_res_partner_warnings_form_view
-msgid "invoices"
-msgstr "factures"
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_account_move_hooks_installed
-msgid "of.account.move.hooks.installed"
 msgstr ""
 
 #. module: of_sale
