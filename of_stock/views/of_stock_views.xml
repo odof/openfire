@@ -69,6 +69,9 @@
                 <field name="of_brand_ids" attrs="{'invisible': [('filter', 'not in',['categories'])], 'required': [('filter', 'in', ['categories']), ('of_category_compute', '=', False)], 'readonly': [('state', '!=', 'draft')]}" options="{'no_create': True}" widget="many2many_tags"/>
                 <field name="of_brand_compute" invisible="1"/>
             </xpath>
+            <xpath expr="//field[@name='exhausted']" position="attributes">
+                <attribute name="groups">of_base.of_group_root_only</attribute>
+            </xpath>
             <xpath expr="//field[@name='exhausted']" position="after">
                 <field name="of_quant_state" widget="radio" attrs="{'readonly': [('state', '!=', 'draft')]}" groups="of_stock.stock_inventory_group_advanced_quant_inventory"/>
             </xpath>
