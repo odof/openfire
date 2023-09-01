@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_config_settings_view_form" model="ir.ui.view">
+        <field name="name">stock.config.settings.view.form</field>
+        <field name="model">stock.config.settings</field>
+        <field name="inherit_id" ref="stock.view_stock_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='module_procurement_jit']" position="after">
+                <label for="of_auto_reserve"/>
+                <div name="of_auto_reserve">
+                    <field name="of_auto_reserve" class="oe_inline"/>
+                    <span> Passage des réservations dans l'onglet 'Opérations' du Bon de livraison à la validation de la commande</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

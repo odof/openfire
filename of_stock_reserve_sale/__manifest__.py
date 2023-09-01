@@ -26,6 +26,7 @@ Module permettant la réservation d'articles en stock depuis les commandes de ve
         'views/sale_order_views.xml',
         'views/stock_picking_views.xml',
         'views/stock_reserve_views.xml',
+        'views/res_config_settings_views.xml',
     ],
     'installable': True,
     'application': False,
