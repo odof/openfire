@@ -196,6 +196,34 @@
         </field>
     </record>
 
+    <!-- Synchro comptage tdb / tree view -> Statut : En retard -->
+    <record id="stock.action_picking_tree_late" model="ir.actions.act_window">
+        <field name="context">{
+            'search_default_picking_type_id': [active_id],
+            'default_picking_type_id': active_id,
+            'contact_display': 'partner_address',
+            'search_default_late': 1,
+            'search_default_confirmed': 1,
+            'search_default_available': 1,
+            'search_default_waiting': 1,
+            }
+        </field>
+    </record>
+
+    <!-- Synchro comptage tdb / tree view -> Statut : Reliquats -->
+    <record id="stock.action_picking_tree_backorder" model="ir.actions.act_window">
+        <field name="context">{
+            'search_default_picking_type_id': [active_id],
+            'default_picking_type_id': active_id,
+            'contact_display': 'partner_address',
+            'search_default_backorder': 1,
+            'search_default_confirmed': 1,
+            'search_default_available': 1,
+            'search_default_waiting': 1,
+            }
+        </field>
+    </record>
+
     <record id="view_of_move_picking_tree" model="ir.ui.view">
         <field name="name">of.stock.move.tree</field>
         <field name="model">stock.move</field>
