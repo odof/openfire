@@ -40,6 +40,18 @@ class SaleOrder(models.Model):
         self.mapped('order_line').release_stock_reservations()
         return super(SaleOrder, self).action_done()
 
+    @api.multi
+    def action_confirm(self):
+        auto_reserve = self.env['ir.values'].get_default('stock.config.settings', 'of_auto_reserve')
+        res = super(SaleOrder, self).action_confirm()
+        if auto_reserve:
+            for line in self.mapped('order_line').filtered('of_reservation_ids'):
+                quants = line.mapped('of_reservation_ids.reserved_quant_ids')
+                line.release_stock_reservations()
+                moves = line.mapped('procurement_ids.move_ids')
+                moves.reservation_to_operation(quants)
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

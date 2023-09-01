@@ -5,3 +5,5 @@ from . import stock_location
 from . import stock_reserve
 from . import sale_order
 from . import stock_picking
+from . import stock
+from . import res_config_settings
