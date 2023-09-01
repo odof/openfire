@@ -742,6 +742,11 @@ class GestionPrixLine(models.TransientModel):
             'tax_id': [(6, 0, [self.discount_tax_ids.ids])],
             'customer_lead': 0,
         }
+        if self.env.user.has_group('sale.group_sale_layout'):
+            # Ajout de la section
+            layout = self.product_id.of_layout_category_id or self.product_id.categ_id.of_layout_id
+            if layout:
+                res['layout_category_id'] = layout.id
         return res
 
 
