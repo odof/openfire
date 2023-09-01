@@ -29,9 +29,9 @@ class OFStockInventoryValuation(models.TransientModel):
         domain="[('id', 'in', allowed_company_ids[0][2])]")
     date = fields.Datetime(string="Date de stock", required=True)
     brand_ids = fields.Many2many(comodel_name='of.product.brand', string="Marques")
-    categ_ids = fields.Many2many(comodel_name='product.category', string="Catégories")
+    categ_ids = fields.Many2many(comodel_name='product.category', string=u"Catégories")
     file = fields.Binary(string='Fichier')
-    file_name = fields.Char(string='Nom du fichier', default='inventaire_valorisé.xlsx')
+    file_name = fields.Char(string='Nom du fichier', default=u"inventaire_valorisé.xlsx")
     inventory_ids = fields.Many2many(
         comodel_name='stock.inventory', string="Inventaires",
         domain="[('state', '=', 'confirm'), "
@@ -283,7 +283,7 @@ class OFStockInventoryValuation(models.TransientModel):
         styles = self._get_styles_excel(workbook)
 
         # --- Création de la page ---
-        worksheet = workbook.add_worksheet("Inventaire valorisé " + self.date)
+        worksheet = workbook.add_worksheet(u"Inventaire valorisé " + self.date)
         worksheet.set_paper(9)  # Format d'impression A4
         worksheet.set_landscape()  # Format d'impression paysage
         worksheet.set_margins(left=0.35, right=0.35, top=0.2, bottom=0.2)
@@ -302,7 +302,7 @@ class OFStockInventoryValuation(models.TransientModel):
         worksheet.set_column(10, 8, 13)  # Largeur colonne 'Valorisation (Valeur définitive)'
 
         # --- Entête ---
-        worksheet.merge_range(0, 0, 0, 2, "Nom du fichier", styles['text_title_ita_border'])
+        worksheet.merge_range(0, 0, 0, 2, u"Nom du fichier", styles['text_title_ita_border'])
         worksheet.merge_range(0, 3, 0, 5, u"Date de l'inventaire", styles['text_title_ita_border'])
         worksheet.merge_range(0, 6, 0, 10, u"Société", styles['text_title_ita_border'])
         worksheet.merge_range(1, 0, 1, 2, u"Inventaire valorisé", styles['text_title_border'])
@@ -315,9 +315,9 @@ class OFStockInventoryValuation(models.TransientModel):
         # --- Ajout des lignes ---
         line_number = 3
         worksheet.merge_range(line_number, 0, line_number + 1, 0, u"Emplacement", styles['text_title_border'])
-        worksheet.merge_range(line_number, 1, line_number + 1, 1, "Article", styles['text_title_border'])
+        worksheet.merge_range(line_number, 1, line_number + 1, 1, u"Article", styles['text_title_border'])
         worksheet.merge_range(line_number, 2, line_number + 1, 2, u"Catégorie", styles['text_title_border'])
-        worksheet.merge_range(line_number, 3, line_number + 1, 3, "Marque", styles['text_title_border'])
+        worksheet.merge_range(line_number, 3, line_number + 1, 3, u"Marque", styles['text_title_border'])
         worksheet.merge_range(line_number, 4, line_number + 1, 4, u"N° de série interne", styles['text_title_border'])
         worksheet.merge_range(line_number, 5, line_number, 6, u"Stock réel", styles['text_title_ita_border'])
         worksheet.merge_range(line_number, 7, line_number, 8, u"Ajustement de stock", styles['text_title_ita_border'])
@@ -325,11 +325,11 @@ class OFStockInventoryValuation(models.TransientModel):
 
         line_number += 1
         worksheet.write(line_number, 5, u"Quantité", styles['text_title_border'])
-        worksheet.write(line_number, 6, "Valorisation", styles['text_title_border'])
+        worksheet.write(line_number, 6, u"Valorisation", styles['text_title_border'])
         worksheet.write(line_number, 7, u"Quantité", styles['text_title_border'])
-        worksheet.write(line_number, 8, "Valorisation", styles['text_title_border'])
+        worksheet.write(line_number, 8, u"Valorisation", styles['text_title_border'])
         worksheet.write(line_number, 9, u"Quantité", styles['text_title_border'])
-        worksheet.write(line_number, 10, "Valorisation", styles['text_title_border'])
+        worksheet.write(line_number, 10, u"Valorisation", styles['text_title_border'])
 
         line_number += 1
 
