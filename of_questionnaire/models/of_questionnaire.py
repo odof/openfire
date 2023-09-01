@@ -164,7 +164,6 @@ class OfPlanningIntervention(models.Model):
             'name': question.name,
             'sequence': question.sequence,
             'answer_type': question.answer_type,
-            'possible_answer': question.answer,
             'category_id': question.category_id.id,
             'intervention_id': self.id,
             'type': question.type,
@@ -200,10 +199,19 @@ class OfPlanningIntervention(models.Model):
         # pour ne pas avoir de problèmes avec la contrainte d'unicité au moment de sauvegarder
         question_line_obj = self.env['of.planning.intervention.question']
         question_line = question_line_obj
-        for question in self.template_id.question_ids.filtered(
-                lambda q: not q.id_code or q.id_code not in self.question_ids.mapped('id_code')):
+        questions_dict = {
+            question.id_code: question
+            for question in self.question_ids
+            if question.id_code
+        }
+        for question in self.template_id.question_ids:
             vals = self._get_question_vals(question)
-            question_line += question_line_obj.new(vals)
+            interv_question = questions_dict.get(question.id_code)
+            if interv_question:
+                interv_question.update(vals)
+            else:
+                interv_question = question_line_obj.new(vals)
+            question_line += interv_question
         self.question_ids = question_line
 
     @api.onchange('parc_installe_id')
@@ -360,7 +368,6 @@ class OfParcInstalle(models.Model):
             'name': question.name,
             'sequence': question.sequence,
             'answer_type': question.answer_type,
-            'possible_answer': question.answer,
             'category_id': question.category_id.id,
             'parc_installe_id': self.id,
             'type': question.type,

@@ -1116,6 +1116,8 @@ class OfPlanningIntervention(models.Model):
                 # We don't want to rechange task if user has changed it manually after the template selection
                 # when creating an intervention from a Contact
                 self.tache_id = template.tache_id
+                if self.tache_id.duree:
+                    self.duree = self.tache_id.duree
             # On change la position fiscale par celle du modèle si celle présente n'est pas sur la même société
             # comptable que le RDV ou si il n'y en a pas ET qu'il n'y a pas de lien vers une commande
             change_fiscal_pos = False
@@ -1129,7 +1131,7 @@ class OfPlanningIntervention(models.Model):
                     (not self.fiscal_position_id or change_fiscal_pos):
                 self.fiscal_position_id = template_accounting.fiscal_position_id
             if not self._context.get('of_intervention_wizard', False) or self._context.get('of_from_contact_form'):
-                new_lines = self.line_ids or intervention_line_obj
+                new_lines = intervention_line_obj
                 for line in template.line_ids:
                     data = line.get_intervention_line_values()
                     data['intervention_id'] = self.id
