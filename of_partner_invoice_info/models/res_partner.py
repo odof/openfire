@@ -11,6 +11,11 @@ class ResPartner(models.Model):
         compute='_compute_of_invoice_balance_total', string=u"Montant facturé dû",)
     of_sale_order_to_invoice_amount = fields.Monetary(
         compute='_compute_of_sale_order_to_invoice_amount', string=u"Montant à facturer")
+    of_invoice_balance_max = fields.Float(
+        string="Encours maximum",
+        help=u"Encours maximum autorisé pour ce client. Une valeur à 0 indique qu'il n'y a pas de limite.")
+    of_invoice_balance_max_exceeded = fields.Boolean(
+        compute="_compute_of_invoice_balance_max_exceeded", string="Encours maximum dépassé", store=True)
 
     # Champs ajoutés pour recherche dans les filtres personnalisés
     of_is_to_invoice = fields.Boolean(
@@ -75,6 +80,12 @@ class ResPartner(models.Model):
                 if partner in self:
                     partner.of_sale_order_to_invoice_amount += group['amount_total']
                 partner = partner.parent_id
+
+    @api.depends('invoice_ids.residual', 'of_invoice_balance_max')
+    def _compute_of_invoice_balance_max_exceeded(self):
+        for partner in self:
+            partner.of_invoice_balance_max_exceeded =\
+                partner.of_invoice_balance_max and partner.of_invoice_balance_total > partner.of_invoice_balance_max
 
     @api.model
     def _search_of_is_to_invoice(self, operator, value):

@@ -16,6 +16,7 @@ Ajout d'informations liées à la facturation dans la fiche du partenaire.
 
 - Smart-button des factures non soldées
 - Smart-button des commandes à facturer
+- Information d'encours maximum et de dépassement de ce montant
 """,
     'depends': ['sale'],
     'data': [

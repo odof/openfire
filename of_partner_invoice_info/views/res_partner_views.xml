@@ -38,4 +38,16 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_partner_property_form" model="ir.ui.view">
+        <field name="name">of.partner.view.invoice.balance.max</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='credit']" position="after">
+                <field name="of_invoice_balance_max"/>
+                <field name="of_invoice_balance_max_exceeded"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
