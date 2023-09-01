@@ -1109,8 +1109,7 @@ class OfPlanningIntervention(models.Model):
         template_accounting = template.sudo().with_context(
             force_company=self.company_id.id or self.env.user.company_id.id)
         # context ajouté dans of_service pour initialiser les champs d'un RDV. Utile ici pour prioriser la DI
-        if (self.state == "draft" or
-                (self.state == 'confirm' and self._context.get('of_intervention_wizard'))) and \
+        if (self.state in ['draft', 'confirm']) and \
                 template and not self._context.get('of_import_service_lines'):
             if template.tache_id and not self._context.get('of_from_contact_form'):
                 # We don't want to rechange task if user has changed it manually after the template selection
