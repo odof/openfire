@@ -85,6 +85,8 @@
                             <field name="state"/>
                             <field name="name" string="Libellé"/>
                             <field name="description" string="Description"/>
+                            <button name="%(of_planning_raport_intervention_report)d"  icon="fa-print"
+                                    string="Imprimer" type="action" help="Imprimer le rapport d'intervention"/>
                         </tree>
                     </field>
                     <field name="intervention_address_ids" colspan="4" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}"
