@@ -16,7 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
-        'wizard/of_sale_price_management_views.xml',
+        'wizards/of_sale_price_management_views.xml',
         'report/of_sale_price_management_template.xml',
     ],
     'installable': True,

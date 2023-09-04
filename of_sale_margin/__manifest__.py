@@ -21,7 +21,7 @@
         'views/sale_order_views.xml',
         'views/sale_order_line_views.xml',
         'views/product_template_views.xml',
-        'wizard/of_sale_order_verification_views.xml'
+        'wizards/of_sale_order_verification_views.xml'
     ],
     'installable': True,
     'application': False,

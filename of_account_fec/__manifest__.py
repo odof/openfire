@@ -13,7 +13,7 @@
         'l10n_fr_fec',
     ],
     'data': [
-        'wizard/of_account_fec_view.xml',
+        'wizards/of_account_fec_view.xml',
     ],
     'installable': True,
     'application': False,

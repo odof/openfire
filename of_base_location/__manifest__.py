@@ -18,9 +18,9 @@
         'views/res_city_zip_views.xml',
         'views/of_sector_views.xml',
         'views/res_partner_views.xml',
-        'wizard/of_res_partner_assign_sector_wizard_views.xml',
-        'wizard/of_res_partner_update_sector_wizard_views.xml',
-        'wizard/of_secteur_update_delete_wizard_views.xml',
+        'wizards/of_res_partner_assign_sector_wizard_views.xml',
+        'wizards/of_res_partner_update_sector_wizard_views.xml',
+        'wizards/of_secteur_update_delete_wizard_views.xml',
     ],
     'installable': True,
 }

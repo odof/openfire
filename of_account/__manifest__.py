@@ -27,7 +27,7 @@
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',
-        'wizard/of_mark_account_move_as_exported_view.xml',
+        'wizards/of_mark_account_move_as_exported_view.xml',
     ],
     'installable': True,
     'application': False,

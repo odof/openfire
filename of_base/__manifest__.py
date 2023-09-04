@@ -38,10 +38,10 @@
         'views/res_users_views.xml',
         'views/login_templates.xml',
         'views/inactive_user_templates.xml',
-        'wizard/base_module_upgrade_view.xml',
-        'wizard/mail_compose_message_views.xml',
-        'wizard/of_popup_wizard_view.xml',
-        'wizard/of_res_partner_check_duplications_views.xml',
+        'wizards/base_module_upgrade_view.xml',
+        'wizards/mail_compose_message_views.xml',
+        'wizards/of_popup_wizard_view.xml',
+        'wizards/of_res_partner_check_duplications_views.xml',
     ],
     'external_dependencies': {
         'python': [

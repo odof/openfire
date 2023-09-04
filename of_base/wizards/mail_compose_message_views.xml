@@ -10,7 +10,7 @@
                 <field name="of_computed_body" options="{'style-inline': true}" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
             </xpath>
             <xpath expr="//footer/button[@special='cancel']" position="after">
-                <button string="(Re)compute the text field" name="button_reload_computed_body" type="object" 
+                <button string="(Re)compute the text field" name="button_reload_computed_body" type="object"
                     class="btn-primary" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
             </xpath>
         </field>

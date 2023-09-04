@@ -2,5 +2,5 @@
 
 from . import monkeypatch
 from . import models
-from . import wizard
+from . import wizards
 from .hooks import post_init_hook

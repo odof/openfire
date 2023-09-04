@@ -14,7 +14,7 @@
     ],
     'data': [
         'views/sale_order_views.xml',
-        'wizard/of_sale_price_management_views.xml'
+        'wizards/of_sale_price_management_views.xml'
     ],
     'installable': True,
     'application': False,
