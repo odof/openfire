@@ -290,7 +290,7 @@ class SaleOrder(models.Model):
 
     def action_button_add_quote(self):
         self.ensure_one()
-        if self.state != 'sale':
+        if self.state not in self._get_valid_states_to_add_quote():
             raise UserError("You cannot add a complementary quote to a non-validated order.")
 
         wizard = self.env['of.sale.order.add.quote.wizard'].create(
@@ -393,6 +393,9 @@ class SaleOrder(models.Model):
         if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_confirmation_date_mode') == 'manual':
             values['date_order'] = self.of_date_order
         return values
+
+    def _get_valid_states_to_add_quote(self):
+        return ['sale', 'done']
 
     # -------------------------------------------------------------------------
     # Report methods
