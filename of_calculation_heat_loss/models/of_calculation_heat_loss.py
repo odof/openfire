@@ -227,7 +227,7 @@ class OFCalculationHeatLoss(models.Model):
                 rec.temperature - reference_temperature)
             rec.write({
                 'estimated_power': estimated_power,
-                'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt/h"),
+                'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt"),
             })
         if errors:
             return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")
