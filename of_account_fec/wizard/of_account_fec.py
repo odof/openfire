@@ -105,7 +105,7 @@ class OFAccountFrFec(models.TransientModel):
             AND am.company_id = %s
             AND aa.include_initial_balance IS NOT TRUE
             AND am.journal_id IN %s
-        '''
+        '''  # nosec B608
 
         if self.export_type == 'nonofficial_posted':
             sql_query += '''
@@ -355,7 +355,7 @@ class OFAccountFrFec(models.TransientModel):
             AND am.company_id = %s
             AND aa.include_initial_balance IS TRUE
             AND am.journal_id IN %s
-        '''
+        '''  # nosec B608
 
         if self.export_type == 'nonofficial_posted':
             sql_query += '''
@@ -452,7 +452,7 @@ class OFAccountFrFec(models.TransientModel):
             {date_clause}
             AND am.company_id = %s
             AND am.journal_id IN %s
-        '''
+        '''  # nosec B608
 
         if self.export_type == 'nonofficial_posted':
             sql_query += '''
