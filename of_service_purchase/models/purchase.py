@@ -9,6 +9,8 @@ class PurchaseOrder(models.Model):
 
     of_service_id = fields.Many2one(
         comodel_name='of.service', string="DI d'origine", compute='_compute_of_service_id')
+    of_date_next = fields.Date(string=u"Date d'intervention", readonly=True)
+    of_date_end = fields.Date(string=u"Date de fin d'intervention", readonly=True)
 
     @api.depends('order_line.of_service_line_id')
     def _compute_of_service_id(self):

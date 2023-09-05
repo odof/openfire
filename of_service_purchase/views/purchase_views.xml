@@ -9,6 +9,17 @@
             <xpath expr="//field[@name='sale_order_id']" position="after">
                 <field name="of_service_id"/>
             </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <label for="of_date_next" attrs="{'invisible':[('of_date_next', '=', False), ('of_date_end', '=', False)]}"/>
+                <div attrs="{'invisible':[('of_date_next', '=', False), ('of_date_end', '=', False)]}">
+                    <span attrs="{'invisible':['|', ('of_date_next', '=', False), ('of_date_end', '=', False)]}">Entre le </span>
+                    <span attrs="{'invisible':[('of_date_end', '!=', False)]}">À partir du </span>
+                    <field name="of_date_next" class="oe_inline"/>
+                    <span attrs="{'invisible':['|', ('of_date_next', '=', False), ('of_date_end', '=', False)]}"> et le </span>
+                    <span attrs="{'invisible':[('of_date_next', '!=', False)]}">Avant le </span>
+                    <field name="of_date_end" class="oe_inline"/>
+                </div>
+            </xpath>
         </field>
     </record>
 
