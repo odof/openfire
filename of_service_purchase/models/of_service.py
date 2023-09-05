@@ -177,6 +177,8 @@ class OfService(models.Model):
             'partner_id': supplier.id,
             'customer_id': self.partner_id.id,
             'origin': self.number,
+            'of_date_next': self.date_next,
+            'of_date_end': self.date_fin,
         }
 
 
