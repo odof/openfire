@@ -28,7 +28,7 @@ generate_fiscal_position_origin = AccountChartTemplate.generate_fiscal_position
 def _load_template(self, company, code_digits=None, account_ref=None, taxes_ref=None):
     """Override of the original method to add the creation of account mappings on taxes."""
     if self.env.get('of.account.tax.hooks.installed') is None:
-        return _load_template_origin(self)
+        return _load_template_origin(self, company, code_digits, account_ref, taxes_ref)
 
     self.ensure_one()
     if account_ref is None:
@@ -100,7 +100,7 @@ def generate_fiscal_position(self, tax_template_ref, acc_template_ref, company):
     We changed the method definition to add the tax_template_ref parameter to add default taxes on fiscal positions.
     """
     if self.env.get('of.account.tax.hooks.installed') is None:
-        return generate_fiscal_position_origin(self)
+        return generate_fiscal_position_origin(self, tax_template_ref, acc_template_ref, company)
 
     self.ensure_one()
     positions = self.env['account.fiscal.position.template'].search([('chart_template_id', '=', self.id)])
