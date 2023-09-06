@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_product_standard_view_form" model="ir.ui.view">
+        <field name="name">of.product.standard.form</field>
+        <field name="model">of.product.standard</field>
+        <field name="arch" type="xml">
+            <form string="Product standard">
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
+                                <span class="text-danger">Archive</span>
+                            </div>
+                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
+                                <span class="text-success">Unarchive</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="code" string="Code" />
+                        <h1>
+                            <field name="code" placeholder="Code of the standard" />
+                        </h1>
+                        <div name="options" groups="base.group_user">
+                            <div>
+                                <field name="display_docs" />
+                                <label for="display_docs" />
+                            </div>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" />
+                        </group>
+                    </group>
+                    <separator name="description" string="Description" />
+                    <field name="description" nolabel="1" />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_product_standard_view_tree" model="ir.ui.view">
+        <field name="name">of.product.standard.tree</field>
+        <field name="model">of.product.standard</field>
+        <field name="arch" type="xml">
+            <tree string="Products standards" decoration-muted="not active">
+                <field name="code" />
+                <field name="name" />
+                <field name="description" />
+                <field name="display_docs" />
+                <field name="active" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_product_standard_view_search" model="ir.ui.view">
+        <field name="name">of.product.standard.search</field>
+        <field name="model">of.product.standard</field>
+        <field name="arch" type="xml">
+            <search string="Products standards">
+                <field name="code" />
+                <field name="name" />
+                <separator />
+                <filter name="active" string="Active" domain="[('active','=',True)]" />
+                <filter name="inactive" string="Archived" domain="[('active','=',False)]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="of_product_standard_action" model="ir.actions.act_window">
+        <field name="name">Products Standards</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.product.standard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new product standard
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_product_standard" name="Products standards" action="of_product_standard_action" parent="sale.prod_config_main" sequence="20" />
+
+</odoo>

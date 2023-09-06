@@ -18,10 +18,10 @@ class AccountMoveLine(models.Model):
                 product = line.product_id.with_context(lang=line.partner_id.lang)
             else:
                 product = line.product_id
-            if not product.of_description_standard:
+            if not product.of_standard_description:
                 continue
             line.name = (
                 line.name
                 + "\n"
-                + _("%s compliant: %s") % (product.of_standard_id.code, product.of_description_standard)
+                + _("%s compliant: %s") % (product.of_standard_id.code, product.of_standard_description)
             )

@@ -9,10 +9,10 @@ class OFProductStandard(models.Model):
     _rec_name = 'code'
     _order = 'code'
 
-    code = fields.Char()
-    name = fields.Char(translate=True)
-    description = fields.Text(translate=True)
-    active = fields.Boolean(default=True)
+    code = fields.Char(string="Code", required=True)
+    name = fields.Char(string="Name", translate=True)
+    description = fields.Text(string="Description", translate=True)
+    active = fields.Boolean(string="Active", default=True)
     display_docs = fields.Boolean(string="Display in documents", default=True)
     product_ids = fields.One2many(comodel_name='product.template', inverse_name='of_standard_id', string="Products")
 

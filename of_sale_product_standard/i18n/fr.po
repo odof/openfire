@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-11 16:05+0000\n"
-"PO-Revision-Date: 2023-05-11 16:05+0000\n"
+"POT-Creation-Date: 2023-09-06 12:43+0000\n"
+"PO-Revision-Date: 2023-09-06 12:43+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -24,15 +24,31 @@ msgid "%s compliant: %s"
 msgstr "Conforme à la norme %s : %s"
 
 #. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+msgid "<span class=\"text-danger\">Archive</span>"
+msgstr ""
+
+#. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
+msgid "<span class=\"text-success\">Unarchive</span>"
+msgstr ""
+
+#. module: of_sale_product_standard
 #: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__active
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_search
 msgid "Active"
 msgstr "Actif"
+
+#. module: of_sale_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_search
+msgid "Archived"
+msgstr "Archivé"
 
 #. module: of_sale_product_standard
 #: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__code
 #: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
 msgid "Code"
-msgstr "Code"
+msgstr ""
 
 #. module: of_sale_product_standard
 #: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
@@ -58,7 +74,7 @@ msgstr "Créé le"
 #: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__description
 #: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
 msgid "Description"
-msgstr "Description"
+msgstr ""
 
 #. module: of_sale_product_standard
 #: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__display_name
@@ -73,7 +89,7 @@ msgstr "Afficher dans les documents"
 #. module: of_sale_product_standard
 #: model:ir.model.fields,field_description:of_sale_product_standard.field_of_product_standard__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: of_sale_product_standard
 #: model:ir.model,name:of_sale_product_standard.model_account_move_line
@@ -113,8 +129,6 @@ msgstr "Variante de produit"
 #. module: of_sale_product_standard
 #: model:ir.model,name:of_sale_product_standard.model_of_product_standard
 #: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_form
-#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_search
-#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_tree
 msgid "Product standard"
 msgstr "Norme de produit"
 
@@ -130,6 +144,8 @@ msgstr "Normes de produits"
 
 #. module: of_sale_product_standard
 #: model:ir.ui.menu,name:of_sale_product_standard.menu_product_standard
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_search
+#: model_terms:ir.ui.view,arch_db:of_sale_product_standard.of_product_standard_view_tree
 msgid "Products standards"
 msgstr "Normes de produits"
 
@@ -145,8 +161,8 @@ msgid "Standard"
 msgstr "Norme"
 
 #. module: of_sale_product_standard
-#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_product__of_description_standard
-#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_template__of_description_standard
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_product__of_standard_description
+#: model:ir.model.fields,field_description:of_sale_product_standard.field_product_template__of_standard_description
 msgid "Standard description"
 msgstr "Description de la norme"
 
@@ -161,4 +177,5 @@ msgid ""
 "This note describes the product standards and is added to sales orders and "
 "invoices."
 msgstr ""
-"Cette note décrit la norme de l'article et sera ajoutée dans les devis et factures"
+"Cette note décrit la norme de l'article et sera ajoutée dans les devis et "
+"factures"

@@ -14,10 +14,10 @@ class SaleOrderLine(models.Model):
                 continue
             if not line.order_partner_id.is_public:
                 line = line.with_context(lang=line.order_partner_id.lang)
-            if not line.product_id.of_description_standard:
+            if not line.product_id.of_standard_description:
                 continue
             line.name = (
                 line.name
                 + "\n"
-                + _("%s compliant: %s") % (line.product_id.of_standard_id.code, line.product_id.of_description_standard)
+                + _("%s compliant: %s") % (line.product_id.of_standard_id.code, line.product_id.of_standard_description)
             )

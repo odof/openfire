@@ -2,6 +2,5 @@
 
 from . import account_move_line
 from . import of_product_standard
-from . import product_product
 from . import product_template
 from . import sale_order_line
