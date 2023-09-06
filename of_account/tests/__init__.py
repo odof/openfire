@@ -5,3 +5,4 @@ from . import test_account_journal
 from . import test_account_move
 from . import test_partner_warnings
 from . import test_account_move_line
+from . import test_account_move_line_brand

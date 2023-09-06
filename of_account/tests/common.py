@@ -178,3 +178,14 @@ class TestOFAccountCommon(TransactionCase):
                 }
             )
         )
+
+        # Journal data
+        cls.journal_purchase = cls.env['account.journal'].search(
+            [('type', '=', 'purchase'), ('company_id', '=', cls.company_fr.id)], limit=1
+        )
+        cls.journal_sale = cls.env['account.journal'].search(
+            [('type', '=', 'sale'), ('company_id', '=', cls.company_fr.id)], limit=1
+        )
+        cls.journal_bank = cls.env['account.journal'].search(
+            [('type', '=', 'bank'), ('company_id', '=', cls.company_fr.id)], limit=1
+        )
