@@ -10,6 +10,9 @@ from odoo.addons.of_utils.models.misc import get_selection_label
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    def _default_of_price_printing(self):
+        return 'order_line'
+
     # Dates
     of_date_order = fields.Datetime(string="Forced confirmation date", readonly=True, copy=False)
 
@@ -17,7 +20,7 @@ class SaleOrder(models.Model):
     of_price_printing = fields.Selection(
         selection='_get_selection_of_price_printing',
         string="Price printing",
-        default='order_line',
+        default=lambda self: self._default_of_price_printing(),
         required=True,
     )
     of_printing_apply_on_move = fields.Boolean(string="Apply to invoices", default=True)

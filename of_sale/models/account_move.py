@@ -1,14 +1,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-# import json  TODO: Uncomment me when `of_account_invoice_report` module is migrated
+# import json  # TODO: Uncomment me when `of_account_invoice_report` module is migrated
 
 from odoo import Command, api, fields, models
 
-# from odoo.tools import float_compare  TODO: Uncomment me when `of_account_invoice_report` module is migrated
+# from odoo.tools import float_compare  # TODO: Uncomment me when `of_account_invoice_report` module is migrated
 
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
+
+    def _default_of_price_printing(self):
+        return self.env['sale.order']._default_of_price_printing()
 
     of_is_locked = fields.Boolean(compute='_compute_of_is_locked', string="Locked")
     of_sale_order_ids = fields.Many2many(
@@ -30,7 +33,7 @@ class AccountMove(models.Model):
     of_price_printing = fields.Selection(
         selection='_get_selection_of_price_printing',
         string="Price printing",
-        default='order_line',
+        default=lambda self: self._default_of_price_printing(),
         required=True,
     )
 
