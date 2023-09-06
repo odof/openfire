@@ -100,8 +100,7 @@ class OFCRMActivity(models.Model):
                    ('done', u"Réalisée"),
                    ('canceled', u"Annulée")], string=u"État", required=True, default='planned',
         track_visibility="onchange")
-    user_id = fields.Many2one(
-        comodel_name='res.users', string=u"Auteur", required=True, default=lambda self: self.env.user)
+    user_id = fields.Many2one(comodel_name='res.users', string=u"Auteur", default=lambda self: self.env.user)
     vendor_id = fields.Many2one(comodel_name='res.users', string=u"Commercial")
     description = fields.Text(string=u"Description")
     report = fields.Text(string=u"Compte-rendu", track_visibility="onchange")
