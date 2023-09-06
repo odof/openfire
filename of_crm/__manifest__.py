@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': "OpenFire / CRM",
-    'version': "10.0.1.3.0",
+    'version': "10.0.1.4.0",
     'author': "OpenFire",
     'website': "http://openfire.fr",
     'category': 'Customer Relationship Management',
@@ -75,7 +76,8 @@ Workflow CRM
         'views/of_sale_followup_tag_views.xml',
         'wizards/of_add_attachment_activity_views.xml',
         'wizards/of_crm_activity_action_views.xml',
-        'reports/of_crm_fiche_rdv_report_view.xml'
+        'reports/of_crm_fiche_rdv_report_view.xml',
+        'hooks/post_hook.xml',
     ],
     'qweb': [
         'static/src/xml/of_sales_team_dashboard.xml',
