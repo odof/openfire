@@ -201,7 +201,7 @@ class ResConfigSettings(models.TransientModel):
 
     def action_printings_params(self):
         return {
-            'name': _('Configure PDF printing'),
+            'name': _("Configure PDF printing"),
             'type': 'ir.actions.act_window',
             'res_model': 'res.config.settings',
             'view_mode': 'form',
