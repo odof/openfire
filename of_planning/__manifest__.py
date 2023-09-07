@@ -38,6 +38,7 @@ Inclut la gestion des équipes d'intervention.
         'mail',
         'of_utils',
         'of_base_location',  # secteurs
+        'of_map_view',
         'of_stock',
         'l10n_fr_department',
     ],
