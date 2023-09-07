@@ -124,7 +124,7 @@
                         <group>
                             <field name="id_code"/>
                             <field name="condition"/>
-                            <field name="condition_code" attrs="{'invisible': [('condition', '=', False)]}"/>
+                            <field name="condition_code" attrs="{'invisible': [('condition', '=', False)], 'required': [('condition', '=', True)]}"/>
                         </group>
                         <div colspan="4" attrs="{'invisible': [('condition', '=', False)]}">
                             <h4>Aide pour le code de condition</h4>

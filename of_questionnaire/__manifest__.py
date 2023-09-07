@@ -41,6 +41,7 @@ Fonctionnalités
         'report/of_planning_rapport_intervention.xml',
         'security/ir.model.access.csv',
         'wizards/of_questionnaire_wizard_view.xml',
+        'hooks/hook.xml',
     ],
     'installable': True,
     'application': False,
