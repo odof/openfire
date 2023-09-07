@@ -3,10 +3,11 @@
 {
     'name': "OpenFire / Echéancier de paiement des ventes",
     'version': '16.0.1.0.0',
+    'license': 'LGPL-3',
     'author': "OpenFire",
-    'category': 'OpenFire',
-    'summary': "Payment schedule for sale orders",
     'website': 'https://www.openfire.fr',
+    'category': 'OpenFire',
+    'summary': "Echéancier de paiement des ventes",
     'description': "",
     'depends': [
         'of_sale_report_setting',
@@ -22,5 +23,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

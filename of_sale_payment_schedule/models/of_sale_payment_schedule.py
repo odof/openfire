@@ -14,32 +14,34 @@ class OFSalePaymenSchedule(models.Model):
     name = fields.Char(required=True, default=lambda self: self._default_payment_schedule_name())
     order_id = fields.Many2one(comodel_name='sale.order', string="Sale order")
     currency_id = fields.Many2one(related='order_id.currency_id', readonly=True)
-    amount = fields.Monetary(currency_field='currency_id')
-    percent = fields.Float(string="Percentage", digits='Product Price')
+    amount = fields.Monetary(
+        currency_field='currency_id', string="Amount", compute='_compute_amount', readonly=False, store=True
+    )
+    percent = fields.Float(
+        string="Percentage", digits='Product Price', compute='_compute_percent', readonly=False, store=True
+    )
     # TODO: rename depuis l'ancien nom : last
     is_last = fields.Boolean(string="Last payment", compute='_compute_is_last')
-    sequence = fields.Integer()
-    date = fields.Date()
+    sequence = fields.Integer(string="Sequence")
+    date = fields.Date(string="Date")
 
     def _compute_is_last(self):
         for order in self.mapped('order_id'):
             for payment in order.of_payment_schedule_ids:
                 payment.is_last = payment == order.of_payment_schedule_ids[-1]
 
-    @api.onchange('amount')
-    def _onchange_amount(self):
-        """Met à jour le pourcentage en fonction du montant"""
-        order_amount = self._context.get('order_amount', self.order_id.amount_total)
-        # Test: si le nouveau montant est calculé depuis le pourcentage, on ne le recalcule pas
-        test_amount = order_amount * self.percent / 100
-        if float_compare(self.amount, test_amount, precision_rounding=0.01):
-            self.percent = self.amount * 100 / order_amount if order_amount else 0
+    @api.depends('amount')
+    def _compute_percent(self):
+        for payment in self:
+            order_amount = payment._context.get('order_amount', payment.order_id.amount_total)
+            test_amount = order_amount * payment.percent / 100
+            if float_compare(payment.amount, test_amount, precision_rounding=0.01):
+                payment.percent = payment.amount * 100 / order_amount if order_amount else 0
 
-    @api.onchange('percent')
-    def _onchange_percent(self):
-        """Met à jour le montant en fonction du pourcentage"""
-        order_amount = self._context.get('order_amount', self.order_id.amount_total)
-        # Test: si le nouveau pourcentage est calculé depuis le montant, on ne le recalcule pas
-        test_percent = self.amount * 100 / order_amount if order_amount else 0
-        if float_compare(self.percent, test_percent, precision_rounding=0.01):
-            self.amount = order_amount * self.percent / 100
+    @api.depends('percent')
+    def _compute_amount(self):
+        for payment in self:
+            order_amount = payment._context.get('order_amount', payment.order_id.amount_total)
+            test_percent = payment.amount * 100 / order_amount if order_amount else 0
+            if float_compare(payment.percent, test_percent, precision_rounding=0.01):
+                payment.amount = order_amount * payment.percent / 100

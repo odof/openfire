@@ -3,6 +3,7 @@
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command
+from odoo.tests import Form
 
 from odoo.addons.of_sale.tests.common import TestOFSaleCommon
 
@@ -98,3 +99,41 @@ class TestOFSaleOrderPaymentSchedule(TestOFSaleCommon):
             sale_order.of_payment_schedule_ids[2].date, sale_order.date_order.date() + relativedelta(days=15)
         )
         self.assertEqual(sum(sale_order.of_payment_schedule_ids.mapped('amount')), 105.5)
+
+    def test_03_payment_schedule_percent_update(self):
+        """Test that the amount is updated when the percentage is changed"""
+        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values['payment_term_id'] = self.payment_term_30_30_40.id
+        sale_order = self.env['sale.order'].create(order_values)
+
+        self.assertEqual(len(sale_order.of_payment_schedule_ids), 3)
+
+        with Form(sale_order) as order_form:
+            with self.assertRaisesRegex(AssertionError, "can't write on readonly field percent"):
+                with order_form.of_payment_schedule_ids.edit(2) as payment_line_form:
+                    # we can't update the last payment, that a read only field
+                    payment_line_form.percent = 50
+
+            with order_form.of_payment_schedule_ids.edit(0) as payment_line_form:
+                payment_line_form.percent = 20
+
+            self.assertEqual(payment_line_form.amount, 21.1)
+
+    def test_04_payment_schedule_amount_update(self):
+        """Test that the percentage is updated when the amount is changed"""
+        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values['payment_term_id'] = self.payment_term_30_30_40.id
+        sale_order = self.env['sale.order'].create(order_values)
+
+        self.assertEqual(len(sale_order.of_payment_schedule_ids), 3)
+
+        with Form(sale_order) as order_form:
+            with self.assertRaisesRegex(AssertionError, "can't write on readonly field percent"):
+                with order_form.of_payment_schedule_ids.edit(2) as payment_line_form:
+                    # we can't update the last payment, that a read only field
+                    payment_line_form.percent = 50
+
+            with order_form.of_payment_schedule_ids.edit(0) as payment_line_form:
+                payment_line_form.amount = 21.1
+
+            self.assertEqual(payment_line_form.percent, 20)
