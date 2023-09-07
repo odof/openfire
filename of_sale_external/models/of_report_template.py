@@ -99,6 +99,8 @@ class OFReportTemplate(models.Model):
         help="If checked, displays the product reference in the order lines on the report")
 
     # Other
+    pdf_invoice_state = fields.Boolean(string="Acquitted invoice",
+        help="If checked, displays the state acquitted in invoice the report")
     pdf_payment_schedule = fields.Boolean(
         string="Payment schedule",
         help="If checked, displays the Payment schedule in the report")

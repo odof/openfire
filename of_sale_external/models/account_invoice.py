@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields
+from odoo import models, api, fields
 
 
 class AccountInvoice(models.Model):
@@ -10,6 +10,10 @@ class AccountInvoice(models.Model):
     of_report_template_id = fields.Many2one(
         comodel_name='of.report.template', string="Report template",
         domain="[('model', 'in', ['account.invoice', False])]")
+
+    def pdf_afficher_mention_acquitte(self):
+        return self.of_report_template_id.pdf_invoice_state if self.of_report_template_id else super(
+            AccountInvoice, self).pdf_afficher_mention_acquitte()
 
     def pdf_afficher_nom_parent(self):
         return self.of_report_template_id.pdf_address_contact_parent_name if self.of_report_template_id else super(

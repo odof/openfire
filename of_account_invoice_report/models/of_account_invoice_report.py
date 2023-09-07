@@ -13,6 +13,9 @@ class AccountInvoice(models.Model):
     # Note : les fonctions de cette classe qui possèdent [IMPRESSION] dans leur description
     # ne sont appelées que lors de l'impression.
 
+    def pdf_afficher_mention_acquitte(self):
+        return self.env['ir.values'].get_default('account.config.settings', 'pdf_afficher_mention_acquitte')
+
     def pdf_afficher_nom_parent(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_nom_parent')
 

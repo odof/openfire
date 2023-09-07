@@ -49,6 +49,10 @@
                                 <field name="pdf_address_contact_email" string="Email"/>
                             </group>
                         </group>
+                        <group colspan="6">
+                                <h4 class="of-printing-parameter-title" colspan="2">Mention</h4>
+                                <field name="pdf_invoice_state" attrs="{'invisible': [('model', '=', 'sale.order')]}"/>
+                        </group>
                         <group colspan="2" name="commercial_insert">
                             <group colspan="2">
                                 <h4 class="of-printing-parameter-title" colspan="2">Inserts</h4>
