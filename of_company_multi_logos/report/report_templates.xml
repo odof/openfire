@@ -17,17 +17,17 @@
                         <div t-field="company.report_footer"/>
                     </ul>
 
-                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
                     <div id="footer_logo_left" style="position: absolute">
-                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
-                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
+                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
                         </t>
                     </div>
 
-                    <t t-set="footer_lcorner_logos" t-value="company._get_footer_left_corner_logos()"/>
-                    <div id="footer_logo_right" t-if="footer_lcorner_logos" style="float: right;">
-                        <t t-foreach="footer_lcorner_logos" t-as="footer_lcorner_logo">
-                            <img t-att-src="image_data_uri(footer_lcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
+                    <t t-set="footer_rcorner_logos" t-value="company._get_footer_right_corner_logos()"/>
+                    <div id="footer_logo_right" t-if="footer_rcorner_logos" style="float: right;">
+                        <t t-foreach="footer_rcorner_logos" t-as="footer_rcorner_logo">
+                            <img t-att-src="image_data_uri(footer_rcorner_logo.logo)" style="margin-left: auto; margin-right: auto; display: inline-block; max-height: 70px;"/>
                         </t>
                     </div>
 
