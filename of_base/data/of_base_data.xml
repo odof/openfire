@@ -22,7 +22,6 @@
             <field name="sequence" eval="5"/>
             <field name="default" eval="False"/>
         </record>
-
     </data>
 
     <record id="master_database_url" model="ir.config_parameter">

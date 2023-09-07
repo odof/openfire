@@ -58,6 +58,7 @@ Ajout d'un modèle servant de log interne :
         'security/of_base_security.xml',
         'security/of_group_intranet_security.xml',
         'security/ir.model.access.csv',
+        'hooks/init_hook.xml',
         'views/of_base_view.xml',
         'views/of_log_message_views.xml',
         'views/mail_views.xml',

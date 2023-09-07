@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+    <function model="of.base.hook" name="_init_partner_phone"/>
+</odoo>
