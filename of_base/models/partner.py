@@ -597,41 +597,6 @@ class OFResPartnerPhone(models.Model):
                 number = convert_phone_number(rec.number_display, country_code)
             rec.number = number
 
-    @api.model_cr_context
-    def _auto_init(self):
-        """
-        Recover old phone numbers
-        """
-        cr = self._cr
-        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-        exists = bool(cr.fetchall())
-        res = super(OFResPartnerPhone, self)._auto_init()
-        if not exists:
-            partner_ids = self.env['res.partner'].search([])
-            for partner_id in partner_ids:
-                phone_number_ids = []
-                cr.execute("""  SELECT  phone
-                                ,       mobile
-                                ,       fax
-                                FROM    res_partner
-                                WHERE   id          = %s""" % partner_id.id)
-                result = cr.fetchone()
-                phone = result[0]
-                mobile = result[1]
-                fax = result[2]
-                country_code = partner_id.country_id and partner_id.country_id.code or "FR"
-                if phone:
-                    number = convert_phone_number(phone, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '01_domicile'}))
-                if mobile:
-                    number = convert_phone_number(mobile, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '03_mobile'}))
-                if fax:
-                    number = convert_phone_number(fax, country_code)
-                    phone_number_ids.append((0, 0, {'number': number, 'type': '04_fax'}))
-                partner_id.write({'of_phone_number_ids': phone_number_ids})
-        return res
-
     @api.model
     def create(self, vals):
         if vals.get('number', False):
