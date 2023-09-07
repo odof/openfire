@@ -70,6 +70,13 @@
                 </xpath>
                 <!-- /Partner details -->
 
+                <!-- Sale header -->
+                <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                    <attribute name="options" separator="}" remove="}"/>
+                    <attribute name="options" add=", 'no_open': True}"/>
+                    <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
+                </xpath>
+
                 <!-- Order lines -->
                 <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
                     <attribute name="groups">account.group_show_line_subtotals_tax_included,of_sale.of_group_display_tax_inclued_total_in_so_lines</attribute>
@@ -116,11 +123,6 @@
                     <field name="of_force_invoice_status" groups="account.group_account_invoice" attrs="{'invisible': [('state', 'not in', ('sale','done'))]}"/>
                     <field name="of_invoice_policy" attrs="{'column_invisible': [('state', 'not in', ['sale', 'done'])]}" groups="account.group_account_invoice"/>
                     <field name="of_estimated_invoicing_date" attrs="{'column_invisible': [('state', 'not in', ['sale', 'done'])], 'readonly': [('of_invoice_policy', '!=', 'order')]}"/>
-                </xpath>
-                <xpath expr="//page[@name='other_information']/group/group[@name='sale_info']/div/field[@name='fiscal_position_id']" position="attributes">
-                    <attribute name="options" separator="}" remove="}"/>
-                    <attribute name="options" add=", 'no_open': True}"/>
-                    <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
                 </xpath>
                 <!-- /Group sale_info -->
 

@@ -12,7 +12,7 @@
     'depends': [
         # "of_account_invoice_report",  # TODO: uncomment when of_account is migrated
         'of_account',
-        # "of_account_tax",  # TODO: uncomment when of_account is migrated
+        "of_account_tax",
         'of_base_location',
         'of_custom_document',
         'of_product',
