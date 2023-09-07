@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_config_settings_view_form" model="ir.ui.view">
+        <field name="name">sale.config.settings.view.form</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
+                <field name="of_discount_product_categ_ids_setting" class="oe_inline" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//group[@name='quotations_sales']/group[@name='field_fonctionnalities']/div[last()]" position="after">
+                <label for="of_create_analyse_auto"/>
+                <div name="of_create_analyse_auto">
+                    <field name="of_create_analyse_auto" class="oe_inline"/>
+                    <span> Activer la création d'analyse de chantier automatique à la validation de la commande</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
