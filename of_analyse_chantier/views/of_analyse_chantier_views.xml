@@ -356,15 +356,4 @@
         </field>
     </record>
 
-    <record id="of_analyse_chantier_view_sale_config_settings" model="ir.ui.view">
-        <field name="name">of_analyse_chantier_view_sale_config_settings</field>
-        <field name="model">sale.config.settings</field>
-        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_deposit_product_categ_id_setting']" position="after">
-                <field name="of_discount_product_categ_ids_setting" class="oe_inline" widget="many2many_tags"/>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>
