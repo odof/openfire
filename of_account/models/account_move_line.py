@@ -132,7 +132,7 @@ class AccountMoveLine(models.Model):
             """Return True if the first line is being created"""
             return lines[0][0] == 0 and len(lines) == 1 if lines else True
 
-        for line in self:
+        for line in self.filtered(lambda line: line.display_type not in ('line_section', 'line_note')):
             if line.partner_id and not line.account_id and _first_line_create(self._context.get('line_ids', [])):
                 supplier = line.partner_id.supplier_rank > 0
                 customer = line.partner_id.customer_rank > 0
