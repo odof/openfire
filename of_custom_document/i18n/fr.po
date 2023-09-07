@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-02 15:28+0000\n"
-"PO-Revision-Date: 2023-05-02 15:28+0000\n"
+"POT-Creation-Date: 2023-09-08 08:18+0000\n"
+"PO-Revision-Date: 2023-09-08 08:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -78,11 +78,6 @@ msgid "Custom documents"
 msgstr "Documents personnalisés"
 
 #. module: of_custom_document
-#: model:ir.model,name:of_custom_document.model_of_custom_document
-msgid "Custom pdf report"
-msgstr "Document pdf personnalisé"
-
-#. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__display_name
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__display_name
 msgid "Display Name"
@@ -97,7 +92,7 @@ msgstr "Ajoute l'option permettant d'imprimer ce document"
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__document_id
 #: model_terms:ir.ui.view,arch_db:of_custom_document.view_of_custom_document_form
 msgid "Document"
-msgstr "Document"
+msgstr ""
 
 #. module: of_custom_document
 #: model:ir.model.fields,help:of_custom_document.field_ir_actions_report__of_custom_document_ids
@@ -117,14 +112,14 @@ msgstr "Fichier"
 
 #. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__file_name
-msgid "File Name"
+msgid "Filename"
 msgstr "Nom du fichier"
 
 #. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__id
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__to_import
@@ -199,6 +194,11 @@ msgid "PDF field name"
 msgstr "Nom de champ PDF"
 
 #. module: of_custom_document
+#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__value
+msgid "PDF field value"
+msgstr "Valeur"
+
+#. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__pdf_field_ids
 #: model_terms:ir.ui.view,arch_db:of_custom_document.view_of_custom_document_form
 msgid "PDF fields"
@@ -210,24 +210,39 @@ msgid "Parameters"
 msgstr "Paramètres"
 
 #. module: of_custom_document
-#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__print_address
-msgid "Print Address"
-msgstr "Afficher l'adresse"
-
-#. module: of_custom_document
-#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__print_header
-msgid "Print Header"
-msgstr "Afficher l'en-tête"
-
-#. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__ref_ir_act_report
 msgid "Print action"
 msgstr "Action d'impression"
 
 #. module: of_custom_document
+#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__print_address
+msgid "Print address"
+msgstr "Afficher l'adresse"
+
+#. module: of_custom_document
+#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__print_header
+msgid "Print header"
+msgstr "Afficher l'en-tête"
+
+#. module: of_custom_document
+#: model:ir.model.fields,help:of_custom_document.field_of_custom_document__print_address
+msgid "Print the address of the company"
+msgstr "Imprimer l'adresse de la société"
+
+#. module: of_custom_document
+#: model:ir.model.fields,help:of_custom_document.field_of_custom_document__print_header
+msgid "Print the header of the company"
+msgstr "Imprimer l'en-tête de la société"
+
+#. module: of_custom_document
+#: model:ir.model,name:of_custom_document.model_of_custom_document
+msgid "Printable PDF document templates"
+msgstr "Modèles de documents à imprimer en PDF"
+
+#. module: of_custom_document
 #: model:ir.model,name:of_custom_document.model_ir_qweb
 msgid "Qweb"
-msgstr "Qweb"
+msgstr ""
 
 #. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__model
@@ -260,8 +275,7 @@ msgstr "Séquence"
 msgid ""
 "Sidebar action to make this template available on records of the related "
 "document model"
-msgstr ""
-"Action permettant d'imprimer ce document dans les objets associés"
+msgstr "Action permettant d'imprimer ce document dans les objets associés"
 
 #. module: of_custom_document
 #: model_terms:ir.ui.view,arch_db:of_custom_document.view_of_custom_document_tree
@@ -274,11 +288,6 @@ msgid "The pdf document will be fillable"
 msgstr "Le document pdf sera remplissable"
 
 #. module: of_custom_document
-#: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document_field__value
-msgid "Value"
-msgstr "Valeur"
-
-#. module: of_custom_document
 #: model_terms:ir.ui.view,arch_db:of_custom_document.view_of_custom_document_form
 msgid "e.g. Contact"
-msgstr "e.g. Contact"
+msgstr ""

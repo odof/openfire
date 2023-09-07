@@ -9,7 +9,7 @@ class OfCustomDocumentField(models.Model):
     _inherit = 'mail.render.mixin'
 
     name = fields.Char(string="PDF field name", required=True, readonly=True)
-    value = fields.Char()
+    value = fields.Char(string="PDF field value")
     document_id = fields.Many2one(comodel_name='of.custom.document', string="Document")
     to_export = fields.Boolean(string="Export", default=True)
     to_import = fields.Boolean(string="Import")

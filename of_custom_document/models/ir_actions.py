@@ -7,7 +7,7 @@ from odoo import api, fields, models
 _logger = logging.getLogger(__name__)
 
 
-class IrActionsReportXml(models.Model):
+class IrActionsReport(models.Model):
     _name = 'ir.actions.report'
     _inherit = ['ir.actions.report', 'of.custom.document.mixin']
 

@@ -1,16 +1,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import base64
+import contextlib
 import io
 import mimetypes
 import os
 import tempfile
 
-from PIL import Image
-
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.mimetypes import guess_mimetype
+
+from odoo.addons.of_utils.models.image import _get_pdf_from_img
 
 try:
     from pdfminer.pdfdocument import PDFDocument
@@ -28,21 +29,21 @@ except ImportError:
 
 
 class OfCustomDocument(models.Model):
-    """Modèles de documents à imprimer en PDF"""
+    """Printable PDF document templates"""
 
     _name = 'of.custom.document'
     _inherit = 'mail.render.mixin'
-    _description = "Custom pdf report"
+    _description = __doc__
     _order = 'sequence'
 
     name = fields.Char(size=250, required=True)
-    print_address = fields.Boolean()
-    print_header = fields.Boolean()
+    print_address = fields.Boolean(string="Print address", help="Print the address of the company")
+    print_header = fields.Boolean(string="Print header", help="Print the header of the company")
     body_html = fields.Html(string='Body', render_engine='qweb', translate=True, prefetch=True, sanitize=False)
-    file_name = fields.Char()
-    file = fields.Binary()
+    file_name = fields.Char(string="Filename")
+    file = fields.Binary(string="File")
     fillable = fields.Boolean(string="Keep fillable", help="The pdf document will be fillable")
-    sequence = fields.Integer(default=10)
+    sequence = fields.Integer(string="Sequence", default=10)
     model_id = fields.Many2one(comodel_name='ir.model', string="Applies to")
     model = fields.Char(
         string='Related Document Model', related='model_id.model', index=True, store=True, readonly=True
@@ -96,14 +97,7 @@ class OfCustomDocument(models.Model):
         if not res_ids or not self.pdf_field_ids:
             # Ensure the stream can be saved in Image.
             if attachment.mimetype.startswith('image'):
-                stream = io.BytesIO(attachment.raw)
-                img = Image.open(stream)
-                new_stream = io.BytesIO()
-                img.convert("RGB").save(new_stream, format="pdf")
-                stream.close()
-                stream = new_stream
-                result = stream.getvalue()
-                stream.close()
+                result = _get_pdf_from_img(attachment)
             else:
                 result = base64.b64decode(attachment.datas)
             return result, 'pdf'
@@ -131,13 +125,10 @@ class OfCustomDocument(models.Model):
             for stream in streams_to_merge:
                 stream.close()
             for fd in pdf_docs:
-                # Nécessaire ?
                 os.close(fd)
             for path in temp_file_paths:
-                try:
+                with contextlib.suppress(OSError, IOError):
                     os.remove(path)
-                except (OSError, IOError):
-                    pass
         return pdf_content, 'pdf'
 
     @api.onchange('file')
@@ -187,20 +178,16 @@ class OfCustomDocument(models.Model):
                 continue
             vals = {}
             if action.name != document.name:
-                vals.update(
-                    {
-                        'name': document.name,
-                        'print_report_name': '"%s"' % document.name,
-                        'report_name': document.name,
-                    }
-                )
+                vals |= {
+                    'name': document.name,
+                    'print_report_name': f'"{document.name}"',
+                    'report_name': document.name,
+                }
             if action.model_name != document.model_id.model:
-                vals.update(
-                    {
-                        'model': document.model_id.model,
-                        'binding_model_id': document.model_id.id,
-                    }
-                )
+                vals |= {
+                    'model': document.model_id.model,
+                    'binding_model_id': document.model_id.id,
+                }
             if vals:
                 action.write(vals)
 

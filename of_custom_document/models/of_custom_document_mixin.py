@@ -12,10 +12,8 @@ except ImportError:
 
 class OfCustomDocumentMixin(models.AbstractModel):
     """Classe abstraite qui permet d'ajouter les documents joints.
-    La fonction _allowed_reports doit être surchargée pour
-    Elle doit être héritée pour
-    Elle doit être surchargée pour ajouter d'autres rapports dans la fonction _allowed_reports
-    et être en héritage pour la classe sur laquelle on veut ajouter la fonctionnalité.
+    La fonction _allowed_reports doit être surchargée pour ajouter d'autres rapports et être en héritage pour la classe
+    sur laquelle on veut ajouter la fonctionnalité.
     """
 
     _name = 'of.custom.document.mixin'
@@ -44,10 +42,8 @@ class OfCustomDocumentMixin(models.AbstractModel):
             record = self
         streams_to_merge = [io.BytesIO(pdf_content)]
         for document in self.of_custom_document_ids:
-            rendered_file = document.render_file(record.ids)
-            if not rendered_file:
-                continue
-            streams_to_merge.append(io.BytesIO(rendered_file[0]))
+            if rendered_file := document.render_file(record.ids):
+                streams_to_merge.append(io.BytesIO(rendered_file[0]))
         with self.env['ir.actions.report']._merge_pdfs(streams_to_merge) as pdf_merged_stream:
             pdf_content = pdf_merged_stream.getvalue()
         return pdf_content
