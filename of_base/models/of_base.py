@@ -365,9 +365,8 @@ class ResGroups(models.Model):
     def write(self, vals):
         res = super(ResGroups, self).write(vals)
         # Ne pas autoriser l'ajout d'utilisateurs dans le groupe of_group_root_only
-        group_root_id = self.env.ref('of_base.of_group_root_only').id
-        if group_root_id in self.ids and vals.get('users'):
-            group_root = self.env['res.groups'].browse(group_root_id)
+        group_root = self.env.ref('of_base.of_group_root_only', raise_if_not_found=False)
+        if group_root and group_root in self and vals.get('users'):
             if not len(group_root.users):
                 raise UserError(u"Le compte admin ne peut pas être retiré de ce groupe!")
             if len(group_root.users) > 1 or SUPERUSER_ID not in group_root.users.ids:
