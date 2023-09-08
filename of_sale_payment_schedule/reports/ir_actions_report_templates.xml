@@ -6,7 +6,7 @@
             <t t-set="pdf_payment_schedule" t-value="doc.pdf_payment_schedule()"/>
         </xpath>
         <xpath expr="//div[@name='so_total_summary']" position="after">
-            <div t-if="pdf_payment_schedule" class="mt-4 mb-4" name="payment_schedule">
+            <div t-if="pdf_payment_schedule and doc.of_payment_schedule_ids" class="mt-4 mb-4" name="payment_schedule">
                 <div class="col-6" style="page-break-inside:avoid;">
                     <t t-set="show_payment_schedule_date" t-value="bool(doc.of_payment_schedule_ids.filtered('date'))"/>
                     <table class="table table-sm">
