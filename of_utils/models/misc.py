@@ -129,9 +129,35 @@ def is_valid_url(of_url):
     return of_url is not None and regex.search(of_url)
 
 
+def intersection_hours_couple(hour_couple1, hour_couple2):
+    """Check if two hours couples intersect
+    :param hour_couple1: First hours couple
+    :type hour_couple1: tuple
+    :param hour_couple2: Second hours couple
+    :type hour_couple2: tuple
+    :return: Return a tuple with the intersection of the two hours couples
+    """
+    # on compare deux couples d'heures, si ce n'est pas un couple alors on ne compare pas
+    if len(hour_couple1) != 2 or len(hour_couple2) != 2:
+        return (0, 0)
+    hour_debut = 0
+    hour_fin = 0
+    # si hour_debut du couple 2 est supérieur à celui du couple 1, alors hour_debut = hour_couple2[0]
+    # sinon hour_debut = hour_couple1[0]
+    hour_debut = max(hour_couple1[0], hour_couple2[0])
+    # si hour_fin du couple 2 est inférieur à celui du couple 1, alors hour_fin = hour_couple2[1]
+    # sinon hour_fin = hour_couple1[1]
+    hour_fin = min(hour_couple1[1], hour_couple2[1])
+    # si hour_min > hour_max, ce n'est pas un créneau que l'on peut utiliser
+    if hour_debut > hour_fin:
+        hour_debut, hour_fin = (0, 0)
+    return (hour_debut, hour_fin)
+
+
 # Deprecated, kept for backward compatibility.
 arrondi_sup = ceil_to_multiple
 distance_points = distance_between_points
 se_chevauchent = intervals_overlap
 float_2_heures_minutes = float_2_hours_minutes
 heures_minutes_2_float = hours_minutes_2_float
+intersect_couple = intersection_hours_couple
