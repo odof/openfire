@@ -48,6 +48,9 @@ class AccountInvoiceReport(models.Model):
         ]
         fields_copy = [f for f in fields if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))]
         res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
+        if not res:  # No data, no need to compute
+            return res
+
         time_groupbys = ('invoice_date:month', 'invoice_date:year', 'invoice_date')
         # Les deltas dépendent d'un champ qui doit être calculé
         diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]
