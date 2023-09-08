@@ -979,9 +979,10 @@ class StockMove(models.Model):
     company_currency_id = fields.Many2one(
         'res.currency', related='company_id.currency_id', string="Company currency", readonly=True)
     of_brand_id = fields.Many2one(
-        comodel_name='of.product.brand', compute='_compute_of_brand_id', string="Marque", store=True)
+        comodel_name='of.product.brand', compute='_compute_of_brand_id', string="Marque", store=True, compute_sudo=True)
     of_categ_id = fields.Many2one(
-        comodel_name='product.category', compute='_compute_of_categ_id', string="Catégorie interne", store=True)
+        comodel_name='product.category', compute='_compute_of_categ_id',
+        string=u"Catégorie interne", store=True, compute_sudo=True)
     of_default_code = fields.Char(related='product_id.default_code', string="Référence interne", readonly=True)
 
     def _inverse_of_price_unit(self):
