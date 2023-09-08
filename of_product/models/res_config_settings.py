@@ -9,6 +9,7 @@ class ResConfigSettings(models.TransientModel):
     group_product_variant_specific_price = fields.Boolean(
         string="(OF) Handle pricing by variant",
         implied_group='of_product.group_product_variant_specific_price',
+        group='base.group_portal,base.group_user,base.group_public',
         compute='_compute_group_product_variant_specific_price',
         store=True,
         readonly=False,
