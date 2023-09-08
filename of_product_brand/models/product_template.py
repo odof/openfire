@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import Command, _, api, fields, models
 
 
 class ProductTemplate(models.Model):
@@ -44,7 +44,7 @@ class ProductTemplate(models.Model):
                     'partner_id': self.brand_id.partner_id.id,
                 }
                 seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
-                self.seller_ids = [(0, 0, seller_data)]
+                self.seller_ids = [Command.create(seller_data)]
             elif len(self.seller_ids) == 1:
                 self.seller_ids.partner_id = self.brand_id.partner_id
 

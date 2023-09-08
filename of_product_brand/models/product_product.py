@@ -1,11 +1,18 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, models
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import ValidationError
 
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
+
+    of_previous_brand_id = fields.Many2one(comodel_name='of.product.brand', compute='_compute_of_previous_brand_id')
+
+    @api.depends('default_code')
+    def _compute_of_previous_brand_id(self):
+        for product in self:
+            product.of_previous_brand_id = product.brand_id
 
     @api.constrains('default_code', 'brand_id', 'product_tmpl_id')
     def check_used_default_code(self):
@@ -30,12 +37,15 @@ class ProductProduct(models.Model):
         self.brand_id.update_products_default_code(products=self, remove_previous_prefix=self.of_previous_brand_id.code)
 
         # Création de la relation fournisseur
-        if self.brand_id and not self.seller_ids:
-            seller_data = {
-                'partner_id': self.brand_id.partner_id.id,
-            }
-            seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
-            self.seller_ids = [(0, 0, seller_data)]
+        if self.brand_id:
+            if not self.seller_ids:
+                seller_data = {
+                    'partner_id': self.brand_id.partner_id.id,
+                }
+                seller_data = self.env['product.supplierinfo']._add_missing_default_values(seller_data)
+                self.seller_ids = [Command.create(seller_data)]
+            elif len(self.seller_ids) == 1:
+                self.seller_ids.partner_id = self.brand_id.partner_id
 
     @api.depends('default_code')
     def _compute_brand_id(self):
