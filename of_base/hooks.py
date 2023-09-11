@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import SUPERUSER_ID, api
+from odoo import SUPERUSER_ID, Command, api
 from odoo.exceptions import ValidationError
 
 from odoo.addons.base_iban.models.res_partner_bank import validate_iban
@@ -17,20 +17,25 @@ def _set_partner_bank_account_type(env):
 
 
 def _set_partner_phones(env, cr):
-    partners = env['res.partner'].search([])
-    for partner in partners:
-        phone_number_ids = []
-        cr.execute("SELECT phone, mobile FROM res_partner WHERE id = %s", (partner.id,))
-        result = cr.fetchone()
-        mobile = result[1]
-        country_code = partner.country_id and partner.country_id.code or 'FR'
-        if phone := result[0]:
-            number = convert_phone_number(phone, country_code)
-            phone_number_ids.append((0, 0, {'number': number, 'type': '01_domicile'}))
+    cr.execute("SELECT id, phone, mobile FROM res_partner")
+    partner_phones = {}
+    for partner_id, phone, mobile in cr.fetchall():
+        vals = {}
+        if phone:
+            vals['01_domicile'] = phone
         if mobile:
-            number = convert_phone_number(mobile, country_code)
-            phone_number_ids.append((0, 0, {'number': number, 'type': '03_mobile'}))
-        partner.write({'of_phone_number_ids': phone_number_ids})
+            vals['03_mobile'] = mobile
+        if vals:
+            partner_phones[partner_id] = vals
+
+    for partner in env['res.partner'].browse(partner_phones):
+        country_code = partner.country_id.code or 'FR'
+        phone_number_ids = []
+        for phone_type, phone_number in partner_phones[partner.id].items():
+            if number := convert_phone_number(phone_number, country_code):
+                phone_number_ids.append(Command.create({'number': number, 'type': phone_type}))
+        if phone_number_ids:
+            partner.write({'of_phone_number_ids': phone_number_ids})
 
 
 def post_init_hook(cr, registry):
