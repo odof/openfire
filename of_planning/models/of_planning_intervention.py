@@ -400,8 +400,8 @@ class OfPlanningIntervention(models.Model):
         'hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
         string="Intervenants", required=True, domain=lambda self: self._domain_employee_ids())
     employee_main_id = fields.Many2one(
-        'hr.employee', string=u"Employé principal", compute="_compute_employee_main_id",
-        search="_search_employee_main_id", store=True)
+        comodel_name='hr.employee', string=u"Employé principal",
+        search='_search_employee_main_id', store=True, required=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client", ondelete='restrict')
     partner_tag_ids = fields.Many2many(comodel_name='res.partner.category', string=u"Étiquettes client",
                                        related='partner_id.category_id', readonly=True)
@@ -561,13 +561,6 @@ class OfPlanningIntervention(models.Model):
     flexible = fields.Boolean(string="Flexible")
 
     # Compute
-
-    @api.multi
-    @api.depends('employee_ids')
-    def _compute_employee_main_id(self):
-        for interv in self:
-            if interv.employee_ids:
-                interv.employee_main_id = interv.employee_ids[0]
 
     @api.depends('date', 'date_deadline_forcee', 'date_deadline')
     def _compute_jour(self):
@@ -1058,6 +1051,17 @@ class OfPlanningIntervention(models.Model):
     ]
 
     # onchange
+
+    @api.onchange('employee_ids')
+    def _onchange_employee_main_id(self):
+        for interv in self:
+            if interv.employee_ids:
+                if not interv.employee_main_id or interv.employee_main_id not in interv.employee_ids:
+                    interv.employee_main_id = interv.employee_ids[0]
+                else:
+                    pass
+            else:
+                interv.employee_main_id = False
 
     @api.onchange('equipe_id')
     def _onchange_equipe_id(self):
