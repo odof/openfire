@@ -2,17 +2,14 @@
 
 from odoo.fields import Command
 from odoo.tests import tagged
-from odoo.tests.common import TransactionCase
+
+from odoo.addons.of_base.tests.common import TestOFBaseCommon
 
 
 @tagged('post_install', '-at_install', 'openfire_custom')
-class TestOFAccountCommon(TransactionCase):
+class TestOFAccountCommon(TestOFBaseCommon):
     def setUp(self):
         super().setUp()
-
-    @classmethod
-    def create_company(cls, values):
-        return cls.env['res.company'].create(values)
 
     @classmethod
     def create_product(cls, values):
@@ -54,14 +51,6 @@ class TestOFAccountCommon(TransactionCase):
         )
         # Company and accounting data
         coa = cls.env.ref('l10n_fr.l10n_fr_pcg_chart_template')
-        cls.company_fr = cls.create_company(
-            {
-                'name': "Openfire FR",
-                'currency_id': cls.env.ref('base.EUR').id,
-                'country_id': cls.env.ref('base.fr').id,
-                'account_fiscal_country_id': cls.env.ref('base.fr').id,
-            }
-        )
         cls.env.user.company_ids |= cls.company_fr
         cls.env.user.company_id = cls.company_fr.id
         coa.try_loading(company=cls.env.user.company_id)
@@ -125,22 +114,6 @@ class TestOFAccountCommon(TransactionCase):
                     'company_id': cls.company_fr.id,
                 },
             ]
-        )
-
-        # Customer data
-        cls.customer_a = cls.env['res.partner'].create(
-            {
-                'name': "Partner A",
-                'company_id': cls.company_fr.id,
-                'customer_rank': 1,
-            }
-        )
-        cls.supplier_a = cls.env['res.partner'].create(
-            {
-                'name': "Supplier A",
-                'company_id': cls.company_fr.id,
-                'supplier_rank': 1,
-            }
         )
 
         # Price list data

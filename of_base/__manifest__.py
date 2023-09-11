@@ -1,3 +1,5 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': "OpenFire / Base",
     'version': '16.0.1.0.0',
@@ -6,8 +8,6 @@
     'sequence': 15,
     'summary': "Base module for OpenFire",
     'website': 'https://www.openfire.fr',
-    'description': """
-""",
     'depends': [
         'base',
         'base_iban',
@@ -42,6 +42,7 @@
         'wizards/mail_compose_message_views.xml',
         'wizards/of_popup_wizard_view.xml',
         'wizards/of_res_partner_check_duplications_views.xml',
+        'wizards/of_html_sanitize_views.xml',
     ],
     'external_dependencies': {
         'python': [

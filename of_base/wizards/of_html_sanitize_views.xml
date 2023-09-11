@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_html_sanitize_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.html.sanitize.wizard.view.form</field>
+        <field name="model">of.html.sanitize.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>
+                    You're about to start cleaning all the HTML fields in the database.
+                    Are you sure you want to continue ?
+                </p>
+                <footer>
+                    <button name="action_button_clean" string="Clean" type="object" class="oe_highlight"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_html_sanitize_wizard_action" model="ir.actions.act_window">
+        <field name="name">HTML field cleanup</field>
+        <field name="res_model">of.html.sanitize.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="of_html_sanitize_wizard_view_form"/>
+    </record>
+
+    <menuitem id="of_html_sanitize_wizard_menu" name="HTML field cleanup" action="of_html_sanitize_wizard_action"
+        parent="base.next_id_9" sequence="20" groups="of_base.of_group_root_only"/>
+
+</odoo>
