@@ -6,7 +6,7 @@
     <record id="of_sale_custom_workflow_sale_order_form_view" model="ir.ui.view">
         <field name="name">of.sale.custom.workflow.sale.order.form.view</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
         <field name="priority" eval="10"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_confirm']" position="after">
@@ -35,7 +35,7 @@
                 <field name="of_confirmation_delta" states="sale,done,closed"/>
             </xpath>
             <xpath expr="//field[@name='confirmation_date']" position="attributes">
-                <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'presale', 'cancel'])]}</attribute>
+                <attribute name="attrs">{'invisible': [('state', 'in', ['draft', 'sent', 'presale', 'cancel']), ('confirmation_date', '=', False)]}</attribute>
             </xpath>
         </field>
     </record>
