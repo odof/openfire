@@ -78,15 +78,18 @@ class SaleOrder(models.Model):
     @api.multi
     def action_preconfirm(self):
         for order in self:
-            order.state = 'presale'
             of_custom_confirmation_date = fields.Datetime.now()
-            order.of_custom_confirmation_date = of_custom_confirmation_date
+            vals = {
+                'state': 'presale',
+                'of_custom_confirmation_date': of_custom_confirmation_date,
+            }
             if order.date_order:
                 date_order = datetime.strptime(order.date_order, "%Y-%m-%d %H:%M:%S")
                 of_custom_confirmation_date = datetime.strptime(of_custom_confirmation_date, "%Y-%m-%d %H:%M:%S")
                 of_custom_confirmation_delta = of_custom_confirmation_date - date_order
                 # We use a float to avoid rounding the result
-                order.of_custom_confirmation_delta = of_custom_confirmation_delta.total_seconds() / 86400.0
+                vals['of_custom_confirmation_delta'] = of_custom_confirmation_delta.total_seconds() / 86400.0
+            order.write(vals)
         self.activate_activities_triggered_at_validation()
         return True
 
