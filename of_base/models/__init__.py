@@ -3,6 +3,7 @@
 from . import update
 from . import base_config_settings
 from . import base
+from . import ir_http
 from . import ir_attachment
 from . import res_company
 from . import ir_mail_server

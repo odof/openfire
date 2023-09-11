@@ -51,10 +51,10 @@
     },
     'assets': {
         'web.assets_backend': [
-            'of_base/static/src/js/of_action_manager.js',
+            'of_base/static/src/js/user_menu_item.js',
             'of_base/static/src/js/history_back.js',
             'of_base/static/src/less/of_base.less',
-        ]
+        ],
     },
     'installable': True,
     'application': False,
