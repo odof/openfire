@@ -91,7 +91,7 @@ Droits utilisateurs:
         "res_config_settings_enterprise_remove",
     ],
     'external_dependencies': {
-        'python': ['pdfminer', 'pypdftk', 'pyPdf'],
+        'python': ['pdfminer', 'pypdftk', 'pyPdf', 'simplejson', 'lxml'],
     },
     'data': [
         'data/assets.xml',

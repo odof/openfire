@@ -69,4 +69,8 @@
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
 
+        <record id="of_group_modification_sale_order_access" model="res.groups">
+            <field name="name">Bloquer la Modification de BC validé</field>
+        </record>
+
 </odoo>

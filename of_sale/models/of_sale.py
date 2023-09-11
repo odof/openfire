@@ -10,7 +10,8 @@ from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
 from odoo.exceptions import UserError
 from odoo.models import regex_order
 from odoo.addons.of_utils.models.of_utils import get_selection_label
-
+import simplejson
+from lxml import etree
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -46,6 +47,32 @@ SO._compute_tax_id = _compute_tax_id
 class SaleOrder(models.Model):
     _name = 'sale.order'
     _inherit = ['sale.order', 'of.documents.joints']
+
+    of_check_access = fields.Boolean(string=u"Check access", compute='_of_check_modification_sale_order_access')
+
+    def _of_check_modification_sale_order_access(self):
+        if self.env.user.has_group('of_sale.of_group_modification_sale_order_access'):
+            self.of_check_access = True
+        else:
+            self.of_check_access = False
+
+    @api.model
+    def of_fields_view_get(self, view_id=None, view_type=False, toolbar=False, submenu=False):
+        res = super(SaleOrder, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                     submenu=submenu)
+        doc = etree.XML(res['arch'])
+        if view_type == 'form':
+            for node in doc.xpath("//field"):
+                modifiers = simplejson.loads(node.get("modifiers"))
+                if 'readonly' not in modifiers:
+                    modifiers['readonly'] = [['check_access', '=', True]]
+                else:
+                    if type(modifiers['readonly']) != bool:
+                        modifiers['readonly'].insert(0, '|')
+                        modifiers['readonly'] += [['check_access', '=', True]]
+                node.set('modifiers', simplejson.dumps(modifiers))
+                res['arch'] = etree.tostring(doc)
+        return res
 
     def pdf_payment_schedule(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_schedule')

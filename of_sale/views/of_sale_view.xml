@@ -51,6 +51,12 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="of_sale_discount.of_sale_discount_view_order_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//header" position="after">
+                <div class="alert alert-info" role="alert" style="height: 40px; margin-bottom:0px; text-align: center;" attrs="{'invisible':[('of_check_access', '=', False)]}">
+                    Vous n'avez pas le droit de modifier un BC validé , merci de contacter votre responsable<strong></strong>.
+                </div>
+                </xpath>
+
                 <button name="action_done" states="sale" position="attributes">
                     <attribute name="confirm">Êtes-vous sûr de vouloir verrouiller la vente ? Une fois verrouillée, vous ne pourrez plus rien modifier. Cette action est irréversible.</attribute>
                 </button>
@@ -87,6 +93,7 @@
                         <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
                         <field name="of_partner_mobile" nolabel="1"/><br/>
                         <field name="of_partner_email" nolabel="1"/>
+                        <field name="of_check_access" invisible="1"/>
                     </div>
                 </xpath>
                 <field name="date_order" position="attributes">
