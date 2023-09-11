@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <function model="sale.config.settings" name="activate_of_analytique_code"/>
+
+    <record id="ir_rule_intervention_only_user_timesheet" model="ir.rule">
+        <field name="name">Ne pouvoir modifier que ses feuilles de temps sur les interventions</field>
+        <field name="model_id" ref="account.model_account_analytic_line"/>
+        <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_access'))]"/>
+        <field name="perm_read" eval="0"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="1" />
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+
+    <record id="ir_rule_intervention_all_user_timesheet" model="ir.rule">
+        <field name="name">Pouvoir modifier toutes les feuilles de temps sur les interventions</field>
+        <field name="model_id" ref="account.model_account_analytic_line"/>
+        <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_responsible'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1" />
+        <field name="domain_force">[(1 ,'=', 1)]</field>
+    </record>
+
+</odoo>
