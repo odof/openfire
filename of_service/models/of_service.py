@@ -215,7 +215,8 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     secteur_tech_id = fields.Many2one(
         related='address_id.of_secteur_tech_id', readonly=True, store=True)
     department_id = fields.Many2one(
-        'res.country.department', compute='_compute_department_id', string=u"Département", readonly=True, store=True)
+        comodel_name='res.country.department', string=u"Département", compute='_compute_department_id',
+        readonly=True, store=True, compute_sudo=True)
     tag_ids = fields.Many2many(
         string=u"Étiquettes", comodel_name='of.planning.tag', relation='of_service_of_planning_tag_rel',
         column1='service_id', column2='tag_id')
