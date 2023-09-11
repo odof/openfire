@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.timesheet.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[last()]" position="after">
+                <page string="Feuilles de temps">
+                    <field name="of_account_id" invisible="1"/>
+                    <field name="of_analytic_line_ids" nolabel="1" context="{'default_user_id': False, 'default_of_intervention_id': active_id, 'default_of_state': 'draft', 'default_name': name, 'default_account_id': of_account_id}">
+                        <tree editable="bottom">
+                            <field name="of_intervention_id" invisible="1"/>
+                            <field name="of_user_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="of_state" invisible="1"/>
+                            <field name="name" invisible="1"/>
+                            <field name="date" invisible="1"/>
+                            <field name="account_id" invisible="1"/>
+                            <field name="user_id" required="1" options="{'no_open': True, 'no_create': True}" string="Intervenant" domain="[('id', 'in', of_user_ids and of_user_ids[0] and of_user_ids[0][2] or False)]"/>
+                            <field name="of_planned_startdate"/>
+                            <field name="of_planned_enddate"/>
+                            <field name="of_real_startdate"/>
+                            <field name="of_real_enddate"/>
+                            <field name="of_real_duration" widget="float_time"/>
+                            <field name="of_break_duration" widget="float_time"/>
+                            <field name="of_trip_duration" widget="float_time"/>
+                        </tree>
+                    </field>
+                    <button string="Valider"
+                        name="validate_of_analytic_line_ids"
+                        type="object" class="btn-primary"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

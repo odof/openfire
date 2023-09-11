@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_account_analytic_line_form" model="ir.ui.view">
+        <field name="name">of.planning.timesheet.view.account.analytic.line.form</field>
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="analytic.view_account_analytic_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="replace">
+            </xpath>
+            <xpath expr="//group[1]" position="before">
+                <div class="oe_title oe_inline">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1><field name="name"/></h1>
+                </div>
+            </xpath>
+            <xpath expr="//group[1]/group[1]" position="attributes">
+                <attribute name="string">Informations</attribute>
+            </xpath>
+            <xpath expr="//field[@name='account_id']" position="before">
+                <field name="user_id"/>
+            </xpath>
+            <!-- Déplacer le champ dans la page informations -->
+            <xpath expr="//field[@name='date']" position="replace"/>
+            <xpath expr="//group[1]" position="inside">
+                <group string="Origine">
+                    <field name="of_intervention_id"/>
+                </group>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Informations">
+                        <group>
+                            <group string="Feuille de temps">
+                                <field name="date"/>
+                                <field name="of_real_startdate"/>
+                                <field name="of_real_enddate"/>
+                                <field name="of_real_duration" widget="float_time"/>
+                                <field name="of_break_duration"/>
+                                <field name="of_trip_duration"/>
+                            </group>
+                            <group string="Durée planifiée">
+                                <field name="of_planned_startdate"/>
+                                <field name="of_planned_duration" widget="float_time"/>
+                                <field name="of_planned_enddate"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

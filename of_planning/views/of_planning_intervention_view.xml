@@ -283,6 +283,11 @@
                                         <i class="fa fa-warning of_ws"/>Au moins un des intervenants n'a pas accès à la société de ce RDV, il ne pourra donc pas l'éditer.'
                                     </div>
                                 </div>
+                                <label for="employee_main_id" string="Intervenant principal"/>
+                                <div>
+                                    <field name="employee_main_id" string="Intervenant principal"
+                                           options='{"no_open": True, "no_create": True}' domain="[('id', 'in', employee_ids and employee_ids[0] and employee_ids[0][2])]"/>
+                                </div>
                                 <field name="company_id" options="{'no_create': True, 'no_edit': True}"/>
                             </group>
                         </group>
