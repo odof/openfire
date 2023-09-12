@@ -21,6 +21,15 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
             }
         )
 
+        # If users don't have group we add them, because we are using Form here and we need discount fields
+        # to be visible
+        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_salesman.groups_id:
+            cls.user_salesman.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
+        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_sale_responsible.groups_id:
+            cls.user_sale_responsible.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
+        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_sale_manager.groups_id:
+            cls.user_sale_manager.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
+
     def test_01_salesman_order_line_price_unit_edit_without_price_unit_group_nok(self):
         """Test that a salesman can't edit the price unit of a sale order line with a non forbidden discount product if
         he doesn't have the group group_of_can_modify_sale_price_unit"""
