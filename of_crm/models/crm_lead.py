@@ -16,22 +16,6 @@ class CrmLead(models.Model):
 
     @api.model_cr_context
     def _auto_init(self):
-        """
-        Changement du fonctionnement des tag_ids de crm.lead pour que le champ soit
-        related a partner_id.category_id donc ajout des tags présent sur le crm.lead
-        dans le res.partner associé
-        """
-        cr = self._cr
-        cr.execute("SELECT 1 FROM ir_model_fields WHERE model = 'crm.lead' AND name = 'tag_ids' "
-                   "AND (related IS NULL OR related = '')")
-        if cr.fetchall():
-            # Remplissage des étiquettes partenaire manquantes à partir des étiquettes du pipeline
-            cr.execute("INSERT INTO res_partner_res_partner_category_rel(partner_id, category_id) "
-                       "SELECT lead.partner_id, rel.category_id "
-                       "FROM crm_lead lead "
-                       "INNER JOIN crm_lead_res_partner_category_rel rel ON rel.lead_id = lead.id "
-                       "WHERE lead.partner_id IS NOT NULL "
-                       "ON CONFLICT DO NOTHING")
         cr = self._cr
         cr.execute(
             "SELECT * FROM information_schema.columns WHERE table_name = 'crm_lead' AND column_name = 'of_date_projet'")
@@ -39,21 +23,6 @@ class CrmLead(models.Model):
         res = super(CrmLead, self)._auto_init()
         if not of_date_projet:
             cr.execute("UPDATE crm_lead SET of_date_projet = date_deadline, date_deadline = of_date_cloture")
-
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_crm')])
-        if module_self:
-            version = module_self.latest_version
-            if version < "10.0.1.1.1":
-                cr.execute(
-                    "UPDATE crm_lead        CL "
-                    "SET    of_date_action  = ( SELECT      OCA.date "
-                    "                           FROM        of_crm_activity     OCA "
-                    "                           WHERE       OCA.opportunity_id  = CL.id "
-                    "                           AND         OCA.state           = 'planned' "
-                    "                           ORDER BY    OCA.date "
-                    "                           LIMIT 1)"
-                )
-
         return res
 
     @api.model

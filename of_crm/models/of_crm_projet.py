@@ -10,36 +10,6 @@ class OFCRMProjetLine(models.Model):
     _name = 'of.crm.projet.line'
     _order = 'sequence'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        # auto_init temporaire pour l'ajout des champs 'is_answered' et affiliés
-        cr = self._cr
-        cr.execute("SELECT 1 FROM information_schema.columns "
-                   "WHERE table_name = 'of_crm_projet_line' AND column_name = 'is_answered'")
-        is_answered_exists = bool(cr.fetchall())
-        res = super(OFCRMProjetLine, self)._auto_init()
-
-        if not is_answered_exists:
-            # Initialisation des champs
-            cr.execute("UPDATE of_crm_projet_line AS l "
-                       "SET is_answered = 't', answer_date = write_date, answer_orig_date = write_date, "
-                       "answer_user_id = create_uid, answer_orig_user_id = create_uid,"
-                       "answer_orig = CASE "
-                       "    WHEN type = 'bool' AND val_bool THEN 'Oui'"
-                       "    WHEN type = 'bool' THEN 'Non'"
-                       "    WHEN type = 'char' THEN val_char "
-                       "    WHEN type = 'text' THEN val_text "
-                       "    WHEN type = 'selection' THEN "
-                       "        (SELECT name FROM of_crm_projet_attr_select AS s WHERE s.id = l.val_select_id) "
-                       "    WHEN type = 'date' THEN TEXT(val_date) "
-                       "    ELSE '' END "
-                       "WHERE type = 'bool' "
-                       "OR type = 'char' AND val_char IS NOT NULL AND val_char != '' "
-                       "OR type = 'text' AND val_text IS NOT NULL AND val_text != '' "
-                       "OR type = 'selection' AND val_select_id IS NOT NULL "
-                       "OR type = 'date' AND val_date IS NOT NULL")
-        return res
-
     name = fields.Char(string=u"Question", required=True, translate=True)
     lead_id = fields.Many2one('crm.lead', string=u"Opportunité", required=True, ondelete="cascade")
     company_id = fields.Many2one(
