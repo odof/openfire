@@ -18,6 +18,8 @@ Module OpenFire pour e-commerce
         'of_sale',
         'of_account_tax',
         'of_website_portal',
+        'website_breadcrumb',
+        'website_canonical_url',
     ],
     'data': [
         'security/of_website_sale_security.xml',
@@ -28,8 +30,7 @@ Module OpenFire pour e-commerce
         'views/templates.xml',
         'hooks/post_hook.xml',
     ],
-    'qweb': [
-    ],
+    'qweb': [],
     'installable': True,
     'application': False,
     'auto_install': False,
