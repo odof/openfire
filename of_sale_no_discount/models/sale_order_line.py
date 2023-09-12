@@ -61,13 +61,30 @@ class SaleOrderLine(models.Model):
         is not forbidden to discount.
         """
         for line in self:
-            of_is_price_unit_readonly = True
-            if self.env.user.has_group('sales_team.group_sale_manager'):
-                of_is_price_unit_readonly = False
-            elif self.env.user.user_has_groups(
-                'of_sale.of_group_sale_responsible+of_sale_no_discount.group_of_can_modify_sale_price_unit'
-            ):
-                of_is_price_unit_readonly = False
-            elif self.env.user.has_group('of_sale_no_discount.group_of_can_modify_sale_price_unit'):
-                of_is_price_unit_readonly = line.of_product_forbidden_discount
-            line.of_is_price_unit_readonly = of_is_price_unit_readonly
+            line.of_is_price_unit_readonly = self._get_is_price_unit_readonly(line)
+
+    @api.onchange('product_id')
+    def _trigger_is_price_readonly(self):
+        """Set the price unit readonly if the product is forbidden to discount. Keep an onchange to be sure that the
+        value is set during the creation of the sale order line.
+        """
+        for line in self:
+            if line.product_id:
+                line.of_is_price_unit_readonly = self._get_is_price_unit_readonly(line)
+
+    def _get_is_price_unit_readonly(self, line):
+        """Return True if the price unit is readonly, False otherwise.
+
+        :param line: sale.order.line record
+        :return: True if the price unit is readonly, False otherwise
+        """
+        of_is_price_unit_readonly = True
+        if self.env.user.has_group('sales_team.group_sale_manager'):
+            of_is_price_unit_readonly = False
+        elif self.env.user.user_has_groups(
+            'of_sale.of_group_sale_responsible+of_sale_no_discount.group_of_can_modify_sale_price_unit'
+        ):
+            of_is_price_unit_readonly = False
+        elif self.env.user.has_group('of_sale_no_discount.group_of_can_modify_sale_price_unit'):
+            of_is_price_unit_readonly = line.of_product_forbidden_discount
+        return of_is_price_unit_readonly
