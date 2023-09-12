@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 
@@ -734,7 +735,8 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
-        self.sudo().creer_analyse_chantier()
+        if self.env['ir.values'].get_default('sale.config.settings', 'of_create_analyse_auto'):
+            self.sudo().creer_analyse_chantier()
         return res
 
 
@@ -748,20 +750,6 @@ class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
     of_order_line_ids = fields.Many2many('sale.order.line', 'sale_order_line_invoice_rel', 'invoice_line_id', 'order_line_id', string='Order Lines', copy=False)
-
-
-class OFSaleConfiguration(models.TransientModel):
-    _inherit = 'sale.config.settings'
-
-    of_discount_product_categ_ids_setting = fields.Many2many(
-        'product.category',
-        string=u"(OF) Catégorie des remises",
-        help=u"Catégorie des articles utilisés pour les remises")
-
-    @api.multi
-    def set_of_discount_product_categ_ids_setting(self):
-        return self.env['ir.values'].sudo().set_default(
-            'sale.config.settings', 'of_discount_product_categ_ids_setting', self.of_discount_product_categ_ids_setting._ids)
 
 
 class HrEmployee(models.Model):
