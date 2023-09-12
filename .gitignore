@@ -4,6 +4,7 @@
 !.flake8
 !.isort.cfg
 !.gitlab-ci.yml
+!.pylintrc
 !.gitignore
 # compiled python and python cache files
 *.py[co]
