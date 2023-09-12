@@ -19,6 +19,7 @@ class AccountInvoice(models.Model):
 
     def invoice_line_move_line_get(self):
         res = super(AccountInvoice, self).invoice_line_move_line_get()
+        invoice_type = self.type
         copy = [x for x in res]
         for aml in copy:
             line = self.invoice_line_ids.filtered(lambda il: il.id == aml['invl_id'])
@@ -26,7 +27,11 @@ class AccountInvoice(models.Model):
                 contribution = line.product_id.of_eco_contribution_id
                 # on a de l'éco-contribution sur la ligne et l'éco-organisme a un compte comptable renseigné
                 # on a donc une nouvelle ligne dans la pièce comptable pour l'éco-contribution
-                if contribution.organism_id.account_id:
+                if invoice_type.startswith('out_'):  # out_invoice, out_refund -> Client
+                    account = contribution.organism_id.account_id
+                else:
+                    account = contribution.organism_id.payable_account_id
+                if account:
                     analytic_tag_ids = [(4, analytic_tag.id, None) for analytic_tag in line.analytic_tag_ids]
                     res_aml_index = res.index(aml)
                     move_line_dict = {
@@ -36,7 +41,7 @@ class AccountInvoice(models.Model):
                         'price_unit': line.of_total_eco_contribution,
                         'quantity': 1.0,
                         'price': line.of_total_eco_contribution,
-                        'account_id': contribution.organism_id.account_id.id,
+                        'account_id': account.id,
                         'product_id': line.product_id.id,
                         'uom_id': line.uom_id.id,
                         'account_analytic_id': line.account_analytic_id.id,
