@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_project_attr_view_form" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.form</field>
+        <field name="model">of.crm.project.attr</field>
+        <field name="arch" type="xml">
+            <form string="Project attribute">
+                <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                <sheet>
+                    <group name="container">
+                        <group name="left">
+                            <field name="name"/>
+                            <field name="type"/>
+                            <field name="val_bool_default" attrs="{'invisible': [('type','!=','bool')]}"/>
+                            <field name="val_char_default" attrs="{'invisible': [('type','!=','char')]}"/>
+                            <field name="val_text_default" attrs="{'invisible': [('type','!=','text')]}"/>
+                            <field name="val_select_id_default" widget="selection" attrs="{'invisible': [('type','!=','selection')]}"/>
+                        </group>
+                        <group name="right">
+                            <field name="active"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group name="description" colspan="4">
+                            <field name="description"/>
+                        </group>
+                        <group name="values" string="Values">
+                            <field name="selection_ids" colspan="4" nolabel="1" attrs="{'invisible': [('type','not in',('selection','multiple'))]}">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group colspan="4">
+                            <field name="template_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_view_tree" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.tree</field>
+        <field name="model">of.crm.project.attr</field>
+        <field name="arch" type="xml">
+            <tree string="Project attributes" decoration-muted="not active">
+                <field name="active" invisible="1"/>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="description"/>
+                <field name="template_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_view_filter" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.search</field>
+        <field name="model">of.crm.project.attr</field>
+        <field name="arch" type="xml">
+            <search string="Project attributes">
+                <field name="name" string="Attribute" filter_domain="[('name','ilike',self)]"/>
+                <field name="template_ids" string="Templates" filter_domain="[('template_ids', 'ilike', self)]"/>
+                <field name="type"/>
+                <separator/>
+                <filter name="filter_bool" string="Boolean" domain="[('type', '=', 'bool')]"/>
+                <filter name="filter_selection" string="Single choice" domain="[('type', '=', 'selection')]"/>
+                <filter name="filter_date" string="Date" domain="[('type', '=', 'date')]"/>
+                <filter name="filter_char" string="Short text" domain="[('type', '=', 'char')]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="groupby_type" string="Type" domain="[]" context="{'group_by':'type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_action" model="ir.actions.act_window">
+        <field name="name">Project attributes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.crm.project.attr</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new attribute.
+            </p>
+        </field>
+    </record>
+
+</odoo>

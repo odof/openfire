@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_project_attr_select_view_form" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.select.form</field>
+        <field name="model">of.crm.project.attr.select</field>
+        <field name="arch" type="xml">
+            <form string="Project attribute value">
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <group>
+                        <group name="main">
+                            <field name="name"/>
+                            <field name="attr_id"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group name="description" colspan="2" string="Description">
+                            <field name="description" colspan="2" nolabel="1" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_select_view_tree" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.select.tree</field>
+        <field name="model">of.crm.project.attr.select</field>
+        <field name="arch" type="xml">
+            <tree string="Project attribute values" decoration-muted="not active">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="attr_id"/>
+                <field name="description"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_select_view_filter" model="ir.ui.view">
+        <field name="name">of.crm.project.attr.select.search</field>
+        <field name="model">of.crm.project.attr.select</field>
+        <field name="arch" type="xml">
+            <search string="Project attribute values">
+                <field name="name" string="Values" filter_domain="[('name','ilike',self)]"/>
+                <field name="attr_id" string="Attributes" filter_domain="[('attr_id', 'ilike', self)]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="groupby_attr" string="Attribute" domain="[]" context="{'group_by':'attr_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_crm_project_attr_select_action" model="ir.actions.act_window">
+        <field name="name">Project attribute values</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.crm.project.attr.select</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to define a new attribute value.
+            </p>
+        </field>
+    </record>
+
+</odoo>

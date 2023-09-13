@@ -1,0 +1,410 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_crm_project
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-14 15:26+0000\n"
+"PO-Revision-Date: 2023-09-14 15:26+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__active
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__active
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__val_bool
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__val_char
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__val_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__val_select_id
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__val_text
+msgid "Answer"
+msgstr "Réponse"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_date
+msgid "Answer date"
+msgstr "Date de réponse"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_form
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_form
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_form
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__attr_id
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__attr_id
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Attribute"
+msgstr "Attribut"
+
+#. module: of_crm_project
+#: model:ir.ui.menu,name:of_crm_project.of_crm_project_attr_select_menu
+msgid "Attribute values"
+msgstr "Valeurs d'attributs"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__attr_ids
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_filter
+msgid "Attributes"
+msgstr "Attributs"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_user_id
+msgid "Author of answer"
+msgstr "Auteur de la réponse"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Boolean"
+msgstr "Booléen"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__bool
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__bool
+msgid "Boolean (Yes/No)"
+msgstr "Booléen (Oui/Non)"
+
+#. module: of_crm_project
+#: model:ir.actions.act_window,name:of_crm_project.action_of_crm_project_line_pivot
+msgid "CRM project lines"
+msgstr "Lignes de projet CRM"
+
+#. module: of_crm_project
+#: model:ir.ui.menu,name:of_crm_project.menu_of_crm_project_line
+msgid "CRM surveys"
+msgstr "Questionnaires CRM"
+
+#. module: of_crm_project
+#: model_terms:ir.actions.act_window,help:of_crm_project.of_crm_project_attr_select_action
+msgid "Click to define a new attribute value."
+msgstr "Cliquez pour définir une nouvelle valeur d'attribut."
+
+#. module: of_crm_project
+#: model_terms:ir.actions.act_window,help:of_crm_project.of_crm_project_attr_action
+msgid "Click to define a new attribute."
+msgstr "Cliquez pour définir un nouvel attribut."
+
+#. module: of_crm_project
+#: model_terms:ir.actions.act_window,help:of_crm_project.of_crm_project_template_action
+msgid "Click to define a new project template."
+msgstr "Cliquez pour définir un nouveau modèle de projet."
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__create_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__create_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__create_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__create_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__create_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__create_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__date
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__date
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Date"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__val_bool_default
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__val_char_default
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__val_select_id_default
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__val_text_default
+msgid "Default value"
+msgstr "Valeur par défaut"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__description
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__description
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_form
+msgid "Description"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__display_name
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__display_name
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__display_name
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__display_name
+msgid "Display Name"
+msgstr "Nom à afficher"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_project_line_ids
+msgid "Entries"
+msgstr "Entrées"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__is_answered
+msgid "Got an answered"
+msgstr "A obtenu une réponse"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__is_corrected
+msgid "Has been corrected"
+msgstr "A été corrigé"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__id
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__id
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__id
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__id
+msgid "ID"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr____last_update
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select____last_update
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line____last_update
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__write_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__write_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__write_uid
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__write_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__write_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__write_date
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_crm_project
+#: model:ir.model,name:of_crm_project.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "Piste/Opportunité"
+
+#. module: of_crm_project
+#: model:ir.model.fields,help:of_crm_project.field_of_crm_project_template__attr_ids
+msgid ""
+"List of attributes for this template. They will be copied to the project "
+"file if this template is selected."
+msgstr ""
+"Liste des attributs pour ce modèle. Ils seront copiés dans le fichier projet"
+" si ce modèle est sélectionné."
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__text
+msgid "Long Text"
+msgstr "Texte long"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__text
+msgid "Long text"
+msgstr "Texte long"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__name
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__name
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__lead_id
+msgid "Opportunity"
+msgstr "Opportunité"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_orig
+msgid "Original answer"
+msgstr "Réponse originale"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_orig_date
+msgid "Original answer date"
+msgstr "Date de réponse originale"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_orig_user_id
+msgid "Original author answer"
+msgstr "Auteur de la réponse originale"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_template_id
+#: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+msgid "Project"
+msgstr "Projet"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_form
+msgid "Project attribute"
+msgstr "Attribut de projet"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_form
+msgid "Project attribute value"
+msgstr "Valeur d'attribut de projet"
+
+#. module: of_crm_project
+#: model:ir.actions.act_window,name:of_crm_project.of_crm_project_attr_select_action
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_tree
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_filter
+msgid "Project attribute values"
+msgstr "Valeurs d'attributs de projet"
+
+#. module: of_crm_project
+#: model:ir.actions.act_window,name:of_crm_project.of_crm_project_attr_action
+#: model:ir.ui.menu,name:of_crm_project.of_crm_project_attr_menu
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_tree
+msgid "Project attributes"
+msgstr "Attributs de projet"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_date_project
+msgid "Project date"
+msgstr "Date de projet"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_line_view_tree
+msgid "Project entries"
+msgstr "Entrées de projet"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_line_view_form
+msgid "Project entry"
+msgstr "Entrée de projet"
+
+#. module: of_crm_project
+#: model:ir.actions.act_window,name:of_crm_project.action_of_crm_project_line_form
+#: model_terms:ir.ui.view,arch_db:of_crm_project.view_of_crm_project_line_pivot
+msgid "Project lines"
+msgstr "Lignes de projet"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_form
+msgid "Project template"
+msgstr "Modèle de projet"
+
+#. module: of_crm_project
+#: model:ir.actions.act_window,name:of_crm_project.of_crm_project_template_action
+#: model:ir.ui.menu,name:of_crm_project.of_crm_project_template_menu
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_template_view_tree
+msgid "Project templates"
+msgstr "Modèles de projet"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__template_ids
+#: model:ir.ui.menu,name:of_crm_project.of_crm_menu_projet_config
+msgid "Projects"
+msgstr "Projets"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__name
+msgid "Question"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__type_var_name
+msgid "Response variable name"
+msgstr "Nom de la variable de réponse"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__sequence
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr_select__sequence
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__char
+msgid "Short Text"
+msgstr "Texte court"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__char
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Short text"
+msgstr "Texte court"
+
+#. module: of_crm_project
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__selection
+#: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__selection
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Single choice"
+msgstr "Choix unique"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Templates"
+msgstr "Modèles"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__type
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__type
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
+msgid "Type"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__selection_ids
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_form
+msgid "Values"
+msgstr "Valeurs"
+
+#. module: of_crm_project
+#: model:ir.model,name:of_crm_project.model_of_crm_project_attr
+msgid "of.crm.project.attr"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model,name:of_crm_project.model_of_crm_project_attr_select
+msgid "of.crm.project.attr.select"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model,name:of_crm_project.model_of_crm_project_line
+msgid "of.crm.project.line"
+msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model,name:of_crm_project.model_of_crm_project_template
+msgid "of.crm.project.template"
+msgstr ""

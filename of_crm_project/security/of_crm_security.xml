@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<record id="of_crm_of_crm_projet_line_comp_rule" model="ir.rule">
+<record id="of_crm_of_crm_project_line_comp_rule" model="ir.rule">
     <field name="name">OF CRM Projet Lines multi-company</field>
-    <field name="model_id" ref="model_of_crm_projet_line"/>
+    <field name="model_id" ref="model_of_crm_project_line"/>
     <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'child_of', [user.company_id.id])]</field>
 </record>
 

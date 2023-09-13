@@ -6,13 +6,14 @@ from odoo import fields, models
 class OFCRMProjectTemplate(models.Model):
     _name = 'of.crm.project.template'
 
-    name = fields.Char(required=True, translate=True)
+    name = fields.Char(string="Name", required=True, translate=True)
     attr_ids = fields.Many2many(
-        'of.crm.project.attr',
-        'crm_project_template_attr_rel',
-        'template_id',
-        'attr_id',
+        comodel_name='of.crm.project.attr',
+        relation='crm_project_template_attr_rel',
+        column1='template_id',
+        column2='attr_id',
         string="Attributes",
-        help=u"Liste des attributs de ce modèle. Ils seront copiés dans la fiche projet si ce modèle est sélectionné.",
+        help="List of attributes for this template. They will be copied to the project file if this template "
+        "is selected.",
     )
-    active = fields.Boolean(default=True)
+    active = fields.Boolean(string="Active", default=True)

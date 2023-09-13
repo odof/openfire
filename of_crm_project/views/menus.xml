@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="of_crm_menu_projet_config" name="Projects" parent="crm.crm_menu_config" sequence="5">
+        <menuitem id="of_crm_project_template_menu" name="Project templates" action="of_crm_project.of_crm_project_template_action" sequence="10"/>
+        <menuitem id="of_crm_project_attr_menu" name="Project attributes" action="of_crm_project.of_crm_project_attr_action" sequence="15"/>
+        <menuitem id="of_crm_project_attr_select_menu" name="Attribute values" action="of_crm_project.of_crm_project_attr_select_action" sequence="20"/>
+    </menuitem>
+
+    <menuitem id="menu_of_crm_project_line" name="CRM surveys" action="of_crm_project.action_of_crm_project_line_pivot" parent="crm.crm_menu_report" sequence="20"/>
+
+</odoo>

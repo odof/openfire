@@ -284,7 +284,7 @@
         </field>
     </record>
 
-    <record id="of_view_crm_case_leads_filter" model="ir.ui.view">
+    <record id="of_crm_view_crm_case_leads_filter" model="ir.ui.view">
         <field name="name">of.crm.lead.search - Leads</field>
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
