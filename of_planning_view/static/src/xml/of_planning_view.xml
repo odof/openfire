@@ -242,7 +242,11 @@
                 <span class="of_ws"/>
                 <t t-raw="record.tache_name"/>
             </div>
-
+            <div t-if="record.tag_names" name="tag_names">
+                <i class="fa fa-tags"/>
+                <span class="of_ws"/>
+                <t t-raw="record.tag_names"/>
+            </div>
             <div class="of_planning_info of_planning_info_lieu">
 
                 <i t-if="record.address_zip || record.address_city || record.secteur_name" class="fa fa-map-marker"/>

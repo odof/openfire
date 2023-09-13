@@ -87,6 +87,7 @@
                 <field name="employee_names" invisible="1"/>
                 <field name="tag_names" invisible="1"/>
                 <field name="tooltip_description" invisible="1"/>
+                <field name="tag_ids"/>
             </planning>
         </field>
     </record>
