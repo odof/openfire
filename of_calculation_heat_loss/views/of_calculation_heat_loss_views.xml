@@ -75,19 +75,7 @@
                     </i>
                     <notebook>
                         <page string="Appareils compatibles">
-                            <field name="product_ids">
-                                <tree default_order="of_puissance_nom_flo">
-                                    <field name="brand_id"/>
-                                    <field name="categ_id"/>
-                                    <field name="name"/>
-                                    <field name="standard_price"/>
-                                    <field name="list_price"/>
-                                    <field name="uom_id"/>
-                                    <field name="qty_available"/>
-                                    <field name="of_puissance_nom"/>
-                                    <field name="of_puissance_nom_flo" invisible="1"/>
-                                </tree>
-                            </field>
+                            <field name="line_ids" context="{'display_search_view': 1}"/>
                         </page>
                     </notebook>
                 </sheet>

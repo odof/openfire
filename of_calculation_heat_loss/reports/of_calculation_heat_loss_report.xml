@@ -82,6 +82,36 @@
                         </i>
                     </div>
                 </div>
+
+                <t t-set="lines_to_print" t-value="o.line_ids.filtered('to_print')"/>
+
+                <t t-if="lines_to_print">
+                    <div class="row mt16">
+                        <div class="col-md-12">
+                            <h3>Appareils compatibles</h3>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Marque</th>
+                                        <th>Nom</th>
+                                        <th class="text-right">Prix de vente</th>
+                                        <th class="text-right">Puissance nominale</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="lines_to_print" t-as="l">
+                                        <tr>
+                                            <td><span t-field="l.brand_name"/></td>
+                                            <td><span t-field="l.product_id.name"/></td>
+                                            <td class="text-right"><span t-field="l.list_price"/></td>
+                                            <td class="text-right"><span t-field="l.power_char"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
             </div>
         </t>
     </template>

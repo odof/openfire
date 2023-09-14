@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_heat_loss_line_view_form" model="ir.ui.view">
+        <field name="name">of.calculation.heat.loss.line.view.form</field>
+        <field name="model">of.calculation.heat.loss.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="brand_name"/>
+                            <field name="to_print"/>
+                        </group>
+                        <group>
+                            <field name="list_price"/>
+                            <field name="power_char"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_heat_loss_line_view_tree" model="ir.ui.view">
+        <field name="name">of.calculation.heat.loss.line.view.tree</field>
+        <field name="model">of.calculation.heat.loss.line</field>
+        <field name="arch" type="xml">
+            <tree default_order="power" editable="bottom">
+                <field name="brand_name"/>
+                <field name="product_id"/>
+                <field name="list_price"/>
+                <field name="power_char"/>
+                <field name="power" invisible="1"/>
+                <field name="to_print"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_heat_loss_line_view_search" model="ir.ui.view">
+        <field name="name">of.calculation.heat.loss.line.view.search</field>
+        <field name="model">of.calculation.heat.loss.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="brand_name"/>
+                <field name="product_id"/>
+                <field name="power"/>
+                <field name="to_print" />
+                <filter string="Impression" name="to_print" domain="[('to_print', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Puissance nominale"
+                            domain=""
+                            context="{'group_by': 'power_char'}" />
+                    <filter string="Marque"
+                            domain=""
+                            context="{'group_by': 'brand_name'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>
