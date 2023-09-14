@@ -16,8 +16,9 @@ class OFService(models.Model):
         # laisser le système calculer l'état
         res = super(OFService, self).button_valider()
         maintenance = self.env.ref('of_service.of_service_type_maintenance', raise_if_not_found=False)
-        if self.tache_id.website_published and maintenance and self.type_id.id == maintenance.id:
-            self.website_publish_button()
+        for service in self:
+            if service.tache_id.website_published and maintenance and service.type_id.id == maintenance.id:
+                service.website_publish_button()
         return res
 
     @api.multi
