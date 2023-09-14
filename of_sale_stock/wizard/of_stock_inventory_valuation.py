@@ -252,13 +252,13 @@ class OFStockInventoryValuation(models.TransientModel):
                 # on ne veut pas calculer toutes leurs valeurs par la suite, donc on bloque le prefetch
                 all_products = product_obj.with_context(active_test=False, prefetch_fields=False).search(product_domain)
                 product_domain = [('product_id', 'in', all_products.ids)]
+            price_precision = self.env['decimal.precision'].precision_get('Product Price')
             for inv_line in self.env['stock.inventory.line'].search(
                     [('inventory_id', 'in', self.inventory_ids.ids)] + product_domain):
                 vals_dict = stock_history_dict[inv_line.location_id.id].setdefault(inv_line.product_id.id, {})
                 if inv_line.of_internal_serial_number in vals_dict:
                     vals_dict = vals_dict[inv_line.of_internal_serial_number]
                     vals_dict['inv_qty'] = vals_dict.get('inv_qty', 0) + inv_line.product_qty
-                    vals_dict['inv_value'] = vals_dict.get('inv_value', 0) + inv_line.product_value
                 else:
                     vals_dict[inv_line.of_internal_serial_number] = {
                         'product_id': inv_line.product_id.id,
@@ -267,8 +267,18 @@ class OFStockInventoryValuation(models.TransientModel):
                         'price': 0,
                         'location_id': inv_line.location_id.id,
                         'inv_qty': inv_line.product_qty,
-                        'inv_value': inv_line.product_value,
                     }
+                    vals_dict = vals_dict[inv_line.of_internal_serial_number]
+                # Pour simplifier le calcul de la valeur des articles de l'ajustement, on utilise le prix moyen des
+                # articles en stock
+                if vals_dict['quantity']:
+                    vals_dict['inv_value'] = round(
+                        vals_dict['price'] * vals_dict['inv_qty'] / vals_dict['quantity'], price_precision)
+                else:
+                    # Il n'y a pas d'article en stock, on prend le coût de l'article à date
+                    price_unit = product.get_history_price(self.company_id.id, date=self.date)
+                    vals_dict['inv_value'] = round(price_unit * vals_dict['inv_qty'], price_precision)
+
         return stock_history_dict
 
     @api.multi
