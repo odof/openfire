@@ -72,17 +72,28 @@
                     </i>
                     <notebook>
                         <page string="Appareils compatibles">
-                            <field name="product_ids">
-                                <tree default_order="of_puissance_nom_flo">
-                                    <field name="brand_id"/>
-                                    <field name="categ_id"/>
-                                    <field name="name"/>
-                                    <field name="standard_price"/>
+                            <field name="line_ids">
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="brand_name"/>
+                                            <field name="impression_dc"/>
+                                        </group>
+                                        <group>
+                                            <field name="list_price"/>
+                                            <field name="of_puissance_nom"/>
+                                        </group>
+
+                                    </group>
+                                </form>
+                                <tree default_order="of_puissance_nom">
+                                    <field name="brand_name"/>
+                                    <field name="product_id"/>
                                     <field name="list_price"/>
-                                    <field name="uom_id"/>
-                                    <field name="qty_available"/>
                                     <field name="of_puissance_nom"/>
-                                    <field name="of_puissance_nom_flo" invisible="1"/>
+                                    <field name="impression_dc"/>
+                                    <field name="of_puissance_nom" invisible="1"/>
                                 </tree>
                             </field>
                         </page>

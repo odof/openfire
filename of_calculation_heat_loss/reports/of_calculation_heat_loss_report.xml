@@ -82,6 +82,47 @@
                         </i>
                     </div>
                 </div>
+
+                <t t-set="flag" t-value="0"/>
+                <t t-if="o.line_ids"  t-foreach="o.line_ids" t-as="p">
+                    <t t-if="p.impression_dc">
+                        <t t-set="flag" t-value="flag+1"/>
+                    </t>
+                </t>
+
+                <t t-if="flag > 0">
+                    <div class="row mt16" style="page-break-after: always;">
+                        <div class="col-md-12">
+                            <i>
+                                <br/>
+                                Appareils compatibles
+                                <br/>
+                            </i>
+                            <table style="width:100%; margin-left:1%;">
+                                <thead>
+                                    <tr style="height: 50px">
+                                        <th>Marque</th>
+                                        <th>Nom</th>
+                                        <th style="text-align:right">Prix de vente</th>
+                                        <th style="text-align:right">Puissance nominale</th>
+                                    </tr>
+                                    <tbody>
+                                        <t t-if="o.line_ids"  t-foreach="o.line_ids" t-as="p">
+                                            <t t-if="p.impression_dc">
+                                                <tr style="height: 30px">
+                                                    <td style="width:25%;"><span t-field="p.brand_name"/></td>
+                                                    <td style="width:45%;"><span t-field="p.product_id.name"/></td>
+                                                    <td style="width:15%;text-align:right"><span t-field="p.list_price"/></td>
+                                                    <td style="width:20%;text-align:right"><span t-field="p.of_puissance_nom"/></td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </t>
             </div>
         </t>
     </template>
