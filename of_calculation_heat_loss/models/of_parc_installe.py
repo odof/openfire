@@ -1,11 +1,22 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, models, fields
 
 
 class OFParcInstalle(models.Model):
     _inherit = 'of.parc.installe'
+
+    of_heat_loss_ids = fields.One2many(
+        comodel_name='of.calculation.heat.loss', inverse_name='parc_installe_id',
+        string=u"Calcul déperdition de chaleur")
+    of_heat_loss_count = fields.Integer(
+        string=u"Calcul déperdition de chaleur (compteur)", compute='_compute_of_heat_loss_count')
+
+    @api.depends('of_heat_loss_ids')
+    def _compute_of_heat_loss_count(self):
+        for parc in self:
+            parc.of_heat_loss_count = len(parc.of_heat_loss_ids)
 
     @api.multi
     def name_get(self):
@@ -40,3 +51,16 @@ class OFParcInstalle(models.Model):
                 limit) or []
             return res
         return super(OFParcInstalle, self).name_search(name, args, operator, limit)
+
+    @api.multi
+    def action_view_calculation_heat_loss(self):
+        heat_loss_calculations = self.of_heat_loss_ids
+        action = self.env.ref('of_calculation_heat_loss.of_calculation_heat_loss_action').read()[0]
+        if len(heat_loss_calculations) > 1:
+            action['domain'] = [('id', 'in', heat_loss_calculations.ids)]
+        elif len(heat_loss_calculations) == 1:
+            action['views'] = [(self.env.ref('of_calculation_heat_loss.of_calculation_heat_loss_form_view').id, 'form')]
+            action['res_id'] = heat_loss_calculations.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
