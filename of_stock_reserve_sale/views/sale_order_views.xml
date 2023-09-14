@@ -17,7 +17,6 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/form/group[1]" position="before">
                 <div class="oe_button_box" name="button_box">
-                    <field name="of_reservation_ids" invisible="1"/>
                     <field name="of_qty_unreserved" invisible="1"/>
                     <button name="%(action_of_stock_reserve_sale)d"
                         type="action"
