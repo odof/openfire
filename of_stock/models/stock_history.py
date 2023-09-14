@@ -60,9 +60,9 @@ class StockHistory(models.Model):
         product_template ON product_template.id = product_product.product_tmpl_id
     WHERE quant.qty>0 AND stock_move.state = 'done' AND dest_location.usage in ('internal', 'transit')
     AND (
-        not (source_location.company_id is null and dest_location.company_id is null) and (
-            source_location.company_id != dest_location.company_id or
-            source_location.usage not in ('internal', 'transit')))
+        not (source_location.company_id is null and dest_location.company_id is null) or
+        source_location.company_id != dest_location.company_id or
+        source_location.usage not in ('internal', 'transit'))
     ) UNION ALL
     (SELECT
         (-1) * stock_move.id AS id,
