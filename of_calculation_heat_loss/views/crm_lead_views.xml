@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_case_form_view_oppor" model="ir.ui.view">
+        <field name="name">of.crm.lead.form.opportunity</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_schedule_meeting']" position="after">
+                <button name="action_view_calculation_heat_loss" type="object" class="oe_stat_button"
+                        icon="fa-pencil-square-o" attrs="{'invisible': [('of_heat_loss_count', '=', 0)]}">
+                    <field name="of_heat_loss_count" widget="statinfo" string="Calculs"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
