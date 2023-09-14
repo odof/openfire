@@ -47,9 +47,9 @@ class OFCalculationHeatLoss(models.Model):
     temperature = fields.Float(string=u"Température de confort désirée", default=19.0, required=True)
     estimated_power = fields.Float(string=u"Puissance estimée de l’appareil (nombre)")
     estimated_power_text = fields.Char(string=u"Puissance estimée de l’appareil (texte)")
-    product_ids = fields.Many2many(
-        comodel_name='product.template', relation='of_calculation_heat_loss_product_template_rel',
-        column1='calculation_id', column2='product_id', string="Articles compatibles", compute='_compute_product_ids')
+    line_ids = fields.One2many(
+        comodel_name='of.calculation.heat.loss.line', inverse_name='calculation_heat_loss_id',
+        string=u"Lignes de calcul")
     floor_number = fields.Integer(string=u"Nombre de niveaux", default=1)
     type = fields.Selection(
         selection=[
@@ -103,15 +103,6 @@ class OFCalculationHeatLoss(models.Model):
             if rec.department_id and rec.altitude_id:
                 rec.base_temperature_line_id = rec.department_id.base_temperature_id.line_ids.filtered(
                     lambda l: l.altitude_id == rec.altitude_id).id
-
-    @api.multi
-    @api.depends('estimated_power')
-    def _compute_product_ids(self):
-        product_obj = self.env['product.template']
-        for rec in self:
-            if rec.estimated_power:
-                products = product_obj.search([('of_puissance_nom_flo', '>=', rec.estimated_power / 1000)])
-                rec.product_ids = [(6, 0, products.ids)]
 
     @api.multi
     @api.depends('surface', 'height')
@@ -226,9 +217,13 @@ class OFCalculationHeatLoss(models.Model):
             reference_temperature = rec.base_temperature_line_id.temperature
             estimated_power = rec.surface * rec.height * rec.get_coefficient_g() * (
                 rec.temperature - reference_temperature)
+            products = self.env['product.template'].search([('of_puissance_nom_flo', '>=', estimated_power / 1000)])
+
             rec.write({
                 'estimated_power': estimated_power,
                 'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt"),
+                'line_ids': [(0, 0, dict({'product_id': p.id}))
+                             for p in products]
             })
         if errors:
             return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")

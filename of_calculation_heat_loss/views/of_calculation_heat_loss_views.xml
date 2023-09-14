@@ -74,21 +74,8 @@
                         Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation
                     </i>
                     <notebook>
-                        <page string="Appareils">
-                            <separator string="Appareils compatibles" name="compatible"/>
-                            <field name="product_ids" context="{'display_search_view': 1, 'validate_function': 'action_select_products', 'auto_open': 0}">
-                                <tree default_order="of_puissance_nom_flo" editable="bottom">
-                                    <field name="brand_id"/>
-                                    <field name="categ_id"/>
-                                    <field name="name"/>
-                                    <field name="standard_price"/>
-                                    <field name="list_price"/>
-                                    <field name="uom_id"/>
-                                    <field name="qty_available"/>
-                                    <field name="of_puissance_nom"/>
-                                    <field name="of_puissance_nom_flo" invisible="1"/>
-                                </tree>
-                            </field>
+                        <page string="Appareils compatibles">
+                            <field name="line_ids" context="{'display_search_view': 1}"/>
                         </page>
                     </notebook>
                 </sheet>
