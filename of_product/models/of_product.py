@@ -5,6 +5,29 @@ from odoo import api, models, fields
 import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo.addons.of_utils.models.of_utils import is_valid_url
+from odoo.addons.product.models.product import ProductProduct
+
+
+@api.multi
+def get_history_price(self, company_id, date=None):
+    history = self.env['product.price.history'].search([
+        ('company_id', '=', company_id),
+        ('product_id', 'in', self.ids),
+        ('datetime', '<=', date or fields.Datetime.now())], order='datetime desc,id desc', limit=1)
+    if history:
+        return history.cost
+    else:
+        history = self.env['product.price.history'].search([
+            ('company_id', '=', company_id),
+            ('product_id', 'in', self.ids)], order='datetime,id', limit=1)
+        if history:
+            return history.cost
+        elif self:
+            return self[0].standard_price
+    return 0.0
+
+
+ProductProduct.get_history_price = get_history_price
 
 
 class ProductCategory(models.Model):
