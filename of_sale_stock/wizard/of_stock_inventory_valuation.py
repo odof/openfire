@@ -276,7 +276,7 @@ class OFStockInventoryValuation(models.TransientModel):
                         vals_dict['price'] * vals_dict['inv_qty'] / vals_dict['quantity'], price_precision)
                 else:
                     # Il n'y a pas d'article en stock, on prend le coût de l'article à date
-                    price_unit = product.get_history_price(self.company_id.id, date=self.date)
+                    price_unit = inv_line.product_id.get_history_price(self.company_id.id, date=self.date)
                     vals_dict['inv_value'] = round(price_unit * vals_dict['inv_qty'], price_precision)
 
         return stock_history_dict
