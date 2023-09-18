@@ -755,7 +755,7 @@ class OFWebsiteWorktopConfigurator(http.Controller):
         request.session['vendor_address_id'] = vendor.id
         top_vendor = vendor.parent_id if vendor.parent_id else vendor
 
-        if quote.partner_invoice_id in top_vendor.child_ids:
+        if quote.partner_invoice_id in top_vendor.sudo().child_ids:
             request.session['invoicing_recipient'] = 'vendor'
             request.session['vendor_invoicing_address_id'] = quote.partner_invoice_id.id
         else:
