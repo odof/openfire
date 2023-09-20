@@ -269,7 +269,7 @@
                                                                     </span>
                                                                 </td>
                                                             </tr>
-                                                            <tr>
+                                                            <tr name="total_ttc" t-if="len(total_group) > 1">
                                                                 <td style="border-top: 2px solid gray !important;">
                                                                     <strong>
                                                                         <t t-esc="total_group[1][0]"/>
