@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.datastore.sale.hook" name="_init_transfer_partner_id_to_partner_ids">
+        <value eval="[]"/>
+    </function>
+
+</odoo>
