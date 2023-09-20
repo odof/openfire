@@ -405,7 +405,8 @@ class OfPlanningIntervention(models.Model):
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client", ondelete='restrict')
     partner_tag_ids = fields.Many2many(comodel_name='res.partner.category', string=u"Étiquettes client",
                                        related='partner_id.category_id', readonly=True)
-    address_id = fields.Many2one(comodel_name='res.partner', string=u"Adresse", track_visibility='onchange')
+    address_id = fields.Many2one(
+        comodel_name='res.partner', string=u"Adresse", track_visibility='onchange', auto_join=True)
     address_street = fields.Char(related='address_id.street', string=u"Rue", readonly=1)
     address_street2 = fields.Char(related='address_id.street2', string=u"Rue 2", readonly=1)
     address_city = fields.Char(related='address_id.city', string="Ville", oldname="partner_city", readonly=1)
