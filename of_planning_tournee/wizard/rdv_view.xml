@@ -42,6 +42,11 @@
                 <field name="source_model" invisible="1"/>
                 <field name="additional_records" invisible="1"/>
                 <field name="additional_record_geojson_data" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="search_template_id" options="{'no_create': True, 'no_open':True}"/>
+                    </group>
+                </group>
                 <notebook>
                     <page name="list_results" string="List">
                         <div name="slots_lists" style="display: flex;">
@@ -147,6 +152,8 @@
                     <button name="button_calcul" string="Rechercher" type="object" colspan="2" class="btn-default"
                             attrs="{'invisible': [('date_propos','=',False)]}"/>
                     <button name="action_show_more_results" string="More results" type="object" colspan="4" class="btn-default" attrs="{'invisible': [('can_show_more','=', False)]}"/>
+                    <button name="button_next" string="Période suivante" type="object" colspan="2" class="btn-default"
+                            attrs="{'invisible': [('display_res', '=', False)]}"/>
                 </footer>
             </form>
         </field>
