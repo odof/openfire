@@ -572,6 +572,7 @@ msgstr "Distance"
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_tour_planning_wizard_line_mixin_new_distance
 #: selection:of.intervention.settings,search_type:0
 #: selection:of.tournee.rdv,search_type:0
+#: selection:of.tournee.rdv.template,search_type:0
 msgid "Distance (km)"
 msgstr "Distance (km)"
 
@@ -612,6 +613,7 @@ msgstr "Durée (h)"
 #. module: of_planning_tournee
 #: selection:of.intervention.settings,search_type:0
 #: selection:of.tournee.rdv,search_type:0
+#: selection:of.tournee.rdv.template,search_type:0
 msgid "Duration (min)"
 msgstr "Durée (min)"
 
@@ -1275,18 +1277,21 @@ msgstr "Ancienne séquence"
 #. module: of_planning_tournee
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
+#: selection:of.tournee.rdv.template,search_mode:0
 msgid "One way"
 msgstr "Aller"
 
 #. module: of_planning_tournee
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
+#: selection:of.tournee.rdv.template,search_mode:0
 msgid "One way if morning / Return if afternoon"
 msgstr "Aller si matin / Retour si après-midi"
 
 #. module: of_planning_tournee
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
+#: selection:of.tournee.rdv.template,search_mode:0
 msgid "One way or Return"
 msgstr "Aller ou Retour"
 
@@ -1544,6 +1549,7 @@ msgstr "Restaurer la tournée"
 #: code:addons/of_planning_tournee/models/of_planning_tournee.py:435
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
+#: selection:of.tournee.rdv.template,search_mode:0
 #, python-format
 msgid "Return"
 msgstr "Retour"
@@ -1557,6 +1563,7 @@ msgstr "Adresse de retour"
 #. module: of_planning_tournee
 #: selection:of.intervention.settings,search_mode:0
 #: selection:of.tournee.rdv,search_mode:0
+#: selection:of.tournee.rdv.template,search_mode:0
 msgid "Round trip"
 msgstr "Aller-retour"
 

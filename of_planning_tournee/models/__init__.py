@@ -9,3 +9,4 @@ from . import hr_employee
 from . import of_horaire_segment
 from . import of_service
 from . import res_partner
+from . import of_tournee_rdv_template
