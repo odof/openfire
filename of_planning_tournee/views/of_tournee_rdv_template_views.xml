@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_tournee_rdv_template_view_form" model="ir.ui.view">
+        <field name="name">of.tournee.rdv.template.view.form</field>
+        <field name="model">of.tournee.rdv.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <div id="header" style="display: flex;">
+                            <div id="title" style="width: 100%;">
+                                <h1>
+                                    <field name="name"/>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                            <field name="task_id"/>
+                            <field name="template_id"/>
+                            <field name="search_type"/>
+                            <field name="search_mode"/>
+                        </group>
+                        <group>
+                            <field name="default_template"/>
+                            <field name="user_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_tournee_rdv_template_view_tree" model="ir.ui.view">
+        <field name="name">of.tournee.rdv.template.view.tree</field>
+        <field name="model">of.tournee.rdv.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="user_ids" widget="many2many_tags"/>
+                <field name="default_template"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_tournee_rdv_template_action" model="ir.actions.act_window">
+        <field name="name">Modèles de recherche de créneaux</field>
+        <field name="res_model">of.tournee.rdv.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning_tournee.of_tournee_rdv_template_view_tree"/>
+    </record>
+
+    <menuitem id="of_tournee_rdv_template_menu" name="Modèles de recherche de créneaux" action="of_tournee_rdv_template_action"
+              parent="of_planning.menu_of_planning_configuration_template" sequence="15"/>
+
+</odoo>

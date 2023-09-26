@@ -7,3 +7,6 @@ access_of_planning_tour_line_access,access.of.planning.tour.line.access,model_of
 access_of_planning_tour_line_create,access.of.planning.tour.line.create,model_of_planning_tour_line,of_planning.group_planning_intervention_modification,1,1,1,0
 access_of_planning_tour_line_responsible,access.of.planning.tour.line.responsible,model_of_planning_tour_line,of_planning.group_planning_intervention_responsible,1,1,1,0
 access_of_planning_tour_line_manager,access.of.planning.tour.line.manager,model_of_planning_tour_line,of_planning.group_planning_intervention_manager,1,1,1,1
+access_of_tournee_rdv_template_user,access.of.tournee.rdv.template.user,model_of_tournee_rdv_template,of_planning.group_planning_intervention_access,1,0,0,0
+access_of_tournee_rdv_template_responsible,access.of.tournee.rdv.template.responsible,model_of_tournee_rdv_template,of_planning.group_planning_intervention_responsible,1,1,1,0
+access_of_tournee_rdv_template_manager,access.of.tournee.rdv.template.manager,model_of_tournee_rdv_template,of_planning.group_planning_intervention_manager,1,1,1,1
