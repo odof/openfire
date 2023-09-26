@@ -5,7 +5,7 @@ import csv
 import StringIO
 
 from odoo import api, fields, models, _
-from odoo.exceptions import Warning
+from odoo.exceptions import Warning, AccessDenied
 
 
 # liste des encodages les plus utilisés, seuls les encodages régulièrement utilisés en France sont non commentés
@@ -48,14 +48,14 @@ class OFAccountFrFec(models.TransientModel):
 
     where_clause_create_date = fields.Boolean("Utiliser la date de création", required=True, default=False)
 
-    def do_query_unaffected_earnings(self):
-        ''' Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
+    def _do_query_unaffected_earnings(self):
+        """ Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.
             This is needed because we have to display only one line for the initial balance of all expense/revenue accounts in the FEC.
             copy of parent function.
-        '''
+        """
         if self.export_type == 'official':  # use parent function instead
-            return super(OFAccountFrFec, self).do_query_unaffected_earnings()
-        sql_query = '''
+            return super(OFAccountFrFec, self)._do_query_unaffected_earnings()
+        sql_query = """
         SELECT
             %s AS JournalCode,
             %s AS JournalLib,
@@ -85,20 +85,20 @@ class OFAccountFrFec(models.TransientModel):
             AND aat.include_initial_balance = 'f'
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
-        '''
+        """
         if self.where_clause_create_date:  # certains client veulent la date de création (exports mensuels vers logiciel compta)
-            sql_query += '''
+            sql_query += """
             AND am.create_date < %s
-            '''
+            """
         else:
-            sql_query += '''
+            sql_query += """
             AND am.date < %s
-            '''
+            """
 
         if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+            sql_query += """
             AND am.state = 'posted'
-            '''
+            """
 
         company = self.env.user.company_id
         while not company.chart_template_id and company.parent_id:
@@ -113,9 +113,9 @@ class OFAccountFrFec(models.TransientModel):
 
     @api.multi
     def generate_fec(self):
-        '''
+        """
         copy of parent function
-        '''
+        """
         self.ensure_one()
         if self.export_type == 'official':  # use parent function instead
             result = super(OFAccountFrFec, self).generate_fec()
@@ -126,6 +126,8 @@ class OFAccountFrFec(models.TransientModel):
                 self.write({'filename': new_filename})
                 result['url'] = result['url'].replace(old_filename, new_filename)
             return result
+        if not (self.env.is_admin() or self.env.user.has_group('account.group_account_user')):
+            raise AccessDenied()
         # We choose to implement the flat file instead of the XML
         # file for 2 reasons :
         # 1) the XSD file impose to have the label on the account.move
@@ -174,10 +176,10 @@ class OFAccountFrFec(models.TransientModel):
         unaffected_earnings_line = True  # used to make sure that we add the unaffected earning initial balance only once
         if unaffected_earnings_xml_ref and self.of_ouv_include:
             # compute the benefit/loss of last year to add in the initial balance of the current year earnings account
-            unaffected_earnings_results = self.do_query_unaffected_earnings()
+            unaffected_earnings_results = self._do_query_unaffected_earnings()
             unaffected_earnings_line = False
 
-        sql_query = '''
+        sql_query = """
         SELECT
             %s AS JournalCode,
             %s AS JournalLib,
@@ -224,26 +226,26 @@ class OFAccountFrFec(models.TransientModel):
             AND aat.include_initial_balance = 't'
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
-        '''
+        """
         if self.where_clause_create_date:  # certains client veulent la date de création (exports mensuels vers logiciel compta)
-            sql_query += '''
+            sql_query += """
             AND am.create_date < %s
-            '''
+            """
         else:
-            sql_query += '''
+            sql_query += """
             AND am.date < %s
-            '''
+            """
 
         if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+            sql_query += """
             AND am.state = 'posted'
-            '''
+            """
 
-        sql_query += '''
+        sql_query += """
         GROUP BY aml.account_id, aa.code, aa.internal_type
         HAVING sum(aml.balance) != 0
         ORDER BY CompteNum, aa.code
-        '''
+        """
         formatted_date_from = self.date_from.replace('-', '')
 
         if self.of_ouv_include:
@@ -290,7 +292,7 @@ class OFAccountFrFec(models.TransientModel):
 
         # LINES
         # Il faudra ajouter les comptes de tiers nécessaires au cas par cas (Associés, Fournisseurs, Clients, etc.)
-        sql_query = '''
+        sql_query = """
         SELECT
             replace(aj.code, '|', '/') AS JournalCode,
             replace(aj.name, '|', '/') AS JournalLib,
@@ -345,22 +347,22 @@ class OFAccountFrFec(models.TransientModel):
             am.company_id = %s
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
-        '''
+        """
         if self.where_clause_create_date:  # Certains client veulent la date de création (export mensuel vers logiciel compta).
-            sql_query += '''
+            sql_query += """
             AND am.create_date >= %s
             AND am.create_date <= %s
-            '''
+            """
         else:
-            sql_query += '''
+            sql_query += """
             AND am.date >= %s
             AND am.date <= %s
-            '''
+            """
 
         if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+            sql_query += """
             AND am.state = 'posted'
-            '''
+            """
 
         sql_sort = 'am.date, am.name, aml.id'
         if self.sortby == 'sort_journal_partner':
