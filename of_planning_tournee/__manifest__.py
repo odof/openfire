@@ -35,6 +35,7 @@
         'views/of_planning_tournee_view.xml',
         'views/of_service_parc_views.xml',
         'views/of_intervention_settings_views.xml',
+        'views/of_tournee_rdv_template_views.xml',
         'views/templates.xml',
         'wizard/tour_planning_optimization_view.xml',
         'wizard/tour_planning_reorganization_view.xml',

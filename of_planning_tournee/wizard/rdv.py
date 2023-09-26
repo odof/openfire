@@ -92,6 +92,25 @@ class OfTourneeRdv(models.TransientModel):
         elif service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
             res['date_recherche_debut'] = service.date_next
             res['date_recherche_fin'] = service.date_fin
+        # Search template
+        search_template = self.env['of.tournee.rdv.template'].search(
+            [('default_template', '=', True), ('user_ids', 'in', self._uid)], limit=1)
+        if not search_template:
+            search_template = self.env['of.tournee.rdv.template'].search(
+                [('default_template', '=', True), ('user_ids', '=', False)], limit=1)
+        if search_template:
+            if search_template.employee_ids and 'pre_employee_ids' not in res:
+                res['pre_employee_ids'] = [(6, 0, [emp.id for emp in search_template.employee_ids])]
+            if search_template.task_id:
+                res['tache_id'] = search_template.task_id.id
+            if search_template.template_id:
+                res['template_id'] = search_template.template_id.id
+            if search_template.search_mode:
+                res['search_mode'] = search_template.search_mode
+            if search_template.search_type:
+                res['search_type'] = search_template.search_type
+            res['search_template_id'] = search_template.id
+
         return res
 
     @api.model
@@ -126,6 +145,10 @@ class OfTourneeRdv(models.TransientModel):
     def _default_planning_task(self):
         return self.env['ir.values'].get_default('of.intervention.settings', 'default_planning_task_id')
 
+    @api.model
+    def _get_domain_search_template_id(self):
+        return ['|', ('user_ids', '=', False), ('user_ids', 'in', self._uid)]
+
     source_model = fields.Char(string="Source Model", readonly=True)
     slots_display_mode = fields.Char(
         string="Display mode", readonly=True, required=True, default=lambda s: s._default_slots_display_mode())
@@ -133,6 +156,9 @@ class OfTourneeRdv(models.TransientModel):
         string="Display next time slots by date", readonly=True,
         default=lambda s: s._default_show_next_available_time_slots())
     # Champs de recherche
+    search_template_id = fields.Many2one(
+        comodel_name='of.tournee.rdv.template', string=u"Modèle de recherche",
+        domain=lambda self: self._get_domain_search_template_id())
     partner_id = fields.Many2one(
         'res.partner', string="Client", required=True, readonly=True)
     partner_address_id = fields.Many2one(
@@ -504,7 +530,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.onchange('template_id')
     def _onchange_template_id(self):
-        if not self.template_id:
+        if not self.template_id or not self.template_id.tache_id:
             return
         template = self.template_id
         self.update({'tache_id': template.tache_id})
@@ -544,7 +570,7 @@ class OfTourneeRdv(models.TransientModel):
         if self.date_recherche_debut:
             period_in_days = self.search_period_in_days or 7
             date_deb = fields.Date.from_string(self.date_recherche_debut)
-            date_fin = date_deb + timedelta(days=period_in_days)
+            date_fin = date_deb + timedelta(days=period_in_days - 1)
             self.date_recherche_fin = fields.Date.to_string(date_fin)
 
     @api.onchange('date_recherche_fin')
@@ -557,6 +583,25 @@ class OfTourneeRdv(models.TransientModel):
         start_date = fields.Date.from_string(self.date_recherche_debut) - timedelta(days=1)
         end_date = fields.Date.from_string(self.date_recherche_fin)
         self.search_period_in_days = (end_date - start_date).days
+
+    @api.onchange('search_template_id')
+    def _onchange_search_template_id(self):
+        if not self.search_template_id:
+            return
+
+        vals = {}
+        if self.search_template_id.employee_ids:
+            vals['pre_employee_ids'] = [(6, 0, [emp.id for emp in self.search_template_id.employee_ids])]
+        if self.search_template_id.task_id and not self.tache_id:
+            vals['tache_id'] = self.search_template_id.task_id.id
+        if self.search_template_id.template_id and not self.template_id:
+            vals['template_id'] = self.search_template_id.template_id.id
+        if self.search_template_id.search_mode:
+            vals['search_mode'] = self.search_template_id.search_mode
+        if self.search_template_id.search_type:
+            vals['search_type'] = self.search_template_id.search_type
+
+        self.update(vals)
 
     @api.model
     def _get_additional_record_geojson_data(self, line):
@@ -705,6 +750,42 @@ class OfTourneeRdv(models.TransientModel):
         by_distance_lines_hidden[:number_of_results].write({'by_distance_hidden': False})
         by_duration_lines_hidden[:number_of_results].write({'by_duration_hidden': False})
         return self.action_open_wizard()
+
+    @api.multi
+    def button_next(self):
+        """
+        Lance la recherche de créneaux dispos sur la période suivante
+        """
+        self.ensure_one()
+        # empty the current selected tour for the map
+        if self.map_tour_id:
+            self.map_tour_id = False
+        # empty the current selected line for the map
+        if self.map_line_id:
+            self.map_line_id = False
+
+        # Change date criteria to next period
+        period_in_days = self.search_period_in_days or 7
+        date_deb = fields.Date.from_string(self.date_recherche_fin) + timedelta(days=1)
+        date_fin = date_deb + timedelta(days=period_in_days - 1)
+        self.date_recherche_debut = fields.Date.to_string(date_deb)
+        self.date_recherche_fin = fields.Date.to_string(date_fin)
+
+        self.compute()
+        context = dict(self._context, employee_domain=self._get_employee_possible())
+        form_view_id = self._get_wizard_form_view_id()
+        return {
+            'name': _("Plan intervention"),
+            'type': 'ir.actions.act_window',
+            'res_model': 'of.tournee.rdv',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'views': [(form_view_id, 'form')],
+            'res_id': self.id,
+            'target': 'new',
+            'context': context,
+            'flags': {'initial_mode': 'edit', 'form': {'options': {'mode': 'edit'}}},
+        }
 
     # Autres
 
