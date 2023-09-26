@@ -1477,6 +1477,9 @@ MapView.LayerGroup = Widget.extend({
     do_draw_routes_from_records: function () {
         // Draw route between markers on the map from records in the layer
         var self = this;
+        //TODO : we can do better with layergroup!!
+        //We track only lines using path , to avoid deleting the other components
+        $('path.leaflet-interactive').remove()
         for (var i = 0; i < self.records.length; i++) {
             if (self.records[i].geojson_data) {
                 let geoline = JSON.parse(self.records[i].geojson_data);
