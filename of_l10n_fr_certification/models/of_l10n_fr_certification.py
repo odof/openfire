@@ -175,7 +175,7 @@ class AccountPayment(models.Model):
                             u"name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name) "
                             u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                             (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id,
-                             paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '',
+                             paiement.payment_date, paiement.partner_id.id or None, paiement.partner_id.name or '',
                              paiement.payment_reference or '', paiement.payment_type or '', paiement.amount,
                              paiement.state or '', paiement.name or '', paiement.communication or '',
                              paiement.of_payment_mode_id.id, paiement.of_payment_mode_id.name or '',
@@ -187,7 +187,7 @@ class AccountPayment(models.Model):
                             u"name, communication, of_payment_mode_id, of_payment_mode_name, company_id, company_name) "
                             u"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, Null, Null, %s, %s)",
                             (self._uid, user_name, time.strftime('%Y-%m-%d %H:%M:%S'), paiement.id,
-                             paiement.payment_date, paiement.partner_id.id, paiement.partner_id.name or '',
+                             paiement.payment_date, paiement.partner_id.id or None, paiement.partner_id.name or '',
                              paiement.payment_reference or '', paiement.payment_type or '', paiement.amount,
                              paiement.state or '', paiement.name or '', paiement.communication or '',
                              paiement.company_id.id, paiement.company_id.name or ''))

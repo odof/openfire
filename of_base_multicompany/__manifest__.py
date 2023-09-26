@@ -27,6 +27,7 @@ Personnalisation multi-sociétés :
         'security/of_base_multicompany_security.xml',
         'views/account_invoice_view.xml',
         'views/res_company_view.xml',
+        'views/res_config_view.xml',
         'views/sale_order_view.xml',
     ],
     'qweb': [
