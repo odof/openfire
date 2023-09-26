@@ -72,38 +72,6 @@ class OFDatastorePurchase(models.Model):
 class OFDatastorePurchaseCompany(models.Model):
     _name = 'of.datastore.purchase.company'
 
-    @api.model_cr_context
-    def _auto_init(self):
-        cr = self._cr
-
-        cr.execute("SELECT * FROM information_schema.tables WHERE table_name = '%s'" % (self._table,))
-        exists = cr.fetchall()
-        res = super(OFDatastorePurchaseCompany, self)._auto_init()
-        if not exists:
-            query = """
-                INSERT INTO of_datastore_purchase_company (
-                    create_uid
-                ,   create_date
-                ,   write_uid
-                ,   write_date
-                ,   parent_id
-                ,   company_id
-                ,   datastore_id
-                )
-                (
-                    SELECT  1
-                    ,       NOW()
-                    ,       1
-                    ,       NOW()
-                    ,       id
-                    ,       %s
-                    ,       datastore_id
-                    FROM    of_datastore_purchase
-                )
-            """
-            cr.execute(query, (self.env.user.company_id.id,))
-        return res
-
     parent_id = fields.Many2one(comodel_name='of.datastore.purchase', string="Connecteur", required=True)
     company_id = fields.Many2one(
         comodel_name='res.company', string=u"Société", required=True)
