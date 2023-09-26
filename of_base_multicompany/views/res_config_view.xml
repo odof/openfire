@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_account_config_settings" model="ir.ui.view">
+            <field name="name">of.multicompany.account settings</field>
+            <field name="model">account.config.settings</field>
+            <field name="inherit_id" ref="account.view_account_config_settings"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="accounting_company_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='transfer_account_id']" position="attributes">
+                    <attribute name="domain">[('company_id', 'parent_of', company_id), ('company_id', 'child_of', accounting_company_id)]</attribute>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>
