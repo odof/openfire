@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="wizard_generate_demo_data_view_form" model="ir.ui.view">
+        <field name="name">wizard.generate.demo.data.view.form</field>
+        <field name="model">wizard.generate.demo.data</field>
+        <field name="arch" type="xml">
+            <form string="Generate demo data">
+                <group name="who" string="Who" class="of_grey_background">
+                    <group colspan="2">
+                        <field name="company_id"/>
+                        <field name="employee_ids" widget="many2many_tags" options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                </group>
+                <group name="where" string="When" class="of_grey_background">
+                    <group colspan="2">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="number_of_interventions"/>
+                        <field name="template_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_button_generate_demo_data" string="Generate Demo Data" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="wizard_generate_demo_data_view_action" model="ir.actions.act_window">
+        <field name="name">Generate demo data</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wizard.generate.demo.data</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="wizard_generate_demo_data_menu" name="Generate Demo Data" action="wizard_generate_demo_data_view_action" parent="base.menu_administration" sequence="10"/>
+
+</odoo>

@@ -1,0 +1,155 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_demo_data_generator
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-21 12:32+0000\n"
+"PO-Revision-Date: 2023-09-21 12:32+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_demo_data_generator
+#: model:ir.ui.view,arch_db:of_demo_data_generator.wizard_generate_demo_data_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_city
+msgid "City"
+msgstr "Ville"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_contact_type
+msgid "Contact type"
+msgstr "Type de contact"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_demo_data_generator
+#: selection:wizard.generate.demo.data,contact_type:0
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_date_from
+msgid "Date from"
+msgstr "Date de"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_date_to
+msgid "Date to"
+msgstr "Date au"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_employee_ids
+msgid "Employees"
+msgstr "Employés"
+
+#. module: of_demo_data_generator
+#: model:ir.ui.menu,name:of_demo_data_generator.wizard_generate_demo_data_menu
+#: model:ir.ui.view,arch_db:of_demo_data_generator.wizard_generate_demo_data_view_form
+msgid "Generate Demo Data"
+msgstr "Génération de données de démo"
+
+#. module: of_demo_data_generator
+#: model:ir.actions.act_window,name:of_demo_data_generator.wizard_generate_demo_data_view_action
+#: model:ir.ui.view,arch_db:of_demo_data_generator.wizard_generate_demo_data_view_form
+msgid "Generate demo data"
+msgstr "Générer des données de démo"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_demo_data_generator
+#: code:addons/of_demo_data_generator/wizards/wizard_demo_data_generator.py:135
+#, python-format
+msgid "Interventions"
+msgstr "Interventions"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data___last_update
+msgid "Last Modified on"
+msgstr "Dernière Modification le"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_number_of_interventions
+msgid "Number of interventions"
+msgstr "Nombre d'interventions"
+
+#. module: of_demo_data_generator
+#: selection:wizard.generate.demo.data,contact_type:0
+msgid "Prospect"
+msgstr "Prospect"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_street
+msgid "Street"
+msgstr "Rue"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_street2
+msgid "Street2"
+msgstr "Rue 2"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_template_id
+msgid "Template"
+msgstr "Modèle"
+
+#. module: of_demo_data_generator
+#: model:ir.ui.view,arch_db:of_demo_data_generator.wizard_generate_demo_data_view_form
+msgid "When"
+msgstr "Quand"
+
+#. module: of_demo_data_generator
+#: model:ir.ui.view,arch_db:of_demo_data_generator.wizard_generate_demo_data_view_form
+msgid "Who"
+msgstr "Qui"
+
+#. module: of_demo_data_generator
+#: model:ir.model.fields,field_description:of_demo_data_generator.field_wizard_generate_demo_data_zip
+msgid "Zip"
+msgstr "Code postal"
+
+#. module: of_demo_data_generator
+#: model:ir.model,name:of_demo_data_generator.model_wizard_generate_demo_data
+msgid "wizard.generate.demo.data"
+msgstr "wizard.generate.demo.data"
+
