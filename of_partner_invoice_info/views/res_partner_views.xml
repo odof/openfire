@@ -12,7 +12,7 @@
                         context="{'default_partner_id': active_id, 'search_default_unpaid': True}">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="of_invoice_balance_total" widget="monetary" options="{'currency_field': 'currency_id'}"/></span>
-                        <span class="o_stat_text">Facturé dû</span>
+                        <span class="o_stat_text">Encours</span>
                     </div>
                 </button>
             </xpath>
@@ -32,9 +32,20 @@
                     icon="fa-usd">
                     <div class="o_form_field o_stat_info">
                         <span class="o_stat_value"><field name="of_sale_order_to_invoice_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/></span>
-                        <span class="o_stat_text">À Facturer</span>
+                        <span class="o_stat_text">Reliquat</span>
                     </div>
                 </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="partner_test" model="ir.ui.view">
+        <field name="name">sale.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_verification_confirm']" position="attributes">
+                <attribute name="name">call_popup</attribute>
             </xpath>
         </field>
     </record>

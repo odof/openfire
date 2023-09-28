@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Permet de créer une fenêtre et d'afficher un warning quand on clique sur confirmer le devis-->
+    <record id="of_popup_warning_view" model="ir.ui.view">
+        <field name="name">of.popup.warning.form</field>
+        <field name="model">of.popup.warning</field>
+        <field name="arch" type="xml">
+            <form string="Message" version="7.0">
+                <separator string="Message" colspan="6"/>
+                <separator colspan="6"/>
+                <field name="message" readonly="1"/>
+                <footer>
+                    <button name="call_action_verification_confirm" type="object" string="Ok" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+        <record id="action_of_popup_warning" model="ir.actions.act_window">
+            <field name="name">of.popup.warning.action</field>
+            <field name="res_model">of.popup.warning</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="of_popup_warning_view"/>
+        </record>
+
+</odoo>
