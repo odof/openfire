@@ -11,7 +11,7 @@
             </xpath>
             <xpath expr="//field[@name='company_id']" position="after">
                 <label for="of_date_next" attrs="{'invisible':[('of_date_next', '=', False), ('of_date_end', '=', False)]}"/>
-                <div attrs="{'invisible':[('of_date_next', '=', False), ('of_date_end', '=', False)]}">
+                <div name="date_range" attrs="{'invisible':[('of_date_next', '=', False), ('of_date_end', '=', False)]}">
                     <span attrs="{'invisible':['|', ('of_date_next', '=', False), ('of_date_end', '=', False)]}">Entre le </span>
                     <span attrs="{'invisible':[('of_date_end', '!=', False)]}">À partir du </span>
                     <field name="of_date_next" class="oe_inline"/>
