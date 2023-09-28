@@ -69,11 +69,6 @@
             <xpath expr="//field[@name='state_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
-            <xpath expr="//field[@name='city']" position="replace"/>
-            <xpath expr="//field[@name='zip']" position="after">
-                <field name="city" class="o_address_city" placeholder="City"
-                       attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-            </xpath>
             <!-- Change placeholder Notes internes non difusées -->
             <xpath expr="//notebook/page[2]//field[@name='comment']" position="replace">
                 <field name="comment" colspan="4" placeholder="Note interne (non diffusée)"/>
