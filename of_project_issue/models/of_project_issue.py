@@ -285,8 +285,8 @@ class OfProjectIssueCategorie(models.Model):
     parent_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie parente", ondelete='restrict')
     pparent_id = fields.Many2one('of.project.issue.categorie', string=u"Catégorie mère", readonly=True)
     sequence = fields.Integer(u"Séquence", help=u"Ordre d'affichage (plus petit en premier)")
-    parent_left = fields.Integer("Left Parent")
-    parent_right = fields.Integer("Right Parent")
+    parent_left = fields.Integer(string="Left Parent", index=True)
+    parent_right = fields.Integer(string="Right Parent", index=True)
 
     _constraints = [
         (models.Model._check_recursion, 'Error ! You can not create recursive category.', ['parent_id'])
