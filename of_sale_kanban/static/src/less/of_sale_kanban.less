@@ -26,9 +26,15 @@
     }
 
     &.o_kanban_grouped {
-        a {
-            display: inline;
+        a, span {
+            overflow: visible;
+        }
 
+        a {
+            color: #666;
+            &.o_priority_star {
+                display: inline;
+            }
             &.fa-star-o {
                 color: @odoo-main-color-muted;
                 &:hover {
