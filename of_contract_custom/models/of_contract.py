@@ -958,7 +958,6 @@ class OfContractLine(models.Model):
                  'invoice_line_ids.invoice_id',
                  'invoice_line_ids.invoice_id.state',
                  'date_avenant',
-                 'last_invoicing_date',
                  'date_end',
                  'contract_id.date_start',
                  'contract_id.date_end',
