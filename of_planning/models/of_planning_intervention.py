@@ -399,9 +399,7 @@ class OfPlanningIntervention(models.Model):
     employee_ids = fields.Many2many(
         'hr.employee', 'of_employee_intervention_rel', 'intervention_id', 'employee_id',
         string="Intervenants", required=True, domain=lambda self: self._domain_employee_ids())
-    employee_main_id = fields.Many2one(
-        comodel_name='hr.employee', string=u"Employé principal",
-        search='_search_employee_main_id', store=True, required=True)
+    employee_main_id = fields.Many2one(comodel_name='hr.employee', string=u"Employé principal", required=True)
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Client", ondelete='restrict')
     partner_tag_ids = fields.Many2many(comodel_name='res.partner.category', string=u"Étiquettes client",
                                        related='partner_id.category_id', readonly=True)
@@ -969,12 +967,6 @@ class OfPlanningIntervention(models.Model):
 
     # Search #
 
-    def _search_employee_main_id(self, operator, operand):
-        intervs = self.search([])
-        res = safe_eval(
-            "intervs.filtered(lambda r: r.employee_main_id %s %s)" % (operator, operand), {'intervs': intervs})
-        return [('id', 'in', res.ids)]
-
     @api.model
     def _search_date_date(self, operator, value):
         mode = self._context.get('of_date_search_mode')
@@ -1058,8 +1050,6 @@ class OfPlanningIntervention(models.Model):
             if interv.employee_ids:
                 if not interv.employee_main_id or interv.employee_main_id not in interv.employee_ids:
                     interv.employee_main_id = interv.employee_ids[0]
-                else:
-                    pass
             else:
                 interv.employee_main_id = False
 
@@ -1329,6 +1319,18 @@ class OfPlanningIntervention(models.Model):
         if 'date' in vals:
             # Tronqué à la minute
             vals['date'] = vals['date'][:17] + '00'
+        if not vals.get('employee_main_id'):
+            employee_ids_val = vals.get('employee_ids')
+            if employee_ids_val:
+                employee_ids_val = employee_ids_val[0]
+            employee_id = False
+            if isinstance(employee_ids_val, (tuple, list)):
+                if employee_ids_val[0] == 4:
+                    employee_id = employee_ids_val[1]
+                elif employee_ids_val[0] == 6:
+                    employee_id = list(employee_ids_val[2])[0]
+            vals['employee_main_id'] = employee_id
+
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
         res._affect_number()
@@ -1387,6 +1389,11 @@ class OfPlanningIntervention(models.Model):
         employee_before = {rec: rec.employee_ids for rec in self}
 
         result = super(OfPlanningIntervention, self).write(vals)
+
+        for inter in self:
+            if inter.employee_ids and inter.employee_main_id not in inter.employee_ids:
+                inter.employee_main_id = inter.employee_ids[0]
+
         if vals.get('state', '') == 'confirm':
             self.mapped('line_ids').sudo()._action_procurement_create()
 
