@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 {
     'name': u"OpenFire / Connecteur ventes",
-    'version': "10.0.1.0.0",
+    'version': "10.0.2.0.0",
     'author': "OpenFire",
     'website': "http://www.openfire.fr",
     'category': "Openfire",
@@ -31,6 +32,7 @@ Ce module nécessite l'installation de openerplib sur le serveur : sudo easy_ins
         'views/product_views.xml',
         'views/of_datastore_sale_views.xml',
         'views/purchase_views.xml',
+        'hooks/post_hook.xml',
     ],
     'installable': True,
     'application': False,
