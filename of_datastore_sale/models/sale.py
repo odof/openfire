@@ -16,7 +16,7 @@ class SaleOrder(models.Model):
         for order in self:
             if not order.of_datastore_purchase_id:
                 continue
-            datastore = datastore_obj.search([('partner_id', '=', order.partner_id.id)])
+            datastore = datastore_obj.search([('partner_ids', 'in', [order.partner_id.id])])
             if datastore:
                 client = datastore.of_datastore_connect()
                 if not isinstance(client, basestring):
