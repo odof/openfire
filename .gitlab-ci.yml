@@ -7,17 +7,9 @@ before_script:
 stages:
   - linting
 
-isort:
+linting:
   stage: linting
   script:
     - isort . --check-only
-
-flake8:
-  stage: linting
-  script:
     - flake8 .
-
-black:
-  stage: linting
-  script:
     - black . --check --skip-string-normalization --line-length 120 --force-exclude="__(init|manifest)__\.py"
