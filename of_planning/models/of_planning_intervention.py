@@ -492,6 +492,7 @@ class OfPlanningIntervention(models.Model):
     partner_name = fields.Char(related='partner_id.name')  # vue Planning, vue Map
     partner_phone = fields.Char(related='partner_id.phone')  # vue Map
     partner_mobile = fields.Char(related='partner_id.mobile')  # vue Map
+    email = fields.Char(related='partner_id.email')
     mobile = fields.Char(related='address_id.mobile')  # vue Planning, of_sms
     phone = fields.Char(related='address_id.phone')  # vue Planning
     tz = fields.Selection(_tz_get, compute='_compute_tz', string="Fuseau horaire")  # vue Calendar

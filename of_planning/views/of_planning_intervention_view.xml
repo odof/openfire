@@ -294,6 +294,7 @@
                         <group name="where" string="Où" class="of_grey_background">
                             <group colspan="2">
                                 <field name="partner_id"/>
+                                <field name="email" widget="email"/>
                                 <field name="partner_tag_ids" widget="many2many_tags"/>
                                 <label for="address_id"/>
                             <div class="o_address_format">
