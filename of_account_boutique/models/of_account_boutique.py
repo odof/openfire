@@ -52,8 +52,8 @@ class AccountInvoice(models.Model):
         transfer_obj = self.env['stock.immediate.transfer']
         res = super(AccountInvoice, self).action_invoice_open()
         for inv in self:
-            if not inv.of_boutique:
-                continue
+            # if not inv.of_boutique:
+            #     continue
             if inv.of_picking_ids:
                 # On vérifie qu'il n'y a pas d'autres BL sinon ça valide deux fois la sortie
                 # Si jamais il faut valider TOUS les BL il y a un bouton pour ça
@@ -62,7 +62,19 @@ class AccountInvoice(models.Model):
                 raise UserError(u"""Votre client n'a pas d'emplacement lié.\n"""
                                 u"""Veuillez vérifier dans la fiche partenaire, onglet "Ventes & Achats" """
                                 u"""le champ "Emplacement Client".""")
-            procs = inv.invoice_line_ids._action_procurement_create()
+            if inv.of_boutique:
+                for line in self.invoice_line_ids:
+                    for prod in line.kit_id.kit_line_ids:
+                        self.env['account.invoice.line'].create({
+                            'product_id': prod.product_id.id,
+                            'uom_id': prod.product_uom_id.id,
+                            'quantity': prod.qty_per_kit,
+                            'price_unit': prod.price_unit_display,
+                            'account_id': prod.product_id.categ_id.property_account_income_categ_id.id,
+                            'name': prod.product_id.name,
+                            'invoice_id': self.id,
+                        })
+            procs = inv.invoice_line_ids.filtered(lambda x: x.of_is_kit == False)._action_procurement_create()
             moves = procs.mapped('move_ids')
             pickings = moves.mapped('picking_id')
             # force_assign() ne fonctionne pas bien si des articles sont déjà considérés comme fait

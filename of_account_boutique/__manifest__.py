@@ -23,6 +23,7 @@ Comptabilité:
         'of_account',
         'stock',
         'of_sale',
+        'of_kit',
     ],
     'demo_xml': [],
     'data': [
