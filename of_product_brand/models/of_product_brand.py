@@ -365,3 +365,12 @@ class AccountInvoiceLine(models.Model):
         else:
             self = self.sudo()
         return super(AccountInvoiceLine, self)._write(vals)
+
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    of_brand_ids = fields.Many2many(
+        'of.product.brand',
+        string=u"Marques non autorisées",
+        help=u"Marques de produits non autorisées pour les utilisateurs assignés")
