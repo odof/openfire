@@ -66,8 +66,14 @@ class OFStockPickingMerge(models.TransientModel):
             final_picking.of_customer_id = False
 
         for other_picking in other_pickings:
-            for move in other_picking.move_lines:
-                move.picking_id = final_picking
+            products = [final.product_id for final in final_picking.move_lines]
+            for final in final_picking.move_lines:
+                for move in other_picking.move_lines:
+                    if final.product_id.id == move.product_id.id:
+                        final.product_uom_qty += move.product_uom_qty
+                    if move.product_id not in products:
+                        move.picking_id = final_picking
+
             for pack_operation in other_picking.pack_operation_ids:
                 pack_operation.picking_id = final_picking
             if other_picking.origin:
@@ -75,7 +81,19 @@ class OFStockPickingMerge(models.TransientModel):
                     final_picking.origin += ', ' + other_picking.origin
                 else:
                     final_picking.origin = other_picking.origin
+        # remove duplicated products in move_lines
+        list_to_remove = []
 
+        for product in final_picking.pack_operation_product_ids.mapped('product_id'):
+            lines = final_picking.pack_operation_product_ids.filtered(lambda m: m.product_id.id == product.id)
+            if lines[1:] not in list_to_remove:
+                list_to_remove.append(lines[1:])
+            quantity = 0
+            for line in lines:
+                quantity += line.product_qty
+            lines[0].product_qty = quantity
+        for l in list_to_remove:
+            l.unlink()
         other_pickings.unlink()
 
         action = self.env.ref('stock.action_picking_tree_all').read()[0]
