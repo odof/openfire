@@ -52,8 +52,6 @@ class AccountInvoice(models.Model):
         transfer_obj = self.env['stock.immediate.transfer']
         res = super(AccountInvoice, self).action_invoice_open()
         for inv in self:
-            # if not inv.of_boutique:
-            #     continue
             if inv.of_picking_ids:
                 # On vérifie qu'il n'y a pas d'autres BL sinon ça valide deux fois la sortie
                 # Si jamais il faut valider TOUS les BL il y a un bouton pour ça
