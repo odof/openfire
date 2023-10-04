@@ -1,9 +1,7 @@
 stages:
-  - setup
+  - dummy-job
 
-print-info:
-  stage: setup
+dummy-job:
+  stage: dummy-job
   script:
-    - 'echo "Job start: $CI_JOB_STARTED_AT"'
-    - 'echo "Branch: $CI_COMMIT_BRANCH"'
-    - 'echo "Commit Author: $CI_COMMIT_AUTHOR"'
+    - 'echo "Dummy Job"'
