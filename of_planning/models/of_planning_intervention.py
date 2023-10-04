@@ -1133,6 +1133,7 @@ class OfPlanningIntervention(models.Model):
                     new_lines += intervention_line_obj.new(data)
                 new_lines.compute_taxes()
                 self.line_ids = new_lines
+                self._onchange_partner_pricelist_id()
 
     @api.onchange('partner_pricelist_id')
     def _onchange_partner_pricelist_id(self):
