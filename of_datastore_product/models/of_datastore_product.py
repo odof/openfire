@@ -547,6 +547,8 @@ class OfDatastoreCentralized(models.AbstractModel):
             if isinstance(right, basestring) or \
                     right and isinstance(right, (tuple, list)) and all(isinstance(item, basestring) for item in right):
                 return False
+            elif isinstance(right, (int, long)) and right < 0:
+                return domain
             else:
                 return TRUE_LEAF
 
@@ -567,6 +569,41 @@ class OfDatastoreCentralized(models.AbstractModel):
         if obj._name == 'of.product.brand':
             result = (left, new_operator, obj.mapped('datastore_brand_id'))
         return result
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        brands, domain = self.of_datastore_update_domain(domain)
+        # Recherche sur la base du fournisseur
+        if brands:
+            supplier = brands[0].datastore_supplier_id
+            # Ex: si la base n'a qu'une base centralisée, elle peut appeler les articles de la base distante
+            #     sans autre filtre de recherche.
+            # Dans ce cas, on ne veut pas les autres marques du fournisseur
+            domain = ['&', ('brand_id', 'in', brands.mapped('datastore_brand_id'))] + domain
+
+            supplier_obj = self.env['of.datastore.supplier']
+
+            # Exécution de la requête sur la base du fournisseur
+            client = supplier.of_datastore_connect()
+            if isinstance(client, basestring):
+                # Échec de la connexion à la base fournisseur
+                raise UserError(u'Erreur accès '+supplier.db_name)
+
+            ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
+            res = supplier_obj.of_datastore_read_group(ds_product_obj, domain, fields, groupby, offset, limit, orderby, lazy)
+            for row in res:
+                for arg in row['__domain']:
+                    if isinstance(arg, (list, tuple)):
+                        arg[0] = 'ds_' + arg[0]
+                row['__domain'] = [
+                    'of_datastore_product_search',
+                    ('brand_id', 'in', brands.ids)
+                ] + row['__domain']
+
+        else:
+            # Éxecution de la requête sur la base courante
+            res = super(OfDatastoreCentralized, self).read_group(domain, fields, groupby, offset, limit, orderby, lazy)
+        return res
 
     @api.model
     def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
