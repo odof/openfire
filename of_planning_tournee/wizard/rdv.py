@@ -96,11 +96,7 @@ class OfTourneeRdv(models.TransientModel):
         if self._context.get('from_portal'):
             return res
         # Search template
-        search_template = self.env['of.tournee.rdv.template'].search(
-            [('default_template', '=', True), ('user_ids', 'in', self._uid)], limit=1)
-        if not search_template:
-            search_template = self.env['of.tournee.rdv.template'].search(
-                [('default_template', '=', True), ('user_ids', '=', False)], limit=1)
+        search_template = self.env['of.tournee.rdv.template'].search([('default_user_ids', 'in', self._uid)], limit=1)
         if search_template:
             if search_template.employee_ids and 'pre_employee_ids' not in res:
                 res['pre_employee_ids'] = [(6, 0, [emp.id for emp in search_template.employee_ids])]
@@ -150,7 +146,7 @@ class OfTourneeRdv(models.TransientModel):
 
     @api.model
     def _get_domain_search_template_id(self):
-        return ['|', ('user_ids', '=', False), ('user_ids', 'in', self._uid)]
+        return ['|', ('access_user_ids', '=', False), ('access_user_ids', 'in', self._uid)]
 
     source_model = fields.Char(string="Source Model", readonly=True)
     slots_display_mode = fields.Char(

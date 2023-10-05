@@ -15,5 +15,9 @@ class OFTourneeRdvTemplate(models.Model):
     search_type = fields.Selection(selection=SELECTION_SEARCH_TYPES, string=u"Type de recherche")
     search_mode = fields.Selection(selection=SELECTION_SEARCH_MODES, string=u"Mode de recherche")
 
-    default_template = fields.Boolean(string=u"Modèle de recherche par défaut")
-    user_ids = fields.Many2many(comodel_name='res.users', string=u"Utilisateurs")
+    access_user_ids = fields.Many2many(
+        comodel_name='res.users', relation='of_tournee_rdv_template_access_users_rel', column1='template_id',
+        column2='user_id', string=u"Accessible par")
+    default_user_ids = fields.Many2many(
+        comodel_name='res.users', relation='of_tournee_rdv_template_default_users_rel', column1='template_id',
+        column2='user_id', string=u"Par défaut pour")
