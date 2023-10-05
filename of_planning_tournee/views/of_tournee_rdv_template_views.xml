@@ -25,8 +25,8 @@
                             <field name="search_mode"/>
                         </group>
                         <group>
-                            <field name="default_template"/>
-                            <field name="user_ids" widget="many2many_tags"/>
+                            <field name="access_user_ids" widget="many2many_tags"/>
+                            <field name="default_user_ids" widget="many2many_tags"/>
                         </group>
                     </group>
                 </sheet>
@@ -40,8 +40,8 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="user_ids" widget="many2many_tags"/>
-                <field name="default_template"/>
+                <field name="access_user_ids" widget="many2many_tags"/>
+                <field name="default_user_ids" widget="many2many_tags"/>
             </tree>
         </field>
     </record>
