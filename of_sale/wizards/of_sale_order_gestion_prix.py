@@ -547,11 +547,11 @@ class GestionPrixLine(models.TransientModel):
                         partner=order_line.order_id.partner_id)
 
             price_management_variation = price_unit - order_line.price_unit + order_line.of_price_management_variation
-            new_price_variation = price_management_variation - (price_unit * (order_line.discount or 0.0) / 100.0)
 
-            line_vals = {'price_unit': price_unit,
-                         'of_price_management_variation': price_management_variation,
-                         'of_unit_price_variation': new_price_variation}
+            line_vals = {
+                'price_unit': price_unit,
+                'of_price_management_variation': price_management_variation,
+            }
         return {order_line: line_vals}, taxes
 
     @api.multi
@@ -580,12 +580,10 @@ class GestionPrixLine(models.TransientModel):
             price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
             partner=order_line.order_id.partner_id)
 
-        new_price_variation = -price_unit * (order_line.discount or 0.0) / 100.0
         return (
             {order_line: {
                 'price_unit': price_unit,
                 'of_price_management_variation': 0.0,
-                'of_unit_price_variation': new_price_variation,
                 'purchase_price': order_line.product_id.get_cost(),
              }},
             taxes)

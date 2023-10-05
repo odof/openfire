@@ -468,6 +468,11 @@ class OfAccountInvoiceKitLine(models.Model):
         for comp in self:
             comp.qty_total = comp.qty_per_kit * comp.nb_kits
 
+    @api.onchange('price_unit_display')
+    def _onchange_price_unit_display(self):
+        for comp in self:
+            comp.price_unit = comp.price_unit_display
+
     @api.multi
     def get_report_name(self):
         self.ensure_one()

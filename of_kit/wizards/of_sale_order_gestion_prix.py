@@ -84,16 +84,14 @@ class GestionPrixLine(models.TransientModel):
                 kit_price_unit += line_price_unit * kit_line.qty_per_kit
 
             price = kit_price_unit * (1 - (order_line.discount or 0.0) / 100.0)
-            # we added the kit_order_line , we need it when we create the lines of the discount
-            # take a look to def _calculer function : specially old_res and price_unit
-            # old_res has the lines of sale.order.line of products (type not a kit) and the components/
-            # of the kit (sale.order.kit.line ) , finally during the calculation of the discount line, /
-            # the kit line was ignored
 
+            # On ajoute les informations de la ligne de commande.
+            # Le price_unit sera utile dans le cas de l'application dans les totaux (ligne de remise séparée).
+            price_management_variation = (
+                    kit_price_unit - order_line.price_unit + order_line.of_price_management_variation)
             values[order_line] = {
-                'price_unit': price,
-                'of_price_management_variation': 0.0,
-                'of_unit_price_variation': -price * (order_line.discount or 0.0) / 100.0
+                'price_unit': kit_price_unit,
+                'of_price_management_variation': price_management_variation,
             }
 #            pb = compute_all arrondit les valeurs?
             taxes = order_line.tax_id.compute_all(
