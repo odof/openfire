@@ -31,6 +31,9 @@
             <xpath expr="//footer/button[@special='cancel']" position="after">
                 <button string="(Re)calculer le champ texte" name="button_reload_computed_body" type="object"  class="btn-primary" attrs="{'invisible':[('composition_mode', '!=', 'mass_mail')]}"/>
             </xpath>
+             <xpath expr="//button[@name='save_as_template']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
         </field>
     </record>
 
