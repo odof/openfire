@@ -15,9 +15,9 @@ class Partner(models.Model):
             partner_dir = self.env['muk_dms.directory']\
                 .search([('of_partner_id', '=', partner.commercial_partner_id.id)])
             if not partner_dir:
-                self.of_dms_file_count = 0
+                partner.of_dms_file_count = 0
             else:
-                self.of_dms_file_count = self.env['muk_dms.file'].search([
+                partner.of_dms_file_count = self.env['muk_dms.file'].search([
                     ('directory', 'child_of', partner_dir.id)], count=True)
 
     @api.multi
