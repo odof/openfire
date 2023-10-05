@@ -672,7 +672,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 'ignorer_geo': True,
                 'service_id': request.session.get('rdv_service_id'),
             }
-            search_wizard = request.env['of.tournee.rdv'].create(wizard_vals)
+            search_wizard = request.env['of.tournee.rdv'].with_context(from_portal=True).create(wizard_vals)
             search_wizard._onchange_date_recherche_debut()
             request.session['rdv_search_wiz_id'] = search_wizard.id
             request.session['rdv_creneau_id'] = False

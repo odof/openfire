@@ -92,6 +92,9 @@ class OfTourneeRdv(models.TransientModel):
         elif service and service.date_next and service.date_next >= date.today().strftime(DEFAULT_SERVER_DATE_FORMAT):
             res['date_recherche_debut'] = service.date_next
             res['date_recherche_fin'] = service.date_fin
+        # Les opérations réalisées après ce if ne doivent pas être appliquées pour la prise de RDV via le portail
+        if self._context.get('from_portal'):
+            return res
         # Search template
         search_template = self.env['of.tournee.rdv.template'].search(
             [('default_template', '=', True), ('user_ids', 'in', self._uid)], limit=1)
