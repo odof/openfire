@@ -18,6 +18,7 @@
     'depends': [
         'account',
         'of_account_payment_mode',
+        'of_l10n_fr_siret',
     ],
     'init_xml': [
     ],

@@ -1,0 +1,97 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_l10n_fr_siret
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-07-19 14:49+0000\n"
+"PO-Revision-Date: 2023-07-19 14:49+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,field_description:of_l10n_fr_siret.field_base_config_settings_of_mandatory_siren
+msgid "(OF) SIREN/NIC obligatoire"
+msgstr "(OF) SIREN/NIC obligatoire"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,field_description:of_l10n_fr_siret.field_account_config_settings_pdf_partner_siret_display
+msgid "(OF) SIRET"
+msgstr "(OF) SIRET"
+
+#. module: of_l10n_fr_siret
+#: model:ir.ui.view,arch_db:of_l10n_fr_siret.base_config_settings_view_form
+msgid "<span> (s'applique sur les partenaires de type société uniquement)</span>"
+msgstr "<span> (s'applique sur les partenaires de type société uniquement)</span>"
+
+#. module: of_l10n_fr_siret
+#: selection:account.config.settings,pdf_partner_siret_display:0
+msgid "Display in additional information insert"
+msgstr "Afficher dans une pastille d'informations complémentaires"
+
+#. module: of_l10n_fr_siret
+#: selection:account.config.settings,pdf_partner_siret_display:0
+msgid "Display in main address box"
+msgstr "Afficher dans l'encart d'adresse principal"
+
+#. module: of_l10n_fr_siret
+#: selection:account.config.settings,pdf_partner_siret_display:0
+msgid "Display in main address insert and in additional information insert"
+msgstr "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,help:of_l10n_fr_siret.field_of_sale_wizard_set_printing_params_pdf_partner_siret_address_insert
+msgid "If checked, displays the customer's SIRET in the address insert"
+msgstr "Si coché, affiche le SIRET du client dans l'encart d'adresse"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,help:of_l10n_fr_siret.field_of_sale_wizard_set_printing_params_pdf_partner_siret_customer_insert
+msgid "If checked, displays the customer's SIRET in the customer insert"
+msgstr "Si coché, affiche le SIRET du client dans la pastille client"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model,name:of_l10n_fr_siret.model_account_invoice
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,field_description:of_l10n_fr_siret.field_of_sale_wizard_set_printing_params_pdf_partner_siret_address_insert
+#: model:ir.model.fields,field_description:of_l10n_fr_siret.field_of_sale_wizard_set_printing_params_pdf_partner_siret_customer_insert
+msgid "SIRET"
+msgstr "SIRET"
+
+#. module: of_l10n_fr_siret
+#: model:ir.ui.view,arch_db:of_l10n_fr_siret.report_saleorder_document
+msgid "SIRET:"
+msgstr "SIRET:"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model,name:of_l10n_fr_siret.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model.fields,help:of_l10n_fr_siret.field_account_config_settings_pdf_partner_siret_display
+msgid "Where to display the SIRET in PDF reports? Leave blank to avoid display."
+msgstr "Où afficher le SIRET dans les rapport PDF ? Ne rien mettre pour ne pas afficher."
+
+#. module: of_l10n_fr_siret
+#: model:ir.model,name:of_l10n_fr_siret.model_account_config_settings
+msgid "account.config.settings"
+msgstr "account.config.settings"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model,name:of_l10n_fr_siret.model_base_config_settings
+msgid "base.config.settings"
+msgstr "base.config.settings"
+
+#. module: of_l10n_fr_siret
+#: model:ir.model,name:of_l10n_fr_siret.model_of_sale_wizard_set_printing_params
+msgid "of.sale.wizard.set.printing.params"
+msgstr "of.sale.wizard.set.printing.params"
