@@ -1010,8 +1010,14 @@ class SaleOrderLine(models.Model):
         return res
 
     of_price_management_variation = fields.Float(
-        string=u"Montant unitaire de la variation de prix liée à la gestion de prix")
-    of_unit_price_variation = fields.Float(string=u"Montant unitaire de la variation de prix")
+        string=u"Montant unitaire de la variation de prix liée à la gestion de prix",
+        help=u"Variation de montant appliquée au prix unitaire via la gestion prix"
+    )
+    of_unit_price_variation = fields.Float(
+        string=u"Montant unitaire de la variation de prix",
+        help=u"Variation de montant appliquée au prix unitaire via la gestion prix"
+             u" + remise standard sur ligne de commande"
+    )
 
     @api.depends('price_subtotal', 'margin')
     def _compute_of_marge(self):

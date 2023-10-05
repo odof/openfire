@@ -825,6 +825,11 @@ class OfSaleOrderKitLine(models.Model):
             comp.cost_per_kit = comp.cost_unit * qty_per_kit
             comp.cost_total = comp.cost_unit * qty_per_kit * comp.nb_kits
 
+    @api.onchange('price_unit_display')
+    def _onchange_price_unit_display(self):
+        for comp in self:
+            comp.price_unit = comp.price_unit_display
+
     @api.multi
     @api.depends('qty_per_kit', 'nb_kits')
     def _compute_qty_total(self):
