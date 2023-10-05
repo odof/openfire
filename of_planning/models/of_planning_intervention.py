@@ -1392,7 +1392,7 @@ class OfPlanningIntervention(models.Model):
 
         for inter in self:
             if inter.employee_ids and inter.employee_main_id not in inter.employee_ids:
-                inter.employee_main_id = inter.employee_ids[0]
+                inter.with_context(from_ui=False).employee_main_id = inter.employee_ids[0]
 
         if vals.get('state', '') == 'confirm':
             self.mapped('line_ids').sudo()._action_procurement_create()
