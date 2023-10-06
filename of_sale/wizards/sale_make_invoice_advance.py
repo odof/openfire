@@ -54,6 +54,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
             invoice.invoice_line_ids[0].name = self._context['of_acompte_line_name']
         if self._context.get('of_acompte_sale_line_name'):
             so_line.name = self._context['of_acompte_sale_line_name']
+        if not self.env['ir.values'].get_default('sale.config.settings', 'of_propagate_payment_term'):
+            invoice.payment_term_id = False
         return invoice
 
     @api.multi
@@ -80,12 +82,6 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 self = self.with_context(of_include_null_qty_lines=True)
             result = super(SaleAdvancePaymentInv, self.with_context(
                 of_acompte_sale_line_name=_("Advance: %s") % time.strftime('%d/%m/%Y'))).create_invoices()
-
-        # On ne propage pas les conditions de règlement si le paramètre de propagation n'est pas coché
-        if not self.env['ir.values'].get_default('sale.config.settings', 'of_propagate_payment_term'):
-            invoice = self.env['account.invoice'].browse(result['res_id'])
-            invoice.payment_term_id = False
-
         return result
 
     @api.onchange('advance_payment_method')

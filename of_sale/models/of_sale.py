@@ -794,6 +794,8 @@ class SaleOrder(models.Model):
         invoice_vals["of_date_vt"] = self.of_date_vt
         if self.of_apply_on_invoice:
             invoice_vals["of_price_printing"] = self.of_price_printing
+        if not self.env['ir.values'].get_default('sale.config.settings', 'of_propagate_payment_term'):
+            invoice_vals['payment_term_id'] = False
         return invoice_vals
 
     @api.multi

@@ -61,7 +61,7 @@ class OFSaleConfiguration(models.TransientModel):
 
     of_propagate_payment_term = fields.Boolean(
         string=u"(OF) Terms of payment",
-        help=u"Si décoché, les conditions de règlement ne sont pas propagées aux factures", default=True)
+        help=u"Si décoché, les conditions de règlement ne sont pas propagées aux factures")
 
     of_sale_order_margin_control = fields.Boolean(
         string=u"(OF) Contrôle de marge", help=u"Activer le contrôle de marge à la validation des commandes")
