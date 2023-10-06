@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_g_view_form" model="ir.ui.view">
+        <field name="name">of.calculation.g.view.form</field>
+        <field name="model">of.calculation.g</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    <group>
+                        <group>
+                            <field name="volume_type"/>
+                            <field name="k_wall"/>
+                            <field name="k_roof"/>
+                            <field name="k_floor"/>
+                        </group>
+                        <group>
+                            <field name="g_value"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_g_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.g.tree.view</field>
+        <field name="model">of.calculation.g</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="volume_type"/>
+                <field name="k_wall"/>
+                <field name="k_roof"/>
+                <field name="k_floor"/>
+                <field name="g_value"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_g_search_view" model="ir.ui.view">
+        <field name="name">of.calculation.g.search.view</field>
+        <field name="model">of.calculation.g</field>
+        <field name="arch" type="xml">
+            <search>
+                <group>
+                    <filter name="IP1" domain="[('volume_type','=','IP1')]" string="IP1"/>
+                    <filter name="IP2" domain="[('volume_type','=','IP2')]" string="IP2"/>
+                    <filter name="IG1" domain="[('volume_type','=','IG1')]" string="IG1"/>
+                    <filter name="IG2/3" domain="[('volume_type','=','IG2/3')]" string="IG2/IG3"/>
+                    <separator orientation="vertical"/>
+                    <field name="name"/>
+                </group>
+                <newline/>
+                <group expand="0" string="Group By...">
+                    <filter string="Catégorie de volume" context="{'group_by':'volume_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_calculation_g_action" model="ir.actions.act_window">
+        <field name="name">Coefficient K / Coefficient G</field>
+        <field name="res_model">of.calculation.g</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Coefficient K / Coefficient G" id="of_calculation_g_menu" action="of_calculation_g_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="6"/>
+
+</odoo>

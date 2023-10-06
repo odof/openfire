@@ -28,7 +28,7 @@ class OFCalculationHeatLoss(models.Model):
     surface = fields.Float(
         string=u"Surface à chauffer (en m²)", help=u"Surface de la ou des pièces à chauffer", required=True)
     height = fields.Float(string=u"Hauteur de plafond (en m)", required=True)
-    volume = fields.Float(string=u"Volume", compute='_compute_volume', store=True)
+    volume = fields.Float(string=u"Volume (en m³)", compute='_compute_volume', store=True)
     construction_date_id = fields.Many2one(
         comodel_name='of.calculation.construction.date', string=u"Date de construction", required=True)
     better_g = fields.Boolean(string=u"Meilleur calcul G", compute='_compute_better_g')
@@ -51,19 +51,19 @@ class OFCalculationHeatLoss(models.Model):
         comodel_name='of.calculation.heat.loss.line', inverse_name='calculation_heat_loss_id',
         string=u"Lignes de calcul")
     floor_number = fields.Integer(string=u"Nombre de niveaux", default=1)
-    type = fields.Selection(
+    volume_type = fields.Selection(
         selection=[
             ('IP1', u"IP1 - Volume < 270 m³, 1 niveau "),
             ('IP2', u"IP2 - Volume < 270 m³, 2 niveaux"),
             ('IG1', u"IG1 - Volume >= 270 m³, 1 niveau"),
             ('IG2/3', u"IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"),
-        ],
-        string=u"Type de coefficient",
-        compute='_compute_type'
-    )
-    attribute1_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Murs")
-    attribute2_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Toiture")
-    attribute3_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Plancher bas")
+        ], string=u"Type de coefficient", compute='_compute_type')
+    wall_surface_id = fields.Many2one(
+        comodel_name='of.calculation.surface', string=u"Murs", domain=[('surface_type', '=', 'wall')])
+    roof_surface_id = fields.Many2one(
+        comodel_name='of.calculation.surface', string=u"Toiture", domain=[('surface_type', '=', 'roof')])
+    floor_surface_id = fields.Many2one(
+        comodel_name='of.calculation.surface', string=u"Plancher bas", domain=[('surface_type', '=', 'floor')])
     coefficient = fields.Float(string=u"Coefficient G", compute='_compute_coefficient')
 
     @api.constrains('floor_number')
@@ -123,15 +123,24 @@ class OFCalculationHeatLoss(models.Model):
     def _compute_type(self):
         for rec in self:
             if rec.volume and rec.volume < 270.0 and rec.floor_number > 0 and rec.floor_number <= 2:
-                rec.type = 'IP%s' % rec.floor_number
+                rec.volume_type = 'IP%s' % rec.floor_number
             elif rec.volume and rec.volume >= 270.0 and rec.floor_number > 0 and rec.floor_number <= 3:
-                rec.type = 'IG%s' % (rec.floor_number > 1 and '2/3' or rec.floor_number)
+                rec.volume_type = 'IG%s' % (rec.floor_number > 1 and '2/3' or rec.floor_number)
 
     @api.multi
-    @api.depends('attribute3_id', 'construction_date_id')
+    @api.depends('wall_surface_id', 'roof_surface_id', 'floor_surface_id', 'better_g', 'volume_type')
     def _compute_coefficient(self):
+        g_values = self.env['of.calculation.g'].search([])
         for rec in self:
-            rec.coefficient = rec.better_g and rec.attribute3_id.coefficient or rec.construction_date_id.coefficient
+            if rec.better_g:
+                g_value = g_values.filtered(
+                    lambda g: rec.volume_type == g.volume_type
+                              and rec.wall_surface_id.k_value == g.k_wall
+                              and rec.roof_surface_id.k_value == g.k_roof
+                              and rec.floor_surface_id.k_value == g.k_floor)
+                rec.coefficient = g_value and g_value[0].g_value or 0.0
+            else:
+                rec.coefficient = rec.construction_date_id.coefficient
 
     @api.multi
     @api.onchange('department_id')
@@ -144,35 +153,6 @@ class OFCalculationHeatLoss(models.Model):
         if self.order_id:
             self.lead_id = self.order_id.opportunity_id
             self.parc_installe_id = self.order_id.of_parc_installe_ids and self.order_id.of_parc_installe_ids[0]
-
-    @api.multi
-    @api.onchange('volume')
-    def _onchange_volume(self):
-        if hasattr(self, '_origin') and self._origin.volume != self.volume and (
-            (self._origin.volume < 270.0 and self.volume >= 270.0) or
-            (self._origin.volume >= 270.0 and self.volume < 270.0)
-        ):
-            self.attribute1_id = False
-            self.attribute2_id = False
-            self.attribute3_id = False
-
-    @api.multi
-    @api.onchange('floor_number')
-    def _onchange_floor_number(self):
-        self._check_floor_number()
-        if hasattr(self, '_origin') and self._origin.floor_number != self.floor_number:
-            if not (self.volume >= 270.0 and self._origin.floor_number in [2, 3] and self.floor_number in [2, 3]):
-                self.attribute1_id = False
-
-    @api.multi
-    @api.onchange('attribute1_id')
-    def _onchange_attribute1_id(self):
-        self.attribute2_id = False
-
-    @api.multi
-    @api.onchange('attribute2_id')
-    def _onchange_attribute2_id(self):
-        self.attribute3_id = False
 
     @api.model
     def create(self, vals):
@@ -287,11 +267,7 @@ class OFCalculationHeatLoss(models.Model):
     @api.multi
     def get_coefficient_g(self):
         self.ensure_one()
-        return (
-            self.attribute3_id.coefficient
-            if self.better_g and self.attribute3_id.coefficient
-            else self.construction_date_id.coefficient
-        )
+        return self.coefficient or self.construction_date_id.coefficient
 
 
 class OFCalculationConstructionDate(models.Model):
@@ -364,35 +340,3 @@ class OFCalculationBaseTemperatureLine(models.Model):
     def _compute_name(self):
         for rec in self:
             rec.name = u"%s°C de %sm" % (rec.temperature, rec.altitude_id.name)
-
-
-class OFCalculationHeatLossAttribute(models.Model):
-    _name = 'of.calculation.heat.loss.attribute'
-    _description = u"Attributs pour un meilleur calcul du coefficient G"
-    _order = "type ASC, valeur_k DESC"
-
-    name = fields.Char(string=u"Nom", compute='_compute_name')
-    description = fields.Char(string=u"Description")
-    valeur_k = fields.Float(string=u"Valeur du K", required=True)
-    coefficient = fields.Float(string=u"Valeur du G")
-    type = fields.Selection(
-        selection=[
-            ('IP1', u"IP1 - Volume < 270 m³, 1 niveau"),
-            ('IP2', u"IP2 - Volume < 270 m³, 2 niveaux"),
-            ('IG1', u"IG1 - Volume >= 270 m³, 1 niveau"),
-            ('IG2/3', u"IG2/IG3 - Volume >= 270 m³, 2/3 niveaux"),
-        ],
-        string=u"Type de coefficient",
-        required=True,
-    )
-    parent_attribute_id = fields.Many2one(comodel_name='of.calculation.heat.loss.attribute', string=u"Attribut parent")
-    attribute_ids = fields.One2many(
-        comodel_name='of.calculation.heat.loss.attribute',
-        inverse_name='parent_attribute_id',
-        string=u"Attributs enfants"
-    )
-
-    @api.depends('description', 'valeur_k')
-    def _compute_name(self):
-        for rec in self:
-            rec.name = "%s - %s K" % (rec.description or "", rec.valeur_k)

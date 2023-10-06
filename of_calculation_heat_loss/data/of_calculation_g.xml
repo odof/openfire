@@ -1,0 +1,1156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_calculation_g_1" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.56</field>
+    </record>
+
+    <record id="of_calculation_g_2" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.42</field>
+    </record>
+
+    <record id="of_calculation_g_3" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">2.27</field>
+    </record>
+
+    <record id="of_calculation_g_4" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.18</field>
+    </record>
+
+    <record id="of_calculation_g_5" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_6" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.86</field>
+    </record>
+
+    <record id="of_calculation_g_7" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.84</field>
+    </record>
+
+    <record id="of_calculation_g_8" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.69</field>
+    </record>
+
+    <record id="of_calculation_g_9" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.54</field>
+    </record>
+
+    <record id="of_calculation_g_10" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.32</field>
+    </record>
+
+    <record id="of_calculation_g_11" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.18</field>
+    </record>
+
+    <record id="of_calculation_g_12" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">2.03</field>
+    </record>
+
+    <record id="of_calculation_g_13" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.87</field>
+    </record>
+
+    <record id="of_calculation_g_14" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.71</field>
+    </record>
+
+    <record id="of_calculation_g_15" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.58</field>
+    </record>
+
+    <record id="of_calculation_g_16" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.56</field>
+    </record>
+
+    <record id="of_calculation_g_17" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.41</field>
+    </record>
+
+    <record id="of_calculation_g_18" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.26</field>
+    </record>
+
+    <record id="of_calculation_g_19" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_20" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.95</field>
+    </record>
+
+    <record id="of_calculation_g_21" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.8</field>
+    </record>
+
+    <record id="of_calculation_g_22" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.65</field>
+    </record>
+
+    <record id="of_calculation_g_23" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.48</field>
+    </record>
+
+    <record id="of_calculation_g_24" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.33</field>
+    </record>
+
+    <record id="of_calculation_g_25" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.31</field>
+    </record>
+
+    <record id="of_calculation_g_26" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.16</field>
+    </record>
+
+    <record id="of_calculation_g_27" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.01</field>
+    </record>
+
+    <record id="of_calculation_g_28" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.96</field>
+    </record>
+
+    <record id="of_calculation_g_29" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.81</field>
+    </record>
+
+    <record id="of_calculation_g_30" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.66</field>
+    </record>
+
+    <record id="of_calculation_g_31" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.51</field>
+    </record>
+
+    <record id="of_calculation_g_32" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.36</field>
+    </record>
+
+    <record id="of_calculation_g_33" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.21</field>
+    </record>
+
+    <record id="of_calculation_g_34" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.19</field>
+    </record>
+
+    <record id="of_calculation_g_35" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.05</field>
+    </record>
+
+    <record id="of_calculation_g_36" model="of.calculation.g">
+        <field name="volume_type">IP1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.91</field>
+    </record>
+
+    <record id="of_calculation_g_37" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.32</field>
+    </record>
+
+    <record id="of_calculation_g_38" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.26</field>
+    </record>
+
+    <record id="of_calculation_g_39" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">2.17</field>
+    </record>
+
+    <record id="of_calculation_g_40" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.11</field>
+    </record>
+
+    <record id="of_calculation_g_41" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_42" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.93</field>
+    </record>
+
+    <record id="of_calculation_g_43" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.91</field>
+    </record>
+
+    <record id="of_calculation_g_44" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.82</field>
+    </record>
+
+    <record id="of_calculation_g_45" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.73</field>
+    </record>
+
+    <record id="of_calculation_g_46" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.95</field>
+    </record>
+
+    <record id="of_calculation_g_47" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.97</field>
+    </record>
+
+    <record id="of_calculation_g_48" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.78</field>
+    </record>
+
+    <record id="of_calculation_g_49" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.71</field>
+    </record>
+
+    <record id="of_calculation_g_50" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.65</field>
+    </record>
+
+    <record id="of_calculation_g_51" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.57</field>
+    </record>
+
+    <record id="of_calculation_g_52" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.55</field>
+    </record>
+
+    <record id="of_calculation_g_53" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.45</field>
+    </record>
+
+    <record id="of_calculation_g_54" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.37</field>
+    </record>
+
+    <record id="of_calculation_g_55" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.56</field>
+    </record>
+
+    <record id="of_calculation_g_56" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.48</field>
+    </record>
+
+    <record id="of_calculation_g_57" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.39</field>
+    </record>
+
+    <record id="of_calculation_g_58" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.34</field>
+    </record>
+
+    <record id="of_calculation_g_59" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.24</field>
+    </record>
+
+    <record id="of_calculation_g_60" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.15</field>
+    </record>
+
+    <record id="of_calculation_g_61" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.13</field>
+    </record>
+
+    <record id="of_calculation_g_62" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.04</field>
+    </record>
+
+    <record id="of_calculation_g_63" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.95</field>
+    </record>
+
+    <record id="of_calculation_g_64" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.41</field>
+    </record>
+
+    <record id="of_calculation_g_65" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.32</field>
+    </record>
+
+    <record id="of_calculation_g_66" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.23</field>
+    </record>
+
+    <record id="of_calculation_g_67" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.15</field>
+    </record>
+
+    <record id="of_calculation_g_68" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.06</field>
+    </record>
+
+    <record id="of_calculation_g_69" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.98</field>
+    </record>
+
+    <record id="of_calculation_g_70" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">0.96</field>
+    </record>
+
+    <record id="of_calculation_g_71" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">0.87</field>
+    </record>
+
+    <record id="of_calculation_g_72" model="of.calculation.g">
+        <field name="volume_type">IP2</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.78</field>
+    </record>
+
+    <record id="of_calculation_g_73" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.42</field>
+    </record>
+
+    <record id="of_calculation_g_74" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.26</field>
+    </record>
+
+    <record id="of_calculation_g_75" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">2.11</field>
+    </record>
+
+    <record id="of_calculation_g_76" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.95</field>
+    </record>
+
+    <record id="of_calculation_g_77" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.79</field>
+    </record>
+
+    <record id="of_calculation_g_78" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.64</field>
+    </record>
+
+    <record id="of_calculation_g_79" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.62</field>
+    </record>
+
+    <record id="of_calculation_g_80" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.47</field>
+    </record>
+
+    <record id="of_calculation_g_81" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.31</field>
+    </record>
+
+    <record id="of_calculation_g_82" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.18</field>
+    </record>
+
+    <record id="of_calculation_g_83" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_84" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.87</field>
+    </record>
+
+    <record id="of_calculation_g_85" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.79</field>
+    </record>
+
+    <record id="of_calculation_g_86" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.17</field>
+    </record>
+
+    <record id="of_calculation_g_87" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.56</field>
+    </record>
+
+    <record id="of_calculation_g_88" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.54</field>
+    </record>
+
+    <record id="of_calculation_g_89" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.38</field>
+    </record>
+
+    <record id="of_calculation_g_90" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.23</field>
+    </record>
+
+    <record id="of_calculation_g_91" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_92" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.87</field>
+    </record>
+
+    <record id="of_calculation_g_93" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.79</field>
+    </record>
+
+    <record id="of_calculation_g_94" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.71</field>
+    </record>
+
+    <record id="of_calculation_g_95" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.56</field>
+    </record>
+
+    <record id="of_calculation_g_96" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.4</field>
+    </record>
+
+    <record id="of_calculation_g_97" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.25</field>
+    </record>
+
+    <record id="of_calculation_g_98" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.23</field>
+    </record>
+
+    <record id="of_calculation_g_99" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.07</field>
+    </record>
+
+    <record id="of_calculation_g_100" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.92</field>
+    </record>
+
+    <record id="of_calculation_g_101" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.77</field>
+    </record>
+
+    <record id="of_calculation_g_102" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.61</field>
+    </record>
+
+    <record id="of_calculation_g_103" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.46</field>
+    </record>
+
+    <record id="of_calculation_g_104" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.3</field>
+    </record>
+
+    <record id="of_calculation_g_105" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.15</field>
+    </record>
+
+    <record id="of_calculation_g_106" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.13</field>
+    </record>
+
+    <record id="of_calculation_g_107" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">0.97</field>
+    </record>
+
+    <record id="of_calculation_g_108" model="of.calculation.g">
+        <field name="volume_type">IG1</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.92</field>
+    </record>
+
+    <record id="of_calculation_g_109" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">2.02</field>
+    </record>
+
+    <record id="of_calculation_g_110" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.95</field>
+    </record>
+
+    <record id="of_calculation_g_111" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.87</field>
+    </record>
+
+    <record id="of_calculation_g_112" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.79</field>
+    </record>
+
+    <record id="of_calculation_g_113" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.71</field>
+    </record>
+
+    <record id="of_calculation_g_114" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.64</field>
+    </record>
+
+    <record id="of_calculation_g_115" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.62</field>
+    </record>
+
+    <record id="of_calculation_g_116" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.54</field>
+    </record>
+
+    <record id="of_calculation_g_117" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">3</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.47</field>
+    </record>
+
+    <record id="of_calculation_g_118" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.71</field>
+    </record>
+
+    <record id="of_calculation_g_119" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.65</field>
+    </record>
+
+    <record id="of_calculation_g_120" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.58</field>
+    </record>
+
+    <record id="of_calculation_g_121" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.56</field>
+    </record>
+
+    <record id="of_calculation_g_122" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.48</field>
+    </record>
+
+    <record id="of_calculation_g_123" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.4</field>
+    </record>
+
+    <record id="of_calculation_g_124" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.38</field>
+    </record>
+
+    <record id="of_calculation_g_125" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.3</field>
+    </record>
+
+    <record id="of_calculation_g_126" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">2</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.23</field>
+    </record>
+
+    <record id="of_calculation_g_127" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.46</field>
+    </record>
+
+    <record id="of_calculation_g_128" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.4</field>
+    </record>
+
+    <record id="of_calculation_g_129" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.33</field>
+    </record>
+
+    <record id="of_calculation_g_130" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.24</field>
+    </record>
+
+    <record id="of_calculation_g_131" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.18</field>
+    </record>
+
+    <record id="of_calculation_g_132" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.11</field>
+    </record>
+
+    <record id="of_calculation_g_133" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.09</field>
+    </record>
+
+    <record id="of_calculation_g_134" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.01</field>
+    </record>
+
+    <record id="of_calculation_g_135" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">1</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.94</field>
+    </record>
+
+    <record id="of_calculation_g_136" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.35</field>
+    </record>
+
+    <record id="of_calculation_g_137" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.28</field>
+    </record>
+
+    <record id="of_calculation_g_138" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">3</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">1.2</field>
+    </record>
+
+    <record id="of_calculation_g_139" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">1.12</field>
+    </record>
+
+    <record id="of_calculation_g_140" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">1.05</field>
+    </record>
+
+    <record id="of_calculation_g_141" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">1.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.97</field>
+    </record>
+
+    <record id="of_calculation_g_142" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1.5</field>
+        <field name="g_value">0.95</field>
+    </record>
+
+    <record id="of_calculation_g_143" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">1</field>
+        <field name="g_value">0.86</field>
+    </record>
+
+    <record id="of_calculation_g_144" model="of.calculation.g">
+        <field name="volume_type">IG2/3</field>
+        <field name="k_wall">0.5</field>
+        <field name="k_roof">0.5</field>
+        <field name="k_floor">0.5</field>
+        <field name="g_value">0.77</field>
+    </record>
+
+</odoo>
