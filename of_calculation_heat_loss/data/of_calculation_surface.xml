@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_calculation_surface_1" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Granite ou basalte (40 cm)</field>
+        <field name="k_value">3</field>
+    </record>
+
+    <record id="of_calculation_surface_2" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Béton plein (22 cm)</field>
+        <field name="k_value">3</field>
+    </record>
+
+    <record id="of_calculation_surface_3" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Pierre semi ferme (40 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_4" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Pierre tendre (30 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_5" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Brique pleine (35 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_6" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Agglos béton parois épaisses (30 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_7" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Torchis (terre comprimée) (30 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_8" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Brique creuse (25 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_9" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Paroi double avec vide d’air (35 cm)</field>
+        <field name="k_value">2</field>
+    </record>
+
+    <record id="of_calculation_surface_10" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Béton cellulaire (20 cm)</field>
+        <field name="k_value">1</field>
+    </record>
+
+    <record id="of_calculation_surface_11" model="of.calculation.surface">
+        <field name="surface_type">wall</field>
+        <field name="description">Paroi isolé</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_12" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble non chauffé et fortement ventilé et plancher non isolé</field>
+        <field name="k_value">3</field>
+    </record>
+
+    <record id="of_calculation_surface_13" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble non chauffé et fortement ventilé et plancher isolé</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_14" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble non chauffé et faiblement ventilé et plancher non isolé</field>
+        <field name="k_value">1.5</field>
+    </record>
+
+    <record id="of_calculation_surface_15" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble non chauffé et faiblement ventilé et plancher isolé</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_16" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble chauffé et toiture non isolée</field>
+        <field name="k_value">3</field>
+    </record>
+
+    <record id="of_calculation_surface_17" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Comble chauffé et toiture isolée</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_18" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Toiture-terrasse non isolée</field>
+        <field name="k_value">3</field>
+    </record>
+
+    <record id="of_calculation_surface_19" model="of.calculation.surface">
+        <field name="surface_type">roof</field>
+        <field name="description">Toiture-terrasse isolée</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_20" model="of.calculation.surface">
+        <field name="surface_type">floor</field>
+        <field name="description">Plancher-bas sur terre-plein non isolé</field>
+        <field name="k_value">1</field>
+    </record>
+
+    <record id="of_calculation_surface_21" model="of.calculation.surface">
+        <field name="surface_type">floor</field>
+        <field name="description">Plancher-bas sur terre-plein isolé</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+    <record id="of_calculation_surface_22" model="of.calculation.surface">
+        <field name="surface_type">floor</field>
+        <field name="description">Plancher-bas sur vide sanitaire non isolé</field>
+        <field name="k_value">1.5</field>
+    </record>
+
+    <record id="of_calculation_surface_23" model="of.calculation.surface">
+        <field name="surface_type">floor</field>
+        <field name="description">Plancher-bas sur vide sanitaire isolé</field>
+        <field name="k_value">0.5</field>
+    </record>
+
+</odoo>

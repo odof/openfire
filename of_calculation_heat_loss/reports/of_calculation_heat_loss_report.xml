@@ -49,6 +49,12 @@
                                     <li>
                                         Date de construction : <strong><span t-field="o.construction_date_id.name"/></strong>
                                     </li>
+                                    <li t-if="o.better_g">
+                                        Murs : <strong><span t-field="o.wall_surface_id.name"/></strong><br/>
+                                        Toiture : <strong><span t-field="o.roof_surface_id.name"/></strong><br/>
+                                        Plancher bas : <strong><span t-field="o.floor_surface_id.name"/></strong><br/>
+                                        Coefficient G : <strong><span t-field="o.coefficient"/></strong><br/>
+                                    </li>
                                     <li>
                                         Température de confort désirée : <strong><span t-field="o.temperature"/></strong>
                                     </li>
