@@ -12,38 +12,38 @@
         </field>
     </record>
 
-    <record id="view_pack_operation_lot_form" model="ir.ui.view">
-        <field name="name">of.stock.pack.operation.lots.form</field>
-        <field name="model">stock.pack.operation</field>
-        <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//tree/field[@name='lot_id']" position="after">
-                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
-            </xpath>
-        </field>
-    </record>
+<!--    <record id="view_pack_operation_lot_form" model="ir.ui.view">-->
+<!--        <field name="name">of.stock.pack.operation.lots.form</field>-->
+<!--        <field name="model">stock.pack.operation</field>-->
+<!--        <field name="inherit_id" ref="stock.view_pack_operation_lot_form"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//tree/field[@name='lot_id']" position="after">-->
+<!--                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
-    <record id="stock_inventory_line_tree2" model="ir.ui.view">
-        <field name="name">of.stock.inventory.line.tree2</field>
-        <field name="model">stock.inventory.line</field>
-        <field name="inherit_id" ref="stock.stock_inventory_line_tree2"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='prod_lot_id']" position="after">
-                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
-            </xpath>
-        </field>
-    </record>
+<!--    <record id="stock_inventory_line_tree2" model="ir.ui.view">-->
+<!--        <field name="name">of.stock.inventory.line.tree2</field>-->
+<!--        <field name="model">stock.inventory.line</field>-->
+<!--        <field name="inherit_id" ref="stock.stock_inventory_line_tree2"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='prod_lot_id']" position="after">-->
+<!--                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
-    <record id="stock_inventory_line_search" model="ir.ui.view">
-        <field name="name">of.stock.inventory.line.search</field>
-        <field name="model">stock.inventory.line</field>
-        <field name="inherit_id" ref="stock.stock_inventory_line_search"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='prod_lot_id']" position="after">
-                <field name="of_internal_serial_number" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>
-            </xpath>
-        </field>
-    </record>
+<!--    <record id="stock_inventory_line_search" model="ir.ui.view">-->
+<!--        <field name="name">of.stock.inventory.line.search</field>-->
+<!--        <field name="model">stock.inventory.line</field>-->
+<!--        <field name="inherit_id" ref="stock.stock_inventory_line_search"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            <xpath expr="//field[@name='prod_lot_id']" position="after">-->
+<!--                <field name="of_internal_serial_number" domain="[('product_id', '=', product_id)]" context="{'default_product_id': product_id}" groups="stock.group_production_lot"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
     <record id="of_stock_view_inventory_form" model="ir.ui.view">
         <field name="name">of.sale.stock.inventory.form</field>
@@ -101,9 +101,9 @@
                 <field name="of_product_lot_serial_management_copy" invisible="1"/>
                 <field name="of_product_lot_serial_management" readonly="1"/>
             </xpath>
-            <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="after">
-                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>
-            </xpath>
+<!--            <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="after">-->
+<!--                <field name="of_internal_serial_number" invisible="context.get('display_internal_serial_number') == False"/>-->
+<!--            </xpath>-->
             <xpath expr="//notebook//field[@name='line_ids']/tree/field[@name='prod_lot_id']" position="attributes">
                 <attribute name="attrs">{'required': [('of_product_lot_serial_management', '=', True)]}</attribute>
                 <attribute name="context">{'prio_location_id': location_id, 'search_internal': True}</attribute>

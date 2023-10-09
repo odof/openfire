@@ -25,7 +25,7 @@
                                   decoration-info="qty_to_reserve and qty_to_reserve &gt; 0 and qty_to_reserve &lt;= qty_available"
                                   decoration-danger="qty_to_reserve and qty_to_reserve &gt; qty_available">
                                 <field name="location_id" readonly="1" options="{'no_open': True}"/>
-                                <field name="of_internal_serial_number" readonly="1"/>
+<!--                                <field name="of_internal_serial_number" readonly="1"/>-->
                                 <field name="qty_available" readonly="1"/>
                                 <field name="qty_to_reserve"/>
                             </tree>
