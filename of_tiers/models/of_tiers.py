@@ -280,7 +280,7 @@ class AccountPayment(models.Model):
 
     @api.depends('invoice_ids', 'payment_type', 'partner_type', 'partner_id')
     def _compute_destination_account_id(self):
-        if not self .invoice_ids and self.payment_type != 'transfer' and self.partner_id:
+        if len(self) == 1 and not self.invoice_ids and self.payment_type != 'transfer' and self.partner_id:
             self.partner_id.update_account()
         return super(AccountPayment, self)._compute_destination_account_id()
 
