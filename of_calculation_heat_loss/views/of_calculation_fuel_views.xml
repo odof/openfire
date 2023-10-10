@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_fuel_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.fuel.form.view</field>
+        <field name="model">of.calculation.fuel</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="calorific_value"/>
+                        <field name="price"/>
+                        <field name="uom_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_fuel_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.fuel.tree.view</field>
+        <field name="model">of.calculation.fuel</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="calorific_value"/>
+                <field name="price"/>
+                <field name="uom_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_fuel_action" model="ir.actions.act_window">
+        <field name="name">Combustible</field>
+        <field name="res_model">of.calculation.fuel</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Combustible" id="of_calculation_fuel_menu" action="of_calculation_fuel_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="7"/>
+
+</odoo>

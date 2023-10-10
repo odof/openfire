@@ -4,570 +4,665 @@
     <record id="department_1" model="of.calculation.department">
         <field name="code">1</field>
         <field name="name">Ain</field>
+        <field name="unified_day_degree">1863.6</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_2" model="of.calculation.department">
         <field name="code">2</field>
         <field name="name">Aisne</field>
+        <field name="unified_day_degree">1977.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_3" model="of.calculation.department">
         <field name="code">3</field>
         <field name="name">Allier</field>
+        <field name="unified_day_degree">1879.65</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_4" model="of.calculation.department">
         <field name="code">4</field>
         <field name="name">Alpes-de-Haute-Provence</field>
+        <field name="unified_day_degree">1613.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_5" model="of.calculation.department">
         <field name="code">5</field>
         <field name="name">Hautes-Alpes</field>
+        <field name="unified_day_degree">2025.95</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_6" model="of.calculation.department">
         <field name="code">6</field>
         <field name="name">Alpes-Maritimes</field>
+        <field name="unified_day_degree">896.65</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
     </record>
 
     <record id="department_7" model="of.calculation.department">
         <field name="code">7</field>
         <field name="name">Ardèche</field>
+        <field name="unified_day_degree">1523.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
     </record>
 
     <record id="department_8" model="of.calculation.department">
         <field name="code">8</field>
         <field name="name">Ardennes</field>
+        <field name="unified_day_degree">2196.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_9" model="of.calculation.department">
         <field name="code">9</field>
         <field name="name">Ariège</field>
+        <field name="unified_day_degree">1554.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_10" model="of.calculation.department">
         <field name="code">10</field>
         <field name="name">Aube</field>
+        <field name="unified_day_degree">1933.2</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_11" model="of.calculation.department">
         <field name="code">11</field>
         <field name="name">Aude</field>
+        <field name="unified_day_degree">1272.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_12" model="of.calculation.department">
         <field name="code">12</field>
         <field name="name">Aveyron</field>
+        <field name="unified_day_degree">1892.4</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_13" model="of.calculation.department">
         <field name="code">13</field>
         <field name="name">Bouches-du-Rhône</field>
+        <field name="unified_day_degree">1079.9</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_14" model="of.calculation.department">
         <field name="code">14</field>
         <field name="name">Calvados</field>
+        <field name="unified_day_degree">1796.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_15" model="of.calculation.department">
         <field name="code">15</field>
         <field name="name">Cantal</field>
+        <field name="unified_day_degree">2024.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_16" model="of.calculation.department">
         <field name="code">16</field>
         <field name="name">Charente</field>
+        <field name="unified_day_degree">1369.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_17" model="of.calculation.department">
         <field name="code">17</field>
         <field name="name">Charente-Maritime</field>
+        <field name="unified_day_degree">1350.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_18" model="of.calculation.department">
         <field name="code">18</field>
         <field name="name">Cher</field>
+        <field name="unified_day_degree">1708.2</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_19" model="of.calculation.department">
         <field name="code">19</field>
         <field name="name">Corrèze</field>
+        <field name="unified_day_degree">1490.1</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_20" model="of.calculation.department">
         <field name="code">20</field>
         <field name="name">Corse</field>
+        <field name="unified_day_degree">935.95</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_1"/>
     </record>
 
     <record id="department_21" model="of.calculation.department">
         <field name="code">21</field>
         <field name="name">Côte-d'Or</field>
+        <field name="unified_day_degree">1948.8</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_22" model="of.calculation.department">
         <field name="code">22</field>
         <field name="name">Côtes-d'Armor</field>
+        <field name="unified_day_degree">1676.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
     </record>
 
     <record id="department_23" model="of.calculation.department">
         <field name="code">23</field>
         <field name="name">Creuse</field>
+        <field name="unified_day_degree">1926.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_24" model="of.calculation.department">
         <field name="code">24</field>
         <field name="name">Dordogne</field>
+        <field name="unified_day_degree">1510.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_25" model="of.calculation.department">
         <field name="code">25</field>
         <field name="name">Doubs</field>
+        <field name="unified_day_degree">1895.65</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
     </record>
 
     <record id="department_26" model="of.calculation.department">
         <field name="code">26</field>
         <field name="name">Drôme</field>
+        <field name="unified_day_degree">1445.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
     </record>
 
     <record id="department_27" model="of.calculation.department">
         <field name="code">27</field>
         <field name="name">Eure</field>
+        <field name="unified_day_degree">1878.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_28" model="of.calculation.department">
         <field name="code">28</field>
         <field name="name">Eure-et-Loir</field>
+        <field name="unified_day_degree">1851.65</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_29" model="of.calculation.department">
         <field name="code">29</field>
         <field name="name">Finistère</field>
+        <field name="unified_day_degree">1591.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
     </record>
 
     <record id="department_30" model="of.calculation.department">
         <field name="code">30</field>
         <field name="name">Gard</field>
+        <field name="unified_day_degree">1173.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_31" model="of.calculation.department">
         <field name="code">31</field>
         <field name="name">Haute-Garonne</field>
+        <field name="unified_day_degree">1317.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_32" model="of.calculation.department">
         <field name="code">32</field>
         <field name="name">Gers</field>
+        <field name="unified_day_degree">1402.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_33" model="of.calculation.department">
         <field name="code">33</field>
         <field name="name">Gironde</field>
+        <field name="unified_day_degree">1231.0</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_34" model="of.calculation.department">
         <field name="code">34</field>
         <field name="name">Hérault</field>
+        <field name="unified_day_degree">1159.2</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_35" model="of.calculation.department">
         <field name="code">35</field>
         <field name="name">Ille-et-Vilaine</field>
+        <field name="unified_day_degree">1561.9</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
     </record>
 
     <record id="department_36" model="of.calculation.department">
         <field name="code">36</field>
         <field name="name">Indre</field>
+        <field name="unified_day_degree">1781.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_37" model="of.calculation.department">
         <field name="code">37</field>
         <field name="name">Indre-et-Loire</field>
+        <field name="unified_day_degree">1640.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_38" model="of.calculation.department">
         <field name="code">38</field>
         <field name="name">Isère</field>
+        <field name="unified_day_degree">1999.75</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_39" model="of.calculation.department">
         <field name="code">39</field>
         <field name="name">Jura</field>
+        <field name="unified_day_degree">1822.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_40" model="of.calculation.department">
         <field name="code">40</field>
         <field name="name">Landes</field>
+        <field name="unified_day_degree">1318.4</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_41" model="of.calculation.department">
         <field name="code">41</field>
         <field name="name">Loir-et-Cher</field>
+        <field name="unified_day_degree">1796.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_42" model="of.calculation.department">
         <field name="code">42</field>
         <field name="name">Loire</field>
+        <field name="unified_day_degree">1925.0</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_43" model="of.calculation.department">
         <field name="code">43</field>
         <field name="name">Haute-Loire</field>
+        <field name="unified_day_degree">2377.4</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_44" model="of.calculation.department">
         <field name="code">44</field>
         <field name="name">Loire-Atlantique</field>
+        <field name="unified_day_degree">1472.9</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_45" model="of.calculation.department">
         <field name="code">45</field>
         <field name="name">Loiret</field>
+        <field name="unified_day_degree">1821.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_46" model="of.calculation.department">
         <field name="code">46</field>
         <field name="name">Lot</field>
+        <field name="unified_day_degree">1514.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
     </record>
 
     <record id="department_47" model="of.calculation.department">
         <field name="code">47</field>
         <field name="name">Lot-et-Garonne</field>
+        <field name="unified_day_degree">1379.35</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_48" model="of.calculation.department">
         <field name="code">48</field>
         <field name="name">Lozère</field>
+        <field name="unified_day_degree">2207.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_49" model="of.calculation.department">
         <field name="code">49</field>
         <field name="name">Maine-et-Loire</field>
+        <field name="unified_day_degree">1532.75</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_50" model="of.calculation.department">
         <field name="code">50</field>
         <field name="name">Manche</field>
+        <field name="unified_day_degree">1693.8</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
     </record>
 
     <record id="department_51" model="of.calculation.department">
         <field name="code">51</field>
         <field name="name">Marne</field>
+        <field name="unified_day_degree">1953.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_52" model="of.calculation.department">
         <field name="code">52</field>
         <field name="name">Haute-Marne</field>
+        <field name="unified_day_degree">2154.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
     </record>
 
     <record id="department_53" model="of.calculation.department">
         <field name="code">53</field>
         <field name="name">Mayenne</field>
+        <field name="unified_day_degree">1730.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_54" model="of.calculation.department">
         <field name="code">54</field>
         <field name="name">Meurthe-et-Moselle</field>
+        <field name="unified_day_degree">2036.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_55" model="of.calculation.department">
         <field name="code">55</field>
         <field name="name">Meuse</field>
+        <field name="unified_day_degree">2097.95</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_9"/>
     </record>
 
     <record id="department_56" model="of.calculation.department">
         <field name="code">56</field>
         <field name="name">Morbihan</field>
+        <field name="unified_day_degree">1585.95</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_2"/>
     </record>
 
     <record id="department_57" model="of.calculation.department">
         <field name="code">57</field>
         <field name="name">Moselle</field>
+        <field name="unified_day_degree">2015.0</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_58" model="of.calculation.department">
         <field name="code">58</field>
         <field name="name">Nièvre</field>
+        <field name="unified_day_degree">1901.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_59" model="of.calculation.department">
         <field name="code">59</field>
         <field name="name">Nord</field>
+        <field name="unified_day_degree">1860.4</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
     </record>
 
     <record id="department_60" model="of.calculation.department">
         <field name="code">60</field>
         <field name="name">Oise</field>
+        <field name="unified_day_degree">1999.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_61" model="of.calculation.department">
         <field name="code">61</field>
         <field name="name">Orne</field>
+        <field name="unified_day_degree">1836.9</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_62" model="of.calculation.department">
         <field name="code">62</field>
         <field name="name">Pas-de-Calais</field>
+        <field name="unified_day_degree">1801.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
     </record>
 
     <record id="department_63" model="of.calculation.department">
         <field name="code">63</field>
         <field name="name">Puy-de-Dôme</field>
+        <field name="unified_day_degree">1709.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_64" model="of.calculation.department">
         <field name="code">64</field>
         <field name="name">Pyrénées-Atlantiques</field>
+        <field name="unified_day_degree">1290.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_65" model="of.calculation.department">
         <field name="code">65</field>
         <field name="name">Hautes-Pyrénées</field>
+        <field name="unified_day_degree">1493.75</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_66" model="of.calculation.department">
         <field name="code">66</field>
         <field name="name">Pyrénées-Orientales</field>
+        <field name="unified_day_degree">959.85</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_67" model="of.calculation.department">
         <field name="code">67</field>
         <field name="name">Bas-Rhin</field>
+        <field name="unified_day_degree">1916.15</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_68" model="of.calculation.department">
         <field name="code">68</field>
         <field name="name">Haut-Rhin</field>
+        <field name="unified_day_degree">1998.8</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_69" model="of.calculation.department">
         <field name="code">69</field>
         <field name="name">Rhône</field>
+        <field name="unified_day_degree">1683.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_70" model="of.calculation.department">
         <field name="code">70</field>
         <field name="name">Haute-Saône</field>
+        <field name="unified_day_degree">2099.35</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_71" model="of.calculation.department">
         <field name="code">71</field>
         <field name="name">Saône-et-Loire</field>
+        <field name="unified_day_degree">1748.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_72" model="of.calculation.department">
         <field name="code">72</field>
         <field name="name">Sarthe</field>
+        <field name="unified_day_degree">1604.0</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_73" model="of.calculation.department">
         <field name="code">73</field>
         <field name="name">Savoie</field>
+        <field name="unified_day_degree">2131.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_74" model="of.calculation.department">
         <field name="code">74</field>
         <field name="name">Haute-Savoie</field>
+        <field name="unified_day_degree">1988.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_75" model="of.calculation.department">
         <field name="code">75</field>
         <field name="name">Paris</field>
+        <field name="unified_day_degree">1549.8</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_76" model="of.calculation.department">
         <field name="code">76</field>
         <field name="name">Seine-Maritime</field>
+        <field name="unified_day_degree">1962.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_77" model="of.calculation.department">
         <field name="code">77</field>
         <field name="name">Seine-et-Marne</field>
+        <field name="unified_day_degree">1815.6</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_78" model="of.calculation.department">
         <field name="code">78</field>
         <field name="name">Yvelines</field>
+        <field name="unified_day_degree">1837.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_79" model="of.calculation.department">
         <field name="code">79</field>
         <field name="name">Deux-Sèvres</field>
+        <field name="unified_day_degree">1515.6</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_80" model="of.calculation.department">
         <field name="code">80</field>
         <field name="name">Somme</field>
+        <field name="unified_day_degree">1898.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_7"/>
     </record>
 
     <record id="department_81" model="of.calculation.department">
         <field name="code">81</field>
         <field name="name">Tarn</field>
+        <field name="unified_day_degree">1461.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_82" model="of.calculation.department">
         <field name="code">82</field>
         <field name="name">Tarn-et-Garonne</field>
+        <field name="unified_day_degree">1433.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_83" model="of.calculation.department">
         <field name="code">83</field>
         <field name="name">Var</field>
+        <field name="unified_day_degree">1178.3</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_84" model="of.calculation.department">
         <field name="code">84</field>
         <field name="name">Vaucluse</field>
+        <field name="unified_day_degree">1387.45</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_4"/>
     </record>
 
     <record id="department_85" model="of.calculation.department">
         <field name="code">85</field>
         <field name="name">Vendée</field>
+        <field name="unified_day_degree">1571.6</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_3"/>
     </record>
 
     <record id="department_86" model="of.calculation.department">
         <field name="code">86</field>
         <field name="name">Vienne</field>
+        <field name="unified_day_degree">1644.7</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_87" model="of.calculation.department">
         <field name="code">87</field>
         <field name="name">Haute-Vienne</field>
+        <field name="unified_day_degree">1704.5</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_6"/>
     </record>
 
     <record id="department_88" model="of.calculation.department">
         <field name="code">88</field>
         <field name="name">Vosges</field>
+        <field name="unified_day_degree">2155.65</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_89" model="of.calculation.department">
         <field name="code">89</field>
         <field name="name">Yonne</field>
+        <field name="unified_day_degree">1888.85</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_8"/>
     </record>
 
     <record id="department_90" model="of.calculation.department">
         <field name="code">90</field>
         <field name="name">Territoire de Belfort</field>
+        <field name="unified_day_degree">2050.05</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_10"/>
     </record>
 
     <record id="department_91" model="of.calculation.department">
         <field name="code">91</field>
         <field name="name">Essonne</field>
+        <field name="unified_day_degree">1697.8</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_92" model="of.calculation.department">
         <field name="code">92</field>
         <field name="name">Hauts-de-Seine</field>
+        <field name="unified_day_degree">1595.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_93" model="of.calculation.department">
         <field name="code">93</field>
         <field name="name">Seine-Saint-Denis</field>
+        <field name="unified_day_degree">1704.85</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_94" model="of.calculation.department">
         <field name="code">94</field>
         <field name="name">Val-de-Marne</field>
+        <field name="unified_day_degree">1595.55</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 
     <record id="department_95" model="of.calculation.department">
         <field name="code">95</field>
         <field name="name">Val-d'Oise</field>
+        <field name="unified_day_degree">1732.25</field>
         <field name="base_temperature_id" ref="of_calculation_heat_loss.base_temperature_5"/>
     </record>
 

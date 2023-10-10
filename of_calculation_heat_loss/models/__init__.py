@@ -5,6 +5,9 @@ from . import of_calculation_heat_loss
 from . import of_calculation_heat_loss_line
 from . import of_calculation_surface
 from . import of_calculation_g
+from . import of_calculation_construction_type
+from . import of_calculation_fuel
+from . import of_calculation_fuel_consumption
 from . import of_parc_installe
 from . import crm_lead
 from . import sale

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_fuel_consumption_graph_view" model="ir.ui.view">
+        <field name="name">of.calculation.fuel.consumption.graph.view</field>
+        <field name="model">of.calculation.fuel.consumption</field>
+        <field name="arch" type="xml">
+            <graph>
+                <field name="fuel_id"/>
+                <field name="fuel_cost" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+</odoo>

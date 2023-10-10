@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="fuel_1" model="of.calculation.fuel">
+        <field name="name">Gaz</field>
+        <field name="sequence">1</field>
+        <field name="calorific_value">12.8</field>
+        <field name="price">1.25</field>
+    </record>
+
+    <record id="fuel_2" model="of.calculation.fuel">
+        <field name="name">Fioul</field>
+        <field name="sequence">2</field>
+        <field name="calorific_value">10000</field>
+        <field name="price">1074</field>
+    </record>
+
+    <record id="fuel_3" model="of.calculation.fuel">
+        <field name="name">Propane</field>
+        <field name="sequence">3</field>
+        <field name="calorific_value">12780</field>
+        <field name="price">1700</field>
+    </record>
+
+    <record id="fuel_4" model="of.calculation.fuel">
+        <field name="name">Bois bûches</field>
+        <field name="sequence">4</field>
+        <field name="calorific_value">4080</field>
+        <field name="price">94</field>
+    </record>
+
+    <record id="fuel_5" model="of.calculation.fuel">
+        <field name="name">Granulé bois</field>
+        <field name="sequence">5</field>
+        <field name="calorific_value">4900</field>
+        <field name="price">510</field>
+    </record>
+
+    <record id="fuel_6" model="of.calculation.fuel">
+        <field name="name">Électricité</field>
+        <field name="sequence">6</field>
+        <field name="calorific_value">0.086</field>
+        <field name="price">0.002276</field>
+    </record>
+
+</odoo>

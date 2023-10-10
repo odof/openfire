@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_construction_type_form_view" model="ir.ui.view">
+        <field name="name">of.calculation.construction.type.form.view</field>
+        <field name="model">of.calculation.construction.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="intermittency_coefficient"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calculation_construction_type_tree_view" model="ir.ui.view">
+        <field name="name">of.calculation.construction.type.tree.view</field>
+        <field name="model">of.calculation.construction.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="intermittency_coefficient"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_construction_type_action" model="ir.actions.act_window">
+        <field name="name">Type de bâtiment</field>
+        <field name="res_model">of.calculation.construction.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Type de bâtiment" id="of_calculation_construction_type_menu" action="of_calculation_construction_type_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="2"/>
+
+</odoo>
