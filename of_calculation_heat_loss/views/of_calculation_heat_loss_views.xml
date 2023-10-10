@@ -40,6 +40,7 @@
                             <field name="height"/>
                             <field name="temperature"/>
                             <field name="construction_date_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                            <field name="construction_type_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
                             <field name="volume"/>
                             <field name="better_g" invisible="1"/>
                             <field name="floor_number" attrs="{'invisible': [('better_g', '=', False)]}"/>
@@ -58,14 +59,18 @@
                         </group>
                     </group>
                     <group>
-                        <group class="oe_right" style="width: 30% !important;">
+                        <group class="oe_right" style="width: 40% !important;">
                             <button string="Calculer" name="button_compute_estimated_power" type="object" class="oe_highlight mb16" colspan="2"/>
                             <label for="estimated_power_text" string="Déperdition de chaleur" class="oe_highlight"
                                    style="padding: 10px; 1px solid blue !important;"/>
-                            <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border:"/>
+                            <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border: 0px"/>
                             <div class="oe_grey mt8" colspan="2">
                                 <field name="message"/>
                             </div>
+                            <label for="annual_consumption_text" string="Consommation annuelle" class="oe_highlight"
+                                   style="margin-top: 10px; padding: 10px; 1px solid blue !important;"/>
+                            <field name="annual_consumption_text" nolabel="1" style="margin-top: 10px; font-size: 32px; border: 0px"/>
+                            <button string="Voir graphique de consommation par combustible" name="button_view_graph" type="object" class="btn btn-link mt8" colspan="2"/>
                         </group>
                     </group>
                     <i class="oe_grey">
@@ -75,6 +80,16 @@
                     <notebook>
                         <page string="Appareils compatibles">
                             <field name="line_ids" context="{'display_search_view': 1}"/>
+                        </page>
+                        <page string="Consommation par combustible">
+                            <field name="fuel_consumption_ids">
+                                <tree>
+                                    <field name="fuel_id"/>
+                                    <field name="uom_id"/>
+                                    <field name="fuel_volume"/>
+                                    <field name="fuel_cost"/>
+                                </tree>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
@@ -105,8 +120,9 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="code"/>
                         <field name="name"/>
+                        <field name="code"/>
+                        <field name="unified_day_degree"/>
                         <field name="base_temperature_id"/>
                     </group>
                 </sheet>
@@ -201,6 +217,7 @@
             <tree>
                 <field name="code"/>
                 <field name="name"/>
+                <field name="unified_day_degree"/>
                 <field name="base_temperature_id"/>
             </tree>
         </field>
@@ -269,15 +286,14 @@
     </record>
 
     <record id="of_calculation_heat_loss_action" model="ir.actions.act_window">
-        <field name="name">Calcul de déperdition de chaleur</field>
+        <field name="name">Calcul de déperdition de chaleur et de consommation</field>
         <field name="res_model">of.calculation.heat.loss</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <!--Menus-->
 
-    <menuitem name="Calcul de déperdition de chaleur" id="of_calculation_heat_loss_menu" action="of_calculation_heat_loss_action"
-              parent="of_calculation.of_calculation_menu" sequence="10"/>
+    <menuitem name="Calcul de déperdition de chaleur et de consommation" id="of_calculation_heat_loss_menu" action="of_calculation_heat_loss_action" parent="of_calculation.of_calculation_menu" sequence="10"/>
     <menuitem name="Déperdition de chaleur" id="of_calculation_heat_loss_configuration_menu" parent="of_calculation.of_calculation_configuration_menu" sequence="1"/>
     <menuitem name="Altitude du site" id="of_calculation_altitude_menu" action="of_calculation_altitude_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="1"/>
     <menuitem name="Date de construction" id="of_calculation_construction_date_menu" action="of_calculation_construction_date_action" parent="of_calculation_heat_loss.of_calculation_heat_loss_configuration_menu" sequence="2"/>

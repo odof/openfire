@@ -49,6 +49,9 @@
                                     <li>
                                         Date de construction : <strong><span t-field="o.construction_date_id.name"/></strong>
                                     </li>
+                                    <li>
+                                        Type de bâtiment : <strong><span t-field="o.construction_type_id.name"/></strong>
+                                    </li>
                                     <li t-if="o.better_g">
                                         Murs : <strong><span t-field="o.wall_surface_id.name"/></strong><br/>
                                         Toiture : <strong><span t-field="o.roof_surface_id.name"/></strong><br/>
@@ -68,14 +71,16 @@
                     <div class="col-xs-3 col-xs-offset-6" style="padding-right: 0px;">
                         <div style="height: 70px; border: 3px solid royalblue; padding: 15px;background-color: royalblue; color: white;">
                             <strong>
-                                Déperdition de chaleur
+                                <div>Déperdition de chaleur</div>
+                                <div>Consommation annuelle</div>
                             </strong>
                         </div>
                     </div>
                     <div class="col-xs-3" style="padding-left: 0px;">
                         <div style="height: 70px; border: 3px solid royalblue; padding: 15px; color: royalblue; border: 3px solid royalblue;">
                             <strong>
-                                <span t-field="o.estimated_power_text"/>
+                                <div><span t-field="o.estimated_power_text"/></div>
+                                <div><span t-field="o.annual_consumption_text"/></div>
                             </strong>
                         </div>
                     </div>

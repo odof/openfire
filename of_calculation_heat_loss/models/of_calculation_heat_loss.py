@@ -31,6 +31,8 @@ class OFCalculationHeatLoss(models.Model):
     volume = fields.Float(string=u"Volume (en m³)", compute='_compute_volume', store=True)
     construction_date_id = fields.Many2one(
         comodel_name='of.calculation.construction.date', string=u"Date de construction", required=True)
+    construction_type_id = fields.Many2one(
+        comodel_name='of.calculation.construction.type', string=u"Type de bâtiment", required=True)
     better_g = fields.Boolean(string=u"Meilleur calcul G", compute='_compute_better_g')
     message = fields.Text(string=u"Message", related='construction_date_id.message', readonly=True)
     department_id = fields.Many2one(
@@ -50,6 +52,11 @@ class OFCalculationHeatLoss(models.Model):
     line_ids = fields.One2many(
         comodel_name='of.calculation.heat.loss.line', inverse_name='calculation_heat_loss_id',
         string=u"Lignes de calcul")
+    annual_consumption = fields.Float(string=u"Consommation estimée de l’appareil (nombre)")
+    annual_consumption_text = fields.Char(string=u"Consommation estimée de l’appareil (texte)")
+    fuel_consumption_ids = fields.One2many(
+        comodel_name='of.calculation.fuel.consumption', inverse_name='calculation_id',
+        string=u"Consommation par combustible")
     floor_number = fields.Integer(string=u"Nombre de niveaux", default=1)
     volume_type = fields.Selection(
         selection=[
@@ -182,6 +189,21 @@ class OFCalculationHeatLoss(models.Model):
         return res
 
     @api.multi
+    def button_view_graph(self):
+        self.ensure_one()
+        return {
+            'name': u"Consommation par combustible",
+            'view_type': 'form',
+            'view_mode': 'graph',
+            'res_model': 'of.calculation.fuel.consumption',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'context': {
+                'search_default_calculation_id': self.id,
+            },
+        }
+
+    @api.multi
     def button_compute_estimated_power(self):
         errors = []
         for rec in self:
@@ -199,12 +221,18 @@ class OFCalculationHeatLoss(models.Model):
                 rec.temperature - reference_temperature)
             products = self.env['product.template'].search([('of_puissance_nom_flo', '>=', estimated_power / 1000)])
 
+            annual_consumption = (estimated_power / (rec.temperature - reference_temperature)) \
+                                 * rec.department_id.unified_day_degree * 24 \
+                                 * rec.construction_type_id.intermittency_coefficient / 1000
             rec.write({
                 'estimated_power': estimated_power,
                 'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt"),
                 'line_ids': [(0, 0, dict({'product_id': p.id}))
-                             for p in products]
+                             for p in products],
+                'annual_consumption': annual_consumption,
+                'annual_consumption_text': "%s %s" % (annual_consumption, "kWatt/h"),
             })
+            self.get_fuel_consumption_data()
         if errors:
             return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")
 
@@ -253,6 +281,24 @@ class OFCalculationHeatLoss(models.Model):
 
         return True
 
+    def get_fuel_consumption_data(self):
+        fuels = self.env['of.calculation.fuel'].search([])
+        res = []
+        for fuel in fuels:
+            volume = self.annual_consumption / fuel.calorific_value
+            values = {
+                'calculation_id': self.id,
+                'fuel_id': fuel.id,
+                'fuel_volume': volume,
+                'fuel_cost': volume * fuel.price,
+            }
+            if not self.fuel_consumption_ids.filtered(lambda f: f.fuel_id == fuel):
+                res += [(0, 0, values)]
+            else:
+                for fuel in self.fuel_consumption_ids.filtered(lambda f: f.fuel_id == fuel):
+                    res += [(1, fuel.id, values)]
+        self.write({'fuel_consumption_ids': res})
+
     @api.model
     def get_construction_date_for_better_g(self):
         construction_dates = [
@@ -288,6 +334,7 @@ class OFCalculationDepartment(models.Model):
 
     name = fields.Char(string=u"Nom", required=True)
     code = fields.Integer(string=u"Code", required=True)
+    unified_day_degree = fields.Float(string=u"DFU", help=u"Degré jour unifié")
     base_temperature_id = fields.Many2one(
         comodel_name='of.calculation.base.temperature', string=u"Température extérieure de base",
         required=True, help=u"Température extérieure de base ramenée au niveau de la mer")
