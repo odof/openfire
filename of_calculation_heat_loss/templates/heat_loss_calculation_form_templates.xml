@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="layout_minimal" name="Minimal layout">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{
+            'lang': lang and lang.replace('_', '-'),
+            'data-website-id': website.id if website else None,
+            'data-editable': '1' if editable else None,
+            'data-translatable': '1' if translatable else None,
+            'data-edit_translations': '1' if edit_translations else None,
+            'data-view-xmlid': xmlid if editable or translatable else None,
+            'data-main-object': repr(main_object) if editable or translatable else None,
+            'data-oe-company-name': res_company.name
+        }"/>
+            <t t-if="not title">
+                <t t-if="not additional_title and main_object and 'name' in main_object">
+                    <t t-set="additional_title" t-value="main_object.name"/>
+                </t>
+                <t t-if="main_object and 'website_meta_title' in main_object and main_object.website_meta_title">
+                    <t t-set="title" t-value="main_object.website_meta_title"/>
+                </t>
+                <t t-else="">
+                    <t t-set="title"><t t-if="additional_title"><t t-raw="additional_title"/> | </t><t t-esc="(website or res_company).name"/></t>
+                </t>
+            </t>
+            <t t-set="x_icon" t-value="'/web/image/website/%s/favicon/' % website.id"/>
+            <t t-set="head_website">
+                <meta name="generator" content="Odoo"/>
+
+                <t t-set="meta_description" t-value="main_object and 'website_meta_description' in main_object
+                and main_object.website_meta_description or website_meta_description"/>
+                <t t-set="meta_keywords" t-value="main_object and 'website_meta_keywords' in main_object
+                and main_object.website_meta_keywords or website_meta_keywords"/>
+                <meta t-if="meta_description or editable" name="description" t-att-content="meta_description"/>
+                <meta t-if="meta_keywords or editable" name="keywords" t-att-content="meta_keywords"/>
+
+                <!-- OpenGraph tags for Facebook sharing -->
+                <meta property="og:title" t-att-content="additional_title" />
+                <meta property="og:site_name" t-att-content="res_company.name" />
+                <t t-if="main_object and 'plain_content' in main_object and main_object.plain_content">
+                    <t t-set="og_description" t-value="main_object.plain_content[0:500]"/>
+                    <meta property="og:description" t-att-content="og_description" />
+                    <meta property='og:image' t-att-content="request.httprequest.url_root+'logo.png'"/>
+                    <meta property='og:url' t-att-content="request.httprequest.url_root+request.httprequest.path[1:end]"/>
+                </t>
+
+                <t t-set="languages" t-value="website.get_languages() if website else None"/>
+                <t t-if="request and request.website_multilang and website">
+                    <t t-foreach="website.get_alternate_languages(request.httprequest)" t-as="lg">
+                        <link rel="alternate" t-att-hreflang="lg['hreflang']" t-att-href="lg['href']"/>
+                    </t>
+                </t>
+
+                <script type="text/javascript">
+                    odoo.session_info = {
+                    is_superuser: <t t-esc="json.dumps(request.env.user._is_superuser())"/>,
+                    is_frontend: true,
+                    };
+                </script>
+
+                <t t-call-assets="web.assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_frontend" t-js="false"/>
+                <t t-call-assets="web_editor.summernote" t-js="false" groups="website.group_website_publisher"/>
+                <t t-call-assets="web_editor.assets_editor" t-js="false" groups="website.group_website_publisher"/>
+                <t t-call-assets="website.assets_editor" t-js="false" groups="website.group_website_publisher"/>
+
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.assets_frontend" t-css="false"/>
+                <t t-call-assets="web_editor.summernote" t-css="false" groups="website.group_website_publisher"/>
+                <t t-call-assets="web_editor.assets_editor" t-css="false" groups="website.group_website_publisher"/>
+                <t t-call-assets="website.assets_editor" t-css="false" groups="website.group_website_publisher"/>
+            </t>
+            <t t-set="head" t-value="head_website + (head or '')"/>
+
+            <div id="wrapwrap" t-att-class="pageName or ''">
+                <main>
+                    <t t-raw="0"/>
+                </main>
+            </div>
+        </t>
+    </template>
+
+
+    <!--<iframe frameborder="0" class="col-md-12" id="test" src="http://localhost:8069/calcul_deperdition_chaleur" class="col-md-12" sandbox="allow-same-origin" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+20)+'px';this.style.width=(this.contentWindow.document.body.scrollWidth+20)+'px';"/>-->
+    <!--<iframe frameborder="0" height="1500px" class="col-md-12" id="test" title="Inline Frame Example" src="http://localhost:8069/calcul_deperdition_chaleur"/>-->
+
+
+    <template id="heat_loss_calculation_form">
+        <t t-call="of_calculation_heat_loss.layout_minimal">
+            <section class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="text-center">Calcul de déperdition de chaleur</h1>
+                    </div>
+                </div>
+            </section>
+            <section id="iframe_section" class="container readable o_website_form_builder">
+                <form accept-charset="UTF-8" action="/create_heat_loss_calculation/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mt32 mb16" enctype="multipart/form-data" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="o_website_form_fields">
+                        <div class="o_not_editable hidden o_default_snippet_text"> This placeholder prevents its parent from disappearing when emptied </div>
+                        <h3 class="text-center mb8">Contact</h3>
+                        <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="partner_zip">
+                                <span> Code postal </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="text" name="partner_zip" required="required" t-att-value="partner_zip"/>
+                        </div>
+                        <div class="form-group form-field  form-field-char" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="partner_city">
+                                <span> Ville </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="text" name="partner_city" t-att-value="partner_city"/>
+                        </div>
+                        <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="altitude_id">
+                                <span> Altitude </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="altitude_id" required="required">
+                                <option/>
+                                <t t-foreach="altitudes" t-as="altitude">
+                                    <option t-att-value="altitude.id" t-att-selected="altitude_id and altitude.id == altitude_id.id and 'selected'"><t t-esc="altitude.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <h3 class="text-center mb8 mt32">Caractéristiques</h3>
+                        <div class="form-group form-field o_required form-field-float" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="surface">
+                                <span> Surface à chauffer (en m²) </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="number" step="0.01" name="surface" required="required" t-att-value="surface"/>
+                            <p class="help-block"> Surface de la ou des pièces à chauffer </p>
+                        </div>
+                        <div class="form-group form-field o_required form-field-float" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="height">
+                                <span> Hauteur de plafond (en m) </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="number" step="0.01" name="height" required="required" t-att-value="height"/>
+                        </div>
+                        <div class="form-group form-field  form-field-float" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="temperature">
+                                <span> Température de confort désirée </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="number" step="0.01" name="temperature" t-att-value="temperature or 19"/>
+                        </div>
+                        <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="construction_date_id">
+                                <span> Date de construction </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="construction_date_id" required="required">
+                                <option/>
+                                <t t-foreach="construction_dates" t-as="construction_date">
+                                    <option t-att-value="construction_date.id"
+                                            t-att-selected="construction_date_id and construction_date.id == construction_date_id.id and 'selected'"
+                                            t-att-show_better_g="construction_date.id in better_g_list and '1'">
+                                        <t t-esc="construction_date.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
+                            <label class="control-label" for="construction_type_id">
+                                <span> Type de bâtiment </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="construction_type_id" required="required">
+                                <option/>
+                                <t t-foreach="construction_types" t-as="construction_type">
+                                    <option t-att-value="construction_type.id" t-att-selected="construction_type_id and construction_type.id == construction_type_id.id and 'selected'"><t t-esc="construction_type.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="form-group form-field  form-field-integer" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="floor_number">
+                                <span> Nombre de niveaux </span>
+                            </label>
+                            <input class="form-control o_website_form_input" type="number" name="floor_number" t-att-value="floor_number or 1"/>
+                        </div>
+                        <div class="form-group form-field  form-field-many2one" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="wall_surface_id">
+                                <span> Murs </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="wall_surface_id">
+                                <option/>
+                                <t t-foreach="wall_surfaces" t-as="wall_surface">
+                                    <option t-att-value="wall_surface.id" t-att-selected="wall_surface_id and wall_surface.id == wall_surface_id.id and 'selected'"><t t-esc="wall_surface.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="form-group form-field  form-field-many2one" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="roof_surface_id">
+                                <span> Toiture </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="roof_surface_id">
+                                <option/>
+                                <t t-foreach="roof_surfaces" t-as="roof_surface">
+                                    <option t-att-value="roof_surface.id" t-att-selected="roof_surface_id and roof_surface.id == roof_surface_id.id and 'selected'"><t t-esc="roof_surface.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                        <div class="form-group form-field  form-field-many2one" data-model-field="true" data-optional="true">
+                            <label class="control-label" for="floor_surface_id">
+                                <span> Plancher bas </span>
+                            </label>
+                            <select class="form-control o_website_form_input" name="floor_surface_id">
+                                <option/>
+                                <t t-foreach="floor_surfaces" t-as="floor_surface">
+                                    <option t-att-value="floor_surface.id" t-att-selected="floor_surface_id and floor_surface.id == floor_surface_id.id and 'selected'"><t t-esc="floor_surface.name"/></option>
+                                </t>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="heat_loss_calculation_button" class="btn btn-primary btn-lg o_default_snippet_text">
+                            Valider
+                        </button>
+                        <span id="o_website_form_result"/>
+                    </div>
+                </form>
+                <div class="col-md-12 mb16" t-if="estimated_power_text">
+                    <label for="estimated_power_text">
+                        Déperdition de chaleur :
+                    </label>
+                    <span t-esc="estimated_power_text"/>
+                    <div class="text-muted text-small mb16">
+                        <span t-esc="message"/>
+                    </div>
+                    <label for="annual_consumption_text">
+                        Consommation annuelle :
+                    </label>
+                    <span t-esc="annual_consumption_text"/>
+                </div>
+                <form t-if="estimated_power_text" accept-charset="UTF-8" action="/get_heat_loss_pdf/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mb16" enctype="multipart/form-data" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <h3 class="text-center mb8 mt32">Recevoir le compte-rendu par mail</h3>
+                    <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
+                        <label class="control-label" for="partner_name">
+                            <span> Nom </span>
+                        </label>
+                        <input class="form-control o_website_form_input" type="text" name="partner_name" required="required"/>
+                    </div>
+                    <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
+                        <label class="control-label" for="partner_email">
+                            <span> Email </span>
+                        </label>
+                        <input class="form-control o_website_form_input" type="text" name="partner_email" required="required" t-att-value="partner_email"/>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" id="get_heat_loss_calculation_pdf_button" class="btn btn-primary btn-lg o_default_snippet_text">
+                            Valider
+                        </button>
+                        <span id="o_website_form_result"/>
+                    </div>
+                </form>
+            </section>
+        </t>
+    </template>
+
+</odoo>
