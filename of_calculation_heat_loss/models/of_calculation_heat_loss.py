@@ -9,6 +9,7 @@ from odoo.exceptions import UserError
 
 class OFCalculationHeatLoss(models.Model):
     _name = 'of.calculation.heat.loss'
+    _inherit = 'mail.thread'
     _description = u"Calcul de déperdition de chaleur"
 
     name = fields.Char(string=u"Nom", compute='_compute_name', store=True)
@@ -18,10 +19,11 @@ class OFCalculationHeatLoss(models.Model):
     lead_id = fields.Many2one(comodel_name='crm.lead', string=u"Opportunité")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Devis / Bon de commande")
     parc_installe_id = fields.Many2one(comodel_name='of.parc.installe', string=u"Parc installé")
-    partner_name = fields.Char(string=u"Nom du contact", related='partner_id.name', required=True)
+    partner_name = fields.Char(string=u"Nom du contact", related='partner_id.name')
+    partner_email = fields.Char(string=u"Email du contact", related='partner_id.email')
     partner_zip = fields.Char(string=u"Code postal du contact", related='partner_id.zip', required=True)
     partner_city = fields.Char(string=u"Ville du contact", related='partner_id.city')
-    partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street', required=True)
+    partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street')
     partner_street2 = fields.Char(string=u"Rue du contact", related='partner_id.street2')
     partner_state_id = fields.Many2one(comodel_name='res.country.state', related='partner_id.state_id', string=u"État")
     partner_country_id = fields.Many2one(comodel_name='res.country', related='partner_id.country_id', string=u"Pays")
@@ -166,7 +168,7 @@ class OFCalculationHeatLoss(models.Model):
         if not vals.get('partner_id'):
             vals, partner_vals = self._of_extract_partner_values(vals)  # split vals
             partner_vals.update({
-                'name': vals.get('partner_name'),
+                'name': vals.get('partner_name') or "Web",
                 'type': False,
                 'customer': True,
             })

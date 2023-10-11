@@ -20,6 +20,7 @@
                         <group>
                             <field name="partner_id" groups="!base.group_portal"/>
                             <field name="partner_name"/>
+                            <field name="partner_email"/>
                             <label for="partner_street" string="Adresse"/>
                             <div class="o_address_format">
                                 <field name="partner_street" placeholder="Street..." class="o_address_street"/>

@@ -15,6 +15,7 @@ Gestion du calcul de déperdition de chaleur
         'of_parc_installe',
         'of_calculation',
         'of_external',
+        'website_form',
     ],
     'category': "OpenFire",
     'data': [
@@ -40,6 +41,8 @@ Gestion du calcul de déperdition de chaleur
         'views/of_parc_installe_views.xml',
         'views/sale_views.xml',
         'views/crm_lead_views.xml',
+        'templates/assets.xml',
+        'templates/heat_loss_calculation_form_templates.xml',
         'reports/of_calculation_heat_loss_report.xml',
         'reports/of_external_report_templates.xml',
     ],
