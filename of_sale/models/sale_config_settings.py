@@ -72,6 +72,7 @@ class OFSaleConfiguration(models.TransientModel):
         implied_group='of_product.group_product_variant_specific_price',
         group='base.group_portal,base.group_user,base.group_public')
 
+    of_copy_opportunity = fields.Boolean(string=u"(OF) Copy opportunity")
 
     @api.multi
     def set_stock_warning_defaults(self):
@@ -140,6 +141,11 @@ class OFSaleConfiguration(models.TransientModel):
     def set_of_sale_order_margin_control(self):
         return self.env['ir.values'].sudo().set_default(
             'sale.config.settings', 'of_sale_order_margin_control', self.of_sale_order_margin_control)
+
+    @api.multi
+    def set_of_copy_opportunity(self):
+        return self.env['ir.values'].sudo().set_default(
+            'sale.config.settings', 'of_copy_opportunity', self.of_copy_opportunity)
 
     @api.multi
     def execute(self):
