@@ -24,6 +24,9 @@
                         groups="of_access_control.of_group_sale_responsible"
                         attrs="{'invisible': [('state', '!=', 'closed')]}"/>
             </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="attributes">
+                <attribute name="states">draft,sent,presale,sale</attribute>
+            </xpath>
             <xpath expr="//field[@name='state']" position="replace">
                 <field name="state" widget="statusbar" statusbar_visible="draft,sent,presale,sale"/>
             </xpath>
