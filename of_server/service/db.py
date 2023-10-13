@@ -13,7 +13,7 @@ import zipfile
 import odoo
 from odoo import SUPERUSER_ID
 from odoo.service import db
-from odoo.service.db import exp_db_exist, _create_empty_database, _drop_conn, dump_db_manifest
+from odoo.service.db import exp_db_exist, _create_empty_database, _drop_conn, dump_db_manifest, exp_drop
 
 _logger = logging.getLogger(__name__)
 
@@ -137,13 +137,18 @@ def dump_db(db_name, stream, backup_format='zip', **kwargs):
 db.dump_db = dump_db
 
 
-def exp_duplicate_database(db_original_name, db_name, sanitize=True):
+def exp_duplicate_database(db_original_name, db_name, sanitize=True, drop_existing=False):
     """
     Surcharge OpenFire:
-    - ajoute le paramètre sanitize
+    - ajoute des paramètres sanitize et drop_existing
     - utilise un nom de base temporaire pour éviter que la base soit chargée par un processus Odoo avant la fin
     """
     _logger.info('Duplicate database `%s` to `%s`.', db_original_name, db_name)
+
+    existing = exp_db_exist(db_name)
+    if existing and not drop_existing:
+        _logger.info('DUPLICATE DB: %s already exists', db_name)
+        raise Exception("Database %s already exists !" % db_name)
     temp_db_name = get_temp_db_name(db_name)
     odoo.sql_db.close_db(db_original_name)
     db = odoo.sql_db.db_connect('postgres')
@@ -182,6 +187,9 @@ def exp_duplicate_database(db_original_name, db_name, sanitize=True):
 
     if sanitize:
         sanitize_database(temp_db_name)
+    if existing:
+        _logger.info('DUPLICATE DB: Dropping database %s', db_name)
+        exp_drop(db_name)
     with closing(db.cursor()) as cr:
         cr.autocommit(True)     # avoid transaction block
         _drop_conn(cr, temp_db_name)
@@ -192,8 +200,8 @@ def exp_duplicate_database(db_original_name, db_name, sanitize=True):
 db.exp_duplicate_database = exp_duplicate_database
 
 
-def exp_restore(db_name, data, copy=False, sanitize=True):
-    # Surcharge OpenFire qui ajoute le paramètre sanitize
+def exp_restore(db_name, data, copy=False, sanitize=True, drop_existing=False):
+    # Surcharge OpenFire qui ajoute les paramètres sanitize et drop_existing
     def chunks(d, n=8192):
         for i in range(0, len(d), n):
             yield d[i:i+n]
@@ -202,7 +210,7 @@ def exp_restore(db_name, data, copy=False, sanitize=True):
         for chunk in chunks(data):
             data_file.write(chunk.decode('base64'))
         data_file.close()
-        restore_db(db_name, data_file.name, copy=copy, sanitize=sanitize)
+        restore_db(db_name, data_file.name, copy=copy, sanitize=sanitize, drop_existing=drop_existing)
     finally:
         os.unlink(data_file.name)
     return True
@@ -211,17 +219,19 @@ def exp_restore(db_name, data, copy=False, sanitize=True):
 db.exp_restore = exp_restore
 
 
-def restore_db(db, dump_file, copy=False, sanitize=True):
+def restore_db(db, dump_file, copy=False, sanitize=True, drop_existing=False):
     """
     Surcharge OpenFire:
-    - ajoute le paramètre sanitize
+    - ajoute les paramètres sanitize et drop_existing
     - utilise un nom de base temporaire pour éviter que la base soit chargée par un processus Odoo avant la fin
     - une base partiellement restaurée est supprimée
     """
     assert isinstance(db, basestring)
-    if exp_db_exist(db):
+
+    existing = exp_db_exist(db)
+    if existing and not drop_existing:
         _logger.info('RESTORE DB: %s already exists', db)
-        raise Exception("Database already exists")
+        raise Exception("Database %s already exists !" % db)
 
     temp_db = get_temp_db_name(db)
     _create_empty_database(temp_db)
@@ -283,6 +293,9 @@ def restore_db(db, dump_file, copy=False, sanitize=True):
                     pass
         if sanitize:
             sanitize_database(temp_db)
+        if existing:
+            _logger.info('RESTORE DB: Dropping database %s', db)
+            exp_drop(db)
         postgres_db = odoo.sql_db.db_connect('postgres')
         # On renomme la base temporaire (code copié de exp_rename)
         with closing(postgres_db.cursor()) as cr:
