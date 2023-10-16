@@ -1,0 +1,162 @@
+<odoo>
+        <template id="details_bank">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Coordonnées bancaires</t>
+            <div id="wrap">
+                <div class="container">
+                  <div class="row">
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home"/></a></li>
+                                <li>Details</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <h1>Coordonnées bancaires</h1>
+                    <form action="/my/account/bankdetails/created" method="post">
+<!--                      <form action="/website_form/" method="post" data-model_name="crm.lead" data-success_page="/page/website_crm.contactus_thanks" class="s_website_form form-horizontal container-fluid mt32" enctype="multipart/form-data">-->
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <div class="row o_website_portal_details">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h2>Coordonnées bancaires</h2>
+<!--                                      <div t-if="error_message" class="alert alert-danger">-->
+<!--                                          <t t-foreach="error_message" t-as="err"><t t-esc="err"/><br /></t>-->
+<!--                                      </div>-->
+                                    </div>
+                                    <div t-attf-class="form-group col-lg-6">
+                                        <label class="control-label" for="name">Titulaire de compte</label>
+                                        <input type="text" name="name" class="form-control" t-att-value="name or partner_id.name" required="required"/>
+                                    </div>
+<!--                                    <div t-attf-class="form-group #{error.get('bic') and 'has-error' or ''} col-lg-6">-->
+                                    <div t-attf-class="form-group col-lg-6">
+                                        <label class="control-label" for="bic">BIC</label>
+<!--                                        <input type="bic" name="bic" class="form-control" t-att-value="bic or partner.bic" />-->
+                                        <input type="text" name="bic" class="form-control" t-att-value="bic" maxlength="10"/>
+                                    </div>
+                                    <div t-attf-class="form-group col-lg-6">
+                                        <label class="control-label" for="iban">IBAN</label>
+                                        <input type="text" name="iban" class="form-control" t-att-value="iban" maxlength="34" pattern="^/[a-z0-9/-]+$"/>
+                                    </div>
+
+<!--                                    <div class="clearfix" />-->
+<!--                                    <div t-attf-class="form-group #{error.get('company_name') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label label-optional" for="company_name">Company Name</label>-->
+<!--                                        <p t-if="partner.commercial_partner_id.is_company" class="form-control" t-esc="partner.commercial_company_name"/>-->
+<!--                                        <input t-else="" type="text" name="company_name" class="form-control" t-att-value="company_name or partner.company_name"/>-->
+<!--                                    </div>-->
+<!--                                    <div t-if="has_check_vat" t-attf-class="form-group #{error.get('vat') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label label-optional" for="vat">VAT Number</label>-->
+<!--                                        <input type="text" name="vat" class="form-control" t-att-value="vat or partner.vat" />-->
+<!--                                    </div>-->
+
+<!--                                    <div class="clearfix" />-->
+<!--                                    <div t-attf-class="form-group #{error.get('street') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label label-optional" for="street">Street</label>-->
+<!--                                        <input type="text" name="street" class="form-control" t-att-value="street or partner.street"/>-->
+<!--                                    </div>-->
+<!--                                    <div t-attf-class="form-group #{error.get('city') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label" for="city">City</label>-->
+<!--                                        <input type="text" name="city" class="form-control" t-att-value="city or partner.city" />-->
+<!--                                    </div>-->
+<!--                                    <div t-attf-class="form-group #{error.get('zip') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label" for="zipcode">Zip / Postal Code</label>-->
+<!--                                        <input type="text" name="zipcode" class="form-control" t-att-value="zipcode or partner.zip" />-->
+<!--                                    </div>-->
+<!--                                    <div t-attf-class="form-group #{error.get('country_id') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label" for="country_id">Country</label>-->
+<!--                                        <select name="country_id" class="form-control">-->
+<!--                                            <option value="">Country...</option>-->
+<!--                                            <t t-foreach="countries or []" t-as="country">-->
+<!--                                                <option t-att-value="country.id" t-att-selected="country.id == int(country_id) if country_id else country.id == partner.country_id.id">-->
+<!--                                                    <t t-esc="country.name" />-->
+<!--                                                </option>-->
+<!--                                            </t>-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                    <div t-attf-class="form-group #{error.get('state_id') and 'has-error' or ''} col-lg-6">-->
+<!--                                        <label class="control-label label-optional" for="state_id">State / Province</label>-->
+<!--                                        <select name="state_id" class="form-control">-->
+<!--                                            <option value="">select...</option>-->
+<!--                                            <t t-foreach="states or []" t-as="state">-->
+<!--                                                <option t-att-value="state.id" style="display:none;" t-att-data-country_id="state.country_id.id" t-att-selected="state.id == partner.state_id.id">-->
+<!--                                                    <t t-esc="state.name" />-->
+<!--                                                </option>-->
+<!--                                            </t>-->
+<!--                                        </select>-->
+<!--                                    </div>-->
+<!--                                    <input type="hidden" name="redirect" t-att-value="redirect"/>-->
+                                </div>
+                                <div class="clearfix">
+                                    <button type="submit" class="btn btn-default btn-primary pull-right mb32 ">
+                                        Confirm
+                                        <span class="fa fa-long-arrow-right" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+     <template id="bank_account_thanks" name="Contact us">
+            <t t-call="website.layout">
+              <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container">
+                    <h1>Thanks!</h1>
+                    <div class="row">
+                        <div class="col-md-8">
+<!--                            <t t-if="error_message" t-foreach="get('error_message', [])" t-as="err">-->
+<!--                                    <h4 class="text-danger" t-esc="err" />-->
+<!--                                </t>-->
+<!--                        <div class="alert alert-danger" t-if="error_message[0]">-->
+<!--                                <t t-esc="error_message[0]"/>-->
+<!--                        </div>-->
+<!--                            <div t-else="" class="alert alert-success">-->
+                            <div class="alert alert-success">
+                                Your bank account has been created successfully.
+                                <button type="button" class="close" data-dismiss="alert">&amp;times;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="oe_structure"/>
+              </div>
+            </t>
+        </template>
+
+
+
+     <template id="details" inherit_id="website_portal.details">
+         <xpath expr="//h1" position="after">
+
+        <div><a href="/my/account/bankdetails">Coordonnées bancaires<div class="page-header"/></a></div>
+
+
+         </xpath>
+        </template>
+    <template id="of_website_portal.bank_account_error">
+        <t t-call="website.layout">
+            <div class="container">
+                <div class="alert alert-danger" role="alert">
+                    <t t-raw="error_message" />
+                </div>
+            </div>
+        </t>
+    </template>
+
+<odoo>
+    <template id="backend_assets" name="of website portal Assets">
+        <t t-call="web.external_layout">
+            <script type="text/javascript" src="/of_website_portal/static/src/js/website_portal.js"/>
+        </t>
+    </template>
+</odoo>
+
+
+</odoo>

@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import http, tools, fields
+from odoo import http, tools, fields, _
 from odoo.http import request
 from odoo.exceptions import AccessError
 from odoo.addons.website_portal.controllers.main import website_account
@@ -10,8 +10,80 @@ from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.of_utils.models.of_utils import format_date
 from dateutil.relativedelta import relativedelta
 import datetime
+from odoo.addons.base_iban.models.res_partner_bank import normalize_iban, _map_iban_template
 
 class WebsiteAccount(website_account):
+
+    @http.route(['/my/account/bankdetails'], type='http', auth='user', website=True)
+    def details_bank(self, **post):
+        partner_id = request.env.user.partner_id
+        vals = {
+            'partner_id': partner_id
+        }
+        return request.render("of_website_portal.details_bank", vals)
+
+    @http.route(['/my/account/bankdetails/created'], type='http', auth='user', website=True)
+    def details_bank_created(self, **post):
+        # partner = request.env.user.partner_id
+        bic = post.get('bic')
+        name = post.get('name')
+        partner_id = request.env['res.partner'].sudo().search([('name', '=', name)]).id
+        iban1 = post.get('iban')
+        iban = normalize_iban(iban1)
+        error_message = []
+        bank_id = request.env['res.bank'].sudo().search([('bic', 'like', bic)])
+        if not bank_id:
+            error_message.append(_('Veuillez informer votre magasin'))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+
+        if not iban:
+            error_message.append(_('Some required fields are empty.'))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+
+        country_code = iban[:2].lower()
+        if country_code not in _map_iban_template:
+            error_message.append(_('The IBAN is invalid, it should begin with the country code'))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+
+        iban_template = _map_iban_template[country_code]
+        if len(iban) != len(iban_template.replace(' ', '')):
+            error_message.append(
+                _("The IBAN does not seem to be correct. You should have entered something like this %s\n"
+                  "Where B = National bank code, S = Branch code, C = Account No, k = Check digit"))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+
+        check_chars = iban[4:] + iban[:4]
+        digits = int(''.join(str(int(char, 36)) for char in check_chars))
+        if digits % 97 != 1:
+            error_message.append(_('This IBAN does not pass the validation check, please verify it.'))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+        bank_check_id = request.env['res.partner.bank'].sudo().search(['|','|' ,('partner_id','=', partner_id.id),
+        ('bank_id','=', bank_id.id) ,('acc_number','=', iban1)])
+        if bank_check_id:
+            error_message.append(_('Ce compte est existant déja !'))
+            return request.render("of_website_portal.bank_account_error", {
+                'error_message': error_message[0],
+            })
+        if error_message == []:
+            bank_account = request.env['res.partner.bank'].sudo().create({
+                'partner_id': partner_id.id,
+                'bank_id': bank_id.id,
+                'acc_number': post.get('iban'),
+                # 'bank_bic': post.get('bic'),
+                'acc_type': 'iban',
+            })
+            return request.render("of_website_portal.bank_account_thanks", {})
+
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
