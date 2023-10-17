@@ -30,6 +30,7 @@ class SaleOrder(models.Model):
         return values
 
     def pdf_technical_visit_info(self):
+        self.ensure_one()
         return self.company_id.pdf_technical_visit_info
 
     def pdf_requested_week(self):

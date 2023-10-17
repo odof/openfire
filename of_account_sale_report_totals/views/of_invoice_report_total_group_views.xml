@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_invoice_report_total_group_view_tree" model="ir.ui.view">
+        <field name="name">of.invoice.report.total.group.view.tree</field>
+        <field name="model">of.invoice.report.total.group</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="subtotal_name"/>
+                <field name="position"/>
+                <field name="is_affect_invoice" invisible="1"/>
+                <field name="is_affect_order" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_invoice_report_total_group_view_form" model="ir.ui.view">
+        <field name="name">of.invoice.report.total.group.view.form</field>
+        <field name="model">of.invoice.report.total.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="subtotal_name"/>
+                    <field name="categ_ids">
+                        <tree>
+                            <field name="name" string="Category name"/>
+                        </tree>
+                    </field>
+                    <field name="product_ids">
+                        <tree>
+                            <field name="default_code"/>
+                            <field name="name"/>
+                            <field name="categ_id"/>
+                        </tree>
+                    </field>
+                    <field name="position"/>
+                    <field name="is_affect_invoice" invisible="1"/>
+                    <field name="is_affect_order" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_invoice_report_total_view_form" model="ir.actions.act_window">
+        <field name="name">Printing totals in sales invoices</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.invoice.report.total.group</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_action_of_invoice_report_total_view_form" action="action_of_invoice_report_total_view_form" parent="account.account_management_menu"/>
+
+</odoo>

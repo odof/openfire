@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="of_report_insert_partner_address">
+        <t t-set="partner_main_address" t-value="pdf_address_contact_parent_name and partner_address.parent_id or partner_address"/>
+        <div name="address_name">
+            <t t-if="pdf_address_contact_parent_name and partner_address.parent_id">
+                <span t-if="pdf_address_contact_titles and partner_address.parent_id.title" t-field="partner_address.parent_id.title"/>
+                <span t-field="partner_address.parent_id.name"/>
+            </t>
+            <span t-if="pdf_address_contact_titles and partner_address.title" t-field="partner_address.title"/>
+            <t t-if="pdf_address_contact_name">
+                <span t-if="not partner_address.name and partner_address.parent_id and not pdf_address_contact_parent_name" t-field="partner_address.parent_id.name"/>
+                <span t-if="partner_address.name" t-field="partner_address.name"/>
+            </t>
+        </div>
+        <div t-out="partner_address" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true}"/>
+        <div t-if="pdf_address_phone and partner_address.phone"><span t-field="partner_address.phone"/></div>
+        <div t-if="pdf_address_fax and partner_address.fax"><span t-field="partner_address.fax"/></div>
+        <div t-if="pdf_address_mobile and partner_address.mobile"><span t-field="partner_address.mobile"/></div>
+        <div t-if="pdf_address_email and partner_address.email"><span t-field="partner_address.email"/></div>
+    </template>
+
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+
+        <!-- Printing settings block -->
+        <xpath expr="//t[@t-set='forced_vat']" position="after">
+
+            <!-- address title -->
+            <t t-set="pdf_address_title" t-value="o.pdf_invoice_address_title()"/>
+            <t t-set="pdf_invoicing_address_title" t-value="o.pdf_invoice_invoicing_address_title()"/>
+            <t t-set="pdf_invoicing_address_title_label" t-value="o.pdf_invoice_invoicing_address_title_label()"/>
+            <t t-set="pdf_shipping_address_title" t-value="o.pdf_invoice_shipping_address_title()"/>
+            <t t-set="pdf_shipping_address_title_label" t-value="o.pdf_invoice_shipping_address_title_label()"/>
+            <t t-set="pdf_invoicing_shipping_address_title" t-value="o.pdf_invoice_invoicing_shipping_address_title()"/>
+            <t t-set="pdf_invoicing_shipping_address_title_label" t-value="o.pdf_invoice_invoicing_shipping_address_title_label()"/>
+            <!-- address -->
+            <t t-set="pdf_address_contact_parent_name" t-value="o.pdf_invoice_address_contact_parent_name()"/>
+            <t t-set="pdf_address_contact_name" t-value="o.pdf_invoice_address_contact_name()"/>
+            <t t-set="pdf_address_contact_titles" t-value="o.pdf_invoice_address_contact_titles()"/>
+            <t t-set="pdf_address_phone" t-value="o.pdf_invoice_address_phone()"/>
+            <t t-set="pdf_address_mobile" t-value="o.pdf_invoice_address_mobile()"/>
+            <t t-set="pdf_address_fax" t-value="o.pdf_invoice_address_fax()"/>
+            <t t-set="pdf_address_email" t-value="o.pdf_invoice_address_email()"/>
+            <!-- salesperson -->
+            <t t-set="pdf_salesperson_name" t-value="o.pdf_invoice_salesperson_name() and o.user_id.name"/>
+            <t t-set="pdf_salesperson_phone" t-value="o.pdf_invoice_salesperson_phone() and o.user_id.phone"/>
+            <t t-set="pdf_salesperson_mobile" t-value="o.pdf_invoice_salesperson_mobile() and o.user_id.mobile"/>
+            <t t-set="pdf_salesperson_fax" t-value="o.pdf_invoice_salesperson_fax() and o.user_id.fax"/>
+            <t t-set="pdf_salesperson_email" t-value="o.pdf_invoice_salesperson_email() and o.user_id.email"/>
+            <t t-set="pdf_salesperson_info" t-value="o.pdf_invoice_salesperson_info() and (pdf_salesperson_name or pdf_salesperson_phone or pdf_salesperson_mobile or pdf_salesperson_fax or pdf_salesperson_email)"/>
+            <!-- customer -->
+            <t t-set="pdf_customer_phone" t-value="o.pdf_invoice_customer_phone() and o.partner_id.phone"/>
+            <t t-set="pdf_customer_mobile" t-value="o.pdf_invoice_customer_mobile() and o.partner_id.mobile"/>
+            <t t-set="pdf_customer_fax" t-value="o.pdf_invoice_customer_fax() and o.partner_id.fax"/>
+            <t t-set="pdf_customer_email" t-value="o.pdf_invoice_customer_email() and o.partner_id.email"/>
+            <t t-set="pdf_customer_info" t-value="o.pdf_invoice_customer_info() and (pdf_customer_phone or pdf_customer_mobile or pdf_customer_fax or pdf_customer_email)"/>
+            <!-- legal notice -->
+            <t t-set="pdf_legal_notice" t-value="o.pdf_invoice_legal_notice()"/>
+            <!-- payment terms -->
+            <t t-set="pdf_invoice_payment_term_info" t-value="o.pdf_invoice_invoice_payment_term_info()"/>
+            <!-- customer ref -->
+            <t t-set="pdf_invoice_customer_ref_info" t-value="o.pdf_invoice_invoice_customer_ref_info()"/>
+            <!-- price -->
+            <t t-set="pdf_price_taxexcl" t-value="o.pdf_invoice_invoice_price_taxexcl()"/>
+            <t t-set="pdf_price_taxinc" t-value="o.pdf_invoice_invoice_price_taxinc()"/>
+        </xpath>
+        <!-- /Settings block -->
+
+        <!-- Address title -->
+        <xpath expr="//div[@name='shipping_address_block']/strong" position="replace">
+            <t t-if="pdf_address_title">
+                <t t-if="pdf_shipping_address_title and pdf_shipping_address_title_label">
+                    <strong t-out="pdf_shipping_address_title_label"/>
+                </t>
+                <t t-else="">
+                    <strong>Shipping Address:</strong>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@name='address_not_same_as_shipping']/t/address" position="before">
+            <t t-if="pdf_address_title">
+                <t t-if="pdf_invoicing_address_title and pdf_invoicing_address_title_label">
+                    <strong t-out="pdf_invoicing_address_title_label"/>
+                </t>
+                <t t-else="">
+                    <strong>Invoicing Address:</strong>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@name='address_same_as_shipping']/t/address" position="before">
+            <t t-if="pdf_address_title">
+                <t t-if="pdf_invoicing_shipping_address_title and pdf_invoicing_shipping_address_title_label">
+                    <strong t-out="pdf_invoicing_shipping_address_title_label"/>
+                </t>
+                <t t-else="">
+                    <strong>Invoicing and Shipping Address:</strong>
+                </t>
+            </t>
+        </xpath>
+
+        <xpath expr="//div[@name='no_shipping']/t/address" position="before">
+            <t t-if="pdf_address_title">
+                <t t-if="pdf_invoicing_address_title and pdf_invoicing_address_title_label">
+                    <strong t-out="pdf_invoicing_address_title_label"/>
+                </t>
+                <t t-else="">
+                    <strong>Invoicing Address:</strong>
+                </t>
+            </t>
+        </xpath>
+        <!-- /Address title -->
+
+        <!-- Address -->
+        <xpath expr="//div[@name='shipping_address_block']/div[@t-field='o.partner_shipping_id']" position="replace">
+            <t t-set="partner_address" t-value="o.partner_shipping_id"/>
+            <t t-set="address_field" t-value="'o.partner_shipping_id'"/>
+            <t t-call="of_invoice_report_setting.of_report_insert_partner_address"/>
+        </xpath>
+
+        <xpath expr="//div[@name='address_not_same_as_shipping']/t/address" position="replace">
+            <t t-set="partner_address" t-value="o.partner_id"/>
+            <t t-set="address_field" t-value="'o.partner_id'"/>
+            <t t-call="of_invoice_report_setting.of_report_insert_partner_address"/>
+        </xpath>
+
+        <xpath expr="//div[@name='address_same_as_shipping']/t/address" position="replace">
+            <t t-set="partner_address" t-value="o.partner_id"/>
+            <t t-set="address_field" t-value="'o.partner_id'"/>
+            <t t-call="of_invoice_report_setting.of_report_insert_partner_address"/>
+        </xpath>
+
+        <xpath expr="//div[@name='no_shipping']/t/address" position="replace">
+            <t t-set="partner_address" t-value="o.partner_id"/>
+            <t t-set="address_field" t-value="'o.partner_id'"/>
+            <t t-call="of_invoice_report_setting.of_report_insert_partner_address"/>
+        </xpath>
+        <!-- /Address -->
+
+        <!-- Header block -->
+        <xpath expr="//div[@id='informations']" position="attributes">
+            <attribute name="class">col-12 mt-4 mb-4</attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='invoice_date']" position="attributes">
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+            <attribute name="style">float: left; padding-right: 10px;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='due_date']" position="attributes">
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+            <attribute name="style">float: left; padding-right: 10px;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='origin']" position="attributes">
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+            <attribute name="style">float: left; padding-right: 10px;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='customer_code']" position="attributes">
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+            <attribute name="style">float: left; padding-right: 10px;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@name='reference']" position="attributes">
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+            <attribute name="style">float: left; padding-right: 10px;</attribute>
+        </xpath>
+
+        <xpath expr="//div[@id='informations']/div[@name='reference']" position="before">
+            <div name="salesperson_information" t-if="pdf_salesperson_info" class="col-3 mw-100 mb-2 mr-3" style="float: left; padding-right: 10px;">
+                <strong>Salesperson:</strong>
+                <p class="m-0">
+                    <t t-if="pdf_salesperson_name and o.user_id.name">
+                        <span t-field="o.user_id.name"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_salesperson_phone">
+                        <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.user_id.phone"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_salesperson_mobile">
+                        <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.user_id.mobile"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_salesperson_fax">
+                        <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.user_id.fax"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_salesperson_email">
+                        <span t-field="o.user_id.email"/>
+                    </t>
+                </p>
+            </div>
+            <div t-if="pdf_customer_info" class="col-3 mw-100 mb-2 mr-3" name="customer_information" style="float: left; padding-right: 10px;">
+                <strong>Customer:</strong>
+                <p class="m-0">
+                    <t t-if="pdf_customer_phone">
+                        <i class='fa fa-phone fa-fw' role="img" aria-label="Phone" title="Phone"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.partner_id.phone"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_customer_mobile">
+                        <i class='fa fa-mobile fa-fw' role="img" aria-label="Mobile" title="Mobile"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.partner_id.mobile"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_customer_fax">
+                        <i class='fa fa-fax fa-fw' role="img" aria-label="Fax" title="Fax"/>
+                        <span class="o_force_ltr" itemprop="telephone" t-out="o.partner_id.fax"/>
+                        <br/>
+                    </t>
+                    <t t-if="pdf_customer_email">
+                        <span t-field="o.partner_id.email"/>
+                    </t>
+                </p>
+            </div>
+        </xpath>
+        <xpath expr="//div[@name='customer_code']" position="attributes">
+            <attribute name="t-if">pdf_invoice_customer_ref_info and o.partner_id.ref</attribute>
+            <attribute name="class">col-3 mw-100 mb-2 mr-3</attribute>
+        </xpath>
+        <!-- /Header block -->
+
+        <!-- Lines block -->
+        <!-- Background and font colors of the line section. Also added a name attribute for an easier xpath in the future -->
+        <xpath expr="//t[contains(@t-foreach, 'lines')]//t[@t-set='current_section']/../td[1]" position="attributes">
+            <attribute name="name">td_section_line</attribute>
+            <attribute name="t-att-style">'background-color: ' + o.pdf_invoice_get_color_section() + ' !important; color: ' + o.pdf_invoice_get_color_font() + ' !important;'</attribute>
+        </xpath>
+
+        <xpath expr="//th[@name='th_priceunit']" position="replace">
+            <th name="th_priceunit_taxexcl" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxexcl">Unit Price Tax excl.</th>
+            <th name="th_priceunit_taxinc" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxinc">Unit Price Tax incl.</th>
+        </xpath>
+
+        <xpath expr="//th[@name='th_subtotal']" position="replace">
+            <th name="th_subtotal_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Price Tax excl.</th>
+            <th name="th_subtotal_taxinc" class="text-end" t-if="pdf_price_taxinc">Price Tax incl.</th>
+        </xpath>
+
+        <xpath expr="//span[@t-field='line.price_unit']/.." position="replace">
+            <td name="td_priceunit_taxexcl" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxexcl">
+                <span t-field="line.of_price_unit_taxexcl"/>
+            </td>
+            <td name="td_priceunit_taxinc" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxinc">
+                <span t-field="line.of_price_unit_taxinc"/>
+            </td>
+        </xpath>
+
+        <xpath expr="//span[@t-field='line.price_subtotal']/.." position="replace">
+            <td t-if="pdf_price_taxexcl" name="td_subtotal_taxexcl" class="text-end o_price_total">
+                <span t-field="line.price_subtotal"/>
+            </td>
+            <td t-if="pdf_price_taxinc" name="td_subtotal_taxinc" class="text-end o_price_total">
+                <span t-field="line.price_total"/>
+            </td>
+        </xpath>
+
+
+        <xpath expr="//t[@name='account_invoice_line_accountable']//td[@name='account_invoice_line_name']/span" position="replace">
+            <span t-field="line.of_display_name" t-options="{'widget': 'text'}"/>
+        </xpath>
+        <!-- /Lines block-->
+
+        <!-- /Footer block-->
+        <xpath expr="//p[@name='incoterm']" position="after">
+            <p t-if="pdf_legal_notice" name="legal_notice">
+                <t t-set="mention_lines" t-value="pdf_legal_notice.split('\n')"/>
+                <strong>Legal Notice :</strong>
+                <div t-foreach="mention_lines" t-as="mention_line" class="text-sm text-muted fst-italic">
+                    <small t-out="mention_line"/>
+                </div>
+            </p>
+        </xpath>
+
+        <xpath expr="//t[@t-set='payment_term_details']" position="attributes">
+            <attribute name="t-value">pdf_invoice_payment_term_info and o.payment_term_details</attribute>
+        </xpath>
+
+        <xpath expr="//div[@name='payment_term']" position="attributes">
+            <attribute name="t-if">pdf_invoice_payment_term_info</attribute>
+        </xpath>
+        <!-- /Footer block-->
+
+    </template>
+
+</odoo>
