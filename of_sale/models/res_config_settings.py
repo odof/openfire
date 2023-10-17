@@ -62,18 +62,6 @@ class ResConfigSettings(models.TransientModel):
     )
 
     # Invoice settings
-    of_color_bg_section = fields.Char(
-        string="Background color of section headings",
-        help="Choose a background color for the section headings",
-        default="#f0f0f0",
-        config_parameter="of.sale.report.account.move.of_color_bg_section",
-    )
-    of_color_font_section = fields.Char(
-        string="Font color of section headings",
-        help="Choose a font color for the section headings",
-        default="#000000",
-        config_parameter="of.sale.report.account.move.of_color_font",
-    )
     of_validate_pickings_on_move = fields.Selection(
         [
             ("no", "Do not manage delivery notes from the invoice"),
