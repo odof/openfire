@@ -2179,8 +2179,9 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
                  'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
     def _compute_qty_invoiceable(self):
+        states = self._invoiceable_state()
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+            if line.intervention_id.state not in states or line.order_line_id:
                 line.qty_invoiceable = 0.0
             elif line.invoice_policy == 'intervention':
                 line.qty_invoiceable = line.qty - line.qty_invoiced
@@ -2190,8 +2191,9 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('intervention_id.state', 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_invoiceable')
     def _compute_invoice_status(self):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        states = self._invoiceable_state()
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+            if line.intervention_id.state not in states or line.order_line_id:
                 line.invoice_status = 'no'
             elif not float_is_zero(line.qty_invoiceable, precision_digits=precision):
                 line.invoice_status = 'to invoice'
@@ -2351,6 +2353,10 @@ class OfPlanningInterventionLine(models.Model):
             elif move.location_dest_id.usage != "customer" and move.to_refund_so:
                 qty -= move.product_uom._compute_quantity(move.product_uom_qty, self.product_id.uom_id)
         return qty
+
+    @api.model
+    def _invoiceable_state(self):
+        return ['confirm', 'done']
 
 
 class ResPartner(models.Model):
