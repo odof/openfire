@@ -1,0 +1,781 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_survey
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-20 07:12+0000\n"
+"PO-Revision-Date: 2023-10-20 07:12+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_count
+msgid "# Questions"
+msgstr "Questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__access_mode
+msgid "Access Mode"
+msgstr "Mode d'accès"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__access_token
+msgid "Access Token"
+msgstr "Jeton d'accès"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_needaction
+msgid "Action Needed"
+msgstr "Nécessite une action"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Activité exception décoration"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_state
+msgid "Activity State"
+msgstr "Status de l'activité"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône de type d'activité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Add a question"
+msgstr "Ajouter une question"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Add a section"
+msgstr "Ajouter une section"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_answer_count
+msgid "Answers Count"
+msgstr "Nombre de réponses"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__answer_done_count
+msgid "Attempts"
+msgstr "Tentatives"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_speed_rating
+msgid "Attendees get more points if they answer quickly"
+msgstr "Les participants obtiennent plus de points s'ils répondent rapidement"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__certification_mail_template_id
+msgid ""
+"Automated email sent to the user when they succeed the certification, "
+"containing their certification document."
+msgstr ""
+"Email automatisé envoyé à l'utilisateur lorsqu'il réussit la certification, "
+"il contient son document de certification."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__answer_duration_avg
+msgid "Average Duration"
+msgstr "Durée moyenne"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__answer_duration_avg
+msgid "Average duration of the survey (in hours)"
+msgstr "Durée moyenne du sondage (en heures)"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__answer_score_avg
+msgid "Avg Score (%)"
+msgstr "Note moyenne (%)"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Back Button"
+msgstr "Bouton de retour"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image
+msgid "Background Image"
+msgstr "Image d'arrière-plan"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image_url
+msgid "Background Url"
+msgstr "URL de l'arrière-plan"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_tree
+msgid "Certification"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_badge_id
+msgid "Certification Badge"
+msgstr "Badge de certification"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_badge_id_dummy
+msgid "Certification Badge "
+msgstr "Badge de certification"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Certification Title"
+msgstr "Titre de la certification"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_report_layout
+msgid "Certification template"
+msgstr "Modèle de certification"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Certified"
+msgstr "Certifié"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_mail_template_id
+msgid "Certified Email Template"
+msgstr "Modèle d'email de certification"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__is_attempts_limited
+msgid "Check this option if you want to limit the number of attempts per user"
+msgstr ""
+"Cochez cette option si vous souhaitez limiter le nombre de tentatives par "
+"utilisateur"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Close Live Session"
+msgstr "Fermer la Session Live"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__color
+msgid "Color Index"
+msgstr "Couleur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__has_conditional_questions
+msgid "Contains conditional questions"
+msgstr "Contient des questions conditionnelles"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Create Live Session"
+msgstr "Créer une session en direct"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_id
+msgid "Current Question"
+msgstr "Question actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_start_time
+msgid "Current Question Start Time"
+msgstr "Heure de début de la question actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_start_time
+msgid "Current Session Start Time"
+msgstr "Heure de début de la session actuelle"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__description
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Description"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__progression_mode
+msgid "Display Progress as"
+msgstr "Afficher la progression comme"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__description_done
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "End Message"
+msgstr "Message de fin"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_give_badge
+msgid "Give Badge"
+msgstr "Donner un badge"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__id
+msgid "ID"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__progression_mode
+msgid ""
+"If Number is selected, it will display the number of questions answered on "
+"the total number of question to answer."
+msgstr ""
+"Si Nombre est sélectionné, il affichera le nombre de questions auxquelles "
+"vous avez répondu par rapport au nombre total de questions auxquelles il "
+"faut encore répondre."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si coché, de nouveaux messages demandent votre attention."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si coché, certains messages ont une erreur de livraison."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_can_go_back
+msgid "If checked, users can go back to previous pages."
+msgstr "Si coché, les utilisateurs peuvent revenir aux pages précédentes."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_login_required
+msgid ""
+"If checked, users have to login before answering even with a valid token."
+msgstr ""
+"Si coché, les utilisateurs doivent se connecter avant de répondre, même avec"
+" un jeton valide."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__questions_selection
+msgid ""
+"If randomized is selected, you can configure the number of random questions "
+"by section. This mode is ignored in live session."
+msgstr ""
+"Si aléatoire est sélectionné, vous pouvez configurer le nombre de questions "
+"aléatoires par section. Ce mode est ignoré dans la session en direct."
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__intervention_survey
+msgid "Intervention Survey"
+msgstr "Questionnaire d'intervention"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_is_follower
+msgid "Is Follower"
+msgstr "Est un abonné"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification
+msgid "Is a Certification"
+msgstr "Est une certification"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__lead_opportunity
+msgid "Lead/Opportunity"
+msgstr "Piste/Opportunité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Limit Attempts"
+msgstr "Limiter les tentatives"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__is_attempts_limited
+msgid "Limited number of attempts"
+msgstr "Nombre de tentatives limité"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Live Session"
+msgstr "Session en direct"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Pièce jointe principale"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur d'envoi du message"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Échéance de mon activité"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_calendar_event_id
+msgid "Next Activity Calendar Event"
+msgstr "Prochain événement du calendrier d'activités"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de l'activité suivante"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activités à venir"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__attempts_limit
+msgid "Number of attempts"
+msgstr "Nombre de tentatives"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Open Session Manager"
+msgstr "Ouvrir le gestionnaire de session"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Options"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__page_ids
+msgid "Pages"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__questions_layout
+msgid "Pagination"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Participants"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Participations"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Pick a Badge..."
+msgstr "Choisir un badge..."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Pick a Style..."
+msgstr "Choisir un style..."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Pick a Template..."
+msgstr "Choisir un modèle..."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Preview"
+msgstr "Aperçu"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Print"
+msgstr "Imprimer"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_answer_count
+msgid "Question Answers Count"
+msgstr "Nombre de réponses aux questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__questions_selection
+msgid "Question Selection"
+msgstr "Sélection de questions"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_ids
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Questions"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__answer_count
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Registered"
+msgstr "Inscrit"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Reopen"
+msgstr "Rouvrir"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_login_required
+msgid "Require Login"
+msgstr "Connexion requise"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__scoring_success_min
+msgid "Required Score (%)"
+msgstr "Note requise (%)"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__user_id
+msgid "Responsible"
+msgstr "Responsable"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_speed_rating
+msgid "Reward quick answers"
+msgstr "Récompenser les réponses rapides"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__scoring_type
+msgid "Scoring"
+msgstr "Notation"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_and_page_ids
+msgid "Sections and Questions"
+msgstr "Sections et Questions"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "See results"
+msgstr "Voir les résultats"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_code
+msgid "Session Code"
+msgstr "Code de session"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_link
+msgid "Session Link"
+msgstr "Lien de session"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_state
+msgid "Session State"
+msgstr "Statut de la session"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Share"
+msgstr "Partager"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_show_leaderboard
+msgid "Show Session Leaderboard"
+msgstr "Afficher le tableau de classement de la session"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"Statut basé sur les activités\n"
+"En retard : la date d'échéance est déjà dépassée\n"
+"Aujourd'hui : la date d'activité est aujourd'hui\n"
+"Planifiée : activités futures"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__success_count
+msgid "Success"
+msgstr "Réussite"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__success_ratio
+msgid "Success Ratio (%)"
+msgstr "Taux de réussite (%)"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_tree
+msgid "Survey"
+msgstr "Questionnaires"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Survey Time Limit"
+msgstr "Limite de temps du questionnaire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__title
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Survey Title"
+msgstr "Nom"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__survey_type
+msgid "Survey Type"
+msgstr "Type de questionnaire"
+
+#. module: of_survey
+#: model:ir.actions.act_window,name:of_survey.of_survey_action
+#: model:ir.ui.menu,name:of_survey.crm_team_menu_config_of_survey
+msgid "Surveys"
+msgstr "Questionnaires"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Test"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_id
+msgid "The current question of the survey session."
+msgstr "La question actuelle du questionnaire."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__description
+msgid ""
+"The description will be displayed on the home page of the survey. You can "
+"use this to give the purpose and guidelines to your candidates before they "
+"start it."
+msgstr ""
+"La description sera affichée sur la page d'accueil du sondage. Vous pouvez "
+"l'utiliser pour donner le but et les directives à vos candidats avant qu'ils"
+" ne commencent."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__is_time_limited
+msgid "The survey is limited in time"
+msgstr "Le questionnaire est limité dans le temps"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_start_time
+msgid ""
+"The time at which the current question has started, used to handle the timer"
+" for attendees."
+msgstr ""
+"L'heure à laquelle la question en cours a commencé, utilisée pour gérer le "
+"minuteur des participants."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_code
+msgid ""
+"This code will be used by your attendees to reach your session. Feel free to"
+" customize it however you like!"
+msgstr ""
+"Ce code sera utilisé par vos participants pour accéder à votre session. "
+"N'hésitez pas à le personnaliser comme bon vous semble !"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__description_done
+msgid "This message will be displayed when survey is completed"
+msgstr "Ce message sera affiché quand le sondage sera entièrement complété"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "This question depends on another question's answer."
+msgstr "Cette question dépend de la réponse à une autre question."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "Time & Scoring"
+msgstr "Temps & Notation"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__time_limit
+msgid "Time limit (minutes)"
+msgstr "Limite de temps (minutes)"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__user_input_ids
+msgid "User responses"
+msgstr "Réponses de l'utilisateur"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_can_go_back
+msgid "Users can go back"
+msgstr "Les utilisateurs peuvent revenir en arrière"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_can_signup
+msgid "Users can signup"
+msgstr "Les utilisateurs peuvent s'inscrire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__website_message_ids
+msgid "Website Messages"
+msgstr "Messages du site Web"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__website_message_ids
+msgid "Website communication history"
+msgstr "Historique des communications du site Web"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_show_leaderboard
+msgid ""
+"Whether or not we want to show the attendees leaderboard for this survey."
+msgstr ""
+"Si nous voulons ou non afficher le classement des participants pour ce "
+"questionnaire."
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "attempts"
+msgstr "tentatives"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "e.g. \"Thank you very much for your feedback!\""
+msgstr "par ex. \"Merci beaucoup pour vos commentaires !\""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "e.g. \"The following Survey will help us...\""
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "e.g. Satisfaction Survey"
+msgstr "par ex. \"Le sondage suivant nous aidera...\""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "minutes"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_survey
+msgid "of.survey.survey"
+msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_view_form
+msgid "to"
+msgstr "à"
