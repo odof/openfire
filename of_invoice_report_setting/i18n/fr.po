@@ -1,0 +1,700 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_invoice_report_setting
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-16 14:55+0000\n"
+"PO-Revision-Date: 2024-10-16 14:55+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<i class=\"fa fa-fax fa-fw\" role=\"img\" aria-label=\"Fax\" title=\"Fax\"/>"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<i class=\"fa fa-mobile fa-fw\" role=\"img\" aria-label=\"Mobile\" title=\"Mobile\"/>"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<i class=\"fa fa-phone fa-fw\" role=\"img\" aria-label=\"Phone\" title=\"Phone\"/>"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Customer:</strong>"
+msgstr "<strong>Client :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Invoicing Address:</strong>"
+msgstr "<strong>Adresse de facturation :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Invoicing and Shipping Address:</strong>"
+msgstr "<strong>Adresse de facturation et de livraison :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Legal Notice :</strong>"
+msgstr "<strong>Mentions légales :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Salesperson:</strong>"
+msgstr "<strong>Vendeur :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "<strong>Shipping Address:</strong>"
+msgstr "<strong>Adresse de livraison :</strong>"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Address Title..."
+msgstr "Titre adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Address insert"
+msgstr "Encart adresse"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_title
+msgid "Address title"
+msgstr "Titre adresse"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_title
+msgid "Address title (Invoice report settings)"
+msgstr "Titre adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid ""
+"Allow to define invoicing address specific title, else it displays "
+"\"Invoicing Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de facturation spécifique, sinon "
+"affiche \"Adresse de Facturation\" :"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid ""
+"Allow to define invoicing and shipping address specific title, else it "
+"displays \"Invoicing and Shipping Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de facturation et de livraison "
+"spécifique, sinon affiche \"Adresse de Facturation et de Livraison\" :"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid ""
+"Allow to define shipping address specific title, else it displays \"Shipping"
+" Address:\""
+msgstr ""
+"Permet de définir un titre d'adresse de livraison spécifique, sinon affiche "
+"\"Adresse de Livraison\" :"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_section_bg_color
+msgid "Background color"
+msgstr "Couleur de fond"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_section_bg_color
+msgid "Background color (Invoice report settings)"
+msgstr "Couleur de fond"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,help:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_section_bg_color
+#: model:ir.model.fields,help:of_invoice_report_setting.field_res_company__pdf_invoice_section_bg_color
+msgid "Background color of the section headings. Default is white."
+msgstr "Couleur de fond des en-têtes de section. Blanc par défaut."
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_invoice_report_setting
+#: model:ir.model,name:of_invoice_report_setting.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_invoice_report_setting
+#: model:ir.model,name:of_invoice_report_setting.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_invoice_report_setting
+#. odoo-python
+#: code:addons/of_invoice_report_setting/models/res_config_settings.py:0
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+#, python-format
+msgid "Configure PDF printing"
+msgstr "Configurer les paramètres d'impression PDF"
+
+#. module: of_invoice_report_setting
+#: model:ir.actions.act_window,name:of_invoice_report_setting.action_invoice_document_layout_configurator
+msgid "Configure your document layout"
+msgstr "Configurer votre mise en forme document"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_name
+msgid "Contact's name (Invoice report settings)"
+msgstr "Nom du contact"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_parent_name
+msgid "Contact's parent name  (Invoice report settings)"
+msgstr "Nom du contact parent"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_email
+msgid "Customer Email (Invoice report settings)"
+msgstr "Email client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_fax
+msgid "Customer Fax (Invoice report settings)"
+msgstr "Fax client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_info
+msgid "Customer Information"
+msgstr "Information client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_info
+msgid "Customer Information (Invoice report settings)"
+msgstr "Information client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_mobile
+msgid "Customer Mobile (Invoice report settings)"
+msgstr "Mobile client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_phone
+msgid "Customer Phone (Invoice report settings)"
+msgstr "Téléphone client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_ref_info
+msgid "Customer ref info"
+msgstr "Référence client"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_customer_ref_info
+msgid "Customer ref info (Invoice report settings)"
+msgstr "Référence client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.res_config_settings_view_form
+msgid "Define fields to display"
+msgstr "Définir les champs à afficher"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_account_move_line__of_display_name
+msgid "Display name for reports"
+msgstr "Nom affiché pour les rapports"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,help:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_price_taxinc
+#: model:ir.model.fields,help:of_invoice_report_setting.field_res_company__pdf_invoice_price_taxinc
+msgid "Display price with tax on invoice report"
+msgstr "Afficher le prix TTC sur le rapport de facture"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,help:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_price_taxexcl
+#: model:ir.model.fields,help:of_invoice_report_setting.field_res_company__pdf_invoice_price_taxexcl
+msgid "Display price without tax on invoice report"
+msgstr "Afficher le prix HT sur le rapport de facture"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's fax in the address insert"
+msgstr "Affiche le numéro de fax du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's mail in the address insert"
+msgstr "Affiche le courriel du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's mobile in the address insert"
+msgstr "Affiche le numéro de mobile du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's name in the address insert"
+msgstr "Affiche le nom du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's parent name in the address insert"
+msgstr "Affiche le nom du parent du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the contact's phone in the address insert"
+msgstr "Affiche le numéro de téléphone du contact dans l'encart d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the customer information"
+msgstr "Affiche les informations client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the customer reference in top information block"
+msgstr "Affiche la référence client dans les informations du haut"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the different address labels"
+msgstr "Affiche les différents libellés d'adresse"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the email in the customer information"
+msgstr "Affiche le courriel dans les informations client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the email in the salesperson information"
+msgstr "Affiche le courriel dans les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the fax number in the customer information"
+msgstr "Affiche le numéro de fax dans les informations client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the fax number in the salesperson information"
+msgstr "Affiche le numéro de fax dans les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the mobile number in the customer information"
+msgstr "Affiche le numéro de mobile dans les informations client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the mobile number in the salesperson information"
+msgstr "Affiche le numéro de mobile dans les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the name in the salesperson information"
+msgstr "Affiche le nom dans les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the payment terms in top information block"
+msgstr "Affiche les conditions de règlement dans les informations du haut"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the phone number in the customer information"
+msgstr "Affiche le numéro de téléphone dans les informations client"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the phone number in the salesperson information"
+msgstr "Affiche le numéro de téléphone dans les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the product reference in the order lines on the report"
+msgstr ""
+"Affiche la référence article dans les lignes de factures sur le rapport"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the salesperson information"
+msgstr "Affiche les informations vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the tax excluded prices on the report"
+msgstr "Affiche les prix hors taxe sur le rapport"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the tax included prices on the report"
+msgstr "Affiche les prix TTC sur le rapport"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Displays the titles in the address insert"
+msgstr "Affiche les civilités dans l'encart adresse"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_email
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_email
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_email
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Email"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_email
+msgid "Email (Invoice report settings)"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_fax
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_fax
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_fax
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Fax"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_fax
+msgid "Fax (Invoice report settings)"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_section_font_color
+msgid "Font color"
+msgstr "Couleur de police"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_section_font_color
+msgid "Font color (Invoice report settings)"
+msgstr "Couleur de police"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,help:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_section_font_color
+#: model:ir.model.fields,help:of_invoice_report_setting.field_res_company__pdf_invoice_section_font_color
+msgid "Font color of the section headings. Default is black."
+msgstr "Couleur de police des en-têtes de section. Noir par défaut."
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__id
+msgid "ID"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid ""
+"Installs the module \"Printing invoice totals\" to display the summary "
+"invoice amounts"
+msgstr ""
+"Installe le module \"Impression des totaux de facture\" pour afficher les "
+"montants récapitulatifs de la facture"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Invoice line"
+msgstr "Ligne de facture"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_invoicing_address_specific_title
+msgid "Invoicing Address Specific Title"
+msgstr "Titre spécifique d'adresse de facturation"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_invoicing_address_specific_title
+msgid "Invoicing Address Specific Title (Invoice report settings)"
+msgstr "Titre spécifique d'adresse de facturation"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_invoicing_address_specific_title_label
+msgid "Invoicing Address Specific Title Label"
+msgstr "Label Titre spécifique d'adresse de facturation"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_invoicing_address_specific_title_label
+msgid "Invoicing Address Specific Title Label (Invoice report settings)"
+msgstr "Label Titre spécifique d'adresse de facturation"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_invoicing_shipping_address_specific_title
+msgid "Invoicing and Shipping Address Specific Title"
+msgstr "Titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_invoicing_shipping_address_specific_title
+msgid ""
+"Invoicing and Shipping Address Specific Title (Invoice report settings)"
+msgstr "Titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_invoicing_shipping_address_specific_title_label
+msgid "Invoicing and Shipping Address Specific Title Label"
+msgstr "Label Titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_invoicing_shipping_address_specific_title_label
+msgid ""
+"Invoicing and Shipping Address Specific Title Label (Invoice report "
+"settings)"
+msgstr "Label Titre spécifique d'adresse de facturation et de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model,name:of_invoice_report_setting.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_invoice_report_setting
+#: model:ir.model,name:of_invoice_report_setting.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_legal_notice
+msgid "Legal notice"
+msgstr "Mentions légales"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_legal_notice
+msgid "Legal notice (Invoice report settings)"
+msgstr "Mentions légales"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_mobile
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_mobile
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_mobile
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Mobile"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_mobile
+msgid "Mobile (Invoice report settings)"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_name
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_name
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Other information"
+msgstr "Autres informations"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.res_config_settings_view_form
+msgid "PDF Printing"
+msgstr "Impression PDF"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_parent_name
+msgid "Parent name"
+msgstr "Nom du parent"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_payment_term_info
+msgid "Payment term info"
+msgstr "Conditions de règlement"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_payment_term_info
+msgid "Payment term info (Invoice report settings)"
+msgstr "Conditions de règlement"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_phone
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_customer_phone
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_phone
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_phone
+msgid "Phone (Invoice report settings)"
+msgstr "Téléphone"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_price_taxexcl
+msgid "Price Tax Excl."
+msgstr "Montant HT"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_price_taxexcl
+msgid "Price Tax Excl. (Invoice report settings)"
+msgstr "Montant HT"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_price_taxinc
+msgid "Price Tax Incl."
+msgstr "Montant TTC"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_price_taxinc
+msgid "Price Tax Incl. (Invoice report settings)"
+msgstr "Montant TTC"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "Price Tax excl."
+msgstr "Montant HT"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "Price Tax incl."
+msgstr "Montant TTC"
+
+#. module: of_invoice_report_setting
+#: model:ir.model,name:of_invoice_report_setting.model_of_invoice_document_layout
+msgid "Printing Settings for Invoice"
+msgstr "Paramètres d'impression pour facture"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_product_reference
+msgid "Product reference"
+msgstr "Référence produit"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_product_reference
+msgid "Product reference (Invoice report settings)"
+msgstr "Référence produit"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_email
+msgid "Salesperson Email (Invoice report settings)"
+msgstr "Email vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_fax
+msgid "Salesperson Fax (Invoice report settings)"
+msgstr "Fax vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_salesperson_info
+msgid "Salesperson Information"
+msgstr "Information vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_info
+msgid "Salesperson Information (Invoice report settings)"
+msgstr "Information vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_mobile
+msgid "Salesperson Mobile (Invoice report settings)"
+msgstr "Mobile vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_name
+msgid "Salesperson Name (Invoice report settings)"
+msgstr "Nom du vendeur"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_phone
+msgid "Salesperson Phone (Invoice report settings)"
+msgstr "Téléphone du vendeur"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Save"
+msgstr "Sauvegarder"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Sections"
+msgstr ""
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_shipping_address_specific_title
+msgid "Shipping Address Specific Title"
+msgstr "Titre spécifique d'adresse de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_shipping_address_specific_title
+msgid "Shipping Address Specific Title (Invoice report settings)"
+msgstr "Titre spécifique d'adresse de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_shipping_address_specific_title_label
+msgid "Shipping Address Specific Title Label"
+msgstr "Label Titre spécifique d'adresse de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_shipping_address_specific_title_label
+msgid "Shipping Address Specific Title Label (Invoice report settings)"
+msgstr "Label Titre spécifique d'adresse de livraison"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_titles
+msgid "Titles"
+msgstr "Civilités"
+
+#. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_address_contact_titles
+msgid "Titles (Invoice report settings)"
+msgstr "Civilités"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "Unit Price Tax excl."
+msgstr "Prix/U HT"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "Unit Price Tax incl."
+msgstr "Prix/U TTC"

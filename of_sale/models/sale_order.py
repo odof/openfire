@@ -496,7 +496,7 @@ class SaleOrder(models.Model):
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _prepare_tax_line_vals(self, line, tax):  # FIXME: no longer exists in v16
     #     """Emulation de la fonction du même nom du modèle 'account.invoice'
-    #     Permet de récupérer la clé de groupement dans _of_get_printable_totals
+    #     Permet de récupérer la clé de groupement dans `_of_report_get_printable_totals`
     #     """
     #     return {
     #         'name': tax['name'],
@@ -604,7 +604,7 @@ class SaleOrder(models.Model):
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
-    # def _of_get_printable_payments(self, order_lines):
+    # def _of_report_get_printable_payments(self, order_lines):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher.
     #     Permet l'affichage des paiements dans une commande.
@@ -625,7 +625,7 @@ class SaleOrder(models.Model):
     #         for payment in payment_widget_vals.get('content', []):
     #             # Les paiements sont classés dans l'ordre chronologique
     #             move_line = account_move_line_obj.browse(payment['payment_id'])
-    #             name = move_obj._of_get_payment_display(move_line)
+    #             name = move_obj._of_report_get_payment_display(move_line)
     #             result.append((name, payment['amount']))
     #     return result
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated

@@ -35,9 +35,6 @@
                                         <field name="pdf_invoicing_address_specific_title_label" placeholder="Address Title..."
                                                 attrs="{'required': [('pdf_invoicing_address_specific_title', '=', True)]}"/>
                                     </div>
-                                    <div class="text-muted">
-                                        Will be also applied on the invoices.
-                                    </div>
                                 </div>
                             </div>
                         </div>

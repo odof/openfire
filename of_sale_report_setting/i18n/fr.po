@@ -147,7 +147,7 @@ msgid ""
 " Address:\""
 msgstr ""
 "Permet de définir un titre d'adresse de livraison spécifique, sinon affiche "
-"displays \"Adresse de Livraison \""
+"\"Adresse de Livraison \""
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.of_sale_report_setting_sale_document_layout
@@ -970,8 +970,3 @@ msgstr "Date de validité"
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_res_company__pdf_validity_info
 msgid "Validity date (Sale PDF Display)"
 msgstr "Date de validité"
-
-#. module: of_sale_report_setting
-#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.of_sale_report_setting_sale_document_layout
-msgid "Will be also applied on the invoices."
-msgstr "Sera également appliquée aux factures"

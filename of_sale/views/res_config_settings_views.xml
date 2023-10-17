@@ -8,25 +8,6 @@
         <field name="priority" eval="41"/>  <!-- parent view has priority 40 -->
         <field name="inherit_id" ref="account.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='invoicing_settings']" position="after">
-                <h2>PDF Printing</h2>
-                <div class="row mt16 o_settings_container" id="invoicing_printing_settings">
-                    <div class="col-xs-12 col-md-6 o_setting_right_pane" id="of_sections_headings_config">
-                        <span class="o_form_label">Section headings</span>
-                        <div class="text-muted">
-                            Customize the background color and the font of your sections headings
-                        </div>
-                        <div class="w-50 row">
-                            <span class="d-block w-75 py-2">Background color</span>
-                            <field name="of_color_bg_section" class="d-block w-25 p-0 m-0" widget="color"/>
-                        </div>
-                        <div class="w-50 row mt-1">
-                            <span class="d-block w-75 py-2">Font Color</span>
-                            <field name="of_color_font_section" class="d-block w-25 p-0 m-0" widget="color"/>
-                        </div>
-                    </div>
-                </div>
-            </xpath>
             <xpath expr="//div[@id='get_invoice_warnings']" position="after">
                 <div class="col-12 col-lg-6 o_setting_box" id="delivery_note_move">
                     <div class="o_setting_left_pane"/>
