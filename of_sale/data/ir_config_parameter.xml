@@ -38,14 +38,4 @@
         <field name="value">no</field>
     </record>
 
-    <record id="of_color_bg_section_account_move" model="ir.config_parameter" >
-        <field name="key">of.sale.report.account.move.of_color_bg_section</field>
-        <field name="value">#FFFFFF</field>
-    </record>
-
-    <record id="of_color_font_section_account_move" model="ir.config_parameter" >
-        <field name="key">of.sale.report.account.move.of_color_font_section</field>
-        <field name="value">#000000</field>
-    </record>
-
 </odoo>
