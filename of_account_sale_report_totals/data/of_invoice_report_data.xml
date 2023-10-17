@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Groupe des taxes dans les impressions de totaux des factures -->
+    <record id="of_invoice_report_total_group_taxes" model="of.invoice.report.total.group">
+        <field name="name">Taxes</field>
+        <field name="subtotal_name">Amount Taxed</field>
+        <field name="sequence" eval="1"/>
+        <field name="is_affect_invoice" eval="True"/>
+    </record>
+
+    <!-- Groupe des paiements dans les impressions de totaux des factures -->
+    <record id="of_invoice_report_total_group_payments" model="of.invoice.report.total.group">
+        <field name="name">Payments</field>
+        <field name="subtotal_name">Amount Due</field>
+        <field name="sequence" eval="100"/>
+        <field name="is_affect_invoice" eval="True"/>
+    </record>
+
+</odoo>
