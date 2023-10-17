@@ -165,18 +165,6 @@ class AccountMove(models.Model):
     # Reporting methods
     # --------------------------------------------------------------------------
 
-    def pdf_get_color_bg_section(self):
-        return (
-            self.env["ir.config_parameter"].sudo().get_param("of.sale.report.account.move.of_color_bg_section")
-            or "#f0f0f0"
-        )
-
-    def pdf_get_color_font_section(self):
-        return (
-            self.env["ir.config_parameter"].sudo().get_param("of.sale.report.account.move.of_color_font_section")
-            or "#000000"
-        )
-
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _report_of_get_linked_invoices(self):
     #     """[IMPRESSION]
@@ -247,7 +235,7 @@ class AccountMove(models.Model):
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
-    # def _report_of_get_printable_payments(self):
+    # def _of_report_get_printable_payments(self):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher.
     #     """
@@ -264,7 +252,7 @@ class AccountMove(models.Model):
     #             # Les paiements sont classés dans l'ordre chronologique
     #             sort_key = (payment['date'], move.invoice_date, move.name, payment['payment_id'])
     #             move_line = account_move_line_obj.browse(payment['payment_id'])
-    #             name = self._of_get_payment_display(move_line)
+    #             name = self._of_report_get_payment_display(move_line)
     #             result_dict[sort_key] = (name, payment['amount'])
     #     return [result_dict[key] for key in sorted(result_dict)]
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
