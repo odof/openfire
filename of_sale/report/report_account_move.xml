@@ -3,12 +3,6 @@
 
     <template id="of_sale_report_invoice_document" inherit_id="account.report_invoice_document">
 
-        <!-- Background and font colors of the line section. Also adde a name attribute for an easier xpath in the future -->
-        <xpath expr="//t[contains(@t-foreach, 'lines')]//t[@t-set='current_section']/../td[1]" position="attributes">
-            <attribute name="name">td_section_line</attribute>
-            <attribute name="t-att-style">'background-color: ' + o.pdf_get_color_bg_section() + ' !important; color: ' + o.pdf_get_color_font_section() + ' !important;'</attribute>
-        </xpath>
-
         <!-- Lines and totals block -->
         <xpath expr="//th[@name='th_priceunit']" position="replace">
             <th name="th_priceunit" t-if="o.of_price_printing == 'order_line'" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
