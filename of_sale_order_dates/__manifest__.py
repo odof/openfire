@@ -13,7 +13,6 @@
     ],
     'data': [
         'data/ir_config_parameter.xml',
-        'views/res_config_settings_views.xml',
         'views/of_sale_document_layout.xml',
         'views/sale_order_views.xml',
         'views/account_move_views.xml',

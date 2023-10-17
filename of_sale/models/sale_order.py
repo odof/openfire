@@ -496,7 +496,7 @@ class SaleOrder(models.Model):
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # def _prepare_tax_line_vals(self, line, tax):  # FIXME: no longer exists in v16
     #     """Emulation de la fonction du même nom du modèle 'account.invoice'
-    #     Permet de récupérer la clé de groupement dans _of_get_printable_totals
+    #     Permet de récupérer la clé de groupement dans `_of_report_get_printable_totals`
     #     """
     #     return {
     #         'name': tax['name'],
@@ -511,100 +511,7 @@ class SaleOrder(models.Model):
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
 
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
-    # def _of_get_printable_totals(self):
-    #     """[IMPRESSION]
-    #     Retourne un dictionnaire contenant les valeurs à afficher dans les totaux de la commande pdf.
-    #     Dictionnaire de la forme :
-    #     {
-    #         'subtotal' : Total HT des lignes affichées,
-    #         'untaxed' : [[('libellé', montant),...], ('libellé total': montant_total)]
-    #         'taxes' : idem,
-    #         'total' : idem,
-    #     }
-    #     Les listes untaxed, taxes et total pourraient être regroupés en une seule.
-    #     Ce format pourra aider aux héritages (?).
-    #     """
-    #     self.ensure_one()
-    #     tax_obj = self.env['account.tax']
-    #     round_curr = self.currency_id.round
-
-    #     group_lines = self._of_get_total_lines_by_group()
-
-    #     result = {}
-    #     result['subtotal'] = sum(group_lines[0][1].mapped('price_subtotal'))
-    #     total_amount = result['subtotal']
-
-    #     i = 1
-    #     untaxed_lines = group_lines[0][1]
-    #     # --- Sous-totaux hors taxes ---
-    #     result_untaxed = []
-    #     while i < len(group_lines) and group_lines[i][0].position == '0-ht':
-    #         group, lines = group_lines[i]
-    #         i += 1
-    #         untaxed_lines |= lines
-    #         lines_vals = []
-    #         for line in lines:
-    #             lines_vals.append((line.of_get_line_name()[0], line.price_subtotal))
-    #             total_amount += line.price_subtotal
-    #         total_vals = (group.subtotal_name, round_curr(total_amount))
-    #         result_untaxed.append([lines_vals, total_vals])
-    #     result['untaxed'] = result_untaxed
-
-    #     # --- Ajout des taxes ---
-    #     # Code copié depuis account.invoice.get_taxes_values()
-    #     tax_grouped = {}
-    #     for line in untaxed_lines:
-    #         price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-    #         taxes = line.tax_id.compute_all(
-    #             price_unit, self.currency_id, line.product_uom_qty, line.product_id, self.partner_id
-    #         )['taxes']
-    #         for tax_val in taxes:
-    #             val = self._prepare_tax_line_vals(line, tax_val)
-    #             tax = tax_obj.browse(tax_val['id'])
-    #             key = tax.get_grouping_key(val)
-
-    #             val['amount'] += val['base'] - round_curr(val['base'])
-    #             if key not in tax_grouped:
-    #                 tax_grouped[key] = val
-    #                 tax_grouped[key]['name'] = tax.description or tax.name
-    #                 tax_grouped[key]['group'] = tax.tax_group_id
-    #             else:
-    #                 tax_grouped[key]['amount'] += val['amount']
-    #     # Taxes groupées par groupe de taxes (cf account.invoice._get_tax_amount_by_group())
-    #     tax_vals_dict = {}
-    #     for tax in sorted(tax_grouped.values(), key=lambda t: t['name']):
-    #         amount = round_curr(tax['amount'])
-    #         tax_vals_dict.setdefault(tax['group'], [tax['group'].name, 0])
-    #         tax_vals_dict[tax['group']][1] += amount
-    #         total_amount += amount
-    #     result['taxes'] = [[tax_vals_dict.values(), (_("Total TTC"), round_curr(total_amount))]]
-
-    #     # --- Sous-totaux TTC ---
-    #     result_total = []
-    #     while i < len(group_lines):
-    #         # Tri des paiements par date
-    #         group, lines = group_lines[i]
-    #         i += 1
-    #         if group.is_group_paiements():
-    #             lines_vals = self._of_get_printable_payments(lines)
-    #             if not lines_vals:
-    #                 continue
-    #             for line in lines_vals:
-    #                 total_amount -= line[1]
-    #         else:
-    #             lines_vals = []
-    #             for line in lines:
-    #                 lines_vals.append((line.of_get_line_name()[0], line.price_total))
-    #                 total_amount += line.price_total
-    #         total_vals = (group.subtotal_name, round_curr(total_amount))
-    #         result_total.append([lines_vals, total_vals])
-    #     result['total'] = result_total
-
-    #     return result
-    # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
-
-    # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
-    # def _of_get_printable_payments(self, order_lines):
+    # def _of_report_get_printable_payments(self, order_lines):
     #     """[IMPRESSION]
     #     Renvoie les lignes à afficher.
     #     Permet l'affichage des paiements dans une commande.
@@ -625,7 +532,7 @@ class SaleOrder(models.Model):
     #         for payment in payment_widget_vals.get('content', []):
     #             # Les paiements sont classés dans l'ordre chronologique
     #             move_line = account_move_line_obj.browse(payment['payment_id'])
-    #             name = move_obj._of_get_payment_display(move_line)
+    #             name = move_obj._of_report_get_payment_display(move_line)
     #             result.append((name, payment['amount']))
     #     return result
     # End of TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
