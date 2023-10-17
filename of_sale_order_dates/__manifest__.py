@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Dates sur les commandes de vente",
-    'version': '16.0.1.1.0',
+    'version': '16.0.1.2.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -13,7 +13,6 @@
     ],
     'data': [
         'data/ir_config_parameter.xml',
-        'views/res_config_settings_views.xml',
         'views/of_sale_document_layout.xml',
         'views/sale_order_views.xml',
         'views/account_move_views.xml',

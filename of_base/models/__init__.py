@@ -2,6 +2,7 @@
 
 from . import update
 from . import base_config_settings
+from . import of_base_document_layout
 from . import base
 from . import ir_http
 from . import ir_attachment
