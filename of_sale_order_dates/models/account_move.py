@@ -9,8 +9,5 @@ class AccountMove(models.Model):
     of_technical_visit_date = fields.Date(string="Technical visit date")
 
     def pdf_technical_visit_info(self):
-        return (
-            self.env["ir.config_parameter"]
-            .sudo()
-            .get_param("of.sale.report.setting.account.move.pdf_technical_visit_info")
-        )
+        self.ensure_one()
+        return self.company_id.pdf_technical_visit_info_move
