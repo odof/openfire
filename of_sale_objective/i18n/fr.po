@@ -1,0 +1,217 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_objective
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-19 14:25+0000\n"
+"PO-Revision-Date: 2023-10-19 14:25+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_objective
+#: model:ir.model.constraint,message:of_sale_objective.constraint_of_sale_objective_line_of_sale_objective_line_employee_uniq
+msgid "A same employee can't have two objectives on the same month."
+msgstr "Un employé ne peut pas avoir deux objectifs dans le même mois."
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__04
+msgid "April"
+msgstr "Avril"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__08
+msgid "August"
+msgstr "Août"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__create_uid
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__create_date
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__objective_date
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__objective_date
+msgid "Date"
+msgstr ""
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__12
+msgid "December"
+msgstr "Décembre"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__display_name
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_objective
+#: model:ir.model,name:of_sale_objective.model_hr_employee
+msgid "Employee"
+msgstr "Employé"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__02
+msgid "February"
+msgstr "Février"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__id
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__id
+msgid "ID"
+msgstr ""
+
+#. module: of_sale_objective
+#: model:ir.model.fields,help:of_sale_objective.field_hr_employee__sale_objective
+msgid "Indicates whether sales targets should be set for this employee"
+msgstr ""
+"Indique si des objectifs de ventes doivent être définis pour cet employé"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__invoiced_turnover
+msgid "Invoiced Turnover"
+msgstr "Chiffre d’affaires facturés"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__01
+msgid "January"
+msgstr "Janvier"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__07
+msgid "July"
+msgstr "Juillet"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__06
+msgid "June"
+msgstr "Juin"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective____last_update
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__write_uid
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__write_uid
+msgid "Last Updated by"
+msgstr "Dernière modification par"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__write_date
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour par"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__objective_id
+msgid "Linked monthly objective"
+msgstr "Objectif mensuel associé"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__03
+msgid "March"
+msgstr "Mars"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__05
+msgid "May"
+msgstr "Mai"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__month
+msgid "Month"
+msgstr "Mois"
+
+#. module: of_sale_objective
+#: model:ir.actions.act_window,name:of_sale_objective.of_crm_of_sale_objective_action
+#: model:ir.model,name:of_sale_objective.model_of_sale_objective
+#: model:ir.ui.menu,name:of_sale_objective.of_crm_of_sale_objective_menu
+msgid "Monthly sales objective"
+msgstr "Objectifs de ventes mensuel"
+
+#. module: of_sale_objective
+#: model:ir.model,name:of_sale_objective.model_of_sale_objective_line
+msgid "Monthly sales objective line"
+msgstr "Ligne d’objectif de ventes mensuel"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__11
+msgid "November"
+msgstr "Novembre"
+
+#. module: of_sale_objective
+#: model_terms:ir.ui.view,arch_db:of_sale_objective.of_crm_hr_employee_form_view
+msgid "Objective"
+msgstr "Objectif"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__objective_line_ids
+msgid "Objective lines"
+msgstr "Ligne d’objectif"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__10
+msgid "October"
+msgstr "Octobre"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__ordered_turnover
+msgid "Ordered Turnover"
+msgstr "Chiffre de ventes"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_hr_employee__sale_objective
+msgid "Sale objectives"
+msgstr "Objectifs de ventes"
+
+#. module: of_sale_objective
+#: model:ir.model.fields.selection,name:of_sale_objective.selection__of_sale_objective__month__09
+msgid "September"
+msgstr "Septembre"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__company_id
+msgid "Shop"
+msgstr "Magasin"
+
+#. module: of_sale_objective
+#: model_terms:ir.ui.view,arch_db:of_sale_objective.of_crm_of_sale_objective_form_view
+msgid "Total"
+msgstr ""
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__turnover_budget
+msgid "Turnover Budget"
+msgstr "Budget"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective_line__employee_id
+msgid "Vendor"
+msgstr "Vendeur"
+
+#. module: of_sale_objective
+#: model:ir.model.fields,field_description:of_sale_objective.field_of_sale_objective__year
+msgid "Year"
+msgstr "Année"

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_objective_years_range" model="ir.config_parameter">
+        <field name="key">of_sale_objective.years_range</field>
+        <field name="value">2020;2031</field>
+    </record>
+
+</odoo>

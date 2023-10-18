@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- OF Sale Objective Views -->
-
     <record id="of_crm_of_sale_objective_form_view" model="ir.ui.view">
         <field name="name">of.crm.of.sale.objective.form.view</field>
         <field name="model">of.sale.objective</field>
@@ -23,7 +21,7 @@
                         </group>
                     </group>
                     <group>
-                        <field name="objective_line_ids" nolabel="1" attrs="{'invisible': [('id', '=', False)]}" colspan="4">
+                        <field name="objective_line_ids" nolabel="1" attrs="{'invisible': [('id', '=', False)]}" colspan="2">
                             <tree editable="bottom">
                                 <field name="employee_id" options="{'no_open': True, 'no_create': True}"/>
                                 <field name="turnover_budget" sum="Total"/>
@@ -62,31 +60,20 @@
     </record>
 
     <record id="of_crm_of_sale_objective_action" model="ir.actions.act_window">
-        <field name="name">Objectifs mensuels</field>
+        <field name="name">Monthly sales objective</field>
         <field name="res_model">of.sale.objective</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
     <menuitem
         id="of_crm_of_sale_objective_menu"
-        name="Objectifs mensuels"
+        name="Monthly sales objective"
         parent="sale.menu_sales_config"
         action="of_crm_of_sale_objective_action"
         sequence="10"
         groups="sales_team.group_sale_manager"
     />
 
-    <!-- HR Employee Form View -->
-    <record id="of_crm_hr_employee_form_view" model="ir.ui.view">
-        <field name="name">of.crm.hr.employee.form.view</field>
-        <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='calendar_id']" position="after">
-                <field name="sale_objective"/>
-            </xpath>
-        </field>
-    </record>
+
 
 </odoo>

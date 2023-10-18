@@ -7,5 +7,5 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     sale_objective = fields.Boolean(
-        string="Sale objectives", help="Indique si des objectifs de ventes doivent être définis pour cet employé"
+        string="Sale objectives", help="Indicates whether sales targets should be set for this employee"
     )

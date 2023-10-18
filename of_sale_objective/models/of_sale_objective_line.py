@@ -4,10 +4,10 @@ from odoo import fields, models
 
 
 class OFSaleObjectiveLine(models.Model):
-    """Ligne d'objectif mensuel de ventes"""
+    """Monthly sales objective line"""
 
     _name = 'of.sale.objective.line'
-    _description = "Monthly sales objective line"
+    _description = __doc__
     _order = 'employee_id'
 
     objective_id = fields.Many2one(
@@ -24,6 +24,6 @@ class OFSaleObjectiveLine(models.Model):
         (
             'of_sale_objective_line_employee_uniq',
             'unique (objective_id, employee_id)',
-            "A same employee can't have two objectives on the same month!",
+            "A same employee can't have two objectives on the same month.",
         )
     ]
