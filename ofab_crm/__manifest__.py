@@ -1,36 +1,19 @@
-# -*- coding: utf-8 -*-
-
-##############################################################################
-#
-#    OpenFire
-#    Version OF10.0
-#
-#    Module conçu et développé par OpenFire SAS
-#
-#    Compatible avec Odoo 10 Community Edition
-#    Copyright © 2004-2016 Odoo S.A. License GNU LGPL
-#
-##############################################################################
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': "OpenFire / Gestion CRM des fabricants",
-    'version': "10.0.1.0.0",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "www.openfire.fr",
-    'category': "Module Fabricants OpenFire",
-    'summary': u"Gestion CRM",
-    'description': u"""
-Module OpenFire pour le CRM Odoo
-================================
-
- - Ajout des marques distribuées dans le formulaire du contact.
-""",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "CRM management of manufacturers",
     'depends': [
         'of_base',
         'of_product_brand',
     ],
     'data': [
-        'views/ofab_crm_view.xml',
+        'views/res_partner_view.xml',
     ],
     'installable': True,
     'application': False,
