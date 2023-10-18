@@ -17,6 +17,9 @@
             <t t-if="pdf_partner_siret_address_insert and doc.partner_invoice_id.siret">SIRET: <span t-field="doc.partner_invoice_id.siret"/><br/></t>
         </xpath>
 
+        <xpath expr="//div[@name='client']//t[@t-if='pdf_customer_email and doc.partner_id.email']" position="inside">
+            <br/>
+        </xpath>
         <xpath expr="//div[@name='client']//t[@t-if='pdf_customer_email and doc.partner_id.email']" position="after">
             <t t-if="doc.partner_id.siret"><span t-field="doc.partner_id.siret"/><br/></t>
         </xpath>
