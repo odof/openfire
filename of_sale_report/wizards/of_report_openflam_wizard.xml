@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_rapport_openflam_view_form" model="ir.ui.view">
+        <field name="name">Openflam Report</field>
+        <field name="model">of.rapport.openflam.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Openflam report">
+                <separator string="Rapport sur mesure"/>
+                <group col="4" colspan="2">
+                    <field name="report_model"/>
+                    <field name="date"/>
+                </group>
+                <separator string="Sociétés"/>
+                <group>
+                    <field name="user_company_id" invisible="1"/>
+                    <field name="company_ids" widget="many2many_tags" domain="[('id', 'child_of', user_company_id)]"/>
+                </group>
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="4" colspan="2">
+                    <separator string="Tableaux" colspan="4"/>
+                    <field name="stats_partner"/>
+                    <field name="stats_product"/>
+                    <field name="stats_brand"/>
+                </group>
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', 'encaissement'))]}" col="4">
+                    <separator string="Périodes / Dates" colspan="4"/>
+                    <field nolabel="1" name="type_filtre_date" attrs="{'required' : [('report_model', 'in', ('stats', 'encaissement'))]}" colspan="4"/>
+                    <group colspan="2">
+                        <div colspan="2" attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}">
+                            <h4><p>Principale</p></h4>
+                        </div>
+                        <field name="period_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'period')], 'invisible': [('type_filtre_date', 'not in', 'period')]}"/>
+                        <field name="debut_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                        <field name="fin_n" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', 'in', 'date')], 'invisible': [('type_filtre_date', 'not in', 'date')]}"/>
+                    </group>
+                    <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" colspan="2">
+                        <div colspan="2">
+                            <h4><p>A comparer</p></h4>
+                        </div>
+                        <field name="period_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'period')], 'invisible': [('type_filtre_date', '!=', 'period')]}"/>
+                        <field name="debut_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'date')], 'invisible': [('type_filtre_date', '!=', 'date')]}"/>
+                        <field name="fin_n1" attrs="{'required' : [('report_model', '=', 'stats'), ('type_filtre_date', '=', 'date')], 'invisible': [('type_filtre_date', '!=', 'date')]}"/>
+                    </group>
+                </group>
+                <separator string="Filtres" colspan="4" attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2"/>
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2">
+                    <field name="filtre_client"/>
+                    <field name="etiquette_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_client', '=', False)]}"/>
+                    <!-- Domaine fait ainsi pour permettre facilement de ne pas utiliser le domaine si il n'y a pas d'étiquette_ids -->
+                    <field name="partner_ids" domain="[('category_id', etiquette_ids and 'child_of' or 'ilike', etiquette_ids and etiquette_ids[0][2] or '')]" attrs="{'invisible': [('filtre_client', '=', False)]}">
+                    </field>
+                </group>
+                <group attrs="{'invisible': [('report_model', 'not in', ('stats', ))]}" col="2">
+                    <field name="filtre_article"/>
+                    <field name="category_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
+                    <field name="brand_ids" widget="many2many_tags" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
+                    <field name="product_ids" domain="[('categ_id', category_ids and 'child_of' or 'ilike', category_ids and category_ids[0][2] or ''),
+                                                        ('brand_id', brand_ids and 'in' or 'ilike', brand_ids and brand_ids[0][2] or '')]" attrs="{'invisible': [('filtre_article', '=', False)]}"/>
+                </group>
+                <footer>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                        <span attrs="{'invisible': [('file', '=', False)]}">
+                            Télécharger
+                            <field name="file_name" invisible="1"/>
+                            <field name="file" filename="file_name" readonly="1"/>
+                            ou
+                        </span>
+                        <button string="(Re)générer le document" name="button_print" type="object" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <menuitem name="Rapport de gestion"
+              action="action_of_rapport_openflam"
+              id="menu_rapport_openflam"
+              parent="sales_team.menu_sale_report"
+              groups="sales_team.group_sale_manager"
+              sequence="20"/>
+
+</odoo>

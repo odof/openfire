@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_report_config" model="ir.ui.view">
+        <field name="name">of.sale.report.config.setting</field>
+        <field name="model">res.config.settings</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_sale.of_sale_res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='quotations_sales']/group[@name='field_fonctionnalities']/div[last()]" position="after">
+                <label for="of_report_type"/>
+                <div name="of_report_type">
+                    <field name="of_report_type" class="oe_inline"/>
+                </div>
+            </xpath>
+            <xpath expr="//div[@name='of_sale_order_margin_control']" position="after">
+                <label for="of_sale_order_installation_date_control"/>
+                <div name="of_sale_order_installation_date_control">
+                    <field name="of_sale_order_installation_date_control" class="oe_inline"/>
+                    <span>Activer le contrôle de date de pose à la validation des commandes</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
