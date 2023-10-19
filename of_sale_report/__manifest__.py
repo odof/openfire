@@ -1,21 +1,19 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
     'name': "OpenFire / CRM",
-    'version': "10.0.1.3.0",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "http://openfire.fr",
-    'category': 'Customer Relationship Management',
-    'license': "AGPL-3",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Sale report customization",
     'depends': [
         'sale_crm',
     ],
-    'data': [
-        'security/ir.model.access.csv',
-        'reports/of_crm_funnel_conversion_views.xml',
-        'reports/of_invoiced_revenue_analysis.xml',
-    ],
-    'qweb': [
-        'static/src/xml/of_sales_team_dashboard.xml',
-    ],
-    'installable': True,
+    'data': [],
+    'qweb': [],
+    'installable': False,
+    'application': False,
+    'auto_install': False,
 }
