@@ -11,7 +11,7 @@
                     <field name="activity_file" filename="activity_filename"/>
                 </group>
                 <footer>
-                    <button name="action_validate" type="object" string="Validate" class="btn-primary"/>
+                    <button name="action_button_validate" type="object" string="Validate" class="btn-primary"/>
                     <button string="Discard" special="cancel" class="btn-secondary"/>
                 </footer>
             </form>

@@ -1,11 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class OFAddAttachmentActivity(models.TransientModel):
     _name = 'of.add.attachment.activity'
-    _description = 'Add an attachment to the Sale linked to an activity'
+    _description = "Add an attachment to the Sale linked to an activity"
 
     order_id = fields.Many2one(comodel_name='sale.order', string='Order')
     lead_id = fields.Many2one(comodel_name='crm.lead', string='Lead')
@@ -13,8 +13,7 @@ class OFAddAttachmentActivity(models.TransientModel):
     activity_file = fields.Binary(comodel_name='ir.attachment', attachment=True)
     activity_filename = fields.Char(string='Filename')
 
-    @api.multi
-    def action_validate(self):
+    def action_button_validate(self):
         self.ensure_one()
         if self.order_id:
             res_model = 'sale.order'

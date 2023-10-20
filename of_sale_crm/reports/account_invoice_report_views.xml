@@ -6,7 +6,7 @@
         <field name="model">account.invoice.report</field>
         <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='categ_id']" position="after">
+            <xpath expr="//field[1]" position="after">
                 <field name="of_canvasser_id"/>
                 <field name="of_partner_tags"/>
             </xpath>
