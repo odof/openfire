@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="details_bank">
+        <t t-call="website.layout">
+            <t t-set="additional_title">Coordonnées bancaires</t>
+            <div id="wrap">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ol class="breadcrumb mt8">
+                                <li><a href="/my/home"><i class="fa fa-home"/></a></li>
+                                <li><a href="/my/account">Détails</a></li>
+                                <li>Coordonnées bancaires</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="row o_website_portal_details">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="nav nav-tabs">
+                                        <li role="personal_info"><a href="/my/account">Informations personnelles</a></li>
+                                        <li role="bank_detail" class="active"><a href="#">Coordonnées bancaires</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-12 mt8">
+                                    <div t-if="error_message" class="alert alert-danger">
+                                        <t t-foreach="error_message" t-as="err"><t t-esc="err"/><br/></t>
+                                    </div>
+                                </div>
+                                <form id="bank_detail_form" action="/my/account/bankdetails/created" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="partner_bank_id" t-att-value="partner_bank_id and partner_bank_id.id or False"/>
+                                    <div t-attf-class="form-group #{error.get('name') and 'has-error' or ''} col-md-6">
+                                        <label class="control-label" for="name">Titulaire de compte</label>
+                                        <input type="text" name="name" class="form-control" t-att-value="partner_id.name"/>
+                                    </div>
+                                    <br/>
+                                    <div t-attf-class="form-group #{error.get('bic') and 'has-error' or ''} col-md-6">
+                                        <label class="control-label" for="bic">BIC</label>
+                                        <input type="text" name="bic" class="form-control" t-att-value="partner_bank_id and partner_bank_id.bank_bic or ''" maxlength="11"/>
+                                    </div>
+                                    <div t-attf-class="form-group #{error.get('iban') and 'has-error' or ''} col-md-6">
+                                        <label class="control-label" for="iban">IBAN</label>
+                                        <input type="text" name="iban" class="form-control" t-att-value="partner_bank_id and partner_bank_id.acc_number.replace(' ', '') or ''" maxlength="34" pattern="[A-Za-z0-9]+"/>
+                                    </div>
+                                    <div class="clearfix col-md-12">
+                                        <button id="validate" type="submit" class="btn btn-default btn-primary pull-right mb32">
+                                            Valider
+                                            <span class="fa fa-long-arrow-right"/>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="bank_account_thanks">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container">
+                    <h1>Merci !</h1>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="alert alert-success">
+                                Vos nouvelles coordonnées bancaires ont bien été enregistré.
+                                <button type="button" class="close" data-dismiss="alert">&amp;times;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="details" inherit_id="website_portal.details">
+        <xpath expr="//h1" position="replace">
+            <ul class="nav nav-tabs">
+                <li role="personal_info" class="active"><a href="#">Informations personnelles</a></li>
+                <li role="bank_detail"><a href="/my/account/bankdetails">Coordonnées bancaires</a></li>
+            </ul>
+        </xpath>
+    </template>
+
+</odoo>

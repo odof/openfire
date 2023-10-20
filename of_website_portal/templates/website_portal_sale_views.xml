@@ -9,6 +9,7 @@
             <script src="/of_website_portal/static/src/js/bootstrap-table.min.js"/>
             <script src="/of_website_portal/static/src/js/jquery.dataTables.min.js"/>
             <script src="/of_website_portal/static/src/js/dataTables.bootstrap.min.js"/>
+            <script src="/of_website_portal/static/src/js/main.js"/>
         </xpath>
     </template>
 
