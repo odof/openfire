@@ -50,117 +50,132 @@ class OfService(models.Model):
                 'type': 'ir.actions.act_window',
             }
 
-    @api.model
+    @api.multi
     def make_purchase_order(self):
-        self.ensure_one()
-
-        # Ne pas créer de commande si la DI n'est pas validée
-        if self.base_state != 'calculated':
-            return self.env['of.popup.wizard'].popup_return(
-                message=u"Cette demande d'intervention n'est pas validée.")
-
-        # Ne pas créer de commande si pas de lignes
-        if not self.line_ids:
-            return self.env['of.popup.wizard'].popup_return(
-                message=u"Cette demande d'intervention n'a aucune ligne.")
-
-        # Ne pas créer de commande si toutes les lignes sont déjà associées à une commande
-        if not self.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
-            return self.env['of.popup.wizard'].popup_return(
-                message=u"Toutes les lignes sont déjà associées à une commande d'achat.")
-
-        res = {
-            'name': u"Demande de prix",
-            'view_mode': 'form,tree',
-            'res_model': 'purchase.order',
-            'type': 'ir.actions.act_window',
-            'target': 'current',
-        }
         purchase_obj = self.env['purchase.order']
         po_line_obj = self.env['purchase.order.line']
         service_line_obj = self.env['of.service.line']
-        if self.company_id:
-            my_company_partners = self.company_id.partner_id
-        else:
-            my_company_partners = self.env['res.company'].search([]).mapped('partner_id')
-        lines_by_supplier = {}
-        lines_no_supplier = service_line_obj
-        lines_i_supply = service_line_obj
-        lines_already_done = self.line_ids.filtered(lambda l: l.purchaseorder_line_id)
-        # Séparer les ligne par fournisseur, lignes sans fournisseur ignorées pour l'instant
-        for line in self.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
-            suppliers = line.product_id.seller_ids \
-                .filtered(lambda r: (not r.company_id or r.company_id == line.company_id) and
-                                    (not r.product_id or r.product_id == line.product_id))
-            if suppliers:
-                supplier = suppliers[0].name  # supplier.name est un many2one vers res.partner
-                if supplier in my_company_partners:
-                    lines_i_supply |= line
-                else:
-                    if supplier not in lines_by_supplier:
-                        lines_by_supplier[supplier] = []
-                    lines_by_supplier[supplier].append(line)
-            else:
-                lines_no_supplier |= line
-        # Informer si au moins une ligne ne sera pas traitée
-        if not self._context.get('of_make_po_validated'):
-            validation_message = u""
-            if lines_no_supplier or lines_i_supply or lines_already_done:
-                validation_message = u"Certaines lignes ne seront pas prises en compte."
-            if lines_already_done:
-                validation_message += u"\n  - Parce qu'elles ont déjà donné lieu à une commande fournisseur : "
-                for line in lines_already_done:
-                    validation_message += u"\n\t%s" % line.product_id.name
-            if lines_i_supply:
-                validation_message += u"\n  - Parce que vous en êtes le fournisseur : "
-                for line in lines_i_supply:
-                    validation_message += u"\n\t%s" % line.product_id.name
-            if lines_no_supplier:
-                validation_message += u"\n  - Parce qu'elles n'ont pas de fournisseur : "
-                for line in lines_no_supplier:
-                    validation_message += u"\n\t%s" % line.product_id.name
-            if validation_message:
-                context = {
-                    'default_message': validation_message,
-                    'default_service_id': self.id,
-                    'active_model': 'of.service',
-                    'active_id': self.id,
-                }
-                res = {
-                    'name': u"Veuillez confirmer",
-                    'view_mode': 'form,tree',
-                    'res_model': 'of.make.po.validation.wizard',
-                    'type': 'ir.actions.act_window',
-                    'target': 'new',
-                    'context': context,
-                }
-                return res
+        popup_wizard_obj = self.env['of.popup.wizard']
+        res_company_obj = self.env['res.company']
 
         purchase_orders = purchase_obj
-        # Vérifier que tous les fournisseurs ont bien une position fiscale, sinon la création de CF echouera
-        suppliers_all = lines_by_supplier.keys()
-        if not all([s.property_account_position_id for s in suppliers_all]):
-            return self.env['of.popup.wizard'].popup_return(
-                message=u"Les fournisseurs suivants n'ont pas de position fiscale, "
-                        u"ce qui empêche la création de la commande.\n"
-                        u"%s" % u", ".join([s.name for s in suppliers_all if not s.property_account_position_id]))
-        # Création de chaque CF
-        for supplier, lines in lines_by_supplier.iteritems():
-            # utilisation de new() pour trigger les onchanges facilement
-            purchase_order_vals = self.get_purchase_order_vals(supplier)
-            purchase_order_new = purchase_obj.new(purchase_order_vals)
-            purchase_order_new.onchange_partner_id()
-            order_values = purchase_order_new._convert_to_write(purchase_order_new._cache)
-            purchase_order = purchase_obj.create(order_values)
-            purchase_lines = []
-            for line in lines:
-                line_vals = line.prepare_po_line_vals(purchase_order)
-                purchase_lines.append((0, 0, line_vals))
-            purchase_order.write({'order_line': purchase_lines})
-            purchase_orders |= purchase_order
-        # Connecter les lignes à leur ligne de commande correspondante
-        for line in self.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
-            line.purchaseorder_line_id = po_line_obj.search([('of_service_line_id', '=', line.id)], limit=1)
+
+        for service in self:
+
+            service_name = service.number or service.titre or "ID : %s" % service.id
+
+            # Ne pas créer de commande si la DI n'est pas validée
+            if service.base_state != 'calculated':
+                return popup_wizard_obj.popup_return(
+                    message=u"La demande d'intervention %s n'est pas validée." % service_name)
+
+            # Ne pas créer de commande si pas de lignes
+            if not service.line_ids:
+                return popup_wizard_obj.popup_return(
+                    message=u"La demande d'intervention %s n'a aucune ligne." % service_name)
+
+            # Ne pas créer de commande si toutes les lignes sont déjà associées à une commande
+            if not service.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
+                return popup_wizard_obj.popup_return(
+                    message=u"Toutes les lignes de la demande d'intervention %s sont déjà associées à une commande "
+                            u"d'achat." % service_name)
+
+            res = {
+                'name': u"Demande de prix",
+                'view_mode': 'form,tree',
+                'res_model': 'purchase.order',
+                'type': 'ir.actions.act_window',
+                'target': 'current',
+            }
+
+            if service.company_id:
+                my_company_partners = service.company_id.partner_id
+            else:
+                my_company_partners = res_company_obj.search([]).mapped('partner_id')
+
+            lines_by_supplier = {}
+            lines_no_supplier = service_line_obj
+            lines_i_supply = service_line_obj
+            lines_already_done = service.line_ids.filtered(lambda l: l.purchaseorder_line_id)
+
+            # Séparer les ligne par fournisseur, lignes sans fournisseur ignorées pour l'instant
+            for line in service.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
+                suppliers = line.product_id.seller_ids \
+                    .filtered(lambda r: (not r.company_id or r.company_id == line.company_id) and
+                                        (not r.product_id or r.product_id == line.product_id))
+                if suppliers:
+                    supplier = suppliers[0].name  # supplier.name est un many2one vers res.partner
+                    if supplier in my_company_partners:
+                        lines_i_supply |= line
+                    else:
+                        if supplier not in lines_by_supplier:
+                            lines_by_supplier[supplier] = []
+                        lines_by_supplier[supplier].append(line)
+                else:
+                    lines_no_supplier |= line
+
+            # Informer si au moins une ligne ne sera pas traitée
+            if len(self) == 1 and not self._context.get('of_make_po_validated'):
+                validation_message = u""
+                if lines_no_supplier or lines_i_supply or lines_already_done:
+                    validation_message = u"Certaines lignes ne seront pas prises en compte."
+                if lines_already_done:
+                    validation_message += u"\n  - Parce qu'elles ont déjà donné lieu à une commande fournisseur : "
+                    for line in lines_already_done:
+                        validation_message += u"\n\t%s" % line.product_id.name
+                if lines_i_supply:
+                    validation_message += u"\n  - Parce que vous en êtes le fournisseur : "
+                    for line in lines_i_supply:
+                        validation_message += u"\n\t%s" % line.product_id.name
+                if lines_no_supplier:
+                    validation_message += u"\n  - Parce qu'elles n'ont pas de fournisseur : "
+                    for line in lines_no_supplier:
+                        validation_message += u"\n\t%s" % line.product_id.name
+                if validation_message:
+                    context = {
+                        'default_message': validation_message,
+                        'default_service_id': self.id,
+                        'active_model': 'of.service',
+                        'active_id': self.id,
+                    }
+                    res = {
+                        'name': u"Veuillez confirmer",
+                        'view_mode': 'form,tree',
+                        'res_model': 'of.make.po.validation.wizard',
+                        'type': 'ir.actions.act_window',
+                        'target': 'new',
+                        'context': context,
+                    }
+                    return res
+
+            # Vérifier que tous les fournisseurs ont bien une position fiscale, sinon la création de CF echouera
+            suppliers_all = lines_by_supplier.keys()
+            if not all([s.property_account_position_id for s in suppliers_all]):
+                return popup_wizard_obj.popup_return(
+                    message=u"Les fournisseurs suivants n'ont pas de position fiscale, "
+                            u"ce qui empêche la création de la commande pour la demande d'intervention %s.\n"
+                            u"%s" % (service_name,
+                                     u", ".join([s.name for s in suppliers_all if not s.property_account_position_id])))
+
+            # Création de chaque CF
+            for supplier, lines in lines_by_supplier.iteritems():
+                # utilisation de new() pour trigger les onchanges facilement
+                purchase_order_vals = service.get_purchase_order_vals(supplier)
+                purchase_order_new = purchase_obj.new(purchase_order_vals)
+                purchase_order_new.onchange_partner_id()
+                order_values = purchase_order_new._convert_to_write(purchase_order_new._cache)
+                purchase_order = purchase_obj.create(order_values)
+                purchase_lines = []
+                for line in lines:
+                    line_vals = line.prepare_po_line_vals(purchase_order)
+                    purchase_lines.append((0, 0, line_vals))
+                purchase_order.write({'order_line': purchase_lines})
+                purchase_orders |= purchase_order
+
+            # Connecter les lignes à leur ligne de commande correspondante
+            for line in service.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
+                line.purchaseorder_line_id = po_line_obj.search([('of_service_line_id', '=', line.id)], limit=1)
+
         # Si plusieurs CF retourner vue liste avec les différentes CF
         # Si une seule, afficher la CF en vue form
         if len(purchase_orders) > 1:
