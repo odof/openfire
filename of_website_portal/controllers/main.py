@@ -1,17 +1,100 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
-from odoo import http, tools, fields
+from odoo import http, tools, fields, _
 from odoo.http import request
 from odoo.exceptions import AccessError
 from odoo.addons.website_portal.controllers.main import website_account
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
-from odoo.addons.of_utils.models.of_utils import format_date
-from dateutil.relativedelta import relativedelta
-import datetime
+from odoo.addons.base_iban.models.res_partner_bank import normalize_iban, _map_iban_template
+
 
 class WebsiteAccount(website_account):
+
+    @http.route(['/my/account/bankdetails'], type='http', auth='user', website=True)
+    def details_bank(self):
+        partner = request.env.user.partner_id
+        partner_bank = request.env['res.partner.bank'].sudo().search([('partner_id', '=', partner.id)], limit=1)
+        vals = {
+            'partner_id': partner,
+            'partner_bank_id': partner_bank or False,
+            'error': {},
+            'error_message': [],
+            'success_message': []
+        }
+        return request.render("of_website_portal.details_bank", vals)
+
+    @http.route(['/my/account/bankdetails/created'], type='http', auth='user', website=True)
+    def details_bank_created(self, **post):
+        partner_id = request.env.user.partner_id
+        bic = post.get('bic')
+        iban = post.get('iban')
+        normalized_iban = normalize_iban(iban)
+        bank_id = request.env['res.bank'].sudo().search([('bic', '=', bic)], limit=1)
+        partner_bank = False
+        error = {}
+        error_message = []
+        if post:
+            if not post.get('name'):
+                error['name'] = 'missing'
+            if not bic:
+                error['bic'] = 'missing'
+            if not iban:
+                error['iban'] = 'missing'
+            if bic and not bank_id:
+                error['bic'] = 'bic_not_found'
+
+            country_code = normalized_iban[:2].lower()
+            if normalized_iban and country_code not in _map_iban_template:
+                error['iban'] = 'invalid_format'
+            elif country_code in _map_iban_template:
+                iban_template = _map_iban_template[country_code]
+                if len(normalized_iban) != len(iban_template.replace(' ', '')):
+                    error['iban'] = 'invalid_format'
+
+            if normalized_iban:
+                check_chars = normalized_iban[4:] + normalized_iban[:4]
+                digits = int(''.join(str(int(char, 36)) for char in check_chars))
+                if digits % 97 != 1:
+                    error['iban'] = 'invalid_format'
+
+            if [err for err in error.values() if err == 'missing']:
+                error_message.append(_("Some required fields are empty."))
+
+            if [err for err in error.values() if err == 'bic_not_found']:
+                error_message.append(_("Le code BIC n'a pas été reconnu. Veuillez informer votre magasin."))
+
+            if [err for err in error.values() if err == 'invalid_format']:
+                error_message.append(_("L'IBAN ne semble pas correct."))
+
+            partner_bank_obj = request.env['res.partner.bank'].sudo()
+            if post.get('partner_bank_id'):
+                partner_bank = partner_bank_obj.browse(int(post['partner_bank_id']))
+
+            if error:
+                vals = {
+                    'partner_id': partner_id,
+                    'partner_bank_id': partner_bank or False,
+                    'error': error,
+                    'error_message': error_message
+                }
+                return request.render('of_website_portal.details_bank', vals)
+
+            if not error_message:
+                if partner_bank:
+                    partner_bank.write({
+                        'bank_id': bank_id.id,
+                        'acc_number': post.get('iban'),
+                        'acc_type': 'iban',
+                    })
+                else:
+                    partner_bank_obj.create({
+                        'partner_id': partner_id.id,
+                        'bank_id': bank_id.id,
+                        'acc_number': post.get('iban'),
+                        'acc_type': 'iban',
+                    })
+                return request.render("of_website_portal.bank_account_thanks", {})
 
     def _prepare_portal_layout_values(self):
         values = super(WebsiteAccount, self)._prepare_portal_layout_values()
@@ -205,7 +288,6 @@ class WebsiteAccount(website_account):
         })
         return request.render('of_website_portal.of_website_portal_portal_my_rdvs', values)
 
-
     @http.route(['/rdv/<model("of.planning.intervention"):rdv>'], type='http', auth='user', website=True)
     def of_portal_rdv(self, rdv=None, **kw):
         values = {
@@ -245,7 +327,6 @@ class SignupVerifyEmail(AuthSignupHome):
         # Mise a jour de qcontext car il a changé
         qcontext = self.get_auth_signup_qcontext()
         is_portal = bool(request.env.user.groups_id.filtered('is_portal'))
-        if qcontext.get('login_success')  and is_portal and not qcontext.get('redirect'):
+        if qcontext.get('login_success') and is_portal and not qcontext.get('redirect'):
             return http.redirect_with_hash('/')
         return res
-

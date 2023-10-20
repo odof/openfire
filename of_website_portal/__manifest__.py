@@ -16,7 +16,6 @@ Module OpenFire pour le portail du site internet
 """,
     'website': u"www.openfire.fr",
     'depends': [
-        'base',
         'website_portal',
         'website_project_issue',
         'website_portal_sale',
@@ -41,6 +40,7 @@ Module OpenFire pour le portail du site internet
         'views/res_config_views.xml',
         'wizards/portal_user_wizard_views.xml',
         'templates/website_portal_sale_views.xml',
+        'templates/website_portal_bank_details.xml',
         'reports/report_stock_picking.xml',
         'data/post_update.xml',
     ],
