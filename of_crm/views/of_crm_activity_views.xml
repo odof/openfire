@@ -20,16 +20,6 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_button_toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
-                                <span class="text-danger">Archive</span>
-                            </div>
-                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
-                                <span class="text-success">Unarchive</span>
-                            </div>
-                        </button>
-                    </div>
                     <group>
                         <group>
                             <field name="origin" invisible="1"/>
@@ -87,16 +77,6 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_button_toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
-                                <span class="text-danger">Archive</span>
-                            </div>
-                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
-                                <span class="text-success">Unarchive</span>
-                            </div>
-                        </button>
-                    </div>
                     <group>
                         <field name="opportunity_id" invisible="1"/>
                         <field name="is_late" invisible="1"/>

@@ -64,10 +64,6 @@ class CrmLead(models.Model):
         string="Is my store ?", compute='_compute_is_my_company', search='_search_is_my_company'
     )
 
-    def action_button_toggle_active(self):
-        for activity in self:
-            activity.active = not activity.active
-
     def action_button_new_activity(self):
         self.ensure_one()
         return self.env.ref('of_crm.of_crm_activity_schedule_action').read()[0]

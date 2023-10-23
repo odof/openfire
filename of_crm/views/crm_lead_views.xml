@@ -92,16 +92,6 @@
                 <attribute name="attrs">{'invisible': ['|', ('type', '=', 'opportunity'), '&amp;', ('probability', 'in', (0,100)), ('active', '=', False)]}</attribute>
             </xpath>
 
-            <xpath expr="//div[@name='button_box']//button[@name='action_schedule_meeting']" position="before">
-                <button name="action_button_toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                    <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
-                        <span class="text-danger">Archive</span>
-                    </div>
-                    <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
-                        <span class="text-success">Unarchive</span>
-                    </div>
-                </button>
-            </xpath>
             <!-- /"Header" part -->
 
             <!-- "Opportunity" visible group part -->
