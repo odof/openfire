@@ -147,6 +147,9 @@
                     <field name="of_ref"/>
                 </group>
             </xpath>
+            <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="after">
                 <field name="of_referred_id" />
             </xpath>
@@ -190,6 +193,12 @@
             </xpath>
             <xpath expr="//group[@name='lead_partner']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='referred']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='referred']" position="after">
+                <field name="of_referred_id" />
             </xpath>
             <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='medium_id']" position="attributes">
                 <attribute name="string">Canal</attribute>
