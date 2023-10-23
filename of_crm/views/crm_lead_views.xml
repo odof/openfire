@@ -150,6 +150,9 @@
             <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="after">
                 <field name="of_referred_id" />
             </xpath>
+            <xpath expr="//group[@name='lead_marketing']//field[@name='medium_id']" position="attributes">
+                <attribute name="string">Canal</attribute>
+            </xpath>
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page string="Activities" name="of_crm_activities">
                     <field name="of_activity_ids" context="{
@@ -187,6 +190,9 @@
             </xpath>
             <xpath expr="//group[@name='lead_partner']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='medium_id']" position="attributes">
+                <attribute name="string">Canal</attribute>
             </xpath>
             <!-- /"Lead" visible group part -->
 
