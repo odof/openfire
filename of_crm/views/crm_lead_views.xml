@@ -86,7 +86,6 @@
             <xpath expr="//form//header//button[@name='action_set_lost']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|', ('type', '=', 'opportunity'), '&amp;', ('probability', 'in', (0,100)), ('active', '=', False)]}</attribute>
             </xpath>
-
             <!-- /"Header" part -->
 
             <!-- "Opportunity" visible group part -->
@@ -139,9 +138,11 @@
             <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="after">
                 <field name="of_referred_id" />
             </xpath>
-
             <xpath expr="//group[@name='lead_marketing']//field[@name='medium_id']" position="attributes">
                 <attribute name="string">Canal</attribute>
+            </xpath>
+            <xpath expr="//group[@name='Misc']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <!-- /"Opportunity" visible group part -->
 
