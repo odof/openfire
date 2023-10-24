@@ -10,6 +10,14 @@ class CrmLead(models.Model):
     of_project_line_ids = fields.One2many(comodel_name='of.crm.project.line', inverse_name='lead_id', string="Entries")
     of_date_project = fields.Date(string="Project date")
 
+    # Linked Partner fields
+    of_interlocutor = fields.Many2one(comodel_name='res.partner', string="Interlocutor")
+    of_decision_maker = fields.Many2one(comodel_name='res.partner', string="Decision maker")
+    of_architect = fields.Many2one(comodel_name='res.partner', string="Architect")
+    of_labor_force = fields.Many2one(comodel_name='res.partner', string="Labor force")
+    of_prime_contractor = fields.Many2one(comodel_name='res.partner', string="Prime contractor")
+    of_engineering_office = fields.Many2one(comodel_name='res.partner', string="Engineering office")
+
     @api.onchange('of_template_id')
     def _onchange_of_template_id(self):
         for lead in self:

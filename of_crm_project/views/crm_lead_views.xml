@@ -6,6 +6,23 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <!-- "Notebook" part -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Partner" colspan="2">
+                    <group>
+                        <group string="Customer" name="customer">
+                            <field name="of_interlocutor"/>
+                            <field name="of_decision_maker"/>
+                        </group>
+                        <group string="Externals" name="externals">
+                            <field name="of_architect"/>
+                            <field name="of_labor_force"/>
+                            <field name="of_prime_contractor"/>
+                            <field name="of_engineering_office"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="project" string="Project">
                     <group>
@@ -41,6 +58,7 @@
                     </field>
                 </page>
             </xpath>
+            <!-- /"Notebook" part -->
         </field>
     </record>
 
@@ -50,7 +68,7 @@
         <field name="inherit_id" ref="of_crm.of_crm_view_crm_case_leads_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='contact_name']" position="after">
-                <field name="of_project_line_ids" string="Projet"/>
+                <field name="of_project_line_ids" string="Project"/>
             </xpath>
         </field>
     </record>
