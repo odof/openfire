@@ -1,6 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_crm_activity_user_my,access.of.crm.activity.user.my,model_of_crm_activity,sales_team.group_sale_salesman,1,1,1,1
-access_of_crm_activity_user,access.of.crm.activity.user,model_of_crm_activity,base.group_user,1,0,0,0
 access_mail_activity_type_sale_my,access.crm.activity.my,mail.model_mail_activity_type,sales_team.group_sale_salesman,1,0,0,0
 access_mail_activity_type_sale_user,access.crm.activity.user,mail.model_mail_activity_type,base.group_user,1,0,0,0
-access_of_crm_compute_date_user,access_of_crm_compute_date_user,of_crm.model_of_crm_compute_date,base.group_user,1,1,1,1

@@ -15,13 +15,9 @@
         'of_utils',
     ],
     'data': [
-        'data/of_crm_compute_date.xml',
         'security/ir.model.access.csv',
-        'security/of_crm_security.xml',
-        'views/mail_activity_type_views.xml',
         'views/crm_stage_views.xml',
         'views/crm_lead_views.xml',
-        'views/of_crm_activity_views.xml',
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
     ],

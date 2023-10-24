@@ -80,11 +80,6 @@
             </xpath>
 
             <!-- "Header" part -->
-            <xpath expr="//button[1]" position="after">
-                <button string="New activity" name="action_button_new_activity" type="object" class="oe_highlight"
-                    attrs="{'invisible': [('type', '=', 'lead')]}"
-                    context="{'default_opportunity_id': active_id, 'default_origin': 'opportunity'}"/>
-            </xpath>
             <xpath expr="//form//header//button[@name='action_set_won_rainbowman']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|','|', ('active','=',False), ('probability', 'in', (0,100)), ('type', '=', 'lead')]}</attribute>
             </xpath>
@@ -144,37 +139,9 @@
             <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="after">
                 <field name="of_referred_id" />
             </xpath>
+
             <xpath expr="//group[@name='lead_marketing']//field[@name='medium_id']" position="attributes">
                 <attribute name="string">Canal</attribute>
-            </xpath>
-            <xpath expr="//page[@name='internal_notes']" position="before">
-                <page string="Activities" name="of_crm_activities">
-                    <field name="of_activity_ids" context="{
-                            'default_opportunity_id': active_id,
-                            'default_origin': 'opportunity',
-                            'close_and_reload': True,
-                            'form_view_ref':'of_crm.of_crm_activity_from_opportunity_form_view'}">
-                        <tree decoration-muted="state=='canceled' or not active" decoration-danger="is_late" editable="bottom">
-                            <field name="origin" invisible="1"/>
-                            <field name="is_late" invisible="1"/>
-                            <field name="active" invisible="1"/>
-                            <field name="load_attachment" invisible="1"/>
-                            <field name="uploaded_attachment_id" invisible="1"/>
-                            <field name="title"/>
-                            <field name="type_id"/>
-                            <field name="date"/>
-                            <field name="user_id"/>
-                            <field name="vendor_id"/>
-                            <field name="state"/>
-                            <button name="action_button_add_attachment" icon="fa-upload" type="object" string="Add attachment"
-                                    attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
-                            <button name="action_button_complete" type="object" string="Realize" icon="fa-check"
-                                    attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                            <button name="action_button_cancel" type="object" string="Cancel" icon="fa-close"
-                                    attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                        </tree>
-                    </field>
-                </page>
             </xpath>
             <!-- /"Opportunity" visible group part -->
 

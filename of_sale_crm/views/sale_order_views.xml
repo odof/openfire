@@ -38,33 +38,6 @@
                         <group name="followup_tags" col="4" colspan="2">
                             <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
                         </group>
-                        <group name="activities" col="4">
-                            <group>
-                                <field name="of_activities_state"/>
-                            </group>
-                            <field name="of_crm_activity_ids" nolabel="1" options="{'reload_on_button': True}" context="{'active_test': False, 'default_order_id': active_id, 'default_partner_id': partner_id, 'default_origin': 'sale_order', 'form_view_ref':'of_crm.of_crm_activity_from_sale_form_view'}">
-                                <tree string="Activities" decoration-muted="state=='canceled' or not active" decoration-danger="is_late">
-                                    <field name="origin" invisible="1"/>
-                                    <field name="is_late" invisible="1"/>
-                                    <field name="active" invisible="1"/>
-                                    <field name="trigger_type" invisible="1"/>
-                                    <field name="load_attachment" invisible="1"/>
-                                    <field name="uploaded_attachment_id" invisible="1"/>
-                                    <field name="user_id" invisible="1"/>
-                                    <field name="description" invisible="1"/>
-                                    <field name="title"/>
-                                    <field name="type_id"/>
-                                    <field name="deadline_date"/>
-                                    <field name="vendor_id" string="Assigned to"/>
-                                    <field name="report"/>
-                                    <field name="state"/>
-                                    <button name="action_button_add_attachment" icon="fa-upload" type="object" string="Add attachment" attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
-                                    <button name="action_button_plan" icon="fa-undo" type="object" string="Plan" attrs="{'invisible': [('state', '=', 'planned')]}"/>
-                                    <button name="action_button_complete" type="object" string="Realize" icon="fa-check" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                                    <button name="action_button_cancel" type="object" string="Cancel" icon="fa-close" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                                </tree>
-                            </field>
-                        </group>
                     </page>
                 </xpath>
             </field>
@@ -113,21 +86,6 @@
                     <filter string="Quotations" name="draft" domain="[('state', '=', 'sent')]" groups="of_sale_crm.group_quotation_sale_order_state"/>
                     <filter string="Sent Quotations" name="sent" domain="[('state', '=', 'sent'), ('of_sent_quotation', '=', True)]"/>
                     <filter string="Quotations" name="quotation" domain="[('state', '=', 'sent')]" groups="!of_sale_crm.group_quotation_sale_order_state"/>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="of_crm_sale_view_sales_order_filter" model="ir.ui.view">
-            <field name="name">of.crm.sale.view.sales.order.filter</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='activities_upcoming_all']" position="after">
-                    <separator/>
-                    <filter string="In Progress" name="activities_in_progress" domain="[('of_activities_state', '=', 'in_progress')]"/>
-                    <filter string="Late" name="activities_late" domain="[('of_activities_state', '=', 'late')]"/>
-                    <filter string="Done" name="activities_done" domain="[('of_activities_state', '=', 'done')]"/>
-                    <filter string="Canceled" name="activities_canceled" domain="[('of_activities_state', '=', 'canceled')]"/>
                 </xpath>
             </field>
         </record>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-25 12:25+0000\n"
-"PO-Revision-Date: 2023-10-25 12:25+0000\n"
+"POT-Creation-Date: 2023-10-25 14:14+0000\n"
+"PO-Revision-Date: 2023-10-25 14:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,80 +21,14 @@ msgid "<span class=\"oe_grey\">&amp;nbsp;at&amp;nbsp;</span>"
 msgstr "<span class=\"oe_grey\">&amp;nbsp;à&amp;nbsp;</span>"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "<span class=\"text-danger\">Archive</span>"
-msgstr ""
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "<span class=\"text-success\">Unarchive</span>"
-msgstr ""
-
-#. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_quick_create_opportunity_form
 msgid "<span>%</span>"
 msgstr ""
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__active
-msgid "Active"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.actions.act_window,name:of_crm.of_crm_activity_action
-#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_activity_ids
-#: model:ir.ui.menu,name:of_crm.of_crm_activity_menu
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "Activities"
-msgstr "Activités"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activities of the day"
-msgstr "Activités de la journée"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activities of the week"
-msgstr "Activités de la semaine"
-
-#. module: of_crm
-#: model:ir.actions.act_window,name:of_crm.of_crm_activity_schedule_action
-msgid "Activity"
-msgstr "Activité"
-
-#. module: of_crm
-#: model:ir.model,name:of_crm.model_mail_activity_type
-msgid "Activity Type"
-msgstr "Type d'activité"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_next_action_activity_id
-msgid "Activity requiring next action"
-msgstr "Activité nécessitant une prochaine action"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_stage__of_manual_activity_id
 msgid "Activity to be created in case of manual update"
 msgstr "Activité à créer en cas de mise à jour manuelle"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__type_id
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Activity type"
-msgstr "Type d'activité"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "Add attachment"
-msgstr "Ajouter une pièce jointe"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_additionnal_infos
@@ -112,31 +46,7 @@ msgid "Additionnal infos..."
 msgstr "Informations complémentaires..."
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Archived"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_user_id
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Assigned to"
-msgstr "Assigné à"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__user_id
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Author"
-msgstr "Autheur"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_automatic_recompute
-msgid "Automatic recompute"
-msgstr "Re-calcul automatique"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_color_bg
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__of_color_bg
 msgid "Background color"
 msgstr "Couleur de fond"
 
@@ -146,24 +56,9 @@ msgid "Brought by"
 msgstr "Apporté par"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "CRM"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model,name:of_crm.model_of_crm_activity
-msgid "CRM Activities for objects (its more like tasks)"
-msgstr "Activités CRM pour les objets (comme des tâches)"
-
-#. module: of_crm
 #: model:ir.model,name:of_crm.model_crm_stage
 msgid "CRM Stages"
 msgstr "Étapes CRM"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_mail_activity_type_view_form
-msgid "CRM activites settings"
-msgstr "Paramètres des activités CRM"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_res_partner__campaign_id
@@ -176,25 +71,6 @@ msgstr "Campagne"
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Canal"
 msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields.selection,name:of_crm.selection__of_crm_activity__state__canceled
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "Cancel"
-msgstr "Annuler"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__cancel_reason
-msgid "Cancel Reason"
-msgstr "Raison de l'annulation"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Canceled"
-msgstr "Annulé"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_canvasser_id
@@ -241,16 +117,6 @@ msgid "Comparison code"
 msgstr "Code de comparaison"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_compute_date_id
-msgid "Compute Date"
-msgstr "Date de calcul"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_compute_date_res_field
-msgid "Compute Date Field"
-msgstr "Champ de date de calcul"
-
-#. module: of_crm
 #: model:ir.model,name:of_crm.model_res_partner
 msgid "Contact"
 msgstr ""
@@ -258,18 +124,6 @@ msgstr ""
 #. module: of_crm
 #: model_terms:ir.actions.act_window,help:of_crm.of_crm_action_prospect_act
 msgid "Create a Contact in your address book"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__create_uid
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__create_uid
-msgid "Created by"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__create_date
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__create_date
-msgid "Created on"
 msgstr ""
 
 #. module: of_crm
@@ -281,12 +135,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Creation date"
 msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__partner_id
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Customer"
-msgstr "Client"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_case_tree_view_oppor
@@ -305,48 +153,12 @@ msgid "Dates"
 msgstr ""
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__deadline_date
-msgid "Deadline date"
-msgstr "Date limite"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_days
-msgid "Delay"
-msgstr "Délai"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__description
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Description"
 msgstr ""
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__display_name
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__display_name
-msgid "Display Name"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields.selection,name:of_crm.selection__of_crm_activity__state__done
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Done"
-msgstr "Terminé"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__done_date
-msgid "Done date"
-msgstr "Date de réalisation"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__email
-msgid "Email"
-msgstr ""
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_stage__of_auto_field_id
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__res_field
 msgid "Field"
 msgstr "Champ"
 
@@ -361,18 +173,6 @@ msgid "Font color"
 msgstr "Couleur de police"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_crm_activity_view_search
-msgid "Group By"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__id
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__id
-msgid "ID"
-msgstr ""
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__is_company
 msgid "Is a company"
 msgstr "Est une société"
@@ -383,29 +183,6 @@ msgid "Is my store ?"
 msgstr "Est mon magasin ?"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity____last_update
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__write_uid
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__write_uid
-msgid "Last Updated by"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__write_date
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__write_date
-msgid "Last Updated on"
-msgstr ""
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__is_late
-msgid "Late activity"
-msgstr "Activité en retard"
-
-#. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Latest modifications"
 msgstr "Dernières modifications"
@@ -414,12 +191,6 @@ msgstr "Dernières modifications"
 #: model:ir.model,name:of_crm.model_crm_lead
 msgid "Lead/Opportunity"
 msgstr "Piste/Opportunité"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_load_attachment
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__load_attachment
-msgid "Load an attachment"
-msgstr "Charer une pièce jointe"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_color_map
@@ -442,13 +213,7 @@ msgid "Miscellaneous"
 msgstr "Divers"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__mobile
-msgid "Mobile"
-msgstr ""
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_stage__of_auto_model_name
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__res_model
 msgid "Model"
 msgstr "Modèle"
 
@@ -465,16 +230,6 @@ msgid "Modified this week"
 msgstr "Modifié cette semaine"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "My activities"
-msgstr "Mes activités"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__name
-msgid "Name"
-msgstr "Nom"
-
-#. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_crm_lead__of_referred_id
 msgid "Name of business referrer"
 msgstr "Nom de l'apporteur d'affaire"
@@ -485,26 +240,9 @@ msgid "Name of next action"
 msgstr "Nom de la prochaine action"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "New activity"
-msgstr "Nouvelle activité"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_next_activity_name
 msgid "Next activity name"
 msgstr "Nom de la prochaine activité"
-
-#. module: of_crm
-#: model:ir.model.fields,help:of_crm.field_mail_activity_type__of_days
-msgid "Number of days before the activity is considered as due."
-msgstr ""
-"Nombre de jours avant que l'activité ne soit considérée comme terminée."
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_object
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_crm_activity_view_search
-msgid "Object"
-msgstr "Objet"
 
 #. module: of_crm
 #: model_terms:ir.actions.act_window,help:of_crm.of_crm_action_prospect_act
@@ -512,48 +250,19 @@ msgid "Odoo helps you track all activities related to your contacts."
 msgstr ""
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__opportunity_id
-#: model:ir.model.fields.selection,name:of_crm.selection__mail_activity_type__of_object__crm_lead
-#: model:ir.model.fields.selection,name:of_crm.selection__of_crm_activity__origin__opportunity
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Opportunity"
 msgstr "Opportunité"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__origin
 #: model:ir.model.fields,field_description:of_crm.field_res_partner__source_id
 msgid "Origin"
 msgstr ""
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
 #: model_terms:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
 msgid "Overdue Activities"
 msgstr "Activités en retard"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__phone
-msgid "Phone"
-msgstr ""
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
-msgid "Plan"
-msgstr "Planifier"
-
-#. module: of_crm
-#: model:ir.model.fields.selection,name:of_crm.selection__of_crm_activity__state__planned
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Planned"
-msgstr "Planifié"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__date
-msgid "Planned date"
-msgstr "Date planifiée"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_quick_create_opportunity_form
@@ -582,20 +291,6 @@ msgid "Qualification and follow-up"
 msgstr "Qualification et suivi"
 
 #. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_tree_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
-msgid "Realize"
-msgstr "Réaliser"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-msgid "Reason for cancellation"
-msgstr "Raison de l'annulation"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_ref
 msgid "Reference"
 msgstr "Référence"
@@ -604,23 +299,6 @@ msgstr "Référence"
 #: model:ir.model.fields,field_description:of_crm.field_of_crm_stage_auto_update__opportunity_id
 msgid "Related opportunity"
 msgstr "Opportunité liée"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__report
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_from_opportunity_form_view
-msgid "Report"
-msgstr ""
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_search_view
-msgid "Sales"
-msgstr "Ventes"
-
-#. module: of_crm
-#: model_terms:ir.ui.view,arch_db:of_crm.of_crm_activity_form_view
-msgid "Salesman"
-msgstr "Vendeur"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_res_partner__user_id
@@ -632,17 +310,6 @@ msgstr "Vendeur"
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__report_description
 msgid "Second follow-up"
 msgstr "Suivi bis"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__sequence
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__sequence
-msgid "Sequence"
-msgstr "Séquence"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_short_name
-msgid "Short Name"
-msgstr "Nom court"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
@@ -664,24 +331,9 @@ msgid "Stage automation"
 msgstr "Automatisation des étapes"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__state
-msgid "State"
-msgstr "État"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__title
-msgid "Summary"
-msgstr "Résumé"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__tag_ids
 msgid "Tags"
 msgstr "Étiquettes"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_team_id
-msgid "Team"
-msgstr "Équipe"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_crm_lead__of_date_action_filter
@@ -691,11 +343,6 @@ msgid ""
 msgstr ""
 "Champ technique utilisé dans la vue de recherche pour filtrer sur la date de"
 " la prochaine action"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__of_color_ft
-msgid "Text color"
-msgstr "Couleur du texte"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_res_partner__user_id
@@ -733,31 +380,6 @@ msgid "Today Activities"
 msgstr "Activités du jour"
 
 #. module: of_crm
-#: model:ir.actions.act_window,name:of_crm.of_crm_next_activities_action
-msgid "Upcoming events"
-msgstr "Événements à venir"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__uploaded_attachment_id
-msgid "Uploaded attachment"
-msgstr "Pièce jointe chargée"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_compute_date__use_today_date
-msgid "Use today's date"
-msgstr "Utiliser la date du jour"
-
-#. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_of_crm_activity__vendor_id
-msgid "Vendor"
-msgstr ""
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_website
 msgid "Website Link"
 msgstr "Siteweb"
-
-#. module: of_crm
-#: model:ir.model,name:of_crm.model_of_crm_compute_date
-msgid "of.crm.compute.date"
-msgstr ""

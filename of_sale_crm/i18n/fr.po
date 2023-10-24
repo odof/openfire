@@ -6,19 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-24 15:28+0000\n"
-"PO-Revision-Date: 2023-10-24 15:28+0000\n"
+"POT-Creation-Date: 2023-10-25 14:11+0000\n"
+"PO-Revision-Date: 2023-10-25 14:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_quotation_form_view
-msgid "!of_sale_crm.group_quotation_sale_order_state"
-msgstr ""
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__of_lost_opportunity_stage_id
@@ -33,51 +28,6 @@ msgid "(OF) Starting state of orders"
 msgstr "(OF) État de départ des commandes"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-msgid "<span class=\"text-danger\">Archive</span>"
-msgstr ""
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-msgid "<span class=\"text-success\">Unarchive</span>"
-msgstr ""
-
-#. module: of_sale_crm
-#: model:ir.actions.act_window,name:of_sale_crm.of_crm_activity_sale_action
-#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_crm_activity_ids
-#: model:ir.ui.menu,name:of_sale_crm.of_crm_activity_sale_menu
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Activities"
-msgstr "Activités"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__activity_id
-msgid "Activity"
-msgstr "Activité"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__activity_file
-msgid "Activity File"
-msgstr "Fichier d'activité"
-
-#. module: of_sale_crm
-#: model:ir.model,name:of_sale_crm.model_mail_activity_type
-msgid "Activity Type"
-msgstr "Type d'activité"
-
-#. module: of_sale_crm
-#: model:ir.model,name:of_sale_crm.model_of_add_attachment_activity
-msgid "Add an attachment to the Sale linked to an activity"
-msgstr "Ajouter une pièce jointe à la vente liée à une activité"
-
-#. module: of_sale_crm
-#: model:ir.actions.act_window,name:of_sale_crm.of_add_attachment_activity_action
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Add attachment"
-msgstr "Ajouter une pièce jointe"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,help:of_sale_crm.field_of_connector_config_settings__of_lost_opportunity_stage_id
 #: model:ir.model.fields,help:of_sale_crm.field_res_config_settings__of_lost_opportunity_stage_id
 msgid ""
@@ -86,29 +36,6 @@ msgid ""
 msgstr ""
 "Permet d'indiquer quelle étape est associée à la perte d'opportunité à des "
 "fin d'analyse"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Assigned to"
-msgstr "Assigné à"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_trigger_type__at_creation
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_crm_activity__trigger_type__at_creation
-msgid "At creation"
-msgstr "À la création"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_trigger_type__at_validation
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_crm_activity__trigger_type__at_validation
-msgid "At validation"
-msgstr "À la validation"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_add_attachment_activity_form_view
-msgid "Attachment"
-msgstr "Pièce jointe"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_main_product_brand_id
@@ -121,11 +48,6 @@ msgid "Brought by"
 msgstr "Apporté par"
 
 #. module: of_sale_crm
-#: model:ir.model,name:of_sale_crm.model_of_crm_activity
-msgid "CRM Activities for objects (its more like tasks)"
-msgstr "Activités CRM pour les objets (comme des tâches)"
-
-#. module: of_sale_crm
 #: model:ir.model,name:of_sale_crm.model_crm_stage
 msgid "CRM Stages"
 msgstr "Étapes CRM"
@@ -136,15 +58,7 @@ msgid "Campaign"
 msgstr "Campagne"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Cancel"
-msgstr "Annuler"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_activities_state__canceled
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__cancel
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_view_sales_order_filter
 msgid "Canceled"
 msgstr "Annulé"
 
@@ -155,7 +69,6 @@ msgstr "Annulé"
 #: model:ir.model.fields,field_description:of_sale_crm.field_account_payment__of_canvasser_id
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_canvasser_id
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_report__of_canvasser_id
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_user_assignment__canvasser
 msgid "Canvasser"
 msgstr "Prospecteur"
 
@@ -175,7 +88,7 @@ msgid "Config Settings"
 msgstr "Paramètres de configuration"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
 msgid "Confirm Estimate"
 msgstr "Confirmer l'estimation"
 
@@ -185,21 +98,14 @@ msgid "Contact"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__create_uid
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__create_uid
 msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__create_date
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__create_date
 msgid "Created on"
 msgstr "Créé le"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_user_assignment__creator
-msgid "Creator"
-msgstr ""
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_case_kanban_view_leads
@@ -212,30 +118,13 @@ msgid "Customer/Vendor view"
 msgstr "Vue Client/Vendeur"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-msgid "Description"
-msgstr ""
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_add_attachment_activity_form_view
-msgid "Discard"
-msgstr "Annuler"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__display_name
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__display_name
 msgid "Display Name"
 msgstr "Afficher un nom"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
 msgid "Divers"
-msgstr ""
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_activities_state__done
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_view_sales_order_filter
-msgid "Done"
 msgstr ""
 
 #. module: of_sale_crm
@@ -254,12 +143,7 @@ msgid "Estimates"
 msgstr "Estimations"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__activity_filename
-msgid "Filename"
-msgstr "Nom du fichier"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
 msgid "Follow-up"
 msgstr "Suivi"
 
@@ -285,20 +169,9 @@ msgid "High"
 msgstr "Haut"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__id
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__id
 msgid "ID"
 msgstr ""
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_view_sales_order_filter
-msgid "In Progress"
-msgstr "En cours"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_activities_state__in_progress
-msgid "In progress"
-msgstr "En cours"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_info
@@ -316,38 +189,24 @@ msgid "Journal Entry"
 msgstr "Pièce comptable"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity____last_update
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__write_uid
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__write_date
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__write_date
 msgid "Last Updated on"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_activities_state__late
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_view_sales_order_filter
-msgid "Late"
-msgstr "En retard"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_laying_week
 msgid "Laying week"
 msgstr "Semaine de ponte"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__lead_id
-msgid "Lead"
-msgstr "Opportunité"
 
 #. module: of_sale_crm
 #: model:ir.model,name:of_sale_crm.model_crm_lead
@@ -369,11 +228,6 @@ msgstr "Verrouillé"
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__1
 msgid "Low"
 msgstr "Faible"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_mail_activity_type__of_mandatory
-msgid "Mandatory"
-msgstr "Obligatoire"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_manual_laying_date
@@ -406,19 +260,9 @@ msgid "Normal"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_mail_activity_type__of_object
-msgid "Object"
-msgstr "Objet"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__opportunity_id
 msgid "Opportunity"
 msgstr "Opportunité"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_add_attachment_activity__order_id
-msgid "Order"
-msgstr "Commande"
 
 #. module: of_sale_crm
 #: model:ir.model,name:of_sale_crm.model_of_sale_followup_tag
@@ -434,8 +278,8 @@ msgid "Order tracking labels"
 msgstr "Etiquettes de suivi de commande"
 
 #. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_connector_config_settings__of_sale_order_start_state__estimation
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_config_settings__of_sale_order_start_state__estimation
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_connector_config_settings__of_sale_order_start_state__estimate
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_config_settings__of_sale_order_start_state__estimate
 msgid "Orders are created at the initial \"Estimate\" stage."
 msgstr "Les commandes sont créées à l'étape initiale \"Estimation\""
 
@@ -474,19 +318,6 @@ msgid "Partner Tags"
 msgstr "Étiquettes du partenaire"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Plan"
-msgstr ""
-
-#. module: of_sale_crm
-#: model:ir.model.fields,help:of_sale_crm.field_mail_activity_type__of_mandatory
-msgid ""
-"Prevent the confirmation of an order if the activity is not carried out"
-msgstr ""
-"Empêcher la confirmation d'une commande si l'activité n'est pas réalisée"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_priority
 msgid "Priority"
 msgstr "Priorité"
@@ -519,17 +350,6 @@ msgid "Quotations"
 msgstr "Devis"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_order_form
-msgid "Realize"
-msgstr "Réaliser"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-msgid "Reason for cancellation"
-msgstr "Motif d'annulation"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_reference_laying_date
 msgid "Reference laying date"
 msgstr "Date de pose de référence"
@@ -540,19 +360,7 @@ msgid "Remains to be invoiced in €"
 msgstr "Reste à facturer en €"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_activity_from_sale_form_view
-msgid "Report"
-msgstr "Rapport"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_user_assignment__responsible
-msgid "Responsible"
-msgstr "Responsable"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_crm_activity__order_id
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__crm_stage__of_auto_model_name__sale_order
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_object__sale_order
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sale
 msgid "Sale Order"
 msgstr ""
@@ -571,11 +379,6 @@ msgstr "Bon de commande"
 #: model:ir.model,name:of_sale_crm.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de commande"
-
-#. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_user_assignment__salesman
-msgid "Salesman"
-msgstr "Vendeur"
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
@@ -603,11 +406,6 @@ msgid "Source"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields.selection,name:of_sale_crm.selection__mail_activity_type__of_user_assignment__specific_user
-msgid "Specific user"
-msgstr "Utilisateur spécifique"
-
-#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_crm_lead__of_customer_state
 #: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_customer_state
 #: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_customer_state
@@ -618,11 +416,6 @@ msgstr "État"
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__state
 msgid "Status"
 msgstr "Statut"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_activities_state
-msgid "Status of activities"
-msgstr "Statut des activités"
 
 #. module: of_sale_crm
 #: model:res.groups,comment:of_sale_crm.group_estimatate_sale_order_state
@@ -644,9 +437,10 @@ msgid ""
 "invoice. This field is updated automatically on order confirmation and "
 "invoice validation."
 msgstr ""
-"Champ uniquement utile pour les partenaires clients."
-"Un client est considéré comme prospect tant qu'il n'a ni commande confirmée ni facture validée."
-"Ce champ se met à jour automatiquement sur confirmation de commande et sur validation de facture."
+"Champ uniquement utile pour les partenaires clients.Un client est considéré "
+"comme prospect tant qu'il n'a ni commande confirmée ni facture validée.Ce "
+"champ se met à jour automatiquement sur confirmation de commande et sur "
+"validation de facture."
 
 #. module: of_sale_crm
 #: model:ir.model.fields,help:of_sale_crm.field_sale_order__campaign_id
@@ -654,8 +448,8 @@ msgid ""
 "This is a name that helps you keep track of your different campaign efforts "
 "Ex: Fall_Drive, Christmas_Special"
 msgstr ""
-"C'est un nom qui vous aide à suivre vos différents efforts de campagne. Ex : "
-"Fall_Drive, Christmas_Special"
+"C'est un nom qui vous aide à suivre vos différents efforts de campagne. Ex :"
+" Fall_Drive, Christmas_Special"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,help:of_sale_crm.field_sale_order__medium_id
@@ -677,22 +471,6 @@ msgstr ""
 #: model:ir.model.constraint,message:of_sale_crm.constraint_of_sale_followup_tag_name_uniq
 msgid "This tag name already exists"
 msgstr "Ce nom de balise existe déjà"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_mail_activity_type__of_trigger_type
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_crm_activity__trigger_type
-msgid "Trigger"
-msgstr "Déclencheurs"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_mail_activity_type__of_user_assignment
-msgid "User assignment"
-msgstr "Affectations des utilisateurs"
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_add_attachment_activity_form_view
-msgid "Validate"
-msgstr "Valider"
 
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__3

@@ -1,4 +1,3 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import of_add_attachment_activity
 from . import mail_compose_message

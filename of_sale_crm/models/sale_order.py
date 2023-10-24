@@ -52,18 +52,7 @@ class SaleOrder(models.Model):
     )
     of_sent_quotation = fields.Boolean(string="Quotation sent", copy=False)
     of_canvasser_id = fields.Many2one(comodel_name='res.users', string="Canvasser")
-    of_crm_activity_ids = fields.One2many(
-        comodel_name='of.crm.activity',
-        inverse_name='order_id',
-        string='Activities',
-        copy=True,
-        context={'active_test': False},
-    )
-    of_activities_state = fields.Selection(
-        selection=[('in_progress', 'In progress'), ('late', 'Late'), ('done', 'Done'), ('canceled', 'Canceled')],
-        string='Status of activities',
-        store=True,
-    )
+
     # Follow-up fields
     of_sale_followup_tag_ids = fields.Many2many(
         comodel_name='of.sale.followup.tag',
