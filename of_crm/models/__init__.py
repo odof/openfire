@@ -4,3 +4,5 @@ from . import crm_lead
 from . import crm_stage
 from . import of_crm_stage_auto_update
 from . import res_partner
+from . import mail_activity_type
+from . import mail_activity

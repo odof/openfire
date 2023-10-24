@@ -20,6 +20,7 @@
         'views/crm_lead_views.xml',
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
+        'views/mail_activity_type_views.xml',
     ],
     'installable': True,
     'application': False,
