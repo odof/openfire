@@ -60,7 +60,7 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="of_crm.of_crm_lead_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='opportunity_followup']//field[@name='date_deadline']" position="before">
+            <xpath expr="//group[@name='opportunity_followup']//label[@for='date_deadline']" position="before">
                 <field name="of_date_project"/>
             </xpath>
         </field>
@@ -72,7 +72,7 @@
         <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='contact_name']" position="after">
-                <field name="of_project_line_ids" string="Projet"/>
+                <field name="of_project_line_ids" string="Project"/>
             </xpath>
         </field>
     </record>
