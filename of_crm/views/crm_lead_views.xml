@@ -120,7 +120,7 @@
                 <xpath expr="//group[@name='opportunity_followup']//field[@name='tag_ids']" position="move"/>
             </xpath>
             <xpath expr="//group[@name='opportunity_followup']//field[@name='user_id']" position="after">
-                <field name="of_canvasser_id"/>
+                <field name="of_canvasser_id" widget="many2one_avatar_user"/>
                 <xpath expr="//group[@name='opportunity_partner']//field[@name='lost_reason_id']" position="move"/>
             </xpath>
             <xpath expr="//group[@name='lead_marketing']" position="after">
