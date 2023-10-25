@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_survey_question_answer_view_tree" model="ir.ui.view">
+        <field name="name">of.survey.question.answer.view.tree</field>
+        <field name="model">of.survey.question.answer</field>
+        <field name="arch" type="xml">
+            <tree string="Survey Label" create="false">
+                <field name="sequence" widget="handle"/>
+                <field name="question_id"/>
+                <field name="matrix_question_id"/>
+                <field name="value"/>
+                <field name="answer_score" groups="base.group_no_one"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_survey_question_answer_view_form" model="ir.ui.view">
+        <field name="name">of.survey.question.answer.view.form</field>
+        <field name="model">of.survey.question.answer</field>
+        <field name="arch" type="xml">
+            <form string="Question Answer Form">
+                <sheet>
+                    <field name="question_type" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="scoring_type" invisible="1"/>
+                            <field name="question_id"/>
+                            <field name="is_correct" attrs="{'invisible': [('scoring_type', '=', 'no_scoring')]}"/>
+                            <field name="answer_score" attrs="{'invisible': ['|', ('scoring_type', '=', 'no_scoring'), ('question_type', '=', 'matrix')]}"/>
+                            <field name="value_image"/>
+                        </group>
+                        <group>
+                            <field name="value"/>
+                            <field name="matrix_question_id" attrs="{'invisible': [('question_type', '!=', 'matrix')]}"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_survey_question_answer_view_search" model="ir.ui.view">
+        <field name="name">of.survey.question.answer.view.search</field>
+        <field name="model">of.survey.question.answer</field>
+        <field name="arch" type="xml">
+            <search string="Search Label">
+                <field name="question_id"/>
+                <group expand="1" string="Group By">
+                    <filter name="group_by_question" string="Question" domain="[]" context="{'group_by':'question_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="survey_question_answer_action" model="ir.actions.act_window">
+        <field name="name">Suggested Values</field>
+        <field name="res_model">of.survey.question.answer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_survey_question_answer_view_search"/>
+        <field name="context">{'search_default_group_by_question': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_empty_folder">
+                No survey labels found
+            </p>
+        </field>
+    </record>
+
+</odoo>

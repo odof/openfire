@@ -1,0 +1,304 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+import ast
+
+from odoo import Command, _, api, models
+
+
+class OFSurveyTemplate(models.Model):
+    """This model defines additional actions on the 'of.survey.survey' model that
+    can be used to load a survey sample. The model defines a sample for:
+    (1) A feedback form
+    (2) A certification
+    (3) A live presentation
+    """
+
+    _inherit = 'of.survey.survey'
+
+    @api.model
+    def action_load_sample_feedback_form(self):
+        return (
+            self.env['of.survey.survey']
+            .create(
+                {
+                    'title': _("Feedback Form"),
+                    'description': '<br>'.join(
+                        [
+                            _(
+                                "Please complete this very short survey to let us know how satisfied your are "
+                                "with our products."
+                            ),
+                            _("Your responses will help us improve our product range to serve you even better."),
+                        ]
+                    ),
+                    'description_done': _("Thank you very much for your feedback. We highly value your opinion !"),
+                    'progression_mode': 'number',
+                    'questions_layout': 'page_per_question',
+                    'question_and_page_ids': [
+                        Command.create(
+                            {  # survey.question
+                                'title': _("How frequently do you use our products?"),
+                                'question_type': 'simple_choice',
+                                'constr_mandatory': True,
+                                'suggested_answer_ids': [
+                                    Command.create(
+                                        {'value': _("Often (1-3 times per week)")}
+                                    ),  # survey.question.answer
+                                    Command.create(
+                                        {'value': _("Rarely (1-3 times per month)")}
+                                    ),  # survey.question.answer
+                                    Command.create(
+                                        {'value': _("Never (less than once a month)")}
+                                    ),  # survey.question.answer
+                                ],
+                            }
+                        ),
+                        Command.create(
+                            {  # survey.question
+                                'title': _("How many orders did you pass during the last 6 months?"),
+                                'question_type': 'numerical_box',
+                            }
+                        ),
+                        Command.create(
+                            {  # survey.question
+                                'title': _('How likely are you to recommend the following products to a friend?'),
+                                'question_type': 'matrix',
+                                'matrix_subtype': 'simple',
+                                'suggested_answer_ids': [
+                                    Command.create({'value': _("Unlikely")}),  # survey.question.answer
+                                    Command.create({'value': _("Neutral")}),  # survey.question.answer
+                                    Command.create({'value': _("Likely")}),  # survey.question.answer
+                                ],
+                                'matrix_row_ids': [
+                                    Command.create({'value': _("Red Pen")}),  # survey.question.answer
+                                    Command.create({'value': _("Blue Pen")}),  # survey.question.answer
+                                    Command.create({'value': _("Yellow Pen")}),  # survey.question.answer
+                                ],
+                            }
+                        ),
+                    ],
+                }
+            )
+            .action_show_sample()
+        )
+
+    @api.model
+    def action_load_sample_certification(self):
+        survey_values = {
+            'title': _("Certification"),
+            'certification': True,
+            'access_mode': 'token',
+            'is_time_limited': True,
+            'time_limit': 15,  # 15 minutes
+            'is_attempts_limited': True,
+            'attempts_limit': 1,
+            'progression_mode': 'number',
+            'scoring_type': 'scoring_without_answers',
+            'users_can_go_back': True,
+            'description': ''.join(
+                [
+                    _("Welcome to this Odoo certification. You will receive 2 random questions out of a pool of 3."),
+                    '(<span style="font-style: italic">',
+                    _("Cheating on your neighbors will not help!"),
+                    '</span> 😁).<br>',
+                    _("Good luck!"),
+                ]
+            ),
+            'description_done': _("Thank you. We will contact you soon."),
+            'questions_layout': 'page_per_section',
+            'questions_selection': 'random',
+            'question_and_page_ids': [
+                Command.create(
+                    {  # survey.question
+                        'title': _("Odoo Certification"),
+                        'is_page': True,
+                        'question_type': False,
+                        'random_questions_count': 2,
+                    },
+                ),
+                Command.create(
+                    {  # survey.question
+                        'title': _("What does \"ODOO\" stand for?"),
+                        'question_type': 'simple_choice',
+                        'suggested_answer_ids': [
+                            Command.create(
+                                {'value': _("It\'s a Belgian word for \"Management\"")}  # survey.question.answer
+                            ),  # survey.question.answer
+                            Command.create({'value': _("Object-Directed Open Organization")}),  # survey.question.answer
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("Organizational Development for Operation Officers")
+                                }
+                            ),
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("It does not mean anything specific"),
+                                    'is_correct': True,
+                                    'answer_score': 10,
+                                }
+                            ),
+                        ],
+                    }
+                ),
+                Command.create(
+                    {  # survey.question
+                        'title': _("On Survey questions, one can define \"placeholders\". But what are they for?"),
+                        'question_type': 'simple_choice',
+                        'suggested_answer_ids': [
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("They are a default answer, used if the participant skips the question")
+                                }
+                            ),
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("It is a small bit of text, displayed to help participants answer"),
+                                    'is_correct': True,
+                                    'answer_score': 10,
+                                }
+                            ),
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _(
+                                        "They are technical parameters that guarantees the responsiveness of the page"
+                                    )
+                                }
+                            ),
+                        ],
+                    }
+                ),
+                Command.create(
+                    {  # survey.question
+                        'title': _("What does one need to get to pass an Odoo Survey?"),
+                        'question_type': 'simple_choice',
+                        'suggested_answer_ids': [
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("It is an option that can be different for each Survey"),
+                                    'is_correct': True,
+                                    'answer_score': 10,
+                                }
+                            ),
+                            Command.create(
+                                {'value': _("One needs to get 50% of the total score")}  # survey.question.answer
+                            ),
+                            Command.create(
+                                {  # survey.question.answer
+                                    'value': _("One needs to answer at least half the questions correctly")
+                                }
+                            ),
+                        ],
+                    }
+                ),
+            ],
+        }
+        if mail_template := self.env.ref('of_survey.mail_template_certification', raise_if_not_found=False):
+            survey_values['certification_mail_template_id'] = mail_template.id
+        return self.env['of.survey.survey'].create(survey_values).action_show_sample()
+
+    @api.model
+    def action_load_sample_live_presentation(self):
+        return (
+            self.env['of.survey.survey']
+            .create(
+                {
+                    'title': _('Live Presentation'),
+                    'description': '<br>'.join(
+                        [
+                            _('How good of a presenter are you? Let\'s find out!'),
+                            _('But first, keep listening to the host.'),
+                        ]
+                    ),
+                    'description_done': _('Thank you for your participation, hope you had a blast!'),
+                    'progression_mode': 'number',
+                    'scoring_type': 'scoring_with_answers',
+                    'questions_layout': 'page_per_question',
+                    'session_speed_rating': True,
+                    'question_and_page_ids': [
+                        Command.create(
+                            {  # survey.question
+                                'title': _("What is the best way to catch the attention of an audience?"),
+                                'question_type': 'simple_choice',
+                                'suggested_answer_ids': [
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("Speak softly so that they need to focus to hear you")
+                                        }
+                                    ),
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("Use a fun visual support, like a live presentation"),
+                                            'is_correct': True,
+                                            'answer_score': 20,
+                                        }
+                                    ),
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("Show them slides with a ton of text they need to read fast")
+                                        }
+                                    ),
+                                ],
+                            }
+                        ),
+                        Command.create(
+                            {  # survey.question
+                                'title': _("What is a frequent mistake public speakers do?"),
+                                'question_type': 'simple_choice',
+                                'suggested_answer_ids': [
+                                    Command.create(
+                                        {'value': _("Practice in front of a mirror")}  # survey.question.answer
+                                    ),
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("Speak too fast"),
+                                            'is_correct': True,
+                                            'answer_score': 20,
+                                        }
+                                    ),
+                                    Command.create({'value': _("Use humor and make jokes")}),  # survey.question.answer
+                                ],
+                            }
+                        ),
+                        Command.create(
+                            {  # survey.question
+                                'title': _(
+                                    "Why should you consider making your presentation more fun with a small quiz?"
+                                ),
+                                'question_type': 'multiple_choice',
+                                'suggested_answer_ids': [
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("It helps attendees focus on what you are saying"),
+                                            'is_correct': True,
+                                            'answer_score': 20,
+                                        }
+                                    ),
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("It is more engaging for your audience"),
+                                            'is_correct': True,
+                                            'answer_score': 20,
+                                        }
+                                    ),
+                                    Command.create(
+                                        {  # survey.question.answer
+                                            'value': _("It helps attendees remember the content of your presentation"),
+                                            'is_correct': True,
+                                            'answer_score': 20,
+                                        }
+                                    ),
+                                ],
+                            }
+                        ),
+                    ],
+                }
+            )
+            .action_show_sample()
+        )
+
+    def action_show_sample(self):
+        action = self.env['ir.actions.act_window']._for_xml_id('of_survey.of_action_survey_form')
+        action['views'] = [[self.env.ref('of_survey.of_survey_survey_view_form').id, 'form']]
+        action['res_id'] = self.id
+        action['context'] = dict(ast.literal_eval(action.get('context', {})), create=False)
+        return action

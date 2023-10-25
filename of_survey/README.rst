@@ -2,8 +2,7 @@
 OF Survey
 ==============
 
-Module de customisation de l'application Odoo pour la gestion des questionnaires.
-
+Duplication de l'application survey d'odoo
 
 Fonctionnalités
 ################
@@ -17,7 +16,11 @@ Questionnaires
 
 * Ajout d'un menu "Questionnaires" dans le menu "CRM > Configuration" pour la gestion des questionnaires
 
-* Modification de la vue liste des questionnaires pour afficher le type de questionnaire et le caractère actif/inactif
+* Modification de la vue liste des questionnaires pour afficher le type de questionnaire et le caractère actif/inactif 
+
+* Garder seulement les vues list et form et supprimer les autres pour le model of.survey.survey
+
+* Ajout de 'of' aux noms des fichiers et aux ids des vues ,le reste c'est identique au module survey d'odoo
 
 
 Droits utilisateurs
