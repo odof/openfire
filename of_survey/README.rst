@@ -2,8 +2,7 @@
 OF Survey
 ==============
 
-Module de customisation de l'application Odoo pour la gestion des questionnaires.
-
+Duplication de l'application survey d'odoo
 
 Fonctionnalités
 ################
