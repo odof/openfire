@@ -25,6 +25,7 @@
             <form>
                 <field name="load_attachment" invisible="1"/>
                 <field name="uploaded_attachment_id" invisible="1"/>
+                <field name="active" invisible="1"/>
                 <header>
                     <button name="action_button_add_attachment" icon="fa-upload" type="object" string="Add attachment"  attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
                     <button name="action_button_plan" string="Plan" type="object" states="cancelled,done"/>
@@ -74,7 +75,7 @@
     <record id="of_sale_crm_of_crm_activity_sale_tree_view" model="ir.ui.view">
         <field name="name">of.sale.crm.of.crm.activity.sale.tree.view</field>
         <field name="model">of.crm.activity</field>
-        <field name="inherit_id" ref="of_crm.of_crm_activity_sale_tree_view"/>
+        <field name="inherit_id" ref="of_crm.of_crm_activity_tree_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='uploaded_attachment_id']" position="after">
                 <field name="order_id"/>
@@ -85,7 +86,7 @@
     <record id="of_sale_crm_of_crm_activity_search_view" model="ir.ui.view">
         <field name="name">of.sale.crm.of.crm.activity.search.view</field>
         <field name="model">of.crm.activity</field>
-        <field name="inherit_id" ref="of_crm.of_crm_activity_sale_tree_view"/>
+        <field name="inherit_id" ref="of_crm.of_crm_activity_search_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='opportunity_id']" position="after">
                 <field name="order_id"/>
@@ -100,8 +101,8 @@
         <field name="name">Activities</field>
         <field name="res_model">of.crm.activity</field>
         <field name="view_mode">tree,form,calendar</field>
-        <field name="view_id" ref="of_crm_activity_sale_tree_view"/>
-        <field name="search_view_id" ref="of_crm_activity_search_view"/>
+        <field name="view_id" ref="of_sale_crm_of_crm_activity_sale_tree_view"/>
+        <field name="search_view_id" ref="of_sale_crm_of_crm_activity_search_view"/>
         <field name="context">{'default_origin': 'sale_order', 'search_default_sale_activities': 1, 'active_test': False}</field>
     </record>
 

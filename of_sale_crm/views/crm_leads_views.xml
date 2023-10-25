@@ -13,26 +13,13 @@
             </xpath>
 
             <!-- Kanban footer-->
-            <xpath expr="//kanban//templates//div[@class='o_kanban_footer']//field[@name='activity_ids']" position="after">
-                <div class="label label-success" attrs="{'invisible': [('of_customer_state', '!=', 'lead')]}">Prospect</div>
-                <div class="label label-info" attrs="{'invisible': [('of_customer_state', '!=', 'customer')]}">Customer</div>
+            <xpath expr="//div[hasclass('oe_kanban_bottom_left')]" position="after">
+                <div t-if="record.of_customer_state.raw_value == 'lead'" class="text-success">Prospect</div>
+                <div t-if="record.of_customer_state.raw_value == 'customer'" class="text-success">Customer</div>
             </xpath>
 
         </field>
     </record>
 
-    <record id="of_sale_crm_lead_view_form" model="ir.ui.view">
-        <field name="name">of.sale.crm.lead.form</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="of_crm.of_crm_lead_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//group[@name='lead_marketing']" position="after">
-                <group string="Geolocation" name="lead_geolocation" invisible="1">
-                    <field name="geo_lat"/>
-                    <field name="geo_lng"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
 
 </odoo>

@@ -1,13 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import models
 
 
 class MailComposeMessage(models.TransientModel):
-    # todo: À adapter au nouveau système des custom documents OpenFire. mail.compose.message n'existe plus.
     _inherit = 'mail.compose.message'
 
-    @api.multi
     def send_mail(self, auto_commit=False):
         if (
             self._context.get('default_model') == 'sale.order'
