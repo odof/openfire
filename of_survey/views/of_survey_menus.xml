@@ -2,7 +2,7 @@
 <odoo>
 
   <!-- Main menu -->
-  <menuitem name="OpenFire Surveys" id="menu_of_surveys" sequence="130" groups="group_survey_user" web_icon="of_survey,static/description/icon.svg"/>
+  <menuitem name="OpenFire Surveys" id="menu_of_surveys" sequence="130" groups="group_of_survey_user" web_icon="of_survey,static/description/icon.svg"/>
 
   <!-- Parent menus -->
   <menuitem name="Questions &amp; Answers" id="of_survey_menu_questions" parent="menu_of_surveys" sequence="90"/>

@@ -714,7 +714,7 @@ class OFSurvey(http.Controller):
         website=True,
     )
     def survey_get_certification_preview(self, survey, **kwargs):
-        if not request.env.user.has_group('of_survey.group_survey_user'):
+        if not request.env.user.has_group('of_survey.group_of_survey_user'):
             raise werkzeug.exceptions.Forbidden()
 
         fake_user_input = survey._create_answer(user=request.env.user, test_entry=True)

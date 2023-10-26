@@ -7,7 +7,7 @@
         </record>
 
         <!-- Survey users -->
-        <record model="res.groups" id="group_survey_user">
+        <record model="res.groups" id="group_of_survey_user">
             <field name="name">User</field>
             <field name="category_id" ref="base.module_category_marketing_surveys"/>
         </record>
@@ -16,7 +16,7 @@
         <record model="res.groups" id="group_survey_manager">
             <field name="name">Administrator</field>
             <field name="category_id" ref="base.module_category_marketing_surveys"/>
-            <field name="implied_ids" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
@@ -39,7 +39,7 @@
             <field name="name">Survey: officer: read all</field>
             <field name="model_id" ref="of_survey.model_of_survey_survey"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="0"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_read" eval="1"/>
@@ -49,7 +49,7 @@
             <field name="name">Survey: officer: create/write/unlink own only</field>
             <field name="model_id" ref="of_survey.model_of_survey_survey"/>
             <field name="domain_force">[('create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_read" eval="0"/>
@@ -70,7 +70,7 @@
             <field name="name">Survey question: officer: read all</field>
             <field name="model_id" ref="of_survey.model_of_survey_question"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="0"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_read" eval="1"/>
@@ -80,7 +80,7 @@
             <field name="name">Survey question: officer: create/write/unlink linked to own survey only</field>
             <field name="model_id" ref="of_survey.model_of_survey_question"/>
             <field name="domain_force">[('survey_id.create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_read" eval="0"/>
@@ -101,7 +101,7 @@
             <field name="name">Survey question answer: officer: read all</field>
             <field name="model_id" ref="of_survey.model_of_survey_question_answer"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="0"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_read" eval="1"/>
@@ -111,7 +111,7 @@
             <field name="name">Survey question answer: officer: create/write/unlink linked to own survey only</field>
             <field name="model_id" ref="of_survey.model_of_survey_question_answer"/>
             <field name="domain_force">['|', ('question_id.survey_id.create_uid', '=', user.id), ('matrix_question_id.survey_id.create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_read" eval="0"/>
@@ -133,7 +133,7 @@
             <field name="name">Survey user input: officer: read all</field>
             <field name="model_id" ref="of_survey.model_of_survey_user_input"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="0"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_read" eval="1"/>
@@ -143,7 +143,7 @@
             <field name="name">Survey user input: officer: create/write/unlink linked to own survey only</field>
             <field name="model_id" ref="of_survey.model_of_survey_user_input"/>
             <field name="domain_force">[('survey_id.create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_read" eval="0"/>
@@ -164,7 +164,7 @@
             <field name="name">Survey user input line: officer: read all</field>
             <field name="model_id" ref="of_survey.model_of_survey_user_input_line"/>
             <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="0"/>
             <field name="perm_write" eval="0"/>
             <field name="perm_read" eval="1"/>
@@ -174,7 +174,7 @@
             <field name="name">Survey user input line: officer: create/write/unlink linked to own survey only</field>
             <field name="model_id" ref="of_survey.model_of_survey_user_input_line"/>
             <field name="domain_force">[('user_input_id.survey_id.create_uid', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_survey_user'))]"/>
+            <field name="groups" eval="[(4, ref('group_of_survey_user'))]"/>
             <field name="perm_unlink" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_read" eval="0"/>

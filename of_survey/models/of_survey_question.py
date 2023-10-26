@@ -182,7 +182,7 @@ class OFSurveyQuestion(models.Model):
         inverse_name='question_id',
         string="Answers",
         domain=[('skipped', '=', False)],
-        groups='of_survey.group_survey_user',
+        groups='of_survey.group_of_survey_user',
     )
 
     # Conditional display

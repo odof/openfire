@@ -27,7 +27,7 @@ class OFUserInputSession(http.Controller):
             return None, {'error': 'survey_wrong'}
         if survey.session_state in ['ready', 'in_progress']:
             return survey, None
-        if request.env.user.has_group("of_survey.group_survey_user"):
+        if request.env.user.has_group("of_survey.group_of_survey_user"):
             return None, {'error': 'survey_session_not_launched', 'survey_id': survey.id}
         return None, {'error': 'survey_session_not_launched'}
 

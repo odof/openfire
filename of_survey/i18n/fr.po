@@ -85,7 +85,8 @@ msgid ""
 "        <tbody>\n"
 "            <tr><td>\n"
 "                <!-- We use the logo of the company that created the survey (to handle multi company cases) -->\n"
-"                <a href=\"/\"><img t-attf-src=\"/logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" style=\"vertical-align:baseline;max-width:100px;\"></a>\n"
+"                <a href=\"/\"><img t-attf-src=\"/logo.png?company={{ object.survey_id.create_uid.company_id.id }}\" style=\"vertical-align:"
+"baseline;max-width:100px;\"></a>\n"
 "            </td><td style=\"text-align:right;vertical-align:middle;\">\n"
 "                    Certification: <t t-out=\"object.survey_id.display_name or ''\">Feedback Form</t>\n"
 "            </td></tr>\n"
@@ -121,7 +122,8 @@ msgid ""
 "            We are conducting a survey and your response would be appreciated.\n"
 "        </t>\n"
 "        <div style=\"margin: 16px 0px 16px 0px;\">\n"
-"            <a t-att-href=\"(object.get_start_url())\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;\">\n"
+"            <a t-att-href=\"(object.get_start_url())\" style=\"background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; "
+"color: #fff; border-radius: 5px; font-size:13px;\">\n"
 "                <t t-if=\"object.survey_id.certification\">\n"
 "                    Start Certification\n"
 "                </t>\n"
@@ -278,12 +280,8 @@ msgstr "<span class=\"fa fa-filter me-1\"/>Filtres"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
-msgid ""
-"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
-"tooltip\"> or press Enter</span>"
-msgstr ""
-"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
-"tooltip\">ou appuyer sur Enter</span>"
+msgid "<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-tooltip\"> or press Enter</span>"
+msgstr "<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-tooltip\">ou appuyer sur Enter</span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
@@ -323,23 +321,17 @@ msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_start
-msgid ""
-"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">or"
-" press Enter</span>"
-msgstr ""
-"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">ou"
-" appuyer sur Enter</span>"
+msgid "<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">or press Enter</span>"
+msgstr "<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">ou appuyer sur Enter</span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_selection_key
 msgid ""
-"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
-"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
-"position-relative\">Key</span></span>"
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-start py-0 ps-2\"><span class=\"text-primary text-center text-center "
+"w-100 position-relative\">Key</span></span>"
 msgstr ""
-"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
-"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
-"position-relative\">Clé</span></span>"
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-start py-0 ps-2\"><span class=\"text-primary text-center text-center "
+"w-100 position-relative\">Clé</span></span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -473,12 +465,8 @@ msgstr ""
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question_answer__answer_score
-msgid ""
-"A positive score indicates a correct choice; a negative or null score "
-"indicates a wrong answer"
-msgstr ""
-"Une note positive indique une bonne réponse, une note négative ou nulle "
-"indique une mauvaise réponse"
+msgid "A positive score indicates a correct choice; a negative or null score indicates a wrong answer"
+msgstr "Une note positive indique une bonne réponse, une note négative ou nulle indique une mauvaise réponse"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
@@ -549,8 +537,7 @@ msgid ""
 "Add a list of email recipients (separated by commas, semicolons or line "
 "breaks). They will not be converted into contacts."
 msgstr ""
-"Ajoutez une liste de destinataires d'emails (séparés par des virgules, des "
-"points-virgules ou des sauts de ligne). Ils ne seront pas convertis en "
+"Ajoutez une liste de destinataires d'emails (séparés par des virgules, des points-virgules ou des sauts de ligne). Ils ne seront pas convertis en "
 "contacts."
 
 #. module: of_survey
@@ -579,7 +566,7 @@ msgid "Additional emails"
 msgstr "Emails supplémentaires"
 
 #. module: of_survey
-#: model:res.groups,name:of_survey.group_survey_manager
+#: model:res.groups,name:of_survey.group_of_survey_manager
 msgid "Administrator"
 msgstr "Administrateur"
 
@@ -659,7 +646,7 @@ msgstr "Nombre de réponses"
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__access_mode__public
 msgid "Anyone with the link"
-msgstr ""
+msgstr "Toute personne avec le lien"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_gamification_challenge__challenge_category
@@ -670,7 +657,7 @@ msgstr "Apparaît sur"
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_attachment_count
@@ -756,7 +743,7 @@ msgstr "Note moyenne (%)"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Back Button"
-msgstr ""
+msgstr "Bouton de retour"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__background_image
@@ -926,7 +913,7 @@ msgstr "Fermer"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Close Live Session"
-msgstr ""
+msgstr "Fermer la Session Live"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__color
@@ -1008,8 +995,7 @@ msgid "Constraints"
 msgstr "Contraintes"
 
 #. module: of_survey
-#: model:ir.model,name:of_survey.model_res_partner
-#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__partner_id
+#: model:ir.model,name:of_survey.model_res_partner model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__partner_id
 msgid "Contact"
 msgstr ""
 
@@ -1090,7 +1076,7 @@ msgstr "Réponse numérique correcte"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Create Live Session"
-msgstr ""
+msgstr "Créer une session en direct"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_invite__create_uid
@@ -1141,7 +1127,6 @@ msgstr ""
 
 #. module: of_survey
 #. odoo-python
-#: code:addons/of_survey/models/of_survey_survey.py:0
 #: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
 msgid ""
@@ -1247,6 +1232,11 @@ msgstr "Réponses détaillées"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__display_name
 msgid "Display Name"
 msgstr "Nom d'affichage"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_survey_view_kanban
+msgid "Dropdown menu"
+msgstr "Menu déroulant"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__progression_mode
@@ -1356,7 +1346,7 @@ msgstr "Icône Font Awesome par ex. fa-tasks"
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__text_box
 msgid "Free Text"
-msgstr ""
+msgstr "Texte libre"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_text_box
@@ -1381,7 +1371,7 @@ msgstr "Défi de ludification"
 #. module: of_survey
 #: model_terms:ir.actions.act_window,help:of_survey.of_action_survey_form
 msgid "Gather feedbacks from your employees and customers"
-msgstr ""
+msgstr "Recueillez les avis de vos employés et clients"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__certification_give_badge
@@ -1418,7 +1408,7 @@ msgstr "Gérer l'existant"
 #. module: of_survey
 #: model_terms:ir.actions.act_window,help:of_survey.of_action_survey_form
 msgid "Handle quiz &amp; certifications"
-msgstr ""
+msgstr "Gérez les quiz et les certifications"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__has_message
@@ -1519,18 +1509,13 @@ msgstr "Si coché, certains messages ont une erreur de livraison."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_email
-msgid ""
-"If checked, this option will save the user's answer as its email address."
-msgstr ""
-"Si cochée, cette option enregistrera la réponse de l'utilisateur sous son "
-"adresse email."
+msgid "If checked, this option will save the user's answer as its email address."
+msgstr "Si cochée, cette option enregistrera la réponse de l'utilisateur sous son adresse email."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_nickname
 msgid "If checked, this option will save the user's answer as its nickname."
-msgstr ""
-"Si coché, cette option enregistrera la réponse de l'utilisateur sous son "
-"surnom."
+msgstr "Si coché, cette option enregistrera la réponse de l'utilisateur sous son surnom."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__is_conditional
@@ -1549,11 +1534,8 @@ msgstr "Si coché, les utilisateurs peuvent revenir aux pages précédentes."
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_invite__survey_users_login_required
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_login_required
-msgid ""
-"If checked, users have to login before answering even with a valid token."
-msgstr ""
-"Si coché, les utilisateurs doivent se connecter avant de répondre, même avec"
-" un jeton valide."
+msgid "If checked, users have to login before answering even with a valid token."
+msgstr "Si coché, les utilisateurs doivent se connecter avant de répondre, même avec un jeton valide."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -1563,18 +1545,12 @@ msgstr "Si autre, veuillez préciser :"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__questions_selection
-msgid ""
-"If randomized is selected, add the number of random questions next to the "
-"section."
-msgstr ""
-"Si aléatoire est sélectionné, ajoutez le nombre de questions aléatoires à "
-"côté de la section."
+msgid "If randomized is selected, add the number of random questions next to the section."
+msgstr "Si aléatoire est sélectionné, ajoutez le nombre de questions aléatoires à côté de la section."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__questions_selection
-msgid ""
-"If randomized is selected, you can configure the number of random questions "
-"by section. This mode is ignored in live session."
+msgid "If randomized is selected, you can configure the number of random questions by section. This mode is ignored in live session."
 msgstr ""
 "Si aléatoire est sélectionné, vous pouvez configurer le nombre de questions "
 "aléatoires par section. Ce mode est ignoré dans la session en direct."
@@ -1610,15 +1586,10 @@ msgstr "En cours"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__is_scored_question
-msgid ""
-"Include this question as part of quiz scoring. Requires an answer and answer"
-" score to be taken into account."
-msgstr ""
-"Inclure cette question dans le cadre de la notation du quiz. Nécessite une "
-"réponse et une note de réponse pour être pris en compte."
+msgid "Include this question as part of quiz scoring. Requires an answer and answer score to be taken into account."
+msgstr "Inclure cette question dans le cadre de la notation du quiz. Nécessite une réponse et une note de réponse pour être pris en compte."
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/static/src/js/survey_result.js:0
@@ -1703,16 +1674,14 @@ msgstr "Cela aide les participants à se concentrer sur ce que vous dites"
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "It helps attendees remember the content of your presentation"
-msgstr ""
-"Cela aide les participants à se souvenir du contenu de votre présentation"
+msgstr "Cela aide les participants à se souvenir du contenu de votre présentation"
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "It is a small bit of text, displayed to help participants answer"
-msgstr ""
-"Il s'agit d'un petit texte affiché pour aider les participants à répondre"
+msgstr "Il s'agit d'un petit texte affiché pour aider les participants à répondre"
 
 #. module: of_survey
 #. odoo-python
@@ -1752,12 +1721,8 @@ msgstr "Étiquettes utilisées pour les choix proposés : rangées de matrice"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__suggested_answer_ids
-msgid ""
-"Labels used for proposed choices: simple choice, multiple choice and columns"
-" of matrix"
-msgstr ""
-"Étiquettes utilisées pour les choix proposés : choix simple, choix multiple "
-"et colonnes de matrice"
+msgid "Labels used for proposed choices: simple choice, multiple choice and columns of matrix"
+msgstr "Étiquettes utilisées pour les choix proposés : choix simple, choix multiple et colonnes de matrice"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_invite__lang
@@ -1813,6 +1778,11 @@ msgstr "Lancer la session"
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "Layout"
 msgstr "Agencement"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__of_crm_lead_id
+msgid "Lead"
+msgstr "Piste"
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__lead_opportunity
@@ -1882,7 +1852,7 @@ msgstr "Présentation en direct"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Live Session"
-msgstr ""
+msgstr "Session en direct"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -2363,15 +2333,11 @@ msgstr "Questionnaires"
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_invite__lang
 msgid ""
-"Optional translation language (ISO code) to select when sending out an "
-"email. If not set, the english version will be used. This should usually be "
-"a placeholder expression that provides the appropriate language, e.g. {{ "
-"object.partner_id.lang }}."
+"Optional translation language (ISO code) to select when sending out an email. If not set, the english version will be used. This should usually "
+"be a placeholder expression that provides the appropriate language, e.g. {{ object.partner_id.lang }}."
 msgstr ""
-"Langue de traduction facultative (code ISO) à sélectionner lors de l'envoi "
-"d'un email. S'il n'est pas défini, la version anglaise sera utilisée. Il "
-"doit généralement s'agir d'une expression d'espace réservé qui fournit le "
-"langage approprié, par ex. {{ object.partner_id.lang }}."
+"Langue de traduction facultative (code ISO) à sélectionner lors de l'envoi d'un email. S'il n'est pas défini, la version anglaise sera utilisée. "
+"Il doit généralement s'agir d'une expression d'espace réservé qui fournit le langage approprié, par ex. {{ object.partner_id.lang }}."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -2434,7 +2400,6 @@ msgid "Partial"
 msgstr "Partiel"
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/static/src/js/survey_result.js:0
@@ -2507,7 +2472,7 @@ msgstr "Performances par section"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Pick a Badge..."
-msgstr ""
+msgstr "Choisir un badge..."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
@@ -2517,7 +2482,7 @@ msgstr ""
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Pick a Template..."
-msgstr ""
+msgstr "Choisir un modèle..."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_question_result_choice
@@ -2572,7 +2537,7 @@ msgstr "Questions prédéfinies"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Preview"
-msgstr ""
+msgstr "Aperçu"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
@@ -2632,11 +2597,8 @@ msgstr "Type de question"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__triggering_question_id
-msgid ""
-"Question containing the triggering answer to display the current question."
-msgstr ""
-"Question contenant la réponse de déclenchement pour afficher la question en "
-"cours."
+msgid "Question containing the triggering answer to display the current question."
+msgstr "Question contenant la réponse de déclenchement pour afficher la question en cours."
 
 #. module: of_survey
 #. odoo-python
@@ -2664,7 +2626,7 @@ msgstr ""
 #. module: of_survey
 #: model:ir.ui.menu,name:of_survey.of_survey_menu_questions
 msgid "Questions & Answers"
-msgstr ""
+msgstr "Questions & Réponses"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__scoring_success
@@ -2734,6 +2696,11 @@ msgid "Reopen"
 msgstr ""
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.crm_lead_view_form
+msgid "Reply"
+msgstr "Répondre"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_invite__survey_users_login_required
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_login_required
 msgid "Require Login"
@@ -2757,7 +2724,7 @@ msgstr "Renvoyer l'invitation"
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_invite__existing_mode__resend
 msgid "Resend invite"
-msgstr ""
+msgstr "Renvoyer l’invitation"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_page_statistics_question
@@ -2907,7 +2874,7 @@ msgstr "Sections et Questions"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "See results"
-msgstr ""
+msgstr "Voir les résultats"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_invite_view_form
@@ -2975,16 +2942,14 @@ msgstr "Afficher le tableau de classement de la session"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Show all records which has next action date is before today"
-msgstr ""
+msgstr "Montrez tous les enregistrements pour lesquels la date des prochaines actions est pour aujourd'hui ou avant"
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "Show them slides with a ton of text they need to read fast"
-msgstr ""
-"Montrez-leur des diapositives avec une tonne de texte qu'ils doivent lire "
-"rapidement"
+msgstr "Montrez-leur des diapositives avec une tonne de texte qu'ils doivent lire rapidement"
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__char_box
@@ -3024,9 +2989,7 @@ msgstr "Désolé, vous n'avez pas été assez rapide."
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "Speak softly so that they need to focus to hear you"
-msgstr ""
-"Parlez doucement afin qu'ils aient besoin de se concentrer pour vous "
-"entendre"
+msgstr "Parlez doucement afin qu'ils aient besoin de se concentrer pour vous entendre"
 
 #. module: of_survey
 #. odoo-python
@@ -3121,6 +3084,11 @@ msgid "Suggestion"
 msgstr ""
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_crm_lead__of_survey_user_input_line
+msgid "Surver User Input Line"
+msgstr ""
+
+#. module: of_survey
 #: model:ir.model,name:of_survey.model_of_survey_survey
 #: model:ir.model.fields,field_description:of_survey.field_gamification_badge__of_survey_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_invite__survey_id
@@ -3159,6 +3127,16 @@ msgstr ""
 
 #. module: of_survey
 #: model:mail.template,name:of_survey.of_mail_template_user_input_invite
+msgid "Survey OpenFire: Invite"
+msgstr ""
+
+#. module: of_survey
+#: model:mail.template,name:of_survey.mail_template_certification_of
+msgid "Survey OpenFire: Certification Success"
+msgstr ""
+
+#. module: of_survey
+#: model:mail.template,name:of_survey.mail_template_user_input_invite_of
 msgid "Survey OpenFire: Invite"
 msgstr ""
 
@@ -3213,8 +3191,7 @@ msgid "Survey User Input Line"
 msgstr ""
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
-#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_tree
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_tree
 msgid "Survey User inputs"
 msgstr "Entrées utilisateur du Questionnaire"
 
@@ -3228,6 +3205,11 @@ msgstr "Questionnaires"
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_button_retake
 msgid "Take Again"
 msgstr "Refaire"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_done
+msgid "Terminer"
+msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
@@ -3260,17 +3242,14 @@ msgstr "Réponse texte"
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "Thank you for your participation, hope you had a blast!"
-msgstr ""
-"Merci pour votre participation, j'espère que vous vous êtes bien amusé !"
+msgstr "Merci pour votre participation, j'espère que vous vous êtes bien amusé !"
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "Thank you very much for your feedback. We highly value your opinion !"
-msgstr ""
-"Merci beaucoup pour vos commentaires. Nous apprécions grandement votre avis "
-"!"
+msgstr "Merci beaucoup pour vos commentaires. Nous apprécions grandement votre avis !"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -3330,23 +3309,20 @@ msgstr "La question actuelle du Questionnaire."
 #: code:addons/of_survey/static/src/js/survey_form.js:0
 #, python-format
 msgid "The date you selected is greater than the maximum date: "
-msgstr ""
-"La date que vous avez sélectionnée est supérieure à la date maximale :"
+msgstr "La date que vous avez sélectionnée est supérieure à la date maximale :"
 
 #. module: of_survey
 #. odoo-javascript
 #: code:addons/of_survey/static/src/js/survey_form.js:0
 #, python-format
 msgid "The date you selected is lower than the minimum date: "
-msgstr ""
-"La date que vous avez sélectionnée est inférieure à la date minimale :"
+msgstr "La date que vous avez sélectionnée est inférieure à la date minimale :"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__description
 msgid ""
-"The description will be displayed on the home page of the survey. You can "
-"use this to give the purpose and guidelines to your candidates before they "
-"start it."
+"The description will be displayed on the home page of the survey. You can use this to give the purpose and guidelines to your candidates before "
+"they start it."
 msgstr ""
 "La description sera affichée sur la page d'accueil du Questionnaire. Vous "
 "pouvez l'utiliser pour donner le but et les directives à vos candidats avant"
@@ -3370,9 +3346,7 @@ msgstr "Les emails suivants ont déjà reçu une invitation"
 #. odoo-python
 #: code:addons/of_survey/wizard/of_survey_invite.py:0
 #, python-format
-msgid ""
-"The following recipients have no user account: %s. You should create user "
-"accounts for them or allow external signup in configuration."
+msgid "The following recipients have no user account: %s. You should create user accounts for them or allow external signup in configuration."
 msgstr ""
 "Les destinataires suivants n'ont pas de compte utilisateur : %s.  Vous devez"
 " leur créer des comptes d'utilisateurs ou autoriser l'inscription externe "
@@ -3417,12 +3391,8 @@ msgstr "Le Questionnaire est limité dans le temps"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_start_time
-msgid ""
-"The time at which the current question has started, used to handle the timer"
-" for attendees."
-msgstr ""
-"L'heure à laquelle la question en cours a commencé, utilisée pour gérer le "
-"minuteur des participants."
+msgid "The time at which the current question has started, used to handle the timer for attendees."
+msgstr "L'heure à laquelle la question en cours a commencé, utilisée pour gérer le minuteur des participants."
 
 #. module: of_survey
 #: model:ir.model.constraint,message:of_survey.constraint_of_survey_survey_time_limit_check
@@ -3447,18 +3417,14 @@ msgstr "Une erreur s'est produite lors de la validation du Questionnaire."
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
 msgid "They are a default answer, used if the participant skips the question"
-msgstr ""
-"Il s'agit d'une réponse par défaut, utilisée si le participant saute la "
-"question"
+msgstr "Il s'agit d'une réponse par défaut, utilisée si le participant saute la question"
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
-msgid ""
-"They are technical parameters that guarantees the responsiveness of the page"
-msgstr ""
-"Ce sont des paramètres techniques qui garantissent la réactivité de la page"
+msgid "They are technical parameters that guarantees the responsiveness of the page"
+msgstr "Ce sont des paramètres techniques qui garantissent la réactivité de la page"
 
 #. module: of_survey
 #. odoo-python
@@ -3488,12 +3454,8 @@ msgstr ""
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_code
-msgid ""
-"This code will be used by your attendees to reach your session. Feel free to"
-" customize it however you like!"
-msgstr ""
-"Ce code sera utilisé par vos participants pour accéder à votre session. "
-"N'hésitez pas à le personnaliser comme bon vous semble !"
+msgid "This code will be used by your attendees to reach your session. Feel free to customize it however you like!"
+msgstr "Ce code sera utilisé par vos participants pour accéder à votre session. N'hésitez pas à le personnaliser comme bon vous semble !"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_button_form_view
@@ -3501,7 +3463,6 @@ msgid "This is a Test Survey."
 msgstr "Ceci est un Questionnaire test."
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/static/src/js/survey_form.js:0
@@ -3518,13 +3479,10 @@ msgstr "Ce n'est pas un nombre"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_invite__emails
-msgid ""
-"This list of emails of recipients will not be converted in contacts.        "
-"Emails must be separated by commas, semicolons or newline."
+msgid "This list of emails of recipients will not be converted in contacts.        Emails must be separated by commas, semicolons or newline."
 msgstr ""
-"La liste des emails des destinataires ne sera pas convertie en contacts. Les"
-" adresses email doivent être séparées par des virgules, des points-virgule "
-"ou des sauts à la ligne."
+"La liste des emails des destinataires ne sera pas convertie en contacts. Les adresses email doivent être séparées par des virgules, des points-"
+"virgule ou des sauts à la ligne."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__description_done
@@ -3558,9 +3516,7 @@ msgstr "Cette question a été ignorée"
 #. odoo-python
 #: code:addons/of_survey/wizard/of_survey_invite.py:0
 #, python-format
-msgid ""
-"This survey does not allow external people to participate. You should create"
-" user accounts or update survey access mode accordingly."
+msgid "This survey does not allow external people to participate. You should create user accounts or update survey access mode accordingly."
 msgstr ""
 "Ce Questionnaire ne permet pas à des personnes externes de participer. Vous "
 "devez créer des comptes d'utilisateurs ou mettre à jour le mode d'accès au "
@@ -3579,7 +3535,7 @@ msgstr "Ce Questionnaire n'est ouvert qu'aux utilisateurs inscrits. Veuillez"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Time & Scoring"
-msgstr ""
+msgstr "Temps & Notation"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__time_limit
@@ -3624,7 +3580,7 @@ msgstr ""
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Today Activities"
-msgstr ""
+msgstr "Activités du jour"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__scoring_total
@@ -3662,12 +3618,9 @@ msgstr "Type de réponses"
 #: code:addons/of_survey/wizard/of_survey_invite.py:0
 #, python-format
 msgid "Unable to post message, please configure the sender's email address."
-msgstr ""
-"Impossible de publier un message, veuillez configurer l'adresse email de "
-"l'expéditeur."
+msgstr "Impossible de publier un message, veuillez configurer l'adresse email de l'expéditeur."
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/static/src/js/survey_result.js:0
@@ -3722,24 +3675,16 @@ msgstr "Utilisez le fil d'Ariane pour revenir rapidement au tableau de bord."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__description
-msgid ""
-"Use this field to add additional explanations about your question or to "
-"illustrate it with pictures or a video"
-msgstr ""
-"Utilisez ce champ pour ajouter des explications supplémentaires à propos de "
-"votre question ou pour l'illustrer avec des images ou une vidéo"
+msgid "Use this field to add additional explanations about your question or to illustrate it with pictures or a video"
+msgstr "Utilisez ce champ pour ajouter des explications supplémentaires à propos de votre question ou pour l'illustrer avec des images ou une vidéo"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__random_questions_count
-msgid ""
-"Used on randomized sections to take X random questions from all the "
-"questions of that section."
-msgstr ""
-"Utilisé sur les sections aléatoires pour prendre X questions aléatoires "
-"parmi toutes les questions de cette section."
+msgid "Used on randomized sections to take X random questions from all the questions of that section."
+msgstr "Utilisé sur les sections aléatoires pour prendre X questions aléatoires parmi toutes les questions de cette section."
 
 #. module: of_survey
-#: model:res.groups,name:of_survey.group_survey_user
+#: model:res.groups,name:of_survey.group_of_survey_user
 msgid "User"
 msgstr "Utilisateur"
 
@@ -3911,12 +3856,8 @@ msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.actions.act_window,help:of_survey.action_survey_user_input
-msgid ""
-"You can share your links through different means: email, invite shortcut, "
-"live presentation, ..."
-msgstr ""
-"Vous pouvez partager vos liens par différents moyens : email, raccourci "
-"d'invitation, présentation en direct, ..."
+msgid "You can share your links through different means: email, invite shortcut, live presentation, ..."
+msgstr "Vous pouvez partager vos liens par différents moyens : email, raccourci d'invitation, présentation en direct, ..."
 
 #. module: of_survey
 #. odoo-python
@@ -3982,12 +3923,8 @@ msgstr "Vous avez obtenu la note de"
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey_template.py:0
 #, python-format
-msgid ""
-"Your responses will help us improve our product range to serve you even "
-"better."
-msgstr ""
-"Vos réponses nous aideront à améliorer notre gamme de produits pour encore "
-"mieux vous servir."
+msgid "Your responses will help us improve our product range to serve you even better."
+msgstr "Vos réponses nous aideront à améliorer notre gamme de produits pour encore mieux vous servir."
 
 #. module: of_survey
 #. odoo-javascript
@@ -4067,7 +4004,7 @@ msgstr ""
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "e.g. Satisfaction Survey"
-msgstr ""
+msgstr "par ex. Sondage de satisfaction"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_certification_report_view_classic
@@ -4142,9 +4079,9 @@ msgstr "le Questionnaire est vide"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
 msgid "this page"
-msgstr ""
+msgstr "cette page"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "to"
-msgstr ""
+msgstr "à"

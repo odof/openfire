@@ -267,6 +267,14 @@
                 <div t-field="survey.description_done" class="oe_no_empty" />
                 <div class="row">
                     <div class="col">
+                        <div>
+                            <p><a role="button" class="btn btn-primary btn-lg" t-attf-href="/web#id={{request.env['crm.lead'].search([('of_survey','=',survey.id)],limit=1).id}}&amp;model=crm.lead&amp;view_type=form">
+                                Terminer</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <t t-if="survey.scoring_type != 'no_scoring' and survey.scoring_success_min">
                             <div>You scored <t t-esc="answer.scoring_percentage" />%</div>
                             <t t-if="answer.scoring_success">
@@ -409,7 +417,7 @@
     <template id="question_suggested_value_image" name="Image from the question suggested answer">
         <t t-if="label.value_image">
             <!-- Directly use field or route if the user doesn't have access rights -->
-            <div t-if="not env.user.has_group('of_survey.group_survey_user')"
+            <div t-if="not env.user.has_group('of_survey.group_of_survey_user')"
                 class="o_survey_choice_img d-flex my-3 justify-content-center">
                 <img t-att-src="'/of_survey/get_question_image/%s/%s/%s/%s' % (survey.access_token, answer.access_token, question.id, label.id)"/>
             </div>

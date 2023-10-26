@@ -9,3 +9,4 @@ from . import of_survey_user_input_line
 from . import badge
 from . import challenge
 from . import res_partner
+from . import crm_lead
