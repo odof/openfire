@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Ajout d'un groupe pour autoriser la modification des étapes kanban de devis / bon de commande -->
+        <record id="sale_change_state_kanban" model="res.groups">
+            <field name="name">(OF) Modifier les étapes kanban de devis</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="comment">Autoriser la modification des étapes kanban de devis / bon de commande</field>
+        </record>
+
+</odoo>
