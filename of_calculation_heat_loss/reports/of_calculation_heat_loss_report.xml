@@ -9,11 +9,53 @@
             file="of_calculation_heat_loss.of_calculation_heat_loss_report"
             name="of_calculation_heat_loss.of_calculation_heat_loss_report"
     />
+<!--*******************************************************-->
+      <report
+            id="of_report_calculation_heat_loss_sale_order"
+            string="Rapport de déperdition de chaleur"
+            model="sale.order"
+            report_type="qweb-pdf"
+            file="of_calculation_heat_loss.of_calculation_heat_loss_report"
+            name="of_calculation_heat_loss.of_sale_order_calculation_heat_loss_report"
+    />
+
+     <report
+            id="of_report_calculation_heat_loss_crm_lead"
+            string="Rapport de déperdition de chaleur"
+            model="crm.lead"
+            report_type="qweb-pdf"
+            file="of_calculation_heat_loss.of_calculation_heat_loss_report"
+            name="of_calculation_heat_loss.of_crm_lead_calculation_heat_loss_report"
+    />
 
     <template id="of_calculation_heat_loss_report">
         <t t-call="report.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="of_calculation_heat_loss.of_calculation_heat_loss_report_document" t-lang="o.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_sale_order_calculation_heat_loss_report">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-foreach="o.of_heat_loss_ids" t-as="heat_loss">
+                    <t t-set="o" t-value="heat_loss"/>
+                    <t t-call="of_calculation_heat_loss.of_calculation_heat_loss_report_document" t-lang="o.partner_id.lang"/>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="of_crm_lead_calculation_heat_loss_report">
+        <t t-call="report.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-foreach="o.of_heat_loss_ids" t-as="heat_loss">
+                    <t t-set="o" t-value="heat_loss"/>
+                    <t t-call="of_calculation_heat_loss.of_calculation_heat_loss_report_document" t-lang="o.partner_id.lang"/>
+
+                </t>
             </t>
         </t>
     </template>
