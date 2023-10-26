@@ -22,7 +22,7 @@ Leads et opportunités
     - Référence;
     - Prospecteur;
     - Date de clôture;
-    - Parrain;
+    - Référé par;
     - Information complémentaire.
 
 * Ajout d'un **champ de complétion pour la ville** et le code postal dans les pistes et les opportunités

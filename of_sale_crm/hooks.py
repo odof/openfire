@@ -7,12 +7,12 @@ _logger = logging.getLogger(__name__)
 
 def _account_invoice_post_install(cr):
     cr.execute(
-        "UPDATE account_invoice AI "
+        "UPDATE account_move AM "
         "SET of_canvasser_id = COALESCE(SO.of_canvasser_id, RP.of_prospecteur_id) "
-        "FROM account_invoice AI2 "
-        "INNER JOIN res_partner RP ON RP.id = AI2.partner_id "
-        "LEFT JOIN sale_order SO ON (SO.name = AI2.origin) "
-        "WHERE AI.id = AI2.id"
+        "FROM account_move AM2 "
+        "INNER JOIN res_partner RP ON RP.id = AM2.partner_id "
+        "LEFT JOIN sale_order SO ON (SO.name = AM2.origin) "
+        "WHERE AM.id = AIM.id"
     )
 
 

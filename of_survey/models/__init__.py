@@ -1,10 +1,11 @@
-# -*- encoding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import survey_survey
-from . import survey_survey_template
-from . import survey_question
-from . import survey_user_input
+from . import of_survey_survey
+from . import of_survey_question_answer
+from . import of_survey_survey_template
+from . import of_survey_question
+from . import of_survey_user_input
+from . import of_survey_user_input_line
 from . import badge
 from . import challenge
 from . import res_partner

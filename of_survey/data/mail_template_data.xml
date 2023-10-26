@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="mail_template_user_input_invite_of" model="mail.template">
+        <record id="of_mail_template_user_input_invite" model="mail.template">
             <field name="name">Survey OpenFire: Invite</field>
             <field name="model_id" ref="model_of_survey_user_input" />
             <field name="subject">Participate to {{ object.survey_id.display_name }} survey</field>
@@ -46,7 +46,7 @@
         </record>
 
         <!-- Certification Email template -->
-        <record id="mail_template_certification_of" model="mail.template">
+        <record id="of_mail_template_certification" model="mail.template">
             <field name="name">Survey OpenFire: Certification Success</field>
             <field name="model_id" ref="of_survey.model_of_survey_user_input"/>
             <field name="subject">Certification: {{ object.survey_id.display_name }}</field>
@@ -80,7 +80,7 @@
     </table>
 </div>
             </field>
-            <field name="report_template" ref="certification_report"/>
+            <field name="report_template" ref="of_certification_report"/>
             <field name="report_name">Certification Document</field>
             <field name="lang">{{ object.partner_id.lang }}</field>
             <field name="auto_delete" eval="True"/>

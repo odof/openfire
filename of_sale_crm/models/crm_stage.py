@@ -6,4 +6,4 @@ from odoo import fields, models
 class CRMStage(models.Model):
     _inherit = 'crm.stage'
 
-    of_auto_model_name = fields.Selection(selection_add=[('sale.order', "Bon de commande")])
+    of_auto_model_name = fields.Selection(selection_add=[('sale.order', "Sale Order")])

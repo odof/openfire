@@ -1,40 +1,96 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'OF-Surveys',
-    'version': '3.5',
-    'category': 'Marketing/Surveys',
-    'description': """
-Create beautiful surveys and visualize answers
-==============================================
-
-It depends on the answers or reviews of some questions by different users. A
-survey may have multiple pages. Each page may contain multiple questions and
-each question may have multiple answers. Different users may give different
-answers of question and according to that survey is done. Partners are also
-sent mails with personal token for the invitation of the survey.
-    """,
-    'summary': 'Send your surveys or share them live.',
-    'website': 'https://www.odoo.com/app/surveys',
-    'depends': ['auth_signup', 'http_routing', 'mail', 'web_tour', 'gamification'],
-    'data': [
-        'views/survey_report_templates.xml',
-        'views/survey_reports.xml',
-        'data/mail_template_data.xml',
-        'security/survey_security.xml',
-        'security/ir.model.access.csv',
-        'views/survey_menus.xml',
-        'views/survey_survey_views.xml',
-        'views/survey_user_views.xml',
-        'views/survey_question_views.xml',
-        'views/survey_templates.xml',
-        'views/survey_templates_management.xml',
-        'views/survey_templates_print.xml',
-        'views/survey_templates_statistics.xml',
-        'views/survey_templates_user_input_session.xml',
-        'wizard/survey_invite_views.xml',
-        'views/res_partner_views.xml',
+    'name': "OpenFire / Questionnaires",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Personnalisation du CRM pour le module vente",
+    'depends': [
+        'auth_signup',
+        'http_routing',
+        'mail',
+        'web_tour',
+        'gamification',
+        'of_crm'
     ],
-    'demo': [],
+    'data': [
+        'reports/survey_report_templates.xml',
+        'views/of_survey_reports.xml',
+        'data/mail_template_data.xml',
+        'security/of_survey_security.xml',
+        'security/ir.model.access.csv',
+        'views/of_survey_menus.xml',
+        'views/of_survey_survey_views.xml',
+        'views/of_survey_user_views.xml',
+        'views/of_survey_question_answer_views.xml',
+        'views/of_survey_question_views.xml',
+        'templates/of_survey_templates.xml',
+        'templates/of_survey_templates_management.xml',
+        'templates/survey_templates_print.xml',
+        'templates/survey_templates_statistics.xml',
+        'templates/of_survey_templates_user_input_session.xml',
+        'views/res_partner_views.xml',
+        'wizard/of_survey_invite_views.xml',
+    ],
+    'assets': {
+        'of_survey.survey_assets': [
+            'web/static/lib/Chart/Chart.js',
+            'of_survey/static/src/js/survey_image_zoomer.js',
+            '/of_survey/static/src/xml/survey_image_zoomer_templates.xml',
+            'of_survey/static/src/js/survey_quick_access.js',
+            'of_survey/static/src/js/survey_timer.js',
+            'of_survey/static/src/js/survey_breadcrumb.js',
+            'of_survey/static/src/js/survey_form.js',
+            'of_survey/static/src/js/survey_preload_image_mixin.js',
+            'of_survey/static/src/js/survey_print.js',
+            'of_survey/static/src/js/survey_result.js',
+            ('include', 'web._assets_helpers'),
+            ('include', 'web._assets_frontend_helpers'),
+            'web/static/src/scss/pre_variables.scss',
+            'web/static/lib/bootstrap/scss/_variables.scss',
+            'of_survey/static/src/scss/survey_templates_form.scss',
+            'of_survey/static/src/scss/survey_templates_results.scss',
+            'of_survey/static/src/xml/survey_breadcrumb_templates.xml',
+        ],
+        'of_survey.survey_user_input_session_assets': [
+            'of_survey/static/src/js/libs/chartjs-plugin-datalabels.min.js',
+            'of_survey/static/src/js/survey_session_colors.js',
+            'of_survey/static/src/js/survey_session_chart.js',
+            'of_survey/static/src/js/survey_session_text_answers.js',
+            'of_survey/static/src/js/survey_session_leaderboard.js',
+            'of_survey/static/src/js/survey_session_manage.js',
+            'of_survey/static/src/xml/survey_session_text_answer_template.xml',
+        ],
+        'web.report_assets_common': [
+            'of_survey/static/src/scss/of_survey_reports.scss',
+        ],
+        'web.assets_backend': [
+            'of_survey/static/src/question_page/*',
+            'of_survey/static/src/js/fields_section_one2many.js',
+            'of_survey/static/src/js/fields_form_page_description.js',
+            'of_survey/static/src/views/*.js',
+            'of_survey/static/src/scss/survey_survey_views.scss',
+            'of_survey/static/src/scss/survey_question_views.scss',
+            'of_survey/static/src/scss/survey_templates_results.scss',
+        ],
+        "web.dark_mode_assets_backend": [
+            'of_survey/static/src/scss/*.dark.scss',
+        ],
+        'web.assets_tests': [
+            'of_survey/static/tests/tours/*.js',
+        ],
+        'web.qunit_suite_tests': [
+            'of_survey/static/tests/components/*.js',
+        ],
+        'web.assets_common': [
+            'of_survey/static/src/js/tours/survey_tour.js',
+        ],
+        'web.assets_frontend': [
+            'of_survey/static/src/js/tours/survey_tour.js',
+        ],
+    },
     'installable': True,
     'application': True,
     'sequence': 220,

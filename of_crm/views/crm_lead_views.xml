@@ -80,27 +80,11 @@
             </xpath>
 
             <!-- "Header" part -->
-            <xpath expr="//button[1]" position="after">
-                <button string="New activity" name="action_button_new_activity" type="object" class="oe_highlight"
-                    attrs="{'invisible': [('type', '=', 'lead')]}"
-                    context="{'default_opportunity_id': active_id, 'default_origin': 'opportunity'}"/>
-            </xpath>
             <xpath expr="//form//header//button[@name='action_set_won_rainbowman']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|','|', ('active','=',False), ('probability', 'in', (0,100)), ('type', '=', 'lead')]}</attribute>
             </xpath>
             <xpath expr="//form//header//button[@name='action_set_lost']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|', ('type', '=', 'opportunity'), '&amp;', ('probability', 'in', (0,100)), ('active', '=', False)]}</attribute>
-            </xpath>
-
-            <xpath expr="//div[@name='button_box']//button[@name='action_schedule_meeting']" position="before">
-                <button name="action_button_toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
-                    <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
-                        <span class="text-danger">Archive</span>
-                    </div>
-                    <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
-                        <span class="text-success">Unarchive</span>
-                    </div>
-                </button>
             </xpath>
             <!-- /"Header" part -->
 
@@ -115,7 +99,8 @@
             <xpath expr="//group[@name='opportunity_partner']" position="attributes">
                 <attribute name="string">Prospect</attribute>
             </xpath>
-            <xpath expr="//group[@name='opportunity_partner']" position="after">
+            <xpath expr="//field[@name='date_deadline']" position="attributes">
+                <attribute name="string">Closing date</attribute>
             </xpath>
             <xpath expr="//group[@name='opportunity_partner']//field[@name='partner_id']" position="after">
                 <field name="is_company"/>
@@ -135,7 +120,7 @@
                 <xpath expr="//group[@name='opportunity_followup']//field[@name='tag_ids']" position="move"/>
             </xpath>
             <xpath expr="//group[@name='opportunity_followup']//field[@name='user_id']" position="after">
-                <field name="of_canvasser_id"/>
+                <field name="of_canvasser_id" widget="many2one_avatar_user"/>
                 <xpath expr="//group[@name='opportunity_partner']//field[@name='lost_reason_id']" position="move"/>
             </xpath>
             <xpath expr="//group[@name='lead_marketing']" position="after">
@@ -147,37 +132,17 @@
                     <field name="of_ref"/>
                 </group>
             </xpath>
+            <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <xpath expr="//group[@name='lead_marketing']//field[@name='referred']" position="after">
                 <field name="of_referred_id" />
             </xpath>
-            <xpath expr="//page[@name='internal_notes']" position="before">
-                <page string="Activities" name="of_crm_activities">
-                    <field name="of_activity_ids" context="{
-                            'default_opportunity_id': active_id,
-                            'default_origin': 'opportunity',
-                            'close_and_reload': True,
-                            'form_view_ref':'of_crm.of_crm_activity_from_opportunity_form_view'}">
-                        <tree decoration-muted="state=='canceled' or not active" decoration-danger="is_late" editable="bottom">
-                            <field name="origin" invisible="1"/>
-                            <field name="is_late" invisible="1"/>
-                            <field name="active" invisible="1"/>
-                            <field name="load_attachment" invisible="1"/>
-                            <field name="uploaded_attachment_id" invisible="1"/>
-                            <field name="title"/>
-                            <field name="type_id"/>
-                            <field name="date"/>
-                            <field name="user_id"/>
-                            <field name="vendor_id"/>
-                            <field name="state"/>
-                            <button name="action_button_add_attachment" icon="fa-upload" type="object" string="Add attachment"
-                                    attrs="{'invisible': ['|', ('load_attachment', '=', False), ('uploaded_attachment_id', '!=', False)]}"/>
-                            <button name="action_button_complete" type="object" string="Realize" icon="fa-check"
-                                    attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                            <button name="action_button_cancel" type="object" string="Cancel" icon="fa-close"
-                                    attrs="{'invisible': [('state', '!=', 'planned')]}"/>
-                        </tree>
-                    </field>
-                </page>
+            <xpath expr="//group[@name='lead_marketing']//field[@name='medium_id']" position="attributes">
+                <attribute name="string">Canal</attribute>
+            </xpath>
+            <xpath expr="//group[@name='Misc']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
             <!-- /"Opportunity" visible group part -->
 
@@ -187,6 +152,15 @@
             </xpath>
             <xpath expr="//group[@name='lead_partner']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='referred']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='referred']" position="after">
+                <field name="of_referred_id" />
+            </xpath>
+            <xpath expr="//page[@name='extra']//group[@name='categorization']//field[@name='medium_id']" position="attributes">
+                <attribute name="string">Canal</attribute>
             </xpath>
             <!-- /"Lead" visible group part -->
 

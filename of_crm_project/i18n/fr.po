@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-14 15:26+0000\n"
-"PO-Revision-Date: 2023-09-14 15:26+0000\n"
+"POT-Creation-Date: 2023-10-25 15:36+0000\n"
+"PO-Revision-Date: 2023-10-25 15:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,11 @@ msgstr "Réponse"
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__answer_date
 msgid "Answer date"
 msgstr "Date de réponse"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_architect
+msgid "Architect"
+msgstr "Architecte"
 
 #. module: of_crm_project
 #: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_select_view_filter
@@ -129,11 +134,21 @@ msgid "Created on"
 msgstr "Créé le"
 
 #. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_crm_project
 #: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_attr__type__date
 #: model:ir.model.fields.selection,name:of_crm_project.selection__of_crm_project_line__type__date
 #: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_attr_view_filter
 msgid "Date"
 msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_decision_maker
+msgid "Decision maker"
+msgstr "Décideur"
 
 #. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr__val_bool_default
@@ -159,9 +174,19 @@ msgid "Display Name"
 msgstr "Nom à afficher"
 
 #. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_engineering_office
+msgid "Engineering office"
+msgstr "Bureau d’études"
+
+#. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_project_line_ids
 msgid "Entries"
 msgstr "Entrées"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+msgid "Externals"
+msgstr "Externes"
 
 #. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__is_answered
@@ -186,6 +211,16 @@ msgstr "A été corrigé"
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_template__id
 msgid "ID"
 msgstr ""
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_interlocutor
+msgid "Interlocutor"
+msgstr "Interlocuteur"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_labor_force
+msgid "Labor force"
+msgstr "Main d’oeuvre"
 
 #. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_attr____last_update
@@ -263,8 +298,19 @@ msgid "Original author answer"
 msgstr "Auteur de la réponse originale"
 
 #. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_prime_contractor
+msgid "Prime contractor"
+msgstr "Maître d’oeuvre"
+
+#. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_template_id
 #: model_terms:ir.ui.view,arch_db:of_crm_project.crm_lead_view_form
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_view_crm_case_opportunities_filter
 msgid "Project"
 msgstr "Projet"
 
@@ -334,6 +380,11 @@ msgstr "Modèles de projet"
 #: model:ir.ui.menu,name:of_crm_project.of_crm_menu_projet_config
 msgid "Projects"
 msgstr "Projets"
+
+#. module: of_crm_project
+#: model_terms:ir.ui.view,arch_db:of_crm_project.of_view_crm_case_leads_filter
+msgid "Project"
+msgstr "Projet"
 
 #. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_of_crm_project_line__name

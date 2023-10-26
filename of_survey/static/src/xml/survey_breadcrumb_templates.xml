@@ -21,7 +21,7 @@
                 </t>
                 <t t-else="">
                     <span t-att-class="'text-break ' + (isActivePage ? 'text-black' : 'text-muted')"
-                          t-esc="page.title" />
+                            t-esc="page.title" />
                 </t>
             </li>
         </t>

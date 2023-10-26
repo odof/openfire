@@ -1,4 +1,4 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import datetime
 import json
@@ -11,7 +11,7 @@ from odoo.http import request
 from odoo.tools import is_html_empty
 
 
-class UserInputSession(http.Controller):
+class OFUserInputSession(http.Controller):
     def _fetch_from_token(self, survey_token):
         """Check that given survey_token matches a survey 'access_token'.
         Unlike the regular survey controller, user trying to access the survey must have full access rights!"""
@@ -39,13 +39,13 @@ class UserInputSession(http.Controller):
     def survey_session_manage(self, survey_token, **kwargs):
         """Main route used by the host to 'manager' the session.
         - If the state of the session is 'ready'
-          We render a template allowing the host to showcase the different options of the session
-          and to actually start the session.
-          If there are no questions, a "void content" is displayed instead to avoid displaying a
-          blank survey.
+            We render a template allowing the host to showcase the different options of the session
+            and to actually start the session.
+            If there are no questions, a "void content" is displayed instead to avoid displaying a
+            blank survey.
         - If the state of the session is 'in_progress'
-          We render a template allowing the host to show the question results, display the attendees
-          leaderboard or go to the next question of the session."""
+            We render a template allowing the host to show the question results, display the attendees
+            leaderboard or go to the next question of the session."""
 
         survey = self._fetch_from_token(survey_token)
 
@@ -55,15 +55,15 @@ class UserInputSession(http.Controller):
         if survey.session_state == 'ready':
             if not survey.question_ids:
                 return request.render(
-                    'of_survey.survey_void_content',
+                    'of_survey.of_survey_void_content',
                     {
                         'survey': survey,
                         'answer': request.env['of.survey.user_input'],
                     },
                 )
-            return request.render('of_survey.user_input_session_open', {'survey': survey})
+            return request.render('of_survey.of_user_input_session_open', {'survey': survey})
         # Note that at this stage survey.session_state can be False meaning that the survey has ended (session closed)
-        return request.render('of_survey.user_input_session_manage', self._prepare_manage_session_values(survey))
+        return request.render('of_survey.of_user_input_session_manage', self._prepare_manage_session_values(survey))
 
     @http.route('/of_survey/session/next_question/<string:survey_token>', type='json', auth='user', website=True)
     def survey_session_next_question(self, survey_token, go_back=False, **kwargs):
@@ -97,10 +97,8 @@ class UserInputSession(http.Controller):
         if survey.session_state == 'ready':
             survey._session_open()
 
-        next_question = survey._get_session_next_question(go_back)
-
-        # using datetime.datetime because we want the millis portion
-        if next_question:
+        if next_question := survey._get_session_next_question(go_back):
+            # using datetime.datetime because we want the millis portion
             now = datetime.datetime.now()
             survey.sudo().write(
                 {
@@ -116,7 +114,7 @@ class UserInputSession(http.Controller):
             return {
                 'background_image_url': survey.session_question_id.background_image_url,
                 'question_html': request.env['ir.qweb']._render(
-                    'of_survey.user_input_session_manage_content', template_values
+                    'of_survey.of_user_input_session_manage_content', template_values
                 ),
             }
         else:
@@ -159,7 +157,7 @@ class UserInputSession(http.Controller):
             return ''
 
         return request.env['ir.qweb']._render(
-            'of_survey.user_input_session_leaderboard',
+            'of_survey.of_user_input_session_leaderboard',
             {'animate': True, 'leaderboard': survey._prepare_leaderboard_values()},
         )
 
@@ -172,7 +170,7 @@ class UserInputSession(http.Controller):
         """Renders the survey session code page route.
         This page allows the user to enter the session code of the survey.
         It is mainly used to ease survey access for attendees in session mode."""
-        return request.render("of_survey.survey_session_code")
+        return request.render('of_survey.of_survey_session_code')
 
     @http.route('/of_s/<string:session_code>', type='http', auth='public', website=True)
     def survey_start_short(self, session_code):
@@ -182,7 +180,7 @@ class UserInputSession(http.Controller):
         survey, survey_error = self._fetch_from_session_code(session_code)
 
         if survey_error:
-            return request.render('of_survey.survey_session_code', dict(**survey_error, session_code=session_code))
+            return request.render('of_survey.of_survey_session_code', dict(**survey_error, session_code=session_code))
         return request.redirect(survey.get_start_url())
 
     @http.route('/of_survey/check_session_code/<string:session_code>', type='json', auth='public', website=True)
@@ -191,9 +189,7 @@ class UserInputSession(http.Controller):
         If yes, redirect to /s/code route.
         If not, return error. The user is invited to type again the code."""
         survey, survey_error = self._fetch_from_session_code(session_code)
-        if survey_error:
-            return survey_error
-        return {'survey_url': survey.get_start_url()}
+        return survey_error or {'survey_url': survey.get_start_url()}
 
     def _prepare_manage_session_values(self, survey):
         is_first_question, is_last_question = False, False
@@ -209,7 +205,7 @@ class UserInputSession(http.Controller):
             'is_session_closed': not survey.session_state,
         }
 
-        values.update(self._prepare_question_results_values(survey, request.env['of.survey.user_input.line']))
+        values |= self._prepare_question_results_values(survey, request.env['of.survey.user_input.line'])
 
         return values
 
@@ -217,17 +213,17 @@ class UserInputSession(http.Controller):
         """Prepares usefull values to display during the host session:
 
         - question_statistics_graph
-          The graph data to display the bar chart for questions of type 'choice'
+            The graph data to display the bar chart for questions of type 'choice'
         - input_lines_values
-          The answer values to text/date/datetime questions
+            The answer values to text/date/datetime questions
         - answers_validity
-          An array containing the is_correct value for all question answers.
-          We need this special variable because of Chartjs data structure.
-          The library determines the parameters (color/label/...) by only passing the answer 'index'
-          (and not the id or anything else we can identify).
-          In other words, we need to know if the answer at index 2 is correct or not.
+            An array containing the is_correct value for all question answers.
+            We need this special variable because of Chartjs data structure.
+            The library determines the parameters (color/label/...) by only passing the answer 'index'
+            (and not the id or anything else we can identify).
+            In other words, we need to know if the answer at index 2 is correct or not.
         - answer_count
-          The number of answers to the current question."""
+            The number of answers to the current question."""
 
         question = survey.session_question_id
         answers_validity = []
@@ -240,7 +236,7 @@ class UserInputSession(http.Controller):
         input_line_values = []
         if question.question_type in ['char_box', 'date', 'datetime']:
             input_line_values = [
-                {'id': line.id, 'value': line['value_%s' % question.question_type]}
+                {'id': line.id, 'value': line[f'value_{question.question_type}']}
                 for line in full_statistics.get('table_data', request.env['of.survey.user_input.line'])[:100]
             ]
 

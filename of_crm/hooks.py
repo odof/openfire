@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import SUPERUSER_ID, api, fields
+from odoo import SUPERUSER_ID, api
 
 
 def _update_mail_activity_short_name(cr):
@@ -10,28 +10,6 @@ def _update_mail_activity_short_name(cr):
     cr.execute("UPDATE mail_activity_type SET of_short_name = name WHERE of_short_name IS NULL")
     # Cause of existing data in table we have to apply the constraint manually
     cr.execute("ALTER TABLE mail_activity_type ALTER of_short_name SET NOT NULL;")
-
-
-def _convert_pending_activities_into_of_crm_activity(env):
-    """Convert existing activities linked to opportunities to new activities.
-    When an activity is maked as done its deleted by Odoo, so existing activities are not done.
-    """
-    if lead_activities := env['mail.activity'].search([('res_model', '=', 'crm.lead')]):
-        env['of.crm.activity'].create(
-            [
-                {
-                    'opportunity_id': activity.res_id,
-                    'title': activity.summary or activity.res_name,
-                    'type_id': activity.activity_type_id.id,
-                    'date': fields.Datetime.from_string(f'{activity.date_deadline or fields.Date.today()} 09:00:00'),
-                    'description': activity.summary or activity.res_name,
-                    'user_id': SUPERUSER_ID,
-                    'vendor_id': activity.user_id.id or SUPERUSER_ID,
-                    'state': 'planned',
-                }
-                for activity in lead_activities
-            ]
-        )
 
 
 def _transfer_leads_tags_to_partners(cr):
@@ -71,18 +49,6 @@ def _transfer_leads_tags_to_partners(cr):
     cr.execute("ALTER TABLE res_partner_category DROP COLUMN old_tag_id")
 
 
-def _update_date_of_activity_date_action(cr):
-    cr.execute(
-        "UPDATE crm_lead        CL "
-        "SET    of_date_action  = ( SELECT      OCA.date "
-        "                           FROM        of_crm_activity     OCA "
-        "                           WHERE       OCA.opportunity_id  = CL.id "
-        "                           AND         OCA.state           = 'planned' "
-        "                           ORDER BY    OCA.date "
-        "                           LIMIT 1)"
-    )
-
-
 def _create_partners_from_leads_without_partners(cr, env):
     """Create partners from leads without partners then assign them to the leads."""
     lead_obj = env['crm.lead']
@@ -115,7 +81,5 @@ def post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
 
     _update_mail_activity_short_name(cr)
-    _convert_pending_activities_into_of_crm_activity(env)
     _transfer_leads_tags_to_partners(cr)
-    _update_date_of_activity_date_action(cr)
     _create_partners_from_leads_without_partners(cr, env)

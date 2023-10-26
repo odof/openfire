@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo><data>
+<odoo>
+
     <record id="gamification_badge_form_view_simplified" model="ir.ui.view">
         <field name="name">gamification.badge.form.view.simplified</field>
         <field name="model">gamification.badge</field>
@@ -25,4 +26,5 @@
             </form>
         </field>
     </record>
-</data></odoo>
+
+</odoo>

@@ -36,18 +36,6 @@ class CrmLead(models.Model):
     of_next_activity_name = fields.Char(string="Next activity name")
     of_color_map = fields.Char(string="Marker color")
 
-    # Activities
-    of_activity_ids = fields.One2many(
-        comodel_name='of.crm.activity',
-        inverse_name='opportunity_id',
-        string="Activities",
-        context={'active_test': False},
-    )
-    of_next_action_activity_id = fields.Many2one(
-        comodel_name='of.crm.activity',
-        string="Activity requiring next action",
-    )
-
     of_date_action = fields.Datetime(  # store=True car of_date_action est la date de référence pour la vue calendar
         string="Date of next action"
     )
@@ -63,11 +51,3 @@ class CrmLead(models.Model):
     of_my_company = fields.Boolean(
         string="Is my store ?", compute='_compute_is_my_company', search='_search_is_my_company'
     )
-
-    def action_button_toggle_active(self):
-        for activity in self:
-            activity.active = not activity.active
-
-    def action_button_new_activity(self):
-        self.ensure_one()
-        return self.env.ref('of_crm.of_crm_activity_schedule_action').read()[0]

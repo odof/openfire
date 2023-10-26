@@ -1,0 +1,488 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_crm
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-25 14:11+0000\n"
+"PO-Revision-Date: 2023-10-25 14:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__of_lost_opportunity_stage_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__of_lost_opportunity_stage_id
+msgid "(OF) Lost stage of opportunities"
+msgstr "(OF) Étape perdue des opportunités"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__of_sale_order_start_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__of_sale_order_start_state
+msgid "(OF) Starting state of orders"
+msgstr "(OF) État de départ des commandes"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_of_connector_config_settings__of_lost_opportunity_stage_id
+#: model:ir.model.fields,help:of_sale_crm.field_res_config_settings__of_lost_opportunity_stage_id
+msgid ""
+"Allows you to indicate which stage is associated with the loss of "
+"opportunity for analysis purposese"
+msgstr ""
+"Permet d'indiquer quelle étape est associée à la perte d'opportunité à des "
+"fin d'analyse"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_main_product_brand_id
+msgid "Brand of the main product"
+msgstr "Marque du produit principal"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_referred_id
+msgid "Brought by"
+msgstr "Apporté par"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_crm_stage
+msgid "CRM Stages"
+msgstr "Étapes CRM"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__campaign_id
+msgid "Campaign"
+msgstr "Campagne"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__cancel
+msgid "Canceled"
+msgstr "Annulé"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_account_bank_statement_line__of_canvasser_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_account_invoice_report__of_canvasser_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_account_move__of_canvasser_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_account_payment__of_canvasser_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_canvasser_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_report__of_canvasser_id
+msgid "Canvasser"
+msgstr "Prospecteur"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_res_config_settings_view_form
+msgid "Choose the start state for sale order."
+msgstr "Choisir l'état de départ pour les commandes."
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__color
+msgid "Color"
+msgstr "couleur"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Confirm Estimate"
+msgstr "Confirmer l'estimation"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_case_kanban_view_leads
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__customer_view
+msgid "Customer/Vendor view"
+msgstr "Vue Client/Vendeur"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__display_name
+msgid "Display Name"
+msgstr "Afficher un nom"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Divers"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_mail_compose_message
+msgid "Email composition wizard"
+msgstr "Assistant de composition d'emails"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__draft
+msgid "Estimate"
+msgstr "Estimation"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
+msgid "Estimates"
+msgstr "Estimations"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Follow-up"
+msgstr "Suivi"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_notes
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
+msgid "Follow-up notes"
+msgstr "Notes de suivi"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_sale_followup_tag_ids
+msgid "Follow-up tags"
+msgstr "Balises de suivi"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_force_laying_date
+msgid "Force laying date"
+msgstr "Date de pose forcée"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__2
+msgid "High"
+msgstr "Haut"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__id
+msgid "ID"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_info
+msgid "Info"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_account_invoice_report
+msgid "Invoices Statistics"
+msgstr "Statistiques des factures"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_laying_week
+msgid "Laying week"
+msgstr "Semaine de ponte"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_crm_lead
+msgid "Lead/Opportunity"
+msgstr "Piste/Opportunité"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_is_lead_warn
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_is_lead_warn
+msgid "Leads warning"
+msgstr "Avertissement opportunités"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__done
+msgid "Locked"
+msgstr "Verrouillé"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__1
+msgid "Low"
+msgstr "Faible"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_manual_laying_date
+msgid "Manual laying date"
+msgstr "Date de pose manuelle"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__medium_id
+msgid "Medium"
+msgstr "Moyen"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_crm_stage__of_auto_model_name
+msgid "Model"
+msgstr "Modèle"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_sale_order__of_referred_id
+msgid "Name of business contributor"
+msgstr "Nom de l'appporteur d'affaires"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__0
+msgid "Normal"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__opportunity_id
+msgid "Opportunity"
+msgstr "Opportunité"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_of_sale_followup_tag
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_followup_tag_form_view
+msgid "Order tracking label"
+msgstr "Etiquettes de suivi de commande"
+
+#. module: of_sale_crm
+#: model:ir.actions.act_window,name:of_sale_crm.of_sale_followup_tag_action
+#: model:ir.ui.menu,name:of_sale_crm.of_sale_followup_config_tag
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_followup_tag_tree_view
+msgid "Order tracking labels"
+msgstr "Etiquettes de suivi de commande"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_connector_config_settings__of_sale_order_start_state__estimate
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_config_settings__of_sale_order_start_state__estimate
+msgid "Orders are created at the initial \"Estimate\" stage."
+msgstr "Les commandes sont créées à l'étape initiale \"Estimation\""
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__of_connector_config_settings__of_sale_order_start_state__quotation
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_config_settings__of_sale_order_start_state__quotation
+msgid "Orders are created at the initial \"Quotation\" stage."
+msgstr "Les commandes sont créées à l'étape initiale \"Devis\""
+
+#. module: of_sale_crm
+#: model:res.groups,name:of_sale_crm.group_estimatate_sale_order_state
+msgid "Orders created in Estimation step"
+msgstr "Commandes créées à l'étape Estimation"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__group_estimation_sale_order_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__group_estimation_sale_order_state
+msgid "Orders created in the Estimate stage"
+msgstr "Commandes créées à l'étape Estimation"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__group_quotation_sale_order_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__group_quotation_sale_order_state
+#: model:res.groups,name:of_sale_crm.group_quotation_sale_order_state
+msgid "Orders created in the Quotation stage"
+msgstr "Commandes créées à l'étape Devis"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_partner__of_customer_state__other
+msgid "Other"
+msgstr "Autre"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_account_invoice_report__of_partner_tags
+msgid "Partner Tags"
+msgstr "Étiquettes du partenaire"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_priority
+msgid "Priority"
+msgstr "Priorité"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_partner__of_customer_state__lead
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_case_kanban_view_leads
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_partner_form
+msgid "Prospect"
+msgstr ""
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_res_partner_filter
+msgid "Prospects"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sent
+msgid "Quotation"
+msgstr "Devis"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_sent_quotation
+msgid "Quotation sent"
+msgstr "Devis envoyé"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
+msgid "Quotations"
+msgstr "Devis"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_reference_laying_date
+msgid "Reference laying date"
+msgstr "Date de pose de référence"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order_line__of_amount_to_invoice
+msgid "Remains to be invoiced in €"
+msgstr "Reste à facturer en €"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__crm_stage__of_auto_model_name__sale_order
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sale
+msgid "Sale Order"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_sale_report
+msgid "Sales Analysis Report"
+msgstr "Rapport d'analyse des ventes"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_crm
+#: model:ir.model,name:of_sale_crm.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
+msgid "Sent Quotations"
+msgstr "Devis envoyés"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__res_partner__of_customer_state__customer
+msgid "Signed customer"
+msgstr "Client signé"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_res_partner_filter
+msgid "Signed customers"
+msgstr "Clients signés"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__source_id
+msgid "Source"
+msgstr ""
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_crm_lead__of_customer_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_customer_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_customer_state
+msgid "State"
+msgstr "État"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__state
+msgid "Status"
+msgstr "Statut"
+
+#. module: of_sale_crm
+#: model:res.groups,comment:of_sale_crm.group_estimatate_sale_order_state
+msgid "The start step of the sales order workflow is \"Estimate\"."
+msgstr "L'étape de départ du workflow de commande est \"Estimation\"."
+
+#. module: of_sale_crm
+#: model:res.groups,comment:of_sale_crm.group_quotation_sale_order_state
+msgid "The start step of the sales order workflow is \"Quotation\"."
+msgstr "L'étape de départ du workflow de commande est \"Devis\"."
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_crm_lead__of_customer_state
+#: model:ir.model.fields,help:of_sale_crm.field_res_partner__of_customer_state
+#: model:ir.model.fields,help:of_sale_crm.field_res_users__of_customer_state
+msgid ""
+"This field is only useful for customer partners.A customer is considered a "
+"prospect as long as he/she has neither confirmed an order nor validated an "
+"invoice. This field is updated automatically on order confirmation and "
+"invoice validation."
+msgstr ""
+"Champ uniquement utile pour les partenaires clients.Un client est considéré "
+"comme prospect tant qu'il n'a ni commande confirmée ni facture validée.Ce "
+"champ se met à jour automatiquement sur confirmation de commande et sur "
+"validation de facture."
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_sale_order__campaign_id
+msgid ""
+"This is a name that helps you keep track of your different campaign efforts "
+"Ex: Fall_Drive, Christmas_Special"
+msgstr ""
+"C'est un nom qui vous aide à suivre vos différents efforts de campagne. Ex :"
+" Fall_Drive, Christmas_Special"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_sale_order__medium_id
+msgid "This is the method of delivery.Ex: Postcard, Email, or Banner Ad"
+msgstr ""
+"Il s'agit du mode de livraison. Ex : carte postale, e-mail ou bannière "
+"publicitaire."
+
+#. module: of_sale_crm
+#: model:ir.model.fields,help:of_sale_crm.field_sale_order__source_id
+msgid ""
+"This is the source of the link Ex:Search Engine, another domain,or name of "
+"email list"
+msgstr ""
+"C'est la source du lien. Ex : Moteur de recherche, un autre domaine, ou le "
+"nom de liste de diffusion"
+
+#. module: of_sale_crm
+#: model:ir.model.constraint,message:of_sale_crm.constraint_of_sale_followup_tag_name_uniq
+msgid "This tag name already exists"
+msgstr "Ce nom de balise existe déjà"
+
+#. module: of_sale_crm
+#: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__3
+msgid "Very High"
+msgstr "Très haut"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_partner_lead_warn_form
+msgid "opportunities"
+msgstr "opportunités"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_res_partner_kanban_view
+msgid "prospect"
+msgstr ""
