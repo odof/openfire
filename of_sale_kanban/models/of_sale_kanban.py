@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 
 class OfSaleOrderKanban(models.Model):
@@ -74,3 +75,9 @@ class SaleOrder(models.Model):
     def _read_group_kanban_step_ids(self, stages, domain, order):
         kanban_step_ids = self.env['of.sale.order.kanban'].search([])
         return kanban_step_ids
+
+    @api.multi
+    def write(self, vals):
+        if 'of_kanban_step_id' in vals and not self.env.user.has_group('of_sale_kanban.sale_change_state_kanban'):
+            raise UserError(u"Vous n'êtes pas autorisé à modifier l'étape kanban des devis/bons de commandes.")
+        return super(SaleOrder, self).write(vals)

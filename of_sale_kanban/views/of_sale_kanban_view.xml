@@ -105,7 +105,19 @@
         <field name="priority">100</field>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_shipping_id']" position="after">
-                <field name="of_kanban_step_id" widget="selection"/>
+                <field name="of_kanban_step_id" widget="selection" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_view_kanban_step2" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_view_kanban_step"/>
+        <field name="groups_id" eval="[(4, ref('sale_change_state_kanban'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_kanban_step_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
             </xpath>
         </field>
     </record>
