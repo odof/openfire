@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 ##############################################################################
 #
@@ -35,6 +36,7 @@ Fonctionnalités
     ],
     'data': [
         'views/of_questionnaire_quote_template_views.xml',
+        'views/sale_config_settings.xml',
     ],
     'installable': True,
     'application': False,

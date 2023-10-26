@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_config_settings_view_form" model="ir.ui.view">
+        <field name="name">sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="sales_team.view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='pdf_printing']" position="after">
+                <group string="Activer la création automatique de demande d'intervention" id="activate_option_auto_di"
+                        name="activate_option_auto_di">
+                    <group colspan="4">
+                        <field name="of_active_option"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
