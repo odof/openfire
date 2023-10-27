@@ -3,15 +3,6 @@
 from odoo import SUPERUSER_ID, api
 
 
-def _update_mail_activity_short_name(cr):
-    """
-    Init the new field 'of_short_name' for the existing activities and set the column as "not null"
-    """
-    cr.execute("UPDATE mail_activity_type SET of_short_name = name WHERE of_short_name IS NULL")
-    # Cause of existing data in table we have to apply the constraint manually
-    cr.execute("ALTER TABLE mail_activity_type ALTER of_short_name SET NOT NULL;")
-
-
 def _transfer_leads_tags_to_partners(cr):
     """
     As tags are now linked to partners (we changed that) we need to update the tags of the partner linked to the lead.
@@ -80,6 +71,5 @@ def post_init_hook(cr, registry):
     """Migrate data from old fields to new ones."""
     env = api.Environment(cr, SUPERUSER_ID, {})
 
-    _update_mail_activity_short_name(cr)
     _transfer_leads_tags_to_partners(cr)
     _create_partners_from_leads_without_partners(cr, env)

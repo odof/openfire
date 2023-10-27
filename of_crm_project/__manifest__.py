@@ -10,6 +10,7 @@
     'summary': "Projets CRM",
     'depends': [
         'of_crm',
+        'of_survey',
     ],
     'data': [
         'security/ir.model.access.csv',

@@ -1,4 +1,5 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': "OpenFire / Questionnaires",
     'version': '16.0.1.0.0',
@@ -13,7 +14,7 @@
         'mail',
         'web_tour',
         'gamification',
-        'of_crm'
+        'crm'
     ],
     'data': [
         'reports/survey_report_templates.xml',
@@ -32,7 +33,7 @@
         'templates/survey_templates_statistics.xml',
         'templates/of_survey_templates_user_input_session.xml',
         'views/res_partner_views.xml',
-        'wizard/of_survey_invite_views.xml',
+        'wizards/of_survey_invite_views.xml',
     ],
     'assets': {
         'of_survey.survey_assets': [
@@ -92,64 +93,6 @@
         ],
     },
     'installable': True,
-    'application': True,
-    'sequence': 220,
-    'assets': {
-        'of_survey.survey_assets': [
-            'web/static/lib/Chart/Chart.js',
-            'of_survey/static/src/js/survey_image_zoomer.js',
-            '/of_survey/static/src/xml/survey_image_zoomer_templates.xml',
-            'of_survey/static/src/js/survey_quick_access.js',
-            'of_survey/static/src/js/survey_timer.js',
-            'of_survey/static/src/js/survey_breadcrumb.js',
-            'of_survey/static/src/js/survey_form.js',
-            'of_survey/static/src/js/survey_preload_image_mixin.js',
-            'of_survey/static/src/js/survey_print.js',
-            'of_survey/static/src/js/survey_result.js',
-            ('include', 'web._assets_helpers'),
-            ('include', 'web._assets_frontend_helpers'),
-            'web/static/src/scss/pre_variables.scss',
-            'web/static/lib/bootstrap/scss/_variables.scss',
-            'of_survey/static/src/scss/survey_templates_form.scss',
-            'of_survey/static/src/scss/survey_templates_results.scss',
-            'of_survey/static/src/xml/survey_breadcrumb_templates.xml',
-        ],
-        'of_survey.survey_user_input_session_assets': [
-            'of_survey/static/src/js/libs/chartjs-plugin-datalabels.min.js',
-            'of_survey/static/src/js/survey_session_colors.js',
-            'of_survey/static/src/js/survey_session_chart.js',
-            'of_survey/static/src/js/survey_session_text_answers.js',
-            'of_survey/static/src/js/survey_session_leaderboard.js',
-            'of_survey/static/src/js/survey_session_manage.js',
-            'of_survey/static/src/xml/survey_session_text_answer_template.xml',
-        ],
-        'web.report_assets_common': [
-            'of_survey/static/src/scss/survey_reports.scss',
-        ],
-        'web.assets_backend': [
-            'of_survey/static/src/question_page/*',
-            'of_survey/static/src/js/fields_section_one2many.js',
-            'of_survey/static/src/js/fields_form_page_description.js',
-            'of_survey/static/src/views/*.js',
-            'of_survey/static/src/scss/survey_survey_views.scss',
-            'of_survey/static/src/scss/survey_question_views.scss',
-            'of_survey/static/src/scss/survey_templates_results.scss',
-        ],
-        "web.dark_mode_assets_backend": [
-            'of_survey/static/src/scss/*.dark.scss',
-        ],
-        'web.assets_tests': [
-            'of_survey/static/tests/tours/*.js',
-        ],
-        'web.qunit_suite_tests': [
-            'of_survey/static/tests/components/*.js',
-        ],
-        'web.assets_common': [
-            'of_survey/static/src/js/tours/survey_tour.js',
-        ],
-        'web.assets_frontend': [
-            'of_survey/static/src/js/tours/survey_tour.js',
-        ],
-    },
-    'license': 'LGPL-3',
+    'application': False,
+    'auto_install': False,
 }
