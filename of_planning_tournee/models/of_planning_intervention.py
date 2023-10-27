@@ -67,7 +67,7 @@ class OfPlanningIntervention(models.Model):
             if interv.state and interv.state == 'being_optimized':
                 interv.state_int = 3
             else:
-                interv_left |= interv
+                interv_left += interv
         super(OfPlanningIntervention, interv_left)._compute_state_int()
 
     # Héritages
