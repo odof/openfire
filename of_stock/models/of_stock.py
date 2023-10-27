@@ -1137,15 +1137,15 @@ class StockQuant(models.Model):
             move, pack_operation_id, lot_id, company_id, initial_domain)
 
     @api.model
-    def test_stock(self):
+    def test_stock(self, domain=[]):
         """
         Test de cohérence des mouvements de stock avec les quants
         """
         move_obj = self.env['stock.move']
         locations = self.env['stock.location'].search([('usage', '=', 'internal')])
 
-        moves_out = move_obj.search([('state', '=', 'done'), ('location_id', 'in', locations.ids)])
-        moves_in = move_obj.search([('state', '=', 'done'), ('location_dest_id', 'in', locations.ids)])
+        moves_out = move_obj.search([('state', '=', 'done'), ('location_id', 'in', locations.ids)] + domain)
+        moves_in = move_obj.search([('state', '=', 'done'), ('location_dest_id', 'in', locations.ids)] + domain)
 
         to_check = moves_out
         location_field = 'location_id'
@@ -1178,11 +1178,11 @@ class StockQuant(models.Model):
                 location_field = 'location_dest_id'
 
     @api.model
-    def test_move_quants(self):
+    def test_move_quants(self, domain=[]):
         """
         Fonction qui vérifie que la somme des quants positifs d'un move sortant est égale à la quantité du move
         """
-        for move in self.env['stock.move'].search([('state', '=', 'done')]):
+        for move in self.env['stock.move'].search([('state', '=', 'done')] + domain):
             quant_qty = sum([quant.qty for quant in move.quant_ids if quant.qty > 0])
             if float_compare(quant_qty, move.product_qty, precision_rounding=move.product_id.uom_id.rounding):
                 print\
@@ -1194,12 +1194,12 @@ class StockQuant(models.Model):
                        move.product_uom.name, move.product_uom.rounding)
 
     @api.model
-    def test_quant_chain(self):
+    def test_quant_chain(self, domain=[]):
         """
         Fonction qui vérifie si les moves associés à un quant forment bien une chaîne
           et si l'emplacement final de la chaîne correspond bien à l'emplacement du quant
         """
-        for quant in self.env['stock.quant'].search([]):
+        for quant in self.env['stock.quant'].search(domain):
             loc_vals = {}
             increment = 1 if quant.qty > 0 else -1
             for move in quant.history_ids:
@@ -1319,7 +1319,7 @@ class StockQuant(models.Model):
         self.propagated_from_id = neg_qt
 
     @api.model
-    def action_of_repair_move_quants_quantities(self):
+    def action_of_repair_move_quants_quantities(self, domain=[]):
         """
         Cette fonction répare les quantités des stock.move et stock.quant quand elles ne sont pas cohérentes
         Dans ces cas, on cherche un stock.move.operation.link (réservation du mouvement de stock dans un stock.picking)
@@ -1333,7 +1333,7 @@ class StockQuant(models.Model):
 
         sale_lines_to_recompute = self.env['sale.order.line']
         purchase_lines_to_recompute = self.env['purchase.order.line']
-        for move in move_obj.search([('state', '=', 'done')]):
+        for move in move_obj.search([('state', '=', 'done')] + domain):
             quant_qty = sum([quant.qty for quant in move.quant_ids if quant.qty > 0])
             if float_compare(quant_qty, move.product_qty, precision_rounding=move.product_id.uom_id.rounding):
                 # Plusieurs cas possibles
@@ -1372,7 +1372,7 @@ class StockQuant(models.Model):
             purchase_line.product_qty = sum(purchase_line.move_ids.mapped('product_uom_qty'))
 
     @api.model
-    def action_of_repair_quant_chain(self):
+    def action_of_repair_quant_chain(self, domain=[]):
         """ Identifie et répare les problèmes de chaîne sur les quants.
         Plusieurs problèmes possibles sont corrigés par cette fonction :
         - Si les mouvements de stock liés au quant ne forment pas un chemin continu, on crée des quants pour séparer
@@ -1416,7 +1416,7 @@ class StockQuant(models.Model):
             'reservation_id': False,
         }
 
-        for quant in quant_obj.search([('qty', '>', 0)]):
+        for quant in quant_obj.search([('qty', '>', 0)] + domain):
             loc_vals = {}
             for move in quant.history_ids:
                 loc_vals[move.location_id] = loc_vals.get(move.location_id, 0) - 1
@@ -1436,16 +1436,16 @@ class StockQuant(models.Model):
                 nb_restricted_moves = 0
                 moves_packs = []
                 available_moves = quant.history_ids
+                # Dictionnaire des mouvements disponibles par emplacement de destination
+                moves_dict = {}
+                for move in available_moves:
+                    if move.location_dest_id.id in moves_dict:
+                        moves_dict[move.location_dest_id.id] += move
+                    else:
+                        moves_dict[move.location_dest_id.id] = move
+                    if move.restrict_lot_id:
+                        nb_restricted_moves += 1
                 for loc_dest in loc_out:
-                    # Dictionnaire des mouvements disponibles par emplacement de destination
-                    moves_dict = {}
-                    for move in available_moves:
-                        if move.location_dest_id.id in moves_dict:
-                            moves_dict[move.location_dest_id.id] += move
-                        else:
-                            moves_dict[move.location_dest_id.id] = move
-                        if move.restrict_lot_id:
-                            nb_restricted_moves += 1
                     # Extraction d'une chaîne
                     moves, loc_orig, nb_restrict = self._extract_greatest_chain(
                         moves_dict, loc_dest, nb_restricted_moves, negative_move)
@@ -1464,6 +1464,8 @@ class StockQuant(models.Model):
                     loc_vals[loc_orig] += 1
                     moves_packs.append((moves, loc_orig, loc_dest, nb_restrict))
                     available_moves -= moves
+                    for used_move in moves:
+                        moves_dict[used_move.location_dest_id.id] -= used_move
                 if available_moves:
                     raise UserError(
                         u"ERR_003 - Il reste des mouvements non affectés après la découpe du quant."
