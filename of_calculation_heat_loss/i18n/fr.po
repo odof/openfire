@@ -53,22 +53,22 @@ msgstr "${object.name} : Votre calcul de déperdition de chaleur"
 #: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_form_view
 msgid "<i class=\"oe_grey\">\n"
 "                        <i class=\"fa fa-warning of_ws\"/>\n"
-"                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                        Attention : Cette estimation n'a pas valeur contractuelle. Elle doit être considérée comme une aide à la décision et ne remplace pas une étude thermique réalisée par un bureau d'études spécialisé.\n"
 "                    </i>"
 msgstr "<i class=\"oe_grey\">\n"
 "                        <i class=\"fa fa-warning of_ws\"/>\n"
-"                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                        Attention : Cette estimation n'a pas valeur contractuelle. Elle doit être considérée comme une aide à la décision et ne remplace pas une étude thermique réalisée par un bureau d'études spécialisé.\n"
 "                    </i>"
 
 #. module: of_calculation_heat_loss
 #: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document
 msgid "<i style=\"color: grey\">\n"
 "                            <i class=\"fa fa-warning of_ws\"/>\n"
-"                            Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                            Attention : Cette estimation n'a pas valeur contractuelle. Elle doit être considérée comme une aide à la décision et ne remplace pas une étude thermique réalisée par un bureau d'études spécialisé.\n"
 "                        </i>"
 msgstr "<i style=\"color: grey\">\n"
 "                            <i class=\"fa fa-warning of_ws\"/>\n"
-"                            Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation\n"
+"                            Attention : Cette estimation n'a pas valeur contractuelle. Elle doit être considérée comme une aide à la décision et ne remplace pas une étude thermique réalisée par un bureau d'études spécialisé.\n"
 "                        </i>"
 
 #. module: of_calculation_heat_loss
@@ -135,11 +135,15 @@ msgid "Attributs pour un meilleur calcul du coefficient G"
 msgstr "Attributs pour un meilleur calcul du coefficient G"
 
 #. module: of_calculation_heat_loss
-#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_heat_loss_action
 #: model:ir.model,name:of_calculation_heat_loss.model_of_calculation_heat_loss
-#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_menu
 msgid "Calcul de déperdition de chaleur"
 msgstr "Calcul de déperdition de chaleur"
+
+#. module: of_calculation_heat_loss
+#: model:ir.actions.act_window,name:of_calculation_heat_loss.of_calculation_heat_loss_action
+#: model:ir.ui.menu,name:of_calculation_heat_loss.of_calculation_heat_loss_menu
+msgid "Calcul de déperdition de chaleur et de consommation"
+msgstr "Calcul de déperdition de chaleur et de consommation"
 
 #. module: of_calculation_heat_loss
 #: model:ir.ui.view,arch_db:of_calculation_heat_loss.of_calculation_heat_loss_report_document

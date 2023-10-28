@@ -13,5 +13,5 @@ class OFCalculationFuelConsumption(models.Model):
         comodel_name='of.calculation.heat.loss', string=u"Calcul de déperdition de chaleur", ondelete='cascade')
     fuel_id = fields.Many2one(comodel_name='of.calculation.fuel', string=u"Combustible", ondelete='cascade')
     uom_id = fields.Many2one(comodel_name='product.uom', string=u"Unité", related='fuel_id.uom_id')
-    fuel_volume = fields.Float(string=u"Volume nécessaire", digits=(12, 6))
+    fuel_volume = fields.Float(string=u"Volume nécessaire", digits=(12, 2))
     fuel_cost = fields.Float(string=u"Coût annuel en €", digits=dp.get_precision('Product Price'))

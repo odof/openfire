@@ -230,7 +230,7 @@ class OFCalculationHeatLoss(models.Model):
                 'line_ids': [(0, 0, dict({'product_id': p.id}))
                              for p in products],
                 'annual_consumption': annual_consumption,
-                'annual_consumption_text': "%s %s" % (annual_consumption, "kWatt/h"),
+                'annual_consumption_text': "%s %s" % (annual_consumption, "kWatt/an"),
             })
             self.get_fuel_consumption_data()
         if errors:
@@ -334,7 +334,7 @@ class OFCalculationDepartment(models.Model):
 
     name = fields.Char(string=u"Nom", required=True)
     code = fields.Integer(string=u"Code", required=True)
-    unified_day_degree = fields.Float(string=u"DFU", help=u"Degré jour unifié")
+    unified_day_degree = fields.Float(string=u"DJU", help=u"Degré jour unifié")
     base_temperature_id = fields.Many2one(
         comodel_name='of.calculation.base.temperature', string=u"Température extérieure de base",
         required=True, help=u"Température extérieure de base ramenée au niveau de la mer")

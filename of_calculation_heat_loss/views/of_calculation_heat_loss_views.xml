@@ -64,9 +64,6 @@
                             <label for="estimated_power_text" string="Déperdition de chaleur" class="oe_highlight"
                                    style="padding: 10px; 1px solid blue !important;"/>
                             <field name="estimated_power_text" nolabel="1" style="font-size: 32px; border: 0px"/>
-                            <div class="oe_grey mt8" colspan="2">
-                                <field name="message"/>
-                            </div>
                             <label for="annual_consumption_text" string="Consommation annuelle" class="oe_highlight"
                                    style="margin-top: 10px; padding: 10px; 1px solid blue !important;"/>
                             <field name="annual_consumption_text" nolabel="1" style="margin-top: 10px; font-size: 32px; border: 0px"/>
@@ -75,12 +72,9 @@
                     </group>
                     <i class="oe_grey">
                         <i class="fa fa-warning of_ws"/>
-                        Le calcul de puissance est une estimation. OpenFire ne peut être tenu responsable des conséquences de son utilisation
+                        Attention : Cette estimation n'a pas valeur contractuelle. Elle doit être considérée comme une aide à la décision et ne remplace pas une étude thermique réalisée par un bureau d'études spécialisé.
                     </i>
                     <notebook>
-                        <page string="Appareils compatibles">
-                            <field name="line_ids" context="{'display_search_view': 1}"/>
-                        </page>
                         <page string="Consommation par combustible">
                             <field name="fuel_consumption_ids">
                                 <tree>
@@ -90,6 +84,9 @@
                                     <field name="fuel_cost"/>
                                 </tree>
                             </field>
+                        </page>
+                        <page string="Appareils compatibles">
+                            <field name="line_ids" context="{'display_search_view': 1}"/>
                         </page>
                     </notebook>
                 </sheet>
