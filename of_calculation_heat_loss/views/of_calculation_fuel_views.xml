@@ -8,10 +8,15 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="calorific_value"/>
-                        <field name="price"/>
-                        <field name="uom_id"/>
+                        <group>
+                            <field name="name"/>
+                            <field name="uom_id"/>
+                            <field name="price"/>
+                            <field name="calorific_value"/>
+                        </group>
+                        <group>
+                            <field name="kwh_unit_price"/>
+                        </group>
                     </group>
                 </sheet>
             </form>
@@ -25,9 +30,10 @@
             <tree>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="calorific_value"/>
-                <field name="price"/>
                 <field name="uom_id"/>
+                <field name="price"/>
+                <field name="calorific_value"/>
+                <field name="kwh_unit_price"/>
             </tree>
         </field>
     </record>

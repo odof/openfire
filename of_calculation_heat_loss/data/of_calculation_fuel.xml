@@ -1,46 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
+    <record id="product_uom_categ_nrg" model="product.uom.categ">
+        <field name="name">Énergie</field>
+    </record>
+
+    <record id="product_uom_kwh" model="product.uom">
+        <field name="name">kWh</field>
+        <field name="category_id" ref="product_uom_categ_nrg"/>
+        <field name="factor">1.0</field>
+    </record>
+
+    <record id="product_uom_m3" model="product.uom">
+        <field name="name">m³</field>
+        <field name="category_id" ref="product.product_uom_categ_vol"/>
+        <field name="factor">1000</field>
+        <field name="uom_type">bigger</field>
+    </record>
+
     <record id="fuel_1" model="of.calculation.fuel">
         <field name="name">Gaz</field>
         <field name="sequence">1</field>
         <field name="calorific_value">12.8</field>
         <field name="price">1.25</field>
+        <field name="uom_id" ref="of_calculation_heat_loss.product_uom_m3"/>
     </record>
 
     <record id="fuel_2" model="of.calculation.fuel">
         <field name="name">Fioul</field>
         <field name="sequence">2</field>
-        <field name="calorific_value">10000</field>
-        <field name="price">1074</field>
+        <field name="calorific_value">10</field>
+        <field name="price">1.074</field>
+        <field name="uom_id" ref="product.product_uom_litre"/>
     </record>
 
     <record id="fuel_3" model="of.calculation.fuel">
         <field name="name">Propane</field>
         <field name="sequence">3</field>
-        <field name="calorific_value">12780</field>
-        <field name="price">1700</field>
+        <field name="calorific_value">12.78</field>
+        <field name="price">1.7</field>
+        <field name="uom_id" ref="product.product_uom_kgm"/>
     </record>
 
     <record id="fuel_4" model="of.calculation.fuel">
         <field name="name">Bois bûches</field>
         <field name="sequence">4</field>
-        <field name="calorific_value">4080</field>
-        <field name="price">94</field>
+        <field name="calorific_value">4.08</field>
+        <field name="price">0.3</field>
+        <field name="uom_id" ref="product.product_uom_kgm"/>
     </record>
 
     <record id="fuel_5" model="of.calculation.fuel">
         <field name="name">Granulé bois</field>
         <field name="sequence">5</field>
-        <field name="calorific_value">4900</field>
-        <field name="price">510</field>
+        <field name="calorific_value">4.9</field>
+        <field name="price">0.51</field>
+        <field name="uom_id" ref="product.product_uom_kgm"/>
     </record>
 
     <record id="fuel_6" model="of.calculation.fuel">
         <field name="name">Électricité</field>
         <field name="sequence">6</field>
-        <field name="calorific_value">0.086</field>
-        <field name="price">0.002276</field>
+        <field name="calorific_value">1</field>
+        <field name="price">0.2276</field>
+        <field name="uom_id" ref="of_calculation_heat_loss.product_uom_kwh"/>
     </record>
 
 </odoo>
