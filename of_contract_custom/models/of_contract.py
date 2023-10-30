@@ -148,6 +148,11 @@ class OfContract(models.Model):
         string=u"Séquence automatique", compute='_compute_automatic_sequence',
         default=lambda c: c._default_automatic_sequence())
     intervention_sites = fields.Char(string=u"Sites d'intervention", compute='_compute_intervention_sites')
+    purchase_order_ids = fields.One2many(
+        comodel_name='purchase.order', inverse_name='of_contract_id',
+        string=u"Commandes fournisseur", help=u"Liste des commandes fournisseur des DI")
+    purchase_order_count = fields.Integer(
+        string=u"Calcul de commandes fournisseur (compteur)", compute='_compute_purchase_order_count')
 
     @api.model
     def _default_journal(self):
@@ -279,6 +284,15 @@ class OfContract(models.Model):
         """ Calcul du nombre de factures liées au contrat """
         for contract in self:
             contract.invoice_count = len(contract.invoice_ids)
+
+    @api.depends('service_ids')
+    def _compute_purchase_order_count(self):
+        for contract in self:
+            total_po = 0
+            if contract.service_ids:
+                for service in contract.service_ids:
+                    total_po += len(service.purchaseorder_ids)
+                contract.purchase_order_count = total_po
 
     @api.depends('line_ids', 'line_ids.date_indexed')
     def _compute_date_indexed(self):
@@ -761,6 +775,27 @@ class OfContract(models.Model):
         for contract in contracts:
             contract.line_ids._generate_services()
         self.env['ir.config_parameter'].set_param('contracts_to_do', '[]')
+
+    @api.multi
+    def action_view_purchase_order(self):
+        services = self.env['of.service'].search([('contract_id', '=', self.id)])
+        purchase_orders = []
+        for service in services:
+            if service.purchaseorder_ids:
+                for purchase_order in service.purchaseorder_ids:
+                    purchase_orders.append(purchase_order.id)
+        if purchase_orders:
+            action = self.env.ref('purchase.purchase_form_action').read()[0]
+            if len(purchase_orders) > 1:
+                action['domain'] = [('id', 'in', purchase_orders)]
+            elif len(purchase_orders) == 1:
+                action['views'] = [(self.env.ref('of_purchase.of_purchase_order_customer_form').id, 'form')]
+                action['res_id'] = purchase_orders[0]
+            else:
+                action = {'type': 'ir.actions.act_window_close'}
+            self.purchase_order_ids = purchase_orders
+            print(self.purchase_order_ids)
+            return action
 
 
 class OfContractLine(models.Model):
@@ -1907,3 +1942,7 @@ class OfContractPeriod(models.Model):
                 period.has_invoices = True
 
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    of_contract_id = fields.Many2one(string=u"Contrat DI")
