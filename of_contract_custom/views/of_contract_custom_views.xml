@@ -94,6 +94,10 @@
                         <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
                             <field name="intervention_count" widget="statinfo" string="RDVs"/>
                         </button>
+                        <button name="action_view_purchase_order" type="object" class="oe_stat_button"
+                        icon="fa-credit-card" attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_count" widget="statinfo" string="Commandes fournisseur"/>
+                        </button>
                         <button name="toggle_active" type="object"
                                         class="oe_stat_button" icon="fa-archive"
                                         confirm="Êtes-vous sûr de vouloir archiver/activer ce contrat ?">
