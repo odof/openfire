@@ -719,7 +719,7 @@ class OfSaleOrderLayoutCategory(models.Model):
             })
 
             # On duplique les lignes de commandes associées
-            for line in layout_category_id.order_line_ids:
+            for line in layout_category_id.order_line_without_child_ids:
                 line.copy({
                     'of_layout_category_id': new_layout_category_id.id,
                 })

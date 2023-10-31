@@ -112,7 +112,7 @@ class OfLayoutCategoryDuplicateWizard(models.TransientModel):
             'parent_id': self.order_parent_id.id or False,
         })
 
-        for line in self.order_layout_category_id.order_line_ids:
+        for line in self.order_layout_category_id.order_line_without_child_ids:
             line.copy({
                 'of_layout_category_id': sale_order_layout_category_parent.id,
             })
