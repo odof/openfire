@@ -1,12 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import of_survey_survey
-from . import of_survey_question_answer
-from . import of_survey_survey_template
-from . import of_survey_question
-from . import of_survey_user_input
-from . import of_survey_user_input_line
-from . import badge
-from . import challenge
-from . import res_partner
-from . import crm_lead
+from . import (
+    badge,
+    challenge,
+    of_survey_question,
+    of_survey_question_answer,
+    of_survey_survey,
+    of_survey_survey_template,
+    of_survey_user_input,
+    of_survey_user_input_line,
+    res_partner,
+)

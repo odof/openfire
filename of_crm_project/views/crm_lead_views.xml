@@ -56,6 +56,37 @@
                             </sheet>
                         </form>
                     </field>
+
+                    <group>
+                        <group>
+                            <field name="of_survey"/>
+                        </group>
+                        <group attrs="{'invisible': [('of_survey','=',False)]}">
+                            <button class="btn btn-primary" name="open_survey" type="object" string="Reply"/>
+                        </group>
+                    </group>
+
+                    <field name="of_question_ids" attrs="{'invisible': ['|',('of_survey','=',False),('of_survey_user_input_line','!=',[])]}">
+                        <tree>
+                            <field name="title" string="Question"/>
+                        </tree>
+                    </field>
+
+                    <group>
+                        <field name="of_survey_user_input" invisible="1"/>
+                    </group>
+                    <field name="of_survey_user_input_line" attrs="{'invisible': ['|',('of_survey','=',False),('of_survey_user_input_line','=',[])]}" >
+                        <tree>
+                            <field name="question_id"/>
+                            <field name="display_name" string="Answer"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <field name="question_id"/>
+                                <field name="display_name" string="Answer"/>
+                            </group>
+                        </form>
+                    </field>
                 </page>
             </xpath>
             <!-- /"Notebook" part -->

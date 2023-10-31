@@ -8,21 +8,13 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Personnalisation du CRM pour le module vente",
-    'depends': [
-        'auth_signup',
-        'http_routing',
-        'mail',
-        'web_tour',
-        'gamification',
-        'of_crm'
-    ],
+    'depends': ['auth_signup', 'http_routing', 'mail', 'web_tour', 'gamification', 'of_crm'],
     'data': [
         'reports/survey_report_templates.xml',
         'views/of_survey_reports.xml',
         'data/mail_template_data.xml',
         'security/of_survey_security.xml',
         'security/ir.model.access.csv',
-        'views/crm_lead_views.xml',
         'views/of_survey_menus.xml',
         'views/of_survey_survey_views.xml',
         'views/of_survey_user_views.xml',
