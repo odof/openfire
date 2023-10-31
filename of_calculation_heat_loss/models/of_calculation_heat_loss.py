@@ -20,7 +20,6 @@ class OFCalculationHeatLoss(models.Model):
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Devis / Bon de commande")
     parc_installe_id = fields.Many2one(comodel_name='of.parc.installe', string=u"Parc installé")
     partner_name = fields.Char(string=u"Nom du contact", related='partner_id.name')
-    partner_email = fields.Char(string=u"Email du contact", related='partner_id.email')
     partner_zip = fields.Char(string=u"Code postal du contact", related='partner_id.zip', required=True)
     partner_city = fields.Char(string=u"Ville du contact", related='partner_id.city')
     partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street')

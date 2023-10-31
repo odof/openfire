@@ -58,6 +58,7 @@
                     is_frontend: true,
                     };
                 </script>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
                 <t t-call-assets="web.assets_common" t-js="false"/>
                 <t t-call-assets="web.assets_frontend" t-js="false"/>
@@ -87,7 +88,7 @@
 
 
     <template id="heat_loss_calculation_form">
-        <t t-call="of_calculation_heat_loss.layout_minimal">
+        <t t-call="of_website_calculation_heat_loss.layout_minimal">
             <section class="container">
                 <div class="row">
                     <div class="col-md-12">
@@ -105,7 +106,7 @@
                             <label class="control-label" for="partner_zip">
                                 <span> Code postal </span>
                             </label>
-                            <input class="form-control o_website_form_input" type="text" name="partner_zip" required="required" t-att-value="partner_zip"/>
+                            <input class="form-control o_website_form_input" type="text" id="partner_zip" name="partner_zip" required="required" t-att-value="partner_zip"/>
                         </div>
                         <div class="form-group form-field  form-field-char" data-model-field="true" data-optional="true">
                             <label class="control-label" for="partner_city">
@@ -117,7 +118,7 @@
                             <label class="control-label" for="altitude_id">
                                 <span> Altitude </span>
                             </label>
-                            <select class="form-control o_website_form_input" name="altitude_id" required="required">
+                            <select class="form-control o_website_form_input" id="altitude_id" name="altitude_id" required="required">
                                 <option/>
                                 <t t-foreach="altitudes" t-as="altitude">
                                     <option t-att-value="altitude.id" t-att-selected="altitude_id and altitude.id == altitude_id.id and 'selected'"><t t-esc="altitude.name"/></option>
@@ -229,6 +230,10 @@
                         Consommation annuelle :
                     </label>
                     <span t-esc="annual_consumption_text"/>
+                    <span id="fuel_consumption_values"
+                          t-esc="fuel_consumption_values"
+                          style="display:none;"/>
+                    <canvas id="chart_energy_consuption" height="400px" width="400px"/>
                 </div>
                 <form t-if="estimated_power_text" accept-charset="UTF-8" action="/get_heat_loss_pdf/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mb16" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
