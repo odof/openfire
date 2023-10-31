@@ -67,8 +67,6 @@ class OFSurveyUserInput(models.Model):
         string="Is in a Session", help="Is that user input part of a survey session or not."
     )
     question_time_limit_reached = fields.Boolean(compute='_compute_question_time_limit_reached')
-    # CRM LEAD
-    of_crm_lead_id = fields.Many2one('crm.lead', string='Lead')
 
     _sql_constraints = [
         ('unique_token', 'UNIQUE (access_token)', "An access token must be unique!"),
