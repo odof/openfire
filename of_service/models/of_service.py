@@ -258,6 +258,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
 
     # Rubrique Description
     note = fields.Text('Notes')
+    map_view_display_note = fields.Text(string=u"Notes (affichage vue carte)", compute='_compute_map_view_display_note')
 
     # Alertes
     recurrence_tache = fields.Boolean(related='tache_id.recurrence', string=u"Récurrence tâche", readonly=True)
@@ -563,6 +564,10 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 record.department_id = record.address_id.department_id
             elif record.partner_id:
                 record.department_id = record.partner_id.department_id
+
+    def _compute_map_view_display_note(self):
+        for rec in self:
+            rec.map_view_display_note = rec.note and rec.note[:300] or ""
 
     # @api.onchange
 

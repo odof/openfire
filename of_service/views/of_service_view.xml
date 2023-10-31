@@ -259,6 +259,7 @@
                 <field name="partner_phone"/>
                 <field name="name"/>
                 <field name="date_next"/>
+                <field name="map_view_display_note"/>
                 <templates>
                     <t t-name="of_map_record_box">
                         <div t-attf-class="#{map_record_color(record.color.raw_value)} of_map_record_global_click">
@@ -290,6 +291,9 @@
                                 </t>
                                 <t t-if="record.date_next.raw_value">
                                     <i class="of_map_record_main fa fa-truck"/><span class="of_ws"/><field name="date_next"/><br/>
+                                </t>
+                                <t t-if="record.map_view_display_note.raw_value">
+                                    <i class="of_map_record_main fa fa-sticky-note"/><span class="of_ws"/><field name="map_view_display_note"/><br/>
                                 </t>
                             </div>
                         </div>
