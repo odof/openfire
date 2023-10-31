@@ -24,6 +24,6 @@ class OFCalculationHeatLossLine(models.Model):
         for line in self:
             try:
                 # Extract float from string
-                line.power = re.findall(r"[-+]?(?:\d*\.*\d+)", line.power_char.replace(',','.'))[0]
+                line.power = re.findall(r"[-+]?(?:\d*\.*\d+)", line.power_char.replace(',', '.'))[0]
             except ValueError:
                 line.power = 0.0
