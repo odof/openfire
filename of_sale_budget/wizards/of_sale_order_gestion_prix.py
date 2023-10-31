@@ -55,6 +55,15 @@ class GestionPrixLine(models.TransientModel):
         else:
             return super(GestionPrixLine, self).get_base_amount(order_line, cost_prorata, all_zero)
 
+    def filter_lines(self, lines_select, cost_prorata):
+        if cost_prorata == 'total_cost':
+            lines_select = lines_select.filtered(lambda line: line.order_line_id.of_total_labor_cost) or lines_select
+        elif cost_prorata == 'theorical_price':
+            lines_select = lines_select.filtered(lambda line: line.order_line_id.of_theorical_price) or lines_select
+        else:
+            lines_select = super(GestionPrixLine, self).filter_lines(lines_select, cost_prorata)
+        return lines_select
+
 
 class GestionPrixLayoutCategory(models.TransientModel):
     _inherit = 'of.sale.order.gestion.prix.layout.category'

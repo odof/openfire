@@ -596,6 +596,19 @@ class GestionPrixLine(models.TransientModel):
         # Cela permet d'ajuster plus facilement le prix sur les dernières lignes
         return self.sorted('quantity', reverse=True)
 
+    @api.model
+    def filter_lines(self, lines_select, cost_prorata):
+        """
+        Cette fonction filtre les lignes qui dont le critère de prorata est à 0.
+        @param lines_select: Ligne de commande dont qu'on veut filtrer
+        @param cost_prorata: Critère de prorata
+        """
+        if cost_prorata == 'price':
+            lines_select = lines_select.filtered(lambda line: line.order_line_id.price_unit) or lines_select
+        elif cost_prorata == 'cost':
+            lines_select = lines_select.filtered(lambda line: line.order_line_id.purchase_price) or lines_select
+        return lines_select
+
     @api.multi
     def distribute_amount(self, to_distribute, mode, currency, cost_prorata, line_rounding):
         u"""
@@ -614,7 +627,7 @@ class GestionPrixLine(models.TransientModel):
 
         lines_select = self.filtered(lambda line: line.state == 'included')
         if mode != 'reset':
-            lines_select = lines_select.filtered(lambda line: line.order_line_id.price_unit) or lines_select
+            lines_select = self.filter_lines(lines_select, cost_prorata)
         lines_forced = self.filtered(lambda line: line.state == 'forced')
         lines_excluded = self - lines_select - lines_forced
 
