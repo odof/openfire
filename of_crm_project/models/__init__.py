@@ -6,5 +6,6 @@ from . import (
     of_crm_project_attr_select,
     of_crm_project_line,
     of_crm_project_template,
+    of_survey_survey,
     of_survey_user_input,
 )

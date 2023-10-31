@@ -45,6 +45,7 @@ class CrmLead(models.Model):
                 }
                 of_survey_user_input = self.env['of.survey.user_input'].create(value)
             self.of_survey_user_input = of_survey_user_input
+            self.of_survey_user_input.write({'state': 'new'})
 
     def open_survey(self):
         url = f'/of_survey/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'

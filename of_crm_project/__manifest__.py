@@ -21,6 +21,13 @@
         'views/of_crm_project_views.xml',
         'views/crm_lead_views.xml',
         'views/menus.xml',
+        'templates/of_survey_templates.xml',
+        'views/of_survey_survey_views.xml',
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'of_crm_project/static/src/js/survey.js',
+        ],
+    },
     'installable': True,
 }

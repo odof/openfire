@@ -452,7 +452,6 @@ publicWidget.registry.OFSurveyFormWidget = publicWidget.Widget.extend(OFSurveyPr
             params.previous_page_id = options.previousPageId;
         }
         var route = "/of_survey/submit";
-
         if (this.options.isStartScreen) {
             route = "/of_survey/begin";
             // Hide survey title in 'page_per_question' layout: it takes too much space

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_project_of_survey_survey_form" model="ir.ui.view">
+        <field name="name">of.survey.survey.form</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey.of_survey_survey_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='options']" position="inside">
+                <group string="Show">
+                    <field name="show_start"/>
+                    <field name="show_end"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

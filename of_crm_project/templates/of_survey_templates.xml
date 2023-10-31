@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="survey_fill_form_start" inherit_id="of_survey.survey_fill_form_start">
+        <xpath expr="//button" position="after">
+            <div class="show_start" t-attf-data-show="{{survey.show_start and 'yes' or 'no'}}"/>
+        </xpath>
+    </template>
+
+</odoo>
