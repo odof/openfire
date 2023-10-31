@@ -21,7 +21,7 @@
                 <field name="of_brand_distributor_ids" widget="many2one"/>
             </field>
             <group name="group_by" position="inside">
-                <filter name="tag" string="Distributed brand" domain="[]" context="{'group_by' : 'of_gb_brand_distributor_id'}"/>
+                <filter name="tag" string="Distributed brand" context="{'group_by' : 'of_brand_distributor_ids'}"/>
             </group>
         </field>
     </record>
