@@ -43,7 +43,7 @@ class OFCalculationController(http.Controller):
 
             })
 
-        return http.request.render('of_website_calculation_heat_loss.heat_loss_calculation_form', values)
+        return request.render('of_website_calculation_heat_loss.heat_loss_calculation_form', values)
 
     @http.route('/create_heat_loss_calculation', type='http', auth="public", methods=['POST'], website=True)
     def create_heat_loss_calculation(self, **kwargs):
@@ -55,7 +55,7 @@ class OFCalculationController(http.Controller):
             heat_loss.write(kwargs)
         else:
             country = request.env['res.country'].search([('code', '=', 'FR')])
-            kwargs['country_id'] = country.id
+            kwargs['partner_country_id'] = country.id
             heat_loss = heat_loss_obj.sudo().create(kwargs)
 
         heat_loss.button_compute_estimated_power()

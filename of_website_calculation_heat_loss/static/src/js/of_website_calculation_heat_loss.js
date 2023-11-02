@@ -8,21 +8,6 @@ odoo.define('of_calculation_heat_loss.calculation_website', function (require) {
     var config = require('web.config');
     var _t = core._t;
 
-    // Chargement du graphe des coûts par énergie
-    var fuel_consumption_values = JSON.parse($("#fuel_consumption_values").text());
-    new Chart("chart_energy_consuption", {
-        type: "bar",
-        data: {
-            labels: fuel_consumption_values.names,
-            datasets: [{
-                label: "Coût annuel (€)",
-                backgroundColor: fuel_consumption_values.colors,
-                data: fuel_consumption_values.costs,
-            }]
-        },
-        options: {}
-    });
-
     // Filtre des altitudes disponibles par département
     $('#iframe_section input#partner_zip').on('change', function (event) {
         // Lorsque le code postal est renseigné, on récupère la liste des altitudes possibles
@@ -49,4 +34,23 @@ odoo.define('of_calculation_heat_loss.calculation_website', function (require) {
             });
         };
     });
+
+    try {
+        // Chargement du graphe des coûts par énergie
+        var fuel_consumption_values = JSON.parse($("#fuel_consumption_values").text());
+        new Chart("chart_energy_consuption", {
+            type: "bar",
+            data: {
+                labels: fuel_consumption_values.names,
+                datasets: [{
+                    label: "Coût annuel (€)",
+                    backgroundColor: fuel_consumption_values.colors,
+                    data: fuel_consumption_values.costs,
+                }]
+            },
+            options: {}
+        });
+    } catch {}
+
+
 });
