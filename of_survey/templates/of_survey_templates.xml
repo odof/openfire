@@ -268,7 +268,7 @@
                 <div class="row">
                     <div class="col">
                         <div>
-                            <p><a role="button" class="btn btn-primary btn-lg" t-attf-href="/web#id={{request.env['crm.lead'].search([('of_survey','=',survey.id)],limit=1).id}}&amp;model=crm.lead&amp;view_type=form">
+                            <p><a role="button" class="btn btn-primary btn-lg btn-end" t-attf-href="/web#id={{request.env['crm.lead'].search([('of_survey','=',survey.id)],limit=1).id}}&amp;model=crm.lead&amp;view_type=form">
                                 Terminer</a></p>
                         </div>
                     </div>

@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import uuid
+
 from odoo import Command, _, api, fields, models
 
 
@@ -32,23 +34,21 @@ class CrmLead(models.Model):
     @api.onchange('of_survey')
     def _onchange_of_survey(self):
         if self.of_survey:
-            # on va chercher s'il existe déjà un survey_user_input avec ce crm_lead
-            # sinon, on le crée
-            of_survey_user_input = self.env['of.survey.user_input'].search(
-                [('of_crm_lead_id', '=', self._origin.id)], limit=1
-            )
-            if not of_survey_user_input:
-                value = {
-                    'survey_id': self.of_survey.id,
-                    'of_crm_lead_id': self._origin.id,
-                    'partner_id': self.env.user.partner_id.id,
-                }
-                of_survey_user_input = self.env['of.survey.user_input'].create(value)
-            self.of_survey_user_input = of_survey_user_input
-            self.of_survey_user_input.write({'state': 'new'})
+            self.of_survey_user_input = False
+            self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
+            self.of_survey_user_input.of_crm_lead_id = self._origin.id
 
     def open_survey(self):
-        url = f'/of_survey/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'
+        if self.of_survey_user_input.state == 'new':
+            url = f'/of_survey/start/{self.of_survey.access_token}'
+        else:
+            self.of_survey_user_input = self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
+            value = {
+                'of_crm_lead_id': self._origin.id,
+            }
+            self.of_survey_user_input.write(value)
+            url = f'/of_survey/retry/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'
+
         return {
             'type': 'ir.actions.act_url',
             'name': _("Start Survey"),
