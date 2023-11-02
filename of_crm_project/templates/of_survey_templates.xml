@@ -9,7 +9,7 @@
 
     <template id="survey_fill_form_done" inherit_id="of_survey.survey_fill_form_done">
         <xpath expr="//a[hasclass('btn-end')]/.." position="after">
-            <div class="show_end" t-attf-crm-lead-id="{{request.env['crm.lead'].search([('of_survey','=',survey.id)],limit=1).id}}" t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}"/>
+            <div class="show_end" t-attf-crm-lead-id="{{request.env['crm.lead'].search([('of_survey','=',survey.id)],limit=1).id}}" t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}" t-attf-action-id="{{request.env['ir.actions.act_window'].search([('name','=','Pipeline')],limit=1).id}}" t-on-click="console.log('Load !')"/>
         </xpath>
     </template>
 </odoo>

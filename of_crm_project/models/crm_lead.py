@@ -29,21 +29,12 @@ class CrmLead(models.Model):
         comodel_name='of.survey.question', related='of_survey.question_ids', string="Questions"
     )
 
-    @api.onchange('of_survey')
-    def _onchange_of_survey(self):
-        if self.of_survey:
-            self.of_survey_user_input = self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.of_crm_lead_id = self._origin.id
-
     def open_survey(self):
-        if self.of_survey_user_input.state == 'new':
-            self.of_survey_user_input = self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.of_crm_lead_id = self._origin.id
-            url = f'/of_survey/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'
-        else:
-            self.of_survey_user_input = self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.of_crm_lead_id = self._origin.id
-            url = f'/of_survey/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'
+        # on nettoie les anciennes données
+        self.env['of.survey.user_input'].search([('of_crm_lead_id', '=', self._origin.id)]).unlink()
+        self.of_survey_user_input = self.of_survey._create_answer(user=self.env.user, email=self.env.user.email)
+        self.of_survey_user_input.of_crm_lead_id = self._origin.id
+        url = f'/of_survey/{self.of_survey.access_token}/{self.of_survey_user_input.access_token}'
 
         return {
             'type': 'ir.actions.act_url',
