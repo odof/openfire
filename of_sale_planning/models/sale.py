@@ -115,11 +115,6 @@ class SaleOrderLine(models.Model):
         self.calculate_duration()
         return res
 
-    @api.onchange('product_uom', 'product_uom_qty')
-    def product_uom_change(self):
-        super(SaleOrderLine, self).product_uom_change()
-        self.calculate_duration()
-
     @api.onchange('of_is_kit')
     def _onchange_of_is_kit(self):
         super(SaleOrderLine, self)._onchange_of_is_kit()
