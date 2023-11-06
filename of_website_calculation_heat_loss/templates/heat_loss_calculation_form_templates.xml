@@ -97,7 +97,7 @@
                 </div>
             </section>
             <section id="iframe_section" class="container readable o_website_form_builder">
-                <form accept-charset="UTF-8" action="/create_heat_loss_calculation/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mt32 mb16" enctype="multipart/form-data" method="post">
+                <form accept-charset="UTF-8" action="/calcul_deperdition_chaleur/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mt32 mb16" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <div class="o_website_form_fields">
                         <div class="o_not_editable hidden o_default_snippet_text"> This placeholder prevents its parent from disappearing when emptied </div>
@@ -182,7 +182,7 @@
                             <label class="control-label" for="construction_type_id">
                                 <span> Type de bâtiment </span>
                             </label>
-                            <select class="form-control o_website_form_input" name="construction_type_id" required="required">
+                            <select class="form-control o_website_form_input" name="construction_type_id" required="required" t-att-value="construction_type_id or None">
                                 <option/>
                                 <t t-foreach="construction_types" t-as="construction_type">
                                     <option t-att-value="construction_type.id" t-att-selected="construction_type_id and construction_type.id == construction_type_id.id and 'selected'"><t t-esc="construction_type.name"/></option>
@@ -244,6 +244,10 @@
                     <div class="text-muted text-small mb16">
                         <span t-esc="message"/>
                     </div>
+                    <label for="base_temperature_line_id">
+                        Ligne de température :
+                    </label>
+                    <span t-field="base_temperature_line_id.name"/><br/>
                     <label for="annual_consumption_text">
                         Consommation annuelle :
                     </label>
@@ -258,7 +262,7 @@
                     <h3 class="text-center mb8 mt32">Recevoir le compte-rendu par mail</h3>
                     <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
                         <label class="control-label" for="partner_name">
-                            <span> Nom </span>
+                            <span> Nom de l'entreprise </span>
                         </label>
                         <input class="form-control o_website_form_input" type="text" name="partner_name" required="required"/>
                     </div>
