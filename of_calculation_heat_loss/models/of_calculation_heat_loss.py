@@ -11,6 +11,7 @@ class OFCalculationHeatLoss(models.Model):
     _name = 'of.calculation.heat.loss'
     _inherit = 'mail.thread'
     _description = u"Calcul de déperdition de chaleur"
+    _order = "create_date DESC"
 
     name = fields.Char(string=u"Nom", compute='_compute_name', store=True)
     number = fields.Char(string=u"Numéro", readonly=True)
@@ -232,7 +233,7 @@ class OFCalculationHeatLoss(models.Model):
                 'line_ids': [(0, 0, dict({'product_id': p.id}))
                              for p in products],
                 'annual_consumption': annual_consumption,
-                'annual_consumption_text': "%s %s" % (annual_consumption, "kWatt/an"),
+                'annual_consumption_text': "%.2f %s" % (annual_consumption, "kWatt/an"),
             })
             self.get_fuel_consumption_data()
         if errors:

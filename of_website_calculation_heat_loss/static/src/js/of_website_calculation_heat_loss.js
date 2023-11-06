@@ -48,7 +48,21 @@ odoo.define('of_calculation_heat_loss.calculation_website', function (require) {
                     data: fuel_consumption_values.costs,
                 }]
             },
-            options: {}
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = "Coût annuel : ";
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
         });
     } catch {}
 
