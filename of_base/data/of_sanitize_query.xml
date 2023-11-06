@@ -18,6 +18,11 @@
         <field name="query">UPDATE ir_cron SET active = False</field>
     </record>
 
+    <!-- Paramètres de configuration -->
+    <record id="sanitize_query_web_base_url_freeze" model="of.sanitize.query">
+        <field name="query">DELETE FROM ir_config_parameter WHERE key='web.base.url.freeze'</field>
+    </record>
+
     <!-- ***  Autres modules, nécessitent une vérification d'existence des tables/champs  *** -->
 
     <!-- Connecteurs Google Agenda - module odoo google_calendar -->
