@@ -9,7 +9,7 @@ class OFCalculationSurface(models.Model):
     _description = u"Tableau de correspondance entre parois et coefficient K"
     _order = "surface_type DESC, k_value DESC"
 
-    name = fields.Char(string=u"Nom", compute='_compute_name')
+    name = fields.Char(string=u"Nom", compute='_compute_name', store=True)
     surface_type = fields.Selection(
         selection=[('wall', u"Murs"), ('roof', u"Toiture"), ('floor', u"Plancher bas")],
         string=u"Parois", required=True)
