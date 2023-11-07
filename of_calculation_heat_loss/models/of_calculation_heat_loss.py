@@ -169,7 +169,6 @@ class OFCalculationHeatLoss(models.Model):
         if not vals.get('partner_id'):
             vals, partner_vals = self._of_extract_partner_values(vals)  # split vals
             partner_vals.update({
-                'name': vals.get('partner_name') or "Web",
                 'type': False,
                 'customer': True,
             })
@@ -253,13 +252,15 @@ class OFCalculationHeatLoss(models.Model):
             if field_name not in self._fields:  # don't take vals that are not fields into account
                 continue
             field = self._fields[field_name]
-            # field is not related or is partner_name-> let it be
-            if not getattr(field, 'related') or field.name == 'partner_name':
+            # field is not related
+            if not getattr(field, 'related'):
                 continue
             related = field.related
             if related and related[0] == 'partner_id':  # field related to partner_id
                 partner_vals['.'.join(related[1:])] = val  # add value to partner_vals
                 del new_vals[field_name]  # take value out of new vals
+        if 'partner_name' in vals and not partner_vals['name']:
+            partner_vals['name'] = "Web"
         return new_vals, partner_vals
 
     @api.multi

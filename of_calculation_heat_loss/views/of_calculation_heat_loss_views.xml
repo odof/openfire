@@ -31,7 +31,8 @@
                             </div>
                             <field name="department_id"/>
                             <field name="available_altitude_ids" widget="many2many_tags" invisible="1"/>
-                            <field name="altitude_id" domain="[('id', 'in', available_altitude_ids and available_altitude_ids[0] and available_altitude_ids[0][2] or False)]"/>
+                            <field name="altitude_id" options="{'no_create': True, 'no_edit': True}"
+                                   domain="[('id', 'in', available_altitude_ids and available_altitude_ids[0] and available_altitude_ids[0][2] or False)]"/>
                             <field name="base_temperature_line_id"/>
                         </group>
                     </group>
