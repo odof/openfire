@@ -261,16 +261,16 @@
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <h3 class="text-center mb8 mt32">Recevoir le compte-rendu par mail</h3>
                     <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
-                        <label class="control-label" for="partner_name">
+                        <label class="control-label" for="pro_partner_name">
                             <span> Nom de l'entreprise </span>
                         </label>
-                        <input class="form-control o_website_form_input" type="text" name="partner_name" required="required"/>
+                        <input class="form-control o_website_form_input" type="text" name="pro_partner_name" required="required" t-att-value="pro_partner_name"/>
                     </div>
                     <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
-                        <label class="control-label" for="partner_email">
+                        <label class="control-label" for="pro_partner_email">
                             <span> Email </span>
                         </label>
-                        <input class="form-control o_website_form_input" type="text" name="partner_email" required="required" t-att-value="partner_email"/>
+                        <input class="form-control o_website_form_input" type="text" name="pro_partner_email" required="required" t-att-value="pro_partner_email"/>
                     </div>
                     <div class="form-group">
                         <button type="submit" id="get_heat_loss_calculation_pdf_button" class="btn btn-primary btn-lg o_default_snippet_text">

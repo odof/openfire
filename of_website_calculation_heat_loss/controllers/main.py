@@ -10,17 +10,17 @@ from odoo.http import request
 class OFCalculationController(http.Controller):
 
     @http.route('/calcul_deperdition_chaleur', type='http', auth="public", methods=['GET', 'POST'], website=True)
-    def heat_loss_calculation_form(self, heat_loss_id=None, **kwargs):
+    def heat_loss_calculation_form(self, **kwargs):
         heat_loss_obj = request.env['of.calculation.heat.loss']
         altitude_obj = request.env['of.calculation.altitude']
         construction_date_obj = request.env['of.calculation.construction.date']
         construction_type_obj = request.env['of.calculation.construction.type']
         surface_obj = request.env['of.calculation.surface']
 
-        if request.httprequest.method == 'POST':
-            heat_loss_id = request.session.get('heat_loss_id')
-            heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
+        heat_loss_id = request.session.get('heat_loss_id')
+        heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
 
+        if request.httprequest.method == 'POST':
             if heat_loss:
                 heat_loss.write(kwargs)
             else:
@@ -42,8 +42,6 @@ class OFCalculationController(http.Controller):
         logement_principal = request.env.ref('of_calculation_heat_loss.construction_type_1', raise_if_not_found=False)
         if logement_principal and logement_principal in values['construction_types']:
             values['construction_type_id'] = logement_principal
-        heat_loss_id = request.session.get('heat_loss_id')
-        heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
         if heat_loss:
             fields_dict = {}
             for key in heat_loss.fields_get():
