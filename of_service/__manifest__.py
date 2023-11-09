@@ -22,6 +22,7 @@
         'data/of_service_data.xml',
         'security/ir.model.access.csv',
         'security/res_groups.xml',
+        'wizards/of_service_create_intervention_wizard_views.xml',
         'views/of_service_view.xml',
     ],
     'installable': True,
