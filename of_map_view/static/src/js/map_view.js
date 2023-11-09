@@ -18,6 +18,7 @@ var QWeb = require('web.QWeb');
 var mixins = core.mixins;
 var formats = require('web.formats');
 var time = require('web.time');
+var Sidebar = require('web.Sidebar');
 
 /**
  *	TODO: add warning when using OSM tile server
@@ -557,6 +558,27 @@ var MapView = View.extend({
         });
     },
     /**
+     * Instantiate and render the sidebar.
+     * Sets this.sidebar
+     * @param {jQuery} [$node] a jQuery node where the sidebar should be inserted
+     * $node may be undefined, in which case the ListView inserts the sidebar in
+     * this.options.$sidebar or in a div of its template
+     **/
+    render_sidebar: function($node) {
+        if (!this.sidebar && this.options.sidebar) {
+            this.sidebar = new Sidebar(this, {editable: this.is_action_enabled('edit')});
+            if (this.fields_view.toolbar) {
+                this.sidebar.add_toolbar(this.fields_view.toolbar);
+            }
+
+            $node = $node || this.options.$sidebar;
+            this.sidebar.appendTo($node);
+
+            // Hide the sidebar by default (it will be shown as soon as a record is selected)
+            this.sidebar.do_hide();
+        }
+    },
+    /**
      * Instantiate and render the pager and add listeners on it.
      * Set this.pager
      * @param {jQuery} [$node] a jQuery node where the pager should be inserted
@@ -618,6 +640,13 @@ var MapView = View.extend({
             //this.load_records(this.current_min - 1, origin="reload");
         }
     },
+    do_show: function () {
+        this._super();
+        if (this.sidebar) {
+            // Hide the sidebar by default (will be shown once a record is selected)
+            this.sidebar.do_hide();
+        }
+    },
     /**
      * remove the map on destroy() so it doesn't generate an error when trying to load the map view of another model.
      */
@@ -626,6 +655,10 @@ var MapView = View.extend({
         this.map.the_map.remove();
         this.map.the_map = null;
         return this._super.apply(this, arguments);
+    },
+    get_selected_ids: function() {
+        var ids = this.map.record_displayer.get_record_ids();
+        return ids;
     },
 });
 /**/
@@ -1627,8 +1660,16 @@ MapView.Marker = L.Marker.extend({
             if (this.selected) {
                 //console.log('marker selected: ',this);
                 this.group.map.record_displayer.add_record(this,this.group.map.view.record_options);
+                if (this.group.map.view.sidebar) {
+                    this.group.map.view.sidebar.do_show();
+                }
             }else{
                 this.group.map.record_displayer.remove_record(this.id);
+                if (this.group.map.record_displayer.get_record_ids().length == 0) {
+                    if (this.group.map.view.sidebar) {
+                        this.group.map.view.sidebar.do_hide();
+                    }
+                }
             }
             this.do_toggle_highlighted(); // workaround. without it the marker would be highlighted on mouseout
             this.update_glyph();

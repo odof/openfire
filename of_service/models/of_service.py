@@ -807,6 +807,18 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         }
 
     @api.multi
+    def action_create_intervention(self):
+        wizard = self.env['of.service.create.intervention.wizard'].create({
+            'line_ids': [(0, 0, {'service_id': service.id}) for service in self]})
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'of.service.create.intervention.wizard',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
+
+    @api.multi
     def _prepare_sale_order_values(self):
         self.ensure_one()
         Sale = self.env['sale.order']

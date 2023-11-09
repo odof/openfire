@@ -98,6 +98,13 @@ L.Control.RecordDisplayer = L.Control.extend({
             throw new Error(_.str.sprintf( _t("couldn't find record id#"+id)))
         }
     },
+    get_record_ids: function() {
+        var record_ids = [];
+        for (var k in this.records) {
+            record_ids.push(parseInt(k));
+        }
+        return record_ids;
+    },
     /**
      *  Handles signal to highlight or downplay a record marker and map_record
      *
