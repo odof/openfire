@@ -51,7 +51,7 @@ class OfService(models.Model):
             }
 
     @api.multi
-    def make_purchase_order(self):
+    def make_purchase_order(self, supplier_mode='product_supplier'):
         purchase_obj = self.env['purchase.order']
         po_line_obj = self.env['purchase.order.line']
         service_line_obj = self.env['of.service.line']
@@ -100,11 +100,8 @@ class OfService(models.Model):
 
             # Séparer les ligne par fournisseur, lignes sans fournisseur ignorées pour l'instant
             for line in service.line_ids.filtered(lambda l: not l.purchaseorder_line_id):
-                suppliers = line.product_id.seller_ids \
-                    .filtered(lambda r: (not r.company_id or r.company_id == line.company_id) and
-                                        (not r.product_id or r.product_id == line.product_id))
-                if suppliers:
-                    supplier = suppliers[0].name  # supplier.name est un many2one vers res.partner
+                supplier = line._get_po_supplier(supplier_mode=supplier_mode)
+                if supplier:
                     if supplier in my_company_partners:
                         lines_i_supply |= line
                     else:
@@ -137,6 +134,7 @@ class OfService(models.Model):
                         'default_service_id': self.id,
                         'active_model': 'of.service',
                         'active_id': self.id,
+                        'supplier_mode': supplier_mode,
                     }
                     res = {
                         'name': u"Veuillez confirmer",
@@ -218,3 +216,13 @@ class OfServiceLine(models.Model):
         order_line_new.update({'product_qty': self.qty})
         order_line_new._onchange_quantity()
         return order_line_new._convert_to_write(order_line_new._cache)
+
+    @api.multi
+    def _get_po_supplier(self, supplier_mode='product_supplier'):
+        if supplier_mode == 'product_supplier':
+            suppliers = self.product_id.seller_ids.filtered(
+                lambda r: (not r.company_id or r.company_id == self.company_id) and
+                          (not r.product_id or r.product_id == self.product_id))
+            if suppliers:
+                return suppliers[0].name  # supplier.name est un many2one vers res.partner
+        return False

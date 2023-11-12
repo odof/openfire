@@ -216,13 +216,6 @@ class OFService(models.Model):
             lines_data, error = super(OFService, self)._prepare_invoice_lines()
         return lines_data, error
 
-    @api.multi
-    def get_purchase_order_vals(self, supplier):
-        purchase_order_vals = super(OFService, self).get_purchase_order_vals(supplier)
-        if self.supplier_id:
-            purchase_order_vals['partner_id'] = self.supplier_id.id
-        return purchase_order_vals
-
 
 class OFServiceLine(models.Model):
     _inherit = 'of.service.line'
@@ -252,6 +245,13 @@ class OFServiceLine(models.Model):
             po_line_vals['name'] = 'name' in po_line_vals and po_line_vals['name'] + "\n%s" % service.tache_id.name or \
                                    service.tache_id.name
         return po_line_vals
+
+    @api.multi
+    def _get_po_supplier(self, supplier_mode='product_supplier'):
+        if supplier_mode == 'service_supplier':
+            return self.service_id.supplier_id
+        else:
+            return super(OFServiceLine, self)._get_po_supplier(supplier_mode=supplier_mode)
 
 
 class OfPlanningIntervention(models.Model):

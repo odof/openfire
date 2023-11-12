@@ -46,4 +46,18 @@
         </field>
     </record>
 
+    <!-- Générer demande de prix depuis DI -->
+    <record id="action_make_purchase_order_contract" model="ir.actions.server">
+        <field name="name">Générer commande prestataire</field>
+        <field name="model_id" ref="of_service.model_of_service"/>
+        <field name="state">code</field>
+        <field name="code">action = records.make_purchase_order(supplier_mode='service_supplier')</field>
+    </record>
+    <record id="value_make_purchase_order_contract" model="ir.values">
+        <field name="name">Générer commande prestataire</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">of.service</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_make_purchase_order_contract"/>
+    </record>
+
 </odoo>
