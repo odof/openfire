@@ -13,4 +13,5 @@ class OFMakePOValidationWizard(models.TransientModel):
     @api.multi
     def validate(self):
         self.ensure_one()
-        return self.service_id.with_context(of_make_po_validated=True).make_purchase_order()
+        supplier_mode = self._context.get('supplier_mode', 'product_supplier')
+        return self.service_id.with_context(of_make_po_validated=True).make_purchase_order(supplier_mode=supplier_mode)
