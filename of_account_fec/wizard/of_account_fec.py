@@ -8,6 +8,23 @@ from odoo import api, fields, models, _
 from odoo.exceptions import Warning
 
 
+# liste des encodages les plus utilisés, seuls les encodages régulièrement utilisés en France sont non commentés
+available_encodings = [
+    ('utf-8', u"UTF-8"),
+    ('iso-8859-1', u"ISO-8859-1"),
+    ('windows-1252', u"Windows-1252"),
+    # ('windows-1251', u"Windows-1251"),
+    # ('gb2312', u"GB2312"),
+    # ('shift_jis', u"Shift JIS"),
+    # ('gbk', u"GBK"),
+    # ('euc_kr', u"EUC-KR"),
+    # ('iso-8859-9', u"ISO-8859-9"),
+    # ('windows-1254', u"Windows-1254"),
+    # ('euc_jp', u"EUC-JP"),
+    # ('big5', u"Big5"),
+]
+
+
 class OFAccountFrFec(models.TransientModel):
     _inherit = 'account.fr.fec'
 
@@ -25,7 +42,9 @@ class OFAccountFrFec(models.TransientModel):
     of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
     of_ouv_code = fields.Char("Code du journal d'ouverture", required=True, default='OUV')
     of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
-    of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)     
+    of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)
+    of_encoding = fields.Selection(
+        selection=available_encodings, string=u"Encodage du fichier", default=available_encodings[0][0], required=True)
 
     where_clause_create_date = fields.Boolean("Utiliser la date de création", required=True, default=False)
 
@@ -358,6 +377,9 @@ class OFAccountFrFec(models.TransientModel):
         end_date = self.date_to.replace('-', '')
         suffix = '-NONOFFICIAL'
         fecvalue = fecfile.getvalue()
+        # venant du fichier est toujours en utf-8
+        if self.of_encoding != 'utf-8':
+            fecvalue = fecvalue.decode('utf-8').encode(self.of_encoding)
         self.write({
             'fec_data': base64.encodestring(fecvalue),
             'filename': '%sFEC%s%s.%s' % (siren, end_date, suffix, self.of_extension),
