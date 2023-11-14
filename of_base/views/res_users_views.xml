@@ -22,4 +22,16 @@
         </field>
     </record>
 
+    <record id="view_users_form_simple_modif_inherit" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherited</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="groups_id" eval="[(4, ref('of_block_modif_pwd'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='preference_change_password']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

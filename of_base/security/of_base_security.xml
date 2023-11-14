@@ -26,4 +26,11 @@
         <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
+    <!-- Ajout d'un groupe pour limiter l'accès au lien de modification de pwd au niveau du menu "Préférences" -->
+        <record id="of_block_modif_pwd" model="res.groups">
+            <field name="name">(OF) Bloquer la modification du mot de passe</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="comment">Limiter l'accès au lien de modification de mot de passe au niveau du menu "Préférences"</field>
+        </record>
+
 </odoo>
