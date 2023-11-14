@@ -1,0 +1,111 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_geolocalize
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-08 16:36+0000\n"
+"PO-Revision-Date: 2023-11-08 16:36+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">If a partner is added</span>"
+msgstr ""
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">If a partner is changed</span>"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_create
+msgid "Calculate geocoding values automatically​​ when a new partner is added"
+msgstr ""
+"Calculer automatiquement les valeurs de géocodage​​ lorsqu'un nouveau "
+"partenaire est ajouté"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__yes
+msgid "Calculate geocoding values ​​automatically"
+msgstr "Calculer automatiquement les valeurs de géocodage"
+
+#. module: of_geolocalize
+#: model:ir.model,name:of_geolocalize.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_geolocalize
+#: model:ir.model,name:of_geolocalize.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__no
+msgid ""
+"Do not calculate geocoding values (recommended when a large number of "
+"partners are imported)"
+msgstr ""
+"Ne calculez pas les valeurs de géocodage (recommandé lorsqu'un grand nombre "
+"deles partenaires sont importés)"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__no
+msgid ""
+"Do not recalculate geocoding values ​​automatically (GPS coordinates are "
+"reset to zero if not entered at the same time.)"
+msgstr ""
+"Ne recalculez pas automatiquement les valeurs de géocodage (les coordonnées "
+"GPS sontremis à zéro s'il n'est pas saisi en même temps.)"
+
+#. module: of_geolocalize
+#: model:ir.ui.menu,name:of_geolocalize.menu_of_geo_config
+msgid "Geolocation"
+msgstr "Géolocalisation"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
+msgid "Geolocation Settings"
+msgstr "Paramètres de géolocalisation"
+
+#. module: of_geolocalize
+#: model:ir.actions.act_window,name:of_geolocalize.action_res_config_settings_menu
+#: model:ir.ui.menu,name:of_geolocalize.main_menu_geolocalization
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
+msgid "Geolocation settings"
+msgstr "Paramètres de géolocalisation"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__geocoding_on_create
+msgid "If a partner is added"
+msgstr "Si un partenaire est ajouté"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__geocoding_on_write
+msgid "If an address is changed"
+msgstr "Si une adresse est modifiée"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_write
+msgid ""
+"Recalculate geocoding values automatically ​​when a partner's address is "
+"changed"
+msgstr ""
+"Recalculez automatiquement les valeurs de géocodage lorsque l'adresse d'un "
+"partenaire estmodifié"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__yes
+msgid ""
+"Recalculate geocoding values ​​(Geocoding is attempted if GPS coordinates"
+"                     are not entered at the same time.)"
+msgstr ""
+"Recalculer les valeurs de géocodage (Le géocodage est tenté si les "
+"coordonnées GPS ne sont pas saisis en même temps.)"

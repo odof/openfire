@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="15"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Geolocation Settings" string="Geolocation Settings" data-key="of_geolocalize">
+                    <h2>Geolocation settings</h2>
+                    <div class="row mt16 o_settings_container">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">If a partner is added</span>
+                                <div class="text-muted">
+                                    <field name="geocoding_on_create" widget="radio" />
+                                </div>
+                                <span class="o_form_label">If a partner is changed</span>
+                                <div class="text-muted">
+                                    <field name="geocoding_on_write" widget="radio" />
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Action Configuration -->
+        <record id="action_res_config_settings_menu" model="ir.actions.act_window">
+        <field name="name">Geolocation settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'of_geolocalize'}</field>
+    </record>
+
+    <!-- Menu Geolocalization -->
+    <menuitem id="main_menu_geolocalization" name="Geolocation settings" parent="contacts.res_partner_menu_config" sequence="10"/>
+    <menuitem id="menu_of_geo_config" action="action_res_config_settings_menu" name="Geolocation"
+        parent="main_menu_geolocalization" sequence="1"/>
+
+</odoo>

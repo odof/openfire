@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo noupdate="1">
+
+    <record id="of_geolocalize_geocoding_on_create" model="ir.config_parameter">
+        <field name="key">of.geolocalize.geocoding_on_create</field>
+        <field name="value">no</field>
+    </record>
+
+    <record id="of_geolocalize_geocoding_on_write" model="ir.config_parameter">
+        <field name="key">of.geolocalize.geocoding_on_write</field>
+        <field name="value">no</field>
+    </record>
+
+</odoo>
