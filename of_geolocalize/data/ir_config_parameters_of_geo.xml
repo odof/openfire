@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Automatics functions -->
+        <record id="show_stats_default" model="ir.config_parameter">
+            <field name="key">show_stats</field>
+            <field name="value">True</field>
+        </record>
+        <record id="geocoding_on_write_default" model="ir.config_parameter">
+            <field name="key">geocoding_on_write</field>
+            <field name="value">yes</field>
+        </record>
+
+        <record id="geocoding_on_create_default" model="ir.config_parameter">
+            <field name="key">geocoding_on_create</field>
+            <field name="value">no</field>
+        </record>
+        <record id="geocoder_by_default_default" model="ir.config_parameter">
+            <field name="key">geocoder_by_default</field>
+            <field name="value">bano</field>
+        </record>
+    </data>
+</odoo>
