@@ -23,13 +23,14 @@ class OFCalculationController(http.Controller):
         if request.httprequest.method == 'POST':
             if heat_loss:
                 heat_loss.write(kwargs)
-            else:
+            elif kwargs:
                 country = request.env['res.country'].search([('code', '=', 'FR')])
                 kwargs['partner_country_id'] = country.id
                 heat_loss = heat_loss_obj.sudo().create(kwargs)
 
-            heat_loss.button_compute_estimated_power()
-            request.session['heat_loss_id'] = heat_loss.id
+            if heat_loss:
+                heat_loss.button_compute_estimated_power()
+                request.session['heat_loss_id'] = heat_loss.id
         values = {
             'altitudes': altitude_obj.search([]),
             'construction_dates': construction_date_obj.search([]),
@@ -73,3 +74,9 @@ class OFCalculationController(http.Controller):
         heat_loss.send_calculation()
 
         return request.redirect('/calcul_deperdition_chaleur')
+
+    @http.route('/calcul_deperdition_chaleur_new', type='http', auth="public", methods=['GET', 'POST'], website=True)
+    def heat_loss_calculation_form_new(self, **kwargs):
+        if request.session.get('heat_loss_id'):
+            del request.session['heat_loss_id']
+        return self.heat_loss_calculation_form(**kwargs)
