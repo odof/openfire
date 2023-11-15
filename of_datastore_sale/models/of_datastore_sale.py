@@ -22,7 +22,8 @@ class OFDatastoreSale(models.Model):
         domain=[('customer', '=', True), '|', ('is_company', '=', True), ('parent_id', '=', False)])
 
     _sql_constraints = [
-        ('db_name_uniq', 'unique (db_name)', u"Il existe déjà une connexion pour cette base")
+        ('db_name_login_uniq', 'unique (db_name, login)',
+         u"Il existe déjà une connexion pour cette base et cet identifiant")
     ]
 
     @api.multi
