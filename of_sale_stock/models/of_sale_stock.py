@@ -144,6 +144,15 @@ class StockInventory(models.Model):
                     line._compute_product_value()
                     line._onchange_product_id()
 
+    of_product_value = fields.Monetary(
+        string='Value', digits=dp.get_precision('Product Price'),
+        compute='_compute_of_product_value', currency_field='of_currency_id')
+    of_currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="line_ids.currency_id")
+
+    def _compute_of_product_value(self):
+        for inventory in self:
+            inventory.of_product_value = sum(inventory.line_ids.mapped('product_value'))
+
 
 class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"

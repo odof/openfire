@@ -17,6 +17,18 @@
         </field>
     </record>
 
+    <record id="of_sale_stock_view_inventory_tree" model="ir.ui.view">
+        <field name="name">of.sale.stock.inventory.tree</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree//field[@name='date']" position="before">
+                <field name="of_product_value" groups="account.group_account_manager" sum="Total"/>
+                <field name="of_currency_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Ajout champ note dans l'onglet Operations du BL -->
     <record id="of_sale_stock_view_picking_form" model="ir.ui.view">
         <field name="name">of.stock.picking.form</field>
