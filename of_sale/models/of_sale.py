@@ -828,8 +828,11 @@ class SaleOrder(models.Model):
             if len(inv.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')) > 1:
                 for line in inv.invoice_line_ids:
                     order_line = line.sale_line_ids[:1]
-                    line.name = "%s %s\n%s" % (
-                        order_line.order_id.name, order_line.order_id.client_order_ref or "", line.name)
+                    line.write({
+                        'name': "%s %s\n%s" % (
+                            order_line.order_id.name, order_line.order_id.client_order_ref or "", line.name),
+                        'of_order_id': order_line.order_id.id
+                    })
 
         return invoice_ids
 
