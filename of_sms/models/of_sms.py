@@ -194,15 +194,6 @@ class OFSmsMessage(models.Model):
             # Commit intermédiaire pour éviter le renvoi d'un SMS en cas d'erreur
             self._cr.commit()
 
-            # Record the message in the communication log (RSE)
-            try:
-                self.env[queued_sms.model_id.model].browse(queued_sms.record_id).message_post(
-                    body=u"SMS envoyé au %s :<br/><br/>%s" %
-                         (queued_sms.to_mobile, queued_sms.sms_content.replace(u"\n", u"<br/>")),
-                    subject="SMS")
-            except Exception:
-                pass
-
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
