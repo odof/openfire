@@ -293,9 +293,11 @@ class AccountInvoice(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
+    _order = 'invoice_id, of_order_id, layout_category_id, sequence, id'
 
     price_unit = fields.Float(digits=False)
     of_is_locked = fields.Boolean(compute="_compute_is_locked", string=u"Article particulier")
+    of_order_id = fields.Many2one(comodel_name='sale.order', string=u"Commande client d'origine")
 
     @api.model
     def get_locked_category_ids(self):
