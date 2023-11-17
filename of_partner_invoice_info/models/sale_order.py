@@ -9,13 +9,12 @@ class SaleOrder(models.Model):
 
     @api.multi
     def call_popup(self):
-        difference = 0.0
-        if self.partner_id.of_invoice_balance_max < (self.amount_total + self.partner_id.of_sale_order_to_invoice_amount
-                                                     + self.partner_id.of_invoice_balance_total):
-            difference = ((self.amount_total+self.partner_id.of_sale_order_to_invoice_amount +
-                           self.partner_id.of_invoice_balance_total) - self.partner_id.of_invoice_balance_max)
+        difference = 0
+        if not self.of_sale_type_id.invoice_info_exclusion:
+            difference = self.partner_id.get_remaining_pending_amount(additional_amount=self.amount_total)
+        if difference < 0:
             wizard_id = self.env['of.popup.warning'].create({
-                'message': u"L'encours maximum de %s est dépassé de %.2f" % (self.partner_id.name, difference)
+                'message': u"L'encours maximum de %s est dépassé de %.2f" % (self.partner_id.name, abs(difference))
             })
             return {
                 'type': 'ir.actions.act_window',

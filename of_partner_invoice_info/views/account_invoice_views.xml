@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_invoice_view_search" model="ir.ui.view">
+        <field name="name">account.invoice.view.search</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='unpaid']" position="after">
+                <filter string="Encours" name="invoicing_pending"
+                        domain="[('state', '=', 'open'),
+                                 '|',
+                                 ('of_sale_type_id', '=', False),
+                                 ('of_sale_type_id.invoice_info_exclusion', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

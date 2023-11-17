@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Order Line Views -->
+    <record id="sale_order_line_view_search" model="ir.ui.view">
+        <field name="name">sale.order.line.view.search</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_sales_order_line_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter string="Reliquat" name="invoicing_pending"
+                        domain="[('product_uom_qty', '>', 0.0),
+                                 ('price_total', '>', 0.0),
+                                 ('state', 'in', ['sale', 'done']),
+                                 ('invoice_status', 'in', ['to invoice', 'no']),
+                                 '|',
+                                 ('of_sale_type_id', '=', False),
+                                 ('of_sale_type_id.invoice_info_exclusion', '=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_line_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.view.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree edit="false" create="false" delete="false">
+                <field name="date_order"/>
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="confirmation_date_order"/>
+                <field name="product_id"/>
+                <field name="product_uom_qty" string="Qté(s) commandée(s)"/>
+                <field name="qty_delivered" string="Qté(s) livrée(s)"/>
+                <field name="qty_invoiced" string="Qté(s) facturée(s)"/>
+                <field name="route_id"/>
+                <field name="of_order_requested_week"/>
+                <field name="of_picking_min_week"/>
+                <field name="of_invoice_date_prev"/>
+                <field name="of_stock_moves_state"/>
+                <field name="invoice_status"/>
+                <field name="of_client_order_ref"/>
+                <field name="of_sale_type_id"/>
+                <field name="state"/>
+                <field name="price_reduce_taxinc"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="sale_order_line_pending_action" model="ir.actions.act_window">
+        <field name="name">Lignes de commande</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_partner_invoice_info.sale_order_line_view_tree"/>
+        <field name="context">{'search_default_invoicing_pending': 1}</field>
+    </record>
+
+</odoo>

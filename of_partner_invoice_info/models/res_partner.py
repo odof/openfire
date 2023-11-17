@@ -46,8 +46,12 @@ class ResPartner(models.Model):
 
         # generate where clause to include multicompany rules
         where_query = account_invoice_report._where_calc([
-            ('partner_id', 'in', all_partner_ids), ('state', 'not in', ['draft', 'cancel']),
-            ('type', 'in', ('out_invoice', 'out_refund'))
+            ('partner_id', 'in', all_partner_ids),
+            ('state', 'not in', ['draft', 'cancel']),
+            ('type', 'in', ('out_invoice', 'out_refund')),
+            '|',
+            ('of_sale_type_id', '=', False),
+            ('of_sale_type_id.invoice_info_exclusion', '=', False),
         ])
         account_invoice_report._apply_ir_rules(where_query, 'read')
         from_clause, where_clause, where_clause_params = where_query.get_sql()
@@ -66,20 +70,16 @@ class ResPartner(models.Model):
                 price['total'] for price in price_totals if price['partner_id'] in child_ids)
 
     def _compute_of_sale_order_to_invoice_amount(self):
-        # retrieve all children partners and prefetch 'parent_id' on them
-        all_partners = self.search([('id', 'child_of', self.ids)])
-        all_partners.read(['parent_id'])
-
-        sale_order_groups = self.env['sale.order'].read_group(
-            domain=[('partner_id', 'in', all_partners.ids), ('invoice_status', '=', 'to invoice')],
-            fields=['partner_id', 'amount_total'], groupby=['partner_id']
-        )
-        for group in sale_order_groups:
-            partner = self.browse(group['partner_id'][0])
-            while partner:
-                if partner in self:
-                    partner.of_sale_order_to_invoice_amount += group['amount_total']
-                partner = partner.parent_id
+        for partner in self:
+            partner_order_lines = self.env['sale.order.line'].search([
+                ('order_id.partner_id', 'child_of', partner.id),
+                ('state', 'in', ('sale', 'done')),
+                ('invoice_status', 'in', ('no', 'to invoice')),
+                '|',
+                ('order_id.of_sale_type_id', '=', False),
+                ('order_id.of_sale_type_id.invoice_info_exclusion', '=', False),
+            ])
+            partner.of_sale_order_to_invoice_amount = sum(partner_order_lines.mapped('of_price_pending'))
 
     @api.depends('invoice_ids.residual', 'of_invoice_balance_max')
     def _compute_of_invoice_balance_max_exceeded(self):
@@ -97,3 +97,23 @@ class ResPartner(models.Model):
         op = 'in' if (operator == '=') == value else 'not in'
         invoices = self.env['account.invoice'].search([('type', '=', 'out_invoice'), ('state', '=', 'open')])
         return [('id', op, invoices.mapped('partner_id').ids)]
+
+    @api.multi
+    def action_view_sale_order_line_pending(self):
+        action = self.env.ref('of_partner_invoice_info.sale_order_line_pending_action').read()[0]
+        action['domain'] = [('order_id', '=', self.sale_order_ids._ids)]
+        return action
+
+    @api.multi
+    def get_remaining_pending_amount(self, additional_amount=0.0):
+        """
+        Retourne False si le client n'a pas de limite d'encours définie.
+        Sinon, retourne la différence entre l'encours maximum et l'encours actuel (en incluant les montants à facturer)
+        """
+        self.ensure_one()
+        if not self.of_invoice_balance_max:
+            return False
+        return (
+            self.of_invoice_balance_max - (
+                self.of_sale_order_to_invoice_amount + self.of_invoice_balance_total + additional_amount)
+        )
