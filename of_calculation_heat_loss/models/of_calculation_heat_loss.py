@@ -223,8 +223,7 @@ class OFCalculationHeatLoss(models.Model):
                 rec.temperature - reference_temperature)
             products = self.env['product.template'].search([('of_puissance_nom_flo', '>=', estimated_power / 1000)])
 
-            annual_consumption = (estimated_power / (rec.temperature - reference_temperature)) \
-                                 * rec.department_id.unified_day_degree * 24 \
+            annual_consumption = estimated_power * rec.department_id.unified_day_degree \
                                  * rec.construction_type_id.intermittency_coefficient / 1000
             rec.write({
                 'estimated_power': estimated_power,
