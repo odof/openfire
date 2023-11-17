@@ -3,3 +3,5 @@
 
 from . import res_partner
 from . import sale_order
+from . import of_sale_type
+from . import sale_order_line
