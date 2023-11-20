@@ -48,7 +48,7 @@ class ResPartner(models.Model):
         action['target'] = "new"
         action['context'] = {
             'default_partner_id': self.id,
-            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']).get('delivery') or self.id,
             'default_recurrence': False,
             'default_date_next': fields.Date.today(),
             'default_origin': u"[Partenaire] " + self.name,
@@ -96,7 +96,7 @@ class ResPartner(models.Model):
             context = {}
         context.update({
             'default_partner_id': self.id,
-            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']).get('delivery') or self.id,
             'default_recurrence': False,
             'default_date_next': fields.Date.today(),
             'default_origin': u"[Partenaire] " + self.name,
@@ -114,7 +114,7 @@ class ResPartner(models.Model):
             context = {}
         context.update({
             'default_partner_id': self.id,
-            'default_address_id': self.address_get(adr_pref=['delivery']) or self.id,
+            'default_address_id': self.address_get(adr_pref=['delivery']).get('delivery') or self.id,
             'default_recurrence': True,
             'default_date_next': fields.Date.today(),
             'default_origin': u"[Partenaire] " + self.name,
