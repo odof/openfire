@@ -12,13 +12,13 @@ class BaseConfigSettings(models.TransientModel):
 
     @api.model
     def _get_of_mandatory_siren_default(self):
-        view = self.env.ref('of_l10n_fr_siret.res_partner_view_form')
+        view = self.env.ref('of_l10n_fr_siret.res_partner_view_form', raise_if_not_found=False)
         if not view or not view.active:
             return False
         return True
 
     @api.multi
     def set_of_mandatory_siren_default(self):
-        view = self.env.ref('of_l10n_fr_siret.res_partner_view_form')
+        view = self.env.ref('of_l10n_fr_siret.res_partner_view_form', raise_if_not_found=False)
         if view:
             view.write({'active': self.of_mandatory_siren})
