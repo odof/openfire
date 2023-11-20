@@ -11,17 +11,31 @@
                 <div class="app_settings_block" data-string="Geolocation Settings" string="Geolocation Settings" data-key="of_geolocalize">
                     <h2>Geolocation settings</h2>
                     <div class="row mt16 o_settings_container">
-                            <div class="o_setting_left_pane"/>
-                            <div class="o_setting_right_pane">
-                                <span class="o_form_label">If a partner is added</span>
-                                <div class="text-muted">
-                                    <field name="geocoding_on_create" widget="radio" />
-                                </div>
-                                <span class="o_form_label">If a partner is changed</span>
-                                <div class="text-muted">
-                                    <field name="geocoding_on_write" widget="radio" />
-                                </div>
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">If a partner is added</span>
+                            <div class="text-muted">
+                                <field name="geocoding_on_create" widget="radio" />
                             </div>
+                        </div>
+                    </div>
+                    <div class="row mt16 o_settings_container">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">If a partner is changed</span>
+                            <div class="text-muted">
+                                <field name="geocoding_on_write" widget="radio" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt16 o_settings_container">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Timeout</span>
+                            <div class="text-muted content-group mt16">
+                                <field name="timeout"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </xpath>

@@ -19,17 +19,20 @@ class ResConfigSettings(models.TransientModel):
                     are not entered at the same time.)",
             ),
         ],
+        config_parameter="of.geolocalize.geocoding_on_write",
         string="If an address is changed",
         help="Recalculate geocoding values automatically when a partner's address is changed",
-        config_parameter="of.geolocalize.geocoding_on_write",
     )
 
     geocoding_on_create = fields.Selection(
         selection=[
-            ('no', "Do not calculate geocoding values (recommended when a large number of partners are imported)"),
+            ('no', "Do not calculate geocoding values " "(recommended when a large number of partners are imported)"),
             ('yes', "Calculate geocoding values automatically"),
         ],
+        config_parameter="of.geolocalize.geocoding_on_create",
         string="If a partner is added",
         help="Calculate geocoding values automatically when a new partner is added",
-        config_parameter="of.geolocalize.geocoding_on_create",
+    )
+    timeout = fields.Integer(
+        config_parameter="of.geolocalize.timeout",
     )

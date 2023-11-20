@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-08 16:36+0000\n"
-"PO-Revision-Date: 2023-11-08 16:36+0000\n"
+"POT-Creation-Date: 2023-11-20 11:22+0000\n"
+"PO-Revision-Date: 2023-11-20 11:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,24 +18,29 @@ msgstr ""
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">If a partner is added</span>"
-msgstr ""
+msgstr "<span class=\"o_form_label\">Si un partenaire est ajouté</span>"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">If a partner is changed</span>"
-msgstr ""
+msgstr "<span class=\"o_form_label\">Si un partenaire est changé</span>"
 
 #. module: of_geolocalize
-#: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_create
-msgid "Calculate geocoding values automatically​​ when a new partner is added"
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Timeout</span>"
 msgstr ""
-"Calculer automatiquement les valeurs de géocodage​​ lorsqu'un nouveau "
-"partenaire est ajouté"
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__yes
-msgid "Calculate geocoding values ​​automatically"
+msgid "Calculate geocoding values automatically"
 msgstr "Calculer automatiquement les valeurs de géocodage"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_create
+msgid "Calculate geocoding values automatically when a new partner is added"
+msgstr ""
+"Calculer automatiquement les valeurs de géocodage​​ lorsqu'un nouveau "
+"partenaire est ajouté"
 
 #. module: of_geolocalize
 #: model:ir.model,name:of_geolocalize.model_res_config_settings
@@ -59,11 +64,33 @@ msgstr ""
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__no
 msgid ""
-"Do not recalculate geocoding values ​​automatically (GPS coordinates are "
-"reset to zero if not entered at the same time.)"
+"Do not recalculate geocoding values automatically (GPS coordinates are reset"
+" to zero if not entered at the same time.)"
 msgstr ""
 "Ne recalculez pas automatiquement les valeurs de géocodage (les coordonnées "
 "GPS sontremis à zéro s'il n'est pas saisi en même temps.)"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__failure
+msgid "Failure"
+msgstr "Échoué"
+
+#. module: of_geolocalize
+#: model:ir.model,name:of_geolocalize.model_base_geocoder
+msgid "Geo Coder"
+msgstr ""
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
+msgid "Geocoding Response"
+msgstr "Réponse de géocoding"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_partner__of_geocoding_state
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_geocoding_state
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
+msgid "Geocoding State"
+msgstr "État de géocodage"
 
 #. module: of_geolocalize
 #: model:ir.ui.menu,name:of_geolocalize.menu_of_geo_config
@@ -74,6 +101,12 @@ msgstr "Géolocalisation"
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
 msgid "Geolocation Settings"
 msgstr "Paramètres de géolocalisation"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_partner__of_response_json
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_response_json
+msgid "Geolocation response"
+msgstr "Réponse de géolocalisation"
 
 #. module: of_geolocalize
 #: model:ir.actions.act_window,name:of_geolocalize.action_res_config_settings_menu
@@ -93,19 +126,69 @@ msgid "If an address is changed"
 msgstr "Si une adresse est modifiée"
 
 #. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
+msgid "Location"
+msgstr "Localisation"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__manual
+msgid "Manual"
+msgstr "Manuel"
+
+#. module: of_geolocalize
+#. odoo-python
+#: code:addons/of_geolocalize/models/res_partner.py:0
+#, python-format
+msgid "No match found for %(partner_names)s address(es)."
+msgstr "Aucune correspondance trouvée pour les adresses de %(partner_names)."
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__not_tried
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
+msgid "Not Tried"
+msgstr "Pas tenté"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__yes
+msgid ""
+"Recalculate geocoding values (Geocoding is attempted if GPS coordinates"
+"                     are not entered at the same time.)"
+msgstr ""
+"Recalculer les valeurs de géocodage (Le géocodage est tenté si les "
+"coordonnées GPS ne sont pas saisis en même temps.)"
+
+#. module: of_geolocalize
 #: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_write
 msgid ""
-"Recalculate geocoding values automatically ​​when a partner's address is "
+"Recalculate geocoding values automatically when a partner's address is "
 "changed"
 msgstr ""
 "Recalculez automatiquement les valeurs de géocodage lorsque l'adresse d'un "
 "partenaire estmodifié"
 
 #. module: of_geolocalize
-#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__yes
-msgid ""
-"Recalculate geocoding values ​​(Geocoding is attempted if GPS coordinates"
-"                     are not entered at the same time.)"
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__success
+msgid "Success"
+msgstr "Succès"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__timeout
+msgid "Timeout"
+msgstr "Timeout"
+
+#. module: of_geolocalize
+#. odoo-python
+#: code:addons/of_geolocalize/models/res_partner.py:0
+#, python-format
+msgid "Warning"
 msgstr ""
-"Recalculer les valeurs de géocodage (Le géocodage est tenté si les "
-"coordonnées GPS ne sont pas saisis en même temps.)"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
+msgid "failed geocoding"
+msgstr "Géocoding echoué"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
+msgid "successful geocoding"
+msgstr "Géocoding réussi"
