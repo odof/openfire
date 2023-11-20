@@ -1604,13 +1604,17 @@ SidebarFilter.include({
     on_mouseout: function (ev) {
         if (!this.filters_radio) {
             var class_a_pulse = ev.target.id;
-            $("." + class_a_pulse).removeClass("of_pulse");
+            if (class_a_pulse) {
+                $("." + class_a_pulse).removeClass("of_pulse");
+            }
         }
     },
     on_mouseover: function (ev) {
         if (!this.filters_radio) {
             var class_a_pulse = ev.target.id;
-            $("." + class_a_pulse).addClass("of_pulse");
+            if (class_a_pulse) {
+                $("." + class_a_pulse).addClass("of_pulse");
+            }
         }
     },
 });
