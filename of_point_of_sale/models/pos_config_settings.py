@@ -11,6 +11,6 @@ class PosConfigSettings(models.TransientModel):
 
     @api.multi
     def set_default_default_invoice_customer_id(self):
-        self.env['ir.values'].set_default(
+        self.env['ir.values'].sudo().set_default(
             'pos.config.settings', 'default_invoice_customer_id',
             self.default_invoice_customer_id.id)
