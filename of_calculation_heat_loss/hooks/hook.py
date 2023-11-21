@@ -448,3 +448,19 @@ class OFCalculationHeatLossHook(models.AbstractModel):
                 UPDATE  of_calculation_department
                 SET     unified_day_degree = 1732.25
                 WHERE   code = 95;""")
+
+
+    @api.model
+    def _update_version_10_0_4(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_calculation_heat_loss'), ('state', 'in', ('installed', 'to upgrade'))])
+        actions_todo = module_self and module_self.latest_version < '10.0.4'
+        if actions_todo:
+            cr = self._cr
+            cr.execute(
+                """
+                    UPDATE  of_calculation_fuel
+                    SET     use_coef = 't'
+                    WHERE   id IN %s;""",
+                ((self.env.ref('of_calculation_heat_loss.fuel_4').id,
+                  self.env.ref('of_calculation_heat_loss.fuel_5').id), ))

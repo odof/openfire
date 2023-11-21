@@ -8,6 +8,7 @@ from . import of_calculation_g
 from . import of_calculation_construction_type
 from . import of_calculation_fuel
 from . import of_calculation_fuel_consumption
+from . import of_calculation_fuel_coef
 from . import of_parc_installe
 from . import crm_lead
 from . import sale
