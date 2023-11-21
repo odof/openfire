@@ -219,8 +219,8 @@ class OFCalculationHeatLoss(models.Model):
             if error:
                 continue
             reference_temperature = rec.base_temperature_line_id.temperature
-            estimated_power = rec.surface * rec.height * rec.get_coefficient_g() * (
-                rec.temperature - reference_temperature)
+            estimated_power = rec.surface * rec.height * rec.get_coefficient_g() * max(
+                rec.temperature - reference_temperature, 0)
             products = self.env['product.template'].search([('of_puissance_nom_flo', '>=', estimated_power / 1000)])
 
             annual_consumption = estimated_power * rec.department_id.unified_day_degree \

@@ -169,7 +169,7 @@
                             <label class="control-label" for="temperature">
                                 <span> Température de confort désirée </span>
                             </label>
-                            <input class="form-control o_website_form_input" type="number" step="0.01" name="temperature" t-att-value="temperature or 19"/>
+                            <input class="form-control o_website_form_input" type="number" step="0.5" name="temperature" t-att-value="19 if temperature is null else temperature or '0'"/>
                         </div>
                         <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
                             <label class="control-label" for="construction_date_id">
@@ -280,9 +280,12 @@
                         </label>
                         <input class="form-control o_website_form_input" type="text" name="pro_partner_email" required="required" t-att-value="pro_partner_email"/>
                     </div>
+                    <span class="mb8" style="display: inline-block; padding-left: 15px;">
+                        <t t-if ="mailing_attempt_message" t-esc="mailing_attempt_message"/>
+                    </span>
                     <div class="form-group">
                         <button type="submit" id="get_heat_loss_calculation_pdf_button" class="btn btn-primary btn-lg o_default_snippet_text of_heat_loss_button">
-                            Valider
+                            Envoyer
                         </button>
                         <span id="o_website_form_result"/>
                     </div>
