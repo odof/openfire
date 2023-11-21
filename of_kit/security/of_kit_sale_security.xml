@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Ajout d'un groupe pour Autorise la modification du champ kit et tarif dans la ligne des commandes pour les commerciaux -->
+    <record id="sale_order_line_acess_pricing_kit" model="res.groups">
+        <field name="name">(OF) Modifier kit et tarification dans les lignes de commande</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Autoriser la modification du champ kit et tarification dans les lignes de commande</field>
+    </record>
+
+</odoo>
