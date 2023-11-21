@@ -82,7 +82,7 @@
                 <field name="of_phone_number_ids" string="Phones" class="of_phone_table">
                     <tree editable="bottom" decoration-danger="not is_valid">
                         <field name="type" string="Type"/>
-                        <field name="title_id" string="Title" options="{'no_open': True}" widget="selection"/>
+                        <field name="title_id" string="Title" options="{'no_open': True, 'no_create_edit': True}"/>
                         <field name="number_display" string="Number" placeholder="Number" required="True"/>
                         <field name="number" invisible="1" readonly="1"/>
                         <field name="is_valid" invisible="1"/>
