@@ -48,6 +48,7 @@
         <field name="calorific_value">4.08</field>
         <field name="price">0.3</field>
         <field name="uom_id" ref="product.product_uom_kgm"/>
+        <field name="use_coef" eval="True"/>
     </record>
 
     <record id="fuel_5" model="of.calculation.fuel">
@@ -56,6 +57,7 @@
         <field name="calorific_value">4.9</field>
         <field name="price">0.51</field>
         <field name="uom_id" ref="product.product_uom_kgm"/>
+        <field name="use_coef" eval="True"/>
     </record>
 
     <record id="fuel_6" model="of.calculation.fuel">

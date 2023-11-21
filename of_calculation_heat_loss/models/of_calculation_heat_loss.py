@@ -75,6 +75,8 @@ class OFCalculationHeatLoss(models.Model):
     floor_surface_id = fields.Many2one(
         comodel_name='of.calculation.surface', string=u"Plancher bas", domain=[('surface_type', '=', 'floor')])
     coefficient = fields.Float(string=u"Coefficient G", compute='_compute_coefficient')
+    fuel_coef_id = fields.Many2one(comodel_name='of.calculation.fuel.coef', string=u"Chauffage au bois")
+    coef_wood = fields.Float(string=u"Coef (Chauffage au bois)", default=1.0)
 
     @api.constrains('floor_number')
     def _check_floor_number(self):
@@ -164,6 +166,14 @@ class OFCalculationHeatLoss(models.Model):
             self.lead_id = self.order_id.opportunity_id
             self.parc_installe_id = self.order_id.of_parc_installe_ids and self.order_id.of_parc_installe_ids[0]
 
+    @api.multi
+    @api.onchange('fuel_coef_id')
+    def _onchange_fuel_coef_id(self):
+        if self.fuel_coef_id:
+            self.coef_wood = self.fuel_coef_id.coef
+        else:
+            self.coef_wood = 1.0
+
     @api.model
     def create(self, vals):
         if not vals.get('partner_id'):
@@ -200,9 +210,7 @@ class OFCalculationHeatLoss(models.Model):
             'res_model': 'of.calculation.fuel.consumption',
             'type': 'ir.actions.act_window',
             'target': 'current',
-            'context': {
-                'search_default_calculation_id': self.id,
-            },
+            'domain': "[('calculation_id', '=', %s)]" % self.id,
         }
 
     @api.multi
@@ -287,8 +295,12 @@ class OFCalculationHeatLoss(models.Model):
     def get_fuel_consumption_data(self):
         fuels = self.env['of.calculation.fuel'].search([])
         res = []
+        fuel_coef = self.coef_wood
         for fuel in fuels:
-            volume = self.annual_consumption / fuel.calorific_value
+            annual_consumption = self.annual_consumption
+            if fuel.use_coef:
+                annual_consumption *= fuel_coef
+            volume =  annual_consumption / fuel.calorific_value
             values = {
                 'calculation_id': self.id,
                 'fuel_id': fuel.id,

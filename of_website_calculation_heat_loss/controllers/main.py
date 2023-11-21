@@ -22,6 +22,7 @@ class OFCalculationController(http.Controller):
         construction_date_obj = request.env['of.calculation.construction.date']
         construction_type_obj = request.env['of.calculation.construction.type']
         surface_obj = request.env['of.calculation.surface']
+        coef_obj = request.env['of.calculation.fuel.coef']
 
         heat_loss_id = request.session.get('heat_loss_id')
         heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
@@ -45,6 +46,7 @@ class OFCalculationController(http.Controller):
             'wall_surfaces': surface_obj.search([('surface_type', '=', 'wall')]),
             'roof_surfaces': surface_obj.search([('surface_type', '=', 'roof')]),
             'floor_surfaces': surface_obj.search([('surface_type', '=', 'floor')]),
+            'fuel_coefs': coef_obj.search([]),
         }
         logement_principal = request.env.ref('of_calculation_heat_loss.construction_type_1', raise_if_not_found=False)
         if logement_principal and logement_principal in values['construction_types']:
@@ -76,6 +78,10 @@ class OFCalculationController(http.Controller):
     @http.route('/get_heat_loss_altitude_ids_from_zip', type='json', auth="public", methods=['POST'], website=True)
     def get_heat_loss_altitude_ids_from_zip(self, zip, **args):
         return request.env['of.calculation.heat.loss'].get_altitude_ids_from_zip(zip)
+
+    @http.route('/get_heat_loss_fuel_coef', type='json', auth="public", methods=['POST'], website=True)
+    def get_heat_loss_fuel_coef(self, coef_id, **args):
+        return request.env['of.calculation.fuel.coef'].browse(coef_id).sudo().coef
 
     @http.route('/get_heat_loss_pdf', type='http', auth="public", methods=['POST'], website=True)
     def get_heat_loss_pdf(self, **kwargs):

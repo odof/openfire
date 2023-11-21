@@ -18,6 +18,7 @@ class OFCalculationFuel(models.Model):
     price = fields.Float(string=u"Prix unitaire", help=u"En € par unité de mesure", digits=(12, 6))
     kwh_unit_price = fields.Float(string="Prix du kWh (€)", compute='_compute_kwh_unit_price', digits=(12, 6))
     uom_id = fields.Many2one(comodel_name='product.uom', string=u"Unité")
+    use_coef = fields.Boolean(string=u"Impacté par le coefficient de chauffage au bois")
 
     def _compute_kwh_unit_price(self):
         for rec in self:

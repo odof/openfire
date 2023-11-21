@@ -171,6 +171,30 @@
                             </label>
                             <input class="form-control o_website_form_input" type="number" step="0.5" name="temperature" t-att-value="19 if temperature is null else temperature or '0'"/>
                         </div>
+                        <div>
+                            <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false" style="display: inline-block">
+                                <label class="control-label" for="fuel_coef_id">
+                                    <span> Chauffage au bois </span>
+                                </label>
+                                <select class="form-control o_website_form_input" name="fuel_coef_id" id="fuel_coef_id">
+                                    <option/>
+                                    <t t-foreach="fuel_coefs" t-as="fuel_coef">
+                                        <option t-att-value="fuel_coef.id"
+                                                t-att-selected="fuel_coef_id and fuel_coef.id == fuel_coef_id.id and 'selected'"
+                                                t-att-show_better_g="fuel_coef.id in better_g_list and '1'">
+                                            <t t-esc="fuel_coef.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="form-group form-field o_required form-field-float" data-model-field="true" data-optional="false" style="display: inline-block; float: right;">
+                                <label class="control-label" for="coef_wood">
+                                    <span> Coefficient </span>
+                                </label>
+                                <input class="form-control o_website_form_input" type="number" step="0.01" name="coef_wood" id="coef_wood" t-att-value="coef_wood or 1"/>
+                            </div>
+                        </div>
+
                         <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
                             <label class="control-label" for="construction_date_id">
                                 <span> Date de construction </span>
