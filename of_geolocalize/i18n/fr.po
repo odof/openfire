@@ -6,14 +6,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 11:22+0000\n"
-"PO-Revision-Date: 2023-11-20 11:22+0000\n"
+"POT-Creation-Date: 2023-11-29 13:42+0000\n"
+"PO-Revision-Date: 2023-11-29 13:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid ""
+"<br/>\n"
+"                        <strong>Processing already geolocated partners</strong>\n"
+"                        <br/>\n"
+"                        <br/>"
+msgstr ""
+"<br/>\n"
+"                        <strong>Traitement des partenaires déjà géolocalisés</strong>\n"
+"                        <br/>\n"
+"                        <br/>"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
@@ -28,6 +41,67 @@ msgstr "<span class=\"o_form_label\">Si un partenaire est changé</span>"
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">Timeout</span>"
+msgstr "<span class=\"o_form_label\">Timeout</span>"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All Failed"
+msgstr "Les selectionnés sont tous échoués"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All Geolocalized"
+msgstr "Les selectionnés sont tous géolocalisés"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All Manual"
+msgstr "Les selectionnés sont tous géolocalisés manuellement"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All Selected"
+msgstr "Tous les selectionnés"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All To Geolocalized"
+msgstr "Tous les contacts à géolocaliser"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid ""
+"All partners already geolocated except those done manually will be tried again and\n"
+"                                geolocation data reseted.\n"
+"                                    <br/>\n"
+"                                You can use filters to define the partners to geolocate."
+msgstr ""
+"Tous les partenaires déjà géolocalisés sauf ceux effectués manuellement seront réessayés et\n"
+"                                données de géolocalisation réinitialisées.\n"
+"                                   <br/>\n"
+"                                Vous pouvez utiliser des filtres pour définir les partenaires à géolocaliser."
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid ""
+"All partners already geolocated will be tried again, and the geolocation data\n"
+"                                reseted.\n"
+"                                    <br/>\n"
+"                                You can use filters to define the partners to geolocate.."
+msgstr ""
+"Tous les partenaires déjà géolocalisés seront réessayés, ainsi que les données de géolocalisation\n"
+"                                réinisialisées.\n"
+"                                <br/>\n"
+"                                Vous pouvez utiliser des filtres pour définir les partenaires à géolocaliser.."
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "All Not Tried"
+msgstr "Tous les selectionnés qui ne sont pas tenté"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "CP"
 msgstr ""
 
 #. module: of_geolocalize
@@ -43,6 +117,11 @@ msgstr ""
 "partenaire est ajouté"
 
 #. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_geolocalize
 #: model:ir.model,name:of_geolocalize.model_res_config_settings
 msgid "Config Settings"
 msgstr "Paramètres de configuration"
@@ -53,13 +132,31 @@ msgid "Contact"
 msgstr ""
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__create_uid
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__create_date
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__display_name
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__display_name
+msgid "Display Name"
+msgstr "Nom"
+
+#. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__no
 msgid ""
 "Do not calculate geocoding values (recommended when a large number of "
 "partners are imported)"
 msgstr ""
-"Ne calculez pas les valeurs de géocodage (recommandé lorsqu'un grand nombre "
-"deles partenaires sont importés)"
+"Ne pas calculer  les valeurs de géocodage (recommandé lorsqu'un grand nombre"
+" de partenaires sont importés)"
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__no
@@ -67,10 +164,22 @@ msgid ""
 "Do not recalculate geocoding values automatically (GPS coordinates are reset"
 " to zero if not entered at the same time.)"
 msgstr ""
-"Ne recalculez pas automatiquement les valeurs de géocodage (les coordonnées "
-"GPS sontremis à zéro s'il n'est pas saisi en même temps.)"
+"Ne pas recalculer automatiquement les valeurs de géocodage (les coordonnées "
+"GPS sont remis à zéro s'il n'est pas saisi en même temps.)"
 
 #. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__excellent
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__excellent
+msgid "Excellent"
+msgstr ""
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Failed"
+msgstr "Échoué"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__geocoding_state__failure
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__failure
 msgid "Failure"
 msgstr "Échoué"
@@ -81,11 +190,22 @@ msgid "Geo Coder"
 msgstr ""
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__partner_latitude
+msgid "Geo Latitude"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__partner_longitude
+msgid "Geo Longitude"
+msgstr ""
+
+#. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
 msgid "Geocoding Response"
 msgstr "Réponse de géocoding"
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__geocoding_state
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_partner__of_geocoding_state
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_geocoding_state
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
@@ -93,9 +213,44 @@ msgid "Geocoding State"
 msgstr "État de géocodage"
 
 #. module: of_geolocalize
+#: model:ir.model,name:of_geolocalize.model_of_geo_wizard
+msgid "Geocoding of selected partners"
+msgstr "Géolocalisation des partenaires selectionnés"
+
+#. module: of_geolocalize
+#: model:ir.actions.act_window,name:of_geolocalize.action_of_geo_wizard
+msgid "Geolocalization"
+msgstr "Géolocalisation"
+
+#. module: of_geolocalize
+#. odoo-python
+#: code:addons/of_geolocalize/models/res_partner.py:0
+#: model:ir.actions.server,name:of_geolocalize.action_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+#, python-format
+msgid "Geolocalize"
+msgstr "Géolocaliser"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__is_geolocalize_done
+msgid "Geolocalize done"
+msgstr "Géolocalisation effectuée"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Geolocalized"
+msgstr "Géolocalisé"
+
+#. module: of_geolocalize
 #: model:ir.ui.menu,name:of_geolocalize.menu_of_geo_config
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
 msgid "Geolocation"
 msgstr "Géolocalisation"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__date_localization
+msgid "Geolocation Date"
+msgstr "Date de géolocalisation"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
@@ -103,6 +258,7 @@ msgid "Geolocation Settings"
 msgstr "Paramètres de géolocalisation"
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__response_json
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_partner__of_response_json
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_response_json
 msgid "Geolocation response"
@@ -116,6 +272,18 @@ msgid "Geolocation settings"
 msgstr "Paramètres de géolocalisation"
 
 #. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__high
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__high
+msgid "High"
+msgstr "Haut"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__id
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__id
+msgid "ID"
+msgstr ""
+
+#. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__geocoding_on_create
 msgid "If a partner is added"
 msgstr "Si un partenaire est ajouté"
@@ -126,14 +294,60 @@ msgid "If an address is changed"
 msgstr "Si une adresse est modifiée"
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard____last_update
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__write_uid
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__write_date
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_geolocalize
+#: model:ir.model.fields,help:of_geolocalize.field_of_geo_wizard_line__precision
+#: model:ir.model.fields,help:of_geolocalize.field_res_partner__of_precision
+#: model:ir.model.fields,help:of_geolocalize.field_res_users__of_precision
+msgid "Level of geolocalization 's precision"
+msgstr ""
+
+#. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
 msgid "Location"
 msgstr "Localisation"
 
 #. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__low
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__low
+msgid "Low"
+msgstr "Bas"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__geocoding_state__manual
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__manual
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__manual
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__manual
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
 msgid "Manual"
 msgstr "Manuel"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__medium
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__medium
+msgid "Medium"
+msgstr "Moyen"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Name"
+msgstr ""
 
 #. module: of_geolocalize
 #. odoo-python
@@ -143,10 +357,85 @@ msgid "No match found for %(partner_names)s address(es)."
 msgstr "Aucune correspondance trouvée pour les adresses de %(partner_names)."
 
 #. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__geocoding_state__not_tried
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__not_tried
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
 msgid "Not Tried"
 msgstr "Pas tenté"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_to_geolocalize
+msgid "Number Partners to geolocalize"
+msgstr "Nombre de partenaires pour géolocaliser"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_failure
+msgid "Number of Failed Geolocalized Partners"
+msgstr "Nombre de partenaires géolocalisés ayant échoué"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_success
+msgid "Number of Geolocalized Partners"
+msgstr "Nombre de partenaires géolocalisés"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_manual
+msgid "Number of Manual Geolocalized Partners"
+msgstr "Nombre de partenaires géolocalisés manuellement"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_not_tried
+msgid "Number of Partners not geolocalized yet"
+msgstr "Nombre de partenaires non encore géolocalisés"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_without_address
+msgid "Number of Partners without address"
+msgstr "Nombre de partenaires sans adresse"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners
+msgid "Number of Selected Partners"
+msgstr "Nombre de partenaires sélectionnés"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid ""
+"Only partners whose geolocation failed or was not attempted will be attempted again.\n"
+"                                The data of partners already geolocated is protected by default.\n"
+"                                You can select a processing option or use filters to define the partners to geolocate.\n"
+"                                    <br/>\n"
+"                                You can select a processing option or use filters to define the partners to geolocate."
+msgstr ""
+"Seuls les partenaires dont la géolocalisation a échoué ou n'a pas été tentée seront à nouveau tentés.\n"
+" Les données des partenaires déjà géolocalisés sont protégées par défaut.\n"
+" Vous pouvez sélectionner une option de traitement ou utiliser des filtres pour définir les partenaires à géolocaliser.\n"
+" <br/>\n"
+" Vous pouvez sélectionner une option de traitement ou utiliser des filtres pour définir les partenaires à géolocaliser. "
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Partners"
+msgstr "Partenaires"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__line_ids
+msgid "Partners to geolocalize"
+msgstr "Les partenaires à géolocaliser"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__precision
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_partner__of_precision
+#: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_precision
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_geo_form
+msgid "Precision"
+msgstr "Précision"
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__yes
@@ -163,10 +452,50 @@ msgid ""
 "Recalculate geocoding values automatically when a partner's address is "
 "changed"
 msgstr ""
-"Recalculez automatiquement les valeurs de géocodage lorsque l'adresse d'un "
-"partenaire estmodifié"
+"Seuls les partenaires dont la géolocalisation a échoué ou n'a pas été tentée seront à nouveau tentés.\n"
+"Les données des partenaires déjà géolocalisés sont protégées par défaut.\n"
+" Vous pouvez sélectionner une option de traitement ou utiliser des filtres pour définir les partenaires à géolocaliser.\n"
+"                                <br/>\n"
+"Vous pouvez sélectionner une option de traitement ou utiliser des filtres pour définir les partenaires à géolocaliser."
 
 #. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__requested_address
+msgid "Requested address"
+msgstr "L'adresse cherchée"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__response_address
+msgid "Response address"
+msgstr "L'adresse trouvée"
+
+#. module: of_geolocalize
+#: model:ir.model,name:of_geolocalize.model_of_geo_wizard_line
+msgid "Save geolocalized partners"
+msgstr "Enregistrer les partenaires géolocalisés"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Selected"
+msgstr "Sélectionné"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__partner_ids
+msgid "Selected Partners"
+msgstr "Les partenaires selectionnés"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,help:of_geolocalize.field_res_partner__of_geocoding_state
+#: model:ir.model.fields,help:of_geolocalize.field_res_users__of_geocoding_state
+msgid "State of geocoding"
+msgstr "État de géocodage"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Status of Selected contacts"
+msgstr "État des contacts selectionnés"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__geocoding_state__success
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__success
 msgid "Success"
 msgstr "Succès"
@@ -177,11 +506,76 @@ msgid "Timeout"
 msgstr "Timeout"
 
 #. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "To Geolocalized"
+msgstr "À géolocaliser"
+
+#. module: of_geolocalize
+#. odoo-python
+#: code:addons/of_geolocalize/wizards/of_geo_wizard.py:0
+#, python-format
+msgid "Unable to launch this wizard from the object %s"
+msgstr "Impossible de lancer cet assistant depuis l'objet %s"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__unknown
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_precision__unknown
+msgid "Unknown"
+msgstr "Indéterminé"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__update_all_selected
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Update all selected"
+msgstr "Mettre à jour tous les contacts selectionnés"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Update all selected except geolocalized contacts"
+msgstr "Mettre à jour tous les contacts sélectionnés sauf les contacts géolocalisés"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__update_all_selected_except_manual_geolocalized
+msgid "Update all selected except manual geolocalized contacts"
+msgstr ""
+"Mettre à jour tous les contacts sélectionnés sauf les contacts géolocalisés "
+"manuellement"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__update_also_failed
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Update also in case of failure"
+msgstr "Mettre à jour également en cas d'échec"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "Validate results"
+msgstr "Valider les résultats"
+
+#. module: of_geolocalize
 #. odoo-python
 #: code:addons/of_geolocalize/models/res_partner.py:0
 #, python-format
 msgid "Warning"
+msgstr "Avertissement"
+
+#. module: of_geolocalize
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__geocoding_state__no_address
+#: model:ir.model.fields.selection,name:of_geolocalize.selection__res_partner__of_geocoding_state__no_address
+msgid "Without address"
+msgstr "Sans adresse"
+
+#. module: of_geolocalize
+#: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__wizard_id
+msgid "Wizard"
 msgstr ""
+
+#. module: of_geolocalize
+#. odoo-python
+#: code:addons/of_geolocalize/wizards/of_geo_wizard.py:0
+#, python-format
+msgid "You must select a result before you can validate"
+msgstr "Vous devez sélectionner un résultat avant de pouvoir valider"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
@@ -189,6 +583,16 @@ msgid "failed geocoding"
 msgstr "Géocoding echoué"
 
 #. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "partners"
+msgstr "Partenaires"
+
+#. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
 msgid "successful geocoding"
 msgstr "Géocoding réussi"
+
+#. module: of_geolocalize
+#: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
+msgid "without address"
+msgstr "sans adresse"

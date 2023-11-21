@@ -43,7 +43,7 @@
     </record>
 
     <!-- Action Configuration -->
-        <record id="action_res_config_settings_menu" model="ir.actions.act_window">
+    <record id="action_res_config_settings_menu" model="ir.actions.act_window">
         <field name="name">Geolocation settings</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">res.config.settings</field>
@@ -54,7 +54,6 @@
 
     <!-- Menu Geolocalization -->
     <menuitem id="main_menu_geolocalization" name="Geolocation settings" parent="contacts.res_partner_menu_config" sequence="10"/>
-    <menuitem id="menu_of_geo_config" action="action_res_config_settings_menu" name="Geolocation"
-        parent="main_menu_geolocalization" sequence="1"/>
+    <menuitem id="menu_of_geo_config" action="action_res_config_settings_menu" name="Geolocation" parent="main_menu_geolocalization" sequence="1"/>
 
 </odoo>

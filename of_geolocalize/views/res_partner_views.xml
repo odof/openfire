@@ -1,38 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-        <record id="res_partner_geo_form" model="ir.ui.view">
-            <field name="name">res.partner.inherit</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//page[@name='geo_location']//group[1]//group[1]" position="after">
-                    <group string="Geocoding Response">
-                        <label for="of_geocoding_state" string="Geocoding State"/>
-                        <field name="of_geocoding_state" nolabel="1" class="oe_inline" readonly="1"/>
-                        <label for="of_response_json" string="Geocoding Response" groups="base.group_no_one"/>
-                        <field name="of_response_json" nolabel="1" class="oe_inline" readonly="1"
-                                groups="base.group_no_one"/>
-                    </group>
-                </xpath>
-                <xpath expr="//page[@name='geo_location']" position="attributes">
-                    <attribute name="string">Location</attribute>
-                </xpath>
-            </field>
-        </record>
+    <record id="res_partner_geo_form" model="ir.ui.view">
+        <field name="name">res.partner.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='geo_location']//group[1]//group[1]" position="after">
+                <group string="Geocoding Response">
+                    <label for="of_geocoding_state" string="Geocoding State"/>
+                    <field name="of_geocoding_state" nolabel="1" class="oe_inline" readonly="1"/>
+                    <label for="of_precision" string="Precision"/>
+                    <field name="of_precision" nolabel="1" class="oe_inline" readonly="1"/>
+                    <label for="of_response_json" string="Geocoding Response" groups="base.group_no_one"/>
+                    <field name="of_response_json" nolabel="1" class="oe_inline" readonly="1" groups="base.group_no_one"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='geo_location']" position="attributes">
+                <attribute name="string">Location</attribute>
+            </xpath>
+        </field>
+    </record>
 
-        <record id="res_partner_view_search" model="ir.ui.view">
-            <field name="name">res.partner.search.inherit</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_res_partner_filter"/>
-            <field name="arch" type="xml">
-                <xpath expr="//filter[@name='inactive']" position="after">
-                    <filter string="Not Tried" name="not_tried" domain="[('of_geocoding_state','=', 'not_tried')]"/>
-                    <filter string="successful geocoding" name="success" domain="[('of_geocoding_state','in', ['success', 'manual'])]"/>
-                    <filter string="failed geocoding" name="failure" domain="[('of_geocoding_state','=', 'failure')]"/>
-                    <separator/>
-                </xpath>
-            </field>
-        </record>
+    <record id="res_partner_view_search" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Not Tried" name="not_tried" domain="[('of_geocoding_state','=', 'not_tried')]"/>
+                <filter string="successful geocoding" name="success" domain="[('of_geocoding_state','in', ['success', 'manual'])]"/>
+                <filter string="failed geocoding" name="failure" domain="[('of_geocoding_state','=', 'failure')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- action geolocalize -->
+    <record model="ir.actions.server" id="action_geolocalize">
+        <field name="name">Geolocalize</field>
+        <field name="model_id" ref="of_geolocalize.model_res_partner"/>
+        <field name="binding_model_id" ref="of_geolocalize.model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_geolocalize()
+        </field>
+    </record>
 
 </odoo>

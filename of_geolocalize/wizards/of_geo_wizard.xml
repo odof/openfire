@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- View wizard geocoding -->
+    <record id="of_geo_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.geo.wizard.form.view</field>
+        <field name="model">of.geo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Geolocation">
+                <div style="background-color: #f8f9fa;">
+                    <header>
+                        <field name="line_ids" invisible="1"/>
+                        <button class="btn-primary" name="action_button_geolocalize" string="Geolocalize" type="object" icon="fa-map-marker" attrs="{'invisible': [('line_ids', '!=', [])]}" />
+                        <button class="btn-primary" name="action_button_validate" string="Validate results" type="object" icon="fa-check" attrs="{'invisible': [('line_ids', '=', [])]}"/>
+                        <button class="btn-default" name="action_button_cancel" string="Cancel" type="object"/>
+                    </header>
+
+                    <div>
+                        <div class="grid gap-4">
+                            <div class="g-col-3 g-col-sm-2 d-flex align-items-center py-2 justify-content-end text-end justify-content-lg-start text-lg-start">
+                            Status of Selected contacts
+                            </div>
+                            <div class="g-col-9 g-col-sm-10 grid gap-1">
+                            <div style="width: 124.77px; height: 57px;" title="All Selected">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners'/>
+                                        <div class="fs-2"/>
+                                            Selected
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="All Geolocalized">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_success'/>
+                                        <div class="fs-2"/>
+                                            Geolocalized
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="All Manual">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_manual'/>
+                                        <div class="fs-2" />
+                                                Manual
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="All Failed">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_failure'/>
+                                        <div class="fs-2" />
+                                                Failed
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="All Not Tried">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_not_tried'/>
+                                        <div class="fs-2" />
+                                                Not Tried
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="without address">
+                                    <a role="button" href="#" class="btn btn-secondary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_without_address'/>
+                                        <div class="fs-2" />
+                                                without address
+                                    </a>
+                                </div>
+                                <div style="width: 124.77px; height: 57px;" title="All To Geolocalized">
+                                    <a role="button" href="#" class="btn btn-primary w-100 h-100 border-0 rounded-0 text-capitalize fw-normal" style="padding: 1rem 0.75rem;">
+                                        <field name='number_selected_partners_to_geolocalize'/>
+                                        <div class="fs-2" />
+                                                To Geolocalized
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <br></br>
+                        <strong>Processing already geolocated partners</strong>
+                        <br></br>
+                        <br></br>
+                        <div id="parameter1" class="app_settings_block" attrs="{'invisible': [('update_all_selected_except_manual_geolocalized', '=', True)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="update_all_selected"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label string="Update all selected" for="update_all_selected"/>
+                            </div>
+                        </div>
+                        <div id="parameter2" class="col-12 col-lg-6 o_setting_box" attrs="{'invisible': [('update_all_selected', '=', True)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="update_all_selected_except_manual_geolocalized"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label string="Update all selected except geolocalized contacts" for="update_all_selected_except_manual_geolocalized"/>
+                            </div>
+                        </div>
+                        <div id="parameter3" class="col-12 col-lg-6 o_setting_box" attrs="{'invisible':['&amp;',('update_all_selected', '=', False),('update_all_selected_except_manual_geolocalized', '=', False)]}">
+
+                            <div class="o_setting_left_pane">
+                                <field name="update_also_failed"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label string="Update also in case of failure" for="update_also_failed"/>
+                            </div>
+                        </div>
+                        <div>
+                            <div name="help">
+                                <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':['|',('update_all_selected', '=', True),('update_all_selected_except_manual_geolocalized', '=', True)]}">
+                                Only partners whose geolocation failed or was not attempted will be attempted again.
+                                The data of partners already geolocated is protected by default.
+                                You can select a processing option or use filters to define the partners to geolocate.
+                                    <br/>
+                                You can select a processing option or use filters to define the partners to geolocate.
+                                </div>
+                                <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('update_all_selected', '=', False)]}">
+                                All partners already geolocated will be tried again, and the geolocation data
+                                reseted.
+                                    <br/>
+                                You can use filters to define the partners to geolocate..
+                                </div>
+                                <div class="oe_grey" style="padding-left: 24px" attrs="{'invisible':[('update_all_selected_except_manual_geolocalized', '=', False)]}">
+                                All partners already geolocated except those done manually will be tried again and
+                                geolocation data reseted.
+                                    <br/>
+                                You can use filters to define the partners to geolocate.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <field name="is_geolocalize_done" invisible ="1"/>
+                    <field name="partner_ids" nolabel="1" options="{'no_create': True 'reload_on_button': True}" attrs="{'invisible': [('is_geolocalize_done', '=', True)]}">
+                        <tree string="Partners" editable="top" create="0" decoration-info="of_geocoding_state == 'not_tried'" decoration-danger="of_geocoding_state in ('no_address', 'failure')">
+                            <field name="display_name" string="Name" readonly="1"/>
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="zip" string="CP"/>
+                            <field name="city"/>
+                            <field name="country_id"/>
+                            <field name="of_geocoding_state"/>
+                            <field name="of_precision"/>
+                        </tree>
+                    </field>
+
+                    <field name="line_ids" nolabel="1" options="{'no_create':True 'reload_on_button': True} " attrs="{'invisible': [('is_geolocalize_done', '=', False)]}">
+                        <tree string="partners" editable="top" create="0">
+                            <field name="partner_id" string="Name" readonly="1"/>
+                            <field name="requested_address"/>
+                            <field name="response_address"/>
+                            <field name="geocoding_state"/>
+                            <field name="precision"/>
+                        </tree>
+                    </field>
+
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action wizard -->
+    <record model="ir.actions.act_window" id="action_of_geo_wizard">
+        <field name="name">Geolocalization</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.geo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="target">current</field>
+    </record>
+
+</odoo>
