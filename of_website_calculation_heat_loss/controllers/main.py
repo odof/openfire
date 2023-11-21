@@ -9,6 +9,12 @@ from odoo.http import request
 
 class OFCalculationController(http.Controller):
 
+    def _cleanup_session(self):
+        if 'heat_loss_id' in request.session:
+            del request.session['heat_loss_id']
+        if 'mail_attempt' in request.session:
+            del request.session['mail_attempt']
+
     @http.route('/calcul_deperdition_chaleur', type='http', auth="public", methods=['GET', 'POST'], website=True)
     def heat_loss_calculation_form(self, **kwargs):
         heat_loss_obj = request.env['of.calculation.heat.loss']
@@ -57,6 +63,13 @@ class OFCalculationController(http.Controller):
                 }),
 
             })
+        if request.session.get('mail_attempt') and heat_loss:
+            if heat_loss.mailing_attempt == 'success':
+                message = u"Le compte-rendu a bien été envoyé à l'adresse : %s" % heat_loss.pro_partner_id.email
+            else:
+                message = u"Désolé, il semble que l'adresse que vous avez renseignée est introuvable ou incorrecte. " \
+                          u"Veuillez réessayer avec une adresse mail valide."
+            values['mailing_attempt_message'] = message
 
         return request.render('of_website_calculation_heat_loss.heat_loss_calculation_form', values)
 
@@ -70,13 +83,17 @@ class OFCalculationController(http.Controller):
         heat_loss_id = request.session.get('heat_loss_id')
         heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
 
-        heat_loss.write(kwargs)
-        heat_loss.send_calculation()
+        try:
+            heat_loss.write(kwargs)
+            heat_loss.with_context(heat_loss_mail_attempt=True).send_calculation()
+        except Exception:
+            heat_loss.write({'mailing_attempt': 'failed'})
 
-        return request.redirect('/calcul_deperdition_chaleur')
+        request.session['mail_attempt'] = True
+
+        return self.heat_loss_calculation_form()
 
     @http.route('/calcul_deperdition_chaleur_new', type='http', auth="public", methods=['GET', 'POST'], website=True)
     def heat_loss_calculation_form_new(self, **kwargs):
-        if request.session.get('heat_loss_id'):
-            del request.session['heat_loss_id']
+        self._cleanup_session()
         return self.heat_loss_calculation_form(**kwargs)

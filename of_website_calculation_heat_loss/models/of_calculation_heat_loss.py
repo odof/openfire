@@ -12,6 +12,13 @@ class OFCalculationHeatLoss(models.Model):
     pro_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire Professionnel")
     pro_partner_name = fields.Char(string=u"Nom de l'entreprise", related='pro_partner_id.name')
     pro_partner_email = fields.Char(string=u"Email de l'entreprise", related='pro_partner_id.email')
+    mailing_attempt = fields.Selection(
+        selection=[
+            ('no_attempt', u"Aucune tentative d'envoi"),
+            ('failed', u"Échec d'envoi"),
+            ('success', u"Envoi réussi"),
+        ], string=u"Tentative d'envoi de mail", default='no_attempt'
+    )
 
     @api.model
     def create(self, vals):
