@@ -46,7 +46,7 @@
                 <button name="action_delivery_division" string="Diviser" type="object"
                         attrs="{'invisible': [('state', 'in', ['cancel', 'done'])]}"/>
                 <button name="action_additional_delivery" string="Livraison complémentaire" type="object"
-                        attrs="{'invisible': [('state', 'not in', ['done']), ('picking_type_code', '!=', 'outgoing')]}"/>
+                        attrs="{'invisible': ['|', ('state', '!=', 'done'), ('picking_type_code', '!=', 'outgoing')]}"/>
 
             </xpath>
         </field>
