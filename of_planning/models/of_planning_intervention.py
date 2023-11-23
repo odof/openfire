@@ -1333,6 +1333,14 @@ class OfPlanningIntervention(models.Model):
                     employee_id = list(employee_ids_val[2])[0]
             vals['employee_main_id'] = employee_id
 
+        if 'picking_manual_ids' in vals and isinstance(vals['picking_manual_ids'], list):
+            picking_manual_ids = []
+            for picking in vals['picking_manual_ids']:
+                if picking[0] == 1:
+                    picking_manual_ids.append((4, picking[1]))
+                picking_manual_ids.append(picking)
+            vals['picking_manual_ids'] = picking_manual_ids
+
         res = super(OfPlanningIntervention, self).create(vals)
         res.do_verif_dispo()
         res._affect_number()
@@ -1389,6 +1397,14 @@ class OfPlanningIntervention(models.Model):
                     date_dt = fields.Datetime.from_string(self[0].date)
                 vals['duree'] = (date_deadline_dt - date_dt).total_seconds() / 3600
         employee_before = {rec: rec.employee_ids for rec in self}
+
+        if 'picking_manual_ids' in vals and isinstance(vals['picking_manual_ids'], list):
+            picking_manual_ids = []
+            for picking in vals['picking_manual_ids']:
+                if picking[0] == 1:
+                    picking_manual_ids.append((4, picking[1]))
+                picking_manual_ids.append(picking)
+            vals['picking_manual_ids'] = picking_manual_ids
 
         result = super(OfPlanningIntervention, self).write(vals)
 
