@@ -8,7 +8,7 @@ from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.addons.sale.models.sale import SaleOrder as SO
 from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
 from odoo.exceptions import UserError
-from odoo.models import regex_order
+from odoo.models import regex_order, NewId
 from odoo.addons.of_utils.models.of_utils import get_selection_label
 
 
@@ -1343,6 +1343,9 @@ class SaleOrderLine(models.Model):
 
     @api.multi
     def _additionnal_tax_verifications(self):
+        if isinstance(self.id, NewId):
+            # Lors de la création manuelle d'une ligne, on veut calculer la taxe
+            return False
         invoice_line_obj = self.env['account.invoice.line']
         if self.product_id and self.product_id.id in invoice_line_obj.get_locked_product_ids():
             return True
