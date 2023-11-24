@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-31 13:15+0000\n"
-"PO-Revision-Date: 2023-08-31 13:15+0000\n"
+"POT-Creation-Date: 2023-11-24 14:48+0000\n"
+"PO-Revision-Date: 2023-11-24 14:48+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -27,10 +27,26 @@ msgid "(OF) Category of items used for down payments"
 msgstr "(OF) Catégorie d'articles utilisés pour les acomptes"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_copy_opportunity_with_sale_order
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_copy_opportunity_with_sale_order
+msgid "(OF) Copy opportunity"
+msgstr "(OF) Copier l'opportunité"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_validate_pickings_on_move
 #: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_validate_pickings_on_move
 msgid "(OF) Delivery notes management in Customer Invoice"
 msgstr "(OF) Gestion des bons de livraison dans la facture client"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
+msgid "(OF) Display subtotals taxes excl. by sales order line"
+msgstr "Affichage des sous-totaux taxes excluses par ligne de commande client"
+
+#. module: of_sale
+#: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
+msgid "(OF) Display subtotals taxes incl. by sales order line"
+msgstr "Affichage des sous-totaux taxes incluses par ligne de commande client"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_deposit_product_categ_id
@@ -212,7 +228,7 @@ msgstr ""
 
 #. module: of_sale
 #. odoo-python
-#: code:addons/of_sale/wizard/sale_make_invoice_advance.py:0
+#: code:addons/of_sale/wizards/sale_make_invoice_advance.py:0
 #, python-format
 msgid "Advance: %s"
 msgstr "Acompte: %s"
@@ -486,20 +502,10 @@ msgid "Display Name"
 msgstr ""
 
 #. module: of_sale
-#: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
-msgid "Display subtotals taxes excl. by sales order line"
-msgstr "Affichage des sous-totaux taxes excluses par ligne de commande client"
-
-#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_exclued_total_in_so_lines
 #: model:ir.model.fields,field_description:of_sale.field_res_config_settings__group_of_display_tax_exclued_total_in_so_lines
 msgid "Display subtotals taxes excl. per order line"
 msgstr "Afficher les sous-totaux HT par ligne de commande"
-
-#. module: of_sale
-#: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
-msgid "Display subtotals taxes incl. by sales order line"
-msgstr "Affichage des sous-totaux taxes incluses par ligne de commande client"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_inclued_total_in_so_lines
@@ -583,7 +589,7 @@ msgstr "Catégorie des articles d'acompte"
 
 #. module: of_sale
 #. odoo-python
-#: code:addons/of_sale/wizard/sale_make_invoice_advance.py:0
+#: code:addons/of_sale/wizards/sale_make_invoice_advance.py:0
 #, python-format
 msgid "Down payment of %s%%"
 msgstr "Acompte de %s%%"
@@ -794,7 +800,7 @@ msgstr "Date du dernier devis"
 
 #. module: of_sale
 #. odoo-python
-#: code:addons/of_sale/wizard/of_sale_order_add_quote.py:0
+#: code:addons/of_sale/wizards/of_sale_order_add_quote.py:0
 #, python-format
 msgid "Line added from the complementary quote %s"
 msgstr "Ligne ajoutée depuis le devis complémentaire %s"
@@ -1325,6 +1331,11 @@ msgid ""
 msgstr ""
 "Avertissement : Nous avons changé l'option \"Affichage des sous-totaux de "
 "ligne\" dans les paramètres de comptabilité (de B2C à B2B)"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
+msgid "When copying a sale order, copy the opportunity too"
+msgstr "Lors de la copie d'une commande client, copier aussi l'opportunité"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_of_sale_order_add_quote_wizard

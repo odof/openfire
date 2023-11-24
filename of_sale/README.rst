@@ -133,6 +133,10 @@ Ventes
         - **automatique** : c'est le fonctionnement standard, la date de confirmation est mise à jour automatiquement lors de la confirmation de la commande;
         - **manuel** : la date de confirmation est renseignée manuellement par l'utilisateur lors du processus de validation de la commande;
 
+* Ajout d'un paramètre système pour permettre la copie de l'opportunité lors de la copie d'une commande
+    - cf. Paramètres > Ventes > Devis & Commande > **(OF) Copier l'opportunitée**;
+    - si cette option est activée, l'opportunité liée à la commande sera copiée lors de la copie de la commande;
+    - si cette option est désactivée, l'opportunité liée à la commande ne sera pas copiée lors de la copie de la commande;
 
 Facturation
 -----------

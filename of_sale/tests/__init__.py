@@ -9,3 +9,4 @@ from . import test_order_line_brand
 from . import test_locked_order_line
 from . import test_order_main_product
 from . import test_sale_order_add_quote
+from . import test_sale_order_opportunity_copy

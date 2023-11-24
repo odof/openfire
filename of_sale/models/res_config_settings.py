@@ -55,6 +55,10 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='of.sale.of_sale_confirmation_date_mode',
         default='default',
     )
+    of_copy_opportunity_with_sale_order = fields.Boolean(
+        string="(OF) Copy opportunity",
+        config_parameter='of.sale.of_copy_opportunity_with_sale_order',
+    )
 
     # Invoice settings
     of_color_bg_section = fields.Char(
