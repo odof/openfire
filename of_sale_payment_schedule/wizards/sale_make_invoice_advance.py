@@ -10,9 +10,9 @@ class SaleAdvancePaymentInv(models.TransientModel):
     def _onchange_advance_payment_method(self):
         categ_deposit_id = self.env['ir.config_parameter'].sudo().get_param('of.sale.of_deposit_product_categ_id')
         categ_deposit_id = int(categ_deposit_id) if categ_deposit_id else False
-        # `advance_payment_method` is available only for one SO, default value is 'delivered'
-        # we should have only one SO in here.
-        self.sale_order_ids.ensure_one()
+        if len(self.sale_order_ids) > 1 or self.advance_payment_method == 'delivered':
+            return {}
+
         self = self.with_company(self.company_id)
         order = self.sale_order_ids
         nb_lines_deposit = len(

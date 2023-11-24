@@ -5,6 +5,7 @@ from odoo import api, fields, models
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
+    _order = 'date desc, move_name desc, of_order_id, id'
 
     price_unit = fields.Float(digits=False)
     of_is_locked = fields.Boolean(
@@ -12,6 +13,10 @@ class AccountMoveLine(models.Model):
         string="Locked",
         help="Special product. That field allows you to know if an invoice line should prevent its counterpart on a"
         "sale order from being deleted",
+    )
+    of_order_id = fields.Many2one(
+        comodel_name='sale.order',
+        string="Origin Customer Order",
     )
 
     @api.model

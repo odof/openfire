@@ -381,13 +381,19 @@ class SaleOrder(models.Model):
                 for line in move.invoice_line_ids:
                     order_line = line.sale_line_ids[:1]
                     order_ref = order_line.order_id.client_order_ref or False
-                    # We add the order reference to the invoice line name
-                    # (for example: "SO1234\nLine name" or "SO1234 Order ref\nLine name")
-                    line.name = "%s%s%s%s" % (
-                        order_line.order_id.name,
-                        f" {order_ref}" if order_ref else '',
-                        "\n" if order_line.order_id.name or order_ref else '',
-                        line.name,
+                    line.write(
+                        {
+                            'name': "%s%s%s%s"
+                            % (
+                                # We add the order reference to the invoice line name
+                                # (for example: "SO1234\nLine name" or "SO1234 Order ref\nLine name")
+                                order_line.order_id.name,
+                                f" {order_ref}" if order_ref else '',
+                                "\n" if order_line.order_id.name or order_ref else '',
+                                line.name,
+                            ),
+                            'of_order_id': order_line.order_id.id,
+                        }
                     )
         return moves
 
