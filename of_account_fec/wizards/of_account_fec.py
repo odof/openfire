@@ -7,6 +7,12 @@ from odoo.exceptions import AccessDenied, UserError
 from odoo.tools import float_is_zero
 from odoo.tools.misc import get_lang
 
+AVAILABLE_ENCODING = [
+    ('utf-8', "UTF-8"),
+    ('iso-8859-1', "ISO-8859-1"),
+    ('windows-1252', "Windows-1252"),
+]
+
 
 class OFAccountFrFec(models.TransientModel):
     _inherit = 'account.fr.fec'
@@ -38,6 +44,12 @@ class OFAccountFrFec(models.TransientModel):
     )
     of_file_extension = fields.Selection(
         selection=[('csv', 'CSV'), ('txt', 'TXT')], string="File extension", required=True, default='csv'
+    )
+    of_output_encoding = fields.Selection(
+        selection=AVAILABLE_ENCODING,
+        string="File encoding",
+        required=True,
+        default='utf-8',
     )
     of_opening_journal_code = fields.Char(string="Opening journal code", required=True, default='OUV')
     of_opening_journal_label = fields.Char(
@@ -257,6 +269,8 @@ class OFAccountFrFec(models.TransientModel):
 
         rows_to_write.extend(list(row) for row in self._cr.fetchall())
         fecvalue = self._csv_write_rows(rows_to_write)
+        if self.of_output_encoding != 'utf-8':
+            fecvalue = fecvalue.decode().encode('iso-8859-1')
         end_date = fields.Date.to_string(self.date_to).replace('-', '')
         self.write(
             {

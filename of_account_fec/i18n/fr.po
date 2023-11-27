@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-17 13:33+0000\n"
-"PO-Revision-Date: 2023-02-17 13:33+0000\n"
+"POT-Creation-Date: 2023-11-27 08:37+0000\n"
+"PO-Revision-Date: 2023-11-27 08:37+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,11 @@ msgid "File extension"
 msgstr "Extension du fichier"
 
 #. module: of_account_fec
+#: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__of_output_encoding__iso-8859-1
+msgid "ISO-8859-1"
+msgstr ""
+
+#. module: of_account_fec
 #: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_include_opening_journal
 msgid "Include the opening journal"
 msgstr "Inclure le journal d'ouverture"
@@ -56,19 +61,9 @@ msgid "Journals"
 msgstr "Journaux"
 
 #. module: of_account_fec
-#: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__export_type__nonofficial
-msgid "Non-official FEC report (posted and unposted entries)"
-msgstr "Rapport FEC non officiel (entrées postées et non postées)"
-
-#. module: of_account_fec
 #: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__export_type__nonofficial_posted
 msgid "Non-official FEC report (posted entries only)"
 msgstr "Rapport FEC non officiel (entrées publiées uniquement)"
-
-#. module: of_account_fec
-#: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__export_type__official
-msgid "Official FEC report (posted entries only)"
-msgstr "Rapport FEC officiel (uniquement les entrées comptabilisées)"
 
 #. module: of_account_fec
 #: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_opening_journal_label
@@ -79,6 +74,11 @@ msgstr "Libellé du journal d'ouverture"
 #: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_opening_journal_code
 msgid "Opening journal code"
 msgstr "Code du journal d'ouverture"
+
+#. module: of_account_fec
+#: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_output_encoding
+msgid "File encoding"
+msgstr "Encodage du fichier"
 
 #. module: of_account_fec
 #: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_order_by
@@ -92,10 +92,15 @@ msgstr ""
 
 #. module: of_account_fec
 #. odoo-python
-#: code:addons/of_account_fec/wizard/of_account_fec.py:0
+#: code:addons/of_account_fec/wizards/of_account_fec.py:0
 #, python-format
 msgid "The start date must be inferior to the end date."
 msgstr "La date de début doit être inférieure à la date de fin."
+
+#. module: of_account_fec
+#: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__of_output_encoding__utf-8
+msgid "UTF-8"
+msgstr ""
 
 #. module: of_account_fec
 #: model:ir.model.fields,field_description:of_account_fec.field_account_fr_fec__of_use_create_date
@@ -109,8 +114,13 @@ msgstr ""
 "Utiliser la date de création du mouvement au lieu de la date du mouvement."
 
 #. module: of_account_fec
+#: model:ir.model.fields.selection,name:of_account_fec.selection__account_fr_fec__of_output_encoding__windows-1252
+msgid "Windows-1252"
+msgstr ""
+
+#. module: of_account_fec
 #. odoo-python
-#: code:addons/of_account_fec/wizard/of_account_fec.py:0
+#: code:addons/of_account_fec/wizards/of_account_fec.py:0
 #, python-format
 msgid "You could not set the start date or the end date in the future."
 msgstr ""

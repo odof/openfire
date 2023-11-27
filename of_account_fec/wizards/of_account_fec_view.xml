@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//page[@name='options']//group//field[@name='export_type']" position="after">
                 <field name="of_file_extension"/>
+                <field name="of_output_encoding" attrs="{'invisible': [('export_type','=','official')]}"/>
             </xpath>
             <xpath expr="//page[@name='options']//group" position="after">
                 <group colspan="2" name="options_more" attrs="{'invisible': [('export_type','=','official')]}">
