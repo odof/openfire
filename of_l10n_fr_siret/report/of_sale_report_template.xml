@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document" priority="9">
         <xpath expr="//t[@t-set='pdf_customer_insert']" position="replace">
             <t t-set="pdf_partner_siret_address_insert" t-value="doc.pdf_partner_siret_address_insert()" />
             <t t-set="pdf_partner_siret_customer_insert" t-value="doc.pdf_partner_siret_customer_insert()" />
