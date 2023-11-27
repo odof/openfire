@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document" priority="9">
+        <xpath expr="//t[@t-set='pdf_customer_insert']" position="replace">
+            <t t-set="pdf_partner_siret_address_insert" t-value="doc.pdf_partner_siret_address_insert()" />
+            <t t-set="pdf_partner_siret_customer_insert" t-value="doc.pdf_partner_siret_customer_insert()" />
+            <t t-set="pdf_customer_insert" t-value="doc.pdf_customer_insert() and (pdf_customer_phone or pdf_customer_mobile or pdf_customer_fax or pdf_customer_email or pdf_partner_siret_customer_insert)"/>
+        </xpath>
+
+        <xpath expr="//div[@name='adresse_livraison']//p[@t-if='doc.partner_id.vat']" position="before">
+            <!-- Choose to positionning before <p> tag because in some private modules, the address div is rewritten and the partner_id field in not the same -->
+            <t t-if="pdf_partner_siret_address_insert and doc.partner_shipping_id.siret">SIRET: <span t-field="doc.partner_shipping_id.siret"/><br/></t>
+        </xpath>
+        <xpath expr="//div[@name='adresse_facturation']//p[@t-if='doc.partner_id.vat']" position="before">
+            <!-- Choose to positionning before <p> tag because in some private modules, the address div is rewritten and the partner_id field in not the same -->
+            <t t-if="pdf_partner_siret_address_insert and doc.partner_invoice_id.siret">SIRET: <span t-field="doc.partner_invoice_id.siret"/><br/></t>
+        </xpath>
+
+        <xpath expr="//div[@name='client']//t[@t-if='pdf_customer_email and doc.partner_id.email']" position="inside">
+            <br/>
+        </xpath>
+        <xpath expr="//div[@name='client']//t[@t-if='pdf_customer_email and doc.partner_id.email']" position="after">
+            <t t-if="doc.partner_id.siret"><span t-field="doc.partner_id.siret"/><br/></t>
+        </xpath>
+    </template>
+
+</odoo>
