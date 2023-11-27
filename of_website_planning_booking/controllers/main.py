@@ -337,8 +337,8 @@ class OFWebsitePlanningBooking(http.Controller):
             address = request.env['res.partner'].browse(request.session.get('rdv_site_adresse_id'))
             if not address.of_secteur_tech_id:
                 # On tente d'assigner un secteur
-                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(address.zip).filtered(
-                    lambda sec: sec.type in ('tech', 'tech_com'))
+                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(
+                    address.zip, type_list=['tech', 'tech_com'])
                 if not secteur:
                     values = {
                         'return_button': True,
@@ -1036,8 +1036,8 @@ class OFWebsitePlanningBooking(http.Controller):
             update_vals['zip'] = params['zip']
             # On recalcule le secteur
             if address.of_secteur_tech_id:
-                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(update_vals['zip']).filtered(
-                    lambda sec: sec.type in ('tech', 'tech_com'))
+                secteur = request.env['of.secteur'].sudo().get_secteur_from_cp(
+                    update_vals['zip'], type_list=['tech', 'tech_com'])
                 if secteur:
                     update_vals['of_secteur_tech_id'] = secteur.id
                 else:

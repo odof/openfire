@@ -12,7 +12,6 @@ class ResPartner(models.Model):
     def _onchange_zip(self):
         self.ensure_one()
         if self.zip and self.env['ir.values'].get_default('of.intervention.settings', 'automatic_areas'):
-            self.of_secteur_com_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
-                lambda sec: sec.type in ('com', 'tech_com'))
-            self.of_secteur_tech_id = self.env['of.secteur'].get_secteur_from_cp(self.zip).filtered(
-                lambda sec: sec.type in ('tech', 'tech_com'))
+            self.of_secteur_com_id = self.env['of.secteur'].get_secteur_from_cp(self.zip, type_list=['com', 'tech_com'])
+            self.of_secteur_tech_id = self.env['of.secteur'].get_secteur_from_cp(
+                self.zip, type_list=['tech', 'tech_com'])
