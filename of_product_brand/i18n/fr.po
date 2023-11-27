@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-16 08:42+0000\n"
-"PO-Revision-Date: 2023-06-16 08:42+0000\n"
+"POT-Creation-Date: 2023-11-27 11:27+0000\n"
+"PO-Revision-Date: 2023-11-27 11:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -394,6 +394,16 @@ msgid "This year"
 msgstr "Année en cours"
 
 #. module: of_product_brand
+#: model:ir.model.fields,field_description:of_product_brand.field_res_users__of_brand_ids
+msgid "Unauthorized brands"
+msgstr "Marques non autorisées"
+
+#. module: of_product_brand
+#: model:ir.model.fields,help:of_product_brand.field_res_users__of_brand_ids
+msgid "Unauthorized product brands for assigned users"
+msgstr "Marques de produits non autorisées pour les utilisateurs assignés"
+
+#. module: of_product_brand
 #. odoo-python
 #: code:addons/of_product_brand/report/of_account_report.py:0
 #: code:addons/of_product_brand/report/of_sale_report.py:0
@@ -410,6 +420,11 @@ msgstr "Utiliser la description de vente au niveau de la marque"
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__use_prefix
 msgid "Use code as prefix"
 msgstr "Utiliser le code comme préfixe"
+
+#. module: of_product_brand
+#: model:ir.model,name:of_product_brand.model_res_users
+msgid "User"
+msgstr "Utilisateur"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_product_product__of_seller_partner_id
