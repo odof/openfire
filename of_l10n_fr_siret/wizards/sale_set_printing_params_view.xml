@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_l10n_fr_wizard_sales_set_printing_params_view_form" model="ir.ui.view">
+        <field name="name">of.l10n.fr.wizard.sales.set.printing.params.view.form</field>
+        <field name="model">of.sale.wizard.set.printing.params</field>
+        <field name="inherit_id" ref="of_sale.wizard_sales_set_printing_params_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pdf_address_contact_email']" position="after">
+                <field name="pdf_partner_siret_address_insert"/>
+            </xpath>
+            <xpath expr="//div[@name='pdf_customer_email']" position="after">
+                <label for="pdf_partner_siret_customer_insert"/>
+                <div name="pdf_partner_siret_customer_insert">
+                    <field name="pdf_partner_siret_customer_insert" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

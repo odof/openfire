@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="account_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.l10n.fr.siret.account.config.settings.view</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="of_account_invoice_report.of_view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='pdf_afficher_email']" position="after">
+                <label for="pdf_partner_siret_display"/>
+                <div name="pdf_partner_siret_display" colspan="1" col="3">
+                    <field name="pdf_partner_siret_display" class="oe_inline" colspan="2" no_label="1"/>
+                    <span colspan="1"></span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

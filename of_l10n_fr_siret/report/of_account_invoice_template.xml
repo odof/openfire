@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_l10n_fr_siret_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='client_info_pastille']" position="replace">
+            <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email) or (pdf_partner_siret_display &gt; 1 and o.partner_id.siret)"/>
+            <t t-set="pdf_partner_siret_display" t-value="o.pdf_partner_siret_display()"/>
+        </xpath>
+        <xpath expr="//div[@name='invoice_address']//t[@t-if='o.partner_id.email and pdf_email % 2 == 1']" position="after">
+            <t t-if="o.partner_id.siret and pdf_partner_siret_display % 2 == 1">SIRET: <span t-field="o.partner_id.siret"/><br/></t>
+        </xpath>
+        <xpath expr="//div[@name='client']//t[@t-if='pdf_email &gt; 1 and o.partner_id.email']" position="after">
+            <t t-if="pdf_partner_siret_display &gt; 1 and o.partner_id.siret"><span t-field="o.partner_id.siret"/><br/></t>
+        </xpath>
+    </template>
+
+    <template id="of_l10n_fr_siret_report_invoice_document_inherit_sale" inherit_id="sale.report_invoice_document_inherit_sale">
+        <xpath expr="//t[@t-set='pdf_shipping_address_specific_title']" position="after">
+            <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email) or (pdf_partner_siret_display &gt; 1 and o.partner_id.siret)"/>
+            <t t-set="pdf_partner_siret_display" t-value="o.pdf_partner_siret_display()"/>
+        </xpath>
+        <xpath expr="//div[@name='adresse_livraison']//t[@t-if='o.partner_shipping_id.email and pdf_email % 2 == 1']" position="after">
+            <t t-if="o.partner_shipping_id.siret and pdf_partner_siret_display % 2 == 1">SIRET: <span t-field="o.partner_shipping_id.siret"/><br/></t>
+        </xpath>
+            <xpath expr="//div[@name='adresse_facturation']//t[@t-if='o.partner_id.email and pdf_email % 2 == 1']" position="after">
+            <t t-if="o.partner_id.siret and pdf_partner_siret_display % 2 == 1">SIRET: <span t-field="o.partner_id.siret"/><br/></t>
+        </xpath>
+    </template>
+
+</odoo>

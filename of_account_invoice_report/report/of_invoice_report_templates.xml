@@ -82,7 +82,7 @@
                             <t t-if="pdf_telephone &gt; 1 and o.partner_id.phone"><span t-field="o.partner_id.phone"/><br/></t>
                             <t t-if="pdf_mobile &gt; 1 and o.partner_id.mobile"><span t-field="o.partner_id.mobile"/><br/></t>
                             <t t-if="pdf_fax &gt; 1 and o.partner_id.fax"><span t-field="o.partner_id.fax"/><br/></t>
-                            <t t-if="pdf_email &gt; 1 and o.partner_id.email"><span t-field="o.partner_id.email"/></t>
+                            <t t-if="pdf_email &gt; 1 and o.partner_id.email"><span t-field="o.partner_id.email"/><br/></t>
                         </p>
                     </div>
                     <div t-if="client_info_pastille" style="display: table-cell; width: 4px;"/>
