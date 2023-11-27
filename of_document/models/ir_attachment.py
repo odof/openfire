@@ -96,7 +96,7 @@ class IrAttachment(models.Model):
                     if partner != dms_file.of_attachment_partner_id:
                         new_file_vals['of_attachment_partner_id'] = partner.id
 
-                    if rec.of_category_id != categ:
+                    if dms_file.of_category_id != categ:
                         new_file_vals['of_category_id'] = categ.id
 
                     if new_file_vals:
