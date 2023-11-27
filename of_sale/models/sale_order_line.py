@@ -377,13 +377,17 @@ class SaleOrderLine(models.Model):
 
     def _additionnal_tax_verifications(self):
         """Avoid to compute taxes on SO lines when the product is tag as locked"""
+        if not self._origin:  # Creating a new SO line we want to compute taxes
+            return False
         move_line_obj = self.env['account.move.line']
-        if self.product_id and self.product_id.id in move_line_obj._get_locked_product_ids():
-            return True
-        return bool(
-            (
-                self.product_id
-                and self.product_id.categ_id
-                and self.product_id.categ_id.id in move_line_obj._get_locked_category_ids()
+        return (
+            True
+            if self.product_id and self.product_id.id in move_line_obj._get_locked_product_ids()
+            else bool(
+                (
+                    self.product_id
+                    and self.product_id.categ_id
+                    and self.product_id.categ_id.id in move_line_obj._get_locked_category_ids()
+                )
             )
         )
