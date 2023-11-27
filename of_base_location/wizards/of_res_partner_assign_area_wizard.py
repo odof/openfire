@@ -43,7 +43,7 @@ class OFResPartnerUpdateAreaWizard(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
 
         for record in self.env['res.partner'].browse(active_ids):
-            record.of_secteur_com_id = record.env['of.secteur'].get_secteur_from_cp(record.zip).filtered(
-                lambda sec: sec.type in ('com', 'tech_com'))
-            record.of_secteur_tech_id = record.env['of.secteur'].get_secteur_from_cp(record.zip).filtered(
-                lambda sec: sec.type in ('tech', 'tech_com'))
+            record.of_secteur_com_id = record.env['of.secteur'].get_secteur_from_cp(
+                record.zip, type_list=['com', 'tech_com'])
+            record.of_secteur_tech_id = record.env['of.secteur'].get_secteur_from_cp(
+                record.zip, type_list=['tech', 'tech_com'])

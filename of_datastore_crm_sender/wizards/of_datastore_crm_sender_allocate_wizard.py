@@ -53,7 +53,7 @@ class OfDatastoreCrmAutoAllocateWizard(models.TransientModel):
         membre_reseau_ids = res_partner_obj.search([('of_network_member', '=', True)])
         for membre_reseau in membre_reseau_ids:
             if not membre_reseau.of_secteur_com_id and membre_reseau.zip:
-                secteur_id = of_secteur_obj.get_secteur_from_cp(membre_reseau.zip)
+                secteur_id = of_secteur_obj.get_secteur_from_cp(membre_reseau.zip, type_list=['com', 'tech_com'])
                 membre_reseau.write({'of_secteur_com_id': secteur_id.id or False})
 
         # On filtre les opportunités déjà traitées par le connecteur CRM
@@ -62,7 +62,7 @@ class OfDatastoreCrmAutoAllocateWizard(models.TransientModel):
             # On définit le secteur pour le partner de l'opportunité réseau
             if not lead.partner_id.of_secteur_com_id:
                 zip = lead.partner_id.zip or lead.zip or False
-                of_secteur_com_id = of_secteur_obj.get_secteur_from_cp(zip)
+                of_secteur_com_id = of_secteur_obj.get_secteur_from_cp(zip, type_list=['com', 'tech_com'])
                 lead.partner_id.write({'of_secteur_com_id': of_secteur_com_id.id})
 
             partner_id = False

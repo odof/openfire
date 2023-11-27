@@ -104,33 +104,22 @@ class OfSecteur(models.Model):
             return res
 
     @api.model
-    def get_secteur_from_cp(self, cp):
-        return self.env['of.secteur.zip.range'].search(
-            [('cp_min', '<=', cp), ('cp_max', '>=', cp)],
-            order="cp_min DESC, cp_max", limit=1
-        ).secteur_id
+    def get_secteur_from_cp(self, cp, type_list=[]):
+        domain = [('cp_min', '<=', cp), ('cp_max', '>=', cp)]
+        if type_list:
+            domain += [('secteur_id.type', 'in', type_list)]
+        return self.env['of.secteur.zip.range'].search(domain, order="cp_min DESC, cp_max", limit=1).secteur_id
 
     @api.multi
     def get_partners(self):
         partner_obj = self.env['res.partner']
-        zip_range_obj = self.env['of.secteur.zip.range']
 
         domain = ['|'] * (len(self.mapped("zip_range_ids")) - 1)
 
         for zip_range in self.mapped("zip_range_ids"):
             cp_min = zip_range.cp_min
             cp_max = zip_range.cp_max
-            zip_ranges_intra = zip_range_obj.search(
-                [('cp_min', '>=', cp_min), ('cp_min', '<=', cp_max), ('id', '!=', zip_range.id)],
-                order='cp_min, cp_max DESC')
-
-            domain_secteur = ['&'] * (len(zip_ranges_intra) + 1)
-            domain_secteur += [('zip', '>=', cp_min), ('zip', '<=', cp_max)]
-            for zip_range_intra in zip_ranges_intra:
-                if zip_range_intra.cp_max >= cp_min:
-                    domain_secteur += ['|', ('zip', '<', zip_range_intra.cp_min), ('zip', '>', zip_range_intra.cp_max)]
-                    cp_min = zip_range_intra.cp_max
-            domain += domain_secteur
+            domain += ['&', ('zip', '>=', cp_min), ('zip', '<=', cp_max)]
 
         return partner_obj.search(domain)
 
