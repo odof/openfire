@@ -22,6 +22,7 @@
         'data/ir_cron.xml',
         'data/ir_config_parameter.xml',
         'data/report_paperformat.xml',
+        'data/of_sanitize_query.xml',
         'security/of_base_security.xml',
         'security/ir.model.access.csv',
         'views/base_config_settings_views.xml',
