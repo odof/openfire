@@ -27,4 +27,10 @@
         <field name="users" eval="[Command.link(ref('base.user_admin'))]"/>
     </record>
 
+    <record id="of_group_block_password_modification" model="res.groups">
+        <field name="name">(OF) Block password modification</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Restrict access to the password modification link in the "Preferences" menu</field>
+    </record>
+
 </odoo>

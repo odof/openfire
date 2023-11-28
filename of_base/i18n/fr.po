@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 14:12+0000\n"
-"PO-Revision-Date: 2023-09-11 14:12+0000\n"
+"POT-Creation-Date: 2023-11-28 15:56+0000\n"
+"PO-Revision-Date: 2023-11-28 15:56+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,11 @@ msgstr ""
 #, python-format
 msgid "%(attribute)r value must be an integer (%(value)s)"
 msgstr ""
+
+#. module: of_base
+#: model:res.groups,name:of_base.of_group_block_password_modification
+msgid "(OF) Block password modification"
+msgstr "(OF) Bloquer la modification du mot de passe"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__of_ref_mode
@@ -1830,6 +1835,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__restrict_template_rendering
 msgid "Restrict Template Rendering"
 msgstr ""
+
+#. module: of_base
+#: model:res.groups,comment:of_base.of_group_block_password_modification
+msgid ""
+"Restrict access to the password modification link in the \"Preferences\" "
+"menu"
+msgstr ""
+"Restreint l'accès au lien de modification du mot de passe dans le menu "
+"\"Préférences\""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__crm_use_auto_assignment
