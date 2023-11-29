@@ -69,4 +69,9 @@
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
 
+        <record id="group_of_restrict_modify_order_bung" model="res.groups">
+            <field name="name">(OF) Bloquer la modification des bons de commandes</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+
 </odoo>

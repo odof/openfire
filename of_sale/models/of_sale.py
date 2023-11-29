@@ -3,6 +3,7 @@
 
 import itertools
 import json
+
 from odoo import models, fields, api, _
 from odoo.addons.sale.models.sale import SaleOrderLine as SOL
 from odoo.addons.sale.models.sale import SaleOrder as SO
@@ -45,7 +46,7 @@ SO._compute_tax_id = _compute_tax_id
 
 class SaleOrder(models.Model):
     _name = 'sale.order'
-    _inherit = ['sale.order', 'of.documents.joints']
+    _inherit = ['sale.order', 'of.documents.joints', 'of.form.readonly']
 
     def pdf_payment_schedule(self):
         return self.env['ir.values'].get_default('sale.config.settings', 'pdf_payment_schedule')
@@ -209,6 +210,14 @@ class SaleOrder(models.Model):
     of_partner_phone = fields.Char(related='partner_id.phone', string=u"Téléphone du partenaire", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string=u"Mobile du partenaire", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string=u"Courriel du partenaire", readonly=True)
+
+    @api.model
+    def fields_view_get(self, view_id=None, view_type=False, toolbar=False, submenu=False):
+        if self.env.user.has_group('of_sale.group_of_restrict_modify_order_bung') and view_type == 'form':
+            self = self.with_context(form_readonly="[('state', '=', 'sale')]")
+        res = super(SaleOrder, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar,
+                                                     submenu=submenu)
+        return res
 
     @api.multi
     @api.depends('name', 'date', 'state')
