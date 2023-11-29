@@ -71,55 +71,72 @@ class OFGeoWizard(models.TransientModel):
             result = geo_obj.geo_find(search, force_country=country)
         return result
 
-    def action_button_geolocalize(self):
+    def _prepare_line_vals(self, partner, result, precision):
+        """Prepare the values to create a line in the wizard, according to the geolocalization result"""
+        return {
+            'partner_id': partner.id,
+            'partner_latitude': result[0],
+            'partner_longitude': result[1],
+            'date_localization': fields.Date.context_today(partner),
+            'response_json': json.dumps(result[2][0], indent=3, sort_keys=True, ensure_ascii=False),
+            'geocoding_state': 'success',
+            'requested_address': partner.get_addr_params(),
+            'response_address': result[2][0]['display_name'],
+            'precision': precision,
+        }
+
+    def _prepare_line_vals_empty(self, partner):
+        """Prepare the values to create a line in the wizard, when the partner has no address"""
+        return {
+            'partner_id': partner.id,
+            'partner_latitude': 0.0,
+            'partner_longitude': 0.0,
+            'response_json': '',
+            'geocoding_state': 'no_address',
+        }
+
+    def _get_partners_to_update(self):
+        """Get the partners to update according to the wizard options"""
         if self.update_all_selected_except_manual_geolocalized:
-            to_update = self.partner_ids.filtered(lambda p: p.of_geocoding_state not in ['no_address', 'manual'])
+            return self.partner_ids.filtered(lambda p: p.of_geocoding_state not in ['no_address', 'manual'])
 
         elif self.update_all_selected:
-            to_update = self.partner_ids.filtered(lambda p: p.of_geocoding_state != 'no_address')
+            return self.partner_ids.filtered(lambda p: p.of_geocoding_state != 'no_address')
 
         else:
-            to_update = self.partner_ids.filtered(lambda p: p.of_geocoding_state not in ['no_address', 'success'])
+            return self.partner_ids.filtered(lambda p: p.of_geocoding_state not in ['no_address', 'success'])
 
+    def _geo_localize_and_add_line(self, partner):
+        """Geolocalize the partner and add a line in the wizard if successfully geolocalized"""
+        if result := self._geo_localize(
+            partner.street, partner.zip, partner.city, partner.state_id.name, partner.country_id.name
+        ):
+            rank = result[2][0]['place_rank']
+            precision = partner._determine_precision(rank)
+            vals = self._prepare_line_vals(partner, result, precision)
+            self.line_ids = [Command.create(vals)]
+
+    def action_button_geolocalize(self):
+        """Button action to geolocalize the selected partners"""
+        to_update = self._get_partners_to_update()
         if len(to_update) > 0:
             for partner in to_update.with_context(lang='en_US'):
                 if partner.street or partner.zip or partner.city or partner.state_id or partner.country_id:
-                    if result := self._geo_localize(
-                        partner.street, partner.zip, partner.city, partner.state_id.name, partner.country_id.name
-                    ):
-                        rank = result[2][0]['place_rank']
-                        precision = partner._determine_precision(rank)
-                        vals = {
-                            'partner_id': partner.id,
-                            'partner_latitude': result[0],
-                            'partner_longitude': result[1],
-                            'date_localization': fields.Date.context_today(partner),
-                            'response_json': json.dumps(result[2][0], indent=3, sort_keys=True, ensure_ascii=False),
-                            'geocoding_state': 'success',
-                            'requested_address': partner.get_addr_params(),
-                            'response_address': result[2][0]['display_name'],
-                            'precision': precision,
-                        }
-                        self.line_ids = [Command.create(vals)]
+                    self._geo_localize_and_add_line(partner)
                 else:
-                    vals = {
-                        'partner_id': partner.id,
-                        'partner_latitude': 0.0,
-                        'partner_longitude': 0.0,
-                        'response_json': '',
-                        'geocoding_state': 'no_address',
-                    }
+                    vals = self._prepare_line_vals_empty(partner)
                     self.line_ids = [Command.create(vals)]
             self.is_geolocalize_done = True
 
     def action_button_validate(self):
+        """Button action to validate the geolocalization results and update the partners"""
         date_last_localization = fields.Datetime.context_timestamp(self, fields.datetime.now())
         if not self.line_ids:
             raise UserError(_("You must select a result before you can validate"))
-        if not self.update_also_failed:
-            self.line_ids.filtered(lambda p: p.geocoding_state != 'failure')
-        else:
+        if self.update_also_failed:
             self.line_ids = self.line_ids
+        else:
+            self.line_ids.filtered(lambda p: p.geocoding_state != 'failure')
         for line in self.line_ids:
             vals = {
                 'id': line.partner_id,
