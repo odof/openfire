@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="of_planning.view_of_employee_form_intervention"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='droite_1']" position="inside">
+                <separator string="Prestataire"/>
+                <field name="of_is_provider"/>
+                <field name="of_provider_id"
+                       attrs="{'invisible': [('of_is_provider', '=', False)], 'required': [('of_is_provider', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
