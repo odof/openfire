@@ -211,6 +211,35 @@ class GestionPrixLine(models.TransientModel):
     @api.multi
     def get_values_order_line_create(self):
         values = super(GestionPrixLine, self).get_values_order_line_create()
+        advanced_sale_layout_category = self.env['sale.config.settings'].search(
+            [('group_of_advanced_sale_layout_category', '=', True)])
+
         if values:
             values['of_layout_category_id'] = self.wizard_id.layout_category_id.id
+
+        if self.wizard_id.discount_mode == 'total' and values and advanced_sale_layout_category:
+            product_id = self.env['product.product'].browse(values["product_id"])
+            sections = self.env['of.sale.order.layout.category'].search(
+                [('order_id', '=', values["order_id"])])
+            categ_exist = False
+            for section in sections:
+                for order_line in section.order_line_ids:
+                    if section.name == order_line.product_id.categ_id.name == product_id.categ_id.name:
+                        values['of_layout_category_id'] = section.id
+                        categ_exist = True
+                        break
+                if categ_exist:
+                    break
+
+            if not categ_exist:
+                sequence = max(sections.mapped("sequence")) + 1 or 1
+                section_vals = {
+                    'sequence': sequence,
+                    'sequence_name': sequence,
+                    'name': product_id.categ_id.name,
+                    'order_id': values["order_id"],
+                }
+                section_id = self.env['of.sale.order.layout.category'].create(section_vals)
+                values['of_layout_category_id'] = section_id.id
+
         return values
