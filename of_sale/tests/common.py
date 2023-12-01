@@ -61,15 +61,18 @@ class TestOFSaleCommon(TestOFAccountCommon):
             'fiscal_position_id': self.fiscal_pos_5_5.id,
         }
 
-    def _prepare_sale_order_values(self, product=False, price_unit=50, quantity=1):
+    def _prepare_sale_order_values(self, salesman=False, product=False, price_unit=50, quantity=1):
         if not product:
             product = self.product_consu_a
+        if not salesman:
+            salesman = self.user_salesman
         return {
             'partner_id': self.customer_a.id,
             'partner_invoice_id': self.customer_a.id,
             'partner_shipping_id': self.customer_a.id,
             'pricelist_id': self.default_pricelist.id,
             'fiscal_position_id': self.fiscal_pos_5_5.id,
+            'user_id': salesman.id,
             'order_line': [
                 Command.create(
                     {

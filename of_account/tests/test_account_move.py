@@ -14,11 +14,11 @@ class TestOFAccountMove(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user_accountant = cls.env['res.users'].create(
+        cls.user_accountant_2 = cls.env['res.users'].create(
             {
-                'name': 'user_accountant',
-                'login': 'user_accountant',
-                'email': 'user_accountant@openfire.fr',
+                'name': 'user_accountant_2',
+                'login': 'user_accountant_2',
+                'email': 'user_accountant_2@openfire.fr',
                 # Theses groups are required to create a new account.move to avoid the error:
                 #  AssertionError: line_ids was not found in the view
                 'groups_id': [
@@ -51,7 +51,7 @@ class TestOFAccountMove(TestOFAccountCommon):
 
         with Form(
             self.env['account.move']
-            .with_user(self.user_accountant)
+            .with_user(self.user_accountant_2)
             .with_context(default_move_type='entry', default_journal_id=self.journal_purchase.id)
         ) as move_form:
             with move_form.line_ids.new() as line_form1:
@@ -75,7 +75,7 @@ class TestOFAccountMove(TestOFAccountCommon):
 
         with Form(
             self.env['account.move']
-            .with_user(self.user_accountant)
+            .with_user(self.user_accountant_2)
             .with_context(default_move_type='entry', default_journal_id=self.journal_purchase.id)
         ) as move_form:
             with move_form.line_ids.new() as line_form:
@@ -96,7 +96,10 @@ class TestOFAccountMove(TestOFAccountCommon):
         """Test that the suitable journal ids are correctly computed when creating a new Entry move from scratch."""
 
         move1 = (
-            self.env['account.move'].with_user(self.user_accountant).with_context(default_move_type='entry').create({})
+            self.env['account.move']
+            .with_user(self.user_accountant_2)
+            .with_context(default_move_type='entry')
+            .create({})
         )
         self.assertIn(self.journal_purchase, move1.suitable_journal_ids)
 
@@ -104,6 +107,9 @@ class TestOFAccountMove(TestOFAccountCommon):
         suitable_default_type_domain.write({'value': 'general,bank'})
 
         move2 = (
-            self.env['account.move'].with_user(self.user_accountant).with_context(default_move_type='entry').create({})
+            self.env['account.move']
+            .with_user(self.user_accountant_2)
+            .with_context(default_move_type='entry')
+            .create({})
         )
         self.assertNotIn(self.journal_purchase, move2.suitable_journal_ids)

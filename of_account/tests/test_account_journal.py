@@ -14,15 +14,6 @@ class TestOFAccountJournal(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user_accountant = cls.env['res.users'].create(
-            {
-                'name': 'user_accountant',
-                'login': 'user_accountant',
-                'email': 'user_accountant@openfire.fr',
-                'groups_id': [(6, 0, [cls.env.ref('account.group_account_manager').id])],
-                'company_id': cls.company_fr.id,
-            }
-        )
         # FIXME: Add specific access rights to ir.sequence to avoid odoo.exceptions.AccessError when creating a new
         #  journal
         cls.env['ir.model.access'].create(

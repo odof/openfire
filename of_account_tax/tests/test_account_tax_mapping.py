@@ -14,17 +14,6 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        # Create user
-        cls.user_accountant = cls.env['res.users'].create(
-            {
-                'name': 'user_accountant',
-                'login': 'user_accountant',
-                'email': 'user_accountant@openfire.fr',
-                'groups_id': [(6, 0, [cls.env.ref('account.group_account_manager').id])],
-                'company_id': cls.company_fr.id,
-            }
-        )
-
         # Create accounts
         cls.account_707022 = cls.env['account.account'].create(
             {

@@ -28,19 +28,6 @@ class TestOFResPartnerWarnings(TestOFAccountCommon):
                 'of_warn_block': True,
             }
         )
-        cls.user_accountant = cls.env['res.users'].create(
-            {
-                'name': 'user_accountant',
-                'login': 'user_accountant',
-                'email': 'user_accountant@openfire.fr',
-                'groups_id': [
-                    Command.set(
-                        [cls.env.ref('account.group_account_manager').id, cls.env.ref('base.group_partner_manager').id]
-                    )
-                ],
-                'company_id': cls.company_fr.id,
-            }
-        )
         cls.user_salesman = cls.env['res.users'].create(
             {
                 'name': 'user_salesman',

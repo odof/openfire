@@ -11,11 +11,11 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user_accountant = cls.env['res.users'].create(
+        cls.user_accountant_2 = cls.env['res.users'].create(
             {
-                'name': 'user_accountant',
-                'login': 'user_accountant',
-                'email': 'user_accountant@openfire.fr',
+                'name': 'user_accountant_2',
+                'login': 'user_accountant_2',
+                'email': 'user_accountant_2@openfire.fr',
                 # Theses groups are required to create a new account.move to avoid the error:
                 #  AssertionError: line_ids was not found in the view
                 'groups_id': [
@@ -54,7 +54,7 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
 
         move = (
             self.env['account.move']
-            .with_user(self.user_accountant)
+            .with_user(self.user_accountant_2)
             .create(
                 {
                     'move_type': 'entry',
@@ -84,7 +84,7 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
         """
         move = (
             self.env['account.move']
-            .with_user(self.user_accountant)
+            .with_user(self.user_accountant_2)
             .create(
                 {
                     'move_type': 'entry',
@@ -114,7 +114,7 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
         """
         move = (
             self.env['account.move']
-            .with_user(self.user_accountant)
+            .with_user(self.user_accountant_2)
             .create(
                 {
                     'move_type': 'entry',

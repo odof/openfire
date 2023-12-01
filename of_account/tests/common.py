@@ -162,3 +162,22 @@ class TestOFAccountCommon(TestOFBaseCommon):
         cls.journal_bank = cls.env['account.journal'].search(
             [('type', '=', 'bank'), ('company_id', '=', cls.company_fr.id)], limit=1
         )
+
+        # User data
+        cls.user_accountant = cls.env['res.users'].create(
+            {
+                'name': 'user_accountant',
+                'login': 'user_accountant',
+                'email': 'user_accountant@openfire.fr',
+                'groups_id': [
+                    Command.set(
+                        [
+                            cls.env.ref('account.group_account_manager').id,
+                            cls.env.ref('base.group_partner_manager').id,
+                            cls.env.ref('sales_team.group_sale_salesman').id,
+                        ]
+                    )
+                ],
+                'company_id': cls.company_fr.id,
+            }
+        )
