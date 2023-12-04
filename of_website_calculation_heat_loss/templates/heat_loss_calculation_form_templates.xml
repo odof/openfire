@@ -97,8 +97,9 @@
                 </div>
             </section>
             <section id="iframe_section" class="container readable o_website_form_builder">
-                <form accept-charset="UTF-8" action="/calcul_deperdition_chaleur_new/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mt32 mb16" enctype="multipart/form-data" method="post">
+                <form accept-charset="UTF-8" action="/calcul_deperdition_chaleur/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mt32 mb16" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="button_id" t-att-value="'reload'"/>
                     <div class="form-group" style="height: 40px; line-height: 40px;">
                         <h3 class="text-center mb0 mt0" style="display: inline-block;">Contact</h3>
                         <button type="submit" id="heat_loss_calculation_button_reload" class="btn btn-primary btn-lg o_default_snippet_text of_heat_loss_button" style="display: inline-block; float: right;">
@@ -108,6 +109,7 @@
                 </form>
                 <form accept-charset="UTF-8" action="/calcul_deperdition_chaleur/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mb16" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="button_id" t-att-value="'validate'"/>
                     <div class="o_website_form_fields">
                         <div class="o_not_editable hidden o_default_snippet_text"> This placeholder prevents its parent from disappearing when emptied </div>
                         <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
@@ -295,8 +297,9 @@
                           style="display:none;"/>
                     <canvas id="chart_energy_consuption" height="400px" width="400px"/>
                 </div>
-                <form t-if="estimated_power_text" accept-charset="UTF-8" action="/get_heat_loss_pdf/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mb16" enctype="multipart/form-data" method="post">
+                <form t-if="estimated_power_text" accept-charset="UTF-8" action="/calcul_deperdition_chaleur/" data-model_name="of.calculation.heat.loss" class="s_website_form col-md-12 mb16" enctype="multipart/form-data" method="post">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="button_id" t-att-value="'mail'"/>
                     <h3 class="text-center mb8 mt32">Recevoir le compte-rendu par mail</h3>
                     <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
                         <label class="control-label" for="pro_partner_name">

@@ -15,6 +15,23 @@ class OFCalculationController(http.Controller):
         if 'mail_attempt' in request.session:
             del request.session['mail_attempt']
 
+    def send_email(self, heat_loss, **kwargs):
+        try:
+            heat_loss.write(kwargs)
+            heat_loss.with_context(heat_loss_mail_attempt=True).send_calculation()
+        except Exception:
+            heat_loss.write({'mailing_attempt': 'failed'})
+        request.session['mail_attempt'] = True
+
+    def update_heat_loss(self, heat_loss, **kwargs):
+        if heat_loss:
+            heat_loss.write(kwargs)
+        elif kwargs:
+            country = request.env['res.country'].search([('code', '=', 'FR')])
+            kwargs['partner_country_id'] = country.id
+            heat_loss = heat_loss.sudo().create(kwargs)
+        return heat_loss
+
     @http.route('/calcul_deperdition_chaleur', type='http', auth="public", methods=['GET', 'POST'], website=True)
     def heat_loss_calculation_form(self, **kwargs):
         heat_loss_obj = request.env['of.calculation.heat.loss']
@@ -22,9 +39,12 @@ class OFCalculationController(http.Controller):
         construction_date_obj = request.env['of.calculation.construction.date']
         construction_type_obj = request.env['of.calculation.construction.type']
         surface_obj = request.env['of.calculation.surface']
+        button_pressed = kwargs.pop('button_id', False)
         coef_obj = request.env['of.calculation.fuel.coef']
         zip_better_obj = request.env['res.better.zip']
 
+        if button_pressed == 'reload':
+            self._cleanup_session()
         heat_loss_id = request.session.get('heat_loss_id')
         heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
 
@@ -38,17 +58,15 @@ class OFCalculationController(http.Controller):
                 kwargs['partner_city'] = zip_better_obj.city
                 kwargs['partner_state_id'] = zip_better_obj.state_id.id
 
-        if request.httprequest.method == 'POST':
-            if heat_loss:
-                heat_loss.write(kwargs)
-            elif kwargs:
-                country = request.env['res.country'].search([('code', '=', 'FR')])
-                kwargs['partner_country_id'] = country.id
-                heat_loss = heat_loss_obj.sudo().create(kwargs)
+        heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else heat_loss_obj
+        if button_pressed == 'mail':
+            self.send_email(heat_loss=heat_loss, **kwargs)
+        if button_pressed == 'validate':
+            heat_loss = self.update_heat_loss(heat_loss=heat_loss, **kwargs)
+        if heat_loss:
+            heat_loss.button_compute_estimated_power()
+            request.session['heat_loss_id'] = heat_loss.id
 
-            if heat_loss:
-                heat_loss.button_compute_estimated_power()
-                request.session['heat_loss_id'] = heat_loss.id
         values = {
             'altitudes': altitude_obj.search([]),
             'construction_dates': construction_date_obj.search([]),
@@ -93,24 +111,3 @@ class OFCalculationController(http.Controller):
     @http.route('/get_heat_loss_fuel_coef', type='json', auth="public", methods=['POST'], website=True)
     def get_heat_loss_fuel_coef(self, coef_id, **args):
         return request.env['of.calculation.fuel.coef'].browse(coef_id).sudo().coef
-
-    @http.route('/get_heat_loss_pdf', type='http', auth="public", methods=['POST'], website=True)
-    def get_heat_loss_pdf(self, **kwargs):
-        heat_loss_obj = request.env['of.calculation.heat.loss']
-        heat_loss_id = request.session.get('heat_loss_id')
-        heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
-
-        try:
-            heat_loss.write(kwargs)
-            heat_loss.with_context(heat_loss_mail_attempt=True).send_calculation()
-        except Exception:
-            heat_loss.write({'mailing_attempt': 'failed'})
-
-        request.session['mail_attempt'] = True
-
-        return self.heat_loss_calculation_form()
-
-    @http.route('/calcul_deperdition_chaleur_new', type='http', auth="public", methods=['GET', 'POST'], website=True)
-    def heat_loss_calculation_form_new(self, **kwargs):
-        self._cleanup_session()
-        return self.heat_loss_calculation_form(**kwargs)
