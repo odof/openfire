@@ -42,16 +42,6 @@ class TestOFSaleCommon(TestOFAccountCommon):
             }
         )
 
-        # Product data
-        cls.product_consu_a = cls.create_product(
-            {
-                'name': 'Product Consu A',
-                'default_code': 'BA_PCA_123',
-                'standard_price': 40,
-                'list_price': 100,
-            }
-        )
-
     def _prepare_empty_sale_order_values(self):
         return {
             'partner_id': self.customer_a.id,

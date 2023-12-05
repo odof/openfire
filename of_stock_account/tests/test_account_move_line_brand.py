@@ -13,32 +13,11 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.product_brand_use_desc = cls.env['of.product.brand'].create(
-            {
-                'name': "Test Brand Use Description",
-                'code': "TBUD",
-                'use_brand_description_sale': True,
-                'description_sale': "Brand Description\nProduct : {{object.name}}",
-                'show_in_sales': True,
-                'partner_id': cls.supplier_a.id,
-            }
-        )
-        cls.product_brand_dont_use_desc = cls.env['of.product.brand'].create(
-            {
-                'name': "Test Brand No Description",
-                'code': "TBNUD",
-                'use_brand_description_sale': False,
-                'description_sale': "Brand Description\nProduct : {{object.name}}",
-                'show_in_sales': True,
-                'partner_id': cls.supplier_a.id,
-            }
-        )
-
     def test_01_of_product_brand_id(self):
         product = self.create_product(
             {
                 'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_use_desc.id,
+                'brand_id': self.product_brand_a.id,
             }
         )
 
@@ -58,7 +37,7 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
         product = self.create_product(
             {
                 'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_use_desc.id,
+                'brand_id': self.product_brand_a.id,
             }
         )
 
@@ -71,15 +50,14 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
                 line_form.product_id = product
                 self.assertEqual(
                     line_form.name,
-                    'Test Brand Use Description - Test Product Use Desc\nBrand Description\n'
-                    'Product : Test Product Use Desc',
+                    'Brand A - Test Product Use Desc\nBrand A Description\n' 'Product : Test Product Use Desc',
                 )
 
     def test_03_compute_name_no_use_description(self):
         product = self.create_product(
             {
                 'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_dont_use_desc.id,
+                'brand_id': self.product_brand_b.id,
             }
         )
 
@@ -90,4 +68,4 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:
                 line_form.product_id = product
-                self.assertEqual(line_form.name, 'Test Brand No Description - Test Product Use Desc')
+                self.assertEqual(line_form.name, 'Brand B - Test Product Use Desc')

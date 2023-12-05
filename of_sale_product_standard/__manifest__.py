@@ -9,7 +9,7 @@
     'category': 'OpenFire',
     'summary': "Normes produits",
     'depends': [
-        'of_sale',
+        'of_sale',  # of_sale > of_account > of_product_brand > of_product
     ],
     'data': [
         'security/ir.model.access.csv',

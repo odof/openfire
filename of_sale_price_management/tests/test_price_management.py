@@ -23,7 +23,7 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
                 'name': 'of_product_test_1',
                 'standard_price': 34.10,
                 'list_price': 66.0,
-                'default_code': 'BA_TEST_1',
+                'default_code': 'TEST_1',
             }
         )
         cls.of_product_2 = cls.create_product(
@@ -31,7 +31,7 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
                 'name': 'of_product_test_2',
                 'standard_price': 36.30,
                 'list_price': 71.00,
-                'default_code': 'BA_TEST_2',
+                'default_code': 'TEST_2',
             }
         )
         cls.product_discount = cls.create_product(
@@ -40,6 +40,7 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
                 'standard_price': 0.0,
                 'list_price': 0.0,
                 'type': 'service',
+                'default_code': 'DISCOUNT',
             }
         )
 

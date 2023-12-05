@@ -1,18 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo.fields import Command
-from odoo.tests import tagged
 
-from odoo.addons.of_base.tests.common import TestOFBaseCommon
+from odoo.addons.of_product_brand.tests.common import TestOFProductCommon
 
 
-@tagged('post_install', '-at_install', 'openfire_custom')
-class TestOFAccountCommon(TestOFBaseCommon):
-    def setUp(self):
-        super().setUp()
-
+class TestOFAccountCommon(TestOFProductCommon):
     @classmethod
-    def create_product(cls, values):
+    def _prepare_product_values(cls, values):
         if 'categ_id' not in values:
             values['categ_id'] = cls.product_category_a.id
         if 'standard_price' not in values:
@@ -29,6 +24,7 @@ class TestOFAccountCommon(TestOFBaseCommon):
             values['uom_po_id'] = cls.env.ref('uom.product_uom_unit').id
         if 'brand_id' not in values:
             values['brand_id'] = cls.product_brand_a.id
+            values['default_code'] = f'{cls.product_brand_a.code}_' + values['default_code']
         if 'invoice_policy' not in values:
             values['invoice_policy'] = 'order'
         if 'expense_policy' not in values:
@@ -37,8 +33,16 @@ class TestOFAccountCommon(TestOFBaseCommon):
             values['taxes_id'] = [Command.set([cls.tax_base.id])]
         if 'supplier_taxes_id' not in values:
             values['supplier_taxes_id'] = [Command.set([])]
+        return values
+
+    @classmethod
+    def create_product(cls, values):
+        values = cls._prepare_product_values(values)
         product_template = cls.env['product.template'].create(values)
         return product_template.product_variant_id
+
+    def setUp(self):
+        super().setUp()
 
     @classmethod
     def setUpClass(cls):
@@ -128,28 +132,14 @@ class TestOFAccountCommon(TestOFBaseCommon):
             )
         )
 
-        # Brand data
-        cls.product_brand_a = (
-            cls.env['of.product.brand']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'Brand A',
-                    'code': 'BA',
-                    'partner_id': cls.supplier_a.id,
-                }
-            )
-        )
-
         # Product data
-        cls.product_category_a = (
-            cls.env['product.category']
-            .with_company(cls.company_fr)
-            .create(
-                {
-                    'name': 'Category A',
-                }
-            )
+        cls.product_consu_a = cls.create_product(
+            {
+                'name': 'Product Consu A',
+                'default_code': 'PCA_123',
+                'standard_price': 40,
+                'list_price': 100,
+            }
         )
 
         # Journal data

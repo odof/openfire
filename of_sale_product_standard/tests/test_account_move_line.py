@@ -13,8 +13,20 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.product_standard_test = cls.create_product(
+            {
+                'name': 'Product Standard Test',
+                'standard_price': 40,
+                'list_price': 100,
+                'brand_id': cls.product_brand_c.id,  # brand with show_in_sales set to False
+                'default_code': f'{cls.product_brand_c.code}_PST_123',
+                'of_manufacturer_description': False,
+                'of_standard_id': cls.product_standard.id,
+            }
+        )
+
         # Set the standard on the product
-        cls.product_consu_a.of_standard_id = cls.product_standard.id
+        cls.product_standard_test.of_standard_id = cls.product_standard.id
 
     def test_01_account_move_line_compute_name(self):
         """Test that the name of the account move line is correctly computed when the product has a standard"""
@@ -24,23 +36,23 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
             )
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:
-                line_form.product_id = self.product_consu_a
+                line_form.product_id = self.product_standard_test
                 line_form.quantity = 1
                 line_form.price_unit = 100
             move = move_form.save()
         self.assertEqual(len(move.invoice_line_ids), 1)
         self.assertEqual(
             move.invoice_line_ids[0].name,
-            '[BA_PCA_123] Product Consu A\nConforme à la norme S1 : This is the standard 1',
+            "[BC_PST_123] Product Standard Test\nConforme à la norme S1 : This is the standard 1",
         )
 
         # Change the standard of the product before adding a new line
-        self.product_consu_a.of_standard_id = self.product_standard2.id
+        self.product_standard_test.of_standard_id = self.product_standard2.id
 
         with Form(move) as move_form:
             # Add a new line
             with move_form.invoice_line_ids.new() as line_form:
-                line_form.product_id = self.product_consu_a
+                line_form.product_id = self.product_standard_test
                 line_form.quantity = 1
                 line_form.price_unit = 100
 
@@ -50,20 +62,20 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
         self.assertEqual(len(move.invoice_line_ids), 2)
         self.assertEqual(
             move.invoice_line_ids[0].name,
-            '[BA_PCA_123] Product Consu A\nConforme à la norme S1 : This is the standard 1',
+            "[BC_PST_123] Product Standard Test\nConforme à la norme S1 : This is the standard 1",
         )
         self.assertEqual(
             move.invoice_line_ids[1].name,
-            '[BA_PCA_123] Product Consu A\nConforme à la norme S2 : This is the standard 2',
+            "[BC_PST_123] Product Standard Test\nConforme à la norme S2 : This is the standard 2",
         )
 
         # Remove the standard of the product before adding a new line
-        self.product_consu_a.of_standard_id = False
+        self.product_standard_test.of_standard_id = False
 
         with Form(move) as move_form:
             # Add a new line
             with move_form.invoice_line_ids.new() as line_form:
-                line_form.product_id = self.product_consu_a
+                line_form.product_id = self.product_standard_test
                 line_form.quantity = 1
                 line_form.price_unit = 100
 
@@ -72,13 +84,13 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
         self.assertEqual(len(move.invoice_line_ids), 3)
         self.assertEqual(
             move.invoice_line_ids[0].name,
-            '[BA_PCA_123] Product Consu A\nConforme à la norme S1 : This is the standard 1',
+            "[BC_PST_123] Product Standard Test\nConforme à la norme S1 : This is the standard 1",
         )
         self.assertEqual(
             move.invoice_line_ids[1].name,
-            '[BA_PCA_123] Product Consu A\nConforme à la norme S2 : This is the standard 2',
+            "[BC_PST_123] Product Standard Test\nConforme à la norme S2 : This is the standard 2",
         )
         self.assertEqual(
             move.invoice_line_ids[2].name,
-            '[BA_PCA_123] Product Consu A',
+            "[BC_PST_123] Product Standard Test",
         )

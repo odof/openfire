@@ -44,6 +44,13 @@ class TestOFBaseCommon(TransactionCase):
                 'supplier_rank': 1,
             }
         )
+        cls.supplier_b = cls.env['res.partner'].create(
+            {
+                'name': "Supplier B",
+                'company_id': cls.company_fr.id,
+                'supplier_rank': 1,
+            }
+        )
 
     @classmethod
     def create_company(cls, values):
