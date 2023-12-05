@@ -8,7 +8,6 @@
     'sequence': 15,
     'summary': "Price management for sales orders",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'of_sale_margin',
         'of_product_brand',

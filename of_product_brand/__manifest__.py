@@ -1,17 +1,16 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Products brands",
+    'name': "OpenFire / Marques de produits",
     'version': '16.0.1.0.0',
+    'license': 'LGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
-    'summary': "Generic Modules/Sales & Purchases",
+    'summary': "Module de gestion des marques de produits",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
-        'sale',
-        'of_product'
+        'of_product',
     ],
     'data': [
         'data/of_product_brand_data.xml',
@@ -21,15 +20,10 @@
         'views/product_supplierinfo_view.xml',
         'views/product_views.xml',
         'views/res_partner_views.xml',
-        'views/sale_order_views.xml',
         'views/res_users_views.xml',
         'wizards/of_product_brand_add_products.xml',
-        'report/of_sale_report_view.xml',
-        'report/of_purchase_report_views.xml',
-        'report/of_account_report_views.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

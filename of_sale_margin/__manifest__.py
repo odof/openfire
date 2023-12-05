@@ -7,12 +7,11 @@
     'license': 'AGPL-3',
     'category': 'OpenFire',
     'sequence': 15,
-    'summary': "Generic Modules/Sales & Purchases",
+    'summary': "Module de gestion des marges de vente",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
-        'of_sale',
         'sale_margin',
+        'of_sale',  # of_sale > of_account
     ],
     'data': [
         'security/res_groups.xml',

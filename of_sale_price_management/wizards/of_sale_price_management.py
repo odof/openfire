@@ -17,7 +17,7 @@ class OFPriceManagementWizard(models.TransientModel):
             ('amount_tax_excl', _("Amount excl. VAT to be deducted")),
             ('percentage', _("% Overall discount")),
         ]
-        if self.user_has_groups('of_sale_margin.of_group_sale_margin_manager'):
+        if self.user_has_groups('of_account.of_group_sale_margin_manager'):
             selection.append(('margin_percent', _("% Margin")))
         selection.append(('restore', _("Restore at store price")))
         return selection

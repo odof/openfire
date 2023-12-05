@@ -154,7 +154,7 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
         """Test that the discount type 'Margin %' is available for the current user if he is in the group
         'OF Margin > Manager'.
         """
-        self.env.user.write({'groups_id': [(4, self.env.ref('of_sale_margin.of_group_sale_margin_manager').id)]})
+        self.env.user.write({'groups_id': [(4, self.env.ref('of_account.of_group_sale_margin_manager').id)]})
 
         price_management = self._create_wizard()
 
@@ -333,7 +333,7 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
     def test_09_discount_type_margin_percent(self):
         """Test the discount type 'Margin %'"""
         # Set user in group 'OF Margin > Manager'
-        self.env.user.write({'groups_id': [(4, self.env.ref('of_sale_margin.of_group_sale_margin_manager').id)]})
+        self.env.user.write({'groups_id': [(4, self.env.ref('of_account.of_group_sale_margin_manager').id)]})
 
         # Create the wizard
         price_management = self._create_wizard()

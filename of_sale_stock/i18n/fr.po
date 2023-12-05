@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-12 12:28+0000\n"
-"PO-Revision-Date: 2023-04-12 12:28+0000\n"
+"POT-Creation-Date: 2023-12-06 10:57+0000\n"
+"PO-Revision-Date: 2023-12-06 10:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,120 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_stock
-#: model_terms:ir.ui.view,arch_db:sale_stock.report_saleorder_document_inherit_sale_stock
-msgid "<strong>Incoterm:</strong>"
-msgstr "<strong>Incoterm&nbsp;:</strong>"
+#: model:ir.model.fields,field_description:of_sale_stock.field_purchase_report__of_brand_id
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_order_line__of_product_brand_id
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_brand_id
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "Brand"
+msgstr "Marque"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_confirmation_date
+msgid "Confirmation date"
+msgstr "Date de confirmation"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_delivered_amount
+msgid "Delivered amount"
+msgstr "Montant livré"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_delivery_date
+msgid "Delivery date"
+msgstr "Date de livraison"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_my_company
+msgid "Is my store ?"
+msgstr "Est mon magasin ?"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_margin_percentage
+msgid "Margin (%)"
+msgstr "Marge (%)"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "Monthly accumulation"
+msgstr "Cumul à date - Mensuel"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "My store"
+msgstr "Mon magasin"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_product_vrand_view_order_form
+msgid ""
+"Note: When searching for a product, typing \"m:ABC\" will filter products "
+"for brand \"ABC\"."
+msgstr ""
+"Note: Lorsque vous recherchez un article, taper \"m:ABC\" filtrera les "
+"articles de la marque \"ABC\"."
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "Previous month"
+msgstr "Mois précédent"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_product_category
+msgid "Product Category"
+msgstr "Catégorie de produit"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_purchase_report
+msgid "Purchase Report"
+msgstr "Rapport d'achat"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_product_category__route_ids
+msgid "Routes"
+msgstr ""
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_sale_report
+msgid "Sales Analysis Report"
+msgstr "Rapport d'analyse des ventes"
+
+#. module: of_sale_stock
+#: model:ir.model,name:of_sale_stock.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "This month"
+msgstr "Mois en cours"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "This year"
+msgstr "Année en cours"
+
+#. module: of_sale_stock
+#. odoo-python
+#: code:addons/of_sale_stock/reports/of_sale_report.py:0
+#, python-format
+msgid "Unsupported search operator"
+msgstr "Opérateur de recherche non supporté"
+
+#. module: of_sale_stock
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_sale_view_order_product_search
+msgid "Yearly accumulation"
+msgstr "Cumul à date - Annuel"
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_diff_price
+msgid "Δ% HT"
+msgstr ""
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_diff_margin
+msgid "Δ% Margin"
+msgstr ""
+
+#. module: of_sale_stock
+#: model:ir.model.fields,field_description:of_sale_stock.field_sale_report__of_diff_qty_delivered
+msgid "Δ% Shipped qty."
+msgstr ""

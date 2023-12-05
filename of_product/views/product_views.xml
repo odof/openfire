@@ -25,17 +25,12 @@
                 <group>
                     <group name="group_standard_price" string="Supplier information" colspan="2">
                         <field name="of_cost_date"/>
-                        <label for="of_seller_price"/>
-                        <div col="3">
-                            <field name="of_seller_price" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                        <div id="uom-display" col="3">
                             <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
                         </div>
-                        <label for="of_seller_pp_untaxed"/>
-                        <div col="5">
-                            <field name="of_seller_pp_untaxed" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+                        <div id="uom-display-2" col="5">
                             <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
                         </div>
-                        <field name="of_seller_discount"/>
                     </group>
                     <group name="advanced_information" string="Advanced information" colspan="2">
                         <field name="currency_id" invisible="1"/>
@@ -56,7 +51,6 @@
                 </group>
             </xpath>
             <xpath expr="//group[@name='group_general']" position="inside">
-                <field name="cost_method" invisible="1"/>
                 <label for="standard_price" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
                 <div name="standard_price_uom" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
                     <field name="standard_price" class="oe_inline" widget='monetary' options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
@@ -64,15 +58,11 @@
                         <field name="uom_name" class="oe_inline"/>
                     </span>
                 </div>
-                <field name="of_theoretical_cost" groups="base.group_user" widget='monetary' options="{'currency_field': 'currency_id'}"
-                        attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
                 <label for="list_price" class="mt-1"/>
                 <div name="pricing">
                     <field name="list_price" class="oe_inline" widget='monetary'
                     options="{'currency_field': 'currency_id', 'field_digits': True}"/>
                 </div>
-                <label id="of_margin" for="of_margin"/>
-                <span id="of_margin"><field name="of_margin" class="oe_inline"/>%</span>
             </xpath>
             <xpath expr="//page[@name='general_information']//field[@name='description']/.." position="attributes">
                 <attribute name="name">group_internal_note</attribute>
@@ -97,19 +87,6 @@
                     <field name="of_misc_taxes"/>
                     <field name="of_misc_costs"/>
                 </group>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="of_product_template_form_view_account" model="ir.ui.view">
-        <field name="name">of.product.template.form.view.account</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="account.product_template_form_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='invoicing']" position="after">
-                <page string="Related products" name="linked_product">
-                    <field name="of_linked_product_ids" nolable="1" domain="[('id', '!=', active_id)]"/>
-                </page>
             </xpath>
         </field>
     </record>
@@ -167,20 +144,6 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='categ_id']" position="before">
                 <field name="product_tag_ids"/>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- FIXME : incorrect view inheritance ? -->
-    <record id="of_product_product_variant_form_view" model="ir.ui.view">
-        <field name="name">of.product.product.variant.form.view</field>
-        <field name="model">product.product</field>
-        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='standard_price']" position="after">
-                <field name="cost_method" invisible="1"/>
-                <field name="of_theoretical_cost" widget="monetary" options="{'currency_field': 'currency_id'}"
-                    attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
             </xpath>
         </field>
     </record>

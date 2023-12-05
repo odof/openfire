@@ -7,4 +7,20 @@
         <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
     </record>
 
+
+    <!--
+        For an easier use and a cleaner module dependency, we create this group in this module
+            instead of in of_sale_margin to avoid an anormal dependency between of_sale_margin and of_purchase_stock
+    -->
+    <record model="ir.module.category" id="of_account_sale_margin_category">
+        <field name="name">OF Margin</field>
+        <field name="description">Defines access rights to margins.</field>
+        <field name="sequence">92</field>
+    </record>
+
+    <record id="of_group_sale_margin_manager" model="res.groups">
+        <field name="name">Responsible</field>
+        <field name="category_id" ref="of_account_sale_margin_category" />
+    </record>
+
 </odoo>

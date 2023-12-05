@@ -6,12 +6,10 @@
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
-    'category': "Generic Modules/Sales & Purchases",
-    'description': "",
+    'category': "OpenFire",
+    'summary': "Module de gestion des produits (articles)",
     'depends': [
         'product',
-        'purchase',
-        'sale_stock',
         'of_utils',
     ],
     'data': [
@@ -21,9 +19,9 @@
         'views/product_views.xml',
         'views/product_supplierinfo_view.xml',
         'views/of_product_tag_views.xml',
-        'views/product_category_views.xml',
         'views/res_config_settings_views.xml'
     ],
     'installable': True,
-    'post_init_hook': 'post_init_hook',
+    'application': False,
+    'auto_install': False,
 }

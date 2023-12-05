@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-27 11:27+0000\n"
-"PO-Revision-Date: 2023-11-27 11:27+0000\n"
+"POT-Creation-Date: 2023-12-06 10:39+0000\n"
+"PO-Revision-Date: 2023-12-06 10:39+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -55,18 +55,11 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_account_move_line__of_product_brand_id
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand_add_products__brand_id
 #: model:ir.model.fields,field_description:of_product_brand.field_product_product__brand_id
 #: model:ir.model.fields,field_description:of_product_brand.field_product_template__brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_purchase_report__of_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_order_line__of_product_brand_id
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_brand_id
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_product_template_search_view
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_kanban
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
 msgid "Brand"
 msgstr "Marque"
 
@@ -101,11 +94,6 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_confirmation_date
-msgid "Confirmation date"
-msgstr "Date de confirmation"
-
-#. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_res_partner
 msgid "Contact"
 msgstr ""
@@ -123,19 +111,9 @@ msgid "Created on"
 msgstr ""
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_delivered_amount
-msgid "Delivered amount"
-msgstr "Montant livré"
-
-#. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__supplier_delay
 msgid "Delivery Delay (days)"
 msgstr "Délai de livraison (jours)"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_delivery_date
-msgid "Delivery date"
-msgstr "Date de livraison"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__description_sale
@@ -162,22 +140,6 @@ msgid ""
 msgstr ""
 "Si cette option est cochée, la marque sera ajoutée au début du descriptif "
 "des lignes de commandes et factures"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_account_invoice_report
-msgid "Invoices Statistics"
-msgstr "Statistiques des factures"
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_my_company
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_my_company
-msgid "Is my store ?"
-msgstr "Est mon magasin ?"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_account_move_line
-msgid "Journal Item"
-msgstr "Écriture comptable"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand____last_update
@@ -213,35 +175,9 @@ msgid "Logo"
 msgstr ""
 
 #. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_margin_percentage
-msgid "Margin (%)"
-msgstr "Marge (%)"
-
-#. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "Monthly accumulation"
-msgstr "Cumul à date - Mensuel"
-
-#. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "My store"
-msgstr "Mon magasin"
-
-#. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__name
 msgid "Name"
 msgstr ""
-
-#. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_vrand_view_order_form
-msgid ""
-"Note: When searching for a product, typing \"m:ABC\" will filter products "
-"for brand \"ABC\"."
-msgstr ""
-"Note: Lorsque vous recherchez un article, taper \"m:ABC\" filtrera les "
-"articles de la marque \"ABC\"."
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__note
@@ -263,12 +199,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_product_brand.of_product_brand_view_form
 msgid "OpenFire"
 msgstr ""
-
-#. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "Previous month"
-msgstr "Mois précédent"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__price_date
@@ -322,21 +252,6 @@ msgid "Products"
 msgstr "Articles"
 
 #. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_purchase_report
-msgid "Purchase Report"
-msgstr "Rapport d'achat"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_sale_report
-msgid "Sales Analysis Report"
-msgstr "Rapport d'analyse des ventes"
-
-#. module: of_product_brand
-#: model:ir.model,name:of_product_brand.model_sale_order_line
-msgid "Sales Order Line"
-msgstr "Ligne de commande"
-
-#. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__show_in_sales
 msgid "Show in sales order lines"
 msgstr "Afficher dans les lignes de ventes"
@@ -382,18 +297,6 @@ msgstr ""
 "ces changements."
 
 #. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "This month"
-msgstr "Mois en cours"
-
-#. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "This year"
-msgstr "Année en cours"
-
-#. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_res_users__of_brand_ids
 msgid "Unauthorized brands"
 msgstr "Marques non autorisées"
@@ -402,14 +305,6 @@ msgstr "Marques non autorisées"
 #: model:ir.model.fields,help:of_product_brand.field_res_users__of_brand_ids
 msgid "Unauthorized product brands for assigned users"
 msgstr "Marques de produits non autorisées pour les utilisateurs assignés"
-
-#. module: of_product_brand
-#. odoo-python
-#: code:addons/of_product_brand/report/of_account_report.py:0
-#: code:addons/of_product_brand/report/of_sale_report.py:0
-#, python-format
-msgid "Unsupported search operator"
-msgstr "Opérateur de recherche non supporté"
 
 #. module: of_product_brand
 #: model:ir.model.fields,field_description:of_product_brand.field_of_product_brand__use_brand_description_sale
@@ -439,33 +334,6 @@ msgid "Vendors"
 msgstr "Fournisseurs"
 
 #. module: of_product_brand
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_account_view_account_invoice_report_search
-#: model_terms:ir.ui.view,arch_db:of_product_brand.of_sale_view_order_product_search
-msgid "Yearly accumulation"
-msgstr "Cumul à date - Annuel"
-
-#. module: of_product_brand
 #: model:ir.model,name:of_product_brand.model_of_product_brand_add_products
 msgid "of.product.brand.add.products"
-msgstr ""
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_diff_price
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_price
-msgid "Δ% HT"
-msgstr ""
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_margin
-msgid "Δ% Margin"
-msgstr ""
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_account_invoice_report__of_diff_qty
-msgid "Δ% Qty"
-msgstr ""
-
-#. module: of_product_brand
-#: model:ir.model.fields,field_description:of_product_brand.field_sale_report__of_diff_qty_delivered
-msgid "Δ% Shipped qty."
 msgstr ""

@@ -8,10 +8,9 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Personnalisation de la comptabilité",
-    'description': "",
     'depends': [
         'account',
-        'of_base',
+        'of_product_brand',
     ],
     'data': [
         'data/ir_cron.xml',

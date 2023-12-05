@@ -1,0 +1,26 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_purchase_stock
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-06 10:41+0000\n"
+"PO-Revision-Date: 2023-12-06 10:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_purchase_stock
+#: model:ir.model.fields,field_description:of_purchase_stock.field_purchase_report__of_brand_id
+msgid "Brand"
+msgstr ""
+
+#. module: of_purchase_stock
+#: model:ir.model,name:of_purchase_stock.model_purchase_report
+msgid "Purchase Report"
+msgstr "Rapport d'achat"

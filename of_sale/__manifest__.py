@@ -11,12 +11,9 @@
     'description': "",
     'depends': [
         # "of_account_invoice_report",  # TODO: uncomment when of_account is migrated
-        'of_account',
+        'of_account',  # of_account > of_product_brand > of_product
         "of_account_tax",
         'of_base_location',
-        'of_custom_document',
-        'of_product',
-        'sale',
         'sale_margin',
         'sale_crm',
         'sale_stock',

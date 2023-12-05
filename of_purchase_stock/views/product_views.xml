@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_purchase_stock_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.purchase.stock.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_standard_price']//div[@id='uom-display']" position="before">
+                <label for="of_seller_price" groups="of_account.of_group_sale_margin_manager"/>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@id='uom-display']//span[1]" position="before">
+                <field name="of_seller_price" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//field[@name='of_seller_price']/.." position="attributes">
+                <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@id='uom-display-2']" position="before">
+                <label for="of_seller_pp_untaxed"/>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@id='uom-display-2']//span[1]" position="before">
+                <field name="of_seller_pp_untaxed" class="oe_inline" attrs="{'readonly':[('seller_ids','=',[])]}"/>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']//div[@id='uom-display-2']" position="after">
+                <field name="of_seller_discount" groups="of_account.of_group_sale_margin_manager"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

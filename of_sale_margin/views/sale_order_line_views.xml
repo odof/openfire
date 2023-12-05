@@ -9,28 +9,28 @@
             <field name="arch" type="xml">
                 <!-- Purchase price -->
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="attributes">
-                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
                     <attribute name="readonly">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="attributes">
-                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price</attribute>
+                    <attribute name="groups">of_account.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price</attribute>
                     <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
                     <attribute name="readonly">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
                     <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
-                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_sale_margin.of_group_sale_margin_manager" readonly="0" optional="hide"/>
+                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_account.of_group_sale_margin_manager" readonly="0" optional="hide"/>
                 </xpath>
                 <!-- /Purchase price -->
                 <!-- Margin and margin percent -->
                 <xpath expr="//field[@name='order_line']/tree//field[@name='margin']" position="attributes">
-                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
                     <attribute name="invisible">0</attribute>  <!-- FIXME ?: in V10, was set to 1 -->
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='margin_percent']" position="attributes">
-                    <attribute name="groups">of_sale_margin.of_group_sale_margin_manager</attribute>
+                    <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
                     <attribute name="attrs">{'invisible': [('of_customer_view', '=', True)]}</attribute>
                     <attribute name="invisible">0</attribute>  <!-- FIXME ?: in V10, was set to 1 -->
                 </xpath>
@@ -38,7 +38,7 @@
 
                 <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
                     <field name="of_customer_view" invisible="1"/>
-                    <field name="of_seller_price" groups="of_sale_margin.of_group_sale_margin_manager+sales_team.group_sale_manager"
+                    <field name="of_seller_price" groups="of_account.of_group_sale_margin_manager+sales_team.group_sale_manager"
                         attrs="{'column_invisible': [('parent.state', 'not in', ['sale', 'done'])], 'invisible': [('of_customer_view', '=', True)]}"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree//field[@name='purchase_price']" position="after">
@@ -55,11 +55,11 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='price_unit']" position="after">
                     <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
-                        readonly="1" groups="of_sale_margin.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price"/>
+                        readonly="1" groups="of_account.of_group_sale_margin_manager+!of_sale_margin.group_of_can_modify_sale_purchase_price"/>
                     <field name="purchase_price" attrs="{'invisible': [('of_customer_view', '=', True)]}"
-                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_sale_margin.of_group_sale_margin_manager" readonly="0" optional="hide"/>
+                        groups="of_sale_margin.group_of_can_modify_sale_purchase_price+of_account.of_group_sale_margin_manager" readonly="0" optional="hide"/>
                     <field name="of_customer_view" invisible="1"/>
-                    <field name="of_seller_price" groups="of_sale_margin.of_group_sale_margin_manager+sales_team.group_sale_manager"
+                    <field name="of_seller_price" groups="of_account.of_group_sale_margin_manager+sales_team.group_sale_manager"
                         attrs="{'column_invisible': [('parent.state', 'not in', ['sale', 'done'])], 'invisible': [('of_customer_view', '=', True)]}"/>
                 </xpath>
             </field>

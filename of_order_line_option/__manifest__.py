@@ -7,14 +7,13 @@
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
-    'summary': "Options for sale and purchase order lines",
+    'summary': "Gestion des options de ligne de commande pour les ventes et les achats",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
-        'purchase',
+        'stock_dropshipping',
         'of_sale_margin',
-        'sale_purchase',
-        'stock_dropshipping'
+        'of_sale_stock',  # easier tests management if of_order_line_option depends on of_sale_stock
+        'of_purchase_stock',  # of_purchase_stock > of_stock_account > of_account
     ],
     'data': [
         'security/ir.model.access.csv',

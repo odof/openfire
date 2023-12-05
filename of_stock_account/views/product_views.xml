@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_stock_account_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.stock.account.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="priority" eval="1"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_general']" position="inside">
+                <field name="cost_method" invisible="1"/>
+                <field name="of_theoretical_cost" groups="of_account.of_group_sale_margin_manager" widget='monetary' options="{'currency_field': 'currency_id'}"
+                        attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
+            </xpath>
+            <xpath expr="//group[@name='group_general']//div[@name='pricing']" position="after">
+                <label id="of_margin" for="of_margin" groups="of_account.of_group_sale_margin_manager"/>
+                <span id="of_margin" groups="of_account.of_group_sale_margin_manager"><field name="of_margin" class="oe_inline"/>%</span>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- FIXME : incorrect view inheritance ? -->
+    <record id="of_product_product_variant_form_view" model="ir.ui.view">
+        <field name="name">of.product.product.variant.form.view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='standard_price']" position="after">
+                <field name="cost_method" invisible="1"/>
+                <field name="of_theoretical_cost" widget="monetary" options="{'currency_field': 'currency_id'}"
+                    attrs="{'invisible': [('cost_method' , '=', 'standard')]}"
+                    groups="of_account.of_group_sale_margin_manager"
+                />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_stock_account_product_template_form_view_account" model="ir.ui.view">
+        <field name="name">of.stock.account.product.template.form.view.account</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='invoicing']" position="after">
+                <page string="Related products" name="linked_product">
+                    <field name="of_linked_product_ids" nolable="1" domain="[('id', '!=', active_id)]"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

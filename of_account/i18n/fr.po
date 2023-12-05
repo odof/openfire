@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-06 08:54+0000\n"
-"PO-Revision-Date: 2023-07-06 08:54+0000\n"
+"POT-Creation-Date: 2023-12-07 18:41+0000\n"
+"PO-Revision-Date: 2023-12-07 18:41+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,11 @@ msgid "Default payment terms for deposit invoices"
 msgstr "Conditions de paiement par défaut pour les factures d'acompte"
 
 #. module: of_account
+#: model:ir.module.category,description:of_account.of_account_sale_margin_category
+msgid "Defines access rights to margins."
+msgstr "Définit les droits d'accès aux marges."
+
+#. module: of_account
 #: model:ir.model.fields,field_description:of_account.field_account_payment_term_line__of_name
 #: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
 msgid "Description"
@@ -242,8 +247,8 @@ msgstr ""
 msgid ""
 "Journal : Automatically activate restriction mode on selected journal types."
 msgstr ""
-"Journal : Activer automatiquement le mode de restriction sur les journaux de "
-"types choisis."
+"Journal : Activer automatiquement le mode de restriction sur les journaux de"
+" types choisis."
 
 #. module: of_account
 #: model:ir.model,name:of_account.model_account_move
@@ -294,6 +299,11 @@ msgstr "Libellé"
 #: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
 msgid "Note"
 msgstr ""
+
+#. module: of_account
+#: model:ir.module.category,name:of_account.of_account_sale_margin_category
+msgid "OF Margin"
+msgstr "OF Marge"
 
 #. module: of_account
 #: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
@@ -374,14 +384,9 @@ msgid "Reference"
 msgstr "Référence"
 
 #. module: of_account
-#: model:ir.model,name:of_account.model_sale_advance_payment_inv
-msgid "Sales Advance Payment Invoice"
-msgstr "Facture de paiement d'avance"
-
-#. module: of_account
-#: model:ir.model,name:of_account.model_sale_order
-msgid "Sales Order"
-msgstr "Bon de commande"
+#: model:res.groups,name:of_account.of_group_sale_margin_manager
+msgid "Responsible"
+msgstr "Responsable"
 
 #. module: of_account
 #: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form

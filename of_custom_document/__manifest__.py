@@ -8,8 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "Documents",
     'summary': "Module de rapports personnalisés",
-    'description': "",
-    'depends': ['sale'],
+    'depends': ['of_base'],
     'external_dependencies': {
         'python': ['pdfminer', 'pypdftk'],
     },

@@ -8,8 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "Documents",
     'summary': "Rapports personnalisés pour les ventes",
-    'description': "",
-    'depends': ['of_custom_document', 'sale'],
+    'depends': ['of_custom_document', 'of_sale'],
     'data': [
         'views/sale_order_views.xml',
     ],
