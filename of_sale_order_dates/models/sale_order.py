@@ -30,12 +30,11 @@ class SaleOrder(models.Model):
         return values
 
     def pdf_technical_visit_info(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_technical_visit_info')
+        return self.company_id.pdf_technical_visit_info
 
     def pdf_requested_week(self):
         # Pour éviter de créer un module intermédiaire entre of_sale_external et of_sale_order_dates,
         # on teste la présence d'un champ créé dans of_sale_external
         if 'of_report_template_id' in self.env['sale.order']._fields and self.of_report_template_id:
             return self.of_report_template_id.pdf_requested_week
-        else:
-            return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_requested_week')
+        return self.company_id.pdf_requested_week

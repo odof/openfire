@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="res_config_settings_sale_printing_params_view_form" model="ir.ui.view">
-        <field name="name">res.config.settings.sale.printing.params.view.form</field>
-        <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="of_sale_report_setting.res_config_settings_sale_printing_params_view_form"/>
+    <record id="of_sale_report_setting_sale_document_layout" model="ir.ui.view">
+        <field name="name">of.sale.payment.schedule.sale.document.layout</field>
+        <field name="model">of.sale.document.layout</field>
+        <field name="inherit_id" ref="of_sale_report_setting.of_sale_report_setting_sale_document_layout"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='pdf_signatures_insert']/../.." position="before">
                 <div class="mt32">

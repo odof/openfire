@@ -4,8 +4,9 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    _inherit = 'res.config.settings'
+    _inherit = 'of.sale.document.layout'
 
     pdf_payment_schedule = fields.Boolean(
-        string="Payment schedule", config_parameter='of.sale.report.setting.pdf_payment_schedule'
+        related='company_id.pdf_payment_schedule',
+        readonly=False,
     )

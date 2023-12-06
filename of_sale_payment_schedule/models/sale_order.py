@@ -19,6 +19,10 @@ class SaleOrder(models.Model):
         string="Payment schedule needs to be updated", compute='_compute_of_show_update_payment_schedule'
     )
 
+    # ----------------------------------------------------------
+    # Compute methods
+    # ----------------------------------------------------------
+
     @api.depends('payment_term_id', 'order_line.price_total', 'amount_total')
     def _compute_of_show_update_payment_schedule(self):
         for order in self:
@@ -31,9 +35,51 @@ class SaleOrder(models.Model):
                 of_show_update_payment_schedule = True
             order.of_show_update_payment_schedule = of_show_update_payment_schedule
 
+    @api.depends('payment_term_id')
+    def _compute_of_payment_schedule_ids(self):
+        if self.payment_term_id:
+            self.of_payment_schedule_ids = self._of_compute_payment_schedule()
+
+    # ----------------------------------------------------------
+    # Onchange methods
+    # ----------------------------------------------------------
+
     @api.onchange('order_line')
     def _onchange_order_line(self):
         self.of_recompute_last_payment_schedule()
+
+    @api.onchange('amount_total')
+    def _onchange_amount_total(self):
+        self._compute_of_payment_schedule_ids()
+
+    # ----------------------------------------------------------
+    # ORM methods
+    # ----------------------------------------------------------
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Recalcul de la dernière échéance si besoin
+        if order_needs_recompute := self._get_payment_schedule_needs_recompute():
+            order_needs_recompute.of_recompute_last_payment_schedule()
+        return res
+
+    def copy(self, default=None):
+        res = super().copy(default=default)
+        res._compute_of_payment_schedule_ids()
+        return res
+
+    # ----------------------------------------------------------
+    # Action methods
+    # ----------------------------------------------------------
+
+    def action_confirm(self):
+        res = super().action_confirm()
+        self.of_update_payment_schedule_dates()
+        return res
+
+    # ----------------------------------------------------------
+    # Business methods
+    # ----------------------------------------------------------
 
     def _of_compute_payment_schedule(self):
         self.ensure_one()
@@ -72,15 +118,6 @@ class SaleOrder(models.Model):
             result[-1][2]['percent'] = pct_left
         return result
 
-    @api.depends('payment_term_id')
-    def _compute_of_payment_schedule_ids(self):
-        if self.payment_term_id:
-            self.of_payment_schedule_ids = self._of_compute_payment_schedule()
-
-    @api.onchange('amount_total')
-    def _onchange_amount_total(self):
-        self._compute_of_payment_schedule_ids()
-
     def of_update_payment_schedule_dates(self):
         for order in self:
             if not order.payment_term_id:
@@ -103,11 +140,6 @@ class SaleOrder(models.Model):
             for payment_schedule, payment_term in zip(order.of_payment_schedule_ids, payment_terms):
                 if payment_term['date'] and not payment_schedule.date or payment_term['date'] != payment_schedule.date:
                     payment_schedule.date = payment_term['date']
-
-    def action_confirm(self):
-        res = super().action_confirm()
-        self.of_update_payment_schedule_dates()
-        return res
 
     def of_recompute_last_payment_schedule(self):
         for order in self:
@@ -134,9 +166,6 @@ class SaleOrder(models.Model):
         self.ensure_one()
         self.of_payment_schedule_ids = self._of_compute_payment_schedule()
 
-    def pdf_payment_schedule(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of.sale.report.setting.pdf_payment_schedule')
-
     def _get_payment_schedule_needs_recompute(self):
         """Returns the orders that need to have their payment schedule recomputed"""
 
@@ -151,14 +180,9 @@ class SaleOrder(models.Model):
 
         return self.filtered(filter_needs_recompute)
 
-    def write(self, vals):
-        res = super().write(vals)
-        # Recalcul de la dernière échéance si besoin
-        if order_needs_recompute := self._get_payment_schedule_needs_recompute():
-            order_needs_recompute.of_recompute_last_payment_schedule()
-        return res
+    # ----------------------------------------------------------
+    # Helper methods for QWeb reports
+    # ----------------------------------------------------------
 
-    def copy(self, default=None):
-        res = super().copy(default=default)
-        res._compute_of_payment_schedule_ids()
-        return res
+    def pdf_payment_schedule(self):
+        return self.company_id.pdf_payment_schedule

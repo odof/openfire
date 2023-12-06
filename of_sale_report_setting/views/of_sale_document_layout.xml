@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_report_setting_sale_document_layout" model="ir.ui.view">
+        <field name="name">of.sale.report.setting.sale.document.layout</field>
+        <field name="model">of.sale.document.layout</field>
+        <field name="arch" type="xml">
+            <form string="Configure PDF printing">
+                <field name="company_id" invisible="1"/>
+                <div class="row o_settings_container" name="of_sale_report_setting_container">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <h4 class="of-printing-parameter-title" colspan="2">Address insert</h4>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_title"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_title"/>
+                                <div class="text-muted">
+                                    Displays the different address labels
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_invoicing_address_specific_title"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_invoicing_address_specific_title"/>
+                                <div class="text-muted">
+                                    Allow to define invoicing address specific title, else it displays "Invoicing Address:"
+                                </div>
+                                <div class="content-group"  attrs="{'invisible': [('pdf_invoicing_address_specific_title','=', False)]}">
+                                    <div class="mt16">
+                                        <field name="pdf_invoicing_address_specific_title_label" placeholder="Address Title..."
+                                                attrs="{'required': [('pdf_invoicing_address_specific_title', '=', True)]}"/>
+                                    </div>
+                                    <div class="text-muted">
+                                        Will be also applied on the invoices.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_shipping_address_specific_title"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_shipping_address_specific_title"/>
+                                <div class="text-muted">
+                                    Allow to define shipping address specific title, else it displays "Shipping Address:"
+                                </div>
+                                <div class="content-group"  attrs="{'invisible': [('pdf_shipping_address_specific_title','=', False)]}">
+                                    <div class="mt16">
+                                        <field name="pdf_shipping_address_specific_title_label" placeholder="Address Title..."
+                                                attrs="{'required': [('pdf_shipping_address_specific_title', '=', True)]}"/>
+                                    </div>
+                                    <div class="text-muted">
+                                        Will be also applied on the invoices.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_invoicing_shipping_address_specific_title"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_invoicing_shipping_address_specific_title"/>
+                                <div class="text-muted">
+                                    Allow to define invoicing and shipping address specific title, else it displays "Invoicing and Shipping Address:"
+                                </div>
+                                <div class="content-group"  attrs="{'invisible': [('pdf_invoicing_shipping_address_specific_title','=', False)]}">
+                                    <div class="mt16">
+                                        <field name="pdf_invoicing_shipping_address_specific_title_label" placeholder="Address Title..."
+                                                attrs="{'required': [('pdf_invoicing_shipping_address_specific_title', '=', True)]}"/>
+                                    </div>
+                                    <div class="text-muted">
+                                        Will be also applied on the invoices.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_titles"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_titles"/>
+                                <div class="text-muted">
+                                    Displays the titles in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_parent_name"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_parent_name"/>
+                                <div class="text-muted">
+                                    Displays the contact's parent name in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_name"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_name"/>
+                                <div class="text-muted">
+                                    Displays the contact's name in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_phone"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_phone"/>
+                                <div class="text-muted">
+                                    Displays the contact's phone in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_mobile"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_mobile"/>
+                                <div class="text-muted">
+                                    Displays the contact's mobile in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_fax"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_fax"/>
+                                <div class="text-muted">
+                                    Displays the contact's fax in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_address_contact_email"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_address_contact_email"/>
+                                <div class="text-muted">
+                                    Displays the contact's mail in the address insert
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt32">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_info" class="of-printing-parameter-title"/>
+                                <div class="text-muted">
+                                    Displays the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_salesperson_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_name"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_name" string="Name"/>
+                                <div class="text-muted">
+                                    Displays the name in the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_salesperson_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_phone"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_phone" string="Phone"/>
+                                <div class="text-muted">
+                                    Displays the phone number in the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_salesperson_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_mobile"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_mobile" string="Mobile"/>
+                                <div class="text-muted">
+                                    Displays the mobile number in the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_salesperson_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_fax"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_fax" string="Fax"/>
+                                <div class="text-muted">
+                                    Displays the fax number in the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_salesperson_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_salesperson_email"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_salesperson_email" string="Email"/>
+                                <div class="text-muted">
+                                    Displays the email in the salesperson information
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt32">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_info" class="of-printing-parameter-title"/>
+                                <div class="text-muted">
+                                    Displays the customer information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_customer_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_phone"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_phone" string="Phone"/>
+                                <div class="text-muted">
+                                    Displays the phone number in the customer information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_customer_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_mobile"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_mobile" string="Mobile"/>
+                                <div class="text-muted">
+                                    Displays the mobile number in the customer information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_customer_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_fax"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_fax" string="Fax"/>
+                                <div class="text-muted">
+                                    Displays the fax number in the customer information
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_customer_info', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_email"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_email" string="Email"/>
+                                <div class="text-muted">
+                                    Displays the email in the customer information
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <h4 class="of-printing-parameter-title" colspan="2">Other information</h4>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_payment_term_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_payment_term_info"/>
+                                <div class="text-muted">
+                                    Displays the payment terms in top information block
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_order_ref_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_order_ref_info"/>
+                                <div class="text-muted">
+                                    Displays the order reference in top information block
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_ref_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_ref_info"/>
+                                <div class="text-muted">
+                                    Displays the customer reference in top information block
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_validity_info"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_validity_info"/>
+                                <div class="text-muted">
+                                    Displays the validity date in top information block
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="of-printing-parameter-title mt32" colspan="2">Sections</h4>
+                        <group col="2" colspan="2">
+                            <field name="pdf_section_bg_color" widget="color"/>
+                            <field name="pdf_section_font_color" widget="color"/>
+                        </group>
+                        <h4 class="of-printing-parameter-title mt32" colspan="2">Order lines</h4>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_product_reference"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_product_reference"/>
+                                <div class="text-muted">
+                                    Displays the product reference in the order lines on the report
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_price_taxexcl"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_price_taxexcl"/>
+                                <div class="text-muted">
+                                    Displays the tax excluded prices on the report
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_price_taxinc"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_price_taxinc"/>
+                                <div class="text-muted">
+                                    Displays the tax included prices on the report
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_print_image_level"/>
+                                <div class="text-muted">
+                                    How product images are displayed in report
+                                </div>
+                                <div class="content-group">
+                                    <field name="pdf_print_image_level" class="o_light_label" widget="radio"/>
+                                    <field name="module_of_sale_report_setting_product_multi_image" invisible="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="group_of_sale_report_print_attachment"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_of_sale_report_print_attachment"/>
+                                <div class="text-muted">
+                                    Print product attachments in report appendix
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt32">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_signatures_insert"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_signatures_insert" class="of-printing-parameter-title"/>
+                                <div class="text-muted">
+                                    Displays signature insert in the report
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_signatures_insert', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_customer_signature"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_customer_signature"/>
+                                <div class="text-muted">
+                                    Displays the customer signature insert
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_signatures_insert', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_vendor_signature"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_vendor_signature"/>
+                                <div class="text-muted">
+                                    Displays the salesman signature insert
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_signatures_insert', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="group_pdf_prefill_vendor_signature"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_pdf_prefill_vendor_signature"/>
+                                <div class="text-muted">
+                                    Allows you to load a signature image in the user form view. This image will be used as a pre-filled signature in the PDF documents.
+                                </div>
+                            </div>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_signatures_insert', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                                <field name="pdf_signature_text"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="pdf_signature_text"/>
+                                <div class="text-muted">
+                                    Signature comment positioned below the titles "Salesman signature" and "Customer signature"
+                                </div>
+                                <div class="content-group"  attrs="{'invisible': [('pdf_signature_text','=', False)]}">
+                                    <div class="mt16">
+                                        <field name="pdf_signature_text_label" placeholder="Signature text..."
+                                                attrs="{'required': [('pdf_signature_text', '=', True)]}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer>
+                    <button string="Save" class="btn-primary" type="object" name="action_button_document_layout_save" data-hotkey="q"/>
+                    <button special="cancel" data-hotkey="z" string="Cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_document_layout_configurator" model="ir.actions.act_window">
+        <field name="name">Configure your document layout</field>
+        <field name="res_model">of.sale.document.layout</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="of_sale_report_setting.of_sale_report_setting_sale_document_layout"/>
+    </record>
+
+</odoo>

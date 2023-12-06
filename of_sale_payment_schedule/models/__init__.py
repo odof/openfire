@@ -2,5 +2,6 @@
 
 from . import of_sale_payment_schedule
 from . import sale_order
-from . import res_config_settings
+from . import of_sale_document_layout
 from . import account_move
+from . import res_company

@@ -8,16 +8,14 @@
     'website': 'https://www.openfire.fr',
     'category': 'OpenFire',
     'summary': "Echéancier de paiement des ventes",
-    'description': "",
     'depends': [
         'of_sale_report_setting',
     ],
     'data': [
-        'data/of_sale_payment_schedule_data.xml',
         'security/ir.model.access.csv',
         'views/sale_order_views.xml',
         'views/of_sale_payment_schedule_views.xml',
-        'views/res_config_settings_views.xml',
+        'views/of_sale_document_layout.xml',
         'reports/ir_actions_report_templates.xml',
     ],
     'installable': True,

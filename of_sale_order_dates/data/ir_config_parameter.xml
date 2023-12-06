@@ -1,16 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo noupdate="1">
 
-    <record id="pdf_requested_week" model="ir.config_parameter" forcecreate="False">
-        <field name="key">of.sale.report.setting.pdf_requested_week</field>
-        <field name="value">False</field>
-    </record>
-
-    <record id="pdf_technical_visit_info" model="ir.config_parameter" forcecreate="False">
-        <field name="key">of.sale.report.setting.pdf_technical_visit_info</field>
-        <field name="value">True</field>
-    </record>
-
     <record id="pdf_technical_visit_info_move" model="ir.config_parameter" forcecreate="False">
         <field name="key">of.sale.report.setting.account.move.pdf_technical_visit_info</field>
         <field name="value">False</field>

@@ -28,39 +28,4 @@
         </field>
     </record>
 
-    <!-- Sales -->
-    <record id="res_config_settings_sale_printing_params_view_form" model="ir.ui.view">
-        <field name="name">of.sale.order.dates.res.config.settings.sale.printing.params.view.form</field>
-        <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="of_sale_report_setting.res_config_settings_sale_printing_params_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='pdf_customer_ref_info']/../.." position="after">
-                <div id="pdf_technical_visit_info">
-                    <div class="o_setting_left_pane">
-                        <field name="pdf_technical_visit_info"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="pdf_technical_visit_info"/>
-                        <div class="text-muted">
-                            Displays the technical visit date in top information block, else it will be displayed at the end of the report
-                        </div>
-                    </div>
-                </div>
-            </xpath>
-            <xpath expr="//field[@name='pdf_payment_term_info']/../.." position="after">
-                <div id="pdf_requested_week">
-                    <div class="o_setting_left_pane">
-                        <field name="pdf_requested_week"/>
-                    </div>
-                    <div class="o_setting_right_pane">
-                        <label for="pdf_requested_week"/>
-                        <div class="text-muted">
-                            Displays the requested week in top information block
-                        </div>
-                    </div>
-                </div>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>

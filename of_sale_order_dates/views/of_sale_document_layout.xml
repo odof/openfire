@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sales -->
+    <record id="of_sale_report_setting_of_sale_document_layout_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.dates.of.sale.document.layout</field>
+        <field name="model">of.sale.document.layout</field>
+        <field name="inherit_id" ref="of_sale_report_setting.of_sale_report_setting_sale_document_layout"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='pdf_customer_ref_info']/../.." position="after">
+                <div id="pdf_technical_visit_info">
+                    <div class="o_setting_left_pane">
+                        <field name="pdf_technical_visit_info"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="pdf_technical_visit_info"/>
+                        <div class="text-muted">
+                            Displays the technical visit date in top information block, else it will be displayed at the end of the report
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='pdf_payment_term_info']/../.." position="after">
+                <div id="pdf_requested_week">
+                    <div class="o_setting_left_pane">
+                        <field name="pdf_requested_week"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="pdf_requested_week"/>
+                        <div class="text-muted">
+                            Displays the requested week in top information block
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
