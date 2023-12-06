@@ -36,8 +36,7 @@ class SaleReport(models.Model):
     def _select_additional_fields(self):
         res = super()._select_additional_fields()
         res['of_brand_id'] = "t.brand_id"
-        # FIXME: This field is defined in a non migrated module yet
-        res['of_confirmation_date'] = "NULL"
+        res['of_confirmation_date'] = "s.date_order"
         res['of_delivery_date'] = (
             "CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) " "    THEN sm.date ELSE NULL END"
         )
@@ -77,7 +76,6 @@ class SaleReport(models.Model):
 
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        # FIXME: Is that ok ?
         # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
         # field no more here. Theses fields should be comptued on the fly after with the values of the previous period
         depends_mapping = {
@@ -102,9 +100,9 @@ class SaleReport(models.Model):
                 'of_confirmation_date',
                 'of_confirmation_date:month',
                 'of_confirmation_date:year',
-                'of_date_livraison',
-                'of_date_livraison:month',
-                'of_date_livraison:year',
+                'of_delivery_date',
+                'of_delivery_date:month',
+                'of_delivery_date:year',
             )
             # Les deltas dépendent d'un champ qui doit être calculé
             diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]

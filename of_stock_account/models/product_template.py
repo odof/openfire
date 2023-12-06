@@ -15,7 +15,7 @@ class ProductTemplate(models.Model):
     of_theoretical_cost = fields.Float(
         string="Theoretical cost",
         compute='_compute_of_theoretical_cost',
-        inverse='_set_of_theoretical_cost',
+        inverse='_inverse_set_of_theoretical_cost',
         search='_search_of_theoretical_cost',
         digits='Product Price',
         groups='base.group_user',
@@ -40,7 +40,7 @@ class ProductTemplate(models.Model):
         for template in self - unique_variants:
             template.of_theoretical_cost = 0.0
 
-    def _set_of_theoretical_cost(self):
+    def _inverse_set_of_theoretical_cost(self):
         for template in self:
             if len(template.product_variant_ids) == 1:
                 template.product_variant_ids.of_theoretical_cost = template.of_theoretical_cost
