@@ -66,9 +66,13 @@
                 <header>
                     <field name="is_invoiceable" invisible="1"/>
 
-                    <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
+                    <button string="Créer les factures"
+                            name="%(of_contract_invoicing_wizard_action)d"
+                            type="action"
+                            class="btn-primary"
                             attrs="{'invisible': [('is_invoiceable', '=', False)]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"/>
+
                     <button name="button_renew" type="object" class="btn-primary" string="Renouveler"
                             attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"
