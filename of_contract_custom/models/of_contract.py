@@ -1350,7 +1350,8 @@ class OfContractLine(models.Model):
     @api.model
     def get_write_allowed_fields(self):
         return ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes',
-                'date_contract_end', 'fiscal_position_id', 'use_index', 'revision']
+                'date_contract_end', 'fiscal_position_id', 'use_index', 'revision', 'contract_product_ids',
+                'intervention_template_id', 'interv_frequency_nbr', 'interv_frequency']
 
     @api.multi
     def _affect_number(self):
@@ -1665,6 +1666,7 @@ class OfContractLine(models.Model):
 
 class OfContractProduct(models.Model):
     _name = 'of.contract.product'
+    _inherit = ['of.form.readonly']
     _order = 'sequence'
 
     sequence = fields.Integer(string=u"Séquence", default=10, help=u"Séquence")

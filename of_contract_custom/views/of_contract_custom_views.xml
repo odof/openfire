@@ -504,15 +504,16 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
                                     <tree>
                                         <field name="product_id"/>
-                                        <field name="price_unit"/>
-                                        <field name="purchase_price"/>
-                                        <field name="quantity"/>
+                                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="purchase_price" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="quantity" attrs="{'form_readonly_exception': True}"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
-                                        <field name="tax_ids" widget="many2many_tags" invisible="1"/>
+                                        <field name="tax_ids" widget="many2many_tags" invisible="1" attrs="{'form_readonly_exception': True}"/>
                                         <field name="amount_total"/>
                                         <field name="qty_invoiced"/>
                                         <field name="price_unit_prec"/>
@@ -531,7 +532,7 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-                                    <field name="intervention_template_id"/>
+                                    <field name="intervention_template_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="tache_id"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
@@ -542,7 +543,7 @@
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
                                            attrs="{'form_readonly_exception': True}"/>
-                                    <field name="nbr_interv"/>
+                                    <field name="nbr_interv" attrs="{'form_readonly_exception': True}"/>
                                 </group>
                                 <group colspan="2" name="sav" string="Sav">
                                     <field name="use_sav"/>
@@ -664,7 +665,7 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-                                    <field name="intervention_template_id"/>
+                                    <field name="intervention_template_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="tache_id"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
@@ -675,7 +676,7 @@
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
                                            attrs="{'form_readonly_exception': True}"/>
-                                    <field name="nbr_interv"/>
+                                    <field name="nbr_interv" attrs="{'form_readonly_exception': True}"/>
                                 </group>
                                 <group colspan="2" name="sav" string="Sav">
                                     <field name="use_sav"/>
@@ -705,16 +706,17 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
                                     <tree>
                                         <field name="product_id"/>
-                                        <field name="purchase_price" invisible="1"/>
-                                        <field name="name"/>
-                                        <field name="quantity"/>
-                                        <field name="price_unit"/>
+                                        <field name="purchase_price" invisible="1" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="name" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="quantity" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
-                                        <field name="tax_ids" widget="many2many_tags" invisible="1"/>
+                                        <field name="tax_ids" widget="many2many_tags" invisible="1" attrs="{'form_readonly_exception': True}"/>
                                         <field name="amount_subtotal" string="Sous-total HT"/>
                                         <field name="amount_total" string="Sous-total TTC"/>
                                         <field name="qty_invoiced" invisible="1"/>
@@ -795,22 +797,22 @@
                 <group>
                     <group>
                         <field name="product_id"/>
-                        <field name="price_unit"/>
-                        <field name="purchase_price"/>
+                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
+                        <field name="purchase_price" attrs="{'form_readonly_exception': True}"/>
                         <label for="product_uom_qty" string="Quantité"/>
                         <div>
-                            <field name="quantity" class="oe_inline"/>
+                            <field name="quantity" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                             <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                         </div>
                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                     </group>
                     <group>
-                        <field name="tax_ids" widget="many2many_tags"/>
+                        <field name="tax_ids" widget="many2many_tags" attrs="{'form_readonly_exception': True}"/>
                         <field name="account_analytic_id" options="{'no_create': True}"
-                               groups="analytic.group_analytic_accounting"/>
+                               groups="analytic.group_analytic_accounting" attrs="{'form_readonly_exception': True}"/>
                     </group>
                     <separator string="Description"/>
-                    <field name="name" nolabel="1" colspan="4"/>
+                    <field name="name" nolabel="1" colspan="4" attrs="{'form_readonly_exception': True}"/>
                 </group>
             </form>
         </field>
