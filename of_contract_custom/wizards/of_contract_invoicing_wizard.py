@@ -28,6 +28,10 @@ class OFContractInvoicingWizard(models.TransientModel):
     manual_date = fields.Date(string=u"Date de facturation")
     line_ids = fields.One2many(
         comodel_name='of.contract.invoicing.line.wizard', inverse_name='wizard_id', string=u"Lignes à facturer")
+    exception_line_ids = fields.One2many(
+        comodel_name='of.contract.invoicing.exception.wizard', inverse_name='wizard_id',
+        string=u"Exceptions de facturation"
+    )
 
     @api.multi
     def compute_line_ids(self):
@@ -43,18 +47,42 @@ class OFContractInvoicingWizard(models.TransientModel):
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
-    def select_all(self):
+    def select_all_line_ids(self):
         self.line_ids.update({'selected': True})
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
-    def deselect_all(self):
+    def deselect_all_line_ids(self):
         self.line_ids.update({'selected': False})
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def compute_exception_line_ids(self):
+        lines = [(5, )]
+        for line in self.mapped('line_ids.contract_line_id.exception_line_ids').filtered(
+                lambda r: r.state == '1-to_invoice' and r.date_invoice_next <= self.invoicing_period):
+            lines.append((0, 0, {
+                'wizard_id': self.id,
+                'contract_exception_id': line.id,
+                'selected': True,
+            }))
+        self.write({'exception_line_ids': lines})
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def select_all_exception_line_ids(self):
+        self.exception_line_ids.update({'selected': True})
+        return {'type': 'ir.actions.do_nothing'}
+
+    @api.multi
+    def deselect_all_exception_line_ids(self):
+        self.exception_line_ids.update({'selected': False})
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
     def button_apply(self):
         lines_selected = self.line_ids.filtered('selected').mapped('contract_line_id')
+        exceptions_selected = self.exception_line_ids.filtered('selected').mapped('contract_exception_id')
         invoices = self.env['account.invoice']
         with self.env.norecompute():
             if self.invoicing_method == 'computed':
@@ -62,16 +90,19 @@ class OFContractInvoicingWizard(models.TransientModel):
                 dates.sort()
                 for date in dates:
                     lines = lines_selected.filtered(lambda l: l.next_date == date)
-                    invoices += self._create_invoice(self.with_context(force_date=date).contract_id, lines)
+                    exception_lines = exceptions_selected.filtered(lambda r: r.line_id.id in lines.ids)
+                    invoices += self._create_invoice(
+                        self.with_context(force_date=date).contract_id, lines, exception_lines)
             else:
                 date = self.invoicing_method == 'day' and fields.Date.today() or self.manual_date
-                invoices = self._create_invoice(self.with_context(force_date=date).contract_id, lines_selected)
+                invoices = self._create_invoice(
+                    self.with_context(force_date=date).contract_id, lines_selected, exceptions_selected)
         self.contract_id.recompute()
         self.lines_selected._auto_cancel()
         return self.contract_id.action_view_invoice()
 
     @api.multi
-    def _create_invoice(self, contract, lines, do_raise=True):
+    def _create_invoice(self, contract, lines, exception_lines, do_raise=True):
         """ Création des factures du contrats en fonction de si les lignes du contrat sont groupées ou non """
         contract.ensure_one()
         if not lines:
@@ -91,6 +122,9 @@ class OFContractInvoicingWizard(models.TransientModel):
             for line in lines_grouped:
                 lines += line._add_invoice_lines()
             if lines:
+                exceptions = exception_lines.filtered(lambda r: r.line_id.id in lines_grouped._ids)
+                for exception in exceptions:
+                    lines += exception._add_invoice_lines()
                 addresses = lines_grouped.mapped('address_id')
                 if len(addresses) == 1:
                     invoice_vals['partner_shipping_id'] = addresses.id
@@ -117,6 +151,9 @@ class OFContractInvoicingWizard(models.TransientModel):
                 lines = line._add_invoice_lines()
                 if not lines:
                     continue
+                exceptions = exception_lines.filtered(lambda r: r.line_id.id == line.id)
+                for exception in exceptions:
+                    lines += exception._add_invoice_lines()
                 if line.address_id:
                     invoice_vals['partner_shipping_id'] = line.address_id.id
                 invoice_vals['invoice_line_ids'] = lines
@@ -155,3 +192,25 @@ class OFContractInvoicingLineWizard(models.TransientModel):
         currency_field='line_company_currency_id'
     )
     line_grouped = fields.Boolean(string=u"Grouper les factures", related='contract_line_id.grouped', readonly=True)
+
+
+class OFContractInvoicingExceptionWizard(models.TransientModel):
+    _name ='of.contract.invoicing.exception.wizard'
+
+    wizard_id = fields.Many2one(comodel_name='of.contract.invoicing.wizard', string="wizard", ondelete='cascade')
+    contract_exception_id = fields.Many2one(
+        comodel_name='of.contract.product.exception', string=u"Exception de facturation")
+    contract_line_id = fields.Many2one(
+        comodel_name='of.contract.line', string=u"Ligne de contrat", related='contract_exception_id.line_id')
+    selected = fields.Boolean(string=u"À facturer")
+    line_code = fields.Char(string=u"Code", related='contract_line_id.code_de_ligne', readonly=True)
+    line_address_id = fields.Many2one(
+        string=u"Adresse d'intervention", related='contract_line_id.address_id', readonly=True)
+    line_address_zip = fields.Char(string=u"CP", related='contract_line_id.address_zip', readonly=True)
+    line_address_city = fields.Char(string=u"Ville", related='contract_line_id.address_city', readonly=True)
+    line_supplier_id = fields.Many2one(
+        comodel_name='res.partner', string=u"Prestataire", related='contract_line_id.supplier_id', readonly=True)
+    exception_date_invoice_next = fields.Date(
+        string=u"Date de facturation prévisionnelle", related='contract_exception_id.date_invoice_next')
+    exception_amount_total = fields.Float(string=u"Montant de la prochaine exception", related='contract_exception_id.amount_total')
+    exception_internal_note = fields.Text(string=u"Notes de l'exception", related='contract_exception_id.internal_note')

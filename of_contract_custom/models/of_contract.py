@@ -605,6 +605,10 @@ class OfContract(models.Model):
                 for line in lines_grouped:
                     lines += line._add_invoice_lines()
                 if lines:
+                    exceptions = lines_grouped.mapped('exception_line_ids').filtered(
+                                     lambda r: r.date_invoice_next <= ref_date)
+                    for exception in exceptions:
+                        lines += exception._add_invoice_lines()
                     addresses = lines_grouped.mapped('address_id')
                     if len(addresses) == 1:
                         invoice_vals['partner_shipping_id'] = addresses.id
@@ -631,6 +635,9 @@ class OfContract(models.Model):
                     lines = line._add_invoice_lines()
                     if not lines:
                         continue
+                    exceptions = line.exception_line_ids.filtered(lambda r: r.date_invoice_next <= ref_date)
+                    for exception in exceptions:
+                        lines += exception._add_invoice_lines()
                     if line.address_id:
                         invoice_vals['partner_shipping_id'] = line.address_id.id
                     invoice_vals['invoice_line_ids'] = lines
@@ -939,6 +946,9 @@ class OfContractLine(models.Model):
     sav_count = fields.Integer(string="Nombre de visites SAV")
     remaining_sav = fields.Integer(string="Nbr. visites SAV restantes", compute="_compute_remaining_sav")
     notes = fields.Text(string="Notes")
+    exception_line_ids = fields.One2many(
+        comodel_name='of.contract.product.exception', inverse_name='line_id', string=u"Exceptions de facturation")
+    exception_date = fields.Date(string=u"Prochaine exception de facturation", compute='_compute_exception_date')
 
     @api.depends('code_de_ligne', 'line_avenant_id', 'line_avenant_id.code_de_ligne', 'state')
     def _compute_name(self):
@@ -1212,6 +1222,13 @@ class OfContractLine(models.Model):
                 remaining_sav = line.sav_count - len(sav)
                 line.remaining_sav = remaining_sav if remaining_sav > 0 else 0
 
+    @api.depends('exception_line_ids.state', 'exception_line_ids.date_invoice_next')
+    def _compute_exception_date(self):
+        for record in self:
+            dates = record.exception_line_ids.filtered(lambda l: l.state == '1-to_invoice').mapped('date_invoice_next')
+            if dates:
+                record.exception_date = min(dates)
+
     @api.onchange('address_id')
     def _onchange_address_id(self):
         """ Récupération du parc installé si l'utilisateur à les droits """
@@ -1351,7 +1368,7 @@ class OfContractLine(models.Model):
     def get_write_allowed_fields(self):
         return ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes',
                 'date_contract_end', 'fiscal_position_id', 'use_index', 'revision', 'contract_product_ids',
-                'intervention_template_id', 'interv_frequency_nbr', 'interv_frequency']
+                'intervention_template_id', 'interv_frequency_nbr', 'interv_frequency', 'exception_line_ids']
 
     @api.multi
     def _affect_number(self):

@@ -22,8 +22,8 @@
                     </div>
                 </group>
                 <button string="Calculer" name="compute_line_ids" type="object" class="btn-default"/>
-                <button string="Tout sélectionner" name="select_all" type="object" class="btn-default"/>
-                <button string="Tout dé-sélectionner" name="deselect_all" type="object" class="btn-default"/>
+                <button string="Tout sélectionner" name="select_all_line_ids" type="object" class="btn-default"/>
+                <button string="Tout dé-sélectionner" name="deselect_all_line_ids" type="object" class="btn-default"/>
                 <group>
                     <field name="line_ids" nolabel="1">
                         <tree create="false" editable="top">
@@ -41,6 +41,25 @@
                             <field name="line_company_currency_id"/>
                             <field name="line_amount_total"/>
                             <field name="line_grouped"/>
+                        </tree>
+                    </field>
+                </group>
+                <button string="Calculer" name="compute_exception_line_ids" type="object" class="btn-default"/>
+                <button string="Tout sélectionner" name="select_all_exception_line_ids" type="object" class="btn-default"/>
+                <button string="Tout dé-sélectionner" name="deselect_all_exception_line_ids" type="object" class="btn-default"/>
+                <group>
+                    <field name="exception_line_ids" nolabel="1">
+                        <tree create="false" editable="top">
+                            <field name="contract_line_id" invisible="1"/>
+                            <field name="selected"/>
+                            <field name="line_code"/>
+                            <field name="line_address_id"/>
+                            <field name="line_address_zip"/>
+                            <field name="line_address_city"/>
+                            <field name="line_supplier_id"/>
+                            <field name="exception_date_invoice_next"/>
+                            <field name="exception_amount_total"/>
+                            <field name="exception_internal_note"/>
                         </tree>
                     </field>
                 </group>
