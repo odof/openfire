@@ -2,14 +2,20 @@
 
 from unittest.mock import patch
 
+from odoo import Command
 from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
+
+from .side_effects import side_effects_test_05_children_update
 
 LATITUDE_RENNES = "48.1113387"
 LONGITUDE_RENNES = "-1.6800198"
 
-LATITUDE_SAINT_GREGOIRE = "48.1513003"
-LONGITUDE_SAINT_GREGOIRE = "-1.6985415"
+LATITUDE_SAINT_GREGOIRE_VICTORIA = "48.1513003"
+LONGITUDE_SAINT_GREGOIRE_VICTORIA = "-1.6985415"
+
+LATITUDE_SAINT_GREGOIRE_KERGUELEN = "48.1518877"
+LONGITUDE_SAINT_GREGOIRE_KERGUELEN = "-1.6984516"
 
 
 @tagged("post_install", "-at_install", "openfire_custom")
@@ -98,8 +104,8 @@ class TestModuleOfGeolocalize(TransactionCase):
                     'street': '1 Rue de la Terre Victoria',
                 }
             )
-            self.assertNotEqual(partner.partner_latitude, float(LATITUDE_SAINT_GREGOIRE))
-            self.assertNotEqual(partner.partner_longitude, float(LONGITUDE_SAINT_GREGOIRE))
+            self.assertNotEqual(partner.partner_latitude, float(LATITUDE_SAINT_GREGOIRE_VICTORIA))
+            self.assertNotEqual(partner.partner_longitude, float(LONGITUDE_SAINT_GREGOIRE_VICTORIA))
             self.assertEqual(partner.of_geocoding_state, 'success')
             self.assertIsNotNone(partner.of_response_json)
 
@@ -119,8 +125,8 @@ class TestModuleOfGeolocalize(TransactionCase):
             'odoo.addons.of_geolocalize.models.base_geocoder.GeoCoder._call_openstreetmap'
         ) as mock_call_openstreetmap:
             mock_call_openstreetmap.return_value = [
-                LATITUDE_SAINT_GREGOIRE,
-                LONGITUDE_SAINT_GREGOIRE,
+                LATITUDE_SAINT_GREGOIRE_VICTORIA,
+                LONGITUDE_SAINT_GREGOIRE_VICTORIA,
                 [
                     {
                         "place_id": 245342690,
@@ -165,8 +171,8 @@ class TestModuleOfGeolocalize(TransactionCase):
                     'street': '1 Rue de la Terre Victoria',
                 }
             )
-            self.assertEqual(round(partner.partner_latitude, 7), float(LATITUDE_SAINT_GREGOIRE))
-            self.assertEqual(round(partner.partner_longitude, 7), float(LONGITUDE_SAINT_GREGOIRE))
+            self.assertEqual(round(partner.partner_latitude, 7), float(LATITUDE_SAINT_GREGOIRE_VICTORIA))
+            self.assertEqual(round(partner.partner_longitude, 7), float(LONGITUDE_SAINT_GREGOIRE_VICTORIA))
             self.assertNotEqual(partner.of_geocoding_state, 'not_tried')
             self.assertEqual(partner.of_geocoding_state, 'success')
 
@@ -235,3 +241,67 @@ class TestModuleOfGeolocalize(TransactionCase):
             self.assertEqual(partner.partner_latitude, 0.0)
             self.assertEqual(partner.partner_longitude, 0.0)
             self.assertEqual(partner.of_geocoding_state, 'success')
+
+    def test_05_children_geolocalize_update(self):
+        """Test the geolocalization of the children of a partner when the partner is updated."""
+
+        # Set the settings values
+        self.env['res.config.settings'].create(
+            {
+                'geocoding_on_write': 'no',
+                'geocoding_on_create': 'no',
+            }
+        ).execute()
+
+        partner = self.env['res.partner'].create(
+            {
+                'name': 'Test_01',
+                'zip': '35000',
+                'city': 'rennes',
+                'child_ids': [
+                    Command.create({'name': 'Test_02', 'zip': '35000', 'city': 'rennes'}),
+                    Command.create({'name': 'Test_03', 'zip': '35000', 'city': 'rennes'}),
+                ],
+            }
+        )
+        self.assertEqual(partner.partner_latitude, 0.0)
+        self.assertEqual(partner.partner_longitude, 0.0)
+        self.assertEqual(partner.child_ids.mapped('partner_latitude'), [0.0, 0.0])
+        self.assertEqual(partner.child_ids.mapped('partner_longitude'), [0.0, 0.0])
+        self.assertEqual(partner.of_geocoding_state, 'not_tried')
+        partner.write(
+            {
+                'street': '1 Rue de la Terre Victoria',
+                'zip': '35760',
+                'city': 'Saint-Grégoire',
+            }
+        )
+        for child in partner.child_ids:
+            child.write(
+                {
+                    'street': '13 Rue des îles Kerguelen',
+                    'zip': '35760',
+                    'city': 'Saint-Grégoire',
+                }
+            )
+
+        # We mock the call to the API
+        with patch(
+            'odoo.addons.of_geolocalize.models.base_geocoder.GeoCoder._call_openstreetmap'
+        ) as mock_call_openstreetmap:
+            mock_call_openstreetmap.side_effect = side_effects_test_05_children_update()
+
+            # Geolocalize the partner and its children
+            partner.with_context(force_geo_localize=True).geo_localize()
+
+        # Check the results, the partner should be geolocalized and its children too
+        self.assertEqual(round(partner.partner_latitude, 7), float(LATITUDE_SAINT_GREGOIRE_VICTORIA))
+        self.assertEqual(round(partner.partner_longitude, 7), float(LONGITUDE_SAINT_GREGOIRE_VICTORIA))
+        self.assertEqual(
+            partner.child_ids.mapped(lambda p: round(p.partner_latitude, 7)),
+            [float(LATITUDE_SAINT_GREGOIRE_KERGUELEN)] * 2,
+        )
+        self.assertEqual(
+            partner.child_ids.mapped(lambda p: round(p.partner_longitude, 7)),
+            [float(LONGITUDE_SAINT_GREGOIRE_KERGUELEN)] * 2,
+        )

@@ -26,6 +26,30 @@ TERRE_VICTORIA_STREET_OSM_RESULT = (
     ],
 )
 
+ILE_KERGUELEN_STREET_OSM_RESULT = (
+    48.1518877,
+    -1.6984516,
+    [
+        {
+            'place_id': 247236130,
+            'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright',
+            'osm_type': 'way',
+            'osm_id': 9227901,
+            'lat': '48.1518877',
+            'lon': '-1.6984516',
+            'class': 'highway',
+            'type': 'unclassified',
+            'place_rank': 26,
+            'importance': 0.10000999999999993,
+            'addresstype': 'road',
+            'name': 'Rue des Îles Kerguelen',
+            'display_name': 'Rue des Îles Kerguelen, Parc Edonia, Gué Mary, Saint-Grégoire, Rennes, '
+            'Ille-et-Vilaine, Bretagne, France métropolitaine, 35760, France',
+            'boundingbox': ['48.1518096', '48.1519305', '-1.6992451', '-1.6973101'],
+        }
+    ],
+)
+
 RENNES_CITY_OSM_RESULT = (
     48.1113387,
     -1.6800198,
@@ -215,6 +239,10 @@ PARIS_CITY_OSM_RESULT = (
         },
     ],
 )
+
+
+def side_effects_test_05_children_update():
+    return [TERRE_VICTORIA_STREET_OSM_RESULT, ILE_KERGUELEN_STREET_OSM_RESULT, ILE_KERGUELEN_STREET_OSM_RESULT]
 
 
 def side_effects_test_03():

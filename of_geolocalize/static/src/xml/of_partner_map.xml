@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-inherit="of_web_widgets.OFPartnerMap" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('map-container')]" position="after">
+            <div class="map-legend">
+                <div class="of-map-legend-items-container">
+                    <div class="of-map-legend-item">
+                        <img src="of_web_widgets/static/lib/leaflet/images/marker-icon-green.png" alt="His Parent"/>
+                        <span>His Parent</span>
+                    </div>
+                    <div class="of-map-legend-item">
+                        <img src="of_web_widgets/static/lib/leaflet/images/marker-icon.png" alt="Current Partner"/>
+                        <span>Current Partner</span>
+                    </div>
+                    <div class="of-map-legend-item">
+                        <img src="of_web_widgets/static/lib/leaflet/images/marker-icon-black.png" alt="His Contacts"/>
+                        <span>His Contacts</span>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </t>
+</templates>

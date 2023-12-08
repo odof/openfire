@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="of_web_widgets.OFPartnerMap" owl="1">
+        <div class="map-container" t-ref="mapContainer"></div>
+    </t>
+</templates>

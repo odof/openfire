@@ -157,6 +157,8 @@ class ResPartner(models.Model):
                         'of_precision': precision,
                     }
                 )
+                # if partner has children with different address data, we should geolocalize it
+                partner._geo_localize_children()
             else:
                 partners_not_geo_localized |= partner
         if partners_not_geo_localized:
@@ -172,6 +174,21 @@ class ResPartner(models.Model):
                 },
             )
         return True
+
+    def _geo_localize_children(self):
+        """Geolocalize children of partner if they have different address data"""
+        self.ensure_one()
+        if children_to_localize := self.child_ids.filtered(
+            lambda child: child.street != self.street
+            or child.street2 != self.street2
+            or child.zip != self.zip
+            or child.city != self.city
+            or child.state_id != self.state_id
+            or child.country_id != self.country_id
+            or child.partner_latitude == 0.0
+            or child.partner_longitude == 0.0
+        ):
+            children_to_localize.geo_localize()
 
     def get_geocoding_country(self):
         return (

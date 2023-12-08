@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="res_partner_geo_form" model="ir.ui.view">
-        <field name="name">res.partner.inherit</field>
+    <record id="of_gerolocalize_res_partner_geo_form" model="ir.ui.view">
+        <field name="name">of.geolocalize.res.partner.geo.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='geo_location']//group[1]//group[1]" position="after">
+            <xpath expr="//page[@name='geo_location']//group[1]" position="after">
+
+                <field name="self" widget="of_geolocalize_map" options="{'map_rows' : 20}"/>
+
                 <group string="Geocoding Response">
                     <label for="of_geocoding_state" string="Geocoding State"/>
                     <field name="of_geocoding_state" nolabel="1" class="oe_inline" readonly="1"/>

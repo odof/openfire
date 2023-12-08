@@ -1,0 +1,19 @@
+.of-map-legend-items-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.of-map-legend-item {
+    margin: 0 10px;
+    padding: 0 10px;
+    color: #000;
+    font-size: 12px;
+    font-weight: "normal";
+    line-height: 10px;
+
+    img {
+        margin-right: 5px;
+        vertical-align: middle;
+        width: 0.85rem;
+    }
+}

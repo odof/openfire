@@ -11,6 +11,7 @@
     'depends': [
         'contacts',
         'base_geolocalize',
+        'of_web_widgets',
     ],
     'data': [
         'data/ir_config_parameter.xml',
@@ -19,6 +20,11 @@
         'views/res_partner_views.xml',
         'wizards/of_geo_wizard.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_geolocalize/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
