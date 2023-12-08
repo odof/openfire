@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="of_planning.view_of_employee_form_intervention"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='droite_1']" position="inside">
-                <separator string="Prestataire"/>
+                <separator string="Prestataire" colspan="2"/>
                 <field name="of_is_provider"/>
                 <field name="of_provider_id"
                        attrs="{'invisible': [('of_is_provider', '=', False)], 'required': [('of_is_provider', '=', True)]}"/>
