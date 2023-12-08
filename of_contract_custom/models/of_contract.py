@@ -1680,6 +1680,25 @@ class OfContractLine(models.Model):
             if services:
                 services.unlink()
 
+    @api.multi
+    def copy_line(self):
+        self.ensure_one()
+        product_lines = []
+        exception_lines = []
+        for product_line in self.contract_product_ids:
+            product_lines.append((0, 0, product_line.copy_data()[0]))
+        for exception_line in self.exception_line_ids:
+            exception_lines.append((0, 0, exception_line.copy_data()[0]))
+        new_line = self.copy(default={'contract_product_ids': product_lines, 'exception_line_ids': exception_lines})
+        return {
+            'name': u"Lignes de contrats",
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'of.contract.line',
+            'res_id': new_line.id,
+            'type': 'ir.actions.act_window',
+        }
+
 
 class OfContractProduct(models.Model):
     _name = 'of.contract.product'

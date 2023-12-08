@@ -828,6 +828,19 @@
     <menuitem name="Lignes de contrats" id="menu_contract_lines_sale" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines" groups="of_contract_custom.group_of_contract_custom_lecture"/>
     <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning_intervention" sequence="151" action="action_contract_lines" groups="of_contract_custom.group_of_contract_custom_lecture"/>
 
+    <record id="action_copy_of_contract_line" model="ir.actions.server">
+        <field name="name">Dupliquer</field>
+        <field name="model_id" ref="of_contract_custom.model_of_contract_line"/>
+        <field name="state">code</field>
+        <field name="code">action = records.copy_line()</field>
+    </record>
+    <record id="value_copy_of_contract_line" model="ir.values">
+        <field name="name">Dupliquer</field>
+        <field name="key2">client_action_relate</field>
+        <field name="model">of.contract.line</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_copy_of_contract_line"/>
+    </record>
+
 <!-- ******************************************************************************************* -->
 <!-- ***************************************** ARTICLES **************************************** -->
 <!-- ******************************************************************************************* -->
