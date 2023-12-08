@@ -110,6 +110,9 @@ class AccountInvoice(models.Model):
     def _get_company_field_domain(self):
         return "type in ('out_invoice', 'out_refund') and [('of_is_shop','=',True)] or []"
 
+    def _get_refund_common_fields(self):
+        return super(AccountInvoice, self)._get_refund_common_fields() + ['company_id']
+
 
 class AccountAccount(models.Model):
     _inherit = 'account.account'
