@@ -1,0 +1,67 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_sale_discount
+#	* sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-11 15:23+0000\n"
+"PO-Revision-Date: 2023-12-11 15:23+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_account_invoice_line
+msgid "Invoice Line"
+msgstr "Ligne de facture"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_product_pricelist_item_of_percent_price_formula
+msgid "Pourcentage (remise)"
+msgstr "Pourcentage (remise)"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_product_pricelist_item
+msgid "Pricelist item"
+msgstr "Élément de la liste de prix"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_account_invoice_line_of_discount_formula
+#: model:ir.model.fields,field_description:of_sale_discount.field_sale_order_line_of_discount_formula
+msgid "Remise (%)"
+msgstr "Remise (%)"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,help:of_sale_discount.field_account_invoice_line_of_discount_formula
+#: model:ir.model.fields,help:of_sale_discount.field_product_pricelist_item_of_percent_price_formula
+#: model:ir.model.fields,help:of_sale_discount.field_sale_order_line_of_discount_formula
+msgid "Remise ou somme de remises.\n"
+"Eg. \"40 + 10.5\" équivaut à \"46.3\""
+msgstr "Remise ou somme de remises.\n"
+"Eg. \"40 + 10.5\" équivaut à \"46.3\""
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de bons de commande"
+
+#. module: of_sale_discount
+#: model:ir.model,name:of_sale_discount.model_account_config_settings
+msgid "account.config.settings"
+msgstr "account.config.settings"
+
+#. module: sale
+#: selection:sale.config.settings,group_discount_per_so_line:0
+msgid "Allow discounts on sales order lines and invoice lines"
+msgstr "Permettre les remises sur les lignes de commande et de facture"
+
+#. module: sale
+#: selection:sale.config.settings,group_discount_per_so_line:0
+msgid "No discount on sales order lines or invoice lines, global discount only"
+msgstr "Pas de remise individuelle sur chaque ligne de commande ou facture, remise uniquement globale"
