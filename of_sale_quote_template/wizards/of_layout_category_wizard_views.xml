@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_layout_category_add_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.layout.category.add.wizard.form.view</field>
+        <field name="model">of.layout.category.add.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="type" invisible="1"/>
+                    <field name="order_id" invisible="1"/>
+                    <field name="quote_id" invisible="1"/>
+                    <field name="order_layout_category_id" invisible="1"/>
+                    <field name="quote_layout_category_id" invisible="1"/>
+                    <field name="section_number"/>
+                    <field name="min_section_number" invisible="1"/>
+                    <field name="display_button" invisible="1"/>
+                    <span attrs="{'invisible': [('display_button', '!=', False)]}">Le nombre de sections doit être supérieur au nombre actuel de sous section.</span>
+                </group>
+                <footer>
+                    <button type="object" name="action_done_order" string="Valider" class="oe_highlight" attrs="{'invisible': ['|', ('display_button', '=', False), ('type', '!=', 'order')]}"/>
+                    <button type="object" name="action_done_quote" string="Valider" class="oe_highlight" attrs="{'invisible': ['|', ('display_button', '=', False), ('type', '!=', 'quote')]}"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_layout_category_duplicate_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.layout.category.duplicate.wizard.form.view</field>
+        <field name="model">of.layout.category.duplicate.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p attrs="{'invisible': [('type', '!=', 'order')]}">Vous allez dupliquer la section et toutes les lignes de commande qui la composent.</p>
+                <p attrs="{'invisible': [('type', '!=', 'quote')]}">Vous allez dupliquer la section et tous les composants qui la composent.</p>
+                <group>
+                    <field name="type" invisible="1"/>
+                    <field name="order_id" invisible="1"/>
+                    <field name="quote_id" invisible="1"/>
+                    <field name="order_layout_category_id" invisible="1"/>
+                    <field name="quote_layout_category_id" invisible="1"/>
+                    <field name="name"/>
+                    <field name="order_parent_id" attrs="{'invisible': [('type', '!=', 'order')]}" domain="[('order_id', '=', order_id), '!', ('id', 'child_of', order_layout_category_id)]"/>
+                    <field name="quote_parent_id" attrs="{'invisible': [('type', '!=', 'quote')]}" domain="[('quote_id', '=', quote_id), '!', ('id', 'child_of', quote_layout_category_id)]"/>
+                    <field name="inclure_sous_sections"/>
+                </group>
+                <footer>
+                    <button type="object" name="action_done_order" string="Valider" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'order')]}"/>
+                    <button type="object" name="action_done_quote" string="Valider" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'quote')]}"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_layout_category_move_wizard_form_view" model="ir.ui.view">
+        <field name="name">of.layout.category.move.wizard.form.view</field>
+        <field name="model">of.layout.category.move.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="type" invisible="1"/>
+                    <field name="order_id" invisible="1"/>
+                    <field name="quote_id" invisible="1"/>
+                    <field name="order_layout_category_id" invisible="1"/>
+                    <field name="quote_layout_category_id" invisible="1"/>
+                    <field name="previous_position" invisible="1"/>
+                    <field name="order_parent_id" attrs="{'invisible': [('type', '!=', 'order')]}" domain="[('order_id', '=', order_id), '!', ('id', 'child_of', order_layout_category_id)]"/>
+                    <field name="quote_parent_id" attrs="{'invisible': [('type', '!=', 'quote')]}" domain="[('quote_id', '=', quote_id), '!', ('id', 'child_of', quote_layout_category_id)]"/>
+                    <field name="position"/>
+                    <field name="inclure_sous_sections"/>
+                </group>
+                <footer>
+                    <button type="object" name="action_done_order" string="Valider" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'order')]}"/>
+                    <button type="object" name="action_done_quote" string="Valider" class="oe_highlight" attrs="{'invisible': [('type', '!=', 'quote')]}"/>
+                    <button string="Annuler" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
