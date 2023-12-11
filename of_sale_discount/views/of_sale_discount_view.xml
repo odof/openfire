@@ -38,7 +38,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='discount']" position="after">
-                    <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
+                    <field name="of_discount_formula" groups="sale.group_discount_per_so_line"/>
                 </xpath>
             </field>
         </record>
@@ -52,7 +52,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='discount']" position="after">
-                    <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
+                    <field name="of_discount_formula" groups="sale.group_discount_per_so_line"/>
                 </xpath>
             </field>
         </record>
@@ -66,7 +66,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='discount']" position="after">
-                    <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
+                    <field name="of_discount_formula" groups="sale.group_discount_per_so_line"/>
                 </xpath>
             </field>
         </record>
@@ -80,7 +80,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='discount']" position="after">
-                    <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
+                    <field name="of_discount_formula" groups="sale.group_discount_per_so_line"/>
                 </xpath>
             </field>
         </record>
