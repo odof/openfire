@@ -1,0 +1,4 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+from . import test_sale_order_template_line
+from . import test_update_line_description

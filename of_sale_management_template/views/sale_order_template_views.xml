@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_template_inherit_view_form" model="ir.ui.view">
+        <field name="name">of.sale.order.template.form</field>
+        <field name="model">sale.order.template</field>
+        <field name="inherit_id" ref="sale_management.sale_order_template_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='mail_template_id']" position="after">
+                <field name="of_fiscal_position_id"/>
+                <field name="of_payment_term_id"/>
+            </xpath>
+            <xpath expr="//notebook//page[@name='terms_and_conditions']" position="after">
+                <page string="Documents">
+                    <field name="of_custom_document_ids"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
