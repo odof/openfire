@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Products brands",
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.1.0",
     "author": "OpenFire",
     "website": "http://www.openfire.fr",
     "category": "OpenFire",
@@ -28,6 +28,7 @@ OpenFire module to manage products brand
         'report/of_sale_report_view.xml',
         'report/of_purchase_report_views.xml',
         'report/of_account_report_views.xml',
+        'hooks/post_hook.xml',
     ],
     "installable": True,
 }
