@@ -43,6 +43,8 @@ class OFCalculationController(http.Controller):
         coef_obj = request.env['of.calculation.fuel.coef']
         zip_better_obj = request.env['res.better.zip']
 
+        if button_pressed:
+            request.env['of.calculation.statistics'].sudo().add_button_click(button_pressed)
         if button_pressed == 'reload':
             self._cleanup_session()
         heat_loss_id = request.session.get('heat_loss_id')

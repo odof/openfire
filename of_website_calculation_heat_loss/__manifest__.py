@@ -22,6 +22,7 @@ Formulaire de calcul de déperdition de chaleur pour le site web
         'templates/assets.xml',
         'templates/heat_loss_calculation_form_templates.xml',
         'views/of_calculation_heat_loss_views.xml',
+        'views/of_calculation_statistics_views.xml',
     ],
     'installable': True,
     'application': False,
