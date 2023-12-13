@@ -106,6 +106,18 @@
         </field>
     </record>
 
+    <record id="view_sale_quote_template_form2" model="ir.ui.view">
+        <field name="name">sale.quote.template.form2</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="view_sale_quote_template_form"/>
+        <field name="type">form</field>
+        <field name="active" eval="False"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[1]/group/field[1]" position="before">
+                <field name="of_company_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
 
     <!-- Configuration modèle de devis pour les sections avancées -->
     <record id="of_sale_quote_template_view_sale_quote_template_form" model="ir.ui.view">

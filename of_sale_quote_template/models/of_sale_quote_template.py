@@ -34,6 +34,8 @@ class SaleQuoteTemplate(models.Model):
     of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
     of_sale_quote_tmpl_activity_ids = fields.One2many(
         comodel_name='of.sale.quote.tmpl.activity', inverse_name='template_id', string='Activities')
+    of_company_ids = fields.Many2many(comodel_name='res.company', relation='res_company_sale_quote_template_rel',
+                                      column1='sale_quote_tmpl_id', column2='company_id', string=u"Société(s) autorisée(s)")
 
     @api.multi
     def copy(self, default=None):

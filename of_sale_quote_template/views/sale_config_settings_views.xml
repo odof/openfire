@@ -9,6 +9,11 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@id='group_of_order_line_option']" position="after">
                 <field name="of_quote_template" widget="radio"/>
+                <label for="of_companies_ok"/>
+                <div>
+                    <field name="of_companies_ok"/>
+                    <span>Définir les sociétés autorisées dans les modèles de devis</span>
+                </div>
                 <label for="group_of_advanced_sale_layout_category"/>
                 <div name="group_of_advanced_sale_layout_category">
                     <field name="group_of_advanced_sale_layout_category" class="oe_inline"/>
