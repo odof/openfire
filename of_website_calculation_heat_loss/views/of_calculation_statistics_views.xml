@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calculation_statistics_view_tree" model="ir.ui.view">
+        <field name="name">of.calculation.statistics.view.tree</field>
+        <field name="model">of.calculation.statistics</field>
+        <field name="arch" type="xml">
+            <tree create="false" delete="false" edit="false">
+                <field name="date"/>
+                <field name="button_reload"/>
+                <field name="button_validate"/>
+                <field name="button_mail"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_calculation_statistics_view_graph" model="ir.ui.view">
+        <field name="name">of.calculation.statistics.view.graph</field>
+        <field name="model">of.calculation.statistics</field>
+        <field name="arch" type="xml">
+            <graph string="Statistiques">
+                <field name="date"/>
+                <field name="button_reload" type="measure"/>
+                <field name="button_validate" type="measure"/>
+                <field name="button_mail" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="of_calculation_statistics_view_pivot" model="ir.ui.view">
+         <field name="name">of.calculation.statistics.view.pivot</field>
+         <field name="model">of.calculation.statistics</field>
+         <field name="arch" type="xml">
+             <pivot string="Statistiques" disable_linking="True">
+                 <field name="date" interval="month" type="rocolw"/>
+                 <field name="button_reload" type="measure"/>
+                 <field name="button_validate" type="measure"/>
+                 <field name="button_mail" type="measure"/>
+             </pivot>
+         </field>
+    </record>
+
+    <record id="of_calculation_statistics_view_search" model="ir.ui.view">
+        <field name="name">of.calculation.statistics.view.search</field>
+        <field name="model">of.calculation.statistics</field>
+        <field name="arch" type="xml">
+            <search>
+                <group>
+                    <field name="date"/>
+                </group>
+                <newline/>
+                <group expand="0" string="Group By..." name="group_by">
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_calculation_statistics_action" model="ir.actions.act_window">
+        <field name="name">Statistiques</field>
+        <field name="res_model">of.calculation.statistics</field>
+        <field name="view_mode">tree,graph,pivot</field>
+        <field name="search_view_id" ref="of_website_calculation_heat_loss.of_calculation_statistics_view_search"/>
+    </record>
+
+    <menuitem name="Statistiques" id="of_calculation_statistics_menu" action="of_calculation_statistics_action" parent="of_calculation.of_calculation_menu" sequence="90"/>
+
+
+</odoo>
