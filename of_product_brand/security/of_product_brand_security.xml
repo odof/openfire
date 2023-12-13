@@ -2,10 +2,11 @@
 
 <odoo noupdate="1">
 
+    <!-- Marques & produits non modifiables -->
     <record id="brand_product_rule_internal_user" model="ir.rule">
         <field name="name">Restriction de marque pour les utilisateurs</field>
         <field ref="model_of_product_brand" name="model_id"/>
-        <field name="domain_force">[('id', 'not in', user.of_brand_ids.ids)]</field>
+        <field name="domain_force">[('id', 'not in', user.of_readonly_brand_ids.ids)]</field>
         <field eval="1" name="global"/>
         <field name="perm_read" eval="False"/>
         <field name="perm_write" eval="True"/>
@@ -16,7 +17,7 @@
     <record id="product_product_rule_internal_user" model="ir.rule">
         <field name="name">Restriction d'articles pour les utilisateurs</field>
         <field ref="model_product_product" name="model_id"/>
-        <field name="domain_force">[('brand_id', 'not in', user.of_brand_ids.ids)]</field>
+        <field name="domain_force">[('brand_id', 'not in', user.of_readonly_brand_ids.ids)]</field>
         <field eval="1" name="global"/>
         <field name="perm_read" eval="False"/>
         <field name="perm_write" eval="True"/>
@@ -27,12 +28,44 @@
     <record id="product_template_rule_internal_user" model="ir.rule">
         <field name="name">Restriction de modèle d'articles pour les utilisateurs</field>
         <field ref="model_product_template" name="model_id"/>
-        <field name="domain_force">[('brand_id', 'not in', user.of_brand_ids.ids)]</field>
+        <field name="domain_force">[('brand_id', 'not in', user.of_readonly_brand_ids.ids)]</field>
         <field eval="1" name="global"/>
         <field name="perm_read" eval="False"/>
         <field name="perm_write" eval="True"/>
         <field name="perm_create" eval="True"/>
         <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Marques & produits non autorisés -->
+    <record id="restricted_access_brand_product_rule_internal_user" model="ir.rule">
+        <field name="name">Restriction d'accès aux marques pour les utilisateurs</field>
+        <field ref="model_of_product_brand" name="model_id"/>
+        <field name="domain_force">[('id', 'not in', user.of_restricted_brand_ids.ids)]</field>
+        <field eval="1" name="global"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="restricted_access_product_product_rule_internal_user" model="ir.rule">
+        <field name="name">Restriction d'accès aux articles pour les utilisateurs</field>
+        <field ref="model_product_product" name="model_id"/>
+        <field name="domain_force">[('brand_id', 'not in', user.of_restricted_brand_ids.ids)]</field>
+        <field eval="1" name="global"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="restricted_access_product_template_rule_internal_user" model="ir.rule">
+        <field name="name">Restriction d'accès aux modèles des articles pour les utilisateurs</field>
+        <field ref="model_product_template" name="model_id"/>
+        <field name="domain_force">[('brand_id', 'not in', user.of_restricted_brand_ids.ids)]</field>
+        <field eval="1" name="global"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
     </record>
 
 </odoo>

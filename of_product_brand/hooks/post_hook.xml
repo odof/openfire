@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.product.brand.hook" name="_post_update_hook_v10_0_1_1_0"/>
+
+</odoo>

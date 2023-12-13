@@ -370,7 +370,13 @@ class AccountInvoiceLine(models.Model):
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    of_brand_ids = fields.Many2many(
-        'of.product.brand',
+    of_restricted_brand_ids = fields.Many2many(
+        comodel_name='of.product.brand', column1='user_id', column2='brand_id',
+        relation='of_product_brand_res_users_rel2',
         string=u"Marques non autorisées",
+        help=u"Marques non visibles par l'utilisateur")
+    of_readonly_brand_ids = fields.Many2many(
+        comodel_name='of.product.brand', column1='res_users_id', column2='of_product_brand_id',
+        relation='of_product_brand_res_users_rel',
+        string=u"Marques non modifiables",
         help=u"Marques de produits non autorisées pour les utilisateurs assignés")
