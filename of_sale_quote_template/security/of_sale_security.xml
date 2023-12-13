@@ -8,5 +8,17 @@
             <field name="comment">Ajoute l'onglet Sections sur les devis</field>
         </record>
 
+        <record id="of_restrict_access_of_sale_quote_template_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux modèles de devis</field>
+            <field name="model_id" ref="of_sale_quote_template.model_sale_quote_template"/>
+            <field name="domain_force">['|', ('of_company_ids', 'in', user.company_ids.ids), ('of_company_ids', '=', False)]</field>
+            <field eval="1" name="global"/>
+            <field name="active" eval="False"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
     </data>
 </openerp>
