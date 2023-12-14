@@ -742,6 +742,7 @@ class InventoryLine(models.Model):
         """
         if not self.product_id:
             return [0.0, 0.0]
+        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
         in_move_request = """
             SELECT  SQ.qty                      AS quantity
             ,       SQ.cost                     AS cost
@@ -761,7 +762,7 @@ class InventoryLine(models.Model):
             AND     SL1.usage                   IN ('internal', 'transit')
             AND     SL1.id                      != SL2.id
             AND     SM.date                     <= %s
-            AND     SL1.id                      = %s
+            AND     SL1.id                      IN %s
             AND     PP.id                       = %s
         """
         out_move_request = """
@@ -783,7 +784,7 @@ class InventoryLine(models.Model):
             AND     SL2.usage                   IN ('internal', 'transit')
             AND     SL1.id                      != SL2.id
             AND     SM.date                     <= %s
-            AND     SL2.id                      = %s
+            AND     SL2.id                      IN %s
             AND     PP.id                       = %s
         """
 
@@ -819,8 +820,8 @@ class InventoryLine(models.Model):
                         %s
                         )                       AS FOO
             """ % (in_move_request, out_move_request),
-            (self.inventory_id.date, self.location_id.id, self.product_id.id,
-             self.inventory_id.date, self.location_id.id, self.product_id.id,))
+            (self.inventory_id.date, tuple(locations.ids), self.product_id.id,
+             self.inventory_id.date, tuple(locations.ids), self.product_id.id,))
         return self.env.cr.fetchone()
 
     def _get_quants(self):
