@@ -189,12 +189,13 @@ class SaleOrderLine(models.Model):
 
                 if moves:
                     to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
-                    if to_process_moves:
+                    if to_process_moves.mapped('picking_id'):
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(to_process_moves[0].date_expected))
-                    else:
+                            fields.Date.from_string(
+                                to_process_moves.mapped('picking_id').sorted('min_date')[0].min_date))
+                    elif moves.mapped('picking_id'):
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(moves[-1].date_expected))
+                            fields.Date.from_string(moves.mapped('picking_id').sorted('min_date')[-1].min_date))
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
     def _compute_of_stock_moves_state(self):
