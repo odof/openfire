@@ -22,6 +22,7 @@ Module de factures :
         'report/of_invoice_report_templates.xml',
         'views/of_account_invoice_report_views.xml',
         'views/report_overdue.xml',
+        'views/account_invoice_views.xml',
         'security/ir.model.access.csv'
     ],
     'installable': True,

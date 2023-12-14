@@ -868,6 +868,10 @@ class SaleOrder(models.Model):
                         'of_order_id': order_line.order_id.id
                     })
 
+        # On calcule l'échéancier des factures générées
+        for inv in invoices:
+            inv.of_echeance_line_ids = inv._of_compute_echeances()
+
         return invoice_ids
 
     @api.multi

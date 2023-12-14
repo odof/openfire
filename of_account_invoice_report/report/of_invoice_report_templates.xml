@@ -10,6 +10,8 @@
         <t t-set="pdf_email" t-value="o.pdf_afficher_email()"/>
         <t t-set="pdf_mention_legale" t-value="o.pdf_mention_legale()"/>
         <t t-set="pdf_masquer_commercial" t-value="o.pdf_masquer_commercial()"/>
+        <t t-set="pdf_pastille_payment_term" t-value="o.pdf_pastille_payment_term()"/>
+        <t t-set="pdf_payment_schedule" t-value="o.pdf_payment_schedule()"/>
         <t t-set="client_info_pastille" t-value="(pdf_telephone &gt; 1 and o.partner_id.phone) or (pdf_mobile &gt; 1 and o.partner_id.mobile) or (pdf_fax &gt; 1 and o.partner_id.fax) or (pdf_email &gt; 1 and o.partner_id.email)"/>
         <!--####################
             La vue d'origine est entièrement réécrite ici.
@@ -92,6 +94,11 @@
                         <p t-field="o.reference"/>
                     </div>
                     <div name="reference" t-if="o.reference and o.type == 'in_invoice'" style="display: table-cell; width: 4px;"/>
+                    <div name="payment_term" t-if="pdf_pastille_payment_term and o.payment_term_id" style="padding: 8px 16px 4px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <strong>Conditions de règlement&amp;nbsp;:</strong>
+                        <p t-field="o.payment_term_id"/>
+                    </div>
+                    <div t-if="pdf_pastille_payment_term and o.payment_term_id" style="display: table-cell; width: 4px;"/>
                 </div>
             </div>
             </div>
@@ -169,6 +176,29 @@
                                 </td>
                             </tr>
                         </t>
+                    </table>
+                </div>
+            </div>
+            <div class="row" style="page-break-inside:avoid;" name="echeances" t-if="o.of_echeance_line_ids">
+                <div class="col-xs-6" t-if="pdf_payment_schedule" string="Échéances">
+                    <t t-set="show_ech_name" t-value="bool(o.of_echeance_line_ids.filtered('date'))"/>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Vos échéances</th>
+                                <th t-if="show_ech_name">Date</th>
+                                <th class="text-right">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.of_echeance_line_ids" t-as="e">
+                                <td><span t-field="e.name"/></td>
+                                <td t-if="show_ech_name"><span t-field="e.date"/></td>
+                                <td class="text-right">
+                                    <span t-field="e.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

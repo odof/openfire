@@ -105,6 +105,16 @@
                     <field name="pdf_masquer_pastille_commercial" class="oe_inline"/>
                     <span>NE PAS afficher dans les rapports PDF</span>
                 </div>
+                <label for="of_pdf_pastille_payment_term"/>
+                <div name="of_pdf_pastille_payment_term">
+                    <field name="of_pdf_pastille_payment_term" class="oe_inline"/>
+                    <span>Afficher dans les rapports PDF</span>
+                </div>
+                <label for="of_payment_schedule"/>
+                <div name="of_payment_schedule">
+                    <field name="of_payment_schedule" class="oe_inline"/>
+                    <span>Afficher dans les rapports PDF</span>
+                </div>
                 <field name="pdf_mention_legale"/>
             </xpath>
         </field>
