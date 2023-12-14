@@ -486,6 +486,34 @@
         </field>
     </record>
 
+ <!--###################################################______Vue form 2 : Restriction de création / édition de quelques modèles liées au RDV______###################################################-->
+    <record id="of_planning_sales_representatives_responsible" model="ir.ui.view">
+        <field name="name">of.planning.intervention.sales.representative.form.view</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning_intervention_view_form"/>
+        <field name="groups_id" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='template_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='service_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tag_ids']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='equipe_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='type_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
 <!--###################################################______Vue tree______###################################################-->
 
     <record id="of_planning_intervention_view_tree" model="ir.ui.view" >

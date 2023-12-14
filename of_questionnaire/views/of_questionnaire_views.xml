@@ -477,6 +477,18 @@
         </field>
     </record>
 
+    <record id="of_planning_questionnaire_sales_representatives_responsible" model="ir.ui.view">
+        <field name="name">of.planning.intervention.sales.representative.form.view2</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_questionnaire.of_questionnaire_of_planning_intervention_view_form"/>
+        <field name="groups_id" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='questionnaire_id']" position="attributes">
+                <attribute name="options">{'no_create':True, 'no_edit':True, 'no_open':True}</attribute>
+            </xpath>
+        </field>
+    </record>
+
 <!-- *************************** Parc installé ***************************-->
 
     <record id="of_parc_installe_question_view_form" model="ir.ui.view">
