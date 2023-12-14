@@ -42,16 +42,28 @@ Puissance nominale : ${object.of_puissance_nom} kW
 Rendement : ${object.of_rendement} %
 % endif
 % if object.of_emission_co:
-Émission CO : ${object.of_emission_co} % à 13% d'O2
+Émission CO : ${object.of_emission_co} % à 13% d'O₂
+% endif
+% if object.of_emission_co_mg:
+Émission CO : ${object.of_emission_co_mg} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_emission_poussiere:
-Émission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+Émission de poussière : ${object.of_emission_poussiere} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_emission_nox:
-Émission de NOx : ${object.of_emission_nox} mg/Nm3 à 13% d'O2
+Émission de NOx : ${object.of_emission_nox} mg/Nm³ à 13% d'O₂
+% endif
+% if object.of_cog_emission:
+Émission de COG : ${object.of_cog_emission} mg/Nm³ à 13% d'O₂
+% endif
+% if object.of_cov_emission:
+Émission de COV : ${object.of_cov_emission} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
+% endif
+% if object.of_efficacite_saison:
+Efficacité énergétique saisonnière : ${object.of_efficacite_saison} %
 % endif
 % if object.of_fonds_air_bois:
 Éligible Fonds Air Bois
@@ -66,12 +78,12 @@ ${'\\n' + object.description_sale}
     of_eco_label = fields.Char(string=u"Éco-label")
     of_puissance_nom = fields.Char(string=u"Puissance nominale", help=u"Exprimé en kW")
     of_rendement = fields.Char(string=u"Rendement", help=u"Exprimé en %")
-    of_emission_co = fields.Char(string=u"Émission de CO (%)", help=u"Exprimé en % à 13% d'O2")
-    of_emission_co_mg = fields.Char(string=u"Émission de CO (mg/m³)")
-    of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm3 à 13% d'O2")
-    of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm3 à 13% d'O2")
-    of_cog_emission = fields.Char(string=u"Émission de COG", help=u"Exprimé en mg/m3")
-    of_cov_emission = fields.Char(string=u"Émission de COV", help=u"Exprimé en µg/m3")
+    of_emission_co = fields.Char(string=u"Émission de CO (%)", help=u"Exprimé en % à 13% d'O₂")
+    of_emission_co_mg = fields.Char(string=u"Émission de CO (mg/Nm³)", help=u"Exprimé en mg/Nm³ à 13% d'O₂")
+    of_emission_poussiere = fields.Char(string=u"Émission de poussière", help=u"Exprimé en mg/Nm³ à 13% d'O₂")
+    of_emission_nox = fields.Char(string=u"Émission de NOx", help=u"Exprimé en mg/Nm³ à 13% d'O₂")
+    of_cog_emission = fields.Char(string=u"Émission de COG", help=u"Exprimé en mg/Nm³ à 13% d'O₂")
+    of_cov_emission = fields.Char(string=u"Émission de COV", help=u"Exprimé en mg/Nm³ à 13% d'O₂")
     of_indice_i = fields.Char(string=u"Indice I")
     of_efficacite_saison = fields.Char(string=u"% Efficacité énergétique saisonnière")
     of_fonds_air_bois = fields.Boolean(string=u"Éligible Fonds Air Bois ?")
@@ -79,6 +91,59 @@ ${'\\n' + object.description_sale}
 
 class OfProductBrand(models.Model):
     _inherit = 'of.product.brand'
+
+    @api.model
+    def _auto_init(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_product_chem')])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < "10.0.4.3.0"
+        if actions_todo:
+            brands = self.search([('description_sale', '!=', False)])
+            # Pour chaque marque on essaye de modifier la description pour corriger les différentes unités
+            for brand in brands:
+                descr = brand.description_sale
+                # O2 => O₂
+                descr = descr.replace(u"O2", u"O₂")
+                # mg/m³ => mg/Nm³
+                descr = descr.replace(u"mg/m³", u"mg/Nm³")
+                # mg/m3 => mg/Nm³
+                descr = descr.replace(u"mg/m3", u"mg/Nm³")
+                # mg/Nm3 => mg/Nm³
+                descr = descr.replace(u"mg/Nm3", u"mg/Nm³")
+                # Émission CO
+                starting_index = descr.find(u"Émission CO")
+                if starting_index > 0:
+                    found_index = descr.find(u"mg/Nm³", starting_index)
+                    verify_index = descr.find(u"mg/Nm³ à", starting_index)
+                    if found_index > starting_index and found_index != verify_index:
+                        new_str = u"mg/Nm³ à 13% d'O₂"
+                        special_index = descr.find(u"%s", starting_index)
+                        if starting_index < special_index < found_index:
+                            new_str = u"mg/Nm³ à 13%% d'O₂"
+                        descr = descr[:found_index] + new_str + descr[found_index+6:]
+                # COG
+                starting_index = descr.find(u"COG")
+                if starting_index > 0:
+                    found_index = descr.find(u"mg/Nm³", starting_index)
+                    verify_index = descr.find(u"mg/Nm³ à", starting_index)
+                    if found_index > starting_index and found_index != verify_index:
+                        new_str = u"mg/Nm³ à 13% d'O₂"
+                        special_index = descr.find(u"%s", starting_index)
+                        if starting_index < special_index < found_index:
+                            new_str = u"mg/Nm³ à 13%% d'O₂"
+                        descr = descr[:found_index] + new_str + descr[found_index+6:]
+                # COV
+                starting_index = descr.find(u"COV")
+                if starting_index > 0:
+                    found_index = descr.find(u"mg/Nm³", starting_index)
+                    verify_index = descr.find(u"mg/Nm³ à", starting_index)
+                    if found_index > starting_index and found_index != verify_index:
+                        new_str = u"mg/Nm³ à 13% d'O₂"
+                        special_index = descr.find(u"%s", starting_index)
+                        if starting_index < special_index < found_index:
+                            new_str = u"mg/Nm³ à 13%% d'O₂"
+                        descr = descr[:found_index] + new_str + descr[found_index+6:]
+                brand.description_sale = descr
+        return super(OfProductBrand, self)._auto_init()
 
     @api.model
     def _default_description_sale(self):
@@ -101,22 +166,22 @@ Puissance nominale : ${object.of_puissance_nom} kW
 Rendement : ${object.of_rendement} %
 % endif
 % if object.of_emission_co:
-Émission CO : ${object.of_emission_co} % à 13% d'O2
+Émission CO : ${object.of_emission_co} % à 13% d'O₂
 % endif
 % if object.of_emission_co_mg:
-Émission CO : ${object.of_emission_co_mg} mg/m³
+Émission CO : ${object.of_emission_co_mg} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_emission_poussiere:
-Émission de poussière : ${object.of_emission_poussiere} mg/Nm3 à 13% d'O2
+Émission de poussière : ${object.of_emission_poussiere} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_emission_nox:
-Émission de NOx : ${object.of_emission_nox} mg/Nm3 à 13% d'O2
+Émission de NOx : ${object.of_emission_nox} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_cog_emission:
-Émission de COG : ${object.of_cog_emission} mg/m3
+Émission de COG : ${object.of_cog_emission} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_cov_emission:
-Émission de COV : ${object.of_cov_emission} mg/m3
+Émission de COV : ${object.of_cov_emission} mg/Nm³ à 13% d'O₂
 % endif
 % if object.of_indice_i:
 Indice I : ${object.of_indice_i}
