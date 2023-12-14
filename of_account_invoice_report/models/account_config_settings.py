@@ -83,6 +83,8 @@ class AccountConfigSettings(models.TransientModel):
         string=u"(OF) Masquer pastille commercial", required=True, default=False,
         help=u"Masquer la pastille commercial dans les rapports PDF ?"
     )
+    of_pdf_pastille_payment_term = fields.Boolean(string=u"(OF) Afficher pastille conditions de règlements")
+    of_payment_schedule = fields.Boolean(string=u"(OF) Afficher l'échéancier")
 
     @api.multi
     def set_pdf_adresse_nom_parent_defaults(self):
@@ -136,3 +138,13 @@ class AccountConfigSettings(models.TransientModel):
     def set_pdf_masquer_pastille_commercial(self):
         return self.env['ir.values'].sudo().set_default(
             'account.config.settings', 'pdf_masquer_pastille_commercial', self.pdf_masquer_pastille_commercial)
+
+    @api.multi
+    def set_of_pdf_pastille_payment_term(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'of_pdf_pastille_payment_term', self.of_pdf_pastille_payment_term)
+
+    @api.multi
+    def set_of_payment_schedule(self):
+        return self.env['ir.values'].sudo().set_default(
+            'account.config.settings', 'of_payment_schedule', self.of_payment_schedule)

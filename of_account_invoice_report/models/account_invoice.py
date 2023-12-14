@@ -8,12 +8,43 @@ from odoo.tools.float_utils import float_compare
 from odoo.tools.misc import formatLang
 
 
-
 class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     # Note : les fonctions de cette classe qui possèdent [IMPRESSION] dans leur description
     # ne sont appelées que lors de l'impression.
+
+    of_echeance_line_ids = fields.One2many(
+        comodel_name='of.account.echeance', inverse_name='invoice_id', string=u"Échéances")
+    of_echeances_modified = fields.Boolean(
+        string=u"Les échéances ont besoin d'être recalculées", compute='_compute_of_echeances_modified')
+
+    @api.depends('of_echeance_line_ids', 'amount_total')
+    def _compute_of_echeances_modified(self):
+        for invoice in self:
+            invoice.of_echeances_modified = bool(
+                invoice.of_echeance_line_ids
+                and float_compare(
+                    invoice.amount_total,
+                    sum(invoice.of_echeance_line_ids.mapped('amount')),
+                    precision_rounding=.01)
+            )
+
+    @api.onchange('payment_term_id')
+    def _onchange_payment_term_id(self):
+        if self.payment_term_id and self.state not in ('open', 'paid'):
+            self.of_echeance_line_ids = self._of_compute_echeances()
+
+    @api.multi
+    def button_dummy(self):
+        return True
+
+    @api.multi
+    def write(self, vals):
+        res = super(AccountInvoice, self).write(vals)
+        self.filtered(lambda r: r.of_echeances_modified and r.state not in ('open', 'paid'))\
+            .of_recompute_echeance_last()
+        return res
 
     def pdf_afficher_nom_parent(self):
         return self.env['ir.values'].get_default('account.config.settings', 'pdf_adresse_nom_parent')
@@ -268,3 +299,77 @@ class AccountInvoice(models.Model):
         self.ensure_one()
         return [(t.tax_id.description, t.base, t.amount)
                 for t in self.tax_line_ids]
+
+    @api.multi
+    def _of_compute_echeances(self):
+        self.ensure_one()
+        if not self.payment_term_id or self.state in ('open', 'paid'):
+            return False
+        dates = {
+            'invoice': self.date_invoice,
+            'default': False,
+        }
+        amounts = self.payment_term_id.compute(self.amount_total, dates=dates)[0]
+
+        amount_total = self.amount_total
+        pct_left = 100.0
+        pct = 0
+        result = [(5, )]
+        for term, (date, amount) in itertools.izip(self.payment_term_id.line_ids, amounts):
+            pct_left -= pct
+            pct = round(100 * amount / amount_total, 2) if amount_total else 0
+
+            line_vals = {
+                'name': term.name,
+                'percent': pct,
+                'amount': amount,
+                'date': date,
+            }
+            result.append((0, 0, line_vals))
+        if len(result) > 1:
+            result[-1][2]['percent'] = pct_left
+        return result
+
+    @api.multi
+    def of_recompute_echeance_last(self):
+        for invoice in self:
+            if not invoice.of_echeance_line_ids or invoice.state in ('open', 'paid'):
+                continue
+
+            percent = 100.0
+            amount = invoice.amount_total
+            for echeance in invoice.of_echeance_line_ids:
+                if echeance.last:
+                    echeance.write({
+                        'percent': percent,
+                        'amount': amount,
+                    })
+                else:
+                    percent -= echeance.percent
+                    amount -= echeance.amount
+
+    @api.multi
+    def of_update_dates_echeancier(self):
+        for invoice in self:
+            if not invoice.payment_term_id or invoice.state in ('open', 'paid'):
+                continue
+
+            dates = {
+                'invoice': self.date_invoice,
+                'default': False,
+            }
+            force_dates = [echeance.date for echeance in invoice.of_echeance_line_ids]
+            echeances = invoice.payment_term_id.compute(invoice.amount_total, dates=dates, force_dates=force_dates)[0]
+
+            if len(echeances) != len(invoice.of_echeance_line_ids):
+                continue
+
+            for echeance, ech_calc in itertools.izip(invoice.of_echeance_line_ids, echeances):
+                if ech_calc[0] and not echeance.date:
+                    echeance.date = ech_calc[0]
+
+    @api.multi
+    def get_totlines(self, company_currency, total):
+        if self.of_echeance_line_ids:
+            return self.of_echeance_line_ids._get_totlines(self.date_invoice)
+        return super(AccountInvoice, self).get_totlines(company_currency, total)

@@ -1,3 +1,4 @@
 "id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
 "access_of_invoice_report_total_group_user","of.invoice.report.total.group","model_of_invoice_report_total_group","base.group_user",1,0,0,0
 "access_of_invoice_report_total_group_manager","of.invoice.report.total.group","model_of_invoice_report_total_group","account.group_account_manager",1,1,1,1
+"access_of_account_echeance_user","of.account.echeance.user","model_of_account_echeance","base.group_user",1,1,1,1
