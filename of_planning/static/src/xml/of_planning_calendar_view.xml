@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+
+    <!-- Info-bulle d'évènement (RDV d'intervention) -->
+    <t t-extend="CalendarView.record.tooltip">  <!-- variables données par le javascript: record -->
+        <t t-jquery="t[t-foreach='attendees']" t-operation="after">
+            <t t-if="record.flexible">
+                <i class="fa fa-exchange" t-attf-style="float: right; margin-left: 2px; margin-top: -3px;"/>
+            </t>
+        </t>
+    </t>
+
+</template>

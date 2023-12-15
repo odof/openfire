@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!--  -->
+    <record id="of_planning_default_intervention_template" model="of.planning.intervention.template">
+        <field name="name">Modèle par défaut</field>
+        <field name="active">True</field>
+        <field name="code">DEFAULT</field>
+
+        <!-- Fiche d'intervention -->
+        <field name="fi_default">False</field>
+        <field name="fi_title">Fiche d'intervention</field>
+        <!-- Rapport d'intervention -->
+        <field name="ri_default">False</field>
+        <field name="ri_title">Rapport d'intervention</field>
+
+    </record>
+
+    <!-- Cron journalier d'envoi du planning du lendemain -->
+    <record id="of_cron_planning_daily" model="ir.cron">
+        <field name="name">Envoi du planning du lendemain</field>
+        <field name="model">hr.employee</field>
+        <field name="function">send_next_day_planning</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall">2021-10-01 21:00:00</field>
+        <field name="numbercall">-1</field>
+        <field name="doall">true</field>
+        <field name="active">true</field>
+        <field name="args">()</field>
+    </record>
+
+    <!--Email template -->
+    <record id="email_template_planning_jour_demain" model="mail.template">
+        <field name="name">Planning de demain - Envoyer par Email</field>
+        <field name="partner_to">${object.user_id.partner_id.id}</field>
+        <field name="subject">${object.name} : Votre planning pour demain (${format_date((datetime.datetime.today().date() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))})</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="lang">${object.user_id.partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.name},
+
+Veuillez trouver ci-joint le planning de votre journée du ${format_date((datetime.datetime.today().date() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))}.
+
+Cordialement,
+</p>
+]]></field>
+    </record>
+
+    <record id="email_template_of_planning_intervention_rapport_intervention" model="mail.template">
+        <field name="name">RDV - Rapport d'intervention</field>
+        <field name="partner_to">${object.address_id.email and object.address_id.id or object.partner_id.id}</field>
+        <field name="subject">Votre rapport d'intervention du ${format_date(object.date_date)}</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.address_id.lang}</field>
+        <field name="report_template" ref="of_planning.of_planning_raport_intervention_report"/>
+        <field name="report_name">${("Rapport d'intervention du %s" % format_date(object.date_date)).replace("/","_")}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.address_id.name or ''},
+<br/><br/>
+Veuillez trouver ci-joint le rapport de l'intervention effectuée le ${format_date(object.date_date)}.
+</p>
+]]></field>
+    </record>
+
+</odoo>

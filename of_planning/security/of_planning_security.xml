@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- ################# Création des catégories de droits planning intervention ################# -->
+
+        <record model="ir.module.category" id="of_planning_intervention_category">
+            <field name="name">OF Interventions</field>
+            <field name="description">Définit les droits d'accès au planning d'intervention OpenFire.</field>
+            <field name="sequence">95</field>
+        </record>
+
+        <!-- ################# Création des groupes de droits planning intervention ################# -->
+
+        <!-- Active la flexibilité des interventions -->
+        <record id="of_group_planning_intervention_flexibility" model="res.groups">
+            <field name="name">Flexibilité des interventions</field>
+        </record>
+
+        <!-- Droits de modification planning intervention -->
+        <!-- Voir et modifier mes interventions seulement-->
+        <record id="group_planning_intervention_access" model="res.groups">
+            <field name="name">Accéder à mes interventions</field>
+            <field name="category_id" ref="of_planning_intervention_category"/>
+        </record>
+
+        <!-- Voir toutes les interventions, modifier mes interventions seulement-->
+        <record id="group_planning_intervention_modification" model="res.groups">
+            <field name="name">Gérer mes interventions</field>
+            <field name="category_id" ref="of_planning_intervention_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_planning_intervention_access'))]"/>
+        </record>
+
+        <!-- Responsable -->
+        <record id="group_planning_intervention_responsible" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="of_planning_intervention_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_planning_intervention_modification'))]"/>
+        </record>
+
+        <!-- Gestionnaire -->
+        <record id="group_planning_intervention_manager" model="res.groups">
+            <field name="name">Gestionnaire</field>
+            <field name="category_id" ref="of_planning_intervention_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_planning_intervention_responsible'))]"/>
+        </record>
+
+        <!-- Restreindre la possibilité de configurer les RDVS pour les commerciaux -->
+        <record id="group_sales_representatives_responsible" model="res.groups">
+            <field name="name">(OF) Bloquer l'accès à la configuration des RDVs</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+            <field name="comment">Restreindre l'accès à la configuration des RDVs</field>
+        </record>
+
+        <!-- Règles droit lecture -->
+        <record id="of_planning_intervention_lecture_siens_rule" model="ir.rule">
+            <field name="name">Lire propres rendez-vous</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_access'))]"/>
+        </record>
+        <record id="of_planning_intervention_lecture_tout_rule" model="ir.rule">
+            <field name="name">Lire tous les rendez-vous</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_modification'))]"/>
+        </record>
+
+        <!-- Règles droit modification -->
+        <record id="of_planning_intervention_group_access_rule" model="ir.rule">
+            <field name="name">Modifier propres rendez-vous</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_access'))]"/>
+        </record>
+        <record id="of_planning_intervention_group_manage_my_interventions_rule" model="ir.rule">
+            <field name="name">Modifier/créer propres rendez-vous</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[('employee_ids.user_id','=',user.id)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_modification'))]"/>
+        </record>
+        <record id="of_planning_intervention_modification_tout_rule" model="ir.rule">
+            <field name="name">Modifier tous les rendez-vous</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_responsible'))]"/>
+        </record>
+
+        <!-- Deletion access rules -->
+        <record id="of_planning_intervention_done_deletion" model="ir.rule">
+            <field name="name">Suppression RDV réalisé</field>
+            <field ref="model_of_planning_intervention" name="model_id"/>
+            <field name="domain_force">[('state', '!=', 'done')]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+        </record>
+
+        <!-- Règles d'enregistrement : Restriction d'accès aux modèles liés aux RDVs -->
+        <record id="of_restrict_access_planning_team_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux équipes</field>
+            <field name="model_id" ref="of_planning.model_of_planning_equipe"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_planning_tasks_categ_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux catégories des tâches</field>
+            <field name="model_id" ref="of_planning.model_of_planning_tache_categ"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_planning_tasks_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux tâches</field>
+            <field name="model_id" ref="of_planning.model_of_planning_tache"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_planning_reason_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux erreurs des RDVs</field>
+            <field name="model_id" ref="of_planning.model_of_planning_intervention_raison"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_planning_tag_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux étiquettes d'interventions</field>
+            <field name="model_id" ref="of_planning.model_of_planning_tag"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_planning_template_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux modèles d'interventions</field>
+            <field name="model_id" ref="of_planning.model_of_planning_intervention_template"/>
+            <field name="groups" eval="[(4, ref('group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+        <record id="of_restrict_access_hr_employee_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux employés</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="of_restrict_access_planning_mail_templates_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux modèles de courriers</field>
+            <field name="model_id" ref="of_gesdoc.model_of_mail_template"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="of_restrict_access_planning_sectors_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux secteurs</field>
+            <field name="model_id" ref="of_base_location.model_of_secteur"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <record id="of_restrict_access_time_slots_sales_representative_rule" model="ir.rule">
+            <field name="name">(OF) Restriction d'accès aux créneaux horaires</field>
+            <field name="model_id" ref="of_calendar.model_of_horaire_creneau"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
+            <field name="domain_force">[(0,'=',1)]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
+        <function
+            id="transfer_old_access_rights"
+            model="res.groups"
+            name="_transfer_old_planning_access_rights">
+        </function>
+
+    </data>
+</odoo>
