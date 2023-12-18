@@ -742,7 +742,8 @@ class InventoryLine(models.Model):
         """
         if not self.product_id:
             return [0.0, 0.0]
-        locations = self.env['stock.location'].search([('id', 'child_of', [self.location_id.id])])
+        locations = self.env['stock.location'].with_context(active_test=False).search(
+            [('id', 'child_of', [self.location_id.id])])
         in_move_request = """
             SELECT  SQ.qty                      AS quantity
             ,       SQ.cost                     AS cost
