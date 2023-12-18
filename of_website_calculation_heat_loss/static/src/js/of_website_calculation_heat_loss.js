@@ -11,7 +11,7 @@ odoo.define('of_calculation_heat_loss.calculation_website', function (require) {
 
     $('#iframe_section').each(function () {
         // Filtre des altitudes disponibles par département
-        $('input#partner_zip').on('change', function (event) {
+        $('input#zip_id').on('change', function (event) {
             // Lorsque le code postal est renseigné, on récupère la liste des altitudes possibles
             var zip = this.value;
             var altitude_selector = $('select#altitude_id');

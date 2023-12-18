@@ -25,6 +25,7 @@
                             <div class="o_address_format">
                                 <field name="partner_street" placeholder="Street..." class="o_address_street"/>
                                 <field name="partner_street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="zip_id" placeholder="Complétion ville" class="oe_edit_only"/>
                                 <field name="partner_city" placeholder="City" class="o_address_city"/>
                                 <field name="partner_zip" placeholder="ZIP" class="o_address_zip"/>
                                 <field name="partner_country_id" placeholder="Country" class="o_address_country" options="{'no_open': True, 'no_create': True}"/>

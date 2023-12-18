@@ -26,6 +26,7 @@ class OFCalculationHeatLoss(models.Model):
     partner_city = fields.Char(string=u"Ville du contact", related='partner_id.city')
     partner_street = fields.Char(string=u"Rue du contact", related='partner_id.street')
     partner_street2 = fields.Char(string=u"Rue du contact", related='partner_id.street2')
+    zip_id = fields.Many2one(comodel_name='res.better.zip', string=u"City")
     partner_state_id = fields.Many2one(comodel_name='res.country.state', related='partner_id.state_id', string=u"État")
     partner_country_id = fields.Many2one(comodel_name='res.country', related='partner_id.country_id', string=u"Pays")
     surface = fields.Float(
@@ -173,6 +174,14 @@ class OFCalculationHeatLoss(models.Model):
             self.coef_wood = self.fuel_coef_id.coef
         else:
             self.coef_wood = 1.0
+
+    @api.onchange('zip_id')
+    def onchange_zip_id(self):
+        if self.zip_id:
+            self.partner_zip = self.zip_id.name
+            self.partner_city = self.zip_id.city
+            self.partner_state_id = self.zip_id.state_id
+            self.partner_country_id = self.zip_id.country_id
 
     @api.model
     def create(self, vals):
