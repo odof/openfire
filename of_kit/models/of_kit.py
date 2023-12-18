@@ -310,6 +310,14 @@ class StockPicking(models.Model):
                 self.sale_id = move.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id
                 return
 
+    def _search_sale_id(self, operator, value):
+        moves = self.env['stock.move'].search(
+            [('picking_id', '!=', False),
+             '|', ('procurement_id.sale_line_id.order_id', operator, value),
+                  ('procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id', operator, value)]
+        )
+        return [('id', 'in', moves.mapped('picking_id').ids)]
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
