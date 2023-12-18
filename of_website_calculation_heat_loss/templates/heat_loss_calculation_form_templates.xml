@@ -129,16 +129,22 @@
                             <input class="form-control o_website_form_input" type="text" id="partner_street" name="partner_street" required="required" t-att-value="partner_street"/>
                         </div>
                         <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
-                            <label class="control-label" for="partner_zip">
-                                <span> Code postal </span>
-                            </label>
-                            <input class="form-control o_website_form_input" type="text" id="partner_zip" name="partner_zip" required="required" t-att-value="partner_zip"/>
-                        </div>
-                        <div class="form-group form-field  form-field-char" data-model-field="true" data-optional="true">
-                            <label class="control-label" for="partner_city">
+                            <label class="control-label" for="zip_id">
                                 <span> Ville </span>
                             </label>
-                            <input class="form-control o_website_form_input" type="text" name="partner_city" t-att-value="partner_city"/>
+                            <div t-if="zip_id">
+                                <t t-set="zip_obj" t-value="zip_id.display_name"/>
+                            </div>
+                            <div t-if="not zip_id">
+                                <t t-set="zip_obj" t-value="zip_id"/>
+                            </div>
+                            <input id="zip_id" name="zip_id" type="text" required="required" class="js_website_autocomplete form-control o_website_form_input"
+                                   t-att-value="zip_obj"
+                                   data-query-field="display_name"
+                                   data-display-field="display_name"
+                                   data-value-field="display_name"
+                                   data-limit="10"
+                                   data-model="res.better.zip"/>
                         </div>
                         <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
                             <label class="control-label" for="altitude_id">

@@ -23,9 +23,20 @@ class OFCalculationController(http.Controller):
         construction_type_obj = request.env['of.calculation.construction.type']
         surface_obj = request.env['of.calculation.surface']
         coef_obj = request.env['of.calculation.fuel.coef']
+        zip_better_obj = request.env['res.better.zip']
 
         heat_loss_id = request.session.get('heat_loss_id')
         heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
+
+        if kwargs and kwargs.get("zip_id"):
+            zip_better_obj = zip_better_obj.search(
+                [('display_name', '=', kwargs["zip_id"])])
+            if zip_better_obj:
+                kwargs['zip_id'] = zip_better_obj.id
+                kwargs['display_name'] = zip_better_obj.display_name
+                kwargs['partner_zip'] = zip_better_obj.name
+                kwargs['partner_city'] = zip_better_obj.city
+                kwargs['partner_state_id'] = zip_better_obj.state_id.id
 
         if request.httprequest.method == 'POST':
             if heat_loss:

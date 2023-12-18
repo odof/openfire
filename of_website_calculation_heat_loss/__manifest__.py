@@ -12,6 +12,7 @@ Formulaire de calcul de déperdition de chaleur pour le site web
     'website': "www.openfire.fr",
     'depends': [
         'of_calculation_heat_loss',
+        'website_field_autocomplete',
         'website_form',
         'partner_firstname',
     ],
