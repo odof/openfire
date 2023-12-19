@@ -143,6 +143,7 @@ class OFPlanningIntervention(models.Model):
         if self.service_id:
             self.tache_id = self.service_id.tache_id
             self.address_id = self.service_id.address_id or self.service_id.partner_id
+            self.tag_ids = self.service_id.tag_ids
             if self.service_id.order_id:
                 self.order_id = self.service_id.order_id
             if self.service_id.type_id:
