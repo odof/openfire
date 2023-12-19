@@ -26,8 +26,8 @@ class CrmLead(models.Model):
     of_question_ids = fields.One2many(
         comodel_name='of.survey.question', related='of_survey_id.question_and_page_ids', string="Questions"
     )
-    of_question_answers_ids = fields.One2many(
-        comodel_name='of.survey.question.answers',
+    of_answers_ids = fields.One2many(
+        comodel_name='of.survey.answers',
         inverse_name='lead_id',
         string="Question and Answers",
         compute='_compute_question_answers_ids',
@@ -42,7 +42,7 @@ class CrmLead(models.Model):
 
             for question in lead.of_question_ids:
                 # on recherche si la réponse est la même, si oui, on ne fait rien, sinon on crée
-                question_answers = lead.of_question_answers_ids.filtered(lambda r: r.question_id.id == question.id)
+                question_answers = lead.of_answers_ids.filtered(lambda r: r.question_id.id == question.id)
                 if question.is_page:
                     # on est sur une section
                     answers = ""
@@ -62,20 +62,29 @@ class CrmLead(models.Model):
                         'sequence': question.sequence,
                     }
                     question_answers_ids.append(Command.create(question_answers_value))
-            lead.of_question_answers_ids = question_answers_ids
+            lead.of_answers_ids = question_answers_ids
 
     @api.onchange('of_survey_id')
     def _onchange_of_survey_id(self):
         if self.of_survey_id:
-            self.of_question_answers_ids = False
+            self.of_answers_ids = False
             self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.lead_id = self._origin.id
+            self.of_survey_user_input.res_model = self._name
+            self.of_survey_user_input.res_id = self._origin.id
+            self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
 
-    def open_survey(self):
+    def action_button_open_survey(self):
         # on nettoie les anciennes données
-        self.env['of.survey.user_input'].search([('lead_id', '=', self._origin.id)]).unlink()
+        self.env['of.survey.user_input'].search(
+            [
+                ('res_model', '=', self._name),
+                ('res_id', '=', self._origin.id),
+            ]
+        ).unlink()
         self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-        self.of_survey_user_input.lead_id = self._origin.id
+        self.of_survey_user_input.res_model = self._name
+        self.of_survey_user_input.res_id = self._origin.id
+        self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
         url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
         return {
             'type': 'ir.actions.act_url',

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_print_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.planning.print.wizard.view.form</field>
+        <field name="model">of.planning.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Print Intervention Planning">
+                <group>
+                    <field name="report_type" />
+                    <field name="start_date" />
+                    <field name="stop_date" invisible="1"/>
+                    <field name="lang" invisible="1"/>
+                    <field name="employee_ids" widget="many2many_tags"
+                        attrs="{'invisible': [('report_type','=','general_week')], 'required': [('report_type', '!=', 'general_week')]}" />
+                </group>
+                <footer>
+                    <button string="Print" name="action_button_print" type="object" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_planning_print_wizard" model="ir.actions.act_window">
+        <field name="name">Print interventions</field>
+        <field name="res_model">of.planning.print.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_planning_print_wizard_view_form" />
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_of_planning_print_wizard" name="Print" parent="of_planning.menu_of_planning_intervention" action="action_of_planning_print_wizard" sequence="40"/>
+
+</odoo>

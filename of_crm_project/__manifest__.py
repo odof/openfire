@@ -13,16 +13,8 @@
         'of_survey',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'views/crm_lead_views.xml',
-        'views/of_survey_survey_views.xml',
-        'templates/of_survey_templates.xml',
     ],
-    'assets': {
-        'web.assets_frontend': [
-            'of_crm_project/static/src/js/survey.js',
-        ],
-    },
     'installable': True,
     'application': False,
     'auto_install': False,

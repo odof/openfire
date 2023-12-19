@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Intervention config wizard -->
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Intervention" string="Intervention" data-key="of_planning" data-force-icon="planning_settings">
+                    <!-- Reporting -->
+                    <h2>Intervention report</h2>
+                    <div class="row mt16 o_settings_container" id="of_hide_remaining_balance">
+                        <div class="col-12 col-lg-12 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="of_hide_remaining_balance"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_hide_remaining_balance"/>
+                                <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img" />
+                                <div class="text-muted">
+                                    If checked, the remaining balance will not be displayed in the intervention report.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Interventions -->
+                    <h2>Interventions</h2>
+                    <div class="row mt16 o_settings_container" id="of_company_choice">
+                        <div class="col-xs-12 col-md-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_company_choice"/>
+                                <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img" />
+                                <div class="text-muted">
+                                    During the creation of an intervention, the company of the intervention will be set to the company of the selected field.
+                                </div>
+                                <div class="content-group mt-2">
+                                    <div class="row">
+                                        <field name="of_company_choice"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt16 o_settings_container" id="of_automatic_sectors">
+                        <div class="col-12 col-lg-12 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="of_automatic_sectors"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_automatic_sectors"/>
+                                <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img" />
+                                <div class="text-muted">
+                                    If you check this box, the sectors will be assigned automatically when the contact is created.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt16 o_settings_container" id="of_intervention_use_deliveries">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="group_intervention_use_deliveries"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="group_intervention_use_deliveries"/>
+                                <div class="text-muted">
+                                    Define the use delivery notes in Interventions
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_of_planning_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form" />
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'of_planning', 'bin_size': False}</field>
+    </record>
+
+</odoo>

@@ -68,10 +68,6 @@ class SaleOrder(models.Model):
     of_partner_phone = fields.Char(related='partner_id.phone', string="Customer's phone", readonly=True)
     of_partner_mobile = fields.Char(related='partner_id.mobile', string="Customer's mobile", readonly=True)
     of_partner_email = fields.Char(related='partner_id.email', string="Customer's e-mail", readonly=True)
-    of_intervention_notes = fields.Html(
-        string="Intervention notes",
-        help="These notes are visualized in the intervention planning and printed in the intervention form.",
-    )
 
     # Other helper fields
     of_allow_quote_addition = fields.Boolean(

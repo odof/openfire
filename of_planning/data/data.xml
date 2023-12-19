@@ -1,67 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
-    <!--  -->
+
     <record id="of_planning_default_intervention_template" model="of.planning.intervention.template">
-        <field name="name">Modèle par défaut</field>
-        <field name="active">True</field>
+        <field name="name">Default template</field>
+        <field name="active" eval="True" />
         <field name="code">DEFAULT</field>
 
-        <!-- Fiche d'intervention -->
-        <field name="fi_default">False</field>
-        <field name="fi_title">Fiche d'intervention</field>
-        <!-- Rapport d'intervention -->
-        <field name="ri_default">False</field>
-        <field name="ri_title">Rapport d'intervention</field>
+        <!-- Intervention sheet-->
+        <field name="sheet_use_default" eval="False" />
+        <field name="sheet_title">Intervention sheet</field>
+        <field name="sheet_partner_id" eval="False" />
+        <field name="sheet_date" eval="False" />
+        <field name="sheet_intervention" eval="True" />
+        <field name="sheet_intervention_partner_id" eval="True" />
+        <field name="sheet_intervention_partner_code" eval="True" />
+        <field name="sheet_intervention_task_id" eval="True" />
+        <field name="sheet_intervention_task_description" eval="False" />
+        <field name="sheet_intervention_duration" eval="True" />
+        <field name="sheet_intervention_team_id" eval="False" />
+        <field name="sheet_intervention_employee_ids" eval="True" />
+        <field name="sheet_intervention_company_id" eval="True" />
+        <field name="sheet_intervention_label" eval="True" />
+        <field name="sheet_intervention_address" eval="True" />
+        <field name="sheet_intervention_contact" eval="True" />
+        <field name="sheet_intervention_type" eval="True" />
+        <field name="sheet_intervention_description" eval="True" />
+        <field name="sheet_intervention_internal_description" eval="True" />
+        <field name="sheet_history" eval="True" />
+        <field name="sheet_order" eval="True" />
+        <field name="sheet_order_name" eval="True" />
+        <field name="sheet_order_confirmation_date" eval="True" />
+        <field name="sheet_order_user_id" eval="True" />
+        <field name="sheet_order_inspection_visit_date" eval="True" />
+        <field name="sheet_order_totals" eval="True" />
+        <field name="sheet_order_intervention_notes" eval="True" />
+        <field name="sheet_products" eval="True" />
+        <field name="sheet_pickings" eval="False" />
+        <field name="sheet_invoicing" eval="False" />
+        <field name="sheet_legal" eval="False" />
+        <field name="sheet_minutes" eval="False" />
+        <field name="sheet_minutes_real_dates" eval="True" />
+        <field name="sheet_minutes_real_duration" eval="False" />
+        <field name="sheet_minutes_description" eval="True" />
+        <field name="sheet_photos" eval="False" />
+        <field name="sheet_signature" eval="False" />
+        <field name="sheet_signature_date" eval="False" />
 
-    </record>
-
-    <!-- Cron journalier d'envoi du planning du lendemain -->
-    <record id="of_cron_planning_daily" model="ir.cron">
-        <field name="name">Envoi du planning du lendemain</field>
-        <field name="model">hr.employee</field>
-        <field name="function">send_next_day_planning</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">days</field>
-        <field name="nextcall">2021-10-01 21:00:00</field>
-        <field name="numbercall">-1</field>
-        <field name="doall">true</field>
-        <field name="active">true</field>
-        <field name="args">()</field>
-    </record>
-
-    <!--Email template -->
-    <record id="email_template_planning_jour_demain" model="mail.template">
-        <field name="name">Planning de demain - Envoyer par Email</field>
-        <field name="partner_to">${object.user_id.partner_id.id}</field>
-        <field name="subject">${object.name} : Votre planning pour demain (${format_date((datetime.datetime.today().date() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))})</field>
-        <field name="model_id" ref="hr.model_hr_employee"/>
-        <field name="auto_delete" eval="True"/>
-        <field name="lang">${object.user_id.partner_id.lang}</field>
-        <field name="body_html"><![CDATA[
-<p>Bonjour ${object.name},
-
-Veuillez trouver ci-joint le planning de votre journée du ${format_date((datetime.datetime.today().date() + datetime.timedelta(days=1)).strftime('%Y-%m-%d'))}.
-
-Cordialement,
-</p>
-]]></field>
-    </record>
-
-    <record id="email_template_of_planning_intervention_rapport_intervention" model="mail.template">
-        <field name="name">RDV - Rapport d'intervention</field>
-        <field name="partner_to">${object.address_id.email and object.address_id.id or object.partner_id.id}</field>
-        <field name="subject">Votre rapport d'intervention du ${format_date(object.date_date)}</field>
-        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
-        <field name="auto_delete" eval="False"/>
-        <field name="lang">${object.address_id.lang}</field>
-        <field name="report_template" ref="of_planning.of_planning_raport_intervention_report"/>
-        <field name="report_name">${("Rapport d'intervention du %s" % format_date(object.date_date)).replace("/","_")}</field>
-        <field name="body_html"><![CDATA[
-<p>Bonjour ${object.address_id.name or ''},
-<br/><br/>
-Veuillez trouver ci-joint le rapport de l'intervention effectuée le ${format_date(object.date_date)}.
-</p>
-]]></field>
+        <!-- Intervention report-->
+        <field name="report_use_default" eval="False" />
+        <field name="report_title">Intervention report</field>
+        <field name="report_partner_id" eval="True" />
+        <field name="report_date" eval="True" />
+        <field name="report_intervention" eval="True" />
+        <field name="report_intervention_partner_id" eval="True" />
+        <field name="report_intervention_partner_code" eval="True" />
+        <field name="report_intervention_task_id" eval="True" />
+        <field name="report_intervention_task_description" eval="False" />
+        <field name="report_intervention_duration" eval="True" />
+        <field name="report_intervention_team_id" eval="False" />
+        <field name="report_intervention_employee_ids" eval="True" />
+        <field name="report_intervention_company_id" eval="True" />
+        <field name="report_intervention_label" eval="True" />
+        <field name="report_intervention_address" eval="True" />
+        <field name="report_intervention_contact" eval="True" />
+        <field name="report_intervention_type" eval="True" />
+        <field name="report_intervention_description" eval="True" />
+        <field name="report_intervention_internal_description" eval="True" />
+        <field name="report_history" eval="False" />
+        <field name="report_order" eval="False" />
+        <field name="report_order_name" eval="False" />
+        <field name="report_order_confirmation_date" eval="False" />
+        <field name="report_order_user_id" eval="False" />
+        <field name="report_order_inspection_visit_date" eval="False" />
+        <field name="report_order_totals" eval="False" />
+        <field name="report_order_intervention_notes" eval="False" />
+        <field name="report_products" eval="False" />
+        <field name="report_pickings" eval="False" />
+        <field name="report_invoicing" eval="True" />
+        <field name="report_legal" eval="True" />
+        <field name="report_minutes" eval="True" />
+        <field name="report_minutes_real_dates" eval="False" />
+        <field name="report_minutes_real_duration" eval="False" />
+        <field name="report_minutes_description" eval="True" />
+        <field name="report_photos" eval="True" />
+        <field name="report_signature" eval="True" />
+        <field name="report_signature_date" eval="False" />
     </record>
 
 </odoo>

@@ -1,0 +1,751 @@
+.o_planning_view {
+    user-select: none;
+
+    .o_view_nocontent {
+        @include o-planning-zindex(view-nocontent);
+    }
+
+    .o_view_sample_data .o_sample_data_disabled {
+        opacity: 0.33;
+        pointer-events: none;
+        user-select: none;
+    }
+}
+
+.o_planning_view .o_planning_renderer {
+    --Planning__RowHeader-template-column: 16px;
+
+    // Allows to use color variables in js
+    --Planning__Day-background-color: #{$o-view-background-color};
+    --Planning__DayOff-background-color: #e9ecef;
+    --Planning__DayToday-background-color: #fffaeb;
+    --Planning__DayOffToday-background-color: #faf2e3;
+    --Planning__Busy-background-color: #934a4a50;
+
+    // Group colors
+    --Planning__Group-background: linear-gradient(
+        #{darken($planning-row-open-bg, 5%)},
+        #{$planning-row-open-bg}
+    );
+    --Planning__GroupOpen-background: linear-gradient(
+        #{$planning-row-open-bg},
+        #{darken($planning-row-open-bg, 5%)}
+    );
+    --Planning__GroupToday-background: #{mix($planning-row-open-bg, $planning-highlight-today-bg)};
+
+    // ============================= Main Layout ==============================
+    // ========================================================================
+
+    // Renderer grid
+    display: grid;
+
+    &:not(.o_no_groups) {
+        grid-template-columns: var(--Planning__RowHeader-width) calc(
+                100% - var(--Planning__RowHeader-width)
+            );
+    }
+
+    // Utilities to use the grid-template-rows or grid-template-columns
+    .o_planning_grid_rows {
+        display: grid;
+        grid-template-rows: repeat(var(--Planning__Template-rows), var(--Planning__Row-height));
+    }
+
+    .o_planning_grid_columns {
+        display: grid;
+        grid-template-columns: repeat(
+            var(--Planning__Template-columns),
+            calc(100% / var(--Planning__Template-columns))
+        );
+    }
+
+    // Row headers
+    .o_planning_row_header {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(
+            auto-fill,
+            minmax(var(--Planning__RowHeader-template-column), 1fr)
+        );
+        line-height: var(--Planning__Pill-height);
+
+        .o_planning_progress_bar {
+            grid-row: 1;
+            grid-column: 1 / -1;
+        }
+
+        .o_planning_row_title {
+            grid-row: 1;
+        }
+
+        &.o_planning_group {
+            line-height: initial;
+        }
+
+        &.o_mobile_progress_bar {
+            grid-template-rows: 1fr var(--Planning__Pill-height);
+
+            .o_planning_progress_bar {
+                grid-row: 2;
+            }
+        }
+    }
+
+    // =============================== Buttons ================================
+    // ========================================================================
+
+    .o_planning_buttons_container {
+        gap: 0.25rem 1rem;
+    }
+
+    // All rows (Regular, Group Header and Total)
+    // ==========================================
+    .o_planning_row_thumbnail_wrapper .o_planning_row_thumbnail {
+        width: auto;
+        max-height: calc(var(--Planning__Row-height) * 4);
+        margin-right: 10px;
+    }
+
+    // ===============  Cursors while dragging  ==============
+    // =======================================================
+
+    &.o_grabbing,
+    &.o_grabbing .o_planning_pill {
+        cursor: move !important;
+    }
+
+    &.o_copying,
+    &.o_copying .o_planning_pill {
+        cursor: copy !important;
+    }
+
+    &.o_grabbing_locked,
+    &.o_grabbing_locked .o_planning_pill {
+        cursor: not-allowed !important;
+    }
+
+    @include media-breakpoint-down(md) {
+        & {
+            width: max-content;
+        }
+    }
+
+    .o_dragged_pill_ghost {
+        opacity: 0.5;
+    }
+
+    // ================ Header ===============
+    // =======================================
+    .o_planning_header {
+        @include o-planning-zindex(view-nocontent);
+    }
+
+    .o_planning_header_scale {
+        grid-column: 1 / -1;
+
+        .o_planning_row_sidebar {
+            width: var(--Planning__RowHeader-width);
+        }
+    }
+
+    .o_planning_header_cell {
+        border: 1px solid transparent;
+        border-bottom-color: $planning-border-color;
+        color: $headings-color;
+        position: relative;
+        @include o-planning-cell;
+        @include media-breakpoint-down(md) {
+            min-width: 0;
+        }
+    }
+
+    // ======= All sidebar headers (Header, Regular, Groups and Total) ========
+    // ========================================================================
+    .o_planning_row_sidebar {
+        color: $headings-color;
+        border-bottom: 1px solid $planning-border-color;
+
+        .o_planning_progress_bar,
+        .o_planning_text_hoverable {
+            right: 0;
+            height: 100%;
+            background-color: inherit;
+        }
+    }
+
+    // =================== "Regular" & "Group Header" cells ===================
+    // ========================================================================
+    .o_planning_cell {
+        border: solid $planning-border-color;
+        border-width: 0 0 1px 1px;
+        @include o-planning-cell;
+        @include o-planning-zindex(grid);
+
+        &.o_drag_hover {
+            border: none;
+            background-color: $planning-highlight-cell-color !important;
+            @include o-planning-zindex(grid-interact);
+        }
+
+        .o_planning_cell_group_button {
+            @include o-planning-zindex(top);
+        }
+
+    }
+
+    // ================================ Pills =================================
+    // ========================================================================
+    .o_planning_pill_wrapper {
+        padding: 2px 2px 3px 3px;
+        min-height: var(--Planning__Pill-height);
+        @include o-planning-zindex(pill);
+
+        // Group pills
+        &.o_planning_group_pill {
+            pointer-events: none;
+            min-height: auto;
+            display: grid;
+
+            .o_planning_pill {
+                grid-area: 1 / 1;
+                background-color: $primary;
+                border-color: $primary;
+                height: 2px;
+
+                &:before,
+                &:after {
+                    content: "";
+                    border-top: 4px solid transparent;
+                    border-bottom: 5px solid transparent;
+                }
+
+                &:before {
+                    border-left: 5px solid;
+                    border-left-color: inherit;
+                    @include o-position-absolute($top: -3px, $left: 0);
+                }
+
+                &:after {
+                    border-right: 5px solid;
+                    border-right-color: inherit;
+                    @include o-position-absolute($top: -3px, $right: 0);
+                }
+            }
+
+            &.o_group_open .o_planning_pill {
+                &:before,
+                &:after {
+                    top: 2px;
+                    border: 2px solid transparent;
+                    border-top-color: inherit;
+                }
+
+                &:before {
+                    border-left-color: inherit;
+                }
+
+                &:after {
+                    border-right-color: inherit;
+                }
+            }
+
+            .o_planning_pill_title {
+                grid-area: 1 / 1;
+                width: fit-content;
+            }
+        }
+
+        &.o_resizable {
+            .o_resize_handle {
+                width: 0.5rem /* 6px */;
+                pointer-events: auto;
+                position: absolute;
+                top: 0;
+                @include o-planning-zindex(interact);
+
+                &.o_handle_start {
+                    left: 0;
+                }
+
+                &.o_handle_end {
+                    right: 0;
+                }
+            }
+
+            @include o-planning-hover() {
+                &:not(.o_resized) .o_resize_handle {
+                    background-color: rgba(230, 230, 230, 0.5);
+
+                    &:hover {
+                        background-color: rgba(230, 230, 230, 0.8);
+                    }
+                }
+            }
+        }
+
+        &.o_draggable,
+        &.o_undraggable {
+            transition: transform 0.6s, box-shadow 0.3s;
+
+            &.o_dragged {
+                opacity: 0.8;
+                transform: rotate(-3deg);
+                box-shadow: 0 5px 25px -10px black;
+                @include o-planning-zindex(interact);
+
+                .o_planning_pill {
+                    box-shadow: 0 5px 25px -10px black;
+                }
+
+                .o_resize_handle {
+                    visibility: hidden;
+                }
+            }
+        }
+
+        &.o_undraggable:not(.o_dragged) .o_planning_lock {
+            display: none;
+        }
+
+        &.o_resizable.o_resized {
+            .o_planning_pill {
+                cursor: inherit;
+            }
+
+            .o_resize_handle {
+                background-color: rgba(black, 0);
+                @include o-planning-zindex(interact);
+            }
+        }
+
+        .o_planning_consolidated_pill_title {
+            background-color: $o-view-background-color;
+        }
+
+        &:not(.o_connector_creator_show) .o_connector_creator_wrapper {
+            display: none;
+        }
+
+        @include o-planning-hover() {
+            .o_connector_creator_wrapper {
+                display: inline;
+            }
+        }
+
+        // used for `color` attribute on <planning>
+        @for $index from 1 through length($o-colors-complete) {
+            $color: nth($o-colors-complete, $index);
+
+            .o_planning_pill.o_planning_color_#{$index - 1} .o_planning_progress {
+                opacity: 0.2;
+                background-color: darken($color, 30%);
+            }
+
+            &.highlight .o_planning_pill.o_planning_color_#{$index - 1} {
+                color: color-contrast($color);
+                background-color: $color;
+
+                svg {
+                    fill: color-contrast($color);
+                }
+            }
+        }
+    }
+
+    // ========================== Main pill content ===========================
+    // ========================================================================
+    .o_planning_cells {
+
+        .o_planning_pill_wrapper .decoration-success {
+            opacity: 50%;
+        }
+
+        .o_planning_pill_wrapper .decoration-danger {
+            opacity: 50%;
+            text-decoration: line-through;
+            @include o-planning-gradient-decorations(nth($o-colors-complete, 1));
+        }
+    }
+
+    .o_planning_cells .o_planning_pill {
+        overflow: hidden;
+        user-select: none;
+        box-sizing: content-box;
+        cursor: pointer;
+        @include o-planning-hoverable-colors(nth($o-colors-complete, 1));
+
+        .o_planning_pill_title {
+            // Prevent displaying pill's description when size is smaller than 50px
+            max-width: calc((100% - 50px) * 9999);
+        }
+
+        &.decoration-warning {
+            @include o-planning-gradient-decorations(nth($o-colors-complete, 1));
+        }
+
+        // used for `color` attribute on <planning>
+        @for $index from 1 through length($o-colors-complete) {
+            &.o_planning_color_#{$index - 1} {
+                $planning-color: nth($o-colors-complete, $index);
+
+                @include o-planning-hoverable-colors($planning-color);
+
+                &.decoration-warning {
+                    @include o-planning-gradient-decorations($planning-color);
+                }
+            }
+        }
+
+        &.geolocalize-warning:before {
+            @include o-planning-ribbon-decoration($warning);
+        }
+
+        &.conflict-warning:before {
+            @include o-planning-ribbon-decoration($danger);
+        }
+    }
+
+    // ========================= "Group Header" rows ==========================
+    // ========================================================================
+    .o_planning_group {
+        cursor: pointer;
+        background: var(--Planning__Group-background);
+
+        &.o_planning_today {
+            background: var(--Planning__GroupToday-background);
+        }
+
+        &.o_planning_group_hovered:not(.o_planning_today) {
+            background: var(--Planning__GroupOpen-background);
+        }
+
+        &.o_group_open {
+            border-left-width: 0;
+            background: var(--Planning__GroupOpen-background);
+
+            &.o_planning_group_hovered {
+                background: var(--Planning__Group-background);
+            }
+        }
+
+        &.o_planning_row_header b {
+            font-weight: bold;
+        }
+    }
+
+    // ========================== Connector creators ==========================
+    // ========================================================================
+
+    .o_connector_creator_wrapper {
+        height: $o-connector-wrapper-height;
+        @include o-planning-zindex(interact);
+
+        // used for `color` attribute on <planning>
+        @for $index from 1 through length($o-colors-complete) {
+            &.o_planning_color_#{$index - 1} {
+                $color: nth($o-colors-complete, $index);
+
+                .o_connector_creator_bullet {
+                    background-color: $color;
+                    color: color-contrast($color);
+                    @include o-grab-cursor;
+                }
+
+                .o_connector_creator_top {
+                    border-top: solid 1px $color;
+                }
+
+                .o_connector_creator_right {
+                    border-left: solid 1px $color;
+                }
+
+                .o_connector_creator_bottom {
+                    border-bottom: solid 1px $color;
+                }
+
+                .o_connector_creator_left {
+                    border-right: solid 1px $color;
+                }
+            }
+        }
+    }
+
+    .o_connector_creator_wrapper_top {
+        top: -1 * $o-connector-wrapper-height;
+    }
+
+    .o_connector_creator_wrapper_bottom {
+        bottom: -1 * $o-connector-wrapper-height;
+    }
+
+    .o_connector_creator {
+        height: $o-connector-creator-size;
+        width: $o-connector-creator-size;
+    }
+
+    .o_connector_creator_bullet {
+        height: $o-connector-creator-bullet-diameter;
+        width: $o-connector-creator-bullet-diameter;
+    }
+
+    .o_connector_creator_top {
+        bottom: 0;
+
+        .o_connector_creator_bullet {
+            top: -0.5 * $o-connector-creator-bullet-diameter;
+        }
+    }
+
+    .o_connector_creator_right {
+        right: $o-connector-creator-size;
+
+        .o_connector_creator_bullet {
+            right: -0.5 * $o-connector-creator-bullet-diameter;
+        }
+    }
+
+    .o_connector_creator_bottom {
+        top: 0;
+
+        .o_connector_creator_bullet {
+            bottom: -0.5 * $o-connector-creator-bullet-diameter;
+        }
+    }
+
+    .o_connector_creator_left {
+        left: $o-connector-creator-size;
+
+        .o_connector_creator_bullet {
+            left: -0.5 * $o-connector-creator-bullet-diameter;
+        }
+    }
+
+    // ============================= "TOTAL" row ==============================
+    // ========================================================================
+    .o_planning_row_total {
+        .o_planning_cell:not(:first-of-type) {
+            border-left: 1px solid rgba($planning-border-color, 0.25);
+        }
+
+        .o_planning_cell,
+        .o_planning_row_title,
+        .o_planning_pill_wrapper {
+            min-height: calc(var(--Planning__Pill-height) * 1.6);
+        }
+
+        .o_planning_pill {
+            color: inherit;
+            margin-left: 1px;
+            background-color: rgba($o-brand-odoo, 0.5);
+        }
+
+        .o_planning_pill_wrapper:hover {
+            overflow: visible;
+
+            .o_planning_pill {
+                color: inherit;
+                background-color: rgba($o-brand-odoo, 0.8);
+            }
+
+            &:before {
+                content: "";
+                border: 1px solid $o-brand-odoo;
+                border-width: 0 1px;
+                background: rgba($o-brand-odoo, 0.1);
+                height: 100vh;
+                pointer-events: none;
+                @include o-planning-zindex(interact);
+                @include o-position-absolute(auto, -1px, 0, 0);
+            }
+        }
+
+        .o_planning_cell:last-child .o_planning_pill_wrapper:hover:before {
+            border-right: 0px;
+            right: 0;
+        }
+    }
+
+    .o_planning_pill_resize_badge {
+        transition: all 0.15s ease-in-out;
+        box-shadow: 0 1px 2px 0 rgba(black, 0.28);
+        @include o-planning-zindex(interact);
+    }
+
+    // Suggest the browsers to print background graphics (IE users will still
+    // need to go to their settings in order to print them)
+    -webkit-print-color-adjust: exact; /* Chrome, Safari */
+    print-color-adjust: exact; /*Firefox*/
+
+    .o_planning_connector {
+        --Connector__ButtonBorder-color: #091124;
+        --Connector__ButtonBackground-color: #ffffff;
+        --Connector__ButtonReschedule-color: #00a09d;
+        --Connector__ButtonRemove-color: #dd3c4f;
+        --Connector__ButtonAccent-color: #ffffff;
+
+        &.o_connector_highlighted {
+            @include o-planning-zindex(interact);
+        }
+
+        .o_connector_stroke_button {
+            > rect {
+                cursor: pointer;
+                fill: var(--Connector__ButtonBackground-color);
+                stroke: var(--Connector__ButtonBorder-color);
+                stroke-width: 24px;
+                transition: fill 0.15s;
+            }
+
+            &.o_connector_stroke_reschedule_button {
+                line {
+                    stroke: var(--Connector__ButtonReschedule-color);
+                    transition: stroke 0.15s;
+                }
+
+                &:hover {
+                    > rect {
+                        fill: var(--Connector__ButtonReschedule-color);
+                    }
+
+                    line {
+                        stroke: var(--Connector__ButtonAccent-color);
+                    }
+                }
+            }
+
+            &.o_connector_stroke_remove_button {
+                g rect {
+                    fill: var(--Connector__ButtonRemove-color);
+                    transition: fill 0.15s;
+                }
+
+                &:hover {
+                    > rect {
+                        fill: var(--Connector__ButtonRemove-color);
+                    }
+
+                    g rect {
+                        fill: var(--Connector__ButtonAccent-color);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ======================== Planning view day renderer =======================
+// ============================================================================
+
+.o_planning_view .o_planning_day_renderer {
+
+    .o_planning_header_scale {
+        grid-template-columns: var(--Planning__RowHeader-width) 1fr !important;
+
+        .o_planning_header_infos {
+
+            .o_planning_header_period {
+                grid-template-columns: repeat(7, 1fr);
+
+                div {
+                    border-left: 1px solid $planning-border-color;
+                    border-right: 1px solid $planning-border-color;
+
+                    &:first-child {
+                        border-left: 0;
+                    }
+                }
+            }
+        }
+        .o_planning_header_slots {
+
+            .o_planning_header_cell {
+                border: solid $planning-border-color;
+                border-width:  1px 1px 1px 0px;
+
+                &.new_day {
+                    border-left: 1px solid $planning-border-color !important;
+                }
+            }
+        }
+    }
+
+    .o_planning_rows {
+        grid-template-columns: var(--Planning__RowHeader-width) 1fr !important;
+        grid-column: 1 / -1;
+        background-color: white;
+
+        .o_planning_row_headers{
+            left: 0;
+            @include o-planning-zindex(top);
+            background-color: white;
+        }
+    }
+
+    .o_planning_total_rows {
+        grid-template-columns: var(--Planning__RowHeader-width) 1fr !important;
+        grid-column: 1 / -1;
+
+        .o_planning_row_headers{
+            left: 0;
+            @include o-planning-zindex(top);
+            background-color: white;
+        }
+    }
+
+    .o_planning_row_sidebar{
+        left: 0;
+        @include o-planning-zindex(top);
+        background-color: white;
+        border-right: 1px solid $planning-border-color;
+    }
+
+    .o_planning_grid_columns {
+        display: grid;
+    }
+
+    .o_planning_cell {
+        border-width: 0 0 1px 0px !important;
+    }
+
+    .o_planning_pill_wrapper {
+        padding: 2px 0px 3px 0px;
+
+        .o_planning_trip_bar {
+            opacity: 50%;
+            height: 31px;
+            border-right: 1px solid white;
+            pointer-events: none;
+
+            // used for `color` attribute on <planning>
+            @for $index from 1 through length($o-colors-complete) {
+                &.o_planning_color_#{$index - 1} {
+                    $planning-color: nth($o-colors-complete, $index);
+
+                    @include o-planning-hoverable-colors(darken($planning-color, 20%));
+                }
+            }
+        }
+
+        &.o_dragged {
+            .o_planning_trip_bar {
+                display: none;
+            }
+        }
+    }
+
+    .o_planning_cells {
+
+        .o_planning_cell {
+            border-left: 0 !important;
+
+            &.even {
+                border-right: 1px solid $planning-border-color !important;
+            }
+            &.new_day {
+                border-left: 1px solid $planning-border-color !important;
+            }
+        }
+
+    }
+
+}

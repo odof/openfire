@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 08:58+0000\n"
-"PO-Revision-Date: 2023-12-14 08:58+0000\n"
+"POT-Creation-Date: 2024-02-08 16:55+0000\n"
+"PO-Revision-Date: 2024-02-08 16:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -214,6 +214,11 @@ msgid "Action Needed"
 msgstr "Nécessite une action"
 
 #. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__redirect_action_id
+msgid "Action to redirect to the related document."
+msgstr "Action pour rediriger vers le document associé."
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__active
 msgid "Active"
 msgstr "Actif"
@@ -285,6 +290,7 @@ msgid "Answer Type"
 msgstr "Type de réponse"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__answers
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__answer_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__user_input_line_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__user_input_line_ids
@@ -445,21 +451,7 @@ msgid "Correct"
 msgstr "Bonne réponse"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
-msgid "Correct Answer"
-msgstr "Bonne réponse"
-
-#. module: of_survey
-#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__answer_date
-msgid "Correct date answer"
-msgstr "Réponse date correcte"
-
-#. module: of_survey
-#: model:ir.model.fields,help:of_survey.field_of_survey_question__answer_date
-msgid "Correct date answer for this question."
-msgstr "Réponse de date correcte pour cette question."
-
-#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_uid
@@ -470,6 +462,7 @@ msgid "Created by"
 msgstr "Créé par"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_date
@@ -569,6 +562,7 @@ msgid "Detailed Answers"
 msgstr "Réponses détaillées"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__display_name
@@ -628,6 +622,11 @@ msgid "Final Leaderboard"
 msgstr "Classement final"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_done
+msgid "Finish"
+msgstr "Terminer"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_follower_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_follower_ids
 msgid "Followers"
@@ -680,6 +679,7 @@ msgid "Helps you manage your OpenFire survey"
 msgstr "Vous aide à gérer votre Questionnaire OpenFire"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__id
@@ -688,6 +688,11 @@ msgstr "Vous aide à gérer votre Questionnaire OpenFire"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__id
 msgid "ID"
 msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__res_id
+msgid "ID of the related document."
+msgstr "ID du document associé."
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__activity_exception_icon
@@ -818,11 +823,6 @@ msgid "Input must be an email"
 msgstr "La saisie doit contenir une adresse email"
 
 #. module: of_survey
-#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__survey_type__intervention_survey
-msgid "Intervention Survey"
-msgstr "Questionnaire d'intervention"
-
-#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__invite_token
 msgid "Invite token"
 msgstr "Jeton d'invitation"
@@ -839,6 +839,7 @@ msgid "Is Follower"
 msgstr "Est un abonné"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__is_page
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__is_page
 msgid "Is a page?"
 msgstr "Est une page ?"
@@ -877,6 +878,7 @@ msgstr ""
 "et colonnes de matrice"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer____last_update
@@ -887,6 +889,7 @@ msgid "Last Modified on"
 msgstr "Dernière modification le"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_uid
@@ -897,6 +900,7 @@ msgid "Last Updated by"
 msgstr "Dernière mise à jour par"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_date
@@ -994,7 +998,8 @@ msgstr "La date maximale ne peut pas être inférieure à la date minimale !"
 #. module: of_survey
 #: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_length
 msgid "Max length cannot be smaller than min length!"
-msgstr "La longueur maximale ne peut pas être inférieure à la longueur minimale !"
+msgstr ""
+"La longueur maximale ne peut pas être inférieure à la longueur minimale !"
 
 #. module: of_survey
 #: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_float
@@ -1057,6 +1062,11 @@ msgstr "Longueur de texte minimale"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__validation_min_float_value
 msgid "Minimum value"
 msgstr "Valeur minimale"
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__res_model
+msgid "Model of the related document."
+msgstr "Model du document lié."
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__text_box
@@ -1265,7 +1275,9 @@ msgstr ""
 #: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
 msgid "Page id is needed for question layout 'page_per_section'"
-msgstr "L'identifiant de la page est nécessaire pour la mise en page 'page_par_section'"
+msgstr ""
+"L'identifiant de la page est nécessaire pour la mise en page "
+"'page_par_section'"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__page_ids
@@ -1329,6 +1341,7 @@ msgid "Print"
 msgstr "Imprimer"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_id
@@ -1400,6 +1413,21 @@ msgid "Ready to change the way you <b>gather data</b>?"
 msgstr "Prêt à changer votre façon de <b>collecter des données</b> ?"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__redirect_action_id
+msgid "Redirect Action"
+msgstr "Action de redirection"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__res_id
+msgid "Related Document ID"
+msgstr "ID du document lié"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__res_model
+msgid "Related Document Model"
+msgstr "Modèle du document lié"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__users_login_required
 msgid "Require Login"
 msgstr "Connexion requise"
@@ -1457,10 +1485,16 @@ msgid "Sections and Questions"
 msgstr "Sections et Questions"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__sequence
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__sequence
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_sequence
 msgid "Sequence"
 msgstr "Séquence"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid "Start/Stop pages display"
+msgstr "Affichage des pages de début/fin"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__comments_allowed
@@ -1477,7 +1511,19 @@ msgstr "Afficher la question si"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Show all records which has next action date is before today"
-msgstr "Afficher tous les enregistrements dont la date de la prochaine action est antérieure à aujourd'hui"
+msgstr ""
+"Afficher tous les enregistrements dont la date de la prochaine action est "
+"antérieure à aujourd'hui"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__show_end
+msgid "Show end page"
+msgstr "Afficher la page de fin"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__show_start
+msgid "Show start page"
+msgstr "Afficher la page de début"
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__char_box
@@ -2066,6 +2112,11 @@ msgstr "vous identifier"
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_progression
 msgid "of"
 msgstr "de"
+
+#. module: of_survey
+#: model:ir.model,name:of_survey.model_of_survey_answers
+msgid "of.survey.answers"
+msgstr ""
 
 #. module: of_survey
 #. odoo-javascript

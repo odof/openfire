@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="action_of_planning_intervention_generate_delivery" model="ir.actions.server">
+        <field name="name">Generate stock picking</field>
+        <field name="groups_id" eval="[Command.link(ref('of_planning.group_intervention_use_deliveries'))]"/>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="binding_model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="binding_view_types">form</field>
+        <field name="code">
+records.action_generate_stock_picking()
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_generate_invoice" model="ir.actions.server">
+        <field name="name">Generate invoice</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="binding_model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="binding_view_types">form</field>
+        <field name="code">
+action = records.action_create_invoice()
+        </field>
+    </record>
+
+</odoo>

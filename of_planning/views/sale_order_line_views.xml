@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_line_form_view" model="ir.ui.view">
+        <field name="name">of.planning.of.sale.order.line.form.view</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="of_sale.of_sale_order_line_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='qty_delivered']/parent::node()" position="after">
+                <label for="of_qty_planning_done" string="Qty done" attrs="{'invisible': [('of_order_state', 'not in', ['sale', 'done'])]}"/>
+                <div attrs="{'invisible': [('of_order_state', 'not in', ['sale', 'done'])]}">
+                    <field name="of_qty_planning_done"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='of_estimated_invoicing_date']" position="after">
+                <field name="of_intervention_state" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_line_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.view.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='price_subtotal']" position="after">
+                <field name="of_intervention_state"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

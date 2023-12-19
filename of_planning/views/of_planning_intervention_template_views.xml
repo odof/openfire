@@ -1,393 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!--##########################################################################################################################-->
-    <!--############################################_________Modèle__________#####################################################-->
-    <!--##########################################################################################################################-->
-
     <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
         <field name="name">of.planning.intervention.template.view.form</field>
         <field name="model">of.planning.intervention.template</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <div class="oe_button_box of_width_600" name="button_box_custom" >
-                        <!-- Bouton Actif -->
-                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" display="inline-block">
-                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
-                        </button>
-                    </div>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger"
+                        attrs="{'invisible': [('active', '=', True)]}" />
                     <div class="oe_title">
-                        <h1><field name="name" placeholder="Nom du modèle"/></h1>
+                        <h1>
+                            <field name="name" placeholder="Template name" />
+                        </h1>
                     </div>
                     <group name="general">
                         <group name="general_one">
-                            <field name="code"/>
-                            <field name="tache_id"/>
-                            <field name="is_default_template" invisible="1"/>
+                            <field name="code" />
+                            <field name="task_id" />
+                            <field name="is_default_template" invisible="1" />
                         </group>
-                        <group name="general_two"/>
+                        <group name="general_two" />
                     </group>
                     <notebook>
                         <page name="configuration" string="Configuration">
                             <group>
-                                <field name="sequence_id" colspan="2"/>
-                                <field name="send_reports" colspan="2"/>
-                                <field name="attach_report" colspan="2"/>
+                                <field name="sequence_id" colspan="2" />
+                                <field name="send_reports" colspan="2" />
+                                <field name="attach_report" colspan="2" />
                             </group>
                         </page>
-                        <page name="facturation" string="Facturation">
+                        <page name="invoicing" string="Invoicing">
                             <group>
                                 <group>
-                                    <field name="fiscal_position_id"/>
-                                </group>
-                                <group>
+                                    <field name="fiscal_position_id" />
                                 </group>
                             </group>
                             <field name="line_ids">
                                 <tree editable="bottom">
-                                    <field name="product_id"/>
-                                    <field name="name"/>
-                                    <field name="qty"/>
-                                    <field name="price_unit"/>
+                                    <field name="product_id" />
+                                    <field name="name" />
+                                    <field name="qty" />
+                                    <field name="price_unit" />
                                 </tree>
                             </field>
                         </page>
-                        <page name="legal" string="Mentions légales">
-                            <group>
-                                <field name="legal" nolabel="1"/>
-                            </group>
+                        <page name="legal" string="Legal notice">
+                            <field name="legal" nolabel="1" />
                         </page>
-                        <page name="fiche_intervention" string="Fiche d'intervention">
-                            <group col="4">
+                        <page name="sheet" string="Intervention sheet">
+                            <group col="4" class="mb-4">
                                 <group>
-                                    <field name="fi_default" attrs="{'invisible':[('is_default_template','=',True)]}"/>
-                                    <separator string="Champ affichés" colspan="2"/>
-                                    <field name="fi_title" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <field name="fi_partner_id" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <field name="fi_date_date" attrs="{'readonly':[('fi_default','=',True)]}"/>
+                                    <field name="sheet_use_default" attrs="{'invisible':[('is_default_template','=',True)]}" />
+                                    <separator string="Displayed fields" colspan="2" />
+                                    <field name="sheet_title" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_partner_id" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_date" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
                                 </group>
                             </group>
-                            <group col="8">
-                                <group name="fi_first">
-                                    <!-- FI - Intervention -->
-                                    <separator string="" colspan="2" name="fi_rdv_above"/>
-                                    <field name="fi_rdv" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <label for="fi_rdv_partner_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_partner_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_partner_code" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_partner_code" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_tache_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_tache_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_description_tache" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_description_tache" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_date" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_duree" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_duree" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_team_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_team_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_employee_ids" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_employee_ids" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_company_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_company_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_lib" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_lib" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_address" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_address" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_contact" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_contact" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_type" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_type" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_description_interne" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_description_interne" class="oe_inline"
-                                               attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_rdv_description" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_rdv_description" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_rdv', '=', False)]}"/>
-                                    </div>
-                                    <separator string="" colspan="2" name="fi_rdv_below"/>
+                            <group col="8" class="mb-4">
+                                <group name="sheet_first">
+                                    <!-- Intervention sheet -->
+                                    <field name="sheet_intervention" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_intervention_partner_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_partner_code" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_task_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_task_description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_team_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_employee_ids" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_company_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_label" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_address" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_contact" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_type" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_internal_description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                                    <field name="sheet_intervention_description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
                                 </group>
-                                <group name="fi_second">
-                                    <!-- FI - Parc installé -->
+                                <group name="sheet_second">
+                                    <!-- Sheet - Installed equipment -->
                                 </group>
-                                <group name="fi_third">
-                                    <!-- FI - Historique -->
-                                    <separator string="" colspan="2" name="fi_history_above"/>
-                                    <field name="fi_history" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_history_below"/>
+                                <group name="sheet_third">
+                                    <!-- Sheet - History -->
+                                    <field name="sheet_history" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- FI - Commande -->
-                                    <separator string="" colspan="2" name="fi_order_above"/>
-                                    <field name="fi_order" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <label for="fi_order_name" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_name" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_order_confirmation_date" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_confirmation_date" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_order_user_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_user_id" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_order_of_date_vt" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_of_date_vt" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_order_totals" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_totals" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="fi_order_of_notes_intervention" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="fi_order_of_notes_intervention" class="oe_inline" attrs="{'readonly':['|', ('fi_default','=',True), ('fi_order', '=', False)]}"/>
-                                    </div>
-                                    <separator string="" colspan="2" name="fi_order_below"/>
+                                    <!-- Sheet - Order -->
+                                    <field name="sheet_order" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_order_name" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_order_confirmation_date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                                    <field name="sheet_order_user_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                                    <field name="sheet_order_inspection_visit_date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                                    <field name="sheet_order_totals" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                                    <field name="sheet_order_intervention_notes" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
                                 </group>
-                                <group name="fi_fourth">
-                                    <!-- FI - Produits et travaux -->
-                                    <separator string="" colspan="2" name="fi_products_above"/>
-                                    <field name="fi_products" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_products_below"/>
+                                <group name="sheet_fourth">
+                                    <!-- Sheet - Products -->
+                                    <field name="sheet_products" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- FI - Livraisons -->
-                                    <separator string="" colspan="2" name="fi_pickings_above"/>
-                                    <field name="fi_pickings" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_pickings_below"/>
+                                    <!-- Sheet - Pickings -->
+                                    <field name="sheet_pickings" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- FI - Facturation -->
-                                    <separator string="" colspan="2" name="fi_invoicing_above"/>
-                                    <field name="fi_invoicing" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_invoicing_below"/>
+                                    <!-- Sheet - Invoicing -->
+                                    <field name="sheet_invoicing" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- FI - Questionnaires -->
+                                    <!-- Sheet - Survey -->
 
-                                    <!-- FI - Compte-rendu -->
+                                    <!-- Sheet - Debriefing -->
 
-                                    <!-- FI - Mentions légales -->
-                                    <separator string="" colspan="2" name="fi_legal_above"/>
-                                    <field name="fi_legal" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_legal_below"/>
+                                    <!-- Sheet - Legal notice -->
+                                    <field name="sheet_legal" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- FI - Signatures -->
-                                    <separator string="" colspan="2" name="fi_signature_above"/>
-                                    <field name="fi_signature" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="fi_signature_below"/>
-                                </group>
-                            </group>
-                            <separator string="Documents joints" name="fi_joined_documents"/>
-                            <group col="8">
-                                <h5 colspan="8">Documents internes</h5>
-                                <field name="fi_order_pdf" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                <field name="fi_picking_pdf" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                <field name="fi_invoice_pdf" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                <!--<field name="fi_purchase_pdf" attrs="{'readonly':[('fi_default','=',True)]}"/>-->
-                            </group>
-                            <group col="4">
-                                <group>
-                                    <h5 colspan="2">Annexes <i>(Modèles de courrier)</i></h5>
-                                    <field name="fi_mail_template_ids" nolabel="1" widget="many2many_tags" attrs="{'readonly':[('fi_default','=',True)]}"/>
-                                </group>
-                                <group>
+                                    <!-- Sheet - Minutes -->
+                                    <field name="sheet_minutes" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+                                    <field name="sheet_minutes_real_dates" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+                                    <field name="sheet_minutes_real_duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+                                    <field name="sheet_minutes_description" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+
+                                    <!-- Report - Photos -->
+                                    <field name="sheet_photos" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+
+                                    <!-- Sheet - Signatures -->
+                                    <field name="sheet_signature" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                                    <field name="sheet_signature_date" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_signature', '=', False)]}"/>
                                 </group>
                             </group>
                         </page>
-                        <page name="ri" string="Rapport d'intervention">
-                            <group col="4">
+                        <page name="report" string="Intervention report">
+                            <group col="4" class="mb-4">
                                 <group>
-                                    <field name="ri_default" attrs="{'invisible':[('is_default_template','=',True)]}"/>
-                                    <separator string="Champ affichés" colspan="2"/>
-                                    <field name="ri_title" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <field name="ri_partner_id" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <field name="ri_date_date" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <field name="report_use_default" attrs="{'invisible':[('is_default_template','=',True)]}" />
+                                    <separator string="Displayed fields" colspan="2" />
+                                    <field name="report_title" attrs="{'readonly':[('report_use_default','=',True)]}" />
+                                    <field name="report_partner_id" attrs="{'readonly':[('report_use_default','=',True)]}" />
+                                    <field name="report_date" attrs="{'readonly':[('report_use_default','=',True)]}" />
                                 </group>
                             </group>
-                            <group col="8">
-                                <group name="ri_first">
-                                    <separator string="" colspan="2" name="ri_rdv_above"/>
-                                    <field name="ri_rdv" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <label for="ri_rdv_partner_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_partner_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_partner_code" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_partner_code" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_tache_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_tache_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_description_tache" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_description_tache" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_date" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_date" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_duree" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_duree" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_team_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_team_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_employee_ids" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_employee_ids" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_company_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_company_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_lib" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_lib" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_address" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_address" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_contact" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_contact" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_type" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_type" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_description_interne" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_description_interne" class="oe_inline"
-                                               attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_rdv_description" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_rdv_description" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_rdv', '=', False)]}"/>
-                                    </div>
-                                    <separator string="" colspan="2" name="ri_rdv_below"/>
+                            <group col="8" class="mb-4">
+                                <group name="report_first">
+                                    <!-- Intervention report -->
+                                    <field name="report_intervention" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_intervention_partner_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_partner_code" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_task_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_task_description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_team_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_employee_ids" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_company_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_label" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_address" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_contact" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_type" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_internal_description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
                                 </group>
-                                <group name="ri_second">
-                                    <!-- RI - Parc installé -->
+                                <group name="report_second">
+                                    <!-- Report - Installed equipment -->
                                 </group>
-                                <group name="ri_third">
-                                    <!-- RI - Historique -->
-                                    <separator string="" colspan="2" name="ri_history_above"/>
-                                    <field name="ri_history" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_history_below"/>
+                                <group name="report_third">
+                                    <!-- Report - History -->
+                                    <field name="report_history" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
 
-                                    <!-- RI - Commande -->
-                                    <separator string="" colspan="2" name="ri_order_above"/>
-                                    <field name="ri_order" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <label for="ri_order_name" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_name" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_order_confirmation_date" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_confirmation_date" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_order_user_id" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_user_id" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_order_of_date_vt" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_of_date_vt" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_order_totals" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_totals" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <label for="ri_order_of_notes_intervention" style="font-weight: normal !important"/>
-                                    <div>
-                                        <field name="ri_order_of_notes_intervention" class="oe_inline" attrs="{'readonly':['|', ('ri_default','=',True), ('ri_order', '=', False)]}"/>
-                                    </div>
-                                    <separator string="" colspan="2" name="ri_order_below"/>
+                                    <!-- Report - Order -->
+                                    <field name="report_order" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_order_name" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_confirmation_date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_user_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_inspection_visit_date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_totals" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_intervention_notes" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
                                 </group>
-                                <group name="ri_fourth">
-                                    <!-- RI - Produits et travaux -->
-                                    <separator string="" colspan="2" name="ri_products_above"/>
-                                    <field name="ri_products" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_products_below"/>
+                                <group name="report_fourth">
+                                    <!-- Report - Products -->
+                                    <field name="report_products" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
 
-                                    <!-- RI - Livraisons -->
-                                    <separator string="" colspan="2" name="ri_pickings_above"/>
-                                    <field name="ri_pickings" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_pickings_below"/>
+                                    <!-- Report - Pickings -->
+                                    <field name="report_pickings" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
 
-                                    <!-- RI - Facturation -->
-                                    <separator string="" colspan="2" name="ri_invoicing_above"/>
-                                    <field name="ri_invoicing" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_invoicing_below"/>
+                                    <!-- Report - Invoicing -->
+                                    <field name="report_invoicing" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
 
-                                    <!-- RI - Questionnaires -->
+                                    <!-- Report - Survey -->
 
-                                    <!-- RI - Compte-rendu -->
+                                    <!-- Report - Debriefing -->
 
-                                    <!-- RI - Photos -->
+                                    <!-- Report - Legal notice -->
+                                    <field name="report_legal" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
 
-                                    <!-- RI - Mentions légales -->
-                                    <separator string="" colspan="2" name="ri_legal_above"/>
-                                    <field name="ri_legal" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_legal_below"/>
+                                    <!-- Report - Minutes -->
+                                    <field name="report_minutes" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_minutes_real_dates" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
+                                    <field name="report_minutes_real_duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
+                                    <field name="report_minutes_description" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
 
-                                    <!-- RI - Signatures -->
-                                    <separator string="" colspan="2" name="ri_signature_above"/>
-                                    <field name="ri_signature" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                    <separator string="" colspan="2" name="ri_signature_below"/>
-                                </group>
-                            </group>
-                            <separator string="Documents joints" name="ri_joined_documents"/>
-                            <group col="8">
-                                <h5 colspan="8">Documents internes</h5>
-                                <field name="ri_order_pdf" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                <field name="ri_picking_pdf" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                <field name="ri_invoice_pdf" attrs="{'readonly':[('ri_default','=',True)]}"/>
-                                <!--<field name="fi_purchase_pdf" attrs="{'readonly':[('ri_default','=',True)]}"/>-->
-                            </group>
-                            <group col="4">
-                                <group colspan="2">
-                                    <h5 colspan="2">Annexes <i>(Modèles de courrier)</i></h5>
-                                    <field name="ri_mail_template_ids" nolabel="1" widget="many2many_tags" attrs="{'readonly':[('ri_default','=',True)]}"/>
+                                    <!-- Report - Photos -->
+                                    <field name="report_photos" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Signatures -->
+                                    <field name="report_signature" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_signature_date" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_signature', '=', False)]}"/>
                                 </group>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
             </form>
+
         </field>
     </record>
 
@@ -396,22 +217,33 @@
         <field name="model">of.planning.intervention.template</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="sequence" widget="handle"/>
-                <field name="name"/>
-                <field name="tache_id"/>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="task_id" />
             </tree>
         </field>
     </record>
 
-    <record id="action_of_planning_intervention_template" model="ir.actions.act_window">
-        <field name="name">Modèle d'intervention</field>
-        <field name="res_model">of.planning.intervention.template</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="of_planning.of_planning_intervention_template_view_tree"/>
+    <record id="of_planning_intervention_template_view_search" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.search</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <separator />
+                <filter string="Active" name="active" domain="[('active','=',True)]" />
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]" />
+            </search>
+        </field>
     </record>
 
-    <menuitem name="Modèles d'intervention" id="menu_of_planning_intervention_template" parent="of_planning.menu_of_planning_configuration_template" sequence="10" action="action_of_planning_intervention_template"/>
+    <record id="action_of_planning_intervention_template" model="ir.actions.act_window">
+        <field name="name">Intervention template</field>
+        <field name="res_model">of.planning.intervention.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning_intervention_template_view_tree" />
+        <field name="search_view_id" ref="of_planning_intervention_template_view_search" />
+    </record>
 
 
 </odoo>

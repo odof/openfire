@@ -1,0 +1,263 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Planning Renderer -->
+    <t t-name="of_web_planning_view.PlanningRenderer" owl="1">
+        <t t-if="model.metaData.scale.id == 'day'">
+            <PlanningDayRenderer t-props="props"/>
+        </t>
+        <t t-else="">
+            <PlanningWeekRenderer t-props="props"/>
+        </t>
+    </t>
+
+    <!-- Planning Renderer (columns header: Monday xx, Tuesday xx, etc.) -->
+    <t t-name="of_web_planning_view.PlanningRenderer.Header" owl="1">
+        <div class="o_planning_header o_planning_header_scale position-sticky top-0 d-flex flex-wrap">
+
+            <div class="d-flex gap-2 align-items-center w-100 px-3 py-2 bg-100">
+                <div class="d-flex gap-2 ms-auto"></div>
+                <b t-esc="getFormattedFocusDate()" class="px-2"/>
+                <div class="d-flex gap-2 ms-auto">
+                    <div t-if="displayExpandCollapseButtons" class="btn-group">
+                        <button class="o_planning_button_expand_rows btn btn-secondary" title="Expand rows" t-on-click="onExpandClicked">
+                            <i class="fa fa-expand"/>
+                        </button>
+                        <button class="o_planning_button_collapse_rows btn btn-secondary" title="Collapse rows" t-on-click="onCollapseClicked">
+                            <i class="fa fa-compress"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <b t-if="model.metaData.groupedBy.length"
+                class="o_planning_title o_planning_row_sidebar d-flex align-items-center justify-content-center p-2 bg-100"
+                t-esc="model.metaData.string"
+            />
+            <div class="o_planning_header_slots o_planning_grid_columns flex-grow-1 bg-view fw-bold">
+                <t t-set="formats" t-value="{'week': 'cccc, d', 'month': 'dd', 'year': env.isSmall ? 'MMM' : 'MMMM'}"/>
+                <t t-foreach="columns" t-as="column" t-key="column.id">
+                    <div class="o_planning_header_cell d-flex align-items-center justify-content-center py-2"
+                        t-att-class="{o_planning_today: column.isToday, 'bg-100': !column.isToday}"
+                    >
+                        <t t-if="model.metaData.scale.id in formats" t-esc="column.start.toFormat(formats[model.metaData.scale.id])"/>
+                        <small t-else="" class="text-center">
+                            <b t-esc="column.start.toFormat('h')"/>
+                            <div class="d-xl-inline-block" t-esc="column.start.toFormat('a').toLowerCase()"/>
+                        </small>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Row header (left part of the row with Resources' names) -->
+    <t t-name="of_web_planning_view.PlanningRenderer.RowHeader"  owl="1">
+        <div
+            class="o_planning_row_header o_planning_row_sidebar position-relative align-items-center"
+            t-att-class="{
+                o_sample_data_disabled: isDisabled(row),
+                o_planning_row_sidebar_empty: !row.name,
+                o_planning_group: row.isGroup,
+                o_planning_hoverable: isHoverable(row),
+                o_mobile_progress_bar: row.progressBar and isTouchDevice,
+                o_group_open: !model.isClosed(row.id),
+            }"
+            t-att-style="getGridPosition({ row: row.grid.row })"
+            t-att-data-row-id="row.id"
+            t-on-click.synthetic="() => row.isGroup and this.model.toggleRow(row.id)"
+        >
+            <div
+                class="o_planning_row_title d-flex align-items-center h-100 w-100 pe-1"
+                t-att-class="{ 'fw-bold': row.isGroup }"
+                t-att-style="getRowTitleStyle(row)"
+                t-att-title="row.name or ''"
+            >
+                <i t-if="row.isGroup" t-attf-class="fa small fa-{{ model.isClosed(row.id) ? 'plus' : 'minus' }} pt-1 me-2" />
+                <span t-if="row.thumbnailUrl and row.resId"
+                    class="o_planning_row_thumbnail_wrapper z-index-1"
+                    t-att-class="{ 'me-1' : row.isGroup }"
+                >
+                    <img t-att-src="row.thumbnailUrl" class="o_planning_row_thumbnail oe_kanban_avatar o_image_24_cover rounded-circle"/>
+                </span>
+                <span class="text-truncate w-0 flex-grow-1 z-index-1">
+                    <t t-esc="row.name"/>
+                </span>
+            </div>
+            <t t-if="row.progressBar">
+                <PlanningRowProgressBar t-props="getProgressBarProps(row)" />
+            </t>
+        </div>
+    </t>
+
+    <!-- Row content (all content after the header, like Pills etc.) -->
+    <t t-name="of_web_planning_view.PlanningRenderer.RowContent" owl="1">
+        <!-- Cells -->
+        <t t-foreach="columns" t-as="column" t-key="column.id">
+            <div
+                    class="o_planning_cell_group_button position-relative"
+                    t-attf-style="{{ getGridPosition({ column: column.grid.column, row: row.grid.row }) }};{{ row.cellColors[column.id] || '' }}"
+                    t-att-data-row-id="row.id"
+                    t-att-data-column-index="column_index"
+                    t-on-click.synthetic="() => row.isGroup and this.model.toggleRow(row.id)"
+                >
+                <PlanningCellButtons t-props="cellButtonsProps" />
+            </div>
+            <div
+                class="o_planning_cell"
+                t-att-class="{
+                    o_sample_data_disabled: isDisabled(row),
+                    o_planning_today: column.isToday,
+                    o_planning_group: row.isGroup,
+                    o_planning_hoverable: isHoverable(row),
+                    o_group_open: !model.isClosed(row.id),
+                }"
+                t-attf-style="{{ getGridPosition({ column: column.grid.column, row: row.grid.row }) }};{{ row.cellColors[column.id] || '' }}"
+                t-att-data-row-id="row.id"
+                t-att-data-column-index="column_index"
+                t-on-click.synthetic="() => row.isGroup and this.model.toggleRow(row.id)"
+            >
+            </div>
+        </t>
+        <!-- Pills -->
+        <t t-if="row.isGroup">
+            <!-- Group pills -->
+            <t t-foreach="row.pills" t-as="pill" t-key="pill.id">
+                <div
+                    class="o_planning_pill_wrapper o_planning_group_pill align-items-center"
+                    t-att-class="{
+                        o_sample_data_disabled: isDisabled(row),
+                        o_group_open: !model.isClosed(row.id),
+                    }"
+                    t-att-style="getGridPosition(pill.grid)"
+                >
+                    <div class="o_planning_pill o_planning_consolidated_pill position-relative overflow-visible"
+                        t-att-class="pill.className"
+                        t-att-title="pill.displayName"
+                    >
+                    </div>
+                    <span class="o_planning_pill_title bg-view text-truncate px-1 z-index-1" t-esc="pill.displayName" />
+                </div>
+            </t>
+        </t>
+        <t t-else="">
+            <!-- Standard pills -->
+            <t t-foreach="row.pills" t-as="pill" t-key="pill.id">
+                <t t-call="{{ constructor.pillTemplate }}" />
+            </t>
+        </t>
+    </t>
+
+    <!-- Pill -->
+    <t t-name="of_web_planning_view.PlanningRenderer.Pill" owl="1">
+        <t t-set="renderConnectors" t-value="shouldRenderRecordConnectors(pill.record)" />
+        <div class="o_planning_pill_wrapper"
+            t-att-class="{
+                o_sample_data_disabled: isDisabled(row),
+                o_draggable: !pill.disableDrag,
+                o_undraggable: pill.disableDrag,
+                o_resizable: !pill.disableStartResize or !pill.disableStopResize,
+                'position-relative': renderConnectors
+            }"
+            t-att-style="getGridPosition(pill.grid)"
+            t-att-data-pill-id="pill.id"
+        >
+            <t t-if="renderConnectors" t-call="{{ constructor.connectorCreatorTemplate }}">
+                <t t-set="alignment" t-value="{ horizontal: 'left', vertical: 'top' }" />
+            </t>
+            <div class="o_planning_pill position-relative h-100 d-flex align-items-center"
+                t-att-class="pill.className"
+                t-on-pointermove.synthetic="(ev) => this.onPillOpen(ev, pill)"
+                t-on-pointerleave="(ev) => this.onPillClose(ev, pill)"
+                t-on-dblclick="(ev) => this.onPillDblClick(ev, pill)"
+            >
+                <div t-if="display_extended_pill_info == '1'" style="display: flex; flex-direction: column">
+                    <div class="o_planning_pill_title text-truncate mx-1">
+                        <span class="fw-bolder" t-esc="pill.displayTime" />
+                        <div style="display: inline-flex; float: right; position: absolute; right: 0.75vh;" t-if="pill._trip">
+                            <svg class="mx-2" width="16" height="16" viewBox="0 0 16 16" fill="#000000" xmlns="http://www.w3.org/2000/svg">
+                                <g clip-path="url(#clip0_1746_5630)">
+                                    <path d="M15.664 3.53703C15.664 5.00872 13.9314 7.20451 13.1838 8.08107C13.0724 8.21007 12.9082 8.2599 12.7587 8.22766H10.0352C9.51634 8.22766 9.09712 8.64688 9.09712 9.16578C9.09712 9.68468 9.51634 10.1039 10.0352 10.1039H12.8496C14.4034 10.1039 15.664 11.3645 15.664 12.9183C15.664 14.4721 14.4034 15.7327 12.8496 15.7327H4.74656C5.00162 15.4424 5.31237 15.0701 5.62605 14.6538C5.81075 14.4076 6.0013 14.1378 6.18307 13.8564H12.8496C13.3685 13.8564 13.7877 13.4372 13.7877 12.9183C13.7877 12.3994 13.3685 11.9802 12.8496 11.9802H10.0352C8.48147 11.9802 7.22087 10.7196 7.22087 9.16578C7.22087 7.61201 8.48147 6.35141 10.0352 6.35141H11.202C10.5864 5.42794 10.0352 4.36669 10.0352 3.53703C10.0352 1.98326 11.2958 0.722656 12.8496 0.722656C14.4034 0.722656 15.664 1.98326 15.664 3.53703ZM4.08694 15.0613C3.97554 15.1874 3.87586 15.2988 3.79085 15.3926L3.73808 15.4512L3.73221 15.4454C3.55632 15.5802 3.30419 15.5626 3.14589 15.3926C2.40711 14.5893 0.653992 12.5225 0.653992 11.042C0.653992 9.48826 1.9146 8.22766 3.46837 8.22766C5.02214 8.22766 6.28274 9.48826 6.28274 11.042C6.28274 11.9215 5.66417 13.0062 5.00748 13.9121C4.69379 14.3431 4.37131 14.733 4.10453 15.0408L4.08694 15.0613ZM4.40649 11.042C4.40649 10.7932 4.30765 10.5546 4.13172 10.3787C3.95579 10.2027 3.71717 10.1039 3.46837 10.1039C3.21956 10.1039 2.98094 10.2027 2.80501 10.3787C2.62908 10.5546 2.53024 10.7932 2.53024 11.042C2.53024 11.2908 2.62908 11.5295 2.80501 11.7054C2.98094 11.8813 3.21956 11.9802 3.46837 11.9802C3.71717 11.9802 3.95579 11.8813 4.13172 11.7054C4.30765 11.5295 4.40649 11.2908 4.40649 11.042ZM12.8496 4.47516C13.0984 4.47516 13.337 4.37632 13.513 4.20039C13.6889 4.02445 13.7877 3.78584 13.7877 3.53703C13.7877 3.28823 13.6889 3.04961 13.513 2.87368C13.337 2.69774 13.0984 2.59891 12.8496 2.59891C12.6008 2.59891 12.3622 2.69774 12.1863 2.87368C12.0103 3.04961 11.9115 3.28823 11.9115 3.53703C11.9115 3.78584 12.0103 4.02445 12.1863 4.20039C12.3622 4.37632 12.6008 4.47516 12.8496 4.47516Z" />
+                                </g>
+                                <defs>
+                                    <clipPath id="clip0_1746_5630">
+                                        <rect width="16" height="16" transform="translate(0.653992 0.722656)"/>
+                                    </clipPath>
+                                </defs>
+                            </svg>
+                            <span t-esc="pill._tripDsp" />
+                        </div>
+                    </div>
+                    <div class="o_planning_pill_title text-truncate mx-1" t-esc="pill.displayPrimary" />
+                    <div class="o_planning_pill_title text-truncate mx-1 fw-bold" t-esc="pill.displaySecondary"/>
+                </div>
+                <div t-else="" class="o_planning_pill_title text-truncate mx-1" t-esc="pill.displayName" />
+                <div t-if="pill.disableDrag" class="o_planning_lock fa fa-lock ms-auto me-2" />
+            </div>
+            <t t-if="renderConnectors" t-call="{{ constructor.connectorCreatorTemplate }}">
+                <t t-set="alignment" t-value="{ horizontal: 'right', vertical: 'bottom' }" />
+            </t>
+        </div>
+    </t>
+
+    <!-- Total row -->
+    <t t-name="of_web_planning_view.PlanningRenderer.TotalRow" owl="1">
+        <t t-if="model.metaData.groupedBy.length">
+            <div class="o_planning_row_sidebar bg-view d-flex align-items-center justify-content-end position-sticky">
+                <h4
+                    class="o_planning_row_title pe-3 my-0 fw-bold"
+                    t-att-title="totalRow.name"
+                    t-esc="totalRow.name"
+                />
+            </div>
+        </t>
+        <div class="o_planning_row_total o_planning_grid_columns bg-view">
+            <t t-foreach="columns" t-as="column" t-key="column.id">
+                <div
+                    class="o_planning_cell"
+                    t-att-class="{ o_planning_today: column.isToday }"
+                    t-att-style="getGridPosition({ column: column.grid.column, row: 1 })"
+                />
+            </t>
+            <t t-foreach="totalRow.pills" t-as="pill" t-key="pill.id">
+                <div
+                    class="o_planning_pill_wrapper position-relative p-0 h-100 d-flex align-items-end"
+                    t-att-style="getGridPosition(pill.grid)"
+                >
+                    <div class="o_planning_pill o_planning_consolidated_pill w-100 d-flex align-items-end justify-content-center"
+                        t-att-title="pill.displayName"
+                        t-attf-style="height: {{ totalRow.factor * pill.aggregateValue }}%;"
+                    >
+                        <span class="o_planning_consolidated_pill_title bg-view text-truncate px-1 mb-1" t-esc="pill.displayName" />
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- Planning cell buttons -->
+    <t t-name="of_web_planning_view.PlanningCellButtons" owl="1">
+        <div
+            class="o_planning_cell_buttons position-absolute o_planning_cell_group_buttons_hidden w-100"
+            t-on-pointermove.stop=""
+            z-index="10"
+            t-ref="root"
+            style="bottom: 0px;"
+        >
+            <i
+                t-if="props.canCreate"
+                title="Create"
+                class="o_planning_cell_add fa fa-plus d-flex align-items-center justify-content-center"
+                t-att-style="props.scale.id == 'day' ? 'margin: auto; margin-bottom: 0;' : 'margin: auto; margin-bottom: 0; margin-right: 0;'"
+                t-on-click.stop="onCreate"
+            />
+            <i
+                t-if="props.scale.id == 'week' and props.canPlan"
+                title="Plan existing"
+                class="o_planning_cell_plan fa fa-search-plus d-flex align-items-center justify-content-center"
+                style="margin: auto; margin-bottom: 0; margin-left: 0;"
+                t-on-click.stop="onPlan"
+            />
+        </div>
+    </t>
+
+</templates>

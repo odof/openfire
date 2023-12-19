@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_survey_question_answers,access_of_survey_question_answers,model_of_survey_question_answers,of_survey.group_of_survey_user,1,1,1,1

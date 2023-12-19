@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button class="oe_stat_button" name="action_button_view_intervention" type="object" icon="fa-calendar">
+                    <field string="Interventions" name="of_intervention_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='qty_delivered']/parent::node()" position="after">
+                <label for="of_qty_planning_done" string="Qty done" attrs="{'invisible': [('parent.state', 'not in', ['sale', 'done'])]}"/>
+                <div attrs="{'invisible': [('parent.state', 'not in', ['sale', 'done'])]}">
+                    <field name="of_qty_planning_done"/>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='price_total']" position="after">
+                <field name="of_intervention_state" optional="hide" />
+            </xpath>
+            <xpath expr="//page[@name='notes']//group[@name='customer_notes']" position="after">
+                <group string="Intervention notes" name="intervention_notes">
+                    <field name="of_intervention_notes" colspan="4" nolabel="1" />
+                    <div class="text-muted" colspan="4">
+                        * The data entered in this field will be visualized in the intervention planning and printed in the intervention form.
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_search" model="ir.ui.view">
+        <field name="name">sale.order.view.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='order_date']" position="after">
+                <separator/>
+                <filter string="Remaining planning" domain="[('of_is_fully_planned', '=', False)]" name="fully_planned"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

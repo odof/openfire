@@ -19,9 +19,7 @@ class OFSurveySurvey(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     survey_type = fields.Selection(
-        required=True,
-        default='lead_opportunity',
-        selection=[('lead_opportunity', "Lead/Opportunity"), ('intervention_survey', "Intervention Survey")],
+        required=True, default='lead_opportunity', selection=[('lead_opportunity', "Lead/Opportunity")]
     )
 
     def _get_default_access_token(self):
@@ -141,6 +139,10 @@ class OFSurveySurvey(models.Model):
     has_conditional_questions = fields.Boolean(
         string="Contains conditional questions", compute='_compute_has_conditional_questions'
     )
+
+    # page display
+    show_start = fields.Boolean(string="Show start page")
+    show_end = fields.Boolean(string="Show end page")
 
     _sql_constraints = [
         ('access_token_unique', 'unique(access_token)', "Access token should be unique"),

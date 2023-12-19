@@ -1,69 +1,56 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-##############################################################################
-#
-#    OpenFire
-#    Version OF10.0
-#
-#    Module conçu et développé par OpenFire SAS
-#
-#    Compatible avec Odoo 10 Community Edition
-#
-##############################################################################
-
 {
-    'name': u"OpenFire / Planning",
-    'version': '10.0.1.2.0',
-    'author': u"OpenFire",
-    'website': u"www.openfire.fr",
-    'category': u"Generic Modules",
-    'summary': u"Gestion des interventions",
-    'description': u"""
-Module OpenFire / Planning
-==========================
-
-Module OpenFire des plannings d'intervention.
-Inclut la gestion des équipes d'intervention.
-
-""",
+    'name': "OpenFire / Planning",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'category': "OpenFire",
+    'summary': "Gestion des interventions",
+    'website': "https://www.openfire.fr",
     'depends': [
-        #'hr',  # par of_calendar
-        'product',
-        'sale',
-        #'of_base', par of_base_location
-        'of_gesdoc',
-        'of_calendar',
-        'of_kit',
-        'mail',
-        'of_utils',
-        'of_base_location',  # secteurs
-        'of_map_view',
-        'of_stock',
+        'calendar',
+        'hr',
         'l10n_fr_department',
+        'of_sale_order_dates',
+        'of_geolocalize',
+        'of_sale_stock',
     ],
     'data': [
-        'security/of_planning_security.xml',
-        'security/ir.model.access.csv',
-        'report/of_planning_fiche_intervention.xml',
-        'report/of_planning_fiche_intervention_view.xml',
-        'report/of_planning_report_templates.xml',
-        'report/of_planning_rapport_intervention.xml',
         'data/data.xml',
-        'wizard/message_invoice.xml',
-        'wizard/of_move_rdv_wizard_views.xml',
-        'views/of_planning_intervention_view.xml',
-        'views/of_res_config_views.xml',
-        'views/of_planning_report_view.xml',
+        'data/report_paperformat.xml',
+        'data/cron_planning.xml',
+        'data/email_planning.xml',
+        'security/res_groups.xml',
+        'security/ir.model.access.csv',
+        'views/of_sector_views.xml',
+        'views/of_planning_intervention_line_views.xml',
         'views/of_planning_intervention_template_views.xml',
-    ],
-    'css': [
-        'static/src/css/of_planning.css',
-    ],
-    'qweb': [
-        'static/src/xml/of_planning_calendar_view.xml',
+        'views/of_planning_tag_views.xml',
+        'views/of_planning_task_views.xml',
+        'views/of_planning_team_views.xml',
+        'views/of_image_views.xml',
+        'views/hr_employee_views.xml',
+        'views/res_partner_views.xml',
+        'views/sale_order_views.xml',
+        'views/sale_order_line_views.xml',
+        'views/stock_picking_views.xml',
+        'views/procurement_group_views.xml',
+        'views/calendar_event_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/menuitems.xml',
+        'reports/report_intervention_template.xml',
+        'reports/report_intervention_sheet.xml',
+        'reports/report_intervention_report.xml',
+        'reports/report_planning_general_week.xml',
+        'reports/report_planning_week.xml',
+        'reports/report_planning_day.xml',
+        'wizards/of_planning_print_wizard_views.xml',
+        'data/ir_action_server.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
+    'uninstall_hook': 'uninstall_hook',
 }

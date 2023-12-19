@@ -56,6 +56,10 @@
                                     <field name="progression_mode" widget="radio" attrs="{'invisible': [('questions_layout', '=', 'one_page')]}"/>
                                 </group>
                             </group>
+                            <group string="Start/Stop pages display" name="show_start_stop">
+                                <field name="show_start"/>
+                                <field name="show_end"/>
+                            </group>
                         </page>
                         <page string="Description" name="description">
                             <field name="description" placeholder="e.g. &quot;The following Survey will help us...&quot;" nolabel="1"></field>

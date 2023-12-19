@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='sheet']" position="before">
+                <page string="Survey">
+                    <group>
+                        <field name="survey_id" domain="[('survey_type', '=', 'intervention_survey')]" context="{'default_survey_type': 'intervention_survey'}"/>
+                    </group>
+                    <field name="question_ids" nolabel="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='sheet_invoicing']" position="after">
+                <!-- Sheet - Survey -->
+                <field name="sheet_survey" string="SURVEY" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='report_invoicing']" position="after">
+                <!-- Report - Survey -->
+                <field name="report_survey" string="SURVEY" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

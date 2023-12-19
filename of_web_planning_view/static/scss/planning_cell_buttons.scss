@@ -1,0 +1,28 @@
+.o_planning_cell_buttons {
+    @include o-planning-zindex(interact);
+
+    .o_planning_cell_add,
+    .o_planning_cell_plan {
+        background: #dee2e6;
+        width: 30px;
+        height: 16px;
+        cursor: pointer;
+        display: inline-block;
+
+        &:first-child {
+            border-top-left-radius: 4px;
+        }
+
+        &:last-child {
+            border-top-right-radius: 4px;
+        }
+    }
+}
+
+.o_planning_cell_group_buttons_hidden {
+    display: none;
+}
+
+.o_planning_cell_group_buttons_flex {
+    display: flex;
+}

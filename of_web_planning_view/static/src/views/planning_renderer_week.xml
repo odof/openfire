@@ -1,0 +1,48 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!-- Planning Week Renderer -->
+    <t t-name="of_web_planning_view.PlanningWeekRenderer" owl="1">
+        <div t-ref="root"
+            class="o_planning_renderer o_renderer bg-view"
+            t-att-class="{ o_no_groups: !model.metaData.groupedBy.length }"
+            t-attf-style="--Planning__RowHeader-width:{{
+                state.rowHeaderWidth
+            }}px;--Planning__Pill-height:{{
+                pillHeight - 1
+            }}px;--Planning__Row-height:{{
+                rowHeight
+            }}px;--Planning__Template-rows:{{
+                gridTemplate.rows
+            }};--Planning__Template-columns:{{
+                gridTemplate.columns
+            }}"
+            t-on-pointermove="throttledOnPointerMove"
+            t-on-pointerleave="onPointerLeave"
+        >
+            <t t-call="{{ constructor.headerTemplate }}"/>
+            <t t-if="model.metaData.groupedBy.length">
+                <div class="o_planning_row_headers o_planning_grid_rows">
+                    <t t-foreach="visibleRows" t-as="row" t-key="row.id">
+                        <t t-call="{{ constructor.rowHeaderTemplate }}" />
+                    </t>
+                </div>
+            </t>
+            <div t-ref="cellContainer" class="o_planning_cells o_planning_grid_rows o_planning_grid_columns position-relative">
+                <t t-foreach="visibleRows" t-as="row" t-key="row.id">
+                    <t t-call="{{ constructor.rowContentTemplate }}">
+                        <t t-set="display_cell_action_buttons" t-value="'1'"/>
+                        <t t-set="display_extended_pill_info" t-value="'1'"/>
+                    </t>
+                </t>
+                <t t-foreach="extraPills" t-as="pill" t-key="pill.id">
+                    <t t-call="{{ constructor.pillTemplate }}" />
+                </t>
+            </div>
+            <t t-if="totalRow">
+                <t t-call="{{ constructor.totalRowTemplate }}"/>
+            </t>
+        </div>
+    </t>
+
+</templates>

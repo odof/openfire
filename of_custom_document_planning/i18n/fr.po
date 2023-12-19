@@ -1,0 +1,82 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_custom_document_planning
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-08 07:36+0000\n"
+"PO-Revision-Date: 2024-02-08 07:36+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
+msgid "Appendices <i>(Mail templates)</i>"
+msgstr "Annexes <i>(Modèle de mail)</i>"
+
+#. module: of_custom_document_planning
+#: model:ir.model,name:of_custom_document_planning.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_calendar_event__of_custom_document_ids
+msgid "Custom documents"
+msgstr "Documents personnalisés"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_picking_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_picking_pdf
+msgid "Delivery notes"
+msgstr "Bons de livraison"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,help:of_custom_document_planning.field_calendar_event__of_custom_document_ids
+msgid "Documents to include into pdf reports."
+msgstr "Documents à inclure dans les rapports pdf"
+
+#. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
+msgid "Internal documents"
+msgstr "Documents internes"
+
+#. module: of_custom_document_planning
+#: model:ir.model,name:of_custom_document_planning.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_invoice_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_invoice_pdf
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_custom_document_ids
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_custom_document_ids
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
+msgid "Joined documents"
+msgstr "Documents joints"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_order_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_order_pdf
+msgid "Order"
+msgstr "Commandes"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_purchase_pdf
+msgid "Purchases"
+msgstr "Achats"
+
+#. module: of_custom_document_planning
+#: model:ir.model,name:of_custom_document_planning.model_ir_actions_report
+msgid "Report Action"
+msgstr "Action d'impression"

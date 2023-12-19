@@ -8,6 +8,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-08 11:14+0000\n"
 "PO-Revision-Date: 2024-01-08 11:14+0000\n"
+"POT-Creation-Date: 2024-01-04 15:04+0000\n"
+"PO-Revision-Date: 2024-01-04 15:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -102,15 +104,6 @@ msgstr "(OF) Arrêter la propagation des conditions de paiement"
 #, python-format
 msgid "(Undated)"
 msgstr "(Non daté)"
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid ""
-"* The data entered in this field will be visualized in the intervention "
-"planning and printed in the intervention form."
-msgstr ""
-"* Les données saisies dans ce champ seront visualisées dans planning "
-"d'intervention et imprimées dans la fiche d'intervention."
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
@@ -727,12 +720,6 @@ msgstr "Inclure les lignes à quantité 0 ?"
 #: model:ir.model.fields,field_description:of_sale.field_account_payment__of_internal_followup
 msgid "Internal follow-up"
 msgstr "Suivi interne"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_intervention_notes
-#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Intervention notes"
-msgstr "Notes intervention"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view

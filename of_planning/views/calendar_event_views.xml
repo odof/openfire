@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_calendar_event_intervention_tree" model="ir.ui.view">
+        <field name="name">calendar.event.intervention.view.tree</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <tree string="Interventions">
+                <field name="name" string="Title" />
+                <field name="start" string="Start date" />
+                <field name="duration" widget="float_time" />
+                <field name="of_employee_ids" widget="many2many_tags" />
+                <field name="of_task_id" />
+                <field name="of_address_id" />
+                <field name="of_address_city" />
+                <field name="of_sector_id" optional="hide" />
+                <field name="of_company_id" optional="show" />
+                <field name="of_state" />
+                <field name="categ_ids" />
+                <field name="of_internal_description" optional="show" attrs="{'readonly':[('recurrency','=',True)]}" />
+                <field name="description" optional="hide" attrs="{'readonly':[('recurrency','=',True)]}" />
+                <field name="recurrency" invisible="1" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form" />
+        <field name="arch" type="xml">
+
+            <!-- Header part -->
+            <xpath expr="//sheet" position="before">
+                <field name="id" invisible="1" />
+                <header attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <field name="of_is_closed" invisible="1" />
+                    <button name="action_button_confirm" string="Confirm" type="object" attrs="{'invisible': [('of_state', 'not in', ['draft'])]}" />
+                    <button name="action_button_ongoing" string="Ongoing" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed', 'postponed'])]}" />
+                    <button name="action_button_done" string="Done" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed', 'ongoing'])]}" />
+                    <button name="action_button_unfinished" string="Unfinished" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed'])]}" />
+                    <button name="action_button_postponed" string="Postponed" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed'])]}" />
+                    <button name="action_button_cancel" string="Cancel" type="object" attrs="{'invisible': [('of_state', 'not in', ['draft','confirmed', 'ongoing', 'done'])]}" />
+                    <button name="action_button_draft" string="Draft" type="object" attrs="{'invisible': [('of_state', 'not in', ['unfinished','cancel','postponed'])]}" />
+                    <button name="action_button_send_email" string="Send email" type="object" />
+                    <button name="action_button_close" string="Close" type="object" attrs="{'invisible': [('of_is_closed', '=', True)]}" />
+                    <button name="action_button_open" string="Reopen" type="object" attrs="{'invisible': [('of_is_closed', '=', False)]}" />
+                    <field name="of_state" widget="statusbar" statusbar_visible="draft,confirmed,ongoing,done" nolabel="1" />
+                </header>
+            </xpath>
+            <!-- /Header part -->
+
+            <!-- Title part -->
+            <xpath expr="//label[@for='name']" position="attributes">
+                <attribute name="attrs">{'invisible':[('of_type', '!=', 'event')]}</attribute>
+            </xpath>
+            <xpath expr="//label[@for='name']" position="after">
+                <label for="name" string="Intervention title" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" />
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="attrs">{'required':[('of_type', '=', 'event')]}</attribute>
+            </xpath>
+            <!-- /Title part -->
+
+            <!-- Button Box part -->
+            <xpath expr="//div[@name='button_box']" position="before">
+                <widget name="web_ribbon" title="Finalized" bg_color="bg-danger" attrs="{'invisible': [('of_is_closed', '=', False)]}" />
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_button_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('of_invoice_count', '=', 0)]}">
+                    <field name="of_invoice_count" widget="statinfo" string="# Invoices" />
+                </button>
+                <button name="action_button_view_delivery" type="object" class="oe_stat_button" icon="fa-truck" attrs="{'invisible': [('of_delivery_count', '=', 0)]}" groups="base.group_user">
+                    <field name="of_delivery_count" widget="statinfo" string="# Deliveries" />
+                </button>
+            </xpath>
+            <!-- /Button Box part -->
+
+            <!-- Hiding fields part -->
+            <!-- Removing -->
+            <xpath expr="//div[@name='send_buttons']" position="replace" />
+            <!-- Repostionning them in the body part -->
+            <xpath expr="//field[@name='partner_ids']" position="replace" />
+            <xpath expr="//field[@name='recurrency']/../.." position="replace" />
+            <!-- /Hiding fields part (repostionning them in the body part) -->
+
+            <!-- Body who/what/when/when part -->
+            <xpath expr="//notebook" position="before">
+                <field name="of_order_id" invisible="1" />
+                <field name="of_address_id" invisible="1" />
+                <field name="of_alert_unable" invisible="1" />
+                <field name="of_alert_wrong_company" invisible="1" />
+                <group>
+                    <group>
+                        <field name="of_type" invisible="1" />
+                        <field name="of_order_user_id" attrs="{'invisible': ['|', ('of_order_id','=',False), ('of_type', '!=', 'intervention')]}" />
+                        <field name="of_template_id" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" />
+                    </group>
+                    <group>
+                        <field name="user_id" widget="many2one_avatar_user" />
+                        <field name="of_tag_ids" widget="many2many_tags" />
+                    </group>
+                </group>
+                <group name="where" string="Where" class="of_blue_background mb-3 p-3">
+                    <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                        <field name="of_partner_id" />
+                        <field name="of_email" widget="email" />
+                        <field name="of_partner_tag_ids" widget="many2many_tags" />
+                    </group>
+                    <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                        <label for="of_address_id" />
+                        <div class="o_address_format">
+                            <div>
+                                <field name="of_address_id" />
+                            </div>
+                            <field name="of_geocoding_state" invisible="1" />
+                            <button name="action_button_geolocalize" class="icon-red" string="Address not geolocalized" type="object" attrs="{'invisible': [('of_geocoding_state','not in',['not_tried','failure','no_address'])]}" icon="fa-map-marker" help="This address is not geolocalized, click here to try to geolocalize it"/>
+                            <field name="of_address_street" attrs="{'invisible': [('of_address_street','=',False)]}" />
+                            <field name="of_address_street2" attrs="{'invisible': [('of_address_street2','=',False)]}" />
+                            <group>
+                                <field name="of_address_zip" nolabel="1" />
+                                <field name="of_address_city" nolabel="1" />
+                            </group>
+                            <field name="of_address_mobile" attrs="{'invisible': [('of_address_mobile','=',False)]}" />
+                            <field name="of_address_phone" attrs="{'invisible': [('of_address_phone','=',False)]}" />
+                        </div>
+                        <field name="of_sector_id" />
+                    </group>
+                    <group attrs="{'invisible':[('of_type', '!=', 'event')]}">
+                        <field name="location" />
+                    </group>
+                    <group attrs="{'invisible':[('of_type', '!=', 'event')]}">
+                        <label for="videocall_location" />
+                        <div col="2" class="o_row">
+                            <field name="videocall_location" class="oe_inline" string="Videocall URL" widget="CopyClipboardChar" force_save="1" attrs="{'readonly':[('videocall_source','=', 'discuss')]}" />
+                            <button name="clear_videocall_location" type="object" class="btn btn-link" attrs="{'invisible': [('videocall_location', '=', False)]}" context="{'recurrence_update': recurrence_update}">
+                                <span class="fa fa-times"></span>
+                                <span> Clear meeting</span>
+                            </button>
+                            <button name="set_discuss_videocall_location" type="object" class="btn btn-link" attrs="{'invisible':  [('videocall_location', '!=', False)]}" context="{'recurrence_update': recurrence_update}">
+                                <span class="fa fa-plus"></span>
+                                <span> Add Odoo meeting</span>
+                            </button>
+                        </div>
+                        <field name="videocall_source" invisible="1" />
+                        <field name="access_token" invisible="1" force_save="1" />
+                    </group>
+                </group>
+                <group name="who" string="Who" class="of_blue_background mb-3 p-3">
+                    <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                        <field name="of_team_id" autofocus="autofocus" />
+                        <field name="of_employee_ids" widget="many2many_tags" options='{"no_open": True, "no_create": True}' attrs="{'required': [('of_type','=','intervention')]}" />
+                        <div colspan="2" attrs="{'invisible': [('of_alert_unable', '=', False)]}" class="of_red">
+                            <i class="fa fa-warning of_ws" /> No operator can perform this task
+                        </div>
+                        <div colspan="2" attrs="{'invisible': [('of_alert_wrong_company', '=', False)]}" class="of_red">
+                            <i class="fa fa-warning of_ws" /> At least one operator doesn't have
+                            access to the company of this intervention, so he won't be able to edit
+                            it
+                        </div>
+                    </group>
+                    <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                        <field name="of_employee_id" options='{"no_open": True, "no_create": True}' domain="[('id', 'in', of_employee_ids)]" attrs="{'required': [('of_type','=','intervention')]}" />
+                        <field name="of_company_id" options="{'no_create': True, 'no_edit': True}" attrs="{'required': [('of_type','=','intervention')]}" />
+                    </group>
+                    <group colspan="4" attrs="{'invisible':[('of_type', '!=', 'event')]}">
+                        <field name="partner_ids" widget="many2manyattendee" placeholder="Select attendees..." context="{'force_email':True}" domain="[('type','!=','private')]" class="oe_inline o_calendar_attendees" />
+                        <button name="action_open_composer" help="Send Email to attendees" type="object" string="EMAIL" icon="fa-envelope" />
+                        <button name="action_join_video_call" class="btn-primary" help="Join Video Call" type="object" string="Join Video Call" attrs="{'invisible': [('videocall_location', '=', False)]}" />
+                    </group>
+                </group>
+                <group name="what" string="What" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" class="of_blue_background mb-3 p-3">
+                    <group>
+                        <field name="of_task_id" attrs="{'required': [('of_type', '=', 'intervention')]}" />
+                    </group>
+                    <group>
+                        <label for="duration" attrs="{'invisible': [('allday','=',True)]}" />
+                        <div attrs="{'invisible': [('allday','=',True)]}">
+                            <field name="duration" widget="float_time" string="Duration" class="oe_inline" attrs="{'readonly': [('id', '!=', False), ('recurrency','=',True)]}" />
+                            <span> hours</span>
+                        </div>
+                    </group>
+                </group>
+                <group name="when" string="When" class="of_blue_background mb-3 p-3">
+                    <group>
+                        <field name="start_date" string="Starting at" attrs="{'required': [('allday','=',True)], 'invisible': [('allday','=',False)]}" force_save="1" />
+                        <field name="stop_date" string="Ending at" attrs="{'required': [('allday','=',True)],'invisible': [('allday','=',False)]}" force_save="1" />
+
+                        <field name="start" string="Starting at" attrs="{'required': [('allday','=',False)], 'invisible': [('allday','=',True)]}" />
+                        <field name="stop" string="Ending At" attrs="{'invisible': [('allday','=',True)]}" />
+                        <field name="event_tz" attrs="{'invisible': [('recurrency', '=', False)]}" />
+                        <field name="of_has_conflict_warning" invisible="1" />
+                        <div colspan="2" attrs="{'invisible': [('of_has_conflict_warning', '=', False)]}" class="text-danger">
+                            <i class="fa fa-warning" /> Warning, this intervention is in conflict with another one.
+                        </div>
+                    </group>
+                    <group>
+                        <field name="allday" force_save="1" />
+                        <field name="of_force_dates" />
+                        <field name="alarm_ids" widget="many2many_tags" options="{'no_quick_create': True}" />
+                        <field name="categ_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" />
+                        <field name="of_is_flexible" attrs="{'readonly': [('of_state','in',['done'])], 'invisible':[('of_type', '!=', 'intervention')]}" groups="of_planning.group_planning_intervention_read_all_write_own"/>
+                    </group>
+                    <group colspan="4">
+                        <group>
+                            <field name="recurrency" />
+                        </group>
+                        <newline />
+                        <group attrs="{'invisible': [('recurrency', '=', False)]}">
+                            <label for="interval" />
+                            <div class="o_col">
+                                <div class="o_row">
+                                    <field name="interval" class="oe_inline" attrs="{'required': [('recurrency', '=', True)]}" />
+                                    <field name="rrule_type" attrs="{'required': [('recurrency', '=', True)]}" />
+                                </div>
+                                <widget name="week_days" attrs="{'invisible': [('rrule_type', '!=', 'weekly')]}" />
+                            </div>
+                            <label string="Until" for="end_type" />
+                            <div class="o_row">
+                                <field name="end_type" attrs="{'required': [('recurrency', '=', True)]}" />
+                                <field name="count" attrs="{'invisible': [('end_type', '!=', 'count')], 'required': [('recurrency', '=', True)]}" />
+                                <field name="until" attrs="{'invisible': [('end_type', '!=', 'end_date')], 'required': [('end_type', '=', 'end_date'), ('recurrency', '=', True)]}" />
+                            </div>
+                        </group>
+                        <group attrs="{'invisible': [('rrule_type', '!=', 'monthly')]}">
+                            <label string="Day of Month" for="month_by" />
+                            <div class="o_row">
+                                <field name="month_by" />
+                                <field name="day" attrs="{'required': [('month_by', '=', 'date'), ('rrule_type', '=', 'monthly')], 'invisible': [('month_by', '!=', 'date')]}" />
+                                <field name="byday" string="The" attrs="{'required': [('recurrency', '=', True), ('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')], 'invisible': [('month_by', '!=', 'day')]}" />
+                                <field name="weekday" nolabel="1" attrs="{'required': [('recurrency', '=', True), ('month_by', '=', 'day'), ('rrule_type', '=', 'monthly')], 'invisible': [('month_by', '!=', 'day')]}" />
+                            </div>
+                        </group>
+                    </group>
+                </group>
+            </xpath>
+            <!-- /Body who/what/when/when part -->
+
+
+            <!-- Page details part -->
+            <xpath expr="//page[@name='page_details']" position="attributes">
+                <attribute name="string">General Info</attribute>
+            </xpath>
+            <xpath expr="//page[@name='page_options']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='page_invitations']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='page_details']/group[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='page_details']//field[@name='description']" position="before">
+                <field name="of_internal_description" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" />
+            </xpath>
+            <xpath expr="//page[@name='page_details']/group" position="after">
+                <group attrs="{'invisible':['|', ('of_customer_notes','=',False), ('of_type', '!=', 'intervention')]}">
+                    <separator string="Customer notes" colspan="2" />
+                    <field name="of_customer_notes" colspan="2" nolabel="1" readonly="1" />
+                </group>
+                <group attrs="{'invisible':['|', ('of_intervention_notes','=',False), ('of_type', '!=', 'intervention')]}">
+                    <separator string="Intervention notes" colspan="2" />
+                    <field name="of_intervention_notes" nolabel="1" />
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='page_details']/group" position="before">
+                <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <group name="origin" string="Origin">
+                        <field name="of_order_id" context="{'sale_extended_name_display': 1}" groups="sales_team.group_sale_salesman,account.group_account_invoice,stock.group_stock_user" />
+                        <field name="of_picking_domain" invisible="1" widget="many2many_tags" context="{'of_force_read': True}" />
+                        <field name="of_picking_manual_ids" mode="tree" string="Stock pickings" groups="sales_team.group_sale_salesman, account.group_account_invoice, stock.group_stock_user" context="{'default_partner_id': of_address_id}">
+                            <tree>
+                                <field name="name" />
+                                <field name="state" invisible="1" />
+                                <button name="action_button_open_picking_manual" type="object" string="Open Pickings" icon="fa-external-link" />
+                            </tree>
+                        </field>
+                    </group>
+                    <separator string="Description" />
+                </group>
+            </xpath>
+            <!-- /Page details part -->
+
+            <!-- Notebook part -->
+            <xpath expr="//notebook" position="inside">
+                <page name="invoicing" string="Invoicing" attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <field name="of_link_order" invisible="1" />
+                    <field name="of_currency_id" invisible="1" />
+                    <group>
+                        <group>
+                            <field name="of_warehouse_id" attrs="{'readonly':[('of_state', '!=', 'draft')]}" options="{'no_create': True, 'no_open': True}" groups="of_planning.group_intervention_use_deliveries" />
+                            <field name="of_invoice_policy" attrs="{'required': [('of_type','=','intervention')]}" />
+                            <field name="of_fiscal_position_id" attrs="{'readonly': [('of_link_order', '!=', False)]}" options="{'no_create': True, 'no_open': True}" />
+                        </group>
+                        <group>
+                            <field name="of_partner_pricelist_id" groups="product.group_sale_pricelist" />
+                        </group>
+                        <div class="oe_button_box col-lg-12">
+                            <button name="action_button_import_order_line" string="Import" type="object" attrs="{'invisible': [('of_order_id','=',False)]}" class="btn btn-link oe_right" />
+                            <button name="action_button_update_lines" string="Update" type="object" attrs="{'invisible': [('of_order_id','=',False)]}" class="btn btn-link oe_right" />
+                        </div>
+                    </group>
+                    <field name="of_line_ids">
+                        <tree editable="bottom" decoration-primary="invoice_status=='to invoice'">
+                            <field name="sequence" widget="handle" />
+                            <field name="order_line_id" invisible="1" />
+                            <field name="invoice_status" invisible="1" />
+                            <field name="product_id" attrs="{'readonly': [('order_line_id', '!=', False)]}" />
+                            <field name="name" attrs="{'readonly': [('order_line_id', '!=', False)]}" />
+                            <field name="qty" />
+                            <field name="qty_delivered" readonly="1" />
+                            <field name="qty_invoiced" readonly="1" />
+                            <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}" />
+                            <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}" widget="many2many_tags" />
+                            <field name="price_subtotal" readonly="1" />
+                            <field name="price_total" readonly="1" />
+                            <field name="so_number" string="CO" />
+                        </tree>
+                    </field>
+                    <group class="oe_subtotal_footer oe_right" colspan="2" name="intervention_total">
+                        <field name="of_price_subtotal" widget="monetary" options="{'currency_field': 'of_currency_id'}" />
+                        <field name="of_price_tax" widget="monetary" options="{'currency_field': 'of_currency_id'}" />
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="of_price_total" />
+                        </div>
+                        <field name="of_price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'of_currency_id'}" />
+                    </group>
+                </page>
+                <page name="payments" string="Payments" attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <group>
+                        <group>
+                            <field name="of_order_amount_total" />
+                            <field name="of_order_still_due" />
+                            <field name="of_picking_amount_total" />
+                        </group>
+                    </group>
+                </page>
+                <page name="photos" string="Photos" attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <field name="of_all_image_ids" mode="kanban" context="{'default_intervention_id': active_id}" string="Photos" />
+                </page>
+            </xpath>
+            <xpath expr="//notebook//field[@name='privacy']" position="attributes">
+                <attribute name="attrs">{'invisible':[('of_type', '!=', 'event')]}</attribute>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="minutes" string="Minutes" attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
+                    <separator string="Description" />
+                    <field name="of_minutes" nolabel="1" />
+                    <separator string="Dates and durations" />
+                    <group>
+                        <group name="intervention_durations">
+                            <field name="of_real_start" attrs="{'readonly': [('of_state','=','ongoing')]}" />
+                            <field name="of_real_stop" attrs="{'readonly': [('of_state','=','ongoing')]}" />
+                            <field name="of_total_duration" widget="float_time" />
+                            <field name="of_travel_duration" widget="float_time" attrs="{'readonly': [('of_state','=','ongoing')]}" />
+                            <field name="of_break_duration" widget="float_time" attrs="{'readonly': [('of_state','=','ongoing')]}" />
+                            <field name="of_real_duration" widget="float_time" attrs="{'readonly': [('of_state','=','ongoing')]}" />
+                        </group>
+                    </group>
+                    <separator string="Signatures" />
+                    <group>
+                        <group name="intervention_signature">
+                            <label for="of_signature_date" />
+                            <field name="of_signature_date" />
+                            <group name="operator_signature">
+                                <div colspan="2"><label for="of_operator_signature" /></div>
+                                <field nolabel="1" name="of_operator_signature" widget="image" options="{'preview_image': 'of_operator_signature'}" />
+                            </group>
+                            <group name="customer_signature">
+                                <div colspan="2"><label for="of_customer_signature" /></div>
+                                <field nolabel="1" name="of_customer_signature" widget="image" options="{'preview_image': 'of_customer_signature'}" />
+                            </group>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <!-- /Notebook part -->
+        </field>
+    </record>
+
+    <record id="calendar_event_view_form_2" model="ir.ui.view">
+        <field name="name">calendar.event.view.form.2</field>
+        <field name="model">calendar.event</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_address_id']" position="attributes">
+                <attribute name="domain">['|', ('id', '=', parent.id), ('parent_id', '=', parent.id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_pivot" model="ir.ui.view">
+        <field name="name">calendar.event.view.pivot</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <pivot string="Interventions" disable_linking="True">
+                <field name="of_employee_id" type="col" />
+                <field name="start_date" interval="month" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_search" model="ir.ui.view">
+        <field name="name">calendar.event.view.search</field>
+        <field name="model">calendar.event</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="of_partner_id" />
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="string">Title</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_ids']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="string">User</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='busy']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='free']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='public']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='private']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='confidential']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='mymeetings']" position="attributes">
+                <attribute name="string">My Interventions</attribute>
+            </xpath>
+
+            <xpath expr="//filter[@name='mymeetings']" position="before">
+                <field name="of_tag_ids" widget="many2one" />
+                <field name="of_task_id" widget="selection" />
+                <field name="of_category_id" widget="selection" />
+                <field name="of_team_id" widget="selection" />
+                <field name="of_employee_ids" />
+                <field name="of_order_id" />
+                <field name="of_company_id" widget="selection" />
+                <filter string="Draft" name="state_draft" domain="[('of_state','=','draft')]" />
+                <filter string="Confirmed" name="state_confirmed" domain="[('of_state','=','confirmed')]" />
+                <filter string="Done" name="state_done" domain="[('of_state','=','done')]" />
+                <filter string="Unfinished" name="state_unfinished" domain="[('of_state','=','unfinished')]" />
+                <filter string="Cancelled" name="state_cancel" domain="[('of_state','=','cancel')]" />
+                <filter string="Postponed" name="state_postponed" domain="[('of_state','=','postponed')]" />
+                <separator />
+                <filter string="Closed" name="closed" domain="[('of_is_closed', '=', True)]" />
+                <filter string="Not closed" name="opened" domain="[('of_is_closed', '=', False)]" />
+                <separator />
+                <filter string="Nothing to Invoice" name="no" domain="[('of_invoice_status', '=', 'no')]" />
+                <filter string="Waiting Invoices" name="to_invoice" domain="[('of_invoice_status', '=', 'to invoice')]" />
+                <filter string="Fully Invoiced" name="invoiced" domain="[('of_invoice_status', '=', 'invoiced')]" />
+                <separator />
+                <filter string="Flexible Intervention" name="flexible" domain="[('of_is_flexible', '=', True)]" groups="of_planning.group_planning_intervention_read_all_write_own" />
+                <filter string="Fixed Intervention" name="fixed" domain="[('of_is_flexible', '=', False)]" groups="of_planning.group_planning_intervention_read_all_write_own" />
+                <separator groups="of_planning.group_planning_intervention_read_all_write_own" />
+            </xpath>
+            <xpath expr="//filter[@name='mymeetings']" position="after">
+                <separator />
+                <filter string="Yesterday" name="yesterday" domain="['|','&amp;',
+                    ('start', '&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                    ('start','&lt;',context_today().strftime('%Y-%m-%d')),
+                    '&amp;',
+                    ('stop', '&gt;=', (context_today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                    ('stop','&lt;',context_today().strftime('%Y-%m-%d'))
+                    ]" />
+                <filter string="Today" name="today" domain="['|','&amp;',
+                    ('start', '&gt;=', (context_today() ).strftime('%Y-%m-%d')),
+                    ('start', '&lt;', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                    '&amp;',
+                    ('stop', '&gt;=', (context_today() ).strftime('%Y-%m-%d')),
+                    ('stop', '&lt;', (context_today() + datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                    ]" />
+                <filter string="Tomorrow" name="tomorrow" domain="['|','&amp;',
+                    ('start', '&gt;=', (context_today() + datetime.timedelta(days=1) ).strftime('%Y-%m-%d')),
+                    ('start', '&lt;', (context_today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d')),
+                    '&amp;',
+                    ('stop', '&gt;=', (context_today() + datetime.timedelta(days=1) ).strftime('%Y-%m-%d')),
+                    ('stop', '&lt;', (context_today() + datetime.timedelta(days=2)).strftime('%Y-%m-%d')),
+                    ]" />
+                <filter string="This week" name="this_week" domain="['|','&amp;',
+                    ('start', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ('start', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    '&amp;',
+                    ('stop', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ('stop', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ]" />
+                <filter string="Next week" name="next_week" domain="['|','&amp;',
+                    ('start', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ('start', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(weeks=1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    '&amp;',
+                    ('stop', '&gt;=', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ('stop', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(weeks=1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                    ]" />
+                <filter string="This month" name="this_month" domain="['|','&amp;',
+                    ('start','&gt;=', context_today().strftime('%Y-%m-01')),
+                    ('start','&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01')),
+                    '&amp;',
+                    ('stop','&gt;=', context_today().strftime('%Y-%m-01')),
+                    ('stop','&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01')),
+                    ]" />
+                <filter string="Next month" name="next_month" domain="['|','&amp;',
+                    ('start', '&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                    ('start', '&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d')),
+                    '&amp;',
+                    ('stop', '&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                    ('stop', '&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d')),
+                    ]" />
+            </xpath>
+            <xpath expr="//group[@expand='0']" position="inside">
+                <filter string="Task" name="task" domain="[]" context="{'group_by' : 'of_task_id'}" />
+                <filter string="Team" name="team" domain="[]" context="{'group_by' : 'of_team_id'}" />
+                <filter string="Operator" name="operator" domain="[]" context="{'group_by' : 'of_gb_employee_id'}" />
+                <filter string="Company" name="company" domain="[]" context="{'group_by' : 'of_company_id'}" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_calendar_event" model="ir.actions.act_window">
+        <field name="name">Intervention Planning</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">tree,form,calendar,pivot</field>
+        <field name="view_id" ref="view_calendar_event_intervention_tree" />
+        <field name="search_view_id" ref="calendar_event_view_search" />
+        <field name="domain">[('of_type','=','intervention')]</field>
+    </record>
+
+    <record id="calendar.action_calendar_event" model="ir.actions.act_window">
+        <field name="context">{'default_of_type': 'event'}</field>
+        <field name="domain">[('of_type','=','event')]</field>
+    </record>
+
+</odoo>

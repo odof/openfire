@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_planning.of_planning_default_intervention_template" model="of.planning.intervention.template">
+
+        <!-- Intervention sheet-->
+        <field name="sheet_survey" eval="True" />
+
+        <!-- Intervention report-->
+        <field name="report_survey" eval="True" />
+    </record>
+
+</odoo>

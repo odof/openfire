@@ -1,0 +1,252 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_planning_view
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-14 14:38+0000\n"
+"PO-Revision-Date: 2024-02-14 14:38+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "<i class=\"fa fa-long-arrow-right\" title=\"Arrow\"/>"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_partner_address
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Address"
+msgstr "Adresse"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_allocated_hours
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_allocated_time
+msgid "Allocated Time"
+msgstr "Temps alloué"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_allocated_percentage
+msgid "Allocated Time %"
+msgstr "Temps alloué %"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Allocated time"
+msgstr "Temps alloué"
+
+#. module: of_planning_view
+#. odoo-python
+#: code:addons/of_planning_view/models/calendar_event.py:0
+#, python-format
+msgid ""
+"As there is no running contract during this period, this resource is not "
+"expected to work a shift.Planned hours:"
+msgstr ""
+"Comme il n'y a pas de contrat en cours pendant cette période, cette "
+"ressource n'est pas censée travailler un poste. Heures prévues :"
+
+#. module: of_planning_view
+#: model:ir.model,name:of_planning_view.model_base
+msgid "Base"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model,name:of_planning_view.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_move_intervention_to_next_week_wizard_form_view
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_planning_color
+#: model:ir.model.fields,help:of_planning_view.field_of_planning_intervention_template__planning_color
+msgid "Color used to display the intervention in the planning view"
+msgstr "Couleur utilisée pour afficher l'intervention dans la vue du planning"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Employee(s)"
+msgstr "Intervenant(s)"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_employees_names
+msgid "Employees"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields.selection,name:of_planning_view.selection__calendar_event__of_allocation_type__forecast
+msgid "Forecast"
+msgstr "Prévisions"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_has_geolocalize_warning
+msgid "Geolocalize Warning"
+msgstr "Avetissement de géolocalisation"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_partner_address
+msgid "Helper field, to display Address in the popover"
+msgstr "Champ d'aide, pour afficher l'adresse dans la fenêtre contextuelle"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_allocated_time
+msgid "Helper field, to display Allocated Time in the popover"
+msgstr ""
+"Champ d'aide, pour afficher le temps alloué dans la fenêtre contextuelle"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_employees_names
+msgid "Helper field, to display Employees in the popover"
+msgstr ""
+"Champ d'aide, pour afficher les intervenants dans la fenêtre contextuelle"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_has_geolocalize_warning
+msgid "Helper field, to display warning if geolocalize is not set"
+msgstr ""
+"Champ d'aide, pour afficher un avertissement si la géolocalisation n'est pas"
+" définie"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__intervention_count
+msgid "Intervention count"
+msgstr "Nombre d'interventions"
+
+#. module: of_planning_view
+#: model:ir.model,name:of_planning_view.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__intervention_ids
+msgid "Interventions"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_of_move_intervention_to_next_week_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_move_intervention_to_next_week_wizard_form_view
+msgid "Move interventions to next week"
+msgstr "Déplacer les interventions à la semaine suivante"
+
+#. module: of_planning_view
+#: model:ir.actions.act_window,name:of_planning_view.of_move_intervention_to_next_week_wizard_action
+msgid "Move to next week"
+msgstr "Déplacer à la semaine suivante"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_allocation_type
+msgid "Of Allocation Type"
+msgstr "Type d'allocation"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_employee_ids
+msgid "Operators"
+msgstr "Techniciens"
+
+#. module: of_planning_view
+#: model:ir.model.fields.selection,name:of_planning_view.selection__calendar_event__of_allocation_type__planning
+msgid "Planning"
+msgstr ""
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_planning_color
+#: model:ir.model.fields,field_description:of_planning_view.field_of_planning_intervention_template__planning_color
+msgid "Planning color"
+msgstr "Couleur du planning"
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_resource_id
+msgid "Resource"
+msgstr "Ressource"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_resource_id
+msgid "Resource linked to the intervention"
+msgstr "Ressource liée à l'intervention"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Schedule"
+msgstr "Planning"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Task"
+msgstr "Tâche"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "The customer's address is not geolocated."
+msgstr "L'adresse du client n'est pas géolocalisée."
+
+#. module: of_planning_view
+#. odoo-python
+#: code:addons/of_planning_view/models/calendar_event.py:0
+#, python-format
+msgid "This Progress Bar is not implemented."
+msgstr "Cette barre de progression n'est pas implémentée."
+
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_trip_duration
+msgid "Trip duration"
+msgstr "Durée du trajet"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_move_intervention_to_next_week_wizard_form_view
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_planning_view
+#: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
+msgid "Warning, this intervention is in conflict with another one."
+msgstr "Attention, cette intervention est en conflit avec une autre."
+
+#. module: of_planning_view
+#: model:ir.model,name:of_planning_view.model_of_move_intervention_to_next_week_wizard
+msgid "Wizard to move interventions to next week"
+msgstr "Assistant pour déplacer les interventions à la semaine suivante"

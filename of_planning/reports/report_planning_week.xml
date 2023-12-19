@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_planning_week" model="ir.actions.report">
+        <field name="name">Week Planning Report</field>
+        <field name="model">of.planning.print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_planning.report_planning_week</field>
+        <field name="report_file">of_planning.report_planning_week</field>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="of_base.paperformat_euro_internal_landscape" />
+    </record>
+
+    <template id="report_planning_week">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_planning.report_planning_week_document" t-lang="doc.lang" />
+            </t>
+        </t>
+    </template>
+
+    <template id="report_planning_week_document">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <div t-foreach="doc.employee_ids" t-as="employee" style="page-break-after: always;">
+                    <t t-set="interventions" t-value="doc._get_employee_interventions(employee.id)" />
+                    <t t-set="title" t-value="doc._get_report_title(employee.id)" />
+                    <h3 class="text-center">
+                        <strong t-out="title" />
+                    </h3>
+                    <table class="table table-condensed border">
+                        <thead>
+                            <tr>
+                                <th class="border-end">Datetime</th>
+                                <th class="border-end">Customer</th>
+                                <th class="border-end">Task</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="interventions" t-as="intervention">
+                                <td class="border-end">
+                                    <span t-out="doc._get_intervention_datetime(intervention)" />
+                                </td>
+                                <td class="border-end">
+                                    <address class="mb-0" t-field="intervention.of_address_id"
+                                        t-options='{"widget": "contact", "fields": ["name", "phone", "mobile", "address"], "no_marker": True}' />
+                                </td>
+                                <td class="border-end">
+                                    <span t-esc="intervention.of_task_id.name" />
+                                </td>
+                                <td>
+                                    <span t-out="intervention.description" />
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

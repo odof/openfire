@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_intervention_report_document" inherit_id="of_planning.report_intervention_report_document">
+        <xpath expr="//div[@name='report_invoicing']" position="after">
+            <!-- Survey -->
+            <div t-if="template.report_survey and doc.of_answers_ids"
+                name="report_survey"
+                class="row mb-4" style="page-break-inside: avoid;">
+                <div class="col">
+                    <h5 name="title_survey">
+                        <strong>Survey</strong>
+                    </h5>
+                    <div class="border border-bottom-0">
+                        <table class="table table-condensed mb-0">
+                            <tbody>
+                                <t t-foreach="doc.of_answers_ids" t-as="answer">
+                                    <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
+                                        <td>
+                                            <strong t-field="answer.question_id.title" />
+                                            <span t-if="not answer.question_id.is_page"> : <span t-field="answer.answers" /></span>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">of.custom.document.calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_picking_manual_ids']" position="after">
+                <field name="of_custom_document_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

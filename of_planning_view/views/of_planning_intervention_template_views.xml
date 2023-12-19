@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.view.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='general']//group[@name='general_two']" position="inside">
+                <field name="planning_color" widget="color_picker" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

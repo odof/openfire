@@ -1,0 +1,365 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_web_planning_view
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-15 12:48+0000\n"
+"PO-Revision-Date: 2024-01-15 12:48+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_web_planning_view
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"role=\"img\"/>"
+msgstr ""
+
+#. module: of_web_planning_view
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+msgid ""
+"<span class=\"o_form_label\">Hours</span>\n"
+"                                <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+
+#. module: of_web_planning_view
+#: model:ir.model,name:of_web_planning_view.model_ir_actions_act_window_view
+msgid "Action Window View"
+msgstr "Vue de la fenêtre d'action"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_controller.js:0
+#, python-format
+msgid "Are you sure to delete this record?"
+msgstr "Êtes-vous sûr de vouloir supprimer cet enregistrement ?"
+
+#. module: of_web_planning_view
+#: model:ir.model,name:of_web_planning_view.model_base
+msgid "Base"
+msgstr ""
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_renderer.xml:0
+#, python-format
+msgid "Collapse rows"
+msgstr "Plier les lignes"
+
+#. module: of_web_planning_view
+#: model:ir.model.fields,field_description:of_web_planning_view.field_resource_resource__color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: of_web_planning_view
+#: model:ir.model,name:of_web_planning_view.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_web_planning_view
+#: model:ir.model,name:of_web_planning_view.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_controller.js:0
+#: code:addons/of_web_planning_view/static/src/views/planning_renderer.xml:0
+#: code:addons/of_web_planning_view/static/src/views/planning_renderer.xml:0
+#, python-format
+msgid "Create"
+msgstr "Créer"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_arch_parser.js:0
+#: code:addons/of_web_planning_view/static/src/js/planning_controller.js:0
+#, python-format
+msgid "Day"
+msgstr "Jour"
+
+#. module: of_web_planning_view
+#: model:ir.model.fields,field_description:of_web_planning_view.field_of_connector_config_settings__of_planning_end_hour
+#: model:ir.model.fields,field_description:of_web_planning_view.field_res_company__of_planning_end_hour
+#: model:ir.model.fields,field_description:of_web_planning_view.field_res_config_settings__of_planning_end_hour
+msgid "Day end time"
+msgstr "Heure de fin de journée"
+
+#. module: of_web_planning_view
+#: model:ir.model.fields,field_description:of_web_planning_view.field_of_connector_config_settings__of_planning_start_hour
+#: model:ir.model.fields,field_description:of_web_planning_view.field_res_company__of_planning_start_hour
+#: model:ir.model.fields,field_description:of_web_planning_view.field_res_config_settings__of_planning_start_hour
+msgid "Day start time"
+msgstr "Heure de début de journée"
+
+#. module: of_web_planning_view
+#: model:ir.model.fields,field_description:of_web_planning_view.field_resource_resource__department_id
+msgid "Department"
+msgstr "Département"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_renderer.js:0
+#, python-format
+msgid "Edit"
+msgstr "Modifier"
+
+#. module: of_web_planning_view
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+msgid "Employees"
+msgstr "Employés"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_renderer.xml:0
+#, python-format
+msgid "Expand rows"
+msgstr "Déplier les lignes"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "Hide Unaffected Interventions"
+msgstr "Cacher non affectées"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Invalid attributes (%s) in planning view. Attributes must be in (%s)"
+msgstr ""
+"Des attributs invalides (%s) dans la vue Planning. Les attributs doivent "
+"être en (%s)"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Invalid default_scale '%s' in planning"
+msgstr "default_scale '%s' invalide dans Planning"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/popover/planning_popover.xml:0
+#, python-format
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "New"
+msgstr "Nouveau"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "Next"
+msgstr "Suivant"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_controller.js:0
+#, python-format
+msgid "Open"
+msgstr "Ouvrir"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_renderer.js:0
+#, python-format
+msgid "Plan"
+msgstr "Planifier"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_renderer.xml:0
+#, python-format
+msgid "Plan existing"
+msgstr "Planifier existant"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_view.js:0
+#: model:ir.model.fields.selection,name:of_web_planning_view.selection__ir_actions_act_window_view__view_mode__planning
+#: model:ir.model.fields.selection,name:of_web_planning_view.selection__ir_ui_view__type__planning
+#, python-format
+msgid "Planning"
+msgstr ""
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_arch_parser.js:0
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+#, python-format
+msgid "Planning View"
+msgstr "Vue Planning"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Planning child can only be field or template, got %s"
+msgstr ""
+"Une ligne enfant Planning peut seulement être un champ ou un modèle, vous "
+"avez %s"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Planning must have a 'date_start' attribute"
+msgstr "Planning doit avoir un attribut 'date_start'"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Planning must have a 'date_stop' attribute"
+msgstr "Planning doit avoir un attribut 'date_stop'"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid ""
+"Planning must have a 'dependency_inverted_field' attribute once the "
+"'dependency_field' is specified"
+msgstr ""
+"Planning doit avoir un attribut 'dependency_inverted_field' dès que le "
+"'dependency_field' est défini"
+
+#. module: of_web_planning_view
+#. odoo-python
+#: code:addons/of_web_planning_view/models/ir_ui_view.py:0
+#, python-format
+msgid "Planning view can contain only one templates tag"
+msgstr "La vue Planning peut uniquement contenir une balise de modèles"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "Previous"
+msgstr "Précédent"
+
+#. module: of_web_planning_view
+#: model:ir.model,name:of_web_planning_view.model_resource_resource
+msgid "Resources"
+msgstr "Ressources"
+
+#. module: of_web_planning_view
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+msgid "Set the hours of the day that will be displayed in the planning view."
+msgstr ""
+"Définir les heures de la journée qui seront affichées dans la vue planning."
+
+#. module: of_web_planning_view
+#: model:ir.actions.act_window,name:of_web_planning_view.action_of_web_planning_view_config
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "Show Unaffected Interventions"
+msgstr "Afficher non affectées"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/popover/planning_popover.xml:0
+#, python-format
+msgid "Start"
+msgstr "Début"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/popover/planning_popover.xml:0
+#, python-format
+msgid "Stop"
+msgstr "Fin"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/views/planning_controller.xml:0
+#, python-format
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_renderer.js:0
+#, python-format
+msgid "Total"
+msgstr ""
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_model.js:0
+#, python-format
+msgid "Unassigned Interventions"
+msgstr "Interventions non affectées"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_model.js:0
+#, python-format
+msgid "Undefined %s"
+msgstr "%s non défini"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_renderer.js:0
+#: model:ir.model,name:of_web_planning_view.model_ir_ui_view
+#, python-format
+msgid "View"
+msgstr "Vue"
+
+#. module: of_web_planning_view
+#: model:ir.model.fields,field_description:of_web_planning_view.field_ir_actions_act_window_view__view_mode
+#: model:ir.model.fields,field_description:of_web_planning_view.field_ir_ui_view__type
+msgid "View Type"
+msgstr "Type de vue"
+
+#. module: of_web_planning_view
+#: model_terms:ir.ui.view,arch_db:of_web_planning_view.res_config_settings_view_form
+msgid "Planning Day View"
+msgstr "Vue Planning Jour"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_arch_parser.js:0
+#: code:addons/of_web_planning_view/static/src/js/planning_controller.js:0
+#, python-format
+msgid "Week"
+msgstr "Semaine"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_arch_parser.js:0
+#, python-format
+msgid "hours"
+msgstr "heures"
+
+#. module: of_web_planning_view
+#. odoo-javascript
+#: code:addons/of_web_planning_view/static/src/js/planning_arch_parser.js:0
+#, python-format
+msgid "minutes"
+msgstr ""

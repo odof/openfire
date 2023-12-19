@@ -161,12 +161,6 @@
                                 * These notes come from the customer's file. They can only be modified in the customer form.
                             </div>
                         </group>
-                        <group string="Intervention notes" name="intervention_notes">
-                            <field name="of_intervention_notes" colspan="4" nolabel="1" />
-                            <div class="text-muted" colspan="4">
-                                * The data entered in this field will be visualized in the intervention planning and printed in the intervention form.
-                            </div>
-                        </group>
                     </page>
                 </xpath>
                 <!-- /Page notes-->

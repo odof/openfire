@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_planning_general_week" model="ir.actions.report">
+        <field name="name">General Week Planning Report</field>
+        <field name="model">of.planning.print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_planning.report_planning_general_week</field>
+        <field name="report_file">of_planning.report_planning_general_week</field>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="of_base.paperformat_euro_internal_landscape" />
+    </record>
+
+    <template id="report_planning_general_week">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_planning.report_planning_general_week_document" t-lang="doc.lang" />
+            </t>
+        </t>
+    </template>
+
+    <template id="report_planning_general_week_document">
+        <t t-call="web.internal_layout">
+            <t t-set="intervention_by_employee" t-value="doc._get_interventions_by_employee()" />
+            <t t-set="title" t-value="doc._get_report_title()" />
+            <t t-set="week_dates_list" t-value="doc._get_week_dates_list()" />
+            <div class="page">
+                <h3 class="text-center">
+                    <strong t-esc="title" />
+                </h3>
+                <table class="table table-striped border">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-center border-end p-2">
+                                Employees
+                            </th>
+                            <t t-foreach="week_dates_list" t-as="date">
+                                <th scope="col" class="planning_report_col_date text-center border-end p-2" style="width: 15%">
+                                    <span t-esc="date.strftime('%A')" />
+                                </th>
+                            </t>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="intervention_by_employee" t-as="employee">
+                            <tr>
+                                <th scope="row" class="text-center border-end p-2">
+                                    <span t-esc="employee.name" />
+                                </th>
+                                <td t-foreach="week_dates_list" t-as="date" class="text-center border-end p-2">
+                                    <t t-set="intervention_by_date" t-value="intervention_by_employee[employee]" />
+                                    <t t-foreach="intervention_by_date" t-as="intervention_date">
+                                        <t t-if="date == intervention_date">
+                                            <t t-foreach="intervention_by_date[date]" t-as="intervention">
+                                                <p>
+                                                    <span class="me-1" t-esc="intervention.start.strftime('%H:%M')" />
+                                                    <span class="fa fa-check me-1" t-if="intervention.of_state == 'confirmed'"/>
+                                                    <span t-esc="intervention.of_partner_id.name" />
+                                                </p>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+</odoo>

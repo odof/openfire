@@ -79,6 +79,10 @@ odoo.define('of_survey.form', function(require) {
             self.$surveyNavigation.find('.o_survey_navigation_submit').on('click', self._onSubmit.bind(self));
 
             self.$('button[type="submit"]').removeClass('disabled');
+         }).then(function() {
+            if ($('.show_start').attr('data-show') == 'no'){
+               self._submitForm({});
+            }
          });
       },
 
@@ -663,6 +667,19 @@ odoo.define('of_survey.form', function(require) {
             var $errorTarget = this.$('.o_survey_error');
             $errorTarget.removeClass("d-none");
             this._scrollToError($errorTarget);
+         }
+
+         let show_end = $('.show_end').attr('data-show');
+         let record_id = $('.show_end').attr('res-id');
+         let model = $('.show_end').attr('res-model');
+         let action_id = $('.show_end').attr('action-id');
+         let survey_id = $('.show_end').attr('survey-id');
+         if (show_end=='no'){
+               if (record_id && model && action_id){
+                  window.location = "/web/#id="+record_id+"&model="+model+"&view_type=form&action="+action_id;
+               } else {
+                  window.location = "/web/#id="+survey_id+"&model=of.survey.survey&view_type=form";
+               }
          }
       },
 

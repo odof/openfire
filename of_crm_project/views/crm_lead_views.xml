@@ -30,11 +30,11 @@
                             <field name="of_survey_id" domain="[('survey_type','=','lead_opportunity')]"/>
                         </group>
                         <group attrs="{'invisible': [('of_survey_id','=',False)]}">
-                            <button class="btn btn-primary" name="open_survey" type="object" string="Reply"/>
+                            <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>
                         </group>
                     </group>
 
-                    <field name="of_question_answers_ids">
+                    <field name="of_answers_ids">
                         <tree create="false" edit="false" delete="false" decoration-info="is_page">
                             <field name="question_id"/>
                             <field name="answers"/>

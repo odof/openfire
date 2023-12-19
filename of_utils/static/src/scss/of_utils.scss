@@ -86,3 +86,19 @@
     min-height: 200px !important;
     padding: 17px !important;
 }
+
+.of_blue_background {
+    background-color: #f3f0ff;
+
+    .btn-secondary {
+        background-color: #f3f0ff;
+    }
+
+    &.o_field_many2one .o_external_button {
+        &:hover {
+            background-color:  #f3f0ff;
+        }
+    }
+}
+
+button.icon-red i{ color: red }

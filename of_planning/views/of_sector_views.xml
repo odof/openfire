@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="action_of_sector_planning" model="ir.actions.act_window">
+        <field name="name">Sectors</field>
+        <field name="res_model">of.sector</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_base_location.of_view_sector_tree"/>
+        <field name="search_view_id" ref="of_base_location.of_view_sector_search"/>
+    </record>
+
+</odoo>

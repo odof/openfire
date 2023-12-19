@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_employee_id']" position="attributes">
+                <attribute name="attrs"/>
+            </xpath>
+            <xpath expr="//field[@name='of_employee_id']" position="after">
+                <field name="of_resource_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='of_sector_id']" position="after">
+                <field name="of_trip_duration" widget="float_time" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_intervention_view_planning" model="ir.ui.view">
+        <field name="name">calendar.event.plannning</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <planning
+                    form_view_id="%(calendar.view_calendar_event_form)d"
+                    date_start="start"
+                    date_stop="stop"
+                    default_group_by="of_resource_id"
+                    default_scale="day"
+                    color="of_planning_color"
+                    plan="true"
+                    string="Schedule"
+                    total_row="True"
+                    scales="day,week,month"
+                    precision="{'day': 'hour:full', 'week': 'day:full', 'month': 'day:full'}"
+                    decoration-warning="of_state == 'draft'"
+                    decoration-secondary="of_state == 'confirmed'"
+                    decoration-success="of_state == 'done'"
+                    decoration-danger="of_state == 'cancel'"
+                    conflict-warning="of_has_conflict_warning"
+                    geolocalize-warning="of_has_geolocalize_warning"
+                    display_unavailability="1"
+                    progress_bar="of_resource_id"
+                    trip_bar="of_trip_duration"
+                    thumbnails="{'of_employee_id': 'avatar_128', 'of_resource_id': 'avatar_128'}"
+                    pill_label="True">
+                <field name="of_state"/>
+                <field name="name"/>
+                <field name="duration"/>
+                <field name="of_trip_duration"/>
+                <field name="of_allocated_hours"/>
+                <field name="of_employee_id"/>
+                <field name="of_employee_ids"/>
+                <field name="of_resource_id"/>
+                <field name="of_allocated_percentage"/>
+                <field name="of_task_id"/>
+                <field name="of_partner_address"/>
+                <field name="of_employees_names"/>
+                <field name="of_allocated_time"/>
+                <field name="of_has_conflict_warning"/>
+                <field name="of_has_geolocalize_warning"/>
+                <templates>
+                    <div t-name="planning-popover">
+                        <div>
+                            <t t-esc="start.toFormat('f ')"/>
+                            <i class="fa fa-long-arrow-right" title="Arrow"/>
+                            <t t-esc="stop.toFormat(' f')"/>
+                        </div>
+                        <div class="mt-2 mb-0 d-flex" t-if="name">
+                            <t t-esc="name.slice(0, 200) + (name.length > 200?'…':'')" />
+                        </div>
+                        <div class="mt-2 mb-0 d-flex" t-if="of_partner_address">
+                            <div style="font-weight: bold">Address</div><div class="ms-2">- <t t-esc="of_partner_address.slice(0, 200) + (of_partner_address.length > 200?'…':'')" /></div>
+                        </div>
+                        <div class="mt-2 mb-0 d-flex" t-if="of_task_id">
+                            <div style="font-weight: bold">Task</div><div class="ms-2">- <t t-esc="of_task_id[1].slice(0, 200) + (of_task_id[1].length > 200?'…':'')" /></div>
+                        </div>
+                        <div class="mt-2 mb-0 d-flex" t-if="allocated_time">
+                            <div style="font-weight: bold">Allocated time</div><div class="ms-2">- <t t-esc="of_allocated_time"/></div>
+                        </div>
+                        <div class="mt-2 mb-0 d-flex" t-if="of_employees_names">
+                            <div style="font-weight: bold">Employee(s)</div><div class="ms-2">- <t t-esc="of_employees_names.slice(0, 200) + (of_employees_names.length > 200?'…':'')" /></div>
+                        </div>
+                        <div class="mt-5">
+                            <div class="text-danger" t-if="of_has_conflict_warning">
+                                Warning, this intervention is in conflict with another one.
+                            </div>
+                            <div class="text-warning" t-if="of_has_geolocalize_warning">
+                                The customer's address is not geolocated.
+                            </div>
+                        </div>
+                    </div>
+                </templates>
+            </planning>
+        </field>
+    </record>
+
+    <record id="of_planning.action_calendar_event" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,form,calendar,planning,pivot</field>
+    </record>
+
+</odoo>

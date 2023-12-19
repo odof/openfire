@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_planning.email_template_planning" model="mail.template">
+            <field name="name">Planning: Send by mail</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="subject">{{ object.company_id.name }} - Planning</field>
+            <field name="email_from">{{ object.work_email }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Hello <t t-out="object.name">User</t>,
+        <br/>
+        <br/>
+        Please find attached your planning for tomorrow
+        <br/>
+        If you have any questions, please do not hesitate to contact us.
+        <br/>
+        <br/>
+        Sincerely,
+    </p>
+</div>
+</field>
+            <field name="lang">{{ object.address_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="description">Sent to employees who wish to receive tomorrow's schedule</field>
+        </record>
+
+</odoo>

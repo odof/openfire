@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="resource_resource_form_view_inherit" model="ir.ui.view">
+        <field name="inherit_id" ref="resource.resource_resource_form" />
+        <field name="model">resource.resource</field>
+        <field name="mode">primary</field>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='resource_type']" position="before">
+                <field name="color" widget="color_picker" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='o_work_employee_main']" position="inside">
+                <group string="Position" name="position">
+                    <field name="of_is_operator"/>
+                    <field name="of_is_salesperson"/>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page name="interventions" string="Interventions" attrs="{'invisible': [('of_is_operator', '=', False), ('of_is_salesperson', '=', False)]}">
+                    <group string="Planning">
+                        <field name="of_team_ids" widget="many2many_tags"/>
+                        <field name="of_daily_email"/>
+                    </group>
+                    <group string="Tasks" name="task">
+                        <field name="of_all_tasks"/>
+                        <field name="of_task_ids" widget="many2many_tags" attrs="{'invisible': [('of_all_tasks', '=', True)], 'required': [('of_all_tasks', '=', False)]}"/>
+                        <div colspan="2" class="text-muted">If you remove a task from an employee, remember to review that employee's interventions.</div>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employee_view_search" model="ir.ui.view">
+        <field name="name">hr.employee.view.search</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter name="operators" string="Operators" domain="[('of_is_operator', '=', True)]"/>
+                <filter name="salespersons" string="Salespersons" domain="[('of_is_salesperson', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_hr_employee" model="ir.actions.act_window">
+        <field name="name">Employees</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="hr.view_employee_tree"/>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>

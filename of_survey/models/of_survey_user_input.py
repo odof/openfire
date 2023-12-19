@@ -17,17 +17,23 @@ class OFSurveyUserInput(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     # answer description
-    survey_id = fields.Many2one('of.survey.survey', string='Survey', required=True, readonly=True, ondelete='cascade')
-    start_datetime = fields.Datetime('Start date and time', readonly=True)
-    end_datetime = fields.Datetime('End date and time', readonly=True)
+    survey_id = fields.Many2one(
+        comodel_name='of.survey.survey', string="Survey", required=True, readonly=True, ondelete='cascade'
+    )
+    start_datetime = fields.Datetime(string="Start date and time", readonly=True)
+    end_datetime = fields.Datetime(string="End date and time", readonly=True)
     state = fields.Selection(
-        selection=[('new', 'Not started yet'), ('in_progress', 'In Progress'), ('done', 'Completed')],
-        string='Status',
+        selection=[
+            ('new', "Not started yet"),
+            ('in_progress', "In Progress"),
+            ('done', "Completed"),
+        ],
+        string="Status",
         default='new',
         readonly=True,
     )
     test_entry = fields.Boolean(readonly=True)
-    last_displayed_page_id = fields.Many2one(comodel_name='of.survey.question', string='Last displayed question/page')
+    last_displayed_page_id = fields.Many2one(comodel_name='of.survey.question', string="Last displayed question/page")
     # identification / access
     access_token = fields.Char(
         string="Identification token", default=lambda self: str(uuid.uuid4()), readonly=True, required=True, copy=False
@@ -48,6 +54,14 @@ class OFSurveyUserInput(models.Model):
     # live sessions
     is_session_answer = fields.Boolean(
         string="Is in a Session", help="Is that user input part of a survey session or not."
+    )
+    # linked record and redirect action
+    res_model = fields.Char(string="Related Document Model", help="Model of the related document.")
+    res_id = fields.Integer(string="Related Document ID", help="ID of the related document.")
+    redirect_action_id = fields.Many2one(
+        comodel_name='ir.actions.act_window',
+        string="Redirect Action",
+        help="Action to redirect to the related document.",
     )
 
     _sql_constraints = [

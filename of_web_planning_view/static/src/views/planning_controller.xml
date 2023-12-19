@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_web_planning_view.PlanningController" owl="1">
+        <div t-att-class="className" t-ref="root">
+            <Layout className="model.useSampleModel ? 'o_view_sample_data' : ''" display="props.display">
+                <t t-set-slot="layout-buttons">
+                    <t t-call="{{ props.buttonTemplate }}"/>
+                </t>
+                <t t-set-slot="layout-actions">
+                </t>
+                <t t-set-slot="control-panel-navigation-additional">
+                </t>
+                <t t-set-slot="default" t-slot-scope="layout">
+                    <t t-if="showNoContentHelp">
+                        <t t-if="props.info.noContentHelp" t-call="web.ActionHelper">
+                            <t t-set="noContentHelp" t-value="props.info.noContentHelp"/>
+                        </t>
+                        <t t-else="" t-call="web.NoContentHelper"/>
+                    </t>
+                    <t t-component="props.Renderer"
+                        class="model.useSampleModel ? 'o_sample_data_disabled' : ''"
+                        model="model"
+                        arch="props.arch"
+                        create.bind="create"
+                        openDialog="openDialog"
+                        scrollPosition="props.scrollPosition"
+                        contentRef="layout.contentRef"
+                    />
+                </t>
+            </Layout>
+        </div>
+    </t>
+
+
+    <t t-name="of_web_planning_view.PlanningController.controlButtons" owl="1">
+        <div class="o_calendar_buttons">
+            <button class="o_planning_button_add btn btn-primary me-3" data-hotkey="r" t-on-click="() => this.onAddClicked()">
+                New
+            </button>
+            <span class="o_calendar_navigation_buttons me-1">
+                <button
+                    class="btn btn-primary o_calendar_button_prev"
+                    title="Previous"
+                    aria-label="Previous"
+                    t-on-click.stop="() => this.onPreviousPeriodClicked()"
+                >
+                    <i class="fa fa-arrow-left" />
+                </button>
+                <button
+                    class="btn btn-primary mx-1 o_calendar_button_today"
+                    t-on-click.stop="() => this.onTodayClicked()"
+                >
+                    Today
+                </button>
+                <button
+                    class="btn btn-primary o_calendar_button_next"
+                    title="Next"
+                    aria-label="Next"
+                    t-on-click.stop="() => this.onNextPeriodClicked()"
+                >
+                    <i class="fa fa-arrow-right" />
+                </button>
+            </span>
+            <span class="o_calendar_scale_buttons">
+                <t t-foreach="model.scales" t-as="scale" t-key="scale">
+                    <button t-attf-class="o_calendar_button btn btn-secondary text-uppercase #{scale == model.scale ? 'active' : ''}" type="button" t-att-data-value="scale" t-att-data-hotkey="scale[0]" t-on-click="() => this.onScaleSwitched(scale)" >
+                        <t t-esc="scaleLabels[scale]"/>
+                    </button>
+                </t>
+            </span>
+            <div class="btn-group gap-1">
+                <button t-if="!model.hideUnassignedRecords"
+                    class="o_gantt_button_copy_previous_week btn btn-secondary"
+                    title="Hide Unaffected Interventions"
+                    data-hotkey="c"
+                    t-on-click="() => this.setUnaffectedRecords()"
+                >
+                    Hide Unaffected Interventions
+                </button>
+                <button t-if="model.hideUnassignedRecords"
+                    class="o_planning_button_copy_previous_week btn btn-secondary"
+                    title="Hide Unaffected Interventions"
+                    data-hotkey="c"
+                    t-on-click="() => this.setUnaffectedRecords()"
+                >
+                    Show Unaffected Interventions
+            </button>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<data>
+
     <!-- Main survey layout -->
     <template id="of_survey.layout" name="Survey Layout" inherit_id="web.frontend_layout" primary="True">
         <xpath expr="//div[@id='wrapwrap']" position="before">
@@ -157,6 +157,7 @@
                             Start Survey
                         </t>
                     </button>
+                    <div class="show_start" t-attf-data-show="{{survey.show_start and 'yes' or 'no'}}"/>
                     <span class="o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline">or press Enter</span>
                 </t>
             </div>
@@ -254,6 +255,22 @@
             <div class="o_survey_finished mt32 mb32">
                 <h1>Thank you!</h1>
                 <div t-field="survey.description_done" class="oe_no_empty" />
+                <div class="row">
+                    <div class="col">
+                        <div>
+                            <p>
+                                <a role="button" t-if="answer.res_model and answer.res_id"
+                                    class="btn btn-primary btn-lg btn-end"
+                                    t-attf-href="/web#id={{answer.res_id}}&amp;model={{answer.res_model}}&amp;view_type=form">Finish</a>
+                                <a role="button" t-else=""
+                                    class="btn btn-primary btn-lg btn-end"
+                                    t-attf-href="/web#id={{survey.id}}&amp;model=of.survey.survey&amp;view_type=form">Finish</a>
+                            </p>
+                            <div class="show_end" t-attf-survey-id="{{survey.id}}" t-attf-res-model="{{ answer.res_model }}" t-attf-res-id="{{answer.res_id}}"
+                                    t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}" t-attf-action-id="{{answer.redirect_action_id.id}}"/>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="o_survey_result p-4 col-12 row" t-if="graph_data">
                 <div t-if="survey.page_ids" class="survey_graph col-lg-6 d-none d-md-block"
@@ -515,5 +532,5 @@
             </div>
         </t>
     </template>
-</data>
+
 </odoo>

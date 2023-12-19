@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_task_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.task.view.tree</field>
+        <field name="model">of.planning.task</field>
+        <field name="arch" type="xml">
+            <tree string="Tasks list">
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="product_id" />
+                <field name="duration" widget="float_time" />
+                <field name="description" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_planning_task_view_form" model="ir.ui.view">
+        <field name="name">of.planning.task.view.form</field>
+        <field name="model">of.planning.task</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_button_view_template" type="object" class="oe_stat_button" icon="fa-pencil-square-o" attrs="{'invisible': [('templates_count', '=', 0)]}">
+                            <field name="templates_count" widget="statinfo" string="# Templates" />
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" attrs="{'readonly':[('is_locked', '=', True)]}" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="duration" widget="float_time" />
+                            <field name="is_locked" invisible="1" />
+                            <field name="product_id" attrs="{'readonly':[('is_locked', '=', True)]}" />
+                            <field name="fiscal_position_id" />
+                            <field name="display" />
+                        </group>
+                        <field name="description" nolabel="1" attrs="{'readonly':[('is_locked', '=', True)]}" placeholder="Add a description..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_task_view_search" model="ir.ui.view">
+        <field name="name">of.planning.task.view.search</field>
+        <field name="model">of.planning.task</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="description" />
+                <separator />
+                <filter string="Active" name="active" domain="[('active','=',True)]" />
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_planning_task" model="ir.actions.act_window">
+        <field name="name">Tasks</field>
+        <field name="res_model">of.planning.task</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning_task_view_tree" />
+        <field name="search_view_id" ref="of_planning_task_view_search" />
+    </record>
+
+</odoo>

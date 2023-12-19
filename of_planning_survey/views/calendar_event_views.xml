@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">of.planning.survey.calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="survey" string="Survey">
+                    <group>
+                        <group>
+                            <field name="of_survey_id" context="{'default_survey_type': 'intervention_survey'}"/>
+                        </group>
+                        <group attrs="{'invisible': [('of_survey_id','=',False)]}">
+                            <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>
+                        </group>
+                        <field name="of_answers_ids">
+                            <tree create="false" edit="false" delete="false" decoration-info="is_page">
+                                <field name="question_id"/>
+                                <field name="answers"/>
+                                <field name="is_page" invisible="1"/>
+                            </tree>
+                            <form>
+                                <group>
+                                    <field name="question_id" readonly="1"/>
+                                    <field name="answers" readonly="1"/>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
