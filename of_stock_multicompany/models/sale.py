@@ -34,7 +34,7 @@ class SaleOrder(models.Model):
             return value
 
         # 3. look up field.default
-        return self.env['res.company'].browse(company_id).of_default_warehouse_id
+        return self.env['res.company'].browse(company_id).of_default_warehouse_id.id
 
     @api.model
     def create(self, vals):
