@@ -59,7 +59,7 @@ class OFContractInvoicingWizard(models.TransientModel):
     @api.multi
     def compute_exception_line_ids(self):
         lines = [(5, )]
-        for line in self.mapped('line_ids.contract_line_id.exception_line_ids').filtered(
+        for line in self.mapped('contract_id.line_ids.exception_line_ids').filtered(
                 lambda r: r.state == '1-to_invoice' and r.date_invoice_next <= self.invoicing_period):
             lines.append((0, 0, {
                 'wizard_id': self.id,
@@ -91,14 +91,17 @@ class OFContractInvoicingWizard(models.TransientModel):
                 for date in dates:
                     lines = lines_selected.filtered(lambda l: l.next_date == date)
                     exception_lines = exceptions_selected.filtered(lambda r: r.line_id.id in lines.ids)
-                    invoices += self._create_invoice(
+                    new_invoices, exception_lines = self._create_invoice(
                         self.with_context(force_date=date).contract_id, lines, exception_lines)
+                    invoices += new_invoices
             else:
                 date = self.invoicing_method == 'day' and fields.Date.today() or self.manual_date
-                invoices = self._create_invoice(
+                invoices, exception_lines = self._create_invoice(
                     self.with_context(force_date=date).contract_id, lines_selected, exceptions_selected)
+        self._handle_exceptions(self.contract_id.with_context(force_date=self.manual_date or fields.Date.today()),
+                                exception_lines)
         self.contract_id.recompute()
-        self.lines_selected._auto_cancel()
+        lines_selected._auto_cancel()
         return self.contract_id.action_view_invoice()
 
     @api.multi
@@ -114,6 +117,7 @@ class OFContractInvoicingWizard(models.TransientModel):
         lines_grouped = lines.filtered('grouped')
         single_lines = lines - lines_grouped
         invoices = contract.env['account.invoice']
+        invoicing_method = self.invoicing_method
         if lines_grouped:
             invoice_vals = contract._prepare_invoice(do_raise=do_raise)
             if not invoice_vals:
@@ -121,8 +125,12 @@ class OFContractInvoicingWizard(models.TransientModel):
             lines = []
             for line in lines_grouped:
                 lines += line._add_invoice_lines()
+            if invoicing_method != 'computed':
+                lines += self._handle_multiple_invoices_from_line(lines_grouped)
             if lines:
-                exceptions = exception_lines.filtered(lambda r: r.line_id.id in lines_grouped._ids)
+                exceptions = exception_lines.filtered(lambda r: r.line_id.id in lines_grouped._ids and
+                                                                r.date_invoice_next < invoice_vals.get('date_invoice'))
+                exception_lines -= exceptions
                 for exception in exceptions:
                     lines += exception._add_invoice_lines()
                 addresses = lines_grouped.mapped('address_id')
@@ -133,34 +141,191 @@ class OFContractInvoicingWizard(models.TransientModel):
                 invoice.compute_taxes()
                 invoices |= invoice
         if single_lines:
+            date_stop = self.invoicing_period
             for line in single_lines:
                 intervention_id = False
-                if line.frequency_type == 'date':
-                    last_invoicing = line.last_invoicing_date
-                    if not last_invoicing:
-                        date_start = fields.Date.from_string(line.date_contract_start)
-                        last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
-                    interventions = line.intervention_ids.filtered(
-                        lambda i: i.state == 'done' and i.date_date > last_invoicing)
-                    if interventions:
-                        interventions = interventions.sorted('date_date')
-                        intervention_id = interventions[0].id
-                invoice_vals = contract._prepare_invoice(do_raise=do_raise, intervention_id=intervention_id)
+                last_invoicing_date = line.last_invoicing_date
+                next_date = line.next_date
+                while next_date and next_date < date_stop:
+                    if line.frequency_type == 'date':
+                        intervention_id = self._get_intervention_from_last_invoicing_date_date(
+                            line, last_invoicing_date)
+                    if invoicing_method == 'computed':
+                        contract = contract.with_context(force_date=next_date)
+                    invoice, exception_lines = self._create_invoice_single_line(
+                    contract, line, intervention_id, next_date, exception_lines)
+                    last_invoicing_date = next_date
+                    next_date = self.date_from_line(line, next_date)
+        return invoices, exception_lines
+
+    def _get_intervention_from_last_invoicing_date_date(self, line, last_invoicing_date):
+        intervention_id = False
+        if not last_invoicing_date:
+            date_start = fields.Date.from_string(line.date_contract_start)
+            last_invoicing_date = fields.Date.to_string(date_start - relativedelta(days=1))
+        interventions = line.intervention_ids.filtered(
+            lambda i: i.state == 'done' and i.date_date > last_invoicing_date)
+        if interventions:
+            interventions = interventions.sorted('date_date')
+            intervention_id = interventions[0].id
+        return intervention_id
+
+    def _create_invoice_single_line(self, contract, line, intervention_id, next_date, exception_lines):
+        invoice_vals = contract._prepare_invoice(do_raise=False, intervention_id=intervention_id)
+        if not invoice_vals:
+            return {}
+        lines = line._add_invoice_lines()
+        for il in lines:
+            il[2]['of_contract_supposed_date'] = next_date
+        if not lines:
+            return {}
+        exceptions = exception_lines.filtered(lambda r: r.line_id.id == line.id and r.date_invoice_next <= next_date)
+        exception_lines -= exceptions
+        for exception in exceptions:
+            lines += exception._add_invoice_lines()
+        if line.address_id:
+            invoice_vals['partner_shipping_id'] = line.address_id.id
+        invoice_vals['invoice_line_ids'] = lines
+        invoice = contract.env['account.invoice'].create(invoice_vals)
+        invoice.compute_taxes()
+        return invoice, exception_lines
+
+    @api.multi
+    def _handle_exceptions(self, contract, exception_lines):
+        """ Création des factures du contrats en fonction de si les lignes du contrat sont groupées ou non """
+        contract.ensure_one()
+        if not exception_lines:
+            return False
+        lines_grouped = exception_lines.filtered('line_id.grouped')
+        single_lines = exception_lines - lines_grouped
+        invoices = contract.env['account.invoice']
+        invoicing_method = self.invoicing_method
+        if lines_grouped:
+            invoice_vals = contract._prepare_invoice(do_raise=False)
+            if not invoice_vals:
+                return invoices
+            lines = []
+            for line in lines_grouped:
+                lines += line._add_invoice_lines()
+            if lines:
+                addresses = lines_grouped.mapped('line_id.address_id')
+                if len(addresses) == 1:
+                    invoice_vals['partner_shipping_id'] = addresses.id
+                invoice_vals['invoice_line_ids'] = lines
+                invoice = contract.env['account.invoice'].create(invoice_vals)
+                invoice.compute_taxes()
+                invoices |= invoice
+        if single_lines:
+            for line in single_lines:
+                if invoicing_method == 'computed':
+                    contract = contract.with_context(force_date=line.date_invoice_next)
+                invoice_vals = contract._prepare_invoice(do_raise=False, intervention_id=False)
                 if not invoice_vals:
                     continue
                 lines = line._add_invoice_lines()
                 if not lines:
                     continue
-                exceptions = exception_lines.filtered(lambda r: r.line_id.id == line.id)
-                for exception in exceptions:
-                    lines += exception._add_invoice_lines()
-                if line.address_id:
-                    invoice_vals['partner_shipping_id'] = line.address_id.id
+                if line.line_id.address_id:
+                    invoice_vals['partner_shipping_id'] = line.line_id.address_id.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = contract.env['account.invoice'].create(invoice_vals)
                 invoice.compute_taxes()
                 invoices |= invoice
         return invoices
+
+    def _handle_multiple_invoices_from_line(self, lines):
+        date_stop = self.invoicing_period
+        added_lines = []
+        for line in lines:
+            last_invoice_date = line.next_date
+            next_date = self.date_from_line(line, last_invoice_date)
+            while next_date and next_date < date_stop:
+                new_lines = line._add_invoice_lines()
+                for nl in new_lines:
+                    nl[2]['of_contract_supposed_date'] = next_date
+                added_lines += new_lines
+                next_date = self.date_from_line(line, next_date)
+        return added_lines
+
+    def date_from_line(self, line, last_invoice_date):
+        frequency_type = line.frequency_type
+        next_date = False
+        if frequency_type == 'date':
+            interventions = line.intervention_ids\
+                                .filtered(lambda i: i.state == 'done' and i.date_date > last_invoice_date)
+            if interventions:
+                next_date = interventions.sorted('date_date')[0].date_date
+                if line.recurring_invoicing_payment_id.code == 'post-paid':
+                    # On se place au dernier jour du mois
+                    base_date = fields.Date.from_string(next_date)
+                    next_date = base_date + relativedelta(months=1, day=1, days=-1)
+        else:
+            invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
+            if not invoice_lines:
+                base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
+                end = fields.Date.from_string(line.date_contract_end)
+                next_date = False
+                if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                    if last_invoice_date:
+                        if frequency_type == 'month':
+                            next_date = base_date + relativedelta(months=1, day=1)
+                        if frequency_type == 'trimester':
+                            next_date = base_date + relativedelta(months=3, day=1)
+                        if frequency_type == 'semester':
+                            next_date = base_date + relativedelta(months=6, day=1)
+                        if frequency_type == 'year':
+                            next_date = base_date + relativedelta(years=1, month=1, day=1)
+                    else:
+                        if base_date.day != 1:
+                            base_date = base_date + relativedelta(months=1)
+                        next_date = base_date + relativedelta(day=1)
+                else:
+                    if frequency_type == 'month':
+                        next_date = base_date + relativedelta(months=1, day=1, days=-1)
+                    if frequency_type == 'trimester':
+                        next_date = base_date + relativedelta(months=3, day=1, days=-1)
+                    if frequency_type == 'semester':
+                        next_date = base_date + relativedelta(months=6, day=1, days=-1)
+                    if frequency_type == 'year':
+                        next_date = base_date + relativedelta(years=1, month=1, day=1, days=-1)
+            elif last_invoice_date:
+                end = line.date_contract_end
+                freq_type = line.frequency_type
+                if freq_type == 'month':
+                    next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=1)
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        next_date = next_date + relativedelta(day=1)
+                    else:
+                        next_date = next_date + relativedelta(months=1, day=1, days=-1)
+                    next_date = fields.Date.to_string(next_date)
+                    if not end or end > next_date:
+                        line.next_date_date = next_date
+                elif freq_type == 'trimester':
+                    next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=3)
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        next_date = next_date + relativedelta(day=1)
+                    else:
+                        next_date = next_date + relativedelta(months=1, day=1, days=-1)
+                    next_date = fields.Date.to_string(next_date)
+                    if not end or end > next_date:
+                        line.next_date_date = next_date
+                elif freq_type == 'semester':
+                    next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=6)
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        next_date = next_date + relativedelta(day=1)
+                    else:
+                        next_date = next_date + relativedelta(months=1, day=1, days=-1)
+                    next_date = fields.Date.to_string(next_date)
+                    if not end or end > next_date:
+                        line.next_date = next_date
+                elif freq_type == 'year':
+                    next_date = fields.Date.from_string(last_invoice_date) + relativedelta(years=1)
+                    if line.recurring_invoicing_payment_id.code == 'pre-paid':
+                        next_date = next_date + relativedelta(day=1)
+                    else:
+                        next_date = next_date + relativedelta(months=1, day=1, days=-1)
+                    next_date = fields.Date.to_string(next_date)
+        return next_date
 
 
 class OFContractInvoicingLineWizard(models.TransientModel):
@@ -212,5 +377,6 @@ class OFContractInvoicingExceptionWizard(models.TransientModel):
         comodel_name='res.partner', string=u"Prestataire", related='contract_line_id.supplier_id', readonly=True)
     exception_date_invoice_next = fields.Date(
         string=u"Date de facturation prévisionnelle", related='contract_exception_id.date_invoice_next')
-    exception_amount_total = fields.Float(string=u"Montant de la prochaine exception", related='contract_exception_id.amount_total')
+    exception_amount_total = fields.Float(
+        string=u"Montant de la prochaine exception", related='contract_exception_id.amount_total')
     exception_internal_note = fields.Text(string=u"Notes de l'exception", related='contract_exception_id.internal_note')
