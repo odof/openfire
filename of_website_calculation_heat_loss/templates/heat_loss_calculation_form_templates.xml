@@ -130,7 +130,7 @@
                             </label>
                             <input class="form-control o_website_form_input" type="text" id="partner_street" name="partner_street" required="required" t-att-value="partner_street"/>
                         </div>
-                        <div class="form-group form-field o_required form-field-char" data-model-field="true" data-optional="false">
+                        <div data-model-field="true" data-optional="false" t-attf-class="form-group form-field o_required form-field-char #{error_dict.get('zip_id') and 'has-error' or ''}">
                             <label class="control-label" for="zip_id">
                                 <span> Ville </span>
                             </label>

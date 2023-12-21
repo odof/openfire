@@ -41,7 +41,8 @@ class OFCalculationController(http.Controller):
         surface_obj = request.env['of.calculation.surface']
         button_pressed = kwargs.pop('button_id', False)
         coef_obj = request.env['of.calculation.fuel.coef']
-        zip_better_obj = request.env['res.better.zip']
+        better_zip_obj = request.env['res.better.zip']
+        env = request.env
 
         if button_pressed:
             request.env['of.calculation.statistics'].sudo().add_button_click(button_pressed)
@@ -50,24 +51,29 @@ class OFCalculationController(http.Controller):
         heat_loss_id = request.session.get('heat_loss_id')
         heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else None
 
-        if kwargs and kwargs.get("zip_id"):
-            zip_better_obj = zip_better_obj.search(
-                [('display_name', '=', kwargs["zip_id"])])
-            if zip_better_obj:
-                kwargs['zip_id'] = zip_better_obj.id
-                kwargs['display_name'] = zip_better_obj.display_name
-                kwargs['partner_zip'] = zip_better_obj.name
-                kwargs['partner_city'] = zip_better_obj.city
-                kwargs['partner_state_id'] = zip_better_obj.state_id.id
+        has_errors = {}
+        if kwargs and kwargs.get('zip_id'):
+            better_zip = better_zip_obj.search(
+                [('display_name', 'ilike', kwargs['zip_id'])], limit=1)
+            if better_zip:
+                kwargs['zip_id'] = better_zip.id
+                kwargs['display_name'] = better_zip.display_name
+                kwargs['partner_zip'] = better_zip.name
+                kwargs['partner_city'] = better_zip.city
+                kwargs['partner_state_id'] = better_zip.state_id.id
+            else:
+                has_errors['zip_id'] = True
+                del kwargs['zip_id']
 
-        heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else heat_loss_obj
-        if button_pressed == 'mail':
-            self.send_email(heat_loss=heat_loss, **kwargs)
-        if button_pressed == 'validate':
-            heat_loss = self.update_heat_loss(heat_loss=heat_loss, **kwargs)
-        if heat_loss:
-            heat_loss.button_compute_estimated_power()
-            request.session['heat_loss_id'] = heat_loss.id
+        if not has_errors:
+            heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else heat_loss_obj
+            if button_pressed == 'mail':
+                self.send_email(heat_loss=heat_loss, **kwargs)
+            if button_pressed == 'validate':
+                heat_loss = self.update_heat_loss(heat_loss=heat_loss, **kwargs)
+            if heat_loss:
+                heat_loss.button_compute_estimated_power()
+                request.session['heat_loss_id'] = heat_loss.id
 
         values = {
             'altitudes': altitude_obj.search([]),
@@ -78,7 +84,18 @@ class OFCalculationController(http.Controller):
             'roof_surfaces': surface_obj.search([('surface_type', '=', 'roof')]),
             'floor_surfaces': surface_obj.search([('surface_type', '=', 'floor')]),
             'fuel_coefs': coef_obj.search([]),
+            'error_dict': has_errors
         }
+        if has_errors:
+            fields_dict = {}
+            fields_get = heat_loss_obj.fields_get()
+            for key in kwargs:
+                if key in fields_get:
+                    if fields_get[key]['type'] == 'many2one':
+                        fields_dict[key] = env[fields_get[key]['relation']].browse(int(kwargs[key] or 0)).exists()
+                    else:
+                        fields_dict[key] = kwargs[key]
+            values.update(fields_dict)
         logement_principal = request.env.ref('of_calculation_heat_loss.construction_type_1', raise_if_not_found=False)
         if logement_principal and logement_principal in values['construction_types']:
             values['construction_type_id'] = logement_principal
