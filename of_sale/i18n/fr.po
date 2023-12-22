@@ -2326,13 +2326,3 @@ msgstr "Manuelle"
 #: model:ir.ui.view,arch_db:sale.report_configuration_tree_view
 msgid "Report Configuration"
 msgstr "Sections de devis"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_config_settings_of_copy_opportunity
-msgid "(OF) Copy opportunity"
-msgstr "(OF) Copier l'opportunité"
-
-#. module: of_sale
-#: model:ir.ui.view,arch_db:of_sale.of_sale_view_sale_config_settings
-msgid "<span>Copy opportunity on duplicated sale orders</span>"
-msgstr "<span>Copie l'opportunité sur les bons de commandes dupliqués</span>"

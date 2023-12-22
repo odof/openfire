@@ -920,18 +920,6 @@ class SaleOrder(models.Model):
             action['ctx'].update({'default_subtype_id': mail_subtype.id})
         return action
 
-    @api.multi
-    def copy_data(self, default=None):
-        param_copy_opportunity = self.env['ir.values'].get_default('sale.config.settings', 'of_copy_opportunity')
-        res = super(SaleOrder, self).copy_data(default)
-        # pourquoi faire les deux cas ? Parce que le champ est par défaut a copy=True sauf si of_crm est installé qui le
-        # met a copy=False.
-        if param_copy_opportunity:
-            res[0]['opportunity_id'] = self.opportunity_id.id
-        else:
-            res[0]['opportunity_id'] = False
-        return res
-
 
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
