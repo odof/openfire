@@ -10,3 +10,4 @@ from . import partner
 from . import of_better_zip
 from . import config_settings
 from . import hr_employee
+from . import of_contract_product_exception

@@ -66,9 +66,13 @@
                 <header>
                     <field name="is_invoiceable" invisible="1"/>
 
-                    <button name="recurring_create_invoice" type="object" class="btn-primary" string="Créer les factures"
+                    <button string="Créer les factures"
+                            name="%(of_contract_invoicing_wizard_action)d"
+                            type="action"
+                            class="btn-primary"
                             attrs="{'invisible': [('is_invoiceable', '=', False)]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"/>
+
                     <button name="button_renew" type="object" class="btn-primary" string="Renouveler"
                             attrs="{'invisible': ['|', ('is_invoiceable', '!=', False), ('renewal', '=', True)]}"
                             groups="of_contract_custom.group_of_contract_custom_modification"
@@ -500,21 +504,44 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
                                     <tree>
                                         <field name="product_id"/>
-                                        <field name="price_unit"/>
-                                        <field name="purchase_price"/>
-                                        <field name="quantity"/>
+                                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="purchase_price" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="quantity" attrs="{'form_readonly_exception': True}"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
-                                        <field name="tax_ids" widget="many2many_tags" invisible="1"/>
+                                        <field name="tax_ids" widget="many2many_tags" invisible="1" attrs="{'form_readonly_exception': True}"/>
                                         <field name="amount_total"/>
                                         <field name="qty_invoiced"/>
                                         <field name="price_unit_prec"/>
                                         <field name="date_indexed"/>
                                     </tree>
                                 </field>
+                                <separator string="Exceptions de facturations" colspan="4"/>
+                                <group>
+                                    <field name="exception_date"/>
+                                </group>
+                                <group></group>
+                                <field colspan="4" name="exception_line_ids" nolabel="1"
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_product_exception_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
+                                    <tree editable="bottom" colors="grey:state=='2-invoiced';blue:state=='1-to_invoice'">
+                                        <field name="date_invoice_next"/>
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="qty"/>
+                                        <field name="qty_invoiced"/>
+                                        <field name="price_unit"/>
+                                        <field name="purchase_price"/>
+                                        <field name="tax_ids" widget="many2many_tags"/>
+                                        <field name="state"/>
+                                        <field name="internal_note"/>
+                                    </tree>
+                                </field>
+
                             </group>
                             <group class="oe_subtotal_footer oe_right">
                                 <field name="company_currency_id" invisible="1"/>
@@ -527,14 +554,14 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-                                    <field name="intervention_template_id"/>
+                                    <field name="intervention_template_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="tache_id"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
                                         <span>Répéter </span>
-                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                                         <span> fois tous les </span>
-                                        <field name="interv_frequency" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
                                            attrs="{'form_readonly_exception': True}"/>
@@ -660,14 +687,14 @@
                             <group col="4">
                                 <group colspan="2" name="planif" string="Planification">
                                     <field name="warning_planif" invisible="1"/>
-                                    <field name="intervention_template_id"/>
+                                    <field name="intervention_template_id" attrs="{'form_readonly_exception': True}"/>
                                     <field name="tache_id"/>
                                     <label for="interv_frequency_nbr" string="Fréquence"/>
                                     <div name="interv_frequency">
                                         <span>Répéter </span>
-                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                                         <span> fois tous les </span>
-                                        <field name="interv_frequency" nolabel="1" class="oe_inline"/>
+                                        <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                                     </div>
                                     <field name="mois_reference_ids" widget="many2many_tags"
                                            attrs="{'form_readonly_exception': True}"/>
@@ -701,21 +728,43 @@
                                 </group>
                                 <separator string="Articles" colspan="4"/>
                                 <field colspan="4" name="contract_product_ids" nolabel="1"
-                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}">
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_custom_contract_product_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
                                     <tree>
                                         <field name="product_id"/>
-                                        <field name="purchase_price" invisible="1"/>
-                                        <field name="name"/>
-                                        <field name="quantity"/>
-                                        <field name="price_unit"/>
+                                        <field name="purchase_price" invisible="1" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="name" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="quantity" attrs="{'form_readonly_exception': True}"/>
+                                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
                                         <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                                         <field name="discount" groups="sale.group_discount_per_so_line"/>
-                                        <field name="tax_ids" widget="many2many_tags" invisible="1"/>
+                                        <field name="tax_ids" widget="many2many_tags" invisible="1" attrs="{'form_readonly_exception': True}"/>
                                         <field name="amount_subtotal" string="Sous-total HT"/>
                                         <field name="amount_total" string="Sous-total TTC"/>
                                         <field name="qty_invoiced" invisible="1"/>
                                         <field name="price_unit_prec" invisible="1"/>
                                         <field name="date_indexed" invisible="1"/>
+                                    </tree>
+                                </field>
+                                <separator string="Exceptions de facturations" colspan="4"/>
+                                <group>
+                                    <field name="exception_date"/>
+                                </group>
+                                <group></group>
+                                <field colspan="4" name="exception_line_ids" nolabel="1"
+                                       context="{'form_view_ref': 'of_contract_custom.of_contract_product_exception_view_form'}"
+                                       attrs="{'form_readonly_exception': True}">
+                                    <tree editable="bottom" colors="grey:state=='2-invoiced';blue:state=='1-to_invoice'">
+                                        <field name="date_invoice_next"/>
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="qty"/>
+                                        <field name="qty_invoiced"/>
+                                        <field name="price_unit"/>
+                                        <field name="purchase_price"/>
+                                        <field name="tax_ids" widget="many2many_tags"/>
+                                        <field name="state"/>
+                                        <field name="internal_note"/>
                                     </tree>
                                 </field>
                             </group>
@@ -779,6 +828,19 @@
     <menuitem name="Lignes de contrats" id="menu_contract_lines_sale" parent="sales_team.menu_sales" sequence="151" action="action_contract_lines" groups="of_contract_custom.group_of_contract_custom_lecture"/>
     <menuitem name="Lignes de contrats" id="menu_contract_lines_interventions" parent="of_planning.menu_of_planning_intervention" sequence="151" action="action_contract_lines" groups="of_contract_custom.group_of_contract_custom_lecture"/>
 
+    <record id="action_copy_of_contract_line" model="ir.actions.server">
+        <field name="name">Dupliquer</field>
+        <field name="model_id" ref="of_contract_custom.model_of_contract_line"/>
+        <field name="state">code</field>
+        <field name="code">action = records.copy_line()</field>
+    </record>
+    <record id="value_copy_of_contract_line" model="ir.values">
+        <field name="name">Dupliquer</field>
+        <field name="key2">client_action_relate</field>
+        <field name="model">of.contract.line</field>
+        <field name="value" eval="'ir.actions.server,%d'%action_copy_of_contract_line"/>
+    </record>
+
 <!-- ******************************************************************************************* -->
 <!-- ***************************************** ARTICLES **************************************** -->
 <!-- ******************************************************************************************* -->
@@ -791,19 +853,42 @@
                 <group>
                     <group>
                         <field name="product_id"/>
-                        <field name="price_unit"/>
-                        <field name="purchase_price"/>
+                        <field name="price_unit" attrs="{'form_readonly_exception': True}"/>
+                        <field name="purchase_price" attrs="{'form_readonly_exception': True}"/>
                         <label for="product_uom_qty" string="Quantité"/>
                         <div>
-                            <field name="quantity" class="oe_inline"/>
+                            <field name="quantity" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
                             <field name="uom_id" groups="product.group_uom" class="oe_inline oe_no_button"/>
                         </div>
                         <field name="discount" groups="sale.group_discount_per_so_line"/>
                     </group>
                     <group>
-                        <field name="tax_ids" widget="many2many_tags"/>
+                        <field name="tax_ids" widget="many2many_tags" attrs="{'form_readonly_exception': True}"/>
                         <field name="account_analytic_id" options="{'no_create': True}"
-                               groups="analytic.group_analytic_accounting"/>
+                               groups="analytic.group_analytic_accounting" attrs="{'form_readonly_exception': True}"/>
+                    </group>
+                    <separator string="Description"/>
+                    <field name="name" nolabel="1" colspan="4" attrs="{'form_readonly_exception': True}"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_contract_product_exception_view_form" model="ir.ui.view">
+        <field name="name">of.contract.product.exception.view.form</field>
+        <field name="model">of.contract.product.exception</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="date_invoice_next"/>
+                        <field name="product_id"/>
+                        <field name="price_unit"/>
+                        <field name="purchase_price"/>
+                        <field name="qty"/>
+                    </group>
+                    <group>
+                        <field name="tax_ids" widget="many2many_tags"/>
                     </group>
                     <separator string="Description"/>
                     <field name="name" nolabel="1" colspan="4"/>

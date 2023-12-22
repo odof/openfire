@@ -110,7 +110,7 @@ class OfContract(models.Model):
     intervention_count = fields.Integer(compute="_compute_intervention_count")
     intervention_ids = fields.One2many(
         comodel_name='of.planning.intervention', inverse_name='contract_id', string="RDV(s) d'intervention")
-    is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", store=True)
+    is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable")
     current_period_id = fields.Many2one(
         comodel_name='of.contract.period', string=u"Période du contrat",
         compute="_compute_current_period_id", store=True)
@@ -186,9 +186,7 @@ class OfContract(models.Model):
     def _compute_is_invoiceable(self):
         """ Contrat peut être facturé si au moins une ligne est facturable """
         for contrat in self:
-            old_date = fields.Date.from_string(contrat.recurring_next_date)
-            lines = contrat.line_ids.filtered('is_invoiceable').filtered(
-                    lambda l: l.next_date and fields.Date.from_string(l.next_date) <= old_date)
+            lines = contrat.line_ids.filtered('is_invoiceable')
             contrat.is_invoiceable = lines and True or False
 
     @api.depends('recurring_next_date', 'date_end', 'date_start', 'period_ids')
@@ -233,7 +231,6 @@ class OfContract(models.Model):
                  'line_ids.amount_subtotal',
                  'line_ids.amount_taxes',
                  'line_ids.amount_total',
-                 'line_ids.is_invoiceable',
                  'recurring_rule_type',
                  'fiscal_position_id',
                  'recurring_next_date')
@@ -556,6 +553,7 @@ class OfContract(models.Model):
         # Permet de générer le compte comptable avant de le tenter dans _onchange_partner_id
         # Si la règle de génération est 'Sur toutes les sociétés comptables, dès qu'une société en a besoin'
         # le fait de générer un compte comptable sur une autre société vide le NewRecord
+        date = self._context.get('force_date', self.recurring_next_date)
         if hasattr(self.partner_id, 'update_account'):
             self.partner_id.update_account()
         invoice = self.env['account.invoice'].new({
@@ -565,7 +563,7 @@ class OfContract(models.Model):
                 ['invoice'])['invoice'],
             'currency_id': currency.id,
             'journal_id': journal.id,
-            'date_invoice': self.recurring_next_date,
+            'date_invoice': date,
             'origin': 'Contrat %s' % self.name,
             'company_id': self.company_id.id,
             'of_contract_id': self.id,
@@ -582,11 +580,13 @@ class OfContract(models.Model):
         return invoice._convert_to_write(invoice._cache)
 
     @api.multi
-    def _create_invoice(self, do_raise=True):
+    def _create_invoice(self, do_raise=True, ref_date=False):
         """ Création des factures du contrats en fonction de si les lignes du contrat sont groupées ou non """
         self.ensure_one()
+        if not ref_date:
+            ref_date = self.recurring_next_date
         lines = self.line_ids.filtered('is_invoiceable').filtered(
-            lambda l: l.next_date == self.recurring_next_date)
+            lambda l: l.next_date <= ref_date)
         if not lines:
             if do_raise:
                 raise UserError("Aucune ligne du contrat n'est facturable")
@@ -596,47 +596,56 @@ class OfContract(models.Model):
         lines_grouped = lines.filtered('grouped')
         single_lines = lines - lines_grouped
         invoices = self.env['account.invoice']
-        if lines_grouped:
-            invoice_vals = self._prepare_invoice(do_raise=do_raise)
-            if not invoice_vals:
-                return invoices
-            lines = []
-            for line in lines_grouped:
-                lines += line._add_invoice_lines()
-            if lines:
-                addresses = lines_grouped.mapped('address_id')
-                if len(addresses) == 1:
-                    invoice_vals['partner_shipping_id'] = addresses.id
-                invoice_vals['invoice_line_ids'] = lines
-                invoice = self.env['account.invoice'].create(invoice_vals)
-                invoice.compute_taxes()
-                invoices |= invoice
-        if single_lines:
-            for line in single_lines:
-                intervention_id = False
-                if line.frequency_type == 'date':
-                    last_invoicing = line.last_invoicing_date
-                    if not last_invoicing:
-                        date_start = fields.Date.from_string(line.date_contract_start)
-                        last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
-                    interventions = line.intervention_ids.filtered(
-                        lambda i: i.state == 'done' and i.date_date > last_invoicing)
-                    if interventions:
-                        interventions = interventions.sorted('date_date')
-                        intervention_id = interventions[0].id
-                invoice_vals = self._prepare_invoice(do_raise=do_raise, intervention_id=intervention_id)
+        with self.env.norecompute():
+            if lines_grouped:
+                invoice_vals = self._prepare_invoice(do_raise=do_raise)
                 if not invoice_vals:
-                    continue
-                lines = line._add_invoice_lines()
-                if not lines:
-                    continue
-                if line.address_id:
-                    invoice_vals['partner_shipping_id'] = line.address_id.id
-                invoice_vals['invoice_line_ids'] = lines
-                invoice = self.env['account.invoice'].create(invoice_vals)
-                invoice.compute_taxes()
-                invoices |= invoice
-        self.line_ids._auto_cancel()
+                    return invoices
+                lines = []
+                for line in lines_grouped:
+                    lines += line._add_invoice_lines()
+                if lines:
+                    exceptions = lines_grouped.mapped('exception_line_ids').filtered(
+                                     lambda r: r.date_invoice_next <= ref_date)
+                    for exception in exceptions:
+                        lines += exception._add_invoice_lines()
+                    addresses = lines_grouped.mapped('address_id')
+                    if len(addresses) == 1:
+                        invoice_vals['partner_shipping_id'] = addresses.id
+                    invoice_vals['invoice_line_ids'] = lines
+                    invoice = self.env['account.invoice'].create(invoice_vals)
+                    invoice.compute_taxes()
+                    invoices |= invoice
+            if single_lines:
+                for line in single_lines:
+                    intervention_id = False
+                    if line.frequency_type == 'date':
+                        last_invoicing = line.last_invoicing_date
+                        if not last_invoicing:
+                            date_start = fields.Date.from_string(line.date_contract_start)
+                            last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
+                        interventions = line.intervention_ids.filtered(
+                            lambda i: i.state == 'done' and i.date_date > last_invoicing)
+                        if interventions:
+                            interventions = interventions.sorted('date_date')
+                            intervention_id = interventions[0].id
+                    invoice_vals = self._prepare_invoice(do_raise=do_raise, intervention_id=intervention_id)
+                    if not invoice_vals:
+                        continue
+                    lines = line._add_invoice_lines()
+                    if not lines:
+                        continue
+                    exceptions = line.exception_line_ids.filtered(lambda r: r.date_invoice_next <= ref_date)
+                    for exception in exceptions:
+                        lines += exception._add_invoice_lines()
+                    if line.address_id:
+                        invoice_vals['partner_shipping_id'] = line.address_id.id
+                    invoice_vals['invoice_line_ids'] = lines
+                    invoice = self.env['account.invoice'].create(invoice_vals)
+                    invoice.compute_taxes()
+                    invoices |= invoice
+            self.line_ids._auto_cancel()
+        self.recompute()
         return invoices
 
     @api.multi
@@ -845,7 +854,7 @@ class OfContractLine(models.Model):
             'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False))
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
-    is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", store=True, copy=False)
+    is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", copy=False)
     date_avenant = fields.Date(u'Date de début (avenant)', copy=False)
     date_start = fields.Date(
         u'Date de début', copy=False,
@@ -937,11 +946,11 @@ class OfContractLine(models.Model):
     sav_count = fields.Integer(string="Nombre de visites SAV")
     remaining_sav = fields.Integer(string="Nbr. visites SAV restantes", compute="_compute_remaining_sav")
     notes = fields.Text(string="Notes")
+    exception_line_ids = fields.One2many(
+        comodel_name='of.contract.product.exception', inverse_name='line_id', string=u"Exceptions de facturation")
+    exception_date = fields.Date(string=u"Prochaine exception de facturation", compute='_compute_exception_date')
 
-    @api.depends('code_de_ligne',
-                 'line_avenant_id', 'line_avenant_id.code_de_ligne',
-                 'state',
-                 'is_invoiceable')
+    @api.depends('code_de_ligne', 'line_avenant_id', 'line_avenant_id.code_de_ligne', 'state')
     def _compute_name(self):
         """ Calcul du nom de la ligne en fonction de l'état et du code de ligne """
         for line in self:
@@ -979,8 +988,7 @@ class OfContractLine(models.Model):
         """ Calcule si la ligne de contrat peut être facturée """
         for service in self:
             if service.state == 'validated':
-                if service.contract_product_ids and service.next_date \
-                   and service.next_date == service.contract_id.recurring_next_date:
+                if service.contract_product_ids and service.next_date:
                     service.is_invoiceable = True
                 else:
                     service.is_invoiceable = False
@@ -1214,6 +1222,13 @@ class OfContractLine(models.Model):
                 remaining_sav = line.sav_count - len(sav)
                 line.remaining_sav = remaining_sav if remaining_sav > 0 else 0
 
+    @api.depends('exception_line_ids.state', 'exception_line_ids.date_invoice_next')
+    def _compute_exception_date(self):
+        for record in self:
+            dates = record.exception_line_ids.filtered(lambda l: l.state == '1-to_invoice').mapped('date_invoice_next')
+            if dates:
+                record.exception_date = min(dates)
+
     @api.onchange('address_id')
     def _onchange_address_id(self):
         """ Récupération du parc installé si l'utilisateur à les droits """
@@ -1352,7 +1367,8 @@ class OfContractLine(models.Model):
     @api.model
     def get_write_allowed_fields(self):
         return ['state', 'supplier_id', 'afficher_facturation', 'grouped', 'mois_reference_ids', 'notes',
-                'date_contract_end', 'fiscal_position_id', 'use_index', 'revision']
+                'date_contract_end', 'fiscal_position_id', 'use_index', 'revision', 'contract_product_ids',
+                'intervention_template_id', 'interv_frequency_nbr', 'interv_frequency', 'exception_line_ids']
 
     @api.multi
     def _affect_number(self):
@@ -1664,9 +1680,29 @@ class OfContractLine(models.Model):
             if services:
                 services.unlink()
 
+    @api.multi
+    def copy_line(self):
+        self.ensure_one()
+        product_lines = []
+        exception_lines = []
+        for product_line in self.contract_product_ids:
+            product_lines.append((0, 0, product_line.copy_data()[0]))
+        for exception_line in self.exception_line_ids:
+            exception_lines.append((0, 0, exception_line.copy_data()[0]))
+        new_line = self.copy(default={'contract_product_ids': product_lines, 'exception_line_ids': exception_lines})
+        return {
+            'name': u"Lignes de contrats",
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'of.contract.line',
+            'res_id': new_line.id,
+            'type': 'ir.actions.act_window',
+        }
+
 
 class OfContractProduct(models.Model):
     _name = 'of.contract.product'
+    _inherit = ['of.form.readonly']
     _order = 'sequence'
 
     sequence = fields.Integer(string=u"Séquence", default=10, help=u"Séquence")
@@ -1715,7 +1751,7 @@ class OfContractProduct(models.Model):
         string="Total annuel", compute='_compute_amount', currency_field='company_currency_id', store=True)
 
     @api.depends('quantity', 'discount', 'price_unit', 'tax_ids', 'qty_to_invoice', 'company_currency_id',
-                 'line_id', 'line_id.is_invoiceable', 'purchase_price', 'line_id.address_id', 'product_id')
+                 'line_id', 'purchase_price', 'line_id.address_id', 'product_id')
     def _compute_amount(self):
         """ Calcul des montants pour la ligne d'article """
         # c_product pour contract_product
