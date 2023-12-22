@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from dateutil.relativedelta import relativedelta
+import datetime
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 
@@ -297,7 +298,6 @@ class OFContractInvoicingWizard(models.TransientModel):
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    next_date = fields.Date.to_string(next_date)
                     if not end or end > next_date:
                         line.next_date_date = next_date
                 elif freq_type == 'trimester':
@@ -306,7 +306,6 @@ class OFContractInvoicingWizard(models.TransientModel):
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    next_date = fields.Date.to_string(next_date)
                     if not end or end > next_date:
                         line.next_date_date = next_date
                 elif freq_type == 'semester':
@@ -315,7 +314,6 @@ class OFContractInvoicingWizard(models.TransientModel):
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    next_date = fields.Date.to_string(next_date)
                     if not end or end > next_date:
                         line.next_date = next_date
                 elif freq_type == 'year':
@@ -324,7 +322,8 @@ class OFContractInvoicingWizard(models.TransientModel):
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    next_date = fields.Date.to_string(next_date)
+        if next_date and isinstance(next_date, datetime.date):
+            next_date = fields.Date.to_string(next_date)
         return next_date
 
 
