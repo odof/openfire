@@ -32,8 +32,6 @@ class OFContractProductException(models.Model):
             record.qty_to_invoice = qty_to_invoice
             record.state = not qty_to_invoice and '2-invoiced' or '1-to_invoice'
 
-    @api.depends('qty', 'price_unit', 'tax_ids', 'qty_invoiced', 'product_id', 'purchase_price',
-                 'line_id.address_id', 'line_id.company_currency_id')
     def _compute_amount(self):
         for record in self:
             price = record.price_unit
