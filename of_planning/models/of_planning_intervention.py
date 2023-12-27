@@ -2188,10 +2188,20 @@ class OfPlanningInterventionLine(models.Model):
                 taxes = fiscal_position.map_tax(taxes, product, partner)
             line.taxe_ids = taxes
 
-    @api.depends('invoice_line_ids', 'invoice_line_ids.invoice_id', 'invoice_line_ids.quantity')
+    @api.depends('invoice_line_ids.invoice_id.state', 'invoice_line_ids.quantity')
     def _compute_qty_invoiced(self):
+        # Code copié depuis sale.order._get_invoice_qty()
         for line in self:
-            line.qty_invoiced = sum(line.sudo().invoice_line_ids.mapped('quantity'))
+            qty_invoiced = 0.0
+            for invoice_line in line.invoice_line_ids:
+                if invoice_line.invoice_id.state != 'cancel':
+                    if invoice_line.invoice_id.type == 'out_invoice':
+                        qty_invoiced += invoice_line.uom_id._compute_quantity(
+                            invoice_line.quantity, invoice_line.product_id.uom_id)
+                    elif invoice_line.invoice_id.type == 'out_refund':
+                        qty_invoiced -= invoice_line.uom_id._compute_quantity(
+                            invoice_line.quantity, invoice_line.product_id.uom_id)
+            line.qty_invoiced = qty_invoiced
 
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
                  'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
