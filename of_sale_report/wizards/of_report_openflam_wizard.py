@@ -1092,15 +1092,18 @@ class OFRapportOpenflamWizard(models.TransientModel):
                         percent = amount / invoice_partner_amount
                         payment_dict = payments_dict.setdefault(payment, {})
                         tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id in sorted_accounts)
+                        account_checked = self.env['account.account']
                         for tax_move_line in tax_move_lines:
                             account = tax_move_line.account_id
-                            tax_accounts |= account
                             if account not in payment_dict:
                                 payment_dict[account] = {"ht": 0.0, "taxe": 0.0}
                             payment_dict[account]["taxe"] -= tax_move_line.balance * percent
-                            corresponding_ht_lines = invoice_move.line_ids.filtered(
-                                lambda ml: ml.account_id.id in correspondance[account]._ids)
-                            payment_dict[account]["ht"] -= percent * sum(corresponding_ht_lines.mapped('balance'))
+                            if account not in account_checked:
+                                corresponding_ht_lines = invoice_move.line_ids.filtered(
+                                    lambda ml: ml.account_id.id in correspondance[account]._ids)
+                                payment_dict[account]["ht"] -= percent * sum(corresponding_ht_lines.mapped('balance'))
+                                account_checked += account
+                        tax_accounts |= account_checked
                 else:
                     # On conserve les paiements non intégralement lettrés pour les signaler a l'utilisateur
                     undefined_payments_list.append(payment)
