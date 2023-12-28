@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ################################## SALE ORDER ################################## -->
+
+    <record id="of_sale_type_sale_order_form_view" model="ir.ui.view">
+        <field name="name">of.sale.type.sale.order.form.view</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_quote_template.sale_order_form_quote"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_template_id']" position="before">
+                <field name="of_sale_type_id" />
+            </xpath>
+        </field>
+    </record>
+
+<!-- ################################ QUOTE TEMPLATE ################################ -->
+
+    <record id="of_sale_type_sale_quote_template_form_view" model="ir.ui.view">
+        <field name="name">of.sale.type.sale.quote.template.form.view</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_sale_quote_template.view_sale_quote_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='property_of_fiscal_position_id']" position="before">
+                <field name="of_sale_type_id" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
