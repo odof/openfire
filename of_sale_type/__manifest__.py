@@ -1,41 +1,23 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "OpenFire / Types de devis",
-    "version": "10.0.1.0.0",
-    "author": "OpenFire",
+    'name': "OpenFire / Types de devis",
+    'version': '16.0.1.0.0',
     'license': 'AGPL-3',
-    "category": "OpenFire",
-    "description": u"""
-Ajout des types de devis
-========================
-Type de devis
--------------
-Création d'un nouveau modèle 'Type de devis' repris dans :
- - Devis/commandes
- - Modèles de devis
- - Factures
-
-et utilisés dans les rapports :
- - Ventes > Rapport > Ventes
- - Ventes > Rapport > Tunnel quali
- - Ventes > Rapport > Tunnel quanti
- - Account > Rapports > Factures
-
-""",
-    "website": "www.openfire.fr",
-    "depends": [
-        "of_sale_quote_template",
-        ],
-    "data": [
-        'reports/account_report_views.xml',
-        'reports/sale_report_views.xml',
-        'security/ir.model.access.csv',
-        'views/account_views.xml',
-        'views/of_sale_type_views.xml',
-        'views/sale_views.xml',
-        ],
+    'author': "OpenFire",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Extension du module OCA sale_order_type",
+    'depends': [
+        'sale_order_type',  # OCA/sale-workflow
+        'of_sale_management_template',
+    ],
+    'data': [
+        'views/sale_order_type.xml',
+        'views/res_partner.xml',
+        'views/sale_order_template.xml',
+    ],
     'installable': True,
     'application': False,
     'auto_install': False,
-    }
+}

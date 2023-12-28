@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+      <record id="sale_order_type.res_partner_sale_type_form_view" model="ir.ui.view">
+            <!-- This view only bring the field sale_type -->
+            <field name="active" eval="False"/>
+      </record>
+
+</odoo>

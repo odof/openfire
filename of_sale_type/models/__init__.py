@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import account
-from . import of_sale_type
-from . import sale
+from . import sale_order_template
+from . import sale_order
