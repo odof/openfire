@@ -42,10 +42,10 @@ class TestOFSaleOrderTemplate(TestOFSaleManagementCommon):
 
         sale_order = self.env['sale.order'].browse()
         # Création d'un devis à partir du modèle de devis
-        with Form(self.env['sale.order']) as order_form:
-            order_form.partner_id = self.customer_a
-            order_form.sale_order_template_id = self.sale_order_template_1
-            sale_order = order_form.save()
+        order_values = self._prepare_sale_order_values()
+        order_values['sale_order_template_id'] = self.sale_order_template_1.id
+        sale_order = self.env['sale.order'].create(order_values)
+        sale_order._onchange_sale_order_template_id()
 
         # Vérification des champs copiés
         self.assertEqual(sale_order.fiscal_position_id, self.fiscal_pos_5_5)

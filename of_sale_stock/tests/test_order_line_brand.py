@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.tests import Form
+from odoo import Command
 
 from odoo.addons.of_account.tests.common import TestOFAccountCommon
 
@@ -31,12 +31,18 @@ class TestOFSaleOrderLineBrand(TestOFAccountCommon):
             }
         )
 
-        order = self.env['sale.order'].create(self._prepare_empty_sale_order_values())
-        with Form(order) as order_form:
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = product
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }
+            )
+        ]
+        order = self.env['sale.order'].create(order_values)
 
-        order = order_form.save()
         self.assertEqual(len(order.order_line), 1)
         self.assertEqual(order.order_line[0].of_product_brand_id, product.brand_id)
 
@@ -49,14 +55,22 @@ class TestOFSaleOrderLineBrand(TestOFAccountCommon):
             }
         )
 
-        order = self.env['sale.order'].create(self._prepare_empty_sale_order_values())
-        with Form(order) as order_form:
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = product
-                self.assertEqual(
-                    line_form.name,
-                    'Brand A - Test Product Use Desc\nBrand A Description\nProduct : Test Product Use Desc',
-                )
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }
+            )
+        ]
+        order = self.env['sale.order'].create(order_values)
+
+        self.assertEqual(
+            order.order_line[0].name,
+            'Brand A - Test Product Use Desc\nBrand A Description\nProduct : Test Product Use Desc',
+        )
 
     def test_03_compute_name_no_use_description(self):
         """Test the compute name of the sale order line when the brand has use_brand_description_sale set to False."""
@@ -67,11 +81,19 @@ class TestOFSaleOrderLineBrand(TestOFAccountCommon):
             }
         )
 
-        order = self.env['sale.order'].create(self._prepare_empty_sale_order_values())
-        with Form(order) as order_form:
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = product
-                self.assertEqual(line_form.name, 'Brand B - Test Product No Use Desc')
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }
+            )
+        ]
+        order = self.env['sale.order'].create(order_values)
+
+        self.assertEqual(order.order_line[0].name, 'Brand B - Test Product No Use Desc')
 
     def test_04_compute_name_no_use_description_with_manufacturer_desc(self):
         """Test the compute name of the sale order line when the brand has use_brand_description_sale set to False
@@ -86,24 +108,39 @@ class TestOFSaleOrderLineBrand(TestOFAccountCommon):
             }
         )
 
+        # Set the company to show the manufacturer description on the sale order line
         self.env.user.company_id.show_manufacturer_description = 'sales'
 
-        order = self.env['sale.order'].create(self._prepare_empty_sale_order_values())
-        with Form(order) as order_form:
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = product
-        order = order_form.save()
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }
+            )
+        ]
+        order = self.env['sale.order'].create(order_values)
 
-        order_line = order.order_line[0]
-        self.assertEqual(order_line.name, "Brand B - Test Product No Use Desc")
+        self.assertEqual(order.order_line[0].name, "Brand B - Test Product No Use Desc")
 
+        # Set a manufacturer description
         product.of_manufacturer_description = "This is the manufacturer description"
 
-        order = self.env['sale.order'].create(self._prepare_empty_sale_order_values())
-        with Form(order) as order_form:
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = product
-        order2 = order_form.save()
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': product.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 100,
+                }
+            )
+        ]
+        order2 = self.env['sale.order'].create(order_values)
 
-        order2_line = order2.order_line[0]
-        self.assertEqual(order2_line.name, "Brand B - Test Product No Use Desc\nThis is the manufacturer description")
+        # Check that the manufacturer description is added to the name
+        self.assertEqual(
+            order2.order_line[0].name, "Brand B - Test Product No Use Desc\nThis is the manufacturer description"
+        )

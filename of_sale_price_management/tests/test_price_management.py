@@ -44,34 +44,32 @@ class TestOFPriceManagementWizard(TestOFSaleCommon):
             }
         )
 
-    def _prepare_sale_order_values(self):
-        return {
-            'partner_id': self.customer_a.id,
-            'partner_invoice_id': self.customer_a.id,
-            'partner_shipping_id': self.customer_a.id,
-            'pricelist_id': self.default_pricelist.id,
-            'fiscal_position_id': self.fiscal_pos_5_5.id,
-            'order_line': [
-                Command.create(
-                    {
-                        'product_id': self.of_product_1.id,
-                        'product_uom_qty': 1,
-                        'price_unit': 150,  # force price unit to 150
-                        'purchase_price': 45,  # force purchase price to 45
-                        'tax_id': self.tax_base,
-                    }
-                ),
-                Command.create(
-                    {
-                        'product_id': self.of_product_2.id,
-                        'product_uom_qty': 1,
-                        'price_unit': 90,  # force price unit to 90
-                        'purchase_price': 50,  # force purchase price to 50
-                        'tax_id': self.tax_base,
-                    }
-                ),
-            ],
-        }
+    def _prepare_sale_order_values(self, default_values=None):
+        if default_values is None:
+            default_values = {}
+        values = super()._prepare_sale_order_values(default_values)
+        values.pop('order_line')  # remove default order lines to add specific ones
+        values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': self.of_product_1.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 150,  # force price unit to 150
+                    'purchase_price': 45,  # force purchase price to 45
+                    'tax_id': self.tax_base,
+                }
+            ),
+            Command.create(
+                {
+                    'product_id': self.of_product_2.id,
+                    'product_uom_qty': 1,
+                    'price_unit': 90,  # force price unit to 90
+                    'purchase_price': 50,  # force purchase price to 50
+                    'tax_id': self.tax_base,
+                }
+            ),
+        ]
+        return values
 
     def _create_sale_order(self):
         return self.env['sale.order'].create(self._prepare_sale_order_values())

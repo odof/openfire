@@ -66,7 +66,7 @@ class TestOFSaleOrderAddQuote(TestOFSaleCommon):
                 'list_price': 100,
             }
         )
-        quote_values = self._prepare_sale_order_values(product=new_product)
+        quote_values = self._prepare_sale_order_values(dict(product=new_product))
         quote = self.env['sale.order'].create(quote_values)
 
         # Try to add the quote to the sale order

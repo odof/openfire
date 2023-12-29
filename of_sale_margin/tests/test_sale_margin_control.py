@@ -50,7 +50,7 @@ class TestOFSaleOrderMarginControl(TestOFSaleCommon):
 
         config = self.env['res.config.settings'].create({'of_sale_order_margin_control': margin_control})
         config.execute()
-        order_values = self._prepare_sale_order_values(product=self.product_margin_control, price_unit=50)
+        order_values = self._prepare_sale_order_values(dict(product=self.product_margin_control, price_unit=50))
         sale_order = self.env['sale.order'].with_user(as_user).create(order_values)
         self.assertEqual(
             float_compare(sale_order.of_margin_percent, 20.0, precision_digits=2),

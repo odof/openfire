@@ -51,11 +51,13 @@ class TestOFSaleCommon(TestOFAccountCommon):
             'fiscal_position_id': self.fiscal_pos_5_5.id,
         }
 
-    def _prepare_sale_order_values(self, salesman=False, product=False, price_unit=50, quantity=1):
-        if not product:
-            product = self.product_consu_a
-        if not salesman:
-            salesman = self.user_salesman
+    def _prepare_sale_order_values(self, default_values=None):
+        if default_values is None:
+            default_values = {}
+        product = default_values.get('product', self.product_consu_a)
+        salesman = default_values.get('user', self.user_salesman)
+        price_unit = default_values.get('price_unit', 50)
+        quantity = default_values.get('quantity', 1)
         return {
             'partner_id': self.customer_a.id,
             'partner_invoice_id': self.customer_a.id,

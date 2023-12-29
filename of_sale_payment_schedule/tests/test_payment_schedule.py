@@ -50,7 +50,7 @@ class TestOFSaleOrderPaymentSchedule(TestOFSaleCommon):
 
     def test_01_payment_schedule_creation(self):
         """Test Payment Schedule creation depending on the payment term."""
-        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values = self._prepare_sale_order_values(dict(price_unit=100))
         order_values['payment_term_id'] = self.payment_term_30_30_40.id
         sale_order = self.env['sale.order'].create(order_values)
         self.assertEqual(sale_order.amount_untaxed, 100.0)
@@ -73,7 +73,7 @@ class TestOFSaleOrderPaymentSchedule(TestOFSaleCommon):
 
     def test_02_payment_schedule_update(self):
         """Test Payment Schedule update when the payment term is changed."""
-        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values = self._prepare_sale_order_values(dict(price_unit=100))
         sale_order = self.env['sale.order'].new(order_values)
         sale_order.payment_term_id = self.payment_term_15days
         sale_order._compute_of_payment_schedule_ids()
@@ -102,7 +102,7 @@ class TestOFSaleOrderPaymentSchedule(TestOFSaleCommon):
 
     def test_03_payment_schedule_percent_update(self):
         """Test that the amount is updated when the percentage is changed"""
-        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values = self._prepare_sale_order_values(dict(price_unit=100))
         order_values['payment_term_id'] = self.payment_term_30_30_40.id
         sale_order = self.env['sale.order'].create(order_values)
 
@@ -121,7 +121,7 @@ class TestOFSaleOrderPaymentSchedule(TestOFSaleCommon):
 
     def test_04_payment_schedule_amount_update(self):
         """Test that the percentage is updated when the amount is changed"""
-        order_values = self._prepare_sale_order_values(price_unit=100)
+        order_values = self._prepare_sale_order_values(dict(price_unit=100))
         order_values['payment_term_id'] = self.payment_term_30_30_40.id
         sale_order = self.env['sale.order'].create(order_values)
 

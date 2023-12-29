@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo.tests import Form
+from odoo import Command
 
 from odoo.addons.of_sale_product_standard.tests.common import TestOFProductStandardCommon
 
@@ -27,7 +27,7 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
 
     def test_01_sale_order_line_compute_name(self):
         """Test that the name of the sale order line is correctly computed when the product has a standard"""
-        order = self.env['sale.order'].create(self._prepare_sale_order_values(product=self.product_standard_test))
+        order = self.env['sale.order'].create(self._prepare_sale_order_values(dict(product=self.product_standard_test)))
         self.assertEqual(len(order.order_line), 1)
         self.assertEqual(
             order.order_line[0].name,
@@ -36,13 +36,19 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
 
         # Change the standard of the product before adding a new line
         self.product_standard_test.of_standard_id = self.product_standard2.id
-
-        with Form(order) as order_form:
-            # Add a new line
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = self.product_standard_test
-                line_form.product_uom_qty = 1
-                line_form.price_unit = 100
+        order.write(
+            {
+                'order_line': [
+                    Command.create(
+                        {
+                            'product_id': self.product_standard_test.id,
+                            'product_uom_qty': 1,
+                            'price_unit': 100,
+                        }
+                    )
+                ]
+            }
+        )
 
         # Check that the name of the lines is correctly computed
         # The first line should not have changed
@@ -60,12 +66,20 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
         # Remove the standard of the product before adding a new line
         self.product_standard_test.of_standard_id = False
 
-        with Form(order) as order_form:
-            # Add a new line
-            with order_form.order_line.new() as line_form:
-                line_form.product_id = self.product_standard_test
-                line_form.product_uom_qty = 1
-                line_form.price_unit = 100
+        # Add a new line
+        order.write(
+            {
+                'order_line': [
+                    Command.create(
+                        {
+                            'product_id': self.product_standard_test.id,
+                            'product_uom_qty': 1,
+                            'price_unit': 100,
+                        }
+                    )
+                ]
+            }
+        )
 
         # Check that the name of the lines is correctly computed
         # The first two lines should not have changed but the third line should not have the standard

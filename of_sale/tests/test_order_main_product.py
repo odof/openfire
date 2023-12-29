@@ -29,7 +29,7 @@ class TestOFOrderMainProduct(TestOFSaleCommon):
     def test_01_sale_order_main_product(self):
         """Test that the main product is set when the product is in a main product category."""
 
-        order = self.env['sale.order'].create(self._prepare_sale_order_values(product=self.product_main_product))
+        order = self.env['sale.order'].create(self._prepare_sale_order_values(dict(product=self.product_main_product)))
 
         self.assertEqual(
             order.order_line.filtered(lambda line: line.of_main_product).product_id, self.product_main_product

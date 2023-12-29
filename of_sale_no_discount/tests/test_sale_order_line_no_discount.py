@@ -129,7 +129,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_salesman)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -141,7 +141,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_salesman)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -154,7 +154,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_responsible)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -170,7 +170,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_responsible)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -182,7 +182,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_responsible)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -198,7 +198,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_responsible)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -209,7 +209,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_manager)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
@@ -220,7 +220,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         order = (
             self.env['sale.order']
             .with_user(self.user_sale_manager)
-            .create(self._prepare_sale_order_values(product=self.product_forbidden_discount))
+            .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:

@@ -22,7 +22,7 @@ class TestSaleOrderLineDescription(TestOFSaleCommon):
             }
         )
 
-        cls.order_values = cls._prepare_sale_order_values(cls, product=cls.product_manufacturer_test)
+        cls.order_values = cls._prepare_sale_order_values(cls, dict(product=cls.product_manufacturer_test))
 
     def test_01_of_sale_order_line_description_both(self):
         """Test the name of the sale order line.
