@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.planning.intervention.hook" name="_post_update_hook_v10_0_1_3_0"/>
+
+</odoo>

@@ -14,7 +14,7 @@
 
 {
     'name': u"OpenFire / Planning",
-    'version': '10.0.1.2.0',
+    'version': '10.0.1.3.0',
     'author': u"OpenFire",
     'website': u"www.openfire.fr",
     'category': u"Generic Modules",
@@ -56,6 +56,7 @@ Inclut la gestion des équipes d'intervention.
         'views/of_res_config_views.xml',
         'views/of_planning_report_view.xml',
         'views/of_planning_intervention_template_views.xml',
+        'hooks/post_hooks.xml',
     ],
     'css': [
         'static/src/css/of_planning.css',
