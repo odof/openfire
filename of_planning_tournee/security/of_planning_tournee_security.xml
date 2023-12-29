@@ -6,15 +6,4 @@
         <field name="category_id" ref="of_planning.of_planning_intervention_category"/>
     </record>
 
-    <record id="of_restrict_access_planning_search_template_time_slot_sales_representative_rule" model="ir.rule">
-        <field name="name">(OF) Restriction d'accès aux modèles de recherche de créneaux</field>
-        <field name="model_id" ref="of_planning_tournee.model_of_tournee_rdv_template"/>
-        <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
-        <field name="domain_force">[(0,'=',1)]</field>
-        <field name="perm_read" eval="False"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
-
 </odoo>

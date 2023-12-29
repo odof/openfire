@@ -5,15 +5,4 @@
         <field name="name">Interventions : Menu DI/Entretiens par défaut</field>
     </record>
 
-    <record id="of_restrict_access_planning_di_sales_representative_rule" model="ir.rule">
-        <field name="name">(OF) Restriction d'accès aux étapes des demandes d'interventions</field>
-        <field name="model_id" ref="of_service.model_of_service_stage"/>
-        <field name="groups" eval="[(4, ref('of_planning.group_sales_representatives_responsible'))]"/>
-        <field name="domain_force">[(0,'=',1)]</field>
-        <field name="perm_read" eval="False"/>
-        <field name="perm_create" eval="True"/>
-        <field name="perm_write" eval="True"/>
-        <field name="perm_unlink" eval="True"/>
-    </record>
-
 </odoo>

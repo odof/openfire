@@ -2,7 +2,7 @@
 
 import logging
 
-from odoo import api, models, tools, SUPERUSER_ID
+from odoo import api, models
 
 _logger = logging.getLogger(__name__)
 
@@ -66,16 +66,3 @@ class ResGroups(models.Model):
             users_responsible_list = [(4, user_id) for user_id in users_responsible._ids]
             group_intervention_responsible.write({'users': users_responsible_list})
         _logger.info(u"Transfer old rights - END")
-
-
-class Menu(models.Model):
-    _inherit = 'ir.ui.menu'
-
-    @api.model
-    @tools.ormcache('frozenset(self.env.user.groups_id.ids)', 'debug')
-    def _visible_menu_ids(self, debug=False):
-        menus = super(Menu, self)._visible_menu_ids(debug)
-        if self.env.user.has_group('of_planning.group_sales_representatives_responsible') \
-           and self.env.user.id != SUPERUSER_ID:
-            menus.discard(self.env.ref("of_planning.menu_of_planning_configuration").id)
-        return menus

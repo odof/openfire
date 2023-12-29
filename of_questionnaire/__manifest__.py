@@ -40,7 +40,6 @@ Fonctionnalités
         'report/of_questionnaire_fiche_intervention.xml',
         'report/of_planning_rapport_intervention.xml',
         'security/ir.model.access.csv',
-        'security/of_questionnaire_security.xml',
         'wizards/of_questionnaire_wizard_view.xml',
         'hooks/hook.xml',
     ],
