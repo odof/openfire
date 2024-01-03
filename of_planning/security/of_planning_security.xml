@@ -31,11 +31,18 @@
             <field name="implied_ids" eval="[(4, ref('group_planning_intervention_access'))]"/>
         </record>
 
+        <!-- Voir et modifier toutes les interventions -->
+        <record id="group_planning_all_intervention_modification" model="res.groups">
+            <field name="name">Gérer toutes les interventions</field>
+            <field name="category_id" ref="of_planning_intervention_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_planning_intervention_modification'))]"/>
+        </record>
+
         <!-- Responsable -->
         <record id="group_planning_intervention_responsible" model="res.groups">
             <field name="name">Responsable</field>
             <field name="category_id" ref="of_planning_intervention_category"/>
-            <field name="implied_ids" eval="[(4, ref('group_planning_intervention_modification'))]"/>
+            <field name="implied_ids" eval="[(4, ref('group_planning_all_intervention_modification'))]"/>
         </record>
 
         <!-- Gestionnaire -->
@@ -88,7 +95,7 @@
             <field ref="model_of_planning_intervention" name="model_id"/>
             <field name="domain_force">[(1,'=',1)]</field>
             <field name="perm_read" eval="False"/>
-            <field name="groups" eval="[(4, ref('of_planning.group_planning_intervention_responsible'))]"/>
+            <field name="groups" eval="[(4, ref('of_planning.group_planning_all_intervention_modification'))]"/>
         </record>
 
         <!-- Deletion access rules -->

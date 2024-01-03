@@ -3,7 +3,7 @@
 
     <record id="group_planning_tournee_manual_creation" model="res.groups">
         <field name="name">Création manuelle des tournées</field>
-        <field name="category_id" ref="of_planning.of_planning_intervention_category"/>
+        <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
 </odoo>
