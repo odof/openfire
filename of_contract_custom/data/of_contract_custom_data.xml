@@ -41,6 +41,18 @@
             <field name="args">()</field>
         </record>
 
+        <record id="of_contract_custom_cron_recompute_all" model="ir.cron">
+            <field name="name">Recalcul des informations relatives à la date des contrats</field>
+            <field name="model">of.contract</field>
+            <field name="function">cron_recompute_all</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall">2024-01-01 05:00:00</field>
+            <field name="active">true</field>
+            <field name="args">()</field>
+        </record>
+
         <record id="of_contract_custom_date_range_type" model="date.range.type">
             <field name="name">Année contractuelle</field>
             <!-- On ne veut pas de société, si  -->

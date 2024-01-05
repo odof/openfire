@@ -85,6 +85,7 @@ class OFContractInvoicingWizard(models.TransientModel):
         lines_selected = self.line_ids.filtered('selected').mapped('contract_line_id')
         exceptions_selected = self.exception_line_ids.filtered('selected').mapped('contract_exception_id')
         invoices = self.env['account.invoice']
+        exception_lines = exceptions_selected
         with self.env.norecompute():
             if self.invoicing_method == 'computed':
                 dates = lines_selected.mapped('next_date')
@@ -98,7 +99,8 @@ class OFContractInvoicingWizard(models.TransientModel):
             else:
                 date = self.invoicing_method == 'day' and fields.Date.today() or self.manual_date
                 invoices, exception_lines = self._create_invoice(
-                    self.with_context(force_date=date).contract_id, lines_selected, exceptions_selected)
+                    self.with_context(force_date=date).contract_id,
+                    lines_selected.with_context(force_date=self.invoicing_period), exceptions_selected)
         self._handle_exceptions(self.contract_id.with_context(force_date=self.manual_date or fields.Date.today()),
                                 exception_lines)
         self.contract_id.recompute()
@@ -118,6 +120,7 @@ class OFContractInvoicingWizard(models.TransientModel):
         lines_grouped = lines.filtered('grouped')
         single_lines = lines - lines_grouped
         invoices = contract.env['account.invoice']
+        services = self.env['of.service']
         invoicing_method = self.invoicing_method
         if lines_grouped:
             invoice_vals = contract._prepare_invoice(do_raise=do_raise)
@@ -126,6 +129,9 @@ class OFContractInvoicingWizard(models.TransientModel):
             lines = []
             for line in lines_grouped:
                 lines += line._add_invoice_lines()
+                services_to_invoice = line._get_to_invoice_services()
+                if services_to_invoice:
+                    services |= services_to_invoice
             if invoicing_method != 'computed':
                 lines += self._handle_multiple_invoices_from_line(lines_grouped)
             if lines:
@@ -141,6 +147,7 @@ class OFContractInvoicingWizard(models.TransientModel):
                 invoice = contract.env['account.invoice'].create(invoice_vals)
                 invoice.compute_taxes()
                 invoices |= invoice
+                services.write({'contract_invoice_id': invoice.id})
         if single_lines:
             date_stop = self.invoicing_period
             for line in single_lines:
@@ -154,7 +161,7 @@ class OFContractInvoicingWizard(models.TransientModel):
                     if invoicing_method == 'computed':
                         contract = contract.with_context(force_date=next_date)
                     invoice, exception_lines = self._create_invoice_single_line(
-                    contract, line, intervention_id, next_date, exception_lines)
+                        contract, line, intervention_id, next_date, exception_lines)
                     last_invoicing_date = next_date
                     next_date = self.date_from_line(line, next_date)
         return invoices, exception_lines
@@ -172,10 +179,16 @@ class OFContractInvoicingWizard(models.TransientModel):
         return intervention_id
 
     def _create_invoice_single_line(self, contract, line, intervention_id, next_date, exception_lines):
+        services = self.env['of.service']
         invoice_vals = contract._prepare_invoice(do_raise=False, intervention_id=intervention_id)
         if not invoice_vals:
             return {}
         lines = line._add_invoice_lines()
+        if 'force_date' in line._context:
+            line = line.with_context(force_date=next_date)
+        services_to_invoice = line._get_to_invoice_services()
+        if services_to_invoice:
+            services = services_to_invoice
         for il in lines:
             il[2]['of_contract_supposed_date'] = next_date
         if not lines:
@@ -189,6 +202,7 @@ class OFContractInvoicingWizard(models.TransientModel):
         invoice_vals['invoice_line_ids'] = lines
         invoice = contract.env['account.invoice'].create(invoice_vals)
         invoice.compute_taxes()
+        services.write({'contract_invoice_id': invoice.id})
         return invoice, exception_lines
 
     @api.multi
@@ -240,7 +254,7 @@ class OFContractInvoicingWizard(models.TransientModel):
         for line in lines:
             last_invoice_date = line.next_date
             next_date = self.date_from_line(line, last_invoice_date)
-            while next_date and next_date < date_stop:
+            while next_date and next_date <= date_stop:
                 new_lines = line._add_invoice_lines()
                 for nl in new_lines:
                     nl[2]['of_contract_supposed_date'] = next_date
@@ -264,7 +278,6 @@ class OFContractInvoicingWizard(models.TransientModel):
             invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
             if not invoice_lines:
                 base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
-                end = fields.Date.from_string(line.date_contract_end)
                 next_date = False
                 if line.recurring_invoicing_payment_id.code == 'pre-paid':
                     if last_invoice_date:
@@ -290,7 +303,7 @@ class OFContractInvoicingWizard(models.TransientModel):
                     if frequency_type == 'year':
                         next_date = base_date + relativedelta(years=1, month=1, day=1, days=-1)
             elif last_invoice_date:
-                end = line.date_contract_end
+                end = fields.Date.from_string(line.date_contract_end)
                 freq_type = line.frequency_type
                 if freq_type == 'month':
                     next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=1)

@@ -21,6 +21,7 @@
                         <field name="manual_date" nolabel="1" class="oe_inline" attrs="{'invisible': [('invoicing_method', '!=', 'manual')], 'required': [('invoicing_method', '=', 'manual')]}"/>
                     </div>
                 </group>
+                <separator string="Lignes à facturer" colspan="4"/>
                 <button string="Calculer" name="compute_line_ids" type="object" class="btn-default"/>
                 <button string="Tout sélectionner" name="select_all_line_ids" type="object" class="btn-default"/>
                 <button string="Tout dé-sélectionner" name="deselect_all_line_ids" type="object" class="btn-default"/>
@@ -44,6 +45,7 @@
                         </tree>
                     </field>
                 </group>
+                <separator string="Exceptions de facturation" colspan="4"/>
                 <button string="Calculer" name="compute_exception_line_ids" type="object" class="btn-default"/>
                 <button string="Tout sélectionner" name="select_all_exception_line_ids" type="object" class="btn-default"/>
                 <button string="Tout dé-sélectionner" name="deselect_all_exception_line_ids" type="object" class="btn-default"/>

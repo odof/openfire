@@ -102,5 +102,8 @@ class OFContractProductException(models.Model):
         lines = []
         for record in self:
             invoice_line_vals = record._prepare_invoice_line()
+            invoice_line_vals.update({
+                'of_contract_line_id': record.line_id.id,
+            })
             lines.append((0, 0, invoice_line_vals))
         return lines

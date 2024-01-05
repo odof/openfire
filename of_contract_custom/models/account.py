@@ -54,6 +54,8 @@ class OfAccountInvoice(models.Model):
                              for code in contractual_lines.mapped('of_contract_line_id').mapped('frequency_type'))):
                     continue
                 base_date = contractual_lines[0].of_contract_supposed_date
+                if not base_date:
+                    continue
                 # La valeur du contrat devrais être utilisée dans la majorité des lignes et donc la plus fiable
                 recurring_invoicing_payment = invoice.of_contract_id.recurring_invoicing_payment_id
                 # Pour passer ici il faut que toutes les lignes utilisent la même fréquence mais celle du contrat

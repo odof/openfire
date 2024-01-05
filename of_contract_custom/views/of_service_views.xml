@@ -30,6 +30,11 @@
                 <field name="contract_line_id" context="{'display_address': True}" domain="[('contract_id', '=', contract_id)]"
                        attrs="{'invisible': ['|', '|', ('contract_id', '=', False), ('type_id','not in',[%(of_service.of_service_type_maintenance)d, %(of_service_parc_installe.of_service_type_sav)d]), ('recurrence','=', True)],
                                'required': [('contract_id', '!=', False)]}"/>
+                <field name="contract_line_frequency_type" invisible="1"/>
+                <field name="contract_invoice_id" domain="[('invoice_line_ids.of_contract_line_id', '=', contract_line_id)]"
+                       attrs="{'invisible': ['|', ('contract_line_id', '=', False), ('contract_line_frequency_type', '!=', 'date')]}"/>
+                <field name="contract_date_invoice"
+                       attrs="{'invisible': ['|', '|', ('contract_line_id', '=', False), ('contract_line_frequency_type', '!=', 'date'), ('contract_invoice_id', '=', False)]}"/>
             </xpath>
             <xpath expr="//field[@name='recurrence']" position="attributes">
                 <attribute name="attrs">{'invisible': ['|', '|', ('type_id','not in',[%(of_service.of_service_type_maintenance)d]), ('contract_id','!=', False), ('contract_line_id','!=', False)]}</attribute>
