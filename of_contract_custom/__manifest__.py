@@ -3,7 +3,7 @@
 
 {
     'name': "OpenFire / Contrat Custom",
-    'version': '10.0.2.0.0',
+    'version': '10.0.2.1.0',
     'author': "OpenFire",
     'license': 'AGPL-3',
     'summary': u"Ajout des contrats OpenFire",
@@ -77,6 +77,7 @@ Ligne d'indice :
         'wizards/of_contract_line_cancel_wizard_views.xml',
         'wizards/of_contract_mass_avenant_wizard_views.xml',
         'wizards/of_contract_revision_wizard_views.xml',
+        'hooks/post_hooks.xml',
         ],
     'installable': True,
     'application': False,

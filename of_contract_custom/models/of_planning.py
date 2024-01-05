@@ -69,6 +69,12 @@ class OFService(models.Model):
     last_intervention_state = fields.Selection(
         selection=lambda r: r.get_intervention_states(), string=u"État du dernier RDV",
         compute='_compute_last_intervention_state')
+    contract_invoice_id = fields.Many2one(comodel_name='account.invoice', string=u"Facture du contrat associé")
+    contract_date_invoice = fields.Date(
+        related='contract_invoice_id.date_invoice', string=u"Date de facture du contrat associé", readonly=True)
+    contract_line_frequency_type = fields.Selection(
+        related='contract_line_id.frequency_type', string=u"Fréquence de facturation de la ligne de contrat associée",
+        readonly=True)
 
     # @api.depends
 

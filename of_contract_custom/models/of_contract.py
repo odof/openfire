@@ -187,9 +187,10 @@ class OfContract(models.Model):
             lines = contrat.line_ids.filtered('is_invoiceable')
             contrat.is_invoiceable = lines and True or False
 
-    @api.depends('recurring_next_date', 'date_end', 'date_start', 'period_ids')
+    @api.depends('recurring_next_date', 'date_end', 'period_ids')
     def _compute_current_period_id(self):
         """ Changement de période en fonction des différentes dates """
+        today = fields.Date.today()
         for contract in self:
             if not contract.period_ids:
                 continue
@@ -198,7 +199,7 @@ class OfContract(models.Model):
             elif contract.last_invoicing_date and contract.date_end:
                 ref_date = contract.date_end
             else:
-                ref_date = contract.date_start
+                ref_date = today
             contract.current_period_id = contract.period_ids.filtered(lambda p: p.date_start <= ref_date <= p.date_end)
 
     def _compute_state(self):
@@ -479,7 +480,12 @@ class OfContract(models.Model):
 
     @api.multi
     def recompute_all(self):
+        self._compute_current_period_id()
         return True
+
+    @api.model
+    def cron_recompute_all(self):
+        self.env['of.contract'].search([]).recompute_all()
 
     @api.multi
     def generate_services(self):
@@ -742,6 +748,9 @@ class OfContract(models.Model):
             current_end = fields.Date.from_string(contract.date_end)
             new_end = current_end + relativedelta(years=1)
             contract.date_end = fields.Date.to_string(new_end)
+            lines_to_renew = self.line_ids.filtered(lambda r: r.state == 'cancel' and not r.date_end)
+            if lines_to_renew:
+                lines_to_renew.bouton_valider()
         ids_list = safe_eval(self.env['ir.config_parameter'].get_param('contracts_to_do', '[]'))
         ids_list += [contract_id for contract_id in self._ids if contract_id not in ids_list]
         self.env['ir.config_parameter'].set_param('contracts_to_do', '%s' % ids_list)
@@ -840,6 +849,9 @@ class OfContractLine(models.Model):
             'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False))
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
+    old_next_date = fields.Date(string=u"Prochaine facturation (old)", copy=False)
+    warning_next_date = fields.Boolean(
+        string=u"Avertissement de prochaine facturation", compute='_compute_warning_next_date', store=True, copy=False)
     is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable", copy=False)
     date_avenant = fields.Date(u'Date de début (avenant)', copy=False)
     date_start = fields.Date(
@@ -983,8 +995,7 @@ class OfContractLine(models.Model):
                  'contract_id.date_end',
                  'contract_id.last_invoicing_date',
                  'state',
-                 'intervention_ids',
-                 'intervention_ids.state')
+                 'service_ids.state')
     def _compute_dates(self):
         """ Calcul des différentes dates utilisées pour la facturation """
         for line in self:
@@ -1027,16 +1038,20 @@ class OfContractLine(models.Model):
                     last_invoicing = invoice_lines[-1].of_contract_supposed_date
                 else:
                     date_start = fields.Date.from_string(line.date_contract_start)
-                    last_invoicing = fields.Date.to_string(date_start - relativedelta(days=1))
-                interventions = line.intervention_ids\
-                                    .filtered(lambda i: i.state == 'done' and i.date_date > last_invoicing)
-                if interventions:
-                    next_date = interventions.sorted('date_date')[0].date_date
-                    if line.recurring_invoicing_payment_id.code == 'post-paid':
-                        # On se place au dernier jour du mois
-                        base_date = fields.Date.from_string(next_date)
-                        next_date = base_date + relativedelta(months=1, day=1, days=-1)
-                    line.next_date = next_date
+                    last_invoicing = fields.Date.to_string(date_start)
+                services_to_invoice = line.service_ids.filtered(
+                    lambda s: not s.contract_invoice_id and s.state == 'done')
+                if services_to_invoice:
+                    interventions = services_to_invoice.mapped('intervention_ids').filtered(lambda i: i.state == 'done')
+                    if interventions:
+                        next_date = interventions.sorted('date_date')[0].date_date
+                        if next_date < last_invoicing:
+                            next_date = last_invoicing
+                        if line.recurring_invoicing_payment_id.code == 'post-paid':
+                            # On se place au dernier jour du mois
+                            base_date = fields.Date.from_string(next_date)
+                            next_date = base_date + relativedelta(months=1, day=1, days=-1)
+                        line.next_date = next_date
             else:
                 invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
                 if not invoice_lines:
@@ -1107,6 +1122,14 @@ class OfContractLine(models.Model):
                         next = fields.Date.to_string(next)
                         if not end or end > next:
                             line.next_date = next
+
+    @api.depends('next_date', 'old_next_date')
+    def _compute_warning_next_date(self):
+        for contract_line in self:
+            if contract_line.frequency_type == 'date':
+                contract_line.warning_next_date = (contract_line.next_date != contract_line.old_next_date)
+            else:
+                contract_line.warning_next_date = False
 
     def _compute_prices(self):
         """ Calcule les différents montants facturés générés par la ligne de contrat """
@@ -1457,7 +1480,14 @@ class OfContractLine(models.Model):
             invoice_line_vals.update({
                 'of_contract_line_id': self.id,
                 })
-            lines.append((0, 0, invoice_line_vals))
+            if self.frequency_type == 'date' and invoice_line_vals['quantity'] > 1.0:
+                qty = int(invoice_line_vals['quantity'])
+                for i in xrange(0, qty):
+                    unit_invoice_line_vals = invoice_line_vals
+                    unit_invoice_line_vals['quantity'] = 1.0
+                    lines.append((0, 0, unit_invoice_line_vals))
+            else:
+                lines.append((0, 0, invoice_line_vals))
         return lines
 
     @api.multi
@@ -1468,6 +1498,7 @@ class OfContractLine(models.Model):
             'type_id': ttype.id,
             'partner_id': self.partner_id.id,
             'address_id': self.address_id.id,
+            'template_id': self.intervention_template_id.id,
             'tache_id': self.tache_id.id,
             'recurrence': False,
             'contract_id': self.contract_id.id,
@@ -1485,10 +1516,17 @@ class OfContractLine(models.Model):
                 line.state = 'cancel'
 
     @api.multi
+    def _get_period(self):
+        self.ensure_one()
+        if self.frequency_type != 'date':
+            return self.current_period_id
+        return self.contract_id.current_period_id
+
+    @api.multi
     def _generate_services(self):
         """ Génération des demandes d'interventions """
         Service = self.with_context(bloquer_recurrence=True).env['of.service']
-        li = [(line, line.current_period_id) for line in self]
+        li = [(line, line._get_period()) for line in self]
         for line, period in li:
             if not period or line.state != 'validated':
                 continue
@@ -1517,6 +1555,8 @@ class OfContractLine(models.Model):
                     continue
 
                 new_service = Service.new(line._prepare_service_values())
+                new_service.onchange_template_id()
+                new_service.update({'tache_id': line.tache_id.id})
                 new_service._onchange_tache_id()
                 new_service.update({'date_next': date_service})
                 new_service._onchange_date_next()
@@ -1663,7 +1703,21 @@ class OfContractLine(models.Model):
             'res_model': 'of.contract.line',
             'res_id': new_line.id,
             'type': 'ir.actions.act_window',
+            'context': {'form_readonly': '[("state","in",["validated","cancel"])]', 'create': False},
         }
+
+    @api.multi
+    def _get_to_invoice_services(self):
+        self.ensure_one()
+        if self.frequency_type == 'date':
+            services = self.service_ids.filtered(lambda s: not s.contract_invoice_id and s.state == 'done')
+            if services:
+                date = self._context.get('force_date', self.next_date)
+                interventions = services.mapped('intervention_ids').filtered(
+                    lambda i: i.state == 'done' and i.date_date <= date)
+                if interventions:
+                    return interventions.mapped('service_id')
+        return False
 
 
 class OfContractProduct(models.Model):
@@ -1787,6 +1841,7 @@ class OfContractProduct(models.Model):
                  'line_id.recurring_invoicing_payment_id.code',
                  'line_id.revision',
                  'line_id.contract_id.period',
+                 'line_id.service_ids.contract_invoice_id',
                  'invoice_line_ids',
                  'invoice_line_ids.quantity', 'invoice_line_ids.invoice_id',
                  'invoice_line_ids.invoice_id.state')
@@ -1799,7 +1854,7 @@ class OfContractProduct(models.Model):
             last_day = product_line.line_id.current_period_id.date_end
             frequency_type = line.frequency_type
             qty_to_invoice = 0
-            if last_day and line.recurring_invoicing_payment_id.code == 'post-paid' and \
+            if frequency_type != 'date' and last_day and line.recurring_invoicing_payment_id.code == 'post-paid' and \
                last_day == line.next_date and line.revision == 'last_day':
                 qty_to_invoice = round(product_line.qty_per_period - product_line.qty_invoiced, 3)
             else:
@@ -1812,7 +1867,10 @@ class OfContractProduct(models.Model):
                 elif frequency_type == 'year':
                     qty_to_invoice = qty_per_period
                 elif frequency_type == 'date':
-                    qty_to_invoice = 1.0
+                    qty_to_invoice = 0.0
+                    services_to_invoice = line._get_to_invoice_services()
+                    if services_to_invoice:
+                        qty_to_invoice = len(services_to_invoice)
             product_line.qty_to_invoice = qty_to_invoice
 
     def _compute_next_product_id(self):
