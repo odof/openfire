@@ -120,11 +120,13 @@ class WebsiteAccount(website_account):
             ('partner_id', 'child_of', request.env.user.partner_id.id),
             ('address_id', 'child_of', request.env.user.partner_id.id)
         ])
+        leads = request.env['crm.lead'].search([('user_id', '=', request.env.user.id)])
         values.update({
             'recurrent_count': len(recurrent_ids),
             'service_count': len(service_ids),
             'delivery_count': len(delivery_ids),
             'rdv_count': len(rdv_ids),
+            'opportunity_count': len(leads),
             'tabs': request.env.user.of_tab_ids.mapped('code'),
         })
         return values
@@ -308,6 +310,23 @@ class WebsiteAccount(website_account):
             'rdv': rdv,
         }
         return request.render('of_website_portal.of_website_portal_website_rdv_cancel', values)
+
+    @http.route(['/my/opportunities/<model("crm.lead"):opportunity>'], type='http', auth='user', website=True)
+    def portal_my_opportunity(self, opportunity):
+        values = {
+            'user': request.env.user,
+            'opportunity': opportunity,
+        }
+        return request.render('of_website_portal.of_website_portal_opportunity', values)
+
+    @http.route(['/my/opportunities'], type='http', auth='user', website=True)
+    def portal_list_opportunities(self):
+        values = self._prepare_portal_layout_values()
+        leads = request.env['crm.lead'].search([('user_id', '=', request.env.user.id)])
+        values.update({
+            'leads': leads,
+        })
+        return request.render('of_website_portal.display_opportunities', values)
 
 
 class SignupVerifyEmail(AuthSignupHome):

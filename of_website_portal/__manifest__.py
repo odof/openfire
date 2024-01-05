@@ -12,6 +12,7 @@ Module OpenFire pour le portail du site internet
 ================================================
 - Ajout des contrats dans le portail (interventions récurrentes)
 - Ajout de la possibilité d'uploader un fichier depuis le portail
+- Afficher la liste des opportunités pour l'utilisateur connecté.
 
 """,
     'website': u"www.openfire.fr",
@@ -41,6 +42,7 @@ Module OpenFire pour le portail du site internet
         'wizards/portal_user_wizard_views.xml',
         'templates/website_portal_sale_views.xml',
         'templates/website_portal_bank_details.xml',
+        'templates/website_portal_crm_lead.xml',
         'reports/report_stock_picking.xml',
         'data/post_update.xml',
     ],

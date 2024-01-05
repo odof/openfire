@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="my_opportunity" name="my opportunity" inherit_id="website_portal.portal_layout">
+        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
+            <li t-att-class="page_name == 'opportunity' and 'active' or ''" t-if="'lead' in tabs">
+                <a href="/my/opportunities">Opportunités</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_opportunity" name="Portal My opportunity" inherit_id="website_portal.portal_my_home">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3  class="page-header" t-if="'lead' in tabs">
+                <a href="/my/opportunities">Vos opportunités
+                    <small class="ml8">
+                        <t t-if="opportunity_count">
+                            <span class='badge'><t t-esc="opportunity_count"/></span>
+                        </t>
+                        <t t-if="not opportunity_count">
+                            Il n'y a actuellement aucune opportunité pour votre compte.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <template id="display_opportunities" name="Liste des opportunités">
+        <t t-call="website_portal.portal_layout">
+            <h3 class="page-header">Vos opportunités</h3>
+            <table class="table table-hover o_my_status_table" t-if="'lead' in tabs">
+                <thead>
+                    <tr class="active">
+                        <th>Libellé</th>
+                        <th>Client</th>
+                        <th>Priorité</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <t t-foreach="leads" t-as="lead">
+                    <tr>
+                        <td>
+                            <a t-attf-href="/my/opportunities/#{lead.id}?{{ keep_query() }}">
+                                <span t-field="lead.name"/>
+                            </a>
+                        </td>
+                        <td>
+                            <span t-field="lead.partner_id.name"/>
+                        </td>
+                        <td>
+                            <span t-field="lead.priority"/>
+                        </td>
+                        <td>
+                            <span t-field="lead.stage_id.name"/>
+                        </td>
+                    </tr>
+                </t>
+            </table>
+            <div t-if="pager" class="o_portal_pager text-center">
+                <t t-call="website.pager"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="of_website_portal_opportunity" name="Opportunité">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <div class="oe_structure">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb mt8">
+                                    <li><a href="/my/home"><i class="fa fa-home"/></a></li>
+                                    <li><a t-attf-href="/my/opportunities?#{keep_query()}">Mes opportunités</a></li>
+                                    <li><span t-field="opportunity.name"/></li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h4>
+                                            <span t-field="opportunity.name"/>
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class='row'>
+                                    <div class="col-md-6">
+                                        <div class="mb8">
+                                            <strong>Client :</strong>
+                                            <div>
+                                                <span t-field="opportunity.partner_id" t-options='{
+                                                "widget": "contact",
+                                                "fields": ["address", "name", "phone", "mobile"]
+                                                }'/>
+                                            </div>
+                                        </div>
+                                        <div class="mb8" t-if="opportunity.email_from">
+                                            <strong>Email :</strong> <span t-field="opportunity.email_from"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb8">
+                                            <strong>Statut :</strong> <span t-field="opportunity.stage_id.name"/>
+                                        </div>
+                                        <div class="mb8">
+                                            <strong>Priorité :</strong> <span t-field="opportunity.priority"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="container" t-if="opportunity.description">
+                                <strong>Description</strong>
+                                <p t-field="opportunity.description"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
