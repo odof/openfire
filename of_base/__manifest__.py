@@ -54,6 +54,7 @@
         'web.assets_backend': [
             'of_base/static/src/js/user_menu_item.js',
             'of_base/static/src/js/history_back.js',
+            'of_base/static/src/js/settings_form_compiler.js',
             'of_base/static/src/less/of_base.less',
         ],
     },
