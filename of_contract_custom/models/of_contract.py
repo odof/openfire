@@ -995,7 +995,8 @@ class OfContractLine(models.Model):
                  'contract_id.date_end',
                  'contract_id.last_invoicing_date',
                  'state',
-                 'service_ids.state')
+                 'service_ids.state',
+                 'service_ids.contract_invoice_id')
     def _compute_dates(self):
         """ Calcul des différentes dates utilisées pour la facturation """
         for line in self:

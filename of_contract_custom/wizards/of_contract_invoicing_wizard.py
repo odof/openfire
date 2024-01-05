@@ -90,6 +90,7 @@ class OFContractInvoicingWizard(models.TransientModel):
             if self.invoicing_method == 'computed':
                 dates = lines_selected.mapped('next_date')
                 dates.sort()
+                dates = list(set(dates))
                 for date in dates:
                     lines = lines_selected.filtered(lambda l: l.next_date == date)
                     exception_lines = exceptions_selected.filtered(lambda r: r.line_id.id in lines.ids)
@@ -135,8 +136,9 @@ class OFContractInvoicingWizard(models.TransientModel):
             if invoicing_method != 'computed':
                 lines += self._handle_multiple_invoices_from_line(lines_grouped)
             if lines:
-                exceptions = exception_lines.filtered(lambda r: r.line_id.id in lines_grouped._ids and
-                                                                r.date_invoice_next < invoice_vals.get('date_invoice'))
+                exceptions = exception_lines.filtered(
+                    lambda r: r.line_id.id in lines_grouped._ids and
+                    r.date_invoice_next <= invoice_vals.get('date_invoice'))
                 exception_lines -= exceptions
                 for exception in exceptions:
                     lines += exception._add_invoice_lines()

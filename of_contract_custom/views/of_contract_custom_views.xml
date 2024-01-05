@@ -147,7 +147,7 @@
                             <field name="pricelist_id" invisible="1"/>
                         </group>
                         <group col="2" colspan="2" string="Validité" name="validity">
-                            <field name="current_period_id"/>
+                            <field name="current_period_id" options="{'no_open': True}"/>
                             <field name="period_ids" invisible="1" readonly="1"/>
                             <field name="validated" invisible="1" readonly="1"/>
                             <label for="date_start" string="Dates"/>
