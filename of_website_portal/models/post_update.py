@@ -9,7 +9,7 @@ class ResUsers(models.Model):
 
     @api.model
     def _update_version_10_0_2_2_0(self):
-        """ Ajout des onglets Contrats et Interventions aux onglets des utilisateurs """
+        """ Ajout des onglets Contrats + Interventions + Opportunités aux onglets des utilisateurs """
         module_self = self.env['ir.module.module'].search(
             [('name', '=', 'of_website_portal'), ('state', 'in', ['installed', 'to upgrade'])])
         if module_self and module_self.latest_version < '10.0.2.2.0':
@@ -22,6 +22,6 @@ class ResUsers(models.Model):
             WHERE       ot.id = imd.res_id
             AND         imd.model = 'of.tab'
             AND         imd.module = 'of_website_portal'
-            AND         imd.name IN ('of_tab_intervention', 'of_tab_contract')
+            AND         imd.name IN ('of_tab_intervention', 'of_tab_contract', 'of_tab_opportunity')
             ON CONFLICT DO NOTHING
             """)
