@@ -83,6 +83,10 @@
         <field name="code">rdv</field>
     </record>
 
+    <record id="of_tab_opportunity" model="of.tab">
+        <field name="name">Opportunités</field>
+        <field name="code">lead</field>
+    </record>
 
     <!-- Modèle de mail -->
     <record id="of_website_portal_rdv_cancellation_mail_template" model="mail.template">
