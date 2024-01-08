@@ -7,7 +7,7 @@ class OFSector(models.Model):
     _name = 'of.sector'
 
     name = fields.Char(string="Title", required=True)
-    code = fields.Char(string="Code")
+    code = fields.Char()
     type = fields.Selection(
         selection=[
             ('technical', "Technical"),
@@ -19,7 +19,7 @@ class OFSector(models.Model):
         default='technical_commercial',
     )
     zip_range_ids = fields.One2many(comodel_name='of.sector.zip.range', inverse_name='sector_id', string="Postal codes")
-    active = fields.Boolean(string="Active", default=True)
+    active = fields.Boolean(default=True)
     partner_count = fields.Integer(string="Number of partners", compute='_compute_partner_count')
 
     _sql_constraints = [
@@ -34,44 +34,14 @@ class OFSector(models.Model):
                 )
             )
 
-    # TODO: Remove me ? (not used)
-    def get_internal_sectors(self, type='technical'):
-        zip_range_obj = self.env['of.sector.zip.range']
-        types = ('technical', 'technical_commercial') if type == 'tech' else ('commercial', 'technical_commercial')
-        if len(self) == 1:
-            zip_range_ids = self.env['of.sector.zip.range']
-            for zip_range in self.zip_range_ids:
-                under_zip_range_ids = zip_range_obj.search(
-                    [('zip_code_min', '<=', zip_range.zip_code_max), ('zip_code_max', '>=', zip_range.zip_code_min)]
-                )
-                for under_zip_range_id in under_zip_range_ids:
-                    if under_zip_range_id.sector_id.type in types:
-                        zip_range_ids |= under_zip_range_id
-            return zip_range_ids.mapped('sector_id').filtered(lambda s: s.id != self.id)
-        elif len(self) > 1:
-            res = {}
-            for secteur in self:
-                zip_range_ids = self.env['of.sector.zip.range']
-                for zip_range in secteur.zip_range_ids:
-                    under_zip_range_ids = zip_range_obj.search(
-                        [('zip_code_min', '<=', zip_range.zip_code_max), ('zip_code_max', '>=', zip_range.zip_code_min)]
-                    )
-                    for under_zip_range_id in under_zip_range_ids:
-                        if under_zip_range_id.sector_id.type in types:
-                            zip_range_ids |= under_zip_range_id
-                res[secteur.id] = zip_range_ids.mapped('sector_id').filtered(lambda s: s.id != secteur.id)
-            return res
-
     @api.model
-    def get_sector_from_zip_code(self, cp):
+    def get_sector_from_zip_code(self, cp, type_list=None):
+        """Get sector from zip code."""
+        domain = [('zip_code_min', '<=', cp), ('zip_code_max', '>=', cp)]
+        if type_list:
+            domain += [('sector_id.type', 'in', type_list)]
         return (
-            self.env['of.sector.zip.range']
-            .search(
-                [('zip_code_min', '<=', cp), ('zip_code_max', '>=', cp)],
-                order='zip_code_min DESC, zip_code_max',
-                limit=1,
-            )
-            .sector_id
+            self.env['of.sector.zip.range'].search(domain, order='zip_code_min DESC, zip_code_max', limit=1).sector_id
         )
 
     def get_partners(self):
@@ -81,34 +51,9 @@ class OFSector(models.Model):
         :rtype: recordset of res.partner
         """
         partner_obj = self.env['res.partner']
-        zip_range_obj = self.env['of.sector.zip.range']
-
         domain_partner = ['|'] * (len(self.mapped('zip_range_ids')) - 1)
-
         for zip_range in self.mapped('zip_range_ids'):
-            zip_code_min = zip_range.zip_code_min
-            zip_code_max = zip_range.zip_code_max
-            inner_zip_ranges = zip_range_obj.search(
-                [
-                    ('zip_code_min', '>=', zip_code_min),
-                    ('zip_code_min', '<=', zip_code_max),
-                    ('id', '!=', zip_range.id),
-                ],
-                order='zip_code_min, zip_code_max DESC',
-            )
-
-            domain_sector = ['&'] * (len(inner_zip_ranges) + 1)
-            domain_sector += [('zip', '>=', zip_code_min), ('zip', '<=', zip_code_max)]
-            for inner_zip_range in inner_zip_ranges:
-                if inner_zip_range.zip_code_max >= zip_code_min:
-                    domain_sector += [
-                        '|',
-                        ('zip', '<', inner_zip_range.zip_code_min),
-                        ('zip', '>', inner_zip_range.zip_code_max),
-                    ]
-                    zip_code_min = inner_zip_range.zip_code_max
-            domain_partner += domain_sector
-
+            domain_partner += ['&', ('zip', '>=', zip_range.zip_code_min), ('zip', '<=', zip_range.zip_code_max)]
         return partner_obj.search(domain_partner)
 
     def action_button_view_partner(self):

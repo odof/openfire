@@ -14,13 +14,9 @@ class OFResPartnerUpdateSectorWizard(models.TransientModel):
         active_ids = context.get('active_ids', []) or []
 
         for record in self.env['res.partner'].browse(active_ids):
-            record.of_com_sector_id = (
-                record.env['of.sector']
-                .get_sector_from_zip_code(record.zip)
-                .filtered(lambda sec: sec.type in ('commercial', 'technical_commercial'))
+            record.of_com_sector_id = record.env['of.sector'].get_sector_from_zip_code(
+                record.zip, ('commercial', 'technical_commercial')
             )
-            record.of_tech_sector_id = (
-                record.env['of.sector']
-                .get_sector_from_zip_code(record.zip)
-                .filtered(lambda sec: sec.type in ('technical', 'technical_commercial'))
+            record.of_tech_sector_id = record.env['of.sector'].get_sector_from_zip_code(
+                record.zip, ('technical', 'technical_commercial')
             )
