@@ -62,7 +62,7 @@ class OFAccountFrFec(models.TransientModel):
         help="Use the date of creation of the move instead of the date of the move.",
     )
 
-    def do_query_unaffected_earnings(self):
+    def _do_query_unaffected_earnings(self):
         '''Copy of l10n_fr_fec method.
 
         If the export type is "official", that will call the standard method.
@@ -74,7 +74,7 @@ class OFAccountFrFec(models.TransientModel):
             to an Accounting software.
         '''
         if self.export_type == 'official':
-            return super().do_query_unaffected_earnings()
+            return super()._do_query_unaffected_earnings()
 
         date_clause = 'am.date < %s'
         if self.of_use_create_date:
@@ -154,7 +154,7 @@ class OFAccountFrFec(models.TransientModel):
             - added a specific customisation of the file extension.
         '''
         self.ensure_one()
-        if not self.env.is_admin() and not self.env.user.has_group('account.group_account_user'):
+        if not (self.env.is_admin() or self.env.user.has_group('account.group_account_user')):
             raise AccessDenied()
 
         today = fields.Date.today()
@@ -253,11 +253,13 @@ class OFAccountFrFec(models.TransientModel):
             and unaffected_earnings_results
             and (unaffected_earnings_results[11] != '0,00' or unaffected_earnings_results[12] != '0,00')
         ):
-            # search an unaffected earnings account
-            unaffected_earnings_account = self.env['account.account'].search(
-                [('account_type', '=', 'equity_unaffected'), ('company_id', '=', company.id)], limit=1
-            )
-            if unaffected_earnings_account:
+            if unaffected_earnings_account := self.env['account.account'].search(
+                [
+                    ('account_type', '=', 'equity_unaffected'),
+                    ('company_id', '=', company.id),
+                ],
+                limit=1,
+            ):
                 unaffected_earnings_results[4] = unaffected_earnings_account.code
                 unaffected_earnings_results[5] = unaffected_earnings_account.name
             rows_to_write.append(unaffected_earnings_results)
