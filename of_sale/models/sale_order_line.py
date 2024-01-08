@@ -9,7 +9,7 @@ from odoo.tools import float_compare, float_is_zero, get_lang
 
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
-    _inherit = ['sale.order.line', 'of.readgroup']
+    _inherit = ['sale.order.line', 'of.readgroup', 'of.form.readonly']
 
     price_unit = fields.Float(  # Override to add help text
         help="Unit price of the article. To enter without VAT or with VAT according to the order line.",
@@ -66,9 +66,9 @@ class SaleOrderLine(models.Model):
     )
     of_product_default_code = fields.Char(related='product_id.default_code', string="Product Reference", readonly=True)
     of_price_date_display = fields.Char(compute='_compute_of_price_date_display', string="Price date")
-    of_obsolete = fields.Boolean(string="Obsolete Product", related="product_id.of_obsolete", readonly=True)
+    of_obsolete = fields.Boolean(string="Obsolete Product", related='product_id.of_obsolete', readonly=True)
     date_order = fields.Datetime(related='order_id.date_order', store=True, index=True)
-    of_customer_view = fields.Boolean(string="Customer/Vendor view", related="order_id.of_customer_view")
+    of_customer_view = fields.Boolean(string="Customer/Vendor view", related='order_id.of_customer_view')
 
     # Related fields for the sale order line custom form view called by `action_button_open_sale_order_line`
     of_order_state = fields.Selection(
@@ -244,6 +244,12 @@ class SaleOrderLine(models.Model):
     def _valid_field_parameter(self, field, name):
         # EXTENDS models
         return name == 'of_custom_groupby' or super()._valid_field_parameter(field, name)
+
+    @api.model
+    def _get_view(self, view_id=None, view_type='form', **options):
+        if self.env.user.has_group('of_sale.of_group_restrict_form_sale_order_modification') and view_type == 'form':
+            self = self.with_context(form_readonly="[('of_order_state', '=', 'sale')]")
+        return super()._get_view(view_id=view_id, view_type=view_type, **options)
 
     def write(self, vals):
         blocked = [x for x in self._get_blocked_fields_on_write() if x in vals.keys()]

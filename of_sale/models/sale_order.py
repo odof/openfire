@@ -8,7 +8,8 @@ from odoo.addons.of_utils.models.misc import get_selection_label
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _name = 'sale.order'
+    _inherit = ['sale.order', 'of.form.readonly']
 
     def _default_of_price_printing(self):
         return 'order_line'
@@ -239,7 +240,7 @@ class SaleOrder(models.Model):
         return
 
     # -------------------------------------------------------------------------
-    # CRUD methods
+    # ORM methods
     # -------------------------------------------------------------------------
 
     @api.model_create_multi
@@ -266,6 +267,12 @@ class SaleOrder(models.Model):
                 {'subtype_ids': [Command.unlink(mail_subtype.id)]}
             )
         return res
+
+    @api.model
+    def _get_view(self, view_id=None, view_type='form', **options):
+        if self.env.user.has_group('of_sale.of_group_restrict_form_sale_order_modification') and view_type == 'form':
+            self = self.with_context(form_readonly="[('state', '=', 'sale')]")
+        return super()._get_view(view_id=view_id, view_type=view_type, **options)
 
     # -------------------------------------------------------------------------
     # Action methods

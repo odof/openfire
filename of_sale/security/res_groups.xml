@@ -25,4 +25,9 @@
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
+    <record id="of_group_restrict_form_sale_order_modification" model="res.groups">
+        <field name="name">(OF) Block changes to sales orders</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
 </odoo>
