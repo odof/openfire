@@ -73,17 +73,17 @@ class SaleOrder(models.Model):
     of_referred_id = fields.Many2one(
         'res.partner', string=u"Apporté par", help="Nom de l'apporteur d'affaire", copy=False)
     opportunity_id = fields.Many2one(
-        'crm.lead', string='Opportunity', domain="[('type', '=', 'opportunity')]", copy=False)
+        'crm.lead', string='Opportunity', domain="[('type', '=', 'opportunity')]", copy=False,)
     campaign_id = fields.Many2one(
-        'utm.campaign', 'Campaign', copy=False,
+        'utm.campaign', 'Campaign', copy=False, track_visibility='onchange',
         help="This is a name that helps you keep track of your different campaign efforts Ex: Fall_Drive, "
              "Christmas_Special")
     source_id = fields.Many2one(
-        'utm.source', 'Source', copy=False,
+        'utm.source', 'Source', copy=False, track_visibility='onchange',
         help="This is the source of the link Ex:Search Engine, another domain,or name of email list")
     medium_id = fields.Many2one(
-        'utm.medium', 'Medium', copy=False, help="This is the method of delivery.Ex: Postcard, Email, or Banner Ad",
-        oldname='channel_id')
+        'utm.medium', 'Medium', copy=False, track_visibility='onchange',
+        help="This is the method of delivery.Ex: Postcard, Email, or Banner Ad", oldname='channel_id')
     state = fields.Selection([
         ('draft', u'Estimation'),
         ('sent', u'Devis'),
