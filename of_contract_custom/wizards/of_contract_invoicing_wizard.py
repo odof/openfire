@@ -23,7 +23,7 @@ class OFContractInvoicingWizard(models.TransientModel):
     invoicing_method = fields.Selection(selection=
         [
             ('day', u"Date du jour"),
-            ('computed', u"Date calculée"),
+            #('computed', u"Date calculée"),
             ('manual', u"Manuelle"),
         ], string=u"Méthode de facturation", required=True)
     manual_date = fields.Date(string=u"Date de facturation")
