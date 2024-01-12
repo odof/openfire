@@ -1,11 +1,21 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': u"OpenFire / Stock multi-sociétés",
+    'name': u"OpenFire / Stock partagé entre magasins",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
+    'summary': u"ATTENTION : à installer pour partager des stocks uniquement, voir détails",
     'description': u"""
-Personnalisation Stock multi-sociétés :
+ATTENTION : Ce module doit uniquement être installé pour partager les stocks entre plusieurs magasins !
+=======================================================================================================
+
+Ne pas oublier de bien configurer le champ "Est le propriétaire du stock" de chaque société et magasin avant installation.
+--------------------------------------------------------------------------------------------------------------------------
+
+Rappel : Ce champ permet de définir la société comme propriétaire du stock de toutes ses sociétés enfant, c'est à dire
+que chaque société enfant pourra partager son stock avec ses sociétés soeurs.
+
+Personnalisation Stock partagé entre magasins :
 
 - Modification des domain sur les ir.rule suivantes : stock_warehouse_comp_rule, stock_picking_type_rule, stock_quant_rule
 - Passage de company_id à la société propriétaire des stocks sur les emplacements, entrepôts et quant
