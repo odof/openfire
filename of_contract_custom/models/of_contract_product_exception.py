@@ -7,7 +7,8 @@ class OFContractProductException(models.Model):
     _name = 'of.contract.product.exception'
     _order = 'state, date_invoice_next'
 
-    line_id = fields.Many2one(comodel_name='of.contract.line', string=u"Ligne de contrat", required=True)
+    line_id = fields.Many2one(
+        comodel_name='of.contract.line', string=u"Ligne de contrat", required=True, ondelete='cascade')
     date_invoice_next = fields.Date(string=u"Date de facturation prévisionnelle", required=True)
     product_id = fields.Many2one(comodel_name='product.product', string=u"Article", required=True)
     name = fields.Char(string=u"Description", required=True)

@@ -14,6 +14,7 @@
                 </script>
                 <group>
                     <field name="contract_id" invisible="1"/>
+                    <field name="contract_ids" invisible="1"/>
                     <field name="invoicing_period"/>
                     <label for="manual_date"/>
                     <div>
@@ -21,52 +22,55 @@
                         <field name="manual_date" nolabel="1" class="oe_inline" attrs="{'invisible': [('invoicing_method', '!=', 'manual')], 'required': [('invoicing_method', '=', 'manual')]}"/>
                     </div>
                 </group>
-                <separator string="Lignes à facturer" colspan="4"/>
-                <button string="Calculer" name="compute_line_ids" type="object" class="btn-default"/>
-                <button string="Tout sélectionner" name="select_all_line_ids" type="object" class="btn-default"/>
-                <button string="Tout dé-sélectionner" name="deselect_all_line_ids" type="object" class="btn-default"/>
-                <group>
-                    <field name="line_ids" nolabel="1">
-                        <tree create="false" editable="top">
-                            <field name="contract_line_id" invisible="1"/>
-                            <field name="selected"/>
-                            <field name="line_code"/>
-                            <field name="line_address_id"/>
-                            <field name="line_address_zip"/>
-                            <field name="line_address_city"/>
-                            <field name="line_supplier_id"/>
-                            <field name="line_tache_id"/>
-                            <field name="line_next_date"/>
-                            <field name="line_frequency_type"/>
-                            <field name="line_type"/>
-                            <field name="line_company_currency_id"/>
-                            <field name="line_amount_total"/>
-                            <field name="line_grouped"/>
-                        </tree>
-                    </field>
-                </group>
-                <separator string="Exceptions de facturation" colspan="4"/>
-                <button string="Calculer" name="compute_exception_line_ids" type="object" class="btn-default"/>
-                <button string="Tout sélectionner" name="select_all_exception_line_ids" type="object" class="btn-default"/>
-                <button string="Tout dé-sélectionner" name="deselect_all_exception_line_ids" type="object" class="btn-default"/>
-                <group>
-                    <field name="exception_line_ids" nolabel="1">
-                        <tree create="false" editable="top">
-                            <field name="contract_line_id" invisible="1"/>
-                            <field name="selected"/>
-                            <field name="line_code"/>
-                            <field name="line_address_id"/>
-                            <field name="line_address_zip"/>
-                            <field name="line_address_city"/>
-                            <field name="line_supplier_id"/>
-                            <field name="exception_date_invoice_next"/>
-                            <field name="exception_amount_total"/>
-                            <field name="exception_internal_note"/>
-                        </tree>
-                    </field>
-                </group>
+                <div attrs="{'invisible': [('contract_id', '=', False)]}">
+                    <separator string="Lignes à facturer" colspan="4"/>
+                    <button string="Calculer" name="compute_line_ids" type="object" class="btn-default"/>
+                    <button string="Tout sélectionner" name="select_all_line_ids" type="object" class="btn-default"/>
+                    <button string="Tout dé-sélectionner" name="deselect_all_line_ids" type="object" class="btn-default"/>
+                    <group>
+                        <field name="line_ids" nolabel="1">
+                            <tree create="false" editable="top">
+                                <field name="contract_line_id" invisible="1"/>
+                                <field name="selected"/>
+                                <field name="line_code"/>
+                                <field name="line_address_id"/>
+                                <field name="line_address_zip"/>
+                                <field name="line_address_city"/>
+                                <field name="line_supplier_id"/>
+                                <field name="line_tache_id"/>
+                                <field name="line_next_date"/>
+                                <field name="line_frequency_type"/>
+                                <field name="line_type"/>
+                                <field name="line_grouped"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <separator string="Exceptions de facturation" colspan="4"/>
+                    <button string="Calculer" name="compute_exception_line_ids" type="object" class="btn-default"/>
+                    <button string="Tout sélectionner" name="select_all_exception_line_ids" type="object" class="btn-default"/>
+                    <button string="Tout dé-sélectionner" name="deselect_all_exception_line_ids" type="object" class="btn-default"/>
+                    <group>
+                        <field name="exception_line_ids" nolabel="1">
+                            <tree create="false" editable="top">
+                                <field name="contract_line_id" invisible="1"/>
+                                <field name="selected"/>
+                                <field name="line_code"/>
+                                <field name="line_address_id"/>
+                                <field name="line_address_zip"/>
+                                <field name="line_address_city"/>
+                                <field name="line_supplier_id"/>
+                                <field name="exception_date_invoice_next"/>
+                                <field name="exception_amount_total"/>
+                                <field name="exception_internal_note"/>
+                            </tree>
+                        </field>
+                    </group>
+                </div>
                 <footer>
-                    <button string="Générer les factures" name="button_apply" type="object" class="btn-primary"/>
+                    <button string="Générer les factures" name="button_apply" type="object" class="btn-primary"
+                            attrs="{'invisible': [('contract_id', '=', False)]}"/>
+                    <button string="Générer les factures" name="button_multi_apply" type="object" class="btn-primary"
+                            attrs="{'invisible': [('contract_id', '!=', False)]}"/>
                     <button string="Annuler" special="cancel" class="btn-default"/>
                 </footer>
             </form>
