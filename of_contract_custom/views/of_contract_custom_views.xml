@@ -511,7 +511,8 @@
                                 <field colspan="4" name="exception_line_ids" nolabel="1"
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_product_exception_view_form'}"
                                        attrs="{'form_readonly_exception': True}">
-                                    <tree editable="bottom" colors="grey:state=='2-invoiced';blue:state=='1-to_invoice'">
+                                    <tree editable="bottom"
+                                          colors="grey:not (isinstance(qty, float) and isinstance(qty_invoiced, float) and bool(qty - qty_invoiced) or True);blue:isinstance(qty, float) and isinstance(qty_invoiced, float) and bool(qty - qty_invoiced) or False">
                                         <field name="date_invoice_next"/>
                                         <field name="product_id"/>
                                         <field name="name"/>
@@ -737,7 +738,8 @@
                                 <field colspan="4" name="exception_line_ids" nolabel="1"
                                        context="{'form_view_ref': 'of_contract_custom.of_contract_product_exception_view_form'}"
                                        attrs="{'form_readonly_exception': True}">
-                                    <tree editable="bottom" colors="grey:state=='2-invoiced';blue:state=='1-to_invoice'">
+                                    <tree editable="bottom"
+                                          colors="grey:not (isinstance(qty, float) and isinstance(qty_invoiced, float) and bool(qty - qty_invoiced) or True);blue:isinstance(qty, float) and isinstance(qty_invoiced, float) and bool(qty - qty_invoiced) or False">
                                         <field name="date_invoice_next"/>
                                         <field name="product_id"/>
                                         <field name="name"/>

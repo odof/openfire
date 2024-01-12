@@ -11,19 +11,27 @@ class OFContractInvoicingWizard(models.TransientModel):
 
     def _default_contract(self):
         ids = self._context.get('active_ids')
-        if not ids:
+        if len(ids) != 1:
             return
         return self.env['of.contract'].browse(ids[0])
+
+    def _default_contracts(self):
+        ids = self._context.get('active_ids')
+        if len(ids) <= 1:
+            return
+        return self.env['of.contract'].browse(ids)
 
     contract_id = fields.Many2one(
         comodel_name='of.contract', string=u"Contrat", ondelete='cascade',
         default=lambda self: self._default_contract()
     )
+    contract_ids = fields.Many2many(
+        comodel_name='of.contract', string=u"Contrats", default=lambda self: self._default_contracts())
     invoicing_period = fields.Date(string=u"Période de facturation", required=True)
     invoicing_method = fields.Selection(selection=
         [
             ('day', u"Date du jour"),
-            #('computed', u"Date calculée"),
+            ('computed', u"Date calculée"),
             ('manual', u"Manuelle"),
         ], string=u"Méthode de facturation", required=True)
     manual_date = fields.Date(string=u"Date de facturation")
@@ -81,27 +89,55 @@ class OFContractInvoicingWizard(models.TransientModel):
         return {'type': 'ir.actions.do_nothing'}
 
     @api.multi
-    def button_apply(self):
+    def button_multi_apply(self):
+        for contract in self.contract_ids:
+            self.contract_id = contract
+            self.compute_line_ids()
+            self.compute_exception_line_ids()
+            self.button_apply(do_raise=False)
+        invoices = self.env['account.invoice'].search(
+            [('of_contract_id', 'in', self.contract_ids._ids), ('state', '=', 'draft')])
+        action = self.env.ref('account.action_invoice_tree1').read()[0]
+        if len(invoices) > 1:
+            action['domain'] = [('id', 'in', invoices.ids)]
+        elif len(invoices) == 1:
+            action['views'] = [(self.env.ref('account.invoice_form').id, 'form')]
+            action['res_id'] = invoices.ids[0]
+        else:
+            action = {'type': 'ir.actions.do_nothing'}
+        return action
+
+    @api.multi
+    def button_apply(self, do_raise=True):
         lines_selected = self.line_ids.filtered('selected').mapped('contract_line_id')
         exceptions_selected = self.exception_line_ids.filtered('selected').mapped('contract_exception_id')
         invoices = self.env['account.invoice']
         exception_lines = exceptions_selected
+
         with self.env.norecompute():
             if self.invoicing_method == 'computed':
-                dates = lines_selected.mapped('next_date')
-                dates.sort()
-                dates = list(set(dates))
-                for date in dates:
-                    lines = lines_selected.filtered(lambda l: l.next_date == date)
-                    exception_lines = exceptions_selected.filtered(lambda r: r.line_id.id in lines.ids)
-                    new_invoices, exception_lines = self._create_invoice(
-                        self.with_context(force_date=date).contract_id, lines, exception_lines)
-                    invoices += new_invoices
+                # Hard limit to 10 loops
+                i = 0
+                while i < 10 and lines_selected.filtered(
+                        lambda l: l.next_date and l.next_date <= self.invoicing_period).mapped('next_date'):
+                    i += 1
+                    dates = lines_selected.filtered(
+                        lambda l: l.next_date and l.next_date <= self.invoicing_period).mapped('next_date')
+                    dates = list(set(dates))
+                    dates.sort()
+                    for date in dates:
+                        lines = lines_selected.filtered(lambda l: l.next_date == date)
+                        exception_lines = exceptions_selected.filtered(lambda r: r.line_id.id in lines.ids)
+                        new_invoices, exception_lines = self._create_invoice(
+                            self.with_context(force_date=date).contract_id, lines, exception_lines, do_raise=do_raise)
+                        invoices += new_invoices
             else:
                 date = self.invoicing_method == 'day' and fields.Date.today() or self.manual_date
                 invoices, exception_lines = self._create_invoice(
                     self.with_context(force_date=date).contract_id,
-                    lines_selected.with_context(force_date=self.invoicing_period), exceptions_selected)
+                    lines_selected.with_context(force_date=self.invoicing_period), exceptions_selected,
+                    do_raise=do_raise)
+
         self._handle_exceptions(self.contract_id.with_context(force_date=self.manual_date or fields.Date.today()),
                                 exception_lines)
         self.contract_id.recompute()
@@ -112,12 +148,12 @@ class OFContractInvoicingWizard(models.TransientModel):
     def _create_invoice(self, contract, lines, exception_lines, do_raise=True):
         """ Création des factures du contrats en fonction de si les lignes du contrat sont groupées ou non """
         contract.ensure_one()
-        if not lines:
+        if not (lines or exception_lines):
             if do_raise:
                 raise UserError("Aucune ligne du contrat n'est facturable")
             else:
                 contract.message_post(body=u"Création de la facture : Aucune ligne du contrat n'est facturable.")
-                return False
+                return False, False
         lines_grouped = lines.filtered('grouped')
         single_lines = lines - lines_grouped
         invoices = contract.env['account.invoice']
@@ -126,9 +162,13 @@ class OFContractInvoicingWizard(models.TransientModel):
         if lines_grouped:
             invoice_vals = contract._prepare_invoice(do_raise=do_raise)
             if not invoice_vals:
-                return invoices
+                return invoices, False
             lines = []
             for line in lines_grouped:
+                if self.invoicing_method == 'computed' and line.frequency_type == 'date':
+                    # Currently in norecompute env, force product lines qty_to_invoice recompute
+                    for product_line in line.contract_product_ids:
+                        product_line._compute_quantities()
                 lines += line._add_invoice_lines()
                 services_to_invoice = line._get_to_invoice_services()
                 if services_to_invoice:
@@ -147,6 +187,11 @@ class OFContractInvoicingWizard(models.TransientModel):
                     invoice_vals['partner_shipping_id'] = addresses.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = contract.env['account.invoice'].create(invoice_vals)
+                # If invoice is negative, do a refund invoice instead
+                if invoice.amount_total < 0:
+                    invoice.type = 'out_refund'
+                    for invoice_line in invoice.invoice_line_ids:
+                        invoice_line.quantity = -invoice_line.quantity
                 invoice.compute_taxes()
                 invoices |= invoice
                 services.write({'contract_invoice_id': invoice.id})
@@ -185,9 +230,13 @@ class OFContractInvoicingWizard(models.TransientModel):
         invoice_vals = contract._prepare_invoice(do_raise=False, intervention_id=intervention_id)
         if not invoice_vals:
             return {}
-        lines = line._add_invoice_lines()
         if 'force_date' in line._context:
             line = line.with_context(force_date=next_date)
+        if line.frequency_type == 'date':
+            # Currently in norecompute env, force product lines qty_to_invoice recompute
+            for product_line in line.contract_product_ids:
+                product_line._compute_quantities()
+        lines = line._add_invoice_lines()
         services_to_invoice = line._get_to_invoice_services()
         if services_to_invoice:
             services = services_to_invoice
@@ -203,6 +252,11 @@ class OFContractInvoicingWizard(models.TransientModel):
             invoice_vals['partner_shipping_id'] = line.address_id.id
         invoice_vals['invoice_line_ids'] = lines
         invoice = contract.env['account.invoice'].create(invoice_vals)
+        # If invoice is negative, do a refund invoice instead
+        if invoice.amount_total < 0:
+            invoice.type = 'out_refund'
+            for invoice_line in invoice.invoice_line_ids:
+                invoice_line.quantity = -invoice_line.quantity
         invoice.compute_taxes()
         services.write({'contract_invoice_id': invoice.id})
         return invoice, exception_lines
@@ -230,6 +284,11 @@ class OFContractInvoicingWizard(models.TransientModel):
                     invoice_vals['partner_shipping_id'] = addresses.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = contract.env['account.invoice'].create(invoice_vals)
+                # If invoice is negative, do a refund invoice instead
+                if invoice.amount_total < 0:
+                    invoice.type = 'out_refund'
+                    for invoice_line in invoice.invoice_line_ids:
+                        invoice_line.quantity = -invoice_line.quantity
                 invoice.compute_taxes()
                 invoices |= invoice
         if single_lines:
@@ -246,6 +305,11 @@ class OFContractInvoicingWizard(models.TransientModel):
                     invoice_vals['partner_shipping_id'] = line.line_id.address_id.id
                 invoice_vals['invoice_line_ids'] = lines
                 invoice = contract.env['account.invoice'].create(invoice_vals)
+                # If invoice is negative, do a refund invoice instead
+                if invoice.amount_total < 0:
+                    invoice.type = 'out_refund'
+                    for invoice_line in invoice.invoice_line_ids:
+                        invoice_line.quantity = -invoice_line.quantity
                 invoice.compute_taxes()
                 invoices |= invoice
         return invoices
@@ -363,7 +427,7 @@ class OFContractInvoicingLineWizard(models.TransientModel):
         string=u"Fréquence de facturation", related='contract_line_id.frequency_type', readonly=True)
     line_type = fields.Selection(string=u"Type de facturation", related='contract_line_id.type', readonly=True)
     line_company_currency_id = fields.Many2one(
-        comodel_name='res.currency', string=u"Company Currency", related='contract_line_id.company_currency_id',
+        comodel_name='res.currency', string=u"Devise société", related='contract_line_id.company_currency_id',
         readonly=True
     )
     line_amount_total = fields.Monetary(

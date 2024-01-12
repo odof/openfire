@@ -103,7 +103,7 @@ class OfContract(models.Model):
     next_total = fields.Monetary(
         string="Prochain Total", compute='_compute_next_total', currency_field='company_currency_id')
     company_currency_id = fields.Many2one(
-        'res.currency', related='company_id.currency_id', string="Company Currency", readonly=True)
+        'res.currency', related='company_id.currency_id', string=u"Devise société", readonly=True)
 
     last_invoicing_date = fields.Date(
         string=u"Date de dernière facturation", copy=False, compute="_compute_last_invoicing_date")
@@ -886,7 +886,7 @@ class OfContractLine(models.Model):
     ], string=u"État", copy=False, required=True, default='draft')
 
     company_currency_id = fields.Many2one(
-        'res.currency', related='contract_id.company_id.currency_id', string="Company Currency", readonly=True)
+        'res.currency', related='contract_id.company_id.currency_id', string=u"Devise société", readonly=True)
     invoice_line_ids = fields.One2many(
         'account.invoice.line', 'of_contract_line_id', string="Lignes de factures", readonly=True)
     invoice_count = fields.Integer(string="Nombre de factures", compute='_compute_invoice_count')
@@ -975,14 +975,16 @@ class OfContractLine(models.Model):
 
     def _compute_is_invoiceable(self):
         """ Calcule si la ligne de contrat peut être facturée """
-        for service in self:
-            if service.state == 'validated':
-                if service.contract_product_ids and service.next_date:
-                    service.is_invoiceable = True
+        for line in self:
+            if line.state == 'validated':
+                if ((line.contract_product_ids and line.next_date) or
+                        (line.exception_line_ids.filtered(
+                            lambda e: e.state == '1-to_invoice' and e.date_invoice_next <= fields.Date.today()))):
+                    line.is_invoiceable = True
                 else:
-                    service.is_invoiceable = False
+                    line.is_invoiceable = False
             else:
-                service.is_invoiceable = False
+                line.is_invoiceable = False
 
     @api.depends('frequency_type', 'invoice_line_ids',
                  'invoice_line_ids.date_invoice',
@@ -1740,7 +1742,7 @@ class OfContractProduct(models.Model):
     quantity = fields.Float(string=u"Qté", default=1.0)
     uom_id = fields.Many2one('product.uom', string=u'Unité de mesure')
     company_currency_id = fields.Many2one(
-        'res.currency', related='line_id.company_currency_id', string="Company Currency", readonly=True)
+        'res.currency', related='line_id.company_currency_id', string=u"Devise société", readonly=True)
     amount_subtotal = fields.Monetary(
         string="Sous-total", compute='_compute_amount', currency_field='company_currency_id',
         digits=dp.get_precision('Account'), store=True
