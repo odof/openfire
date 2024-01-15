@@ -512,15 +512,32 @@ class SaleOrder(models.Model):
     @api.multi
     def write(self, vals):
         mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
-        if mail_subtype and vals.get('partner_id'):
-            old_partner_ids = self.mapped('partner_id')._ids
         res = super(SaleOrder, self).write(vals)
         if mail_subtype and vals.get('partner_id'):
-            # subscribe new partner and unsunscribe the old ones
-            self.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
+            new_partners = self.mapped('partner_id')
+            # Récupération du nouveau vendeur des clients
+            if self.user_id.partner_id:
+                new_partners |= self.user_id.partner_id
+            else:
+                for new_partner in new_partners:
+                    if new_partner.user_id.partner_id:
+                        new_partners |= new_partner.user_id.partner_id
+            if self.create_uid.partner_id:
+                new_partners |= self.create_uid.partner_id
+            # subscribe new partner and unsubscribe the old ones
+            self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
             message_followers = self.mapped('message_follower_ids')
-            message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids)\
-                             .write({'subtype_ids': [(3, mail_subtype.id)]})
+            message_followers.sudo().filtered(
+                lambda r: r.partner_id.id not in new_partners.ids).unlink()
+        elif 'user_id' in vals and 'partner_id' not in vals and mail_subtype:
+            new_partners = self.mapped('partner_id')
+            if self.user_id.partner_id:
+                new_partners |= self.user_id.partner_id
+            if self.create_uid.partner_id:
+                new_partners |= self.create_uid.partner_id
+            self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
+            message_followers = self.mapped('message_follower_ids')
+            message_followers.filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
