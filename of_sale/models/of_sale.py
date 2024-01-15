@@ -527,7 +527,7 @@ class SaleOrder(models.Model):
             # subscribe new partner and unsubscribe the old ones
             self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
             message_followers = self.mapped('message_follower_ids')
-            message_followers.filtered(
+            message_followers.sudo().filtered(
                 lambda r: r.partner_id.id not in new_partners.ids).unlink()
         elif 'user_id' in vals and 'partner_id' not in vals and mail_subtype:
             new_partners = self.mapped('partner_id')
