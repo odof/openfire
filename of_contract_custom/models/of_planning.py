@@ -299,6 +299,57 @@ class OfPlanningIntervention(models.Model):
                 vals['of_contract_id'] = contracts.id
         return vals, message
 
+    @api.multi
+    def create_invoice(self):
+        invoice_obj = self.env['account.invoice']
+
+        msgs = []
+        for interv in self:
+            # toutes les lignes sont liées à une commande (au moins une avec commande et aucune sans commande)
+            if interv.lien_commande and not interv.line_ids.filtered(lambda l: not l.order_line_id):
+                msgs.append(u"Les lignes facturables du rendez-vous %s étant liées à des lignes de commandes "
+                            u"veuillez effectuer la facturation depuis le bon de commande." % interv.name)
+                continue
+            # Toutes les lignes sont liées à un contrat
+            if interv.line_ids and not interv.line_ids.filtered(lambda l: not l.of_contract_line_id):
+                msgs.append(u"Les lignes facturables du rendez-vous %s étant liées à des lignes de contrat "
+                            u"veuillez effectuer la facturation depuis le contrat." % interv.name)
+                continue
+            invoice_data, msg = interv._prepare_invoice()
+            msgs.append(msg)
+            if invoice_data:
+                invoice = invoice_obj.create(invoice_data)
+                invoice.compute_taxes()
+                invoice.message_post_with_view('mail.message_origin_link',
+                                               values={'self': invoice, 'origin': interv},
+                                               subtype_id=self.env.ref('mail.mt_note').id)
+        msg = "\n".join(msgs)
+
+        return {
+            'name': u"Création de la facture",
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.planning.message.invoice',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {'default_msg': msg}
+        }
+
+    @api.multi
+    def _prepare_invoice_lines(self):
+        self.ensure_one()
+        if self.contract_line_id:
+            lines_data = []
+            error = ''
+            for line in self.line_ids.filtered(
+                    lambda l: l.invoice_status == 'to invoice' and not l.order_line_id and not l.of_contract_line_id):
+                line_data, line_error = line._prepare_invoice_line()
+                lines_data.append((0, 0, line_data))
+                error += line_error
+        else:
+            lines_data, error = super(OfPlanningIntervention, self)._prepare_invoice_lines()
+        return lines_data, error
+
 
 class OFPlanningInterventionLine(models.Model):
     _inherit = 'of.planning.intervention.line'

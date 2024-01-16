@@ -32,6 +32,10 @@
                 <field name="contract_id"/>
                 <field name="contract_line_id"/>
             </xpath>
+            <xpath expr="//field[@name='line_ids']//field[@name='order_line_id']" position="after">
+                <field name="of_contract_line_id" invisible="1"/>
+                <field name="of_contract_product_id" invisible="1"/>
+            </xpath>
         </field>
     </record>
 
