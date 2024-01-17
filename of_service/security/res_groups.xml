@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_group_intervention_open_menu_maintenance" model="res.groups">
+        <field name="name">Interventions : Menu DI/Entretiens par défaut</field>
+    </record>
+
+</odoo>
