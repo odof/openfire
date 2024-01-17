@@ -40,21 +40,6 @@ class OFPlanningTask(models.Model):
         compute='_compute_employee_ids',
         search='_search_employee_ids',
     )
-    planning_granularity = fields.Selection(
-        selection=[
-            ('weekly', "Weekly"),
-            ('fortnightly', "Fortnightly"),
-            ('monthly', "Monthly"),
-        ],
-        string="Planning granularity",
-        help="Granularity is used to define the reference planning period by task type. "
-        "This granularity is used to calculate the end date once the start date has been entered, "
-        "to calculate the end date once the start date has been entered.\nDefault:\n"
-        "  * For an installation, the planning granularity is fortnightly.\n"
-        "  * For an after-sales service (when the after-sales service field is filled in), the planning granularity is "
-        "weekly.\n"
-        "  * For maintenance (recurring operations), the planning granularity is monthly.",
-    )
     templates_ids = fields.Many2many(
         comodel_name='of.planning.intervention.template',
         compute='_compute_templates_ids',

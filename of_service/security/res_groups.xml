@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="of_group_intervention_open_menu_maintenance" model="res.groups">
-        <field name="name">Interventions : Menu DI/Entretiens par défaut</field>
+        <field name="name">(OF) Interventions : Service Request/Maintenance Menu by default</field>
     </record>
 
 </odoo>

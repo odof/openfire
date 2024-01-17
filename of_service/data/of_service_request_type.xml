@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="of_service_request_type_maintenance" model="of.service.request.type">
+        <field name="name">Care - Maintenance</field>
+    </record>
+
+    <record id="of_service_request_type_installation" model="of.service.request.type">
+        <field name="name">Installation</field>
+    </record>
+
+    <record id="of_service_request_type_technical" model="of.service.request.type">
+        <field name="name">Technical visit</field>
+    </record>
+
+</odoo>

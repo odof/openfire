@@ -41,3 +41,15 @@ class OFPlanningInterventionTemplateLine(models.Model):
                 record.name = name
             else:
                 record.name = ''
+
+    def _prepare_intervention_line_vals(self, event):
+        self.ensure_one()
+        if not event:
+            return {}
+        return {
+            'product_id': self.product_id.id,
+            'price_unit': self.price_unit,
+            'qty': self.qty,
+            'name': self.name,
+            'intervention_id': event.id,
+        }

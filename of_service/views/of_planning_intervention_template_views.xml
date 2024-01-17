@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='task_id']" position="before">
+                <field name="type_id" options="{'no_open':True, 'no_create': True}"/>
+            </xpath>
+            <xpath expr="//group[@name='general']//group[@name='general_two']" position="inside">
+                <field name="planning_granularity"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

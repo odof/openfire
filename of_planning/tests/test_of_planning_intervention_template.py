@@ -13,6 +13,7 @@ class TestPlanningInterventionTemplate(TestOFPlanningCommon):
             {
                 'name': 'Test Template',
                 'code': 'TEST',
+                'type_id': self.env.ref('of_service.of_service_request_type_installation').id,
             }
         )
         with Form(template) as template_form:

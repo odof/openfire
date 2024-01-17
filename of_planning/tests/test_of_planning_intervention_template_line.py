@@ -11,7 +11,7 @@ class TestPlanningInterventionTemplateLine(TestOFPlanningCommon):
     def test_01_onchange_product(self):
         """Test that changing the product resets the line data."""
         self.assertEqual(self.template_line.qty, 1)
-        self.assertEqual(self.template_line.price_unit, self.product_wood_stove.lst_price)
+        self.assertEqual(self.template_line.price_unit, 125.0)
 
         # Change line data
         self.template_line.qty = 2

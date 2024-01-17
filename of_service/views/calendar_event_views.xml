@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_search" model="ir.ui.view">
+        <field name="name">calendar.event.view.search</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_order_id']" position="after">
+                <field name="of_request_id" />
+                <field name="of_type_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_form" model="ir.ui.view" >
+        <field name="name">calendar.event.form</field>
+        <field name="model">calendar.event</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_template_id']" position="after">
+                <field name="of_request_id" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" context="{
+                    'default_partner_id': of_partner_id,
+                    'default_address_id': of_address_id,
+                    'default_task_id': of_task_id,
+                    'service_request_extended_name_display': 1
+                }"/>
+            </xpath>
+            <xpath expr="//field[@name='of_task_id']" position="before">
+                <field name="of_type_id" attrs="{'readonly': [('of_request_id', '!=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -41,12 +41,23 @@ class TestOFPlanningCommon(TestOFSaleCommon):
             }
         )
 
+        cls.product_ash_vacuum_cleaner = cls.env['product.product'].create(
+            {
+                'name': 'Aspirateur à cendres',
+                'type': 'product',
+                'list_price': 125,
+                'brand_id': cls.brand_stove.id,
+                'description_sale': 'Aspirateur à cendres pour poêle à bois',
+            }
+        )
+
         # Tasks data
         cls.task_sweeping = cls.env['of.planning.task'].create(
             {
                 'name': 'Ramonage',
                 'duration': 1.5,
                 'description': 'Tâche de ramonage',
+                'fiscal_position_id': cls.fiscal_pos_5_5.id,
             }
         )
 
@@ -56,6 +67,7 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                 'duration': 8,
                 'description': 'Tâche d\'installation de poêle à bois',
                 'product_id': cls.product_wood_stove.id,
+                'fiscal_position_id': cls.fiscal_pos_20.id,
             }
         )
 
@@ -104,6 +116,7 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                 .id,
                 'of_task_ids': [Command.set([cls.task_sweeping.id])],
                 'of_is_operator': True,
+                'of_all_tasks': False,
             }
         )
 
@@ -116,9 +129,9 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                 'line_ids': [
                     Command.create(
                         {
-                            'product_id': cls.product_wood_stove.id,
+                            'product_id': cls.product_ash_vacuum_cleaner.id,
                             'qty': 1,
-                            'price_unit': 1000,
+                            'price_unit': 125.0,
                         }
                     )
                 ],

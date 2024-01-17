@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_task_view_form" model="ir.ui.view" >
+        <field name="name">of.planning.task.view.form</field>
+        <field name="model">of.planning.task</field>
+        <field name="inherit_id" ref="of_planning.of_planning_task_view_form"/>
+        <field name="arch" type="xml" >
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" type="object" name="action_button_view_of_service_request" icon="fa-home" context="{'search_default_task_id': active_id}">
+                    <field string="Service Requests" name="request_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='display']" position="after">
+                <field name="is_recurring"/>
+                <label for="recurring_interval" attrs="{'invisible': [('is_recurring', '=', False)]}"/>
+                <div attrs="{'invisible': [('is_recurring', '=', False)]}" col="2">
+                    <field name="recurring_interval" nolabel="1" class="oe_inline of_ws"/>
+                    <field name="recurring_rule_type" nolabel="1" class="oe_inline"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_task_view_tree" model="ir.ui.view" >
+        <field name="name">of.planning.task.tree</field>
+        <field name="model">of.planning.task</field>
+        <field name="inherit_id" ref="of_planning.of_planning_task_view_tree"/>
+        <field name="arch" type="xml" >
+            <xpath expr="//field[@name='description']" position="after">
+                <field name="recurrency_display"/>
+                <field name="is_recurring" invisible="1"/>
+                <field name="recurring_interval" invisible="1"/>
+                <field name="recurring_rule_type" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

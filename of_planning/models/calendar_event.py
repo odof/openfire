@@ -62,7 +62,12 @@ class CalendarEvent(models.Model):
         comodel_name='of.planning.tag', column1='intervention_id', column2='tag_id', string="Tags"
     )
     of_line_ids = fields.One2many(
-        comodel_name='of.planning.intervention.line', inverse_name='intervention_id', string="Invoice lines"
+        comodel_name='of.planning.intervention.line',
+        inverse_name='intervention_id',
+        string="Invoice lines",
+        compute='_compute_of_line_ids',
+        store=True,
+        readonly=False,
     )
 
     # ===== Team, Operators, Employees fields =====
@@ -300,6 +305,7 @@ class CalendarEvent(models.Model):
 
     # Helpers UX, UI fields
     of_is_flexible = fields.Boolean(string="Flexible")
+    of_show_update_fpos = fields.Boolean(string="Has Fiscal Position Changed", store=False)
 
     @api.constrains('of_alert_unable')
     def _check_of_alert_unable(self):
@@ -412,6 +418,8 @@ class CalendarEvent(models.Model):
             ):
                 event.of_fiscal_position_id = template_accounting.fiscal_position_id
 
+            event._recompute_taxes()
+
     @api.depends('of_line_ids', 'of_line_ids.order_line_id')
     def _compute_of_link_order(self):
         for event in self.filtered('of_line_ids.order_line_id'):
@@ -422,6 +430,17 @@ class CalendarEvent(models.Model):
         for event in self.filtered(lambda e: e.of_state in ['draft', 'confirmed'] and e.of_template_id):
             event.of_task_id = event.of_template_id.task_id
 
+    @api.depends('of_template_id')
+    def _compute_of_line_ids(self):
+        for event in self.filtered(lambda e: e.of_template_id):
+            if lines_to_create := [
+                Command.create(line._prepare_intervention_line_vals(event)) for line in event.of_template_id.line_ids
+            ]:
+                event.of_line_ids = lines_to_create
+
+        for event in self:
+            event._recompute_taxes()
+
     @api.depends(
         'of_line_ids',
         'of_line_ids.price_subtotal',
@@ -430,8 +449,8 @@ class CalendarEvent(models.Model):
     )
     def _compute_amount(self):
         for event in self:
-            event.of_price_subtotal = 0.0
-            event.of_price_tax = 0.0
+            event.of_price_subtotal = sum(event.mapped('of_line_ids.price_subtotal'))
+            event.of_price_tax = sum(tax['amount'] for tax in event._get_taxes_values().values())
             event.of_price_total = event.of_price_subtotal + event.of_price_tax
 
     @api.depends('of_line_ids', 'of_line_ids.invoice_line_ids', 'of_order_id', 'of_order_id.invoice_ids')
@@ -624,7 +643,7 @@ class CalendarEvent(models.Model):
     # ---------------------------------------------------------------------
 
     @api.onchange('of_task_id')
-    def onchange_of_task_id(self):
+    def _onchange_of_task_id(self):
         self.duration = self.of_task_id.duration
 
     @api.onchange('of_team_id')
@@ -641,6 +660,13 @@ class CalendarEvent(models.Model):
             if self._origin.of_order_id.picking_ids:
                 for picking in self._origin.of_order_id.picking_ids:
                     self.of_picking_manual_ids = [Command.unlink(picking.id)]
+
+    @api.onchange('of_fiscal_position_id')
+    def _onchange_fpos_id_show_update_fpos(self):
+        if self.of_line_ids and (
+            not self.of_fiscal_position_id or self._origin.of_fiscal_position_id != self.of_fiscal_position_id
+        ):
+            self.of_show_update_fpos = True
 
     # ---------------------------------------------------------------------
     # ORM methods
@@ -999,7 +1025,12 @@ class CalendarEvent(models.Model):
         :return: dict with the updated action
         """
         event_count = len(self)
-        if event_count >= 1:
+        if event_count == 1:
+            views = [(self.env.ref('calendar.view_calendar_event_form', raise_if_not_found=False).id, 'form')]
+            views.extend(view for view in action['views'] if view[1] != 'form')
+            action['views'] = views
+            return action
+        else:
             if tree_view := self.env.ref('calendar.view_calendar_event_tree', raise_if_not_found=False):
                 views = [(tree_view.id, 'tree')]
                 views.extend(view for view in action['views'] if view[1] != 'tree')

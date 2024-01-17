@@ -1,0 +1,1737 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_service
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-02-27 10:49+0000\n"
+"PO-Revision-Date: 2024-02-27 10:49+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__intervention_count
+msgid "# Interventions"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__invoice_count
+msgid "# Invoices"
+msgstr "# Factures"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__order_count
+msgid "# Orders"
+msgstr "# Commande"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "&amp;nbsp;"
+msgstr ""
+
+#. module: of_service
+#: model:res.groups,name:of_service.of_group_intervention_open_menu_maintenance
+msgid "(OF) Interventions : Service Request/Maintenance Menu by default"
+msgstr "(OF) Interventions : Menu DI/Entretiens par défaut"
+
+#. module: of_service
+#: model:mail.template,body_html:of_service.email_template_of_service_request
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"Hello <t t-out=\"object.partner_id.name or ''\">user</t>,\n"
+"<br>\n"
+"<br>\n"
+"Please find attached the intervention request\n"
+"<t t-if=\"object.number\">\n"
+"    (with reference: <t t-out=\"object.number or ''\">DI/12345</t> )\n"
+"</t>\n"
+"to be scheduled between  <span style=\"font-weight:bold;\" t-out=\"format_date(object.next_date) or ''\">06/02/2024</span> and  <span style=\"font-weight:bold;\" t-out=\"format_date(object.end_date) or ''\">06/02/2024</span>.\n"
+"<br>\n"
+"If you have any questions, please do not hesitate to contact us.\n"
+"<br>\n"
+"<br>\n"
+"Sincerely,\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"Bonjour <t t-out=\"object.partner_id.name or ''\">utilisateur</t>,\n"
+"<br>\n"
+"<br>\n"
+"Veuillez trouver ci-joint la demande d'intervention\n"
+"<t t-if=\"object.number\">\n"
+"    (avec la référence : <t t-out=\"object.number or ''\">DI/12345</t> )\n"
+"</t>\n"
+"à programmer entre le  <span style=\"font-weight:bold;\" t-out=\"format_date(object.next_date) or ''\">06/02/2024</span> et le  <span style=\"font-weight:bold;\" t-out=\"format_date(object.end_date) or ''\">06/02/2024</span>.\n"
+"<br>\n"
+"Si vous avez des questions, n'hésitez pas à nous contacter.\n"
+"<br>\n"
+"<br>\n"
+"Bien cordialement,\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid ""
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
+"'done')]}\"> estimated, including </em>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid ""
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
+"'done')]}\"> planned and </em>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid ""
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', 'done')]}\"> remaining</em>\n"
+"                                <em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '!=', 'done')]}\"> This intervention is done</em>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "<i class=\"fa fa-envelope pr-1\" title=\"Mail button\"/>"
+msgstr "<i class=\"fa fa-envelope pr-1\" title=\"bouton Email\"/>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "<i class=\"fa fa-phone pr-1\" title=\"Mobile button\"/>"
+msgstr "<i class=\"fa fa-phone pr-1\" title=\"bouton Mobile\"/>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "<i class=\"fa fa-phone pr-1\" title=\"Phone button\"/>"
+msgstr "<i class=\"fa fa-phone pr-1\" title=\"bouton Telephone\"/>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid ""
+"<span attrs=\"{'invisible': [('number', '!=', False)]}\">Service "
+"Request</span>"
+msgstr ""
+"<span class=\"pr-1\" attrs=\"{'invisible': [('number', '!=', False)]}\">\n"
+"                                    Demande d'intervention\n"
+"                                </span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Customer&amp;nbsp;:</span>"
+msgstr "<span>Client&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Date Order&amp;nbsp;:</span>"
+msgstr "<span>Date de commande&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Duration&amp;nbsp;:</span>"
+msgstr "<span>Durée&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Employees&amp;nbsp;:</span>"
+msgstr "<span>Employés&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Label&amp;nbsp;:</span>"
+msgstr "<span>Libellé&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Linked order&amp;nbsp;:</span>"
+msgstr "<span>Commande liée&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Reference Month&amp;nbsp;:</span>"
+msgstr "<span>Mois référent&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Store&amp;nbsp;:</span>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Task&amp;nbsp;:</span>"
+msgstr "<span>Tâche&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<span>Vendor&amp;nbsp;:</span>"
+msgstr "<span>Vendeur&amp;nbsp;:</span>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Contact</strong>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Description</strong>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Intervention Address</strong>"
+msgstr "<strong>Adresse d'intervention</strong>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Order</strong>"
+msgstr "<strong>Commande</strong>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Product and works</strong>"
+msgstr "<strong>Produit et travaux</strong>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Service Request</strong>"
+msgstr "<strong>Demande d'intervention</strong>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Taxes</strong>"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Total Without Taxes</strong>"
+msgstr "<strong>Total HT</strong>"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "<strong>Total</strong>"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_needaction
+msgid "Action Needed"
+msgstr "Action demandée"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__active
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__active
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_address
+msgid "Address"
+msgstr "Adresse"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "All Planned"
+msgstr "Entièrement planifié"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "All lines are already associated with an order."
+msgstr "Toutes les lignes sont déjà associées à une commande."
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "All lines are already associated with one or more invoices."
+msgstr "Toutes les lignes sont déjà associées à une ou plusieurs factures."
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__all_planned
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__all_planned
+msgid "All planned"
+msgstr "Entièrement planifié"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_ir_attachment
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièce jointe"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__stage_ids
+msgid "Authorized Stages"
+msgstr "Étapes autorisées"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__type_ids
+msgid "Authorized types"
+msgstr "Types autorisés"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Between"
+msgstr "Entre le"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__invoice_status
+msgid "Billing Status"
+msgstr "État de facturation"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__base_state__calculated
+msgid "Calculated"
+msgstr "Calculé"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__base_state
+msgid "Calculation status"
+msgstr "État de calcul"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__base_state__cancel
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__cancel
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__cancel
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_service
+#: model:of.service.request.type,name:of_service.of_service_request_type_maintenance
+msgid "Care - Maintenance"
+msgstr "Entretien - Maintenance"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_city
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_address_city
+msgid "City"
+msgstr "Ville"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__color
+msgid "Color"
+msgstr "Couleur"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__color
+msgid "Color of the request in the views"
+msgstr "Couleur de la demande dans les vues"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__company_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Completed on %s"
+msgstr "Terminé le %s"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Compose Email"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__contract_end_date
+msgid "Contract end date"
+msgstr "Date de fin de contrat"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__control_date
+msgid "Control Date"
+msgstr "Date de contrôle"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
+msgid "Create intervention"
+msgstr "Créer intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__create_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__create_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__currency_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__day_ids
+msgid "Customer availability days."
+msgstr "Disponibilité du client"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__request_label_date
+msgid "Date"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__end_date
+msgid "Date from which intervention becomes overdue"
+msgstr ""
+"Date à partir de laquelle l'intervention devient en retard de planification"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__next_date
+msgid "Date from which to schedule the next intervention"
+msgstr "Date à partir de laquelle programmer le prochain RDV"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__last_intervention_date
+msgid ""
+"Date of last appointment. Does not include cancelled or rescheduled "
+"appointments."
+msgstr ""
+"Date du dernier RDV en date. Ne prend pas en compte les RDVs annulés ni "
+"reportés "
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__day_ids
+msgid "Days"
+msgstr "Jours"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__department_id
+msgid "Department"
+msgstr "Département"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__name
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "Description"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Description..."
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__discount
+msgid "Discount (%)"
+msgstr "Remise (%)"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__display_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__done
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__done
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Done"
+msgstr "Terminé"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__base_state__draft
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__draft
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__draft
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Due date"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Durations"
+msgstr "Durées"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_email
+msgid "Email"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
+msgid "End of contract"
+msgstr "Fin de contrat"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__duration
+msgid "Estimated Duration"
+msgstr "Durée estimée"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__last_next_date
+msgid "Field to keep rollback capability"
+msgstr "Champ pour conserver une possibilité de rollback"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__fiscal_position_id
+msgid "Fiscal Position"
+msgstr "Position fiscale"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_follower_ids
+msgid "Followers"
+msgstr "Abonnés"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_planning_intervention_template__planning_granularity__fortnightly
+msgid "Fortnightly"
+msgstr "Bimensuel"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
+msgid "From"
+msgstr "À partir du"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request_line__invoice_status__invoiced
+msgid "Fully Billed"
+msgstr "Entièrement facturé"
+
+#. module: of_service
+#: model:ir.actions.server,name:of_service.action_make_sale_order
+msgid "Generate customer quotation"
+msgstr "Générer devis client"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_latitude
+msgid "Geo Latitude"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_longitude
+msgid "Geo Longitude"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_planning_intervention_template__planning_granularity
+msgid ""
+"Granularity is used to define the reference planning period by task type. This granularity is used to calculate the end date once the start date has been entered, to calculate the end date once the start date has been entered.\n"
+"Default:\n"
+"  * For an installation, the planning granularity is fortnightly.\n"
+"  * For an after-sales service (when the after-sales service field is filled in), the planning granularity is weekly.\n"
+"  * For maintenance (recurring operations), the planning granularity is monthly."
+msgstr ""
+"La granularité est utilisée pour définir la période de planification de référence par type de tâche. Cette granularité est utilisée pour calculer la date de fin une fois la date de début saisie, pour calculer la date de fin une fois la date de début saisie.\n"
+"Par défaut:\n"
+"  * Pour une installation, la granularité de planification est bimensuelle.\n"
+"  * Pour un service après-vente (lorsque le champ service après-vente est rempli), la granularité de planification est hebdomadaire.\n"
+"  * Pour la maintenance (opérations récurrentes), la granularité de planification est mensuelle."
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__show_update_fpos
+msgid "Has Fiscal Position Changed"
+msgstr "La position fiscale a-t-elle changé"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__2
+msgid "High"
+msgstr "Haut"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__history_intervention_ids
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "History"
+msgstr "Historique"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__id
+msgid "ID"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "In Progress"
+msgstr "En cours"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__alert_dates
+msgid "Inconsistent dates"
+msgstr "Dates incohérentes"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__color
+msgid "Index Color"
+msgstr "Index Couleur"
+
+#. module: of_service
+#: model:of.service.request.type,name:of_service.of_service_request_type_installation
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Installation"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "Installed"
+msgstr "Posé"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Intervention"
+msgstr ""
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Intervention (%s): Inconsistent dates"
+msgstr "Intervention (%s): Dates incohérentes"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_id
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Intervention Address"
+msgstr "Adresse d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__template_id
+msgid "Intervention Template"
+msgstr "Modèle d'intervention"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#: model:ir.model.constraint,message:of_service.constraint_of_service_request_duration_not_null_constraint
+#, python-format
+msgid "Intervention duration must be greater than 0!"
+msgstr "La durée de l'intervention doit être supérieure à 0!"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__history_intervention_ids
+msgid ""
+"Intervention history of the installed products. If no installed products, "
+"address history"
+msgstr ""
+"Historique des RDVs du parc installé. Si pas de parc installé, historique de"
+" l'adresse"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_ir_attachment__of_intervention_report
+msgid "Intervention sheet"
+msgstr "Fiche d'intervention"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_planning_intervention_template_line
+msgid "Intervention template's line"
+msgstr "Ligne de modèle d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__intervention_ids
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Interventions"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__invoice_line_ids
+msgid "Invoice Line"
+msgstr "Ligne de facture"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__line_ids
+msgid "Invoice Lines"
+msgstr "Lignes de facture"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__qty_invoiceable
+msgid "Invoiceable qty"
+msgstr "Qté facturable"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__qty_invoiced
+msgid "Invoiced qty"
+msgstr "Qté facturée"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__invoice_ids
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Invoicing"
+msgstr "Facturation"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_is_follower
+msgid "Is Follower"
+msgstr "Est abonné"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Last"
+msgstr "Dernière"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag____last_update
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__last_next_date
+msgid "Last Next Date"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__write_uid
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__write_date
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__last_intervention_date
+msgid "Last intervention Date"
+msgstr "Dernière date d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__last_attachment_id
+msgid "Last report"
+msgstr "Dernier rapport"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__late
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__late
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Late for planning"
+msgstr "En retard de planification"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__precision
+msgid "Level of geolocalization 's precision"
+msgstr "Niveau de précision de la géolocalisation"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__line_ids
+msgid "Lines"
+msgstr "Lignes"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__0
+msgid "Low"
+msgstr "Bas"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Pièce jointe principale"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__state
+msgid ""
+"Main state of the request. If the request is recurrent, the state is "
+"calculated from the interventions."
+msgstr ""
+"État principal de la demande. Si la requête est récurrente, l'état est "
+"calculé à partir des interventions."
+
+#. module: of_service
+#: model:ir.actions.act_window,name:of_service.action_of_service_request_maintenance
+#: model:ir.ui.menu,name:of_service.menu_of_service_maintenance
+#: model:ir.ui.menu,name:of_service.menu_of_service_request_maintenance_maintenance_first
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Maintenance"
+msgstr "Entretien - Maintenance"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__end_date_max
+msgid "Max due date"
+msgstr "Date d'échéance max"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_ir_ui_menu
+msgid "Menu"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__end_date_min
+msgid "Min due date"
+msgstr "Date d'échéance min"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_mobile
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_mobile
+msgid "Mobile"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_planning_intervention_template__planning_granularity__monthly
+#: model:ir.model.fields.selection,name:of_service.selection__of_planning_task__recurring_rule_type__monthly
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__recurring_rule_type__monthly
+msgid "Monthly"
+msgstr "Mensuel"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__month_ids
+msgid "Months"
+msgstr "Mois"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__task_name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__name
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_type__name
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_tag_view_form
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Next"
+msgstr "Prochaine"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Next Month"
+msgstr "Mois suivant"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Next Planning"
+msgstr "Prochaine planification"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__next_date
+msgid "Next planning"
+msgstr "Prochaine planification"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Next week"
+msgstr "Semaine suivante"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "No date to compute next date from"
+msgstr "Pas de date pour calculer la prochaine date"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
+msgid "No later than"
+msgstr "Au plus tard le"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__1
+msgid "Normal"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__note
+msgid "Notes"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__map_view_display_note
+msgid "Notes (displayed in Map view)"
+msgstr "Notes (affiché en vue Map)"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__nothing_to_plan
+msgid "Nothing To plan"
+msgstr "Rien à planifier"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request_line__invoice_status__no
+msgid "Nothing to Bill"
+msgstr "Rien à facturer"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__number
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_number
+msgid "Number"
+msgstr "Nombre"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "Nombre de messages qui requiert une action"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec erreur de livraison"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_res_partner__recurring_request_count
+#: model:ir.model.fields,field_description:of_service.field_res_users__recurring_request_count
+msgid "Number of recurring SR"
+msgstr "Nombre DI récurrentes"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__ongoing
+msgid "Ongoing intervention"
+msgstr "Intervention en cours"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__employee_id
+msgid "Operator"
+msgstr "Intervenant"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__employee_ids
+msgid "Operators"
+msgstr "Intervenants"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__order_id
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+#, python-format
+msgid "Order"
+msgstr "Commande"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__order_ids
+msgid "Orders"
+msgstr "Commandes"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__origin
+msgid "Origin"
+msgstr "Origine"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Partially Planned"
+msgstr "Partiellement planifié"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__part_planned
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__part_planned
+msgid "Partially planned"
+msgstr "Partiellement planifié"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_partner_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_res_partner__request_partner_ids
+#: model:ir.model.fields,field_description:of_service.field_res_users__request_partner_ids
+msgid "Partner Service Request"
+msgstr "Demande d'intervention du partenaire"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_tag_ids
+msgid "Partner Tags"
+msgstr "Étiquettes partenaire"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_phone
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_phone
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_service
+#: model:ir.actions.server,name:of_service.action_create_intervention
+msgid "Plan Intervention"
+msgstr "Planifier intervention"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__planned
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Planned"
+msgstr "Planifié"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__planned_duration
+msgid "Planned Duration"
+msgstr "Durée planifiée"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Planned Soon"
+msgstr "PLanifié bientôt"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__end_date
+msgid "Planning end date"
+msgstr "Date de fin de planification"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_intervention_template__planning_granularity
+msgid "Planning granularity"
+msgstr "Granularité du planning"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__month_ids
+msgid "Planning reference months."
+msgstr "Mois de référence pour la planification."
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__state
+msgid "Planning status"
+msgstr "État de planification"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Please enter a fiscal position."
+msgstr "Veuillez saisir une position fiscale."
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
+msgid ""
+"Please note that the selected operator is not fully available on the chosen "
+"date, the dates of new interventions will be forced."
+msgstr ""
+"Attention, l'intervenant sélectionné n'est pas totalement disponible à la "
+"date choisie, les dates des nouveaux RDV seront forcées."
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__precision
+msgid "Precision"
+msgstr "Précision"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__price_unit
+msgid "Price Unit"
+msgstr "Prix unitaire"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__priority
+msgid "Priority"
+msgstr "Priorité"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__product_id
+msgid "Product"
+msgstr "Article"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Product taxes have been recomputed according to fiscal position %s."
+msgstr ""
+"Les taxes des produits ont été recalculées selon la position fiscale %s."
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Punctual"
+msgstr "Ponctuelle"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__qty
+msgid "Qty"
+msgstr "Qté"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Recompute all taxes based on this fiscal position"
+msgstr "Recalculer toutes les taxes en fonction de cette position fiscale"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__recurrency_display
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__recurring_rule_type
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Recurrency"
+msgstr "Récurrence"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__recurring_rule_type
+msgid "Recurring Rule"
+msgstr "Règle récurrente"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_res_partner__recurring_request_ids
+#: model:ir.model.fields,field_description:of_service.field_res_users__recurring_request_ids
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Recurring SR"
+msgstr "DI récurrente"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__is_recurring
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__is_recurring_task
+msgid "Recurring Task"
+msgstr "Tâche récurrente"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__recurrency
+msgid "Recurring service request"
+msgstr "Récurrence"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Remain To Plan"
+msgstr "Reste à planifier"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__remaining_duration
+msgid "Remaining Duration"
+msgstr "Durée restante"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_planning_task__recurring_interval
+#: model:ir.model.fields,help:of_service.field_of_service_request__recurring_interval
+msgid "Repeat (Months/Years)"
+msgstr "Répéter chaque (Mois/Année)"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__recurring_interval
+msgid "Repeat Every"
+msgstr "Répéter chaque"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__recurring_interval
+msgid "Repeat every"
+msgstr "Répéter chaque"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__request_count
+msgid "Request Count"
+msgstr "Nombre de demande d'intervention"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Request title..."
+msgstr "Titre de la demande d'intervention"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Return to draft"
+msgstr "Remettre en brouillon"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "SR to Schedule"
+msgstr "DI à planifier"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_res_partner__request_to_schedule_count
+#: model:ir.model.fields,field_description:of_service.field_res_partner__request_to_schedule_ids
+#: model:ir.model.fields,field_description:of_service.field_res_users__request_to_schedule_count
+#: model:ir.model.fields,field_description:of_service.field_res_users__request_to_schedule_ids
+msgid "SR to schedule"
+msgstr "DI à planifier"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__order_line_id
+msgid "Sale Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__so_number
+msgid "Sale Order Number"
+msgstr "Numéro de ligne de commande"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/res_partner.py:0
+#: code:addons/of_service/models/sale_order.py:0
+#, python-format
+msgid "Schedule an intervention"
+msgstr "Planifier une intervention"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Scheduled between %s and %s"
+msgstr "Planifié entre %s et %s"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "Scheduled for %s"
+msgstr "Planifié pour %s"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Send Email"
+msgstr "Envoyer mail"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__sequence
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_service
+#: model:ir.actions.act_window,name:of_service.action_of_service_request
+#: model:ir.actions.report,name:of_service.action_report_service_request
+#: model:ir.model,name:of_service.model_of_service_request
+#: model:ir.model.fields,field_description:of_service.field_calendar_event__of_request_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__request_id
+#: model:ir.model.fields,field_description:of_service.field_res_partner__request_address_ids
+#: model:ir.model.fields,field_description:of_service.field_res_users__request_address_ids
+#: model:ir.ui.menu,name:of_service.menu_of_service_request
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_pivot
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+#: model_terms:ir.ui.view,arch_db:of_service.sale_order_view_form
+msgid "Service Request"
+msgstr "Demande d'intervention"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_line
+#: model:ir.model.fields,field_description:of_service.field_account_move_line__of_request_line_id
+#: model:ir.model.fields,field_description:of_service.field_sale_order_line__of_request_line_id
+msgid "Service Request Line"
+msgstr "Ligne de demande d'intervention"
+
+#. module: of_service
+#: model:ir.actions.act_window,name:of_service.action_of_service_request_stage
+msgid "Service Request Stage"
+msgstr "Étape de demande d'intervention"
+
+#. module: of_service
+#: model:mail.template,name:of_service.email_template_of_service_request
+msgid "Service Request: Send by mail"
+msgstr "Demande d'intervention: Envoyer par mail"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_sale_order__of_request_count
+#: model:ir.model.fields,field_description:of_service.field_sale_order__of_request_ids
+#: model_terms:ir.ui.view,arch_db:of_service.of_planning_task_view_form
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
+msgid "Service Requests"
+msgstr "Demandes d'intervention"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_stage
+msgid "Service Stage"
+msgstr "Étape Service"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_tag
+msgid "Service Tag"
+msgstr "Étiquette Service"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_type
+msgid "Service Type"
+msgstr "Type Service"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
+msgid "Service request"
+msgstr "Demande d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_planning_task__request_ids
+msgid "Service requests"
+msgstr "Demandes d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_res_partner__request_partner_ids
+#: model:ir.model.fields,help:of_service.field_res_users__request_partner_ids
+msgid ""
+"Service requests linked to the partner, including requests from associated "
+"contacts"
+msgstr ""
+"Demandes d'intervention liées au partenaire, y compris les demandes émanant "
+"de contacts associés"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__recurring_rule_type
+msgid ""
+"Specify the interval for automatic calculation of the next planning date for"
+" interventions."
+msgstr ""
+"Spécifier l'intervalle pour le calcul automatique de la date de prochaine "
+"planification dans les interventions"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_planning_task__recurring_rule_type
+msgid ""
+"Specify the interval for automatic calculation of the next planning date in "
+"recurring tasks."
+msgstr ""
+"Spécifier l'intervalle pour le calcul automatique de la date de prochaine "
+"planification dans les tâches récurrentes"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__stage_id
+#: model:ir.ui.menu,name:of_service.menu_of_service_stage
+msgid "Stage"
+msgstr "Étape"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__start_date
+msgid "Start Date"
+msgstr "Date de début"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__state_punctual
+msgid "State"
+msgstr "État"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_street
+msgid "Street"
+msgstr "Rue"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_street2
+msgid "Street 2"
+msgstr "Rue 2"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__price_subtotal
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__price_subtotal
+msgid "Subtotal"
+msgstr "Sous-total"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_tag_view_form
+msgid "Tag Name"
+msgstr "Nom d'étiquette"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__tag_ids
+msgid "Tags"
+msgstr "Étiquette"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_tag_view_tree
+msgid "Tags List"
+msgstr "Liste d'étiquette"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_planning_task
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__task_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_task_id
+msgid "Task"
+msgstr "Tâche"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__price_tax
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__price_tax
+msgid "Taxes"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__tech_sector_id
+msgid "Tech Sector"
+msgstr "Secteur technique"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Technical Sector"
+msgstr "Secteur technique"
+
+#. module: of_service
+#: model:of.service.request.type,name:of_service.of_service_request_type_technical
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "Technical Visit"
+msgstr "Visite technique"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "This Month"
+msgstr "Ce mois-ci"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "This Week"
+msgstr "Cette semaine"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__base_state
+msgid ""
+"This field is used to determine whether the request has been calculated or "
+"not."
+msgstr ""
+"Ce champ est utilisé pour déterminer si la demande a été calculée ou non."
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "This service request has no lines."
+msgstr "Cette demande d'intervention n'a pas de lignes."
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "This service request is not validated."
+msgstr "Cette demande d'intervention n'est pas validée."
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid ""
+"This will update all taxes based on the currently selected fiscal position."
+msgstr ""
+"Cela mettra à jour toutes les taxes en fonction de la position fiscale"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__title
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_title
+msgid "Title"
+msgstr "Titre"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
+msgid "To Plan"
+msgstr "À planifier"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__to_plan_quickly
+msgid "To Plan Quickly"
+msgstr "À planifier rapidement"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__to_plan
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__to_plan
+msgid "To plan"
+msgstr "À planifier"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__price_total
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__price_total
+msgid "Total"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_calendar_event__of_type_id
+#: model:ir.model.fields,field_description:of_service.field_of_planning_intervention_template__type_id
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__type_id
+msgid "Type"
+msgstr ""
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Update Taxes"
+msgstr "Mettre à jour les taxes"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request_line__order_line_id
+msgid "Used to find out whether a order has been generated for this line."
+msgstr "Utilisé pour déterminer si une commande a été généré pour cette ligne"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__user_id
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_line__tax_ids
+msgid "VAT"
+msgstr "TVA"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__3
+msgid "Very High"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request_line__invoice_status__to_invoice
+msgid "Waiting Bills"
+msgstr "Factures en attente"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_wizard__show_warning
+msgid "Warning"
+msgstr "Avertissement"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__website_message_ids
+msgid "Website Messages"
+msgstr "Messages site web"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__website_message_ids
+msgid "Website communication history"
+msgstr "Historique de communication site web"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_planning_intervention_template__planning_granularity__weekly
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "What"
+msgstr "Quoi"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "When"
+msgstr "Quand"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Where"
+msgstr "Où"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "Who"
+msgstr "Qui"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_create_intervention_wizard
+msgid "Wizard for creating Intervention from Service Requests"
+msgstr "Wizard de création d'intervention depuis les demandes d'intervention"
+
+#. module: of_service
+#: model:ir.model,name:of_service.model_of_service_request_create_intervention_line_wizard
+msgid "Wizard line for creating Intervention from Service Requests"
+msgstr ""
+"Ligne de wizard de création d'intervention depuis les demandes "
+"d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_planning_task__recurring_rule_type__yearly
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__recurring_rule_type__yearly
+msgid "Yearly"
+msgstr "Année"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "You cannot create an appointment for %s."
+msgstr "Vous ne pouvez pas créer un rendez-vous pour %s."
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__address_zip
+msgid "Zip"
+msgstr "Code postal"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_address_zip
+msgid "Zip Code"
+msgstr "Code postal"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/sale_order.py:0
+#, python-format
+msgid "[Order] %s"
+msgstr "[Commande] %s"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/res_partner.py:0
+#: code:addons/of_service/models/res_partner.py:0
+#, python-format
+msgid "[Partner] %s"
+msgstr "[Partenaire] %s"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "an intervention who is cancelled"
+msgstr "une intervention qui est annulée"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "an intervention who is done"
+msgstr "une intervention qui est terminée"
+
+#. module: of_service
+#. odoo-python
+#: code:addons/of_service/models/of_service_request.py:0
+#, python-format
+msgid "an intervention who is not confirmed"
+msgstr "une intervention qui n'est pas confirmée"
+
+#. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "and"
+msgstr "et le"
+
+#. module: of_service
+#: model:mail.template,report_name:of_service.email_template_of_service_request
+msgid "{{ (object.number or object.name).replace('/','_') }}"
+msgstr ""
+
+#. module: of_service
+#: model:mail.template,subject:of_service.email_template_of_service_request
+msgid ""
+"{{ object.company_id.name }} - Service request (Ref {{ object.number or "
+"'n/a' }})"
+msgstr ""
+"{{ object.company_id.name }} - Demande d'intervention (Réf {{ object.number "
+"or 'n/a' }})"

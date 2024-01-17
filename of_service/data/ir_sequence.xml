@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="of_service_request_sequence" model="ir.sequence">
+        <field name="name">Service Request Sequence</field>
+        <field name="prefix">DI/</field>
+        <field name="code">of.service.request</field>
+        <field name="padding">6</field>
+    </record>
+
+</odoo>

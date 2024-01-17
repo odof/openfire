@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.res.partner.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_schedule_intervention" string="Service Request" type="object"/>
+            </xpath>
+            <xpath expr="//form//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_button_view_recurring_service_request" type="object" icon="fa-wrench" groups="of_planning.group_planning_intervention_read_all_write_own">
+                    <field string="Recurring SR" name="recurring_request_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_button_view_service_request" type="object" icon="fa-wrench" groups="of_planning.group_planning_intervention_read_all_write_own">
+                    <field string="SR to Schedule" name="request_to_schedule_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <page name="sales_purchases" position="after">
+                <page string="Intervention" name="request" invisible="1">
+                    <!-- Display partner service requests -->
+                    <field name="request_partner_ids" nolabel="1" attrs="{'invisible': [('parent_id','!=', False)]}" context="{'default_address_id':id}">
+                        <tree string="Interventions" decoration-muted="not active">
+                            <field name="address_id" domain="[('parent_id','=',parent.id)]"/>
+                            <field name="task_id"/>
+                            <field name="month_ids"/>
+                            <field name="note"/>
+                            <field name="last_next_date" string="Last"/>
+                            <field name="next_date" string="Next"/>
+                            <field name="contract_end_date" string="Due date"/>
+                            <field name="active" invisible="1"/>
+                        </tree>
+                    </field>
+
+                    <!-- Display service requests linked to the address -->
+                    <field name="request_address_ids" nolabel="1" attrs="{'invisible': [('parent_id','=', False)]}" context="{'hide_request_address_id':True}">
+                        <tree string="Service request" decoration-muted="not active">
+                            <field name="task_id"/>
+                            <field name="month_ids"/>
+                            <field name="note"/>
+                            <field name="active" invisible="1"/>
+                            <field name="last_next_date" string="Last"/>
+                            <field name="next_date" string="Next"/>
+                            <field name="contract_end_date" string="Due date"/>
+                            <field name="state" invisible="0"/>
+                        </tree>
+                    </field>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

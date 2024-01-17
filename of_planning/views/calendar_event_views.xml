@@ -290,7 +290,17 @@
                         <group>
                             <field name="of_warehouse_id" attrs="{'readonly':[('of_state', '!=', 'draft')]}" options="{'no_create': True, 'no_open': True}" groups="of_planning.group_intervention_use_deliveries" />
                             <field name="of_invoice_policy" attrs="{'required': [('of_type','=','intervention')]}" />
-                            <field name="of_fiscal_position_id" attrs="{'readonly': [('of_link_order', '!=', False)]}" options="{'no_create': True, 'no_open': True}" />
+                            <field name="of_show_update_fpos" invisible="1"/>
+                            <label for="of_fiscal_position_id"/>
+                            <div class="o_row">
+                                <field name="of_fiscal_position_id" attrs="{'readonly': [('of_link_order', '!=', False)]}" options="{'no_create': True, 'no_open': True}"/>
+                                <button name="action_button_update_taxes" type="object"
+                                    string=" Update Taxes"
+                                    help="Recompute all taxes based on this fiscal position"
+                                    class="btn-link mb-1 px-0" icon="fa-refresh"
+                                    confirm="This will update all taxes based on the currently selected fiscal position."
+                                    attrs="{'invisible': ['|', ('of_show_update_fpos', '=', False), ('of_state', 'in', ['sale', 'done','cancel'])]}"/>
+                            </div>
                         </group>
                         <group>
                             <field name="of_partner_pricelist_id" groups="product.group_sale_pricelist" />
@@ -311,7 +321,7 @@
                             <field name="qty_delivered" readonly="1" />
                             <field name="qty_invoiced" readonly="1" />
                             <field name="price_unit" attrs="{'readonly': [('order_line_id', '!=', False)]}" />
-                            <field name="taxe_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}" widget="many2many_tags" />
+                            <field name="tax_ids" attrs="{'readonly': [('order_line_id', '!=', False)]}" widget="many2many_tags" />
                             <field name="price_subtotal" readonly="1" />
                             <field name="price_total" readonly="1" />
                             <field name="so_number" string="CO" />

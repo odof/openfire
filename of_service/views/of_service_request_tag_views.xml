@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_request_tag_view_form" model="ir.ui.view" >
+        <field name="name">of.service.request.tag.view.form</field>
+        <field name="model">of.service.request.tag</field>
+        <field name="arch" type="xml" >
+            <form>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name" string="Name"/>
+                        <h1><field name="name" placeholder="Tag Name"/></h1>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_service_request_tag_view_tree" model="ir.ui.view" >
+        <field name="name">of.service.request.tag.view.tree</field>
+        <field name="model">of.service.request.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Tags List" decoration-muted="not active">
+                <field name="name"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

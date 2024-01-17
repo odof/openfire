@@ -1087,11 +1087,6 @@ msgid "Force dates"
 msgstr "Forcer les dates"
 
 #. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__of_planning_task__planning_granularity__fortnightly
-msgid "Fortnightly"
-msgstr "Bimensuel"
-
-#. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__calendar_event__of_invoice_status__invoiced
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_intervention_line__invoice_status__invoiced
 msgid "Fully Billed"
@@ -1933,11 +1928,6 @@ msgid "Planning"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_task__planning_granularity
-msgid "Planning granularity"
-msgstr "Granularité du planning"
-
-#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_sale_order_line__of_intervention_state
 msgid "Planning status"
 msgstr "Statut du planning"
@@ -2142,6 +2132,11 @@ msgstr "Début réel"
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_real_stop
 msgid "Real stop"
 msgstr "Fin réelle"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+msgid "Recompute all taxes based on this fiscal position"
+msgstr "Recalculer toutes les taxes en fonction de cette position fiscale"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.sale_order_view_search
@@ -2556,6 +2551,14 @@ msgid "This week"
 msgstr "Semaine en cours"
 
 #. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+msgid ""
+"This will update all taxes based on the currently selected fiscal position."
+msgstr ""
+"Cela mettra à jour toutes les taxes en fonction de la position fiscale "
+"actuellement sélectionnée."
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__tz
 msgid "Timezone"
 msgstr ""
@@ -2658,6 +2661,11 @@ msgid "Update"
 msgstr "Mettre à jour"
 
 #. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+msgid "Update Taxes"
+msgstr "Mettre à jour les taxes"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_use_default
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_use_default
 msgid "Use default report"
@@ -2744,11 +2752,6 @@ msgstr "Semaine"
 #: model:ir.actions.report,name:of_planning.action_report_planning_week
 msgid "Week Planning Report"
 msgstr "Rapport Planning semaine"
-
-#. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__of_planning_task__planning_granularity__weekly
-msgid "Weekly"
-msgstr "Hebdomadaire"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form

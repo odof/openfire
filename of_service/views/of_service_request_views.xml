@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_request_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.view.form</field>
+        <field name="model">of.service.request</field>
+        <field name="arch" type="xml">
+            <form>
+
+                <!-- Header part -->
+                <header>
+                    <button name="action_button_validate" string="Validate" states="draft" type="object" groups="of_planning.group_planning_intervention_responsible" />
+                    <button name="action_button_cancel" string="Cancel" type="object" attrs="{'invisible': [('base_state', '!=', 'calculated')]}" />
+                    <button name="action_button_draft" string="Return to draft" states="cancel" type="object" />
+                    <button name="action_button_request_send_mail" string="Send Email" type="object" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_plan,planned,done" />
+                </header>
+                <!-- /Header part -->
+
+                <sheet>
+                    <field name="alert_dates" invisible="1" />
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+
+                    <!-- Button box part -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_button_view_order" type="object" context="{'default_partner_id': partner_id}" class="oe_stat_button" icon="fa-usd">
+                            <field name="order_count" widget="statinfo" string="Order" />
+                        </button>
+                        <button name="action_button_view_invoice" type="object" class="oe_stat_button" icon="fa-usd">
+                            <field name="invoice_count" widget="statinfo" string="Invoices" />
+                        </button>
+                        <button name="action_button_view_intervention" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field string="Interventions" name="intervention_count" widget="statinfo" />
+                        </button>
+                    </div>
+                    <!-- /Button box part -->
+
+                    <!-- Title part -->
+                    <div class="oe_title">
+                        <h1>
+                            <strong>
+                                <span attrs="{'invisible': [('number', '!=', False)]}">Service Request</span>
+                                <field name="number" readonly="1" />
+                                <field  name="title" placeholder="Request title..." />
+                            </strong>
+                        </h1>
+                        <h2>
+                            <field name="priority" widget="priority" />
+                        </h2>
+                    </div>
+                    <!-- /Title part -->
+
+                    <!-- Body who/what/when/when part -->
+                    <group>
+                        <group>
+                            <field name="state" invisible="1" />
+                            <field name="base_state" invisible="1" />
+                            <field name="type_id" />
+                            <field name="template_id" context="{'of_search_by_type_id': type_id}" attrs="{'readonly': [('number', '!=', False), ('base_state', 'not in', ('draft', 'cancel'))]}" />
+                            <field name="order_id" context="{'extended_display': 1}" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}" />
+                        </group>
+                        <group>
+                            <field name="user_id" />
+                            <field name="tag_ids" widget="many2many_tags" />
+                        </group>
+                    </group>
+
+                    <group name="where" string="Where" class="of_blue_background mb-3 p-3">
+                        <group>
+                            <label for="partner_id" string="Customer" />
+                            <div class="o_address_format">
+                                <div>
+                                    <field name="partner_id" />
+                                </div>
+                                <div attrs="{'invisible': [('partner_phone', '=', False)]}">
+                                    <i class="fa fa-phone pr-1" title="Phone button" />
+                                    <field name="partner_phone" />
+                                </div>
+                                <div attrs="{'invisible': [('partner_mobile', '=', False)]}">
+                                    <i class="fa fa-phone pr-1" title="Mobile button" />
+                                    <field name="partner_mobile" />
+                                </div>
+                            </div>
+                            <field name="partner_tag_ids" widget="many2many_tags" />
+                            <field name="tech_sector_id" />
+                        </group>
+                        <group>
+                            <label for="address_id" string="Intervention Address" />
+                            <div class="o_address_format">
+                                <div>
+                                    <field name="address_id" />
+                                </div>
+                                <field name="address_street" class="o_address_street" />
+                                <field name="address_street2" class="o_address_street" />
+                                <field name="address_zip" class="o_address_zip pr-1" />
+                                <field name="address_city" class="o_address_city" />
+                                <div attrs="{'invisible': [('address_phone', '=', False)]}">
+                                    <i class="fa fa-phone pr-1" title="Phone button" />
+                                    <field name="address_phone" />
+                                </div>
+                                <div attrs="{'invisible': [('address_mobile', '=', False)]}">
+                                    <i class="fa fa-phone pr-1" title="Mobile button" />
+                                    <field name="address_mobile" />
+                                </div>
+                                <div attrs="{'invisible': [('address_email', '=', False)]}">
+                                    <i class="fa fa-envelope pr-1" title="Mail button" />
+                                    <field name="address_email" />
+                                </div>
+                            </div>
+                        </group>
+                    </group>
+
+                    <group name="who" string="Who" class="of_blue_background mb-3 p-3">
+                        <group>
+                            <field name="employee_ids" widget="many2many_tags" />
+                        </group>
+                        <group>
+                            <field name="company_id" />
+                        </group>
+                    </group>
+
+                    <group name="what" string="What" class="of_blue_background mb-3 p-3">
+                        <group>
+                            <field name="task_id" />
+                            <label for="duration" string="Durations" />
+                            <div>
+                                <field name="duration" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}" />
+                                <em class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> estimated, including </em>
+                                <field name="planned_duration" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}" />
+                                <em class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> planned and </em>
+                                <field name="remaining_duration" widget="float_time" nolabel="1" class="oe_inline" attrs="{'invisible': [('state', '=', 'done')]}" />
+                                <em class="oe_grey oe_inline" attrs="{'invisible': [('state', '=', 'done')]}"> remaining</em>
+                                <em class="oe_grey oe_inline" attrs="{'invisible': [('state', '!=', 'done')]}"> This intervention is done</em>
+                            </div>
+                        </group>
+                    </group>
+
+                    <group name="when" string="When" class="of_blue_background mb-3 p-3">
+                        <group>
+                            <field name="next_date" string="Between " />
+                            <field name="end_date" string="and " />
+                            <field name="day_ids" widget="many2many_tags" options="{'no_create': True}" />
+                        </group>
+                        <group>
+                            <field name="recurrency" attrs="{'invisible': [('type_id','not in',[%(of_service.of_service_request_type_maintenance)d])]}" />
+                            <field name="month_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('recurrency', '=', False)]}" />
+                            <label for="recurring_interval" attrs="{'invisible': [('recurrency', '=', False)]}" />
+                            <div attrs="{'invisible': [('recurrency', '=', False)]}">
+                                <field name="recurring_interval" nolabel="1" class="oe_inline pr-1" />
+                                <field name="recurring_rule_type" nolabel="1" class="oe_inline" />
+                            </div>
+                            <field name="is_recurring_task" invisible="1" />
+                        </group>
+                    </group>
+                    <!-- /Body who/what/when/when part -->
+
+                    <!-- Notebook part -->
+                    <notebook>
+                        <page name="description" string="Description">
+                            <group>
+                                <field name="note" placeholder="Description..." colspan="2" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="history" string="History">
+                            <group name="interventions">
+                                <group>
+                                    <label for="history_intervention_ids" string="Interventions"/>
+                                    <field name="history_intervention_ids" nolabel="1" colspan="4">
+                                        <tree string="Interventions">
+                                            <field name="of_employee_ids" widget="many2many_tags" />
+                                            <field name="of_type" />
+                                            <field name="of_task_id" />
+                                            <field name="start_date" />
+                                            <field name="duration"/>
+                                            <field name="stop_date" />
+                                            <field name="of_state" />
+                                            <field name="name" />
+                                            <field name="description"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                            </group>
+                        </page>
+                        <page name="invoicing" string="Invoicing">
+                            <field name="currency_id" invisible="1" />
+                            <group col="4">
+                                <field name="show_update_fpos" invisible="1"/>
+                                <label for="fiscal_position_id"/>
+                                <div class="o_row">
+                                    <field name="fiscal_position_id" options="{'no_create': True}"/>
+                                    <button name="action_button_update_taxes" type="object"
+                                        string=" Update Taxes"
+                                        help="Recompute all taxes based on this fiscal position"
+                                        class="btn-link mb-1 px-0" icon="fa-refresh"
+                                        confirm="This will update all taxes based on the currently selected fiscal position."
+                                        attrs="{'invisible': ['|', ('show_update_fpos', '=', False), ('state', 'in', ['done', 'cancel'])]}"/>
+                                </div>
+                            </group>
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="name" />
+                                    <field name="qty" />
+                                    <field name="price_unit" />
+                                    <field name="tax_ids" widget="many2many_tags" />
+                                    <field name="price_subtotal" readonly="1" />
+                                    <field name="price_total" readonly="1" />
+                                    <field name="so_number"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right" name="intervention_total">
+                                <field name="price_subtotal" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                                <field name="price_tax" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                    <label for="price_total" />
+                                </div>
+                                <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                            </group>
+                        </page>
+                    </notebook>
+                    <!-- /Notebook part -->
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_service_request_kanban_view" model="ir.ui.view">
+        <field name="name">of.service.request.kanban.view</field>
+        <field name="model">of.service.request</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="stage_id">
+                <field name="type_id" />
+                <field name="stage_id" />
+                <field name="next_date" />
+                <field name="end_date" />
+                <field name="partner_id" />
+                <field name="address_id" />
+                <field name="address_address" />
+                <field name="request_label_date" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong class="oe_partner_heading"><field name="address_id" /> - <field
+                                        name="type_id" /></strong>
+                                <div class="mt-2">
+                                    <field name="address_address" t-if="record.address_address.raw_value" />
+                                </div>
+                                <div class="mt-4 mb-4">
+                                    <field name="tag_ids" />
+                                    <field name="priority" widget="priority" />
+                                </div>
+                                <div>
+                                    <field name="request_label_date" t-if="record.request_label_date.raw_value"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_tree" model="ir.ui.view">
+        <field name="name">of.service.request.view.tree</field>
+        <field name="model">of.service.request</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="color == 'grey'" decoration-danger="color == 'red'" decoration-warning="color == 'orange'">
+                <field name="color" invisible="1" />
+                <field name="active" invisible="1" />
+                <field name="partner_id" />
+                <field name="number" />
+                <field name="title" />
+                <field name="address_zip" />
+                <field name="address_city" />
+                <field name="task_id" />
+                <field name="recurrency" />
+                <field name="next_date" string="From" />
+                <field name="end_date" string="No later than" />
+                <field name="last_next_date" />
+                <field name="contract_end_date" string="End of contract" />
+                <field name="note" />
+                <field name="tag_ids" widget="many2many_tags" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_pivot" model="ir.ui.view">
+        <field name="name">of.service.request.view.pivot</field>
+        <field name="model">of.service.request</field>
+        <field name="arch" type="xml">
+            <pivot string="Service Request" disable_linking="True">
+                <field name="next_date" interval="month" type="row" />
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_search" model="ir.ui.view">
+        <field name="name">of.service.request.view.search</field>
+        <field name="model">of.service.request</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search>
+                <filter string="Recurrency" name="filter_recurrency" domain="[('recurrency', '=', True)]" />
+                <filter string="Punctual" name="filter_punctual" domain="[('recurrency', '=', False)]" />
+                <separator />
+                <filter string="Technical Sector" name="filter_tech_sector" domain="[('tech_sector_id', '!=', False)]" />
+                <filter string="Maintenance" name="filter_maintenance" domain="[('type_id', '=', %(of_service.of_service_request_type_maintenance)d)]" />
+                <filter string="Installation" name="filter_installation" domain="[('type_id', '=', %(of_service.of_service_request_type_installation)d)]" />
+                <filter string="Technical Visit" name="filter_techical_visit" domain="[('type_id', '=', %(of_service.of_service_request_type_technical)d)]" />
+                <separator />
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]" />
+                <filter string="This Week" name="this_week"
+                    domain="['|',
+                                '&amp;',
+                                    ('recurrency', '=', True),
+                                    ('state', '=', 'to_plan'),
+                                '&amp;',
+                                    ('recurrency', '=', False),
+                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
+                                ('end_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                ('next_date', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
+                            ]" />
+                <filter string="Next week" name="next_week"
+                    domain="['|',
+                                '&amp;',
+                                    ('recurrency', '=', True),
+                                    ('state', '=', 'to_plan'),
+                                '&amp;',
+                                    ('recurrency', '=', False),
+                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
+                                ('end_date', '&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
+                                ('next_date', '&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d')),
+                            ]" />
+                <filter string="This Month" name="this_month"
+                    domain="['|',
+                                '&amp;',
+                                    ('recurrency', '=', True),
+                                    ('state', '=', 'to_plan'),
+                                '&amp;',
+                                    ('recurrency', '=', False),
+                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
+                                ('end_date', '&gt;=', context_today().strftime('%Y-%m-01')),
+                                ('next_date', '&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-01')),
+                            ]" />
+                <filter string="Next Month" name="next_month"
+                    domain="['|',
+                                '&amp;',
+                                    ('recurrency', '=', True),
+                                    ('state', '=', 'to_plan'),
+                                '&amp;',
+                                    ('recurrency', '=', False),
+                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
+                                ('end_date', '&gt;=', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                ('next_date', '&lt;', (context_today() + relativedelta(day=1,months=2)).strftime('%Y-%m-%d')),
+                            ]" />
+
+                <filter string="Late for planning" name="filter_late" domain="[('state', '=', 'late')]" />
+                <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]" />
+                <filter string="Cancelled" name="filter_cancel" domain="[('state', '=', 'cancel')]" />
+                <filter string="To Plan" name="filter_to_plan" domain="[('state', '=', 'to_plan')]" invisible="1" />
+                <filter string="Planned" name="filter_planned" domain="[('state', '=', 'planned')]" invisible="1" />
+                <filter string="Planned Soon" name="filter_planned_soon" domain="[('state', '=', 'planned_soon')]" invisible="1" />
+                <filter string="Partially Planned" name="filter_part_planned" domain="[('state', '=', 'part_planned')]" invisible="1" />
+                <filter string="All Planned" name="filter_all_planned" domain="[('state', '=', 'all_planned')]" invisible="1" />
+                <filter string="In Progress" name="filter_progress" domain="[('state', '=', 'progress')]" invisible="1" />
+                <separator />
+                <filter string="Remain To Plan" name="filter_plan" domain="[('remaining_duration', '>', 0), ('state', 'in', ('to_plan', 'part_planned', 'late'))]" />
+                <separator />
+                <filter string="Active" name="filter_active" domain="[('active', '=', True)]" />
+                <filter string="Archived" name="filter_inactive" domain="[('active', '=', False)]" />
+                <separator />
+                <field name="next_date" filter_domain="[('next_date','&lt;=',self)]" string="Next Planning" context="{'next_date_max': self}" />
+                <field name="partner_id" />
+                <field name="number" />
+                <field name="title" />
+                <field name="address_id" />
+                <field name="address_zip" />
+                <field name="address_city" />
+                <field name="task_id" />
+                <field name="tag_ids" widget="many2one" />
+                <field name="month_ids" />
+                <field name="day_ids" />
+                <field name="state" />
+                <field name="note" />
+                <field name="recurrency" invisible="1" />
+                <field name="end_date" invisible="1" />
+                <field name="end_date_min" filter_domain="[('end_date','&gt;=',self)]" />
+                <field name="end_date_max" filter_domain="[('end_date','&lt;=',self)]" />
+            </search>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_search_distinct_type" model="ir.ui.view">
+        <field name="name">of.service.request.search.view.distinct.type</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_search" />
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//separator[1]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_tech_sector']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_maintenance']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_installation']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_techical_visit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_of_service_request" model="ir.actions.act_window">
+        <field name="name">Service Request</field>
+        <field name="res_model">of.service.request</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="view_id" ref="of_service_request_view_tree" />
+        <field name="search_view_id" ref="of_service_request_view_search"/>
+    </record>
+
+    <!-- Generate customer quotation from Service Request -->
+    <record id="action_make_sale_order" model="ir.actions.server">
+        <field name="name">Generate customer quotation</field>
+        <field name="model_id" ref="of_service.model_of_service_request" />
+        <field name="binding_model_id" ref="of_service.model_of_service_request"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = records._make_sale_order()</field>
+    </record>
+
+    <!-- Plan Intervention from Service Request -->
+    <record id="action_create_intervention" model="ir.actions.server">
+        <field name="name">Plan Intervention</field>
+        <field name="model_id" ref="of_service.model_of_service_request" />
+        <field name="binding_model_id" ref="of_service.model_of_service_request"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_button_create_intervention()</field>
+    </record>
+
+    <record id="action_of_service_request_maintenance" model="ir.actions.act_window">
+        <field name="name">Maintenance</field>
+        <field name="res_model">of.service.request</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="view_id" ref="of_service_request_view_tree" />
+        <field name="search_view_id" ref="of_service_request_view_search_distinct_type"/>
+        <field name="domain" eval="[('type_id', '=', ref('of_service.of_service_request_type_maintenance'))]"/>
+        <field name="context" eval="{'default_type_id': ref('of_service.of_service_request_type_maintenance'), 'of_kanban_steps': 'Maintenance'}"/>
+    </record>
+
+</odoo>

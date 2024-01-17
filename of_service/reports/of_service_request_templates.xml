@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_service_request" model="ir.actions.report">
+        <field name="name">Service Request</field>
+        <field name="model">of.service.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_service.report_service_request</field>
+        <field name="report_file">of_service.report_service_request</field>
+        <field name="binding_model_id" ref="of_service.model_of_service_request" />
+        <field name="attachment">((object.number or object.name).replace('/','_')+'.pdf')</field>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="base.paperformat_euro" />
+    </record>
+
+    <template id="report_service_request">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="of_service.report_service_request_document"
+                    t-lang="doc.partner_id.lang" />
+            </t>
+        </t>
+    </template>
+
+    <template id="report_service_request_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <t t-set="o" t-value="doc" />
+                <t t-set="order" t-value="doc.order_id" />
+                <t t-set="hide_remaining_balance" t-value="doc.company_id.of_hide_remaining_balance" />
+                <t t-if="order">
+
+                    <h5 name="title_order">
+                        <strong>Order</strong>
+                    </h5>
+                    <div class="row mb-4" name="order_info" style="page-break-inside: avoid;">
+                        <div class="border border-top-0 w-100 d-table">
+                            <div class="w-50 border-end d-table-cell">
+                                <div t-if="doc.partner_id.name" class="border-top">
+                                    <div class="m-2">
+                                        <span>Customer&amp;nbsp;:</span>
+                                        <strong t-field="doc.partner_id.name" />
+                                    </div>
+                                </div>
+                                <div class="border-top">
+                                    <div class="m-2">
+                                        <span>Linked order&amp;nbsp;:</span>
+                                        <span t-field="order.name" />
+                                    </div>
+                                </div>
+                                <div t-if="order.date_order" class="border-top">
+                                    <div class="m-2">
+                                        <span>Date Order&amp;nbsp;:</span>
+                                        <span t-field="order.date_order"
+                                            t-options="{'widget': 'date'}" />
+                                    </div>
+                                </div>
+                                <div class="border-top" t-if="doc.name">
+                                    <div class="m-2">
+                                        <span>Label&amp;nbsp;:</span>
+                                        <span t-field="doc.name" />
+                                    </div>
+                                </div>
+                                <div class="border-top" t-if="doc.company_id">
+                                    <div class="m-2">
+                                        <span>Store&amp;nbsp;:</span>
+                                        <span t-field="doc.company_id" />
+                                    </div>
+                                </div>
+                                <div class="border-top" t-if="order.user_id">
+                                    <div class="m-2">
+                                        <span>Vendor&amp;nbsp;:</span>
+                                        <span t-field="order.user_id" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-50 d-table-cell"
+                                t-if="not hide_remaining_balance">
+
+                                <div class="w-25 d-table-cell">
+                                    <div class="border-top">
+                                        <div class="m-2">
+                                            <strong>Total Without Taxes</strong>
+                                        </div>
+                                    </div>
+                                    <div class="border-top">
+                                        <div class="m-2">
+                                            <strong>Taxes</strong>
+                                        </div>
+                                    </div>
+                                    <div class="border-top">
+                                        <div class="m-2">
+                                            <strong>Total</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-25 d-table-cell">
+                                    <div name="order_amounts">
+                                        <div class="border-top">
+                                            <div class="m-2 text-end"
+                                                t-field="order.amount_untaxed"
+                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                        </div>
+                                        <div class="border-top">
+                                            <div class="m-2 text-end"
+                                                t-field="order.amount_tax"
+                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                        </div>
+                                        <div class="border-top">
+                                            <div class="m-2 text-end"
+                                                t-field="order.amount_total"
+                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Intervention -->
+
+                <h5 name="title_service_request">
+                    <strong>Service Request</strong>
+                </h5>
+                <div class="row mb-4" name="order_info" style="page-break-inside: avoid;">
+                    <div class="border border-top-0 w-100 d-table">
+                        <div class="w-50 border-end d-table-cell">
+                            <div t-if="doc.task_id" class="border-top">
+                                <div class="m-2">
+                                    <span>Task&amp;nbsp;:</span>
+                                    <strong t-field="doc.task_id.name" />
+                                </div>
+                            </div>
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <span>Employees&amp;nbsp;:</span>
+                                    <t t-if="doc.employee_ids">
+                                        <t t-foreach="doc.employee_ids" t-as="employee">
+                                            <span t-raw="employee.name" />&amp;nbsp;
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                            <div t-if="order.date_order" class="border-top">
+                                <div class="m-2">
+                                    <span>Duration&amp;nbsp;:</span>
+                                    <t t-if="doc.duration">
+                                        <span t-field="doc.duration" t-options='{"widget": "duration", "unit": "hour", "round": "minute"}'></span>
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="border-top" t-if="doc.name">
+                                <div class="m-2">
+                                    <span>Reference Month&amp;nbsp;:</span>
+                                    <t t-if="doc.month_ids">
+                                        <span t-esc="doc.month_ids[0].name" />
+                                    </t>
+                                    <span t-field="doc.name" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-50 d-table-cell">
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <div>
+                                        <strong>Intervention Address</strong>
+                                    </div>
+                                    <t t-if="doc.address_id">
+                                        <div t-field="doc.address_id"
+                                            t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
+                                    </t>
+                                    <t t-elif="order.partner_shipping_id">
+                                        <div t-field="order.partner_shipping_id"
+                                            t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
+                                    </t>
+                                    <t t-else="">
+                                        <div style="height: 35px;" />
+                                    </t>
+                                </div>
+                            </div>
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <div>
+                                        <strong>Contact</strong>
+                                    </div>
+                                    <t t-if="doc.address_id">
+                                        <div t-field="doc.address_id"
+                                            t-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}" />
+                                    </t>
+                                    <t t-elif="order.partner_shipping_id">
+                                        <div t-field="order.partner_shipping_id"
+                                            t-options="{'widget': 'contact', 'fields': ['name', 'phone', 'mobile']}" />
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produits et travaux (affichage conditionnel selon que vient du planning ou des devis/commandes) -->
+                <t t-if="order">
+                    <div class="row mb-4" style="page-break-inside: avoid;">
+                        <div class="col">
+                            <h5>
+                                <strong>Product and works</strong>
+                            </h5>
+                            <div class="border">
+                                <t t-set="lines_to_report" t-value="doc.order_id._get_order_lines_to_report()"/>
+
+                                <table class="table table-sm o_main_table table-borderless mt-4">
+                                    <!-- In case we want to repeat the header, remove "display: table-row-group" -->
+                                    <thead style="display: table-row-group">
+                                        <tr>
+                                            <th name="th_description" class="text-start">Description</th>
+                                            <th name="th_quantity" class="text-end">Quantity</th>
+                                            <th name="th_installed_quantity" class="text-end">Installed</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="sale_tbody">
+                                        <t t-foreach="lines_to_report" t-as="line">
+                                            <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                                <t t-if="not line.display_type">
+                                                    <td name="td_name"><span t-field="line.name"/></td>
+                                                    <td name="td_quantity" class="text-end">
+                                                        <span t-field="line.product_uom_qty"/>
+                                                        <span t-field="line.product_uom"/>
+                                                    </td>
+                                                    <td name="td_installed_quantity" class="text-end">
+
+                                                    </td>
+                                                </t>
+                                                <t t-elif="line.display_type == 'line_section'">
+                                                    <td name="td_section_line" colspan="99">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                </t>
+                                                <t t-elif="line.display_type == 'line_note'">
+                                                    <td name="td_note_line" colspan="99">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Description -->
+                <t t-if="doc.note">
+                    <div class="row mb-4" style="page-break-inside: avoid;">
+                        <div class="col">
+                            <h5>
+                                <strong>Description</strong>
+                            </h5>
+                            <div class="border">
+                                <div class="m-2" t-field="doc.note" />
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

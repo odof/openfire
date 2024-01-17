@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Interventions -->
+    <!-- Service Request -->
+    <menuitem id="menu_of_service_request" name="Service Request" parent="of_planning.menu_of_planning_intervention" action="action_of_service_request" sequence="15"/>
+    <menuitem id="menu_of_service_maintenance" name="Maintenance" parent="of_planning.menu_of_planning_intervention" action="action_of_service_request_maintenance" sequence="16"/>
+    <menuitem id="menu_of_service_request_maintenance_maintenance_first" name="Maintenance" parent="of_planning.menu_of_planning_intervention" action="action_of_service_request_maintenance" groups="of_service.of_group_intervention_open_menu_maintenance" sequence="1"/>
+
+    <!-- Configuration -->
+    <menuitem id="menu_of_service_stage" name="Stage" parent="of_planning.menu_of_planning_configuration" action="action_of_service_request_stage" sequence="65"/>
+
+</odoo>

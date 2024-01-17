@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_service.email_template_of_service_request" model="mail.template">
+        <field name="name">Service Request: Send by mail</field>
+        <field name="model_id" ref="of_service.model_of_service_request"/>
+        <field name="subject">{{ object.company_id.name }} - Service request (Ref {{ object.number or 'n/a' }})</field>
+        <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+        <field name="partner_to">{{ object.partner_id.id }}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px;">
+                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+Hello <t t-out="object.partner_id.name or ''">user</t>,
+<br/>
+<br/>
+Please find attached the intervention request
+<t t-if="object.number">
+    (with reference: <t t-out="object.number or ''">DI/12345</t> )
+</t>
+to be scheduled between  <span style="font-weight:bold;" t-out="format_date(object.next_date) or ''">06/02/2024</span> and  <span style="font-weight:bold;" t-out="format_date(object.end_date) or ''">06/02/2024</span>.
+<br/>
+If you have any questions, please do not hesitate to contact us.
+<br/>
+<br/>
+Sincerely,
+                </p>
+            </div>
+        </field>
+        <field name="lang">{{ object.partner_id.lang }}</field>
+        <field name="auto_delete" eval="True"/>
+        <field name="report_template" ref="of_service.action_report_service_request"/>
+        <field name="report_name">{{ (object.number or object.name).replace('/','_') }}</field>
+    </record>
+
+</odoo>

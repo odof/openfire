@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="of_service_request_stage_new" model="of.service.request.stage">
+        <field name="name">New</field>
+        <field name="sequence">10</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_quote" model="of.service.request.stage">
+        <field name="name">Quote</field>
+        <field name="sequence">20</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_sale" model="of.service.request.stage">
+        <field name="name">Order</field>
+        <field name="sequence">30</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_toplan" model="of.service.request.stage">
+        <field name="name">To Plan</field>
+        <field name="sequence">50</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+            Command.link(ref('of_service.of_service_request_type_technical')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_planned" model="of.service.request.stage">
+        <field name="name">Planned</field>
+        <field name="sequence">60</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+            Command.link(ref('of_service.of_service_request_type_technical')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_toinvoice" model="of.service.request.stage">
+        <field name="name">To Invoice</field>
+        <field name="sequence">70</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_closed" model="of.service.request.stage">
+        <field name="name">Closed</field>
+        <field name="sequence">80</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+            Command.link(ref('of_service.of_service_request_type_technical')),
+        ]"/>
+    </record>
+
+    <record id="of_service_request_stage_cancelled" model="of.service.request.stage">
+        <field name="name">Cancelled</field>
+        <field name="sequence">90</field>
+        <field name="type_ids" eval="[
+            Command.link(ref('of_service.of_service_request_type_maintenance')),
+            Command.link(ref('of_service.of_service_request_type_installation')),
+            Command.link(ref('of_service.of_service_request_type_technical')),
+        ]"/>
+    </record>
+
+</odoo>
