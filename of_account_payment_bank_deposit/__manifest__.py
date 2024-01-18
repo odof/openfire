@@ -19,6 +19,7 @@ Fonctionnalités
 """,
     'depends': [
         'of_account',
+        'of_account_payment_mode',
     ],
     'data': [
         'views/of_account_payment_bank_deposit_view.xml',
