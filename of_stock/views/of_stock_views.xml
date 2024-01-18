@@ -520,7 +520,6 @@
     <!-- Action articles du module stock, mettre vue tree en première -->
     <record id="stock.product_template_action_product" model="ir.actions.act_window">
         <field name="view_mode">tree,kanban,form</field>
-        <field name="tree_view_ref" ref="of_stock.of_stock_product_template_tree_view"/>
     </record>
 
     <record id="action_generate_serial_number" model="ir.actions.server">

@@ -266,7 +266,6 @@
         <field name="model_id" ref="model_of_followup_project"/>
         <field name="state">code</field>
         <field name="code">action = records.last_step_for_all()</field>
-        <field name="groups">of_access_control.of_group_sale_responsible</field>
     </record>
 
     <record id="action_of_followup_last_step_for_all_values" model="ir.values">

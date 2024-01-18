@@ -726,8 +726,7 @@ class InventoryLine(models.Model):
         self.theoretical_qty = theoretical_qty
 
     @api.onchange(
-        'location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id',
-        'inventory_id.date')
+        'location_id', 'product_id', 'package_id', 'product_uom_id', 'company_id', 'prod_lot_id', 'partner_id')
     def _onchange_product_info(self):
         if self[0].inventory_id.of_performance_mode:
             return

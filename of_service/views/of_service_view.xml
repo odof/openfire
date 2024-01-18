@@ -814,7 +814,6 @@
         <field name="model_id" ref="model_of_service"/>
         <field name="state">code</field>
         <field name="code">action = records.create_invoice()</field>
-        <field name="groups">account.group_account_invoice</field>
     </record>
 
     <record id="action_create_invoice_service" model="ir.values">
@@ -822,7 +821,6 @@
         <field name="key2">client_action_multi</field>
         <field name="model">of.service</field>
         <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_service"/>
-        <field name="groups">account.group_account_invoice</field>
     </record>
 
 </odoo>

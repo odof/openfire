@@ -275,7 +275,7 @@ class SaleOrderLine(models.Model):
                     self.price_unit = (self.product_id and self.product_id.of_seller_price or 0) * self.of_coef * \
                                       factor * purchase_factor
 
-    @api.onchange('of_coef', 'product_id.of_seller_price', 'purchase_price')
+    @api.onchange('of_coef', 'purchase_price')
     def onchange_of_coef(self):
         """ Permet de recalculer le prix si le coefficient est utilisé 
         et que le coefficient, le prix d'achat ou le coût est modifié

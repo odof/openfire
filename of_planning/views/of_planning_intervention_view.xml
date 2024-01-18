@@ -1232,7 +1232,6 @@ if new_procs._context.get('errors'):
         <field name="model_id" ref="model_of_planning_intervention"/>
         <field name="state">code</field>
         <field name="code">action = records.create_invoice()</field>
-        <field name="groups">account.group_account_invoice</field>
     </record>
 
     <record id="action_create_invoice_intervention" model="ir.values">
@@ -1240,7 +1239,6 @@ if new_procs._context.get('errors'):
         <field name="key2">client_action_multi</field>
         <field name="model">of.planning.intervention</field>
         <field name="value" eval="'ir.actions.server,%d'%action_of_create_invoice_intervention"/>
-        <field name="groups">account.group_account_invoice</field>
     </record>
 
 
