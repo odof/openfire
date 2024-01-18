@@ -67,10 +67,10 @@ class ProductCategory(models.Model):
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    modele = fields.Char(string='Modèle')
+    modele = fields.Char(string=u"Modèle")
     marge = fields.Float(
         string='Marge', digits=(4, 2), compute="_compute_marge",
-        help="Marge calculée sur base du prix de vente")
+        help=u"Marge calculée sur base du prix de vente")
     description_fabricant = fields.Text('Description du fabricant', translate=True)
     date_tarif = fields.Date(string="Date du tarif")
 
@@ -328,13 +328,13 @@ class ProductSupplierInfo(models.Model):
 
     # Champ inutile? Voir avec Aymeric
     # Probablement ajouté par erreur à la place de la fonctionnalité d'import avec ancienne-nouvelle références
-    old_code = fields.Char(string="Ancienne Référence")
+    old_code = fields.Char(string=u"Ancienne Référence")
     pp_ht = fields.Float(
         string='Prix public HT', default=1.0, digits=dp.get_precision('Product Price'),
-        required=True, help="Prix Public HT conseillé par le fabricant")
+        required=True, help=u"Prix Public HT conseillé par le fabricant")
     pp_currency_id = fields.Many2one(related='currency_id')
     remise = fields.Float(string='Remise', digits=(4, 2), compute="_compute_remise")
-    of_product_category_name = fields.Char("Catégorie fournisseur")
+    of_product_category_name = fields.Char(u"Catégorie fournisseur")
 
     # Retrait de la société par défaut
     company_id = fields.Many2one(default=False)

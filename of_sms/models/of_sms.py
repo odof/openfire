@@ -53,7 +53,7 @@ class OFSmsTemplate(models.Model):
         string=u'Placeholder Expression',
         help=u"Final placeholder expression, to be copy-pasted in the desired template field.")
     from_mobile_verified_id = fields.Many2one('of.sms.number', string=u"From Mobile (stored)")
-    from_mobile = fields.Char(string="Émetteur", help=u"Placeholders are allowed here")
+    from_mobile = fields.Char(string=u"Émetteur", help=u"Placeholders are allowed here")
     # Champs media (PJ d'un SMS) laissés pour compatibilité code d'origine
     media_id = fields.Binary(string=u"Media (MMS)")
     media_filename = fields.Char(string=u"Media filename")
@@ -434,14 +434,14 @@ class OFSmsAccount(models.Model):
     _name = "of.sms.account"
     _order = "sequence"
 
-    name = fields.Char(string='Libellé compte', required=True)
+    name = fields.Char(string=u"Libellé compte", required=True)
     account_gateway_id = fields.Many2one('of.sms.gateway', string=u"Passerelle", required=True)
     gateway_model = fields.Char(string=u"Gateway Model", related="account_gateway_id.gateway_model_name")
     can_receive_sms = fields.Boolean(related="account_gateway_id.can_receive_sms")
-    account_name = fields.Char(string="Nom du compte", help=u"Pour OVH, commence par sms-...")
-    account_login = fields.Char(string="Identifiant")
+    account_name = fields.Char(string=u"Nom du compte", help=u"Pour OVH, commence par sms-...")
+    account_login = fields.Char(string=u"Identifiant")
     account_password = fields.Char(
-        string="Mot de passe", default='', invisible=True, copy=False,
+        string=u"Mot de passe", default='', invisible=True, copy=False,
         help=u"Laisser vide si vous ne voulez pas que l'utilisateur puisse se connecter à la passerelle.")
     sequence = fields.Integer(string=u'Séquence', default=10)
     number_ids = fields.One2many("of.sms.number", "account_id", string=u"Comptes émetteurs")

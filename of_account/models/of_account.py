@@ -110,7 +110,7 @@ AccountInvoice.get_taxes_values = get_taxes_values
 class AccountAccount(models.Model):
     _inherit = 'account.account'
 
-    of_account_counterpart_id = fields.Many2one('account.account', string="Compte de contrepartie")
+    of_account_counterpart_id = fields.Many2one('account.account', string=u"Compte de contrepartie")
     of_editable = fields.Boolean(
         string=u"Éditable", default=True,
         help=u"Un compte non éditable ne pourra être modifié que par l'admin."
@@ -279,7 +279,7 @@ class AccountInvoiceLine(models.Model):
         readonly=True, store=True, index=True
     )
     date_invoice = fields.Date(
-        related='invoice_id.date_invoice', string="Date de facturation",
+        related='invoice_id.date_invoice', string=u"Date de facturation",
         store=True, index=True
     )
     of_gb_partner_tag_id = fields.Many2one(
@@ -389,7 +389,7 @@ class AccountMoveLine(models.Model):
         return self.env['account.journal'].fields_get(['type'], ['selection'])['type']['selection']
 
     of_journal_type = fields.Selection(
-        selection=lambda s: s.get_journal_types(), related='move_id.journal_id.type', string="Type de journal",
+        selection=lambda s: s.get_journal_types(), related='move_id.journal_id.type', string=u"Type de journal",
         readonly=True)
 
     @api.model

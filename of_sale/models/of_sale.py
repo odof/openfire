@@ -920,7 +920,7 @@ class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'of.readgroup']
 
-    price_unit = fields.Float(digits=False, help="""
+    price_unit = fields.Float(digits=False, help=u"""
     Prix unitaire de l'article.
     À entrer HT ou TTC suivant la TVA de la ligne de commande.
     """)
@@ -935,7 +935,7 @@ class SaleOrderLine(models.Model):
         related='order_id.confirmation_date', string="Date de confirmation de commande", store=True, index=True)
     of_gb_partner_tag_id = fields.Many2one(
         'res.partner.category', compute=lambda *a, **k: {}, search='_search_of_gb_partner_tag_id',
-        string="Étiquette client", of_custom_groupby=True
+        string=u"Étiquette client", of_custom_groupby=True
     )
     of_price_unit_display = fields.Float(related='price_unit', string=u"Prix unitaire", readonly=True)
     of_product_forbidden_discount = fields.Boolean(string=u"Remise interdite pour cet article")

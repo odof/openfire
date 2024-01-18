@@ -17,18 +17,18 @@ class AccountPaymentTermLine(models.Model):
             ('last_day_following_month', "Last day of following month"),
             ('last_day_current_month', "Last day of current month"),
         ],
-        default='day_after_invoice_date', required=True, string="Mode de calcul")
+        default='day_after_invoice_date', required=True, string=u"Mode de calcul")
     name = fields.Char(string=u"Libellé", required=True, default=u"Échéance")
     of_option_date = fields.Selection(
-        '_get_of_option_date', string="Date de référence", required=True, default='invoice')
+        '_get_of_option_date', string=u"Date de référence", required=True, default='invoice')
     of_amount_round = fields.Float(
-        string="Arrondi du montant",
+        string=u"Arrondi du montant",
         digits=dp.get_precision('Account'),
         help=u"Arrondit le montant à un multiple de cette valeur")
-    of_months = fields.Integer(string="Nombre de mois")
-    of_weeks = fields.Integer(string="Nombre de semaines")
+    of_months = fields.Integer(string=u"Nombre de mois")
+    of_weeks = fields.Integer(string=u"Nombre de semaines")
     of_payment_days = fields.Char(
-        string="Jours du mois",
+        string=u"Jours du mois",
         help=u"Liste des jours du mois valides pour les paiements, séparés par des virgules (,), 'espaces blancs ( ) "
              u"ou tirets pour des périodes (-).")
 

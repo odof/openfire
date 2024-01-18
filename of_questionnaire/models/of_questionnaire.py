@@ -29,7 +29,7 @@ class OfQuestionnaireLine(models.Model):
          ('text', "Texte libre"),
          ('one', u"Plusieurs choix, une seule réponse possible"),
          ('list', u"plusieurs choix, plusieurs réponses possibles")],
-        string="Type de réponse", default='bool', required=True)
+        string=u"Type de réponse", default='bool', required=True)
     answer = fields.Text(string=u"Réponses possibles", compute='_compute_answer')
     category_id = fields.Many2one('of.questionnaire.line.category', string=u"Catégorie")
     answer_ids = fields.Many2many(
@@ -78,7 +78,7 @@ class OfQuestionnaireLineReponse(models.Model):
     _name = "of.questionnaire.line.reponse"
     _order = "sequence"
 
-    name = fields.Char(string="Réponse", required=True)
+    name = fields.Char(string=u"Réponse", required=True)
     sequence = fields.Integer(string=u"Séquence")
     active = fields.Boolean(string="Active", default=True)
     planning_question_ids = fields.Many2many(

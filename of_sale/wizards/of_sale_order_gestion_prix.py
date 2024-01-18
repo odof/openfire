@@ -405,7 +405,7 @@ class GestionPrixLine(models.TransientModel):
         column1='line_id', column2='tax_id')
     is_discount = fields.Boolean(string="Est une ligne de remise")
     # champ pour conserver le prix unitaire calculé, pour la création de ligne de commande
-    prix_unit_create = fields.Monetary(string='Prix prix unitaire pour la création de ligne de commande')
+    prix_unit_create = fields.Monetary(string=u"Prix prix unitaire pour la création de ligne de commande")
     product_forbidden_discount = fields.Boolean(
         related='order_line_id.of_product_forbidden_discount', string=u"Remise interdite pour cet article",
         readonly=True)

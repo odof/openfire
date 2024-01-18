@@ -324,35 +324,35 @@ class AccountConfigSettings(models.TransientModel):
         help=u"Afficher la civilité dans les rapport PDF ?")
     pdf_adresse_telephone = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (1, u"Afficher dans l'encart d'adresse principal"),
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Téléphone",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_mobile = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (1, u"Afficher dans l'encart d'adresse principal"),
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string=u"(OF) Mobile",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_fax = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (1, u"Afficher dans l'encart d'adresse principal"),
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) Fax",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_adresse_email = fields.Selection(
         [
-            (1, "Afficher dans l'encart d'adresse principal"),
-            (2, "Afficher dans une pastille d'informations complémentaires"),
-            (3, "Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
+            (1, u"Afficher dans l'encart d'adresse principal"),
+            (2, u"Afficher dans une pastille d'informations complémentaires"),
+            (3, u"Afficher dans l'encart d'adresse principal et dans une pastille d'informations complémentaires")
         ], string="(OF) E-mail",
         help=u"Où afficher le numéro de téléphone dans les rapport PDF ? Ne rien mettre pour ne pas afficher.")
     pdf_display_product_ref = fields.Boolean(
-        string="(OF) Réf. produits", required=True, default=False,
-        help="Afficher les références produits dans les rapports PDF ?")
+        string=u"(OF) Réf. produits", required=True, default=False,
+        help=u"Afficher les références produits dans les rapports PDF ?")
 
     pdf_mention_legale = fields.Text(
         string=u"(OF) Mentions légales", help=u"Sera affiché dans les factures sous les commentaires du bas"
@@ -421,14 +421,14 @@ class OFInvoiceReportTotalGroup(models.Model):
     _description = "Impression des totaux de factures de vente"
     _order = 'position, sequence'
 
-    name = fields.Char(string='Nom')
-    subtotal_name = fields.Char(string="Libellé du sous-total")
+    name = fields.Char(string=u"Nom")
+    subtotal_name = fields.Char(string=u"Libellé du sous-total")
     sequence = fields.Integer(string=u"Séquence", default=10)
-    product_ids = fields.Many2many('product.product', string="Filtre sur articles")
+    product_ids = fields.Many2many('product.product', string=u"Filtre sur articles")
     categ_ids = fields.Many2many('product.category', string=u"Filtre sur catégories")
-    invoice = fields.Boolean(string='Concerne les factures', default=True)
+    invoice = fields.Boolean(string=u"Concerne les factures", default=True)
     order = fields.Boolean(
-        string='Concerne les commandes clients',
+        string=u"Concerne les commandes clients",
         readonly=False)
     position = fields.Selection(
         [('0-ht', "Hors taxe"), ('1-ttc', "TTC")],

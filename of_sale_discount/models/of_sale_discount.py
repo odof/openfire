@@ -5,6 +5,7 @@ import odoo.addons.decimal_precision as dp
 
 from odoo.exceptions import UserError
 
+
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
@@ -29,7 +30,8 @@ class SaleOrderLine(models.Model):
             line.discount = 100.0 - price_percent
 
     discount = fields.Float(string='Discount (%)', compute='_get_discount', digits=dp.get_precision('Discount'), store=True)
-    of_discount_formula = fields.Char("Remise (%)", help="Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
+    of_discount_formula = fields.Char(
+        string=u"Remise (%)", help=u"Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
 
     @api.onchange('product_id', 'price_unit', 'product_uom', 'product_uom_qty', 'tax_id')
     def _onchange_discount(self):
@@ -76,6 +78,7 @@ class SaleOrderLine(models.Model):
             vals['of_discount_formula'] = "%s" % vals['discount']
         return super(SaleOrderLine, self).write(vals)
 
+
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
@@ -100,7 +103,8 @@ class AccountInvoiceLine(models.Model):
             line.discount = 100.0 - price_percent
 
     discount = fields.Float(string='Discount (%)', compute='_get_discount', digits=dp.get_precision('Discount'), store=True)
-    of_discount_formula = fields.Char("Remise (%)", help="Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
+    of_discount_formula = fields.Char(
+        string=u"Remise (%)", help=u"Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
 
     @api.model
     def create(self, vals):
@@ -113,6 +117,7 @@ class AccountInvoiceLine(models.Model):
         if not vals.get('of_discount_formula') and vals.get('discount'):
             vals['of_discount_formula'] = "%s" % vals['discount']
         return super(AccountInvoiceLine, self).write(vals)
+
 
 class PricelistItem(models.Model):
     _inherit = "product.pricelist.item"
@@ -129,7 +134,8 @@ class PricelistItem(models.Model):
                    "WHERE of_percent_price_formula IS NULL AND percent_price != 0")
 
     percent_price = fields.Float('Percentage Price', compute='_compute_percent_price')
-    of_percent_price_formula = fields.Char("Pourcentage (remise)", help="Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
+    of_percent_price_formula = fields.Char(
+        string=u"Pourcentage (remise)", help=u"Remise ou somme de remises.\nEg. \"40 + 10.5\" équivaut à \"46.3\"")
 
     @api.depends('of_percent_price_formula')
     def _compute_percent_price(self):

@@ -63,7 +63,7 @@ class OFPlanningTournee(models.Model):
         track_visibility='onchange', copy=False,
         help=" * 'Draft' : With remaining available slots, unconfirmed.\n"
              " * 'Full' : No slots available.\n"
-             " * 'Confirmed' : Click on “Confirm” (may or may not have slots available)")
+             " * 'Confirmed' : Click on \"Confirm\" (may or may not have slots available)")
     employee_id = fields.Many2one(
         comodel_name='hr.employee', string=u"Intervenant", required=True, ondelete='cascade')
     start_address_id = fields.Many2one(comodel_name='res.partner', string="Start address")

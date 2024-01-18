@@ -82,7 +82,7 @@ class OFGeoWizardMono(models.TransientModel):
     addr_search = fields.Char(string=u"Adresse à géocoder")
     geocodeur = fields.Selection(_get_geocodeurs, string=u"Géocodeur", default=lambda x: x._get_geocodeurs()[0])
 
-    aucun_res = fields.Boolean(string="Aucun résultat")
+    aucun_res = fields.Boolean(string=u"Aucun résultat")
     write_addr = fields.Boolean(string=u"Mettre à jour l'adresse du partenaire")
 
     line_ids = fields.One2many('of.geo.wizard.mono.line', 'wizard_id', string=u"Résultats")

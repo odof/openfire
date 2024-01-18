@@ -112,7 +112,6 @@ AccountChartTemplate._load_template = _load_template
 AccountChartTemplate.generate_fiscal_position = generate_fiscal_position
 
 
-
 class AccountTax(models.Model):
     _inherit = 'account.tax'
 
@@ -186,7 +185,7 @@ class OfAccountTaxAccountTemplate(models.Model):
     _rec_name = 'template_tax_id'
 
     template_tax_id = fields.Many2one(
-        'account.tax.template', string='Modèle de taxe', required=True, ondelete='cascade')
+        'account.tax.template', string=u"Modèle de taxe", required=True, ondelete='cascade')
     account_src_id = fields.Many2one(
         'account.account.template', string="Compte de l'article", domain=[('deprecated', '=', False)], required=True)
     account_dest_id = fields.Many2one(

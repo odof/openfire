@@ -33,7 +33,7 @@ class OFCRMProjetLine(models.Model):
     # val_select_ids = fields.Many2many(
     #     'of.crm.projet.attr.select', 'crm_projet_multiple_rel', 'line_id', 'val_id', string="Valeurs")
     sequence = fields.Integer(string=u'Séquence', default=10)
-    type_var_name = fields.Char(string="nom de la variable de réponse", compute="_compute_type_var_name")
+    type_var_name = fields.Char(string=u"Nom de la variable de réponse", compute="_compute_type_var_name")
 
     is_answered = fields.Boolean(string=u"A eu une réponse")
     is_corrected = fields.Boolean(string=u"A été corrigé", compute='_compute_is_corrected', store=True)

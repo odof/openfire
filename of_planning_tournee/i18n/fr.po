@@ -19,10 +19,10 @@ msgstr ""
 #: model:ir.model.fields,help:of_planning_tournee.field_of_planning_tournee_state
 msgid " * 'Draft' : With remaining available slots, unconfirmed.\n"
 " * 'Full' : No slots available.\n"
-" * 'Confirmed' : Click on “Confirm” (may or may not have slots available)"
+" * 'Confirmed' : Click on \"Confirm\" (may or may not have slots available)"
 msgstr " * 'Brouillon' : Avec créneaux dispo restants, non confirmée.\n"
 " * 'Complet' : Sans créneaux disponibles.\n"
-" * 'Confirmé' : Clic sur “Confirmer” (peut avoir ou non des créneaux disponibles)"
+" * 'Confirmé' : Clic sur \"Confirmer\" (peut avoir ou non des créneaux disponibles)"
 
 #. module: of_planning_tournee
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tournee_count_interventions

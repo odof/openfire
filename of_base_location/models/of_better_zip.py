@@ -6,8 +6,8 @@ from odoo import models, fields, api
 class BetterZip(models.Model):
     _inherit = 'res.better.zip'
 
-    geo_lat = fields.Float(string='Latitude', digits=(16, 5))
-    geo_lng = fields.Float(string='Longitude', digits=(16, 5))
+    geo_lat = fields.Float(string=u"Latitude", digits=(16, 5))
+    geo_lng = fields.Float(string=u"Longitude", digits=(16, 5))
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
@@ -44,8 +44,8 @@ class BetterZip(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    of_secteur_com_id = fields.Many2one('of.secteur', string="Secteur commercial", oldname="secteur_com_id")
-    of_secteur_tech_id = fields.Many2one('of.secteur', string="Secteur technique")
+    of_secteur_com_id = fields.Many2one('of.secteur', string=u"Secteur commercial", oldname="secteur_com_id")
+    of_secteur_tech_id = fields.Many2one('of.secteur', string=u"Secteur technique")
 
     @api.onchange('of_secteur_com_id')
     def _onchange_of_secteur_com_id(self):
@@ -57,14 +57,14 @@ class ResPartner(models.Model):
 class OfSecteur(models.Model):
     _name = "of.secteur"
 
-    name = fields.Char(string="Libellé", required=True)
-    code = fields.Char(string="Code")
+    name = fields.Char(string=u"Libellé", required=True)
+    code = fields.Char(string=u"Code")
     type = fields.Selection(
-        [('tech', 'Technique'),
-         ('com', 'Commercial'),
-         ('tech_com', 'Technique et commercial')], string="type de secteur", required=True, default='tech_com')
+        [('tech', "Technique"),
+         ('com', "Commercial"),
+         ('tech_com', "Technique et commercial")], string=u"Type de secteur", required=True, default='tech_com')
     zip_range_ids = fields.One2many('of.secteur.zip.range', 'secteur_id', string=u'Codes postaux')
-    active = fields.Boolean(string='Actif', default=True)
+    active = fields.Boolean(string=u"Actif", default=True)
     partner_count = fields.Integer(string=u"Nombre de partenaires", compute='_compute_partner_count')
 
     _sql_constraints = [
@@ -171,7 +171,7 @@ class OfSecteurZipRange(models.Model):
     name = fields.Char(string=u"Nom affiché", compute="_compute_name", store=True)
     cp_min = fields.Char(u'Code postal début', required=True)
     cp_max = fields.Char(u'Code postal fin', required=True)
-    secteur_id = fields.Many2one('of.secteur', string='Secteur', required=True, ondelete='cascade')
+    secteur_id = fields.Many2one('of.secteur', string=u"Secteur", required=True, ondelete='cascade')
 
     @api.depends('cp_min', 'cp_max')
     @api.multi

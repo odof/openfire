@@ -6,22 +6,22 @@ from odoo import api, fields, models
 class UtmCampaign(models.Model):
     _inherit = 'utm.campaign'
 
-    active = fields.Boolean(string="Actif", default=True)
+    active = fields.Boolean(string=u"Actif", default=True)
 
 
 class UtmMedium(models.Model):
     _inherit = 'utm.medium'
 
-    source_ids = fields.One2many('utm.source', 'medium_id', string="Origines disponibles")
+    source_ids = fields.One2many('utm.source', 'medium_id', string=u"Origines disponibles")
 
 
 class UtmSource(models.Model):
     _inherit = 'utm.source'
     _order = 'sequence'
 
-    active = fields.Boolean(string="Actif", default=True)
-    sequence = fields.Integer(string='Sequence', default=10)
-    medium_id = fields.Many2one('utm.medium', string='Canal associé')
+    active = fields.Boolean(string=u"Actif", default=True)
+    sequence = fields.Integer(string=u"Séquence", default=10)
+    medium_id = fields.Many2one('utm.medium', string=u"Canal associé")
 
 
 class UtmMixin(models.AbstractModel):

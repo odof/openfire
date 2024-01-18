@@ -31,7 +31,7 @@ class SaleQuoteTemplate(models.Model):
     of_note2 = fields.Html('Commentaire du bas')
     property_of_fiscal_position_id = fields.Many2one(
         'account.fiscal.position', string="Position fiscale", company_dependent=True)
-    of_payment_term_id = fields.Many2one('account.payment.term', string="Conditions de règlement")
+    of_payment_term_id = fields.Many2one('account.payment.term', string=u"Conditions de règlement")
     of_sale_quote_tmpl_activity_ids = fields.One2many(
         comodel_name='of.sale.quote.tmpl.activity', inverse_name='template_id', string='Activities')
     of_company_ids = fields.Many2many(comodel_name='res.company', relation='res_company_sale_quote_template_rel',
@@ -230,8 +230,8 @@ class OfSaleQuoteTemplateLayoutCategory(models.Model):
     _order = 'sequence'
 
     sequence = fields.Integer(required=True, default=10)
-    sequence_name = fields.Char(string="Séquence", compute='_compute_sequence_name')
-    name = fields.Char(string="Libellé", required=True)
+    sequence_name = fields.Char(string=u"Séquence", compute='_compute_sequence_name')
+    name = fields.Char(string=u"Libellé", required=True)
     depth = fields.Integer(string=u"Profondeur", compute='_compute_depth')
     quote_id = fields.Many2one('sale.quote.template', u'Modèle de devis', ondelete='cascade', index=True)
     parent_id = fields.Many2one('of.sale.quote.template.layout.category', string=u"Parent")
@@ -465,7 +465,6 @@ class OfSaleOrderLayoutCategory(models.Model):
     _description = u"Ligne de sections"
     _order = 'sequence'
 
-
     @api.multi
     def prepare_sqt_section_vals(self, quote_id):
         self.ensure_one()
@@ -488,7 +487,6 @@ class OfSaleOrderLayoutCategory(models.Model):
             'quote_line_ids': lines_to_create
         })
         return section_line_new._convert_to_write(section_line_new._cache)
-
 
     @api.model
     def _get_domain_parent_id(self):

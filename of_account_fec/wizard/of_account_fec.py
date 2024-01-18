@@ -41,12 +41,12 @@ class OFAccountFrFec(models.TransientModel):
              " - Non-official : Non-official FEC report (posted and unposted entries)")
     of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
     of_ouv_code = fields.Char("Code du journal d'ouverture", required=True, default='OUV')
-    of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
+    of_ouv_name = fields.Char(string=u"Libellé du journal d'ouverture", required=True, default="Balance initiale")
     of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)
     of_encoding = fields.Selection(
         selection=available_encodings, string=u"Encodage du fichier", default=available_encodings[0][0], required=True)
 
-    where_clause_create_date = fields.Boolean("Utiliser la date de création", required=True, default=False)
+    where_clause_create_date = fields.Boolean(string=u"Utiliser la date de création", required=True, default=False)
 
     def _do_query_unaffected_earnings(self):
         """ Compute the sum of ending balances for all accounts that are of a type that does not bring forward the balance in new fiscal years.

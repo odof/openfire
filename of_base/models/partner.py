@@ -544,7 +544,7 @@ class ResPartnerTitle(models.Model):
     _order = "sequence"
 
     sequence = fields.Integer(string="Sequence", default=1, help="Used to order titles. Lower is better.")
-    of_used_for_phone = fields.Boolean(string="Utilisée pour les numéros de téléphone", default=True)
+    of_used_for_phone = fields.Boolean(string=u"Utilisée pour les numéros de téléphone", default=True)
 
 
 class OFResPartnerPhone(models.Model):
@@ -554,14 +554,14 @@ class OFResPartnerPhone(models.Model):
     _rec_name = 'number'
 
     partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire", index=True, ondelete='cascade')
-    number = fields.Char(string="Numéro")
+    number = fields.Char(string=u"Numéro")
     number_display = fields.Char(
-        string="Numéro au format national", compute="_compute_number_display", inverse="_inverse_number_display",
+        string=u"Numéro au format national", compute="_compute_number_display", inverse="_inverse_number_display",
         track_visibility='onchange')
-    type = fields.Selection(selection=PHONE_TYPES, string="Type de numéro", required=True)
+    type = fields.Selection(selection=PHONE_TYPES, string=u"Type de numéro", required=True)
     title_id = fields.Many2one(
-        comodel_name="res.partner.title", string="Civilité du numéro", domain="[('of_used_for_phone', '=', True)]")
-    is_valid = fields.Boolean(string="Est valide", compute='_compute_is_valid', store=True)
+        comodel_name="res.partner.title", string=u"Civilité du numéro", domain="[('of_used_for_phone', '=', True)]")
+    is_valid = fields.Boolean(string=u"Est valide", compute='_compute_is_valid', store=True)
 
     @api.depends('number')
     def _compute_number_display(self):

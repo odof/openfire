@@ -984,7 +984,7 @@ class StockMove(models.Model):
     of_categ_id = fields.Many2one(
         comodel_name='product.category', compute='_compute_of_categ_id',
         string=u"Catégorie interne", store=True, compute_sudo=True)
-    of_default_code = fields.Char(related='product_id.default_code', string="Référence interne", readonly=True)
+    of_default_code = fields.Char(related='product_id.default_code', string=u"Référence interne", readonly=True)
 
     def _inverse_of_price_unit(self):
         for move in self:

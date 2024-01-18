@@ -47,7 +47,7 @@ class ResCompany(models.Model):
             ('logo_right', u"Logo société et adresse configurable à droite"),
             ('bandeau_pastille', u"Bandeau image + pastille"),
             ('bandeau_totalite', u"Bandeau image totalité page "),
-            ], string="Type d'en-tête société", default="logo_right",
+            ], string=u"Type d'en-tête société", default="logo_right",
         help=u"Position des lignes d'en-tête relativement au logo de société\n"
              u"Sous le logo : les lignes d'en-tête seront placées sous le logo de société.\n"
              u"À droite du logo : les lignes d'en-tête seront placées à droite du logo.")

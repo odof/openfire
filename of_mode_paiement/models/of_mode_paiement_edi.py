@@ -87,9 +87,9 @@ class OfPaiementEdi(models.Model):
     date_valeur = fields.Date(u'Date de valeur du paiement (LCR)', required=False, default=fields.Datetime.now)
     date_echeance = fields.Date(u"Date d'échéance du paiement", required=True, default=fields.Datetime.now)
     motif = fields.Selection(
-        [('nofacture', 'No de facture')], string='Motif opération (SEPA)', required=False,
+        selection=[('nofacture', 'No de facture')], string=u"Motif opération (SEPA)", required=False,
         help=u"Texte qui apparaît sur le relevé bancaire du débiteur", default='nofacture')
-    date_creation = fields.Text('Date de création', default=fields.Datetime.now)
+    date_creation = fields.Text(string=u"Date de création", default=fields.Datetime.now)
     mode_paiement_id = fields.Many2one('of.account.payment.mode', u'Mode de paiement', required=True)
     mode_paiement = fields.Char(u"Libellé mode de paiement")
     journal_id = fields.Many2one(related='mode_paiement_id.journal_id', string='Journal', store=False)

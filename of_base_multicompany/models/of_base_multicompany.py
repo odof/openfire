@@ -17,10 +17,10 @@ class Company(models.Model):
              u"Pour une société disposant d'un plan comptable, ce champ référence la société elle-même.")
     of_is_shop = fields.Boolean(
         string="Est un magasin", default=True,
-        help="Laisser coché pour pouvoir utiliser cette société dans les bons de commande")
+        help=u"Laisser coché pour pouvoir utiliser cette société dans les bons de commande")
     of_default_shop_id = fields.Many2one(
-        'res.company', string="Magasin par défaut", domain="[('of_is_shop','=',True)]",
-        help="Si ce champ est renseigné, le magasin sera choisi par défaut en place de la société courante.")
+        'res.company', string=u"Magasin par défaut", domain="[('of_is_shop','=',True)]",
+        help=u"Si ce champ est renseigné, le magasin sera choisi par défaut en place de la société courante.")
 
     @api.multi
     @api.depends('chart_template_id', 'parent_id', 'parent_id.accounting_company_id')

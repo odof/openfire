@@ -398,19 +398,19 @@ class OfAnalyseChantier(models.Model):
     service_line_ids = fields.One2many('of.analyse.chantier.service', 'chantier_id', string="Services")
     remise_ids = fields.One2many('of.analyse.chantier.remise', 'chantier_id', string="Remises", context={'active_test':False})
 
-    cout_chantier = fields.Float(string="Coût du chantier", compute="_compute_marge", store=True)
+    cout_chantier = fields.Float(string=u"Coût du chantier", compute="_compute_marge", store=True)
     vente_chantier = fields.Float(string="Vente du chantier", compute="_compute_marge", store=True)
 
-    cout_produit_total = fields.Float(string="Coût total produits", compute="_compute_produit", store=True)
-    cout_produit = fields.Float(string="Coût des produits", compute="_compute_produit", store=True)
-    cout_produit_additionnels = fields.Float(string="Coût des produits additionnels", compute="_compute_produit", store=True)
+    cout_produit_total = fields.Float(string=u"Coût total produits", compute="_compute_produit", store=True)
+    cout_produit = fields.Float(string=u"Coût des produits", compute="_compute_produit", store=True)
+    cout_produit_additionnels = fields.Float(string=u"Coût des produits additionnels", compute="_compute_produit", store=True)
     vente_produit_total = fields.Float(string="Vente total produits", compute="_compute_produit", store=True)
     vente_produit = fields.Float(string="Vente des produits", compute="_compute_produit", store=True)
     vente_produit_additionnels = fields.Float(string="Vente des produits additionnels", compute="_compute_produit", store=True)
 
-    cout_service_total = fields.Float(string="Coût total services", compute="_compute_service", store=True)
-    cout_service = fields.Float(string="Coût des services", compute="_compute_service", store=True)
-    cout_service_additionnels = fields.Float(string="Coût des services additionnels", compute="_compute_service", store=True)
+    cout_service_total = fields.Float(string=u"Coût total services", compute="_compute_service", store=True)
+    cout_service = fields.Float(string=u"Coût des services", compute="_compute_service", store=True)
+    cout_service_additionnels = fields.Float(string=u"Coût des services additionnels", compute="_compute_service", store=True)
     vente_service_total = fields.Float(string="Vente total services", compute="_compute_service", store=True)
     vente_service = fields.Float(string="Vente des services", compute="_compute_service", store=True)
     vente_service_additionnels = fields.Float(string="Vente des services additionnels", compute="_compute_service", store=True)
@@ -422,7 +422,7 @@ class OfAnalyseChantier(models.Model):
     marge_nette = fields.Float(string="Marge nette", compute="_compute_marge", store=True)
     marge_nette_pc = fields.Float(string="Marge nette (%)", compute="_compute_marge", store=True)
 
-    view_qty = fields.Boolean(string=u"Voir les quantitées", default=True)
+    view_qty = fields.Boolean(string=u"Voir les quantités", default=True)
 
     intervention_ids = fields.Many2many('of.planning.intervention', string=u"Poses liées", compute="_compute_intervention_ids")
 
@@ -447,7 +447,7 @@ class OfAnalyseChantier(models.Model):
 
 
     def toggle_view_qty(self):
-        """ Permet d'afficher/masquer les quantitées
+        """ Permet d'afficher/masquer les quantités
         """
         self.view_qty = not self.view_qty
         return {

@@ -8,6 +8,6 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     of_description = fields.Html(
-        string="Description société site web",
+        string=u"Description société site web",
         help=u"Ce descriptif concerne les sociétés autres que la société principale et sera ajouté "
              u"à la suite des informations de la société principale sur le footer du site web.")
