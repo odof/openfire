@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_cost_recompute_wizard_view_form" model="ir.ui.view">
+        <field name="name">Recalcul des coûts</field>
+        <field name="model">of.cost.recompute.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Recalcul des coûts">
+                <group name="method" string="Méthode de coût">
+                    <field name="order_ids" widget="many2many_tags" invisible="1"/>
+                    <field name="cost_method" widget="radio"/>
+                    <field name="real_cost"/>
+                    <field name="exclude_zero"/>
+                    <field name="exclude_change_zero"/>
+                </group>
+                <group name="perimeter" string="Périmètre">
+                    <field name="brand_ids" widget="many2many_tags"/>
+                    <field name="product_categ_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button string="Confirmer" name="recompute_cost" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Recalcul de coût"
+        res_model="of.cost.recompute.wizard"
+        src_model="sale.order"
+        view_mode="form"
+        view_id="of_cost_recompute_wizard_view_form"
+        id="of_cost_recompute_wizard_sale_order_action"
+        target="new"
+        key2="client_action_multi"
+    />
+
+</odoo>

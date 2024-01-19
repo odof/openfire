@@ -110,6 +110,7 @@ Droits utilisateurs:
         'wizards/of_sale_order_add_quote_views.xml',
         'wizards/of_sale_order_verification_views.xml',
         'wizards/sale_set_printing_params_view.xml',
+        'wizards/of_cost_recompute_wizard_views.xml',
     ],
     'installable': True,
     'application': False,

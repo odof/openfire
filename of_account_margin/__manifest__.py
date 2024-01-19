@@ -19,6 +19,7 @@ Ce module apporte la notion de marge sur les factures client
     ],
     'data': [
         'views/account_views.xml',
+        'wizards/of_cost_recompute_wizard_views.xml',
     ],
     'installable': True,
     'application': False,
