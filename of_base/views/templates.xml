@@ -8,4 +8,12 @@
             <link rel="stylesheet" type="text/less" href="/of_base/static/src/less/of_base.less"/>
         </xpath>
    </template>
+
+<data noupdate="1">
+    <template id="layout_noindex" inherit_id="web.layout" name="OF Web Layout noindex" active="False">
+        <xpath expr="//head" position="inside">
+            <meta name="robots" content="noindex, nofollow"/>
+        </xpath>
+    </template>
+</data>
 </odoo>
