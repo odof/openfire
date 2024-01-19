@@ -18,6 +18,11 @@
         <field name="query">UPDATE ir_cron SET active = False</field>
     </record>
 
+    <!-- Indexation du site web -->
+    <record id="sanitize_query_view_web_layout_noindex" model="of.sanitize.query">
+        <field name="query">UPDATE ir_ui_view SET active=true WHERE id IN (SELECT res_id FROM ir_model_data WHERE model = 'ir.ui.view' AND module = 'of_base' AND name = 'layout_noindex')</field>
+    </record>
+
     <!-- Paramètres de configuration -->
     <record id="sanitize_query_web_base_url_freeze" model="of.sanitize.query">
         <field name="query">DELETE FROM ir_config_parameter WHERE key='web.base.url.freeze'</field>
