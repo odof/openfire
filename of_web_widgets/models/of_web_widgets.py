@@ -3,7 +3,7 @@
 from odoo import models, api
 
 
-class OFWebWidgetsUtils(models.Model):
+class OFWebWidgetsUtils(models.AbstractModel):
     _name = "of.web.widgets.utils"
 
     @api.model
