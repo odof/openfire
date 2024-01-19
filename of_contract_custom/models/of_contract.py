@@ -1530,6 +1530,13 @@ class OfContractLine(models.Model):
         """ Génération des demandes d'interventions """
         Service = self.with_context(bloquer_recurrence=True).env['of.service']
         li = [(line, line._get_period()) for line in self]
+        today = fields.Date.today()
+        for line, period in li:
+            # If period is not on current year, add current year
+            if not (period.date_start <= today <= period.date_end):
+                current_year_period = line.contract_id.period_ids.filtered(
+                    lambda p: p.date_start <= today <= p.date_end)
+                li.append((line, current_year_period))
         for line, period in li:
             if not period or line.state != 'validated':
                 continue
