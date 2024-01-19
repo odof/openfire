@@ -1,9 +1,8 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import fields, models
 
-MAP_VIEW = ('map', 'Map')
 
-
-class IrUIView(models.Model):
+class View(models.Model):
     _inherit = 'ir.ui.view'
 
-    type = fields.Selection(selection_add=[MAP_VIEW])
+    type = fields.Selection(selection_add=[('map', "Map")])

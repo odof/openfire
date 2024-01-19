@@ -1,24 +1,26 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': 'OpenFire / Vue carte (cartographie)',
-    'author': 'OpenFire',
-    'version': '10.0',
-    'category': 'OpenFire modules',
-    'summary': 'Map View',
-    'description': """
-        Creates a new type of view : "map".
-        Contains a built-in implementation for res.partner.
-    """,
-    'website': 'openfire.fr',
-    'depends': ['web', 'of_geolocalize', 'contacts', 'of_web_widgets'],
-    'data': [
-        'data/ir_config_parameter_data.xml',
-        'views/of_map_templates.xml',
-        'views/of_partner_views.xml'
+    'name': "OpenFire / Vue carte",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Ajout d'un type de vue carte (OpenStreetMap) dans les contacts",
+    'depends': [
+        'contacts',
+        'web',
+        'of_geolocalize',
     ],
-    'qweb': [
-        'static/src/xml/*.xml',
-    ],
+    'data': ['views/of_partner_views.xml'],
+    'assets': {
+        'web.assets_backend': [
+            '/of_map_view/static/src/**/*',
+        ],
+    },
     'installable': True,
+    'application': False,
     'auto_install': False,
+    'uninstall_hook': '_uninstall_hook',
 }

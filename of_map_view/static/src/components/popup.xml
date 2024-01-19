@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_map_view.ListPopupMap" owl="1">
+        <div class="map--list-popup">
+            <t t-foreach="props.map.partners" t-as="partner" t-key="partner.id">
+                <PopupMap t-props="rendererProps" partner="partner"/>
+            </t>
+        </div>
+    </t>
+
+
+    <t t-name="of_map_view.PopupMap" owl="1">
+        <t t-if="state.show">
+            <div class="map-popup" t-on-mouseenter="onMouseOver" t-on-mouseleave="onMouseOut" t-attf-style="background-color: {{state.color}}">
+
+                <div class="map-popup--header" t-on-click="onClose" >
+                    <i class="fa fa-close"/>
+                </div>
+                <div class="map-popup--content"  t-on-click.stop.prevent="onClick" >
+                    <t t-if="props.partner.name">
+                        <i class="fa fa-user"/> <span t-esc="props.partner.name"/><br/>
+                    </t>
+                    <t t-if="props.partner.zip or props.partner.city">
+                        <i class="fa fa-map-marker"/> <span t-esc="props.partner.zip and props.partner.zip or ''"/> <span t-esc="props.partner.city and props.partner.city or ''"/><br/>
+                    </t>
+                    <t t-if="props.partner.phone">
+                        <i class="fa fa-phone"/> <span t-esc="props.partner.phone"/><br/>
+                    </t>
+                    <t t-if="props.partner.mobile">
+                        <i class="fa fa-phone"/> <span t-esc="props.partner.mobile"/><br/>
+                    </t>
+                </div>
+
+            </div>
+        </t>
+    </t>
+
+</templates>
