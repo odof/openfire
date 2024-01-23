@@ -143,8 +143,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 if product.active:
                     if product.purchase_ok:
                         ds_product_data['purchase_ok'] = False
-                    if product.virtual_available > 0:
-                        del ds_product_data['active']
+                    del ds_product_data['active']
 
             ds_product_data = {
                 field: val
