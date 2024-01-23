@@ -380,6 +380,11 @@ class SaleOrder(models.Model):
             self.payment_term_id = payment_term.id
 
         if self.partner_id:
+            if self.opportunity_id.partner_id != self.partner_id:
+                self.opportunity_id = False
+                self.campaign_id = False
+                self.source_id = False
+                self.medium_id = False
             # Référence client
             ref = self.partner_id.ref
             if not ref and self.partner_id.parent_id:
