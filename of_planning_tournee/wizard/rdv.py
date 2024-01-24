@@ -725,6 +725,13 @@ class OfTourneeRdv(models.TransientModel):
                 })
             elif self.creer_recurrence and (not contract_custom or contract_custom.state != 'installed'):
                 intervention.service_id = service_obj.create(self._get_service_data(date_propos_dt.month))
+                intervention.service_id.onchange_template_id()
+                vals = {'base_state': 'calculated'}
+                if self.tache_id != intervention.service_id.tache_id:
+                    vals['tache_id'] = self.tache_id.id
+                if intervention.service_id.type_id != self.env.ref('of_service.of_service_type_maintenance'):
+                    vals['type_id'] = self.env.ref('of_service.of_service_type_maintenance').id
+                intervention.service_id.write(vals)
 
         return {
             'type': 'ir.actions.act_window',
@@ -1241,9 +1248,10 @@ class OfTourneeRdv(models.TransientModel):
             'date_next': self.date_next,
             'date_fin': self.date_fin_planif,
             'note': self.description or '',
-            'base_state': 'calculated',
+            'base_state': 'draft',
             'duree': self.duree,
             'recurrence': True,
+            'template_id': self.template_id.id,
         }
 
     @api.multi
