@@ -574,8 +574,8 @@
                         <group name="what" string="What" class="of_grey_background">
                             <group colspan="2">
                                 <field name="service_id"/>
-                                <field name="tache_id"/>
                                 <field name="template_id"/>
+                                <field name="tache_id"/>
                                 <field name="duree" widget="float_time"/>
                             </group>
                         </group>
