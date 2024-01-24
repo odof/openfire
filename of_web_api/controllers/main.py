@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import json
 
 from odoo import http, tools, fields
 from odoo.http import request
@@ -70,6 +71,8 @@ Fonctions de l'API :
                 'message': u"OpenFire API is not authorized to access this model (%s)." % model.model,
             }
         vals = body.get('values')
+        if isinstance(vals, basestring):
+            vals = json.loads(vals)
         authorized_fields = request.env['ir.model.fields'].search(
             [('model_id', '=', model.id), ('of_api_auth', '=', True), ('name', 'not in', MAGIC_AUTH_FIELDS)])
         authorized_fields_name = authorized_fields.mapped('name')
