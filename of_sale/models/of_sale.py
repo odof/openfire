@@ -542,7 +542,7 @@ class SaleOrder(models.Model):
                 new_partners |= self.create_uid.partner_id
             self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
             message_followers = self.mapped('message_follower_ids')
-            message_followers.filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
+            message_followers.sudo().filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
