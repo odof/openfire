@@ -5,6 +5,9 @@
 !.isort.cfg
 !.gitlab-ci.yml
 !.pylintrc
+!.eslintrc.yml
+!.prettierrc.yml
+!.editorconfig
 !.gitignore
 # compiled python and python cache files
 *.py[co]

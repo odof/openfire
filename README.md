@@ -36,6 +36,33 @@ pip3 install -r openfire-requirements.txt
 # Code et qualité
 <br />
 
+## Linters
+
+Les linters sont des outils qui permettent de vérifier la qualité du code et de le formatter automatiquement.
+
+Voici les linters utilisés dans ce projet :
+  - [Flake8](https://flake8.pycqa.org/en/latest/) : vérifie la qualité du code python
+  - [Isort](https://pycqa.github.io/isort/) : vérifie l'ordre des imports
+  - [Black](https://black.readthedocs.io/en/stable/) : formate le code python
+  - [Bandit](https://bandit.readthedocs.io/en/latest/) : vérifie la sécurité du code python
+  - [EsLint](https://eslint.org/) : vérifie la qualité du code javascript
+  - [Prettier](https://prettier.io/) : formate le code javascript
+
+Les linters sont configurés dans les fichiers suivants :
+* [.sort.cfg](.sort.cfg) : configuration d'isort
+* [.flake8](.flake8) : configuration de flake8
+* [.pre-commit-config.yaml](.pre-commit-config.yaml) : configuration de pre-commit
+* [.eslintrc.yml](.eslintrc.yml) : configuration d'eslint
+* [.prettierrc.yml](.prettierrc.yml) : configuration de prettier
+
+
+## Configuration de l'IDE
+
+Un fichier .editorconfig est présent à la racine du projet.
+Il permet de configurer l'IDE pour qu'il respecte les règles de qualité du projet.
+La plus part des IDE supportent ce fichier de configuration de façon native mais il est possible d'installer un plugin pour les IDE qui ne le supportent pas.
+
+
 ## Gitlab-ci
 
 Gitlab lancera le pipeline de contrôle suivant :
@@ -154,3 +181,9 @@ Documentations :
 - [Black](https://black.readthedocs.io/en/stable/)
 
 - [Bandit](https://bandit.readthedocs.io/en/latest/)
+
+- [EsLint](https://eslint.org/)
+
+- [Prettier](https://prettier.io/)
+
+- [EditorConfig](https://editorconfig.org/)
