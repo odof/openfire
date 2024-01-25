@@ -42,20 +42,20 @@ class OFCalculationController(http.Controller):
 
     @http.route('/calcul_deperdition_chaleur', type='http', auth="public", methods=['GET', 'POST'], website=True)
     def heat_loss_calculation_form(self, **kwargs):
-        heat_loss_obj = request.env['of.calculation.heat.loss']
-        altitude_obj = request.env['of.calculation.altitude']
-        department_obj = request.env['of.calculation.department']
-        construction_date_obj = request.env['of.calculation.construction.date']
-        construction_type_obj = request.env['of.calculation.construction.type']
-        surface_obj = request.env['of.calculation.surface']
-        button_pressed = kwargs.pop('button_id', False)
-        coef_obj = request.env['of.calculation.fuel.coef']
-        better_zip_obj = request.env['res.better.zip']
-        display_altitude = request.session.get('display_altitude', False)
         env = request.env
+        heat_loss_obj = env['of.calculation.heat.loss']
+        altitude_obj = env['of.calculation.altitude']
+        department_obj = env['of.calculation.department']
+        construction_date_obj = env['of.calculation.construction.date']
+        construction_type_obj = env['of.calculation.construction.type']
+        surface_obj = env['of.calculation.surface']
+        button_pressed = kwargs.pop('button_id', False)
+        coef_obj = env['of.calculation.fuel.coef']
+        better_zip_obj = env['res.better.zip']
+        display_altitude = request.session.get('display_altitude', False)
 
         if button_pressed:
-            request.env['of.calculation.statistics'].sudo().add_button_click(button_pressed)
+            env['of.calculation.statistics'].sudo().add_button_click(button_pressed)
         if button_pressed == 'reload':
             self._cleanup_session()
         heat_loss_id = request.session.get('heat_loss_id')
@@ -115,7 +115,7 @@ class OFCalculationController(http.Controller):
                     else:
                         fields_dict[key] = kwargs[key]
             values.update(fields_dict)
-        logement_principal = request.env.ref('of_calculation_heat_loss.construction_type_1', raise_if_not_found=False)
+        logement_principal = env.ref('of_calculation_heat_loss.construction_type_1', raise_if_not_found=False)
         if logement_principal and logement_principal in values['construction_types']:
             values['construction_type_id'] = logement_principal
         if heat_loss:
