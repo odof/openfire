@@ -276,7 +276,7 @@ class AccountInvoice(models.Model):
     def _onchange_fiscal_position_id(self):
         if self.fiscal_position_id:
             for line in self.invoice_line_ids:
-                # Début de la fonction _set_taxes() reprise ici pour calculer les taxes a utiliser sans modifier le PU
+                # Début de la fonction _set_taxes() reprise ici pour calculer les taxes à utiliser sans modifier le PU
                 if self.type in ('out_invoice', 'out_refund'):
                     taxes = line.product_id.taxes_id or self.account_id.tax_ids
                 else:
@@ -286,3 +286,4 @@ class AccountInvoice(models.Model):
                 line.invoice_line_tax_ids = self.fiscal_position_id.map_tax(taxes, line.product_id, self.partner_id)
                 # Permet d'avoir le bon compte comptable
                 line.onchange_tax_ids()
+        self._onchange_invoice_line_ids()
