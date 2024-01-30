@@ -62,7 +62,7 @@ Fonctions de l'API :
                 'code': 400,
                 'message': u"Model not found in database",
             }
-        # l'accès à ce modèle est interdit'
+        # l'accès à ce modèle est interdit
         if not model.of_api_auth:
             _logger.warning(
                 u"OF ERROR api creation : OpenFire API is not authorized to access this model (%s)." % model.model)
@@ -72,12 +72,18 @@ Fonctions de l'API :
             }
         vals = body.get('values')
         if isinstance(vals, basestring):
-            vals = json.loads(vals)
+            vals = json.loads(vals.replace('\r\n', '\\n'))
         authorized_fields = request.env['ir.model.fields'].search(
             [('model_id', '=', model.id), ('of_api_auth', '=', True), ('name', 'not in', MAGIC_AUTH_FIELDS)])
         authorized_fields_name = authorized_fields.mapped('name')
         # Restreindre les valeurs de création aux champs autorisés
         vals_clean = {k: vals[k] for k in authorized_fields_name if k in vals}
+        # Gestion de retours à la ligne en fonction du type de champ
+        for key, val in vals_clean.iteritems():
+            if '\n' in val:
+                corresponding_field = authorized_fields.filtered(lambda f: f.name == key)
+                if corresponding_field.ttype == 'html':
+                    vals_clean[key] = val.replace('\n', '<br/>')
         try:
             record = self.create_record(model_name, vals_clean)
         except Exception as e:
