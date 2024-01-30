@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="of_sale_order_form_view_inherit" model="ir.ui.view">
+        <field name="name">of.sale.product.pack.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form" />
+        <field name="arch" type="xml">
+            <field name="of_printing_apply_on_move" position="after">
+                <field name="of_pack_report_type"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

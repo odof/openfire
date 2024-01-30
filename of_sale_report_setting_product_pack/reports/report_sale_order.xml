@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="of_sale_report_setting.report_saleorder_document">
+        <xpath expr="//t[@t-set='pdf_signature_text_label']" position="after">
+            <t t-set="pack_report_type" t-value="doc.of_pack_report_type"/>
+        </xpath>
+    </template>
+
+    <template id="of_sale_report_setting_product_pack_lines" inherit_id="of_sale_report_setting.of_report_saleorder_document">
+        <!-- Price unit is displayed as 0.00 if we are in `pack_components_details` mode -->
+        <xpath expr="//td[@name='td_priceunit_taxexcl']/span[@t-field='line.of_price_unit_taxexcl']" position="replace">
+            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxexcl"/>
+            <span t-else="">0.00</span>
+        </xpath>
+        <xpath expr="//td[@name='td_priceunit_taxinc']/span[@t-field='line.of_price_unit_taxinc']" position="replace">
+            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxinc"/>
+            <span t-else="">0.00</span>
+        </xpath>
+
+        <!-- Subtotal is displayed as 0.00 if we are in `pack_components_details` mode -->
+        <xpath expr="//td[@name='td_subtotal_taxexcl']/span[@t-field='line.price_subtotal']" position="replace">
+            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.price_subtotal"/>
+            <span t-else="">0.00</span>
+        </xpath>
+        <xpath expr="//td[@name='td_subtotal_taxinc']/span[@t-field='line.price_total']" position="replace">
+            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.price_total"/>
+            <span t-else="">0.00</span>
+        </xpath>
+
+        <!-- Positionning after sale order lines <tr/> -->
+        <xpath expr="//td[@name='td_name']/../.." position="after">
+            <t t-if="line.of_pack_ok and pack_report_type in ['pack_components', 'pack_components_details']">
+                <t t-set="packlines_to_report" t-value="line._get_items_lines_data_to_report()"/>
+                <t t-foreach="packlines_to_report" t-as="packline">
+                    <tr name="tr_packlines">
+                        <td name="td_pack_name"><span t-field="packline.name"/></td>
+                        <td name="td_pack_quantity" class="text-end">
+                            <span t-field="packline.product_uom_qty"/>
+                            <span t-field="packline.product_uom"/>
+                        </td>
+                        <td name="td_pack_priceunit_taxexcl" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">
+                            <t t-if="pack_report_type == 'pack_components_details'">
+                                <span t-field="packline.of_pack_item_price_unit_taxexcl"/>
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </td>
+                        <td name="td_pack_priceunit_taxinc" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">
+                            <t t-if="pack_report_type == 'pack_components_details'">
+                                <span t-field="packline.of_pack_item_price_unit_taxinc"/>
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </td>
+                        <td t-if="display_discount" class="text-end">
+                            <span>-</span>
+                        </td>
+                        <td name="td_pack_taxes" class="text-end">
+                            <t t-if="pack_report_type == 'pack_components_details'">
+                                <span t-out="', '.join(map(lambda x: (x.description or x.name), packline.tax_id))"/>
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </td>
+                        <td name="td_pack_subtotal_taxexcl" class="text-end o_price_total" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">
+                            <t t-if="pack_report_type == 'pack_components_details'">
+                                <span t-field="packline.of_pack_item_price_subtotal"/>
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </td>
+                        <td name="td_pack_subtotal_taxinc" class="text-end o_price_total" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">
+                            <t t-if="pack_report_type == 'pack_components_details'">
+                                <span t-field="packline.of_pack_item_price_total"/>
+                            </t>
+                            <t t-else="">
+                                <span>-</span>
+                            </t>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

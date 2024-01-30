@@ -1,0 +1,81 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_product_pack
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-27 16:02+0000\n"
+"PO-Revision-Date: 2024-03-27 16:02+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields.selection,name:of_sale_product_pack.selection__sale_order_line__of_pack_component_price__totalized
+msgid "Calculated"
+msgstr "Calculé"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields.selection,name:of_sale_product_pack.selection__sale_order_line__of_pack_type__detailed
+msgid "Detailed"
+msgstr "Détaillé"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields.selection,name:of_sale_product_pack.selection__sale_order_line__of_pack_component_price__ignored
+msgid "Fixed"
+msgstr "Fixé"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields.selection,name:of_sale_product_pack.selection__sale_order_line__of_pack_type__non_detailed
+msgid "Non Detailed"
+msgstr "Non détaillé"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_component_price
+msgid "Of Pack Component Price"
+msgstr ""
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_ok
+msgid "Pack"
+msgstr "Kit"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_type
+msgid "Pack Display Type"
+msgstr "Affichage du kit"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_line_ids
+msgid "Pack Products"
+msgstr "Kit de produits"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:of_sale_product_pack.field_of_product_pack_lines__parent_product_id
+msgid "Parent Product"
+msgstr "Produit parent"
+
+#. module: of_sale_product_pack
+#: model:ir.model.constraint,message:of_sale_product_pack.constraint_of_product_pack_lines_product_uniq
+msgid "Product must be only once on a pack !"
+msgstr "Le produit doit être présent une seule fois dans un pack !"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,help:of_sale_product_pack.field_sale_order_line__of_pack_line_ids
+msgid "Products that are part of this pack."
+msgstr "Produits faisant partie de ce pack."
+
+#. module: of_sale_product_pack
+#: model:ir.model,name:of_sale_product_pack.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_product_pack
+#: model:ir.model,name:of_sale_product_pack.model_of_product_pack_lines
+msgid "of.product.pack.lines"
+msgstr ""

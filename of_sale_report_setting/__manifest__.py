@@ -14,8 +14,8 @@
     'data': [
         'security/of_sale_report_setting_security.xml',
         'security/ir.model.access.csv',
-        'report/ir_actions_report_templates.xml',
-        'report/report_account_move.xml',
+        'reports/ir_actions_report_templates.xml',
+        'reports/report_account_move.xml',
         'views/of_sale_document_layout.xml',
         'views/res_config_settings_views.xml',
         'views/res_users_views.xml',
