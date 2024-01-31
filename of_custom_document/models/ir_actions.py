@@ -27,7 +27,7 @@ class IrActionsReport(models.Model):
         # Ajout de documents personnalisés à la fin d'un rapport pdf
         if res_ids and (isinstance(res_ids, int) or len(res_ids) == 1):
             record = self.env[report_sudo.model].browse(res_ids)
-            # On prend en priotirté les documents
+            # On prend en priorité les documents
             if report_sudo.of_custom_document_ids:
                 pdf_content = report_sudo.join_custom_documents(pdf_content, record)
             if hasattr(record, 'join_custom_documents') and record.is_allowed_report(report_sudo):

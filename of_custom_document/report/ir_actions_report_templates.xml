@@ -11,7 +11,7 @@
         </t>
         <div class="page">
             <div class="oe_structure"/>
-            <div t-raw="of_custom_document.format_html(doc)"/>
+            <div t-out="of_custom_document.format_html(doc)"/>
         </div>
     </t>
 </template>
