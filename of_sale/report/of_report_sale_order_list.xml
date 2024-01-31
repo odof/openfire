@@ -12,8 +12,8 @@
                                 <th name="th_customer">Customer</th>
                                 <th name="th_city">City</th>
                                 <th name="th_state">State</th>
-                                <th name="th_tax_excl" class="text-right">Taxes excl.</th>
-                                <th name="th_tax_incl" class="text-right">Taxes incl.</th>
+                                <th name="th_tax_excl" class="text-end">Taxes excl.</th>
+                                <th name="th_tax_incl" class="text-end">Taxes incl.</th>
                             </tr>
                         </thead>
                         <tbody class="sale_tbody">
@@ -24,11 +24,11 @@
                                     <td name="td_customer"><span t-field="doc.partner_id"/> </td>
                                     <td name="td_city"><span t-field="doc.partner_id.city"/></td>
                                     <td name="td_state"><span t-field="doc.state"/> - <span t-field="doc.invoice_status"/></td>
-                                    <td name="td_tax_excl" class="text-right">
+                                    <td name="td_tax_excl" class="text-end">
                                         <span t-field="doc.amount_untaxed"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
-                                    <td name ="td_tax_incl" class="text-right">
+                                    <td name ="td_tax_incl" class="text-end">
                                         <span t-field="doc.amount_total"
                                             t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'/>
                                     </td>
@@ -40,13 +40,13 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <strong>
                                     <span t-esc="sum(docs.mapped('amount_untaxed'))"
                                         t-options='{"widget": "monetary", "display_currency": docs[0].pricelist_id.currency_id}'/>
                                     </strong>
                                 </td>
-                                <td class="text-right">
+                                <td class="text-end">
                                     <strong>
                                     <span t-esc="sum(docs.mapped('amount_total'))"
                                         t-options='{"widget": "monetary", "display_currency": docs[0].pricelist_id.currency_id}'/>

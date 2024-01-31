@@ -44,13 +44,13 @@
                         <tr>
                             <th name="code">Reference</th>
                             <th name="descr" style="width: 40%">Product</th>
-                            <th name="quant" class="text-right">Qty</th>
-                            <th name="price_unit_ht" class="text-right">Price/U excl VAT.</th>
-                            <th name="cost" class="text-right">Cost</th>
-                            <th name="price_total_tax_excl" class="text-right">Total price VAT excl.</th>
-                            <th name="price_total_tax_incl" class="text-right">Total price incl. VAT</th>
-                            <th name="marge_ht" class="text-right">Margin</th>
-                            <th name="parge_pc" class="text-right">Margin %</th>
+                            <th name="quant" class="text-end">Qty</th>
+                            <th name="price_unit_ht" class="text-end">Price/U excl VAT.</th>
+                            <th name="cost" class="text-end">Cost</th>
+                            <th name="price_total_tax_excl" class="text-end">Total price VAT excl.</th>
+                            <th name="price_total_tax_incl" class="text-end">Total price incl. VAT</th>
+                            <th name="marge_ht" class="text-end">Margin</th>
+                            <th name="parge_pc" class="text-end">Margin %</th>
                         </tr>
                     </thead>
                     <tbody class="sale_tbody">
@@ -62,26 +62,26 @@
                                 <td name="descr">
                                     <span t-field="line.order_line_id.product_id.name"/>
                                 </td>
-                                <td class="text-right" name="qty">
+                                <td class="text-end" name="qty">
                                     <span t-esc="(str(line.order_line_id.product_uom_qty)).rstrip('0').rstrip('.').replace('.', ',')"/>
                                     <span t-field="line.order_line_id.product_uom" groups="product.group_uom"/>
                                 </td>
-                                <td class="text-right" name="price_unit">
+                                <td class="text-end" name="price_unit">
                                     <span t-field="line.order_line_id.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" name="total_cost_tax_excl">
+                                <td class="text-end" name="total_cost_tax_excl">
                                     <span t-field="line.total_cost_tax_excl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" name="total_cost_tax_excl">
+                                <td class="text-end" name="total_cost_tax_excl">
                                     <span t-field="line.total_cost_tax_excl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" name="total_price_tax_incl">
+                                <td class="text-end" name="total_price_tax_incl">
                                     <span t-field="line.total_price_tax_incl" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" name="margin">
+                                <td class="text-end" name="margin">
                                     <span t-field="line.margin" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
                                 </td>
-                                <td class="text-right" name="margin_percent">
+                                <td class="text-end" name="margin_percent">
                                     <t t-set="margin_percent" t-value="'%0.2f' % line.margin_percent"/>
                                     <span t-esc="margin_percent" /> %
                                 </td>
@@ -94,10 +94,10 @@
                     <thead>
                         <tr>
                             <th>Type</th>
-                            <th class="text-right">Cost</th>
-                            <th class="text-right">Sale</th>
-                            <th class="text-right">Margin</th>
-                            <th class="text-right">Margin %</th>
+                            <th class="text-end">Cost</th>
+                            <th class="text-end">Sale</th>
+                            <th class="text-end">Margin</th>
+                            <th class="text-end">Margin %</th>
                         </tr>
                     </thead>
                     <tbody class="sale_tbody">
@@ -106,16 +106,16 @@
                                 <td name="summary_line_name">
                                     <span t-esc="summary_line['name']"/>
                                 </td>
-                                <td class="text-right" name="summary_line_cout">
+                                <td class="text-end" name="summary_line_cout">
                                     <span t-esc="summary_line['cost']" />
                                 </td>
-                                <td class="text-right" name="summary_line_vente">
+                                <td class="text-end" name="summary_line_vente">
                                     <span t-esc="summary_line['sale']" />
                                 </td>
-                                <td class="text-right" name="summary_line_marge">
+                                <td class="text-end" name="summary_line_marge">
                                     <span t-esc="summary_line['margin']" />
                                 </td>
-                                <td class="text-right" name="summary_line_marge_pc">
+                                <td class="text-end" name="summary_line_marge_pc">
                                     <span t-esc="summary_line['margin_percent']" />
                                 </td>
                             </tr>
