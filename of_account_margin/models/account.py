@@ -69,8 +69,8 @@ class AccountInvoiceLine(models.Model):
     def _compute_of_cost(self):
         for line in self:
             if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
-                purchase_lines = line.sale_line_ids.procurement_ids.mapped('move_ids').mapped('move_orig_ids'). \
-                    mapped('purchase_line_id')
+                purchase_lines = line.sale_line_ids.mapped('procurement_ids.move_ids.move_orig_ids.purchase_line_id')
+                purchase_lines |= line.sale_line_ids.mapped('procurement_ids.move_ids.purchase_line_id')
                 purchase_price_subtotal = sum(purchase_lines.mapped('price_subtotal'))
                 purchase_qty = sum(purchase_lines.mapped('product_qty'))
                 purchase_unit_price = purchase_price_subtotal / purchase_qty if purchase_qty else 0.0
