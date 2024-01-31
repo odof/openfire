@@ -9,13 +9,15 @@ class PurchaseOrder(models.Model):
     @api.multi
     def button_confirm(self):
         datastore_obj = self.env['of.datastore.sale']
-        datastore = datastore_obj.search([('partner_ids', 'in', [self.customer_id.id])])
+        datastore = False
         line_link = {}
-        if datastore:
-            for line in self.mapped('order_line'):
-                datastore_purchase_line_id = line.procurement_ids.mapped('sale_line_id').mapped('of_datastore_line_id')
-                if len(datastore_purchase_line_id) == 1 and datastore_purchase_line_id[0] > 0:
-                    line_link[line] = datastore_purchase_line_id[0]
+        if self.customer_id:
+            datastore = datastore_obj.search([('partner_ids', 'in', [self.customer_id.id])])
+            if datastore:
+                for line in self.mapped('order_line'):
+                    datastore_purchase_line_id = line.procurement_ids.mapped('sale_line_id.of_datastore_line_id')
+                    if len(datastore_purchase_line_id) == 1 and datastore_purchase_line_id[0] > 0:
+                        line_link[line] = datastore_purchase_line_id[0]
 
         res = super(PurchaseOrder, self).button_confirm()
         if datastore and line_link:
