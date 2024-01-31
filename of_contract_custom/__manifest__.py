@@ -54,6 +54,7 @@ Ligne d'indice :
         'of_base',
         'of_analytique',
         'of_service_purchase',
+        'of_sale_type',
     ],
     'category': 'OpenFire',
     'data': [

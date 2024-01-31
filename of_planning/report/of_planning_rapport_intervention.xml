@@ -10,10 +10,12 @@
             paperformat="report.paperformat_euro">
     </report>
 
-    <!-- On utilise une balise record pour modifier le print_report_name car la balise report ne permet pas de le modifier -->
-    <record id="of_planning.of_planning_raport_intervention_report" model="ir.actions.report.xml">
-        <field name="print_report_name">((object.tache_id.name + ' - ' + (object.partner_id.display_name or '') + ' ' + object.date or '').replace('/','-') or "compte-rendu")+'.pdf'</field>
-    </record>
+    <data noupdate="1">
+        <!-- On utilise une balise record pour modifier le print_report_name car la balise report ne permet pas de le modifier -->
+        <record id="of_planning.of_planning_raport_intervention_report" model="ir.actions.report.xml">
+            <field name="print_report_name">((object.tache_id.name + ' - ' + (object.partner_id.display_name or '') + ' ' + object.date or '').replace('/','-') or "compte-rendu")+'.pdf'</field>
+        </record>
+    </data>
 
     <!-- Template pour planning -->
     <template id="of_planning_rapport_intervention_report_template">
