@@ -100,8 +100,8 @@
                         <button class="oe_stat_button" type="object" name="action_view_intervention" icon="fa-calendar">
                             <field name="intervention_count" widget="statinfo" string="RDVs"/>
                         </button>
-                        <button name="action_view_purchase_order" type="object" class="oe_stat_button"
-                        icon="fa-credit-card" attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button"
+                                icon="fa-credit-card" attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
                             <field name="purchase_order_count" widget="statinfo" string="Commandes fournisseur"/>
                         </button>
                         <button name="toggle_active" type="object"
@@ -145,6 +145,7 @@
                             <field name="recurring_next_date"/>
                             <field name="revision" attrs="{'invisible': [('contract_type','=','simple')]}"/>
                             <field name="pricelist_id" invisible="1"/>
+                            <field name="sale_type_id"/>
                         </group>
                         <group col="2" colspan="2" string="Validité" name="validity">
                             <field name="current_period_id" options="{'no_open': True}"/>

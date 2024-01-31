@@ -149,10 +149,11 @@ class OfContract(models.Model):
         default=lambda c: c._default_automatic_sequence())
     intervention_sites = fields.Char(string=u"Sites d'intervention", compute='_compute_intervention_sites')
     purchase_order_ids = fields.One2many(
-        comodel_name='purchase.order', inverse_name='of_contract_id',
-        string=u"Commandes fournisseur", help=u"Liste des commandes fournisseur des DI")
+        comodel_name='purchase.order', compute='_compute_purchase_order_ids', string=u"Commandes fournisseur",
+        help=u"Commandes fournisseur des DI")
     purchase_order_count = fields.Integer(
-        string=u"Calcul de commandes fournisseur (compteur)", compute='_compute_purchase_order_count')
+        string=u"Nombre de commandes fournisseur", compute='_compute_purchase_order_ids')
+    sale_type_id = fields.Many2one(comodel_name='of.sale.type', string=u"Type de devis")
 
     @api.model
     def _default_journal(self):
@@ -271,13 +272,11 @@ class OfContract(models.Model):
         for contract in self:
             contract.invoice_count = len(contract.invoice_ids)
 
-    def _compute_purchase_order_count(self):
+    def _compute_purchase_order_ids(self):
         for contract in self:
-            total_po = 0
-            if contract.service_ids:
-                for service in contract.service_ids:
-                    total_po += len(service.purchaseorder_ids)
-                contract.purchase_order_count = total_po
+            orders = contract.service_ids.mapped('purchaseorder_ids')
+            contract.purchase_order_ids = orders
+            contract.purchase_order_count = len(orders)
 
     def _compute_date_indexed(self):
         for contract in self:
@@ -564,6 +563,7 @@ class OfContract(models.Model):
             'payment_term_id': self.payment_term_id.id,
             'of_intervention_id': intervention_id,
             'of_project_id': self.account_analytic_id and self.account_analytic_id.id,
+            'of_sale_type_id': self.sale_type_id.id,
         })
         # Get other invoice values from partner onchange
         invoice._onchange_partner_id()
@@ -781,25 +781,18 @@ class OfContract(models.Model):
         self.env['ir.config_parameter'].set_param('contracts_to_do', '[]')
 
     @api.multi
-    def action_view_purchase_order(self):
-        services = self.env['of.service'].search([('contract_id', '=', self.id)])
-        purchase_orders = []
-        for service in services:
-            if service.purchaseorder_ids:
-                for purchase_order in service.purchaseorder_ids:
-                    purchase_orders.append(purchase_order.id)
-        if purchase_orders:
-            action = self.env.ref('purchase.purchase_form_action').read()[0]
-            if len(purchase_orders) > 1:
-                action['domain'] = [('id', 'in', purchase_orders)]
-            elif len(purchase_orders) == 1:
-                action['views'] = [(self.env.ref('of_purchase.of_purchase_order_customer_form').id, 'form')]
-                action['res_id'] = purchase_orders[0]
-            else:
-                action = {'type': 'ir.actions.act_window_close'}
-            self.purchase_order_ids = purchase_orders
-            print(self.purchase_order_ids)
-            return action
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+        orders = self.purchase_order_ids
+        action = self.env.ref('purchase.purchase_form_action').read()[0]
+        if len(orders) > 1:
+            action['domain'] = [('id', 'in', orders.ids)]
+        elif len(orders) == 1:
+            action['views'] = [(self.env.ref('of_purchase.of_purchase_order_customer_form').id, 'form')]
+            action['res_id'] = orders.id
+        else:
+            action = {'type': 'ir.actions.do_nothing'}
+        return action
 
 
 class OfContractLine(models.Model):
@@ -1027,7 +1020,7 @@ class OfContractLine(models.Model):
                 line.last_invoicing_date = invoice_lines[-1].invoice_id.date_invoice
             # On entre dans ce cas quand la ligne est un avenant et n'a pas encore été facturée donc on vérifie
             # la ligne qui a généré cet avenant
-            elif line.line_origine_id.invoice_line_ids:
+            elif line.line_origine_id.invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel'):
                 last_invoice_date = line.line_origine_id\
                                         .invoice_line_ids.filtered(lambda il: il.invoice_id.state != 'cancel')\
                                         .sorted('date_invoice')[-1].of_contract_supposed_date
@@ -2027,9 +2020,3 @@ class OfContractPeriod(models.Model):
             return [('id', 'in', period_with_invoice_ids)]
         else:
             return [('id', 'not in', period_with_invoice_ids)]
-
-
-class PurchaseOrder(models.Model):
-    _inherit = 'purchase.order'
-
-    of_contract_id = fields.Many2one(string=u"Contrat DI")
