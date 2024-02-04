@@ -369,7 +369,6 @@ class OFContractInvoicingWizard(models.TransientModel):
                     if frequency_type == 'year':
                         next_date = base_date + relativedelta(years=1, month=1, day=1, days=-1)
             elif last_invoice_date:
-                end = fields.Date.from_string(line.date_contract_end)
                 freq_type = line.frequency_type
                 if freq_type == 'month':
                     next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=1)
@@ -377,24 +376,18 @@ class OFContractInvoicingWizard(models.TransientModel):
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    if not end or end > next_date:
-                        line.next_date_date = next_date
                 elif freq_type == 'trimester':
                     next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=3)
                     if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    if not end or end > next_date:
-                        line.next_date_date = next_date
                 elif freq_type == 'semester':
                     next_date = fields.Date.from_string(last_invoice_date) + relativedelta(months=6)
                     if line.recurring_invoicing_payment_id.code == 'pre-paid':
                         next_date = next_date + relativedelta(day=1)
                     else:
                         next_date = next_date + relativedelta(months=1, day=1, days=-1)
-                    if not end or end > next_date:
-                        line.next_date = next_date
                 elif freq_type == 'year':
                     next_date = fields.Date.from_string(last_invoice_date) + relativedelta(years=1)
                     if line.recurring_invoicing_payment_id.code == 'pre-paid':
