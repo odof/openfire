@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_outlay_analysis_entry_view_tree" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.entry.tree</field>
+        <field name="model">of.outlay.analysis.entry</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="type" invisible="1"/>
+                <field name="date"/>
+                <field name="product_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="name"/>
+                <field name="analytic_account_id" options="{'no_create': True}"
+                       domain="[('id', 'in', parent.analytic_account_ids[0][2])]"/>
+                <field name="analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="qty"/>
+                <field name="price_unit"/>
+                <field name="price_subtotal"/>
+                <field name="line_type"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

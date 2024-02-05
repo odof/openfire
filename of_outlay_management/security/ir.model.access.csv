@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_account_analytic_section_user,access.of.account.analytic.section.user,model_of_account_analytic_section,base.group_user,1,0,0,0
+access_of_account_analytic_section_manager,access.of.account.analytic.section.manager,model_of_account_analytic_section,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_user,access.of.outlay.analysis.user,model_of_outlay_analysis,base.group_user,1,0,0,0
+access_of_outlay_analysis_manager,access.of.outlay.analysis.manager,model_of_outlay_analysis,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_entry_user,access.of.outlay.analysis.entry.user,model_of_outlay_analysis_entry,base.group_user,1,0,0,0
+access_of_outlay_analysis_enry_manager,access.of.outlay.analysis.entry.manager,model_of_outlay_analysis_entry,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_line_user,access.of.outlay.analysis.line.user,model_of_outlay_analysis_line,base.group_user,1,0,0,0
+access_of_outlay_analysis_line_manager,access.of.outlay.analysis.line.manager,model_of_outlay_analysis_line,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_value_user,access.of.outlay.analysis.value.user,model_of_outlay_analysis_value,base.group_user,1,0,0,0
+access_of_outlay_analysis_value_manager,access.of.outlay.analysis.value.manager,model_of_outlay_analysis_value,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_kanban_record_user,access.of.outlay.analysis.kanban.record.user,model_of_outlay_analysis_kanban_record,base.group_user,1,0,0,0
+access_of_outlay_analysis_kanban_record_manager,access.of.outlay.analysis.kanban.record.manager,model_of_outlay_analysis_kanban_record,sales_team.group_sale_manager,1,1,1,1

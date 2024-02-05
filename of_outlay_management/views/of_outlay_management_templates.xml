@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_backend" name="OF outlay management backend assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_outlay_management/static/src/js/of_outlay_management_kanban.js"/>
+            <link rel="stylesheet" type="text/less" href="/of_outlay_management/static/src/less/of_outlay_analysis_line.less"/>
+            <link rel="stylesheet" type="text/less" href="/of_outlay_management/static/src/less/of_outlay_management_kanban.less"/>
+        </xpath>
+    </template>
+
+</odoo>
