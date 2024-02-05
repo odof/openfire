@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_outlay_analysis_form" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.form</field>
+        <field name="model">of.outlay.analysis</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open" type="object" states="closed" string="Rouvrir"/>
+                    <button name="action_close" type="object" states="open" string="Fermer"/>
+                    <button name="action_recompute_values" type="object" states="open" string="Recalculer les valeurs"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(of_outlay_management.of_outlay_analysis_value_action)d"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-line-chart"
+                            domain="[('analysis_id', '=', self)]"
+                            attrs="{'invisible': [('sale_order_ids', '=', [])]}">
+                            <span>Graphe des valeurs</span>
+                        </button>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="analytic_account_ids" widget="many2many_tags"/>
+                        <field name="sale_order_ids" widget="many2many_tags"/>
+                        <field name="sales_total"/>
+                        <field name="expected_expenses"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_outlay_analysis_action" model="ir.actions.act_window">
+        <field name="name">Analyse des débours</field>
+        <field name="res_model">of.outlay.analysis</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Analyse des débours" id="of_outlay_analysis_menu" parent="sales_team.menu_sale_report" sequence="15"
+              action="of_outlay_analysis_action"/>
+
+</odoo>

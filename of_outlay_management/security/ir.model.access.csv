@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_account_analytic_section_user,access.of.account.analytic.ection.user,model_of_account_analytic_section,base.group_user,1,0,0,0
+access_of_account_analytic_section_manager,access.of.account.analytic.section.manager,model_of_account_analytic_section,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_user,access.of.outlay.analysis.user,model_of_outlay_analysis,base.group_user,1,0,0,0
+access_of_outlay_analysis_manager,access.of.outlay.analysis.manager,model_of_outlay_analysis,sales_team.group_sale_manager,1,1,1,1
