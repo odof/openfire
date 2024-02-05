@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_outlay_analysis_value_view_search" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.value.search</field>
+        <field name="model">of.outlay.analysis.value</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="analysis_id" options="{'no_create': True}"/>
+                <field name="analytic_account_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="type"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_outlay_analysis_value_view_graph" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.value.graph</field>
+        <field name="model">of.outlay.analysis.value</field>
+        <field name="arch" type="xml">
+            <graph>
+                <field name="date"/>
+                <field name="type"/>
+                <field name="amount" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="of_outlay_analysis_value_view_tree" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.value.tree</field>
+        <field name="model">of.outlay.analysis.value</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="analytic_account_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="type"/>
+                <field name="date"/>
+                <field name="amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_outlay_analysis_value_action" model="ir.actions.act_window">
+        <field name="name">Valeurs des débours</field>
+        <field name="res_model">of.outlay.analysis.value</field>
+        <field name="context">{'search_default_analysis_id': [active_id], 'graph_mode':'line'}</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">graph,list,form</field>
+    </record>
+
+</odoo>

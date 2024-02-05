@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_outlay_analysis_view_form" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.form</field>
+        <field name="model">of.outlay.analysis</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open" type="object" states="closed" string="Rouvrir"/>
+                    <button name="action_close" type="object" states="open" string="Fermer"/>
+                    <button name="action_recompute_all" type="object" states="open" string="Recalculer les valeurs"/>
+                    <field name="state" widget="statusbar" statusbar_visible="open" />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(of_outlay_management.of_outlay_analysis_value_action)d"
+                            type="action"
+                            class="oe_stat_button"
+                            icon="fa-line-chart"
+                            domain="[('analysis_id', '=', self)]"
+                            attrs="{'invisible': [('sale_ids', '=', [])]}">
+                            <span>Graphe des valeurs</span>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="create_date"/>
+                            <field name="write_date"/>
+                            <field name="analytic_account_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="sales_total"/>
+                        </group>
+                        <group>
+                            <field name="user_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="company_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="analytic_section_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="expected_margin_pct"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Sources produits" name="sale_shipping">
+                            <field name="sale_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="sale_init_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="sale_compl_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="out_invoice_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="all_income_journal_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="income_journal_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Sources charges">
+                            <field name="purchase_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="in_invoice_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="all_picking_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="picking_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="all_expense_journal_ids" widget="many2many_tags" invisible="1"/>
+                            <field name="expense_journal_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Synthèse">
+                            <group string="Synthèse globale">
+                                <field name="kanban_record_ids" mode="kanban" nolabel="1" readonly="1" domain="[('analysis_id', '=', active_id)]">
+                                    <kanban class="of_outlay_mngt_kanban o_kanban_small_column" default_group_by="category" drag_group="false">
+                                        <field name="type"/>
+                                        <field name="category"/>
+                                        <field name="label1"/>
+                                        <field name="label2"/>
+                                        <field name="label3"/>
+                                        <field name="label4"/>
+                                        <field name="value1"/>
+                                        <field name="value2"/>
+                                        <field name="value3"/>
+                                        <field name="value4"/>
+                                        <field name="main_color"/>
+                                        <field name="color1"/>
+                                        <field name="color2"/>
+                                        <field name="color3"/>
+                                        <field name="color4"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div class="of_outlay_mngt_kanban_main" t-att-style="'background-color: ' + record.main_color.raw_value + ';'">
+                                                    <div class="o_kanban_card_content">
+                                                        <div class="of_outlay_mngt_kanban_title">
+                                                            <span>
+                                                                <field name="type"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main1" t-att-style="'color: ' + record.color1.raw_value + ';' + (record.value2.raw_value == &apos;&apos; and ' padding-top: 15px;' or '')">
+                                                            <span class="of_outlay_mngt_kanban_label1">
+                                                                <field name="label1"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value1">
+                                                                <field name="value1"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main2" t-att-style="'color: ' + record.color2.raw_value + ';'">
+                                                            <span class="of_outlay_mngt_kanban_label2">
+                                                                <field name="label2"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value2">
+                                                                <field name="value2"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main3" t-att-style="'color: ' + record.color3.raw_value + ';' + (record.value4.raw_value == &apos;&apos; and ' padding-top: 5px;' or '')">
+                                                            <span class="of_outlay_mngt_kanban_label3">
+                                                                <field name="label3"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value3">
+                                                                <field name="value3"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main4" t-att-style="'color: ' + record.color4.raw_value + ';'">
+                                                            <span class="of_outlay_mngt_kanban_label4">
+                                                                <field name="label4"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value4">
+                                                                <field name="value4"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Produits">
+                            <separator string="Budget initial &amp; complémentaire"/>
+                            <label for="sale_line_ids" string="Produits réels"/>
+                            <field name="sale_line_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_selected"/>
+                                    <field name="order_id" readonly="1"/>
+                                    <field name="date_order" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="of_order_project_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="product_uom_qty" readonly="1"/>
+                                    <field name="qty_delivered" readonly="1"/>
+                                    <field name="qty_invoiced" readonly="1"/>
+                                    <field name="price_unit" readonly="1"/>
+                                    <field name="purchase_price" readonly="1"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="of_purchase_price_subtotal" readonly="1"/>
+                                    <field name="of_outlay_analysis_type" readonly="1"/>
+                                </tree>
+                            </field>
+                            <label for="income_entry_ids" string="Produits analytiques additionnels (ajouts manuels)"/>
+                            <field name="income_entry_ids" context="{'default_type': 'income'}"/>
+                            <separator string="Produits facturés"/>
+                            <label for="out_invoice_line_ids" string="Factures réelles"/>
+                            <field name="out_invoice_line_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_selected"/>
+                                    <field name="invoice_id" readonly="1"/>
+                                    <field name="date_invoice" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="account_analytic_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="quantity" readonly="1"/>
+                                    <field name="price_unit" readonly="1"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="origin" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Charges">
+                            <separator string="Budget initial &amp; complémentaire"/>
+                            <label for="sale_line_cost_ids" string="Achats réels"/>
+                            <field name="sale_line_cost_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_cost_selected"/>
+                                    <field name="order_id" readonly="1"/>
+                                    <field name="date_order" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="of_order_project_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="product_uom_qty" readonly="1"/>
+                                    <field name="purchase_price" readonly="1"/>
+                                    <field name="of_purchase_price_subtotal" readonly="1"/>
+                                    <field name="of_outlay_analysis_type" readonly="1"/>
+                                </tree>
+                            </field>
+                            <separator string="Budget engagé"/>
+                            <label for="purchase_line_ids" string="Charges réelles"/>
+                            <field name="purchase_line_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_selected"/>
+                                    <field name="order_id" readonly="1"/>
+                                    <field name="date_order" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="account_analytic_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="product_qty" readonly="1"/>
+                                    <field name="qty_received" readonly="1"/>
+                                    <field name="qty_invoiced" readonly="1"/>
+                                    <field name="price_unit" readonly="1"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                </tree>
+                            </field>
+                            <label for="expense_entry_ids" string="Charges analytiques additionnelles (ajouts manuels)"/>
+                            <field name="expense_entry_ids" context="{'default_type':'expense'}"/>
+                            <separator string="Charges facturées"/>
+                            <label for="in_invoice_line_ids" string="Factures réelles"/>
+                            <field name="in_invoice_line_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_selected"/>
+                                    <field name="invoice_id" readonly="1"/>
+                                    <field name="date_invoice" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="account_analytic_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="quantity" readonly="1"/>
+                                    <field name="price_unit" readonly="1"/>
+                                    <field name="price_subtotal" readonly="1"/>
+                                    <field name="origin" readonly="1"/>
+                                </tree>
+                            </field>
+                            <separator string="Stocks consommés"/>
+                            <label for="stock_move_ids" string="Sorties de stock"/>
+                            <field name="stock_move_ids">
+                                <tree editable="bottom" create="false" delete="false">
+                                    <field name="of_outlay_analysis_selected"/>
+                                    <field name="picking_id" readonly="1"/>
+                                    <field name="date" readonly="1"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="of_analytic_account_id" readonly="1"/>
+                                    <field name="of_analytic_section_id" readonly="1"/>
+                                    <field name="product_uom_qty" readonly="1"/>
+                                    <field name="of_quant_price_unit" string="Coût unitaire"/>
+                                    <field name="of_quant_price_total" string="Coût total"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Avancement">
+                            <group string="Synthèse par section analytique">
+                                <field name="line_ids" nolabel="1" colspan="2"/>
+                            </group>
+
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_outlay_analysis_action" model="ir.actions.act_window">
+        <field name="name">Analyse des débours</field>
+        <field name="res_model">of.outlay.analysis</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Analyse des débours" id="of_outlay_analysis_menu" parent="sales_team.menu_sale_report" sequence="15"
+              action="of_outlay_analysis_action" groups="analytic.group_analytic_accounting"/>
+
+</odoo>

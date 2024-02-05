@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_order_view_form" model="ir.ui.view">
+        <field name="name">of.outlay.management.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='analytic_tag_ids']" position="before">
+                <field name="of_analytic_section_id" groups="analytic.group_analytic_accounting" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//label[@for='analytic_tag_ids']" position="before">
+                <field name="of_analytic_section_id" groups="analytic.group_analytic_accounting" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

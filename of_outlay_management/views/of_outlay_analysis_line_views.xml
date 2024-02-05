@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_outlay_analysis_line_view_tree" model="ir.ui.view">
+        <field name="name">of.outlay.analysis.line.tree</field>
+        <field name="model">of.outlay.analysis.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom" class="of_outlay_analysis_line" create="false" delete="false" decoration-success="type == 'expense_remaining'">
+                <field name="currency_id" invisible="1"/>
+                <field name="is_closed" invisible="1"/>
+                <field name="analytic_section_id" readonly="1"/>
+                <field name="type" readonly="1"/>
+                <field name="amount_init" string="Initial" readonly="1"/>
+                <field name="amount_init_pct" string="(%)"
+                       attrs="{'readonly': ['|', ('is_closed', '=', True), ('type', '!=', 'margin_objective')]}"/>
+                <field name="amount_compl" string="Complémentaire" readonly="1"/>
+                <field name="amount_compl_pct" string="(%)" readonly="1"/>
+                <field name="amount_studies" string="Études"
+                       attrs="{'readonly': ['|', ('is_closed', '=', True), ('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
+                <field name="amount_studies_pct" string="(%)" readonly="1"/>
+                <field name="amount_engaged" string="Engagé" readonly="1"/>
+                <field name="amount_engaged_pct" string="(%)" readonly="1"/>
+                <field name="amount_current" string="Situation en cours"
+                       attrs="{'readonly': ['|', ('is_closed', '=', True), ('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
+                <field name="amount_current_pct" string="(%)" readonly="1"/>
+                <field name="amount_invoiced" string="Facturé" readonly="1"/>
+                <field name="amount_invoiced_pct" string="(%)" readonly="1"/>
+                <field name="amount_final" string="Situation finale" readonly="1"/>
+                <field name="amount_final_pct" string="(%)" readonly="1"/>
+                <button type="object" name="action_close" icon="fa-check" string="Clôturer la section"
+                        attrs="{'invisible': ['|', ('is_closed', '=', True), ('type', '!=', 'income')]}"/>
+                <button type="object" name="action_open" icon="fa-refresh" string="Rouvrir la section"
+                        attrs="{'invisible': ['|', ('is_closed', '=', False), ('type', '!=', 'income')]}"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

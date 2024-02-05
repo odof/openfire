@@ -1,0 +1,34 @@
+/* On modifie l'aspect du tableau de synthèse des débours par section */
+
+.of_outlay_analysis_line {
+    tbody {
+        td.o_list_number:not(.o_readonly) {
+            background-color: #fef9a2;
+        }
+        tr.text-success {
+            border-bottom: 2px solid #666666;
+            color: #666666;
+        }
+    }
+
+    th[data-id='amount_init'],
+    th[data-id='amount_compl'],
+    th[data-id='amount_studies'],
+    th[data-id='amount_engaged'],
+    th[data-id='amount_current'],
+    th[data-id='amount_invoiced'],
+    th[data-id='amount_final'],
+    th[data-id='action_close'],
+    td[data-field='amount_init'],
+    td[data-field='amount_compl'],
+    td[data-field='amount_studies'],
+    td[data-field='amount_engaged'],
+    td[data-field='amount_current'],
+    td[data-field='amount_invoiced'],
+    td[data-field='amount_final'],
+    td[data-field='action_close'],
+    {
+        border-left: 2px solid #666666;
+    }
+
+}
