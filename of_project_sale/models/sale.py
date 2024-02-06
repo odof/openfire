@@ -7,6 +7,13 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.onchange('of_sale_id')
+    def _onchange_of_sale_id(self):
+        res = super(SaleOrder, self)._onchange_of_sale_id()
+        if self.of_sale_id and self.of_sale_id.tag_ids:
+            self.of_sale_tag_ids = [(6, 0, self.of_sale_id.tag_ids.ids)]
+        return res
+
     def _prepare_tasks_values(self):
         self.ensure_one()
         values = []
@@ -31,6 +38,11 @@ class SaleOrder(models.Model):
     def _prepare_project_vals(self):
         vals = super(SaleOrder, self)._prepare_project_vals()
         vals['tasks'] = [(0, 0, task) for task in self._prepare_tasks_values()]
+        company = self.company_id or self.env.user.company_id
+        accounting_company = getattr(company, 'accounting_company_id', company)
+        vals['company_id'] = accounting_company.id
+        if self.tag_ids:
+            vals['of_sale_tag_ids'] = [(6, 0, self.tag_ids.ids)]
         return vals
 
     @api.multi

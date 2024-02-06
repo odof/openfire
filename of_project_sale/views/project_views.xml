@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="project_project_view_form" model="ir.ui.view">
+        <field name="name">project.project.view.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="of_project.of_project_project_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="company_id"/>
+                <field name="of_sale_tag_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_task_form2" model="ir.ui.view">
         <field name="name">of.project.sale.view.task.form2</field>
         <field name="model">project.task</field>
