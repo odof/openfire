@@ -1297,7 +1297,7 @@ msgid "Lots & Serial Numbers"
 msgstr ""
 
 #. module: of_base
-#: model:mail.message.subtype,name:of_base.mt_of_sale_mail_subscribtion
+#: model:mail.message.subtype,name:of_base.mt_of_sale_mail_subscription
 msgid "E-Mail"
 msgstr ""
 
