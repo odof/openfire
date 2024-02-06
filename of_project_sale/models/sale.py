@@ -31,6 +31,11 @@ class SaleOrder(models.Model):
     def _prepare_project_vals(self):
         vals = super(SaleOrder, self)._prepare_project_vals()
         vals['tasks'] = [(0, 0, task) for task in self._prepare_tasks_values()]
+        company = self.company_id or self.env.user.company_id
+        accounting_company = getattr(company, 'accounting_company_id', company)
+        vals['company_id'] = accounting_company.id
+        if self.tag_ids:
+            vals['of_sale_tag_ids'] = [(6, 0, self.tag_ids.ids)]
         return vals
 
     @api.multi
