@@ -11,7 +11,7 @@ class AccountMoveLine(models.Model):
     of_is_locked = fields.Boolean(
         compute='_compute_of_is_locked',
         string="Locked",
-        help="Special product. That field allows you to know if an invoice line should prevent its counterpart on a"
+        help="Special product. That field allows you to know if an invoice line should prevent its counterpart on a "
         "sale order from being deleted",
     )
     of_order_id = fields.Many2one(

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo noupdate="1">
 
-    <record id="mt_of_sale_mail_subscribtion" model="mail.message.subtype">
+    <record id="mt_of_sale_mail_subscription" model="mail.message.subtype">
         <field name="name">E-Mail</field>
         <field name="sequence" eval="5"/>
         <field name="default" eval="False"/>

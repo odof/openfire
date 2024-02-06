@@ -23,7 +23,7 @@
     </record>
 
     <record id="of_sale_subtype" model="ir.config_parameter" forcecreate="False">
-        <field name="key">of.sale.of_sale_mail_subtype_subscribtion</field>
+        <field name="key">of.sale.of_sale_mail_subtype_subscription</field>
         <field name="value">False</field>
     </record>
 

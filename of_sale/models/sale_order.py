@@ -59,7 +59,7 @@ class SaleOrder(models.Model):
     # Delivery
     of_is_delivered = fields.Boolean(string="Is the order delivered ?", compute='_compute_of_is_delivered', store=True)
 
-    # Customer, project, intervetions informations
+    # Customer, project, interventions informations
     client_order_ref = fields.Char(compute='_compute_client_order_ref', readonly=False, store=True)
     of_customer_category_ids = fields.Many2many(
         comodel_name='res.partner.category', related='partner_id.category_id', string="Customer tags"
@@ -246,21 +246,21 @@ class SaleOrder(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion'):
-            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
+        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscription'):
+            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscription', raise_if_not_found=False):
                 # Subscribe the followers of the mail subtype to the new records
                 records.message_subscribe(partner_ids=records.mapped('partner_id')._ids, subtype_ids=[mail_subtype.id])
         return records
 
     def write(self, vals):
-        subtype_icp = self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion')
+        subtype_icp = self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscription')
         if subtype_icp:
-            mail_subtype = self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
+            mail_subtype = self.env.ref('of_sale.mt_of_sale_mail_subscription', raise_if_not_found=False)
             old_partner_ids = mail_subtype and vals.get('partner_id') and self.mapped('partner_id').ids or []
         res = super().write(vals)
         if subtype_icp and (mail_subtype and vals.get('partner_id')):
             # Subscribe the new partner to the mail subtype
-            self.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
+            self.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id])
             message_followers = self.mapped('message_follower_ids')
             # Unsubscribe the old partners from the mail subtype
             message_followers.filtered(lambda r: r.partner_id.id in old_partner_ids).write(
@@ -280,8 +280,8 @@ class SaleOrder(models.Model):
 
     def action_quotation_send(self):
         action = super().action_quotation_send()
-        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscribtion'):
-            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False):
+        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_sale_mail_subtype_subscription'):
+            if mail_subtype := self.env.ref('of_sale.mt_of_sale_mail_subscription', raise_if_not_found=False):
                 action['context'].update({'default_subtype_id': mail_subtype.id})
         return action
 

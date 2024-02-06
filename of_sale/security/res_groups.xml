@@ -21,7 +21,7 @@
 
     <record id="of_group_display_tax_exclued_total_in_so_lines" model="res.groups">
         <field name="name">(OF) Display subtotals taxes excl. by sales order line</field>
-        <field name="comment">Displays, in the form (not in the reports), the subtotals exckuding VAT per line in the sales orders</field>
+        <field name="comment">Displays, in the form (not in the reports), the subtotals excluding VAT per line in the sales orders</field>
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 

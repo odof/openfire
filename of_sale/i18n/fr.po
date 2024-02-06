@@ -46,7 +46,7 @@ msgstr "(OF) Gestion des bons de livraison dans la facture client"
 #. module: of_sale
 #: model:res.groups,name:of_sale.of_group_display_tax_exclued_total_in_so_lines
 msgid "(OF) Display subtotals taxes excl. by sales order line"
-msgstr "Affichage des sous-totaux taxes excluses par ligne de commande client"
+msgstr "Affichage des sous-totaux taxes exclues par ligne de commande client"
 
 #. module: of_sale
 #: model:res.groups,name:of_sale.of_group_display_tax_inclued_total_in_so_lines
@@ -60,8 +60,8 @@ msgid "(OF) Down payment product category"
 msgstr "(OF) Catégorie des acomptes"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
-#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_sale_mail_subtype_subscribtion
+#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscription
+#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_sale_mail_subtype_subscription
 msgid "(OF) Enable subscription of subtype E-Mail for sale orders"
 msgstr ""
 "(OF) Activer l'abonnement au sous-type E-Mail pour les commandes de ventes"
@@ -521,7 +521,7 @@ msgstr "Afficher les sous-totaux TTC par ligne de commande"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
 msgid "Displays subtotals tax excl. by command line in sales order forms."
-msgstr "Affiche les sous-totaux taxes excluses par ligne de commande client."
+msgstr "Affiche les sous-totaux taxes exclues par ligne de commande client."
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
@@ -551,7 +551,7 @@ msgstr ""
 #. module: of_sale
 #: model:res.groups,comment:of_sale.of_group_display_tax_exclued_total_in_so_lines
 msgid ""
-"Displays, in the form (not in the reports), the subtotals exckuding VAT per "
+"Displays, in the form (not in the reports), the subtotals excluding VAT per "
 "line in the sales orders"
 msgstr ""
 "Affiche, dans le formulaire (pas dans les rapports), les sous-totaux hors "
@@ -600,7 +600,7 @@ msgid "Down payment of %s%%"
 msgstr "Acompte de %s%%"
 
 #. module: of_sale
-#: model:mail.message.subtype,name:of_sale.mt_of_sale_mail_subscribtion
+#: model:mail.message.subtype,name:of_sale.mt_of_sale_mail_subscription
 msgid "E-Mail"
 msgstr "E-mail"
 
@@ -922,8 +922,8 @@ msgstr ""
 "des acomptes"
 
 #. module: of_sale
-#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscribtion
-#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_sale_mail_subtype_subscribtion
+#: model:ir.model.fields,help:of_sale.field_of_connector_config_settings__of_sale_mail_subtype_subscription
+#: model:ir.model.fields,help:of_sale.field_res_config_settings__of_sale_mail_subtype_subscription
 msgid ""
 "Only the recipients and subscribers to this document subtype will receive "
 "the emails."
@@ -1170,7 +1170,7 @@ msgstr "Passer"
 #: model:ir.model.fields,help:of_sale.field_account_move_line__of_is_locked
 msgid ""
 "Special product. That field allows you to know if an invoice line should "
-"prevent its counterpart on asale order from being deleted"
+"prevent its counterpart on a sale order from being deleted"
 msgstr ""
 "Produit spécial. Ce champ vous permet de savoir si une ligne de facture doit"
 " empêcher la suppression de son équivalent sur une commande de vente"

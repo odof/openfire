@@ -84,12 +84,12 @@
                 </div>
             </xpath>
             <xpath expr="//div[@id='proforma_configuration']" position="after">
-                <div class="col-12 col-lg-6 o_setting_box" id="of_sale_mail_subtype_subscribtion">
+                <div class="col-12 col-lg-6 o_setting_box" id="of_sale_mail_subtype_subscription">
                     <div class="o_setting_left_pane">
-                        <field name="of_sale_mail_subtype_subscribtion"/>
+                        <field name="of_sale_mail_subtype_subscription"/>
                     </div>
                     <div class="o_setting_right_pane">
-                        <label for="of_sale_mail_subtype_subscribtion"/>
+                        <label for="of_sale_mail_subtype_subscription"/>
                         <div class="text-muted">
                             <p>Adds a new subtype E-Mail for sale orders. Only the recipients and subscribers to this document subtype will receive emails.</p>
                             <p>The mail composer will automatically select this subtype when sending a message from a sale order.</p>

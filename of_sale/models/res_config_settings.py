@@ -44,10 +44,10 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='of.sale.of_grouped_invoicing',
         default='default_grouping',
     )
-    of_sale_mail_subtype_subscribtion = fields.Boolean(
+    of_sale_mail_subtype_subscription = fields.Boolean(
         string="(OF) Enable subscription of subtype E-Mail for sale orders",
         help="Only the recipients and subscribers to this document subtype will receive the emails.",
-        config_parameter='of.sale.of_sale_mail_subtype_subscribtion',
+        config_parameter='of.sale.of_sale_mail_subtype_subscription',
     )
     of_sale_confirmation_date_mode = fields.Selection(
         selection=[('default', "Automatic (default)"), ('manual', "Manual")],
@@ -98,9 +98,9 @@ class ResConfigSettings(models.TransientModel):
         view = self.env.ref('of_sale.of_sale_order_form_fiscal_position_required', raise_if_not_found=False)
         view and view.write({'active': self.of_fiscal_position_required})
 
-    def _set_of_sale_mail_subtype_subscribtion(self):
-        subtype = self.env.ref('of_sale.mt_of_sale_mail_subscribtion', raise_if_not_found=False)
-        subtype and subtype.write({'hidden': not self.of_sale_mail_subtype_subscribtion})
+    def _set_of_sale_mail_subtype_subscription(self):
+        subtype = self.env.ref('of_sale.mt_of_sale_mail_subscription', raise_if_not_found=False)
+        subtype and subtype.write({'hidden': not self.of_sale_mail_subtype_subscription})
 
     def _set_of_sale_confirmation_date_mode(self):
         view = self.env.ref('of_sale.of_sale_view_confirmation_date_order_form', raise_if_not_found=False)
@@ -111,7 +111,7 @@ class ResConfigSettings(models.TransientModel):
         super().set_values()
         self._set_of_validate_pickings_on_move()
         self._set_of_fiscal_position_required()
-        self._set_of_sale_mail_subtype_subscribtion()
+        self._set_of_sale_mail_subtype_subscription()
         self._set_of_sale_confirmation_date_mode()
 
     @api.onchange('group_of_display_tax_inclued_total_in_so_lines', 'group_of_display_tax_exclued_total_in_so_lines')
