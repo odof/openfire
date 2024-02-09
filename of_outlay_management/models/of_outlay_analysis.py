@@ -34,6 +34,21 @@ class OFOutlayAnalysis(models.Model):
     currency_id = fields.Many2one(
         comodel_name='res.currency', related='company_id.currency_id', string=u"Devise", readonly=True
     )
+    state = fields.Selection(
+        selection=[('open', u"Ouvert"), ('closed', u"Fermé")],
+        sttring=u"État", default='open', required=True
+    )
+    sales_total = fields.Float(string=u"CA", compute='_compute_sales_total')
+    expected_margin_pct = fields.Float(string=u"Marge théorique (%)")
+    expected_margin = fields.Monetary(
+        string=u"Marge théorique", currency_field='currency_id', computed='_compute_expected_margin')
+
+    # Les lignes sont les valeurs affichées en vue liste dans le formulaire de l'analyse
+    line_ids = fields.One2many(comodel_name='of.outlay.analysis.line', inverse_name='analysis_id', string=u"Lignes")
+    # Les valeurs servent à alimenter la vue graphe (courbe) des montants au cours du temps
+    value_ids = fields.One2many(comodel_name='of.outlay.analysis.value', inverse_name='analysis_id', string=u"Valeurs")
+
+    # Objets sélectionnés (vie champs m2m_tags)
 
     sale_ids = fields.Many2many(
         comodel_name='sale.order', string=u"Commandes client",
@@ -49,8 +64,6 @@ class OFOutlayAnalysis(models.Model):
         comodel_name='purchase.order', string=u"Commandes fournisseur",
         domain="[('order_line.account_analytic_id', 'in', analytic_account_ids[0][2])]"
     )
-    # Ce domain nécessite le module of_analytic
-    # todo: Vérifier si nécessaire, sinon changer pour un fonctionnement similaire aux factures fournisseur
     out_invoice_ids = fields.Many2many(
         comodel_name='account.invoice', string=u"Factures client",
         relation='of_outlay_analysis_out_invoice_rel', column1='analysis_id', column2='invoice_id',
@@ -63,7 +76,6 @@ class OFOutlayAnalysis(models.Model):
         domain="[('type', 'in', ('in_invoice', 'in_refund')),"
                " ('invoice_line_ids.account_analytic_id', 'in', analytic_account_ids[0][2])]"
     )
-
     all_expense_move_ids = fields.Many2many(comodel_name='account.move', compute='_compute_all_move_ids')
     all_income_move_ids = fields.Many2many(comodel_name='account.move', compute='_compute_all_move_ids')
     all_expense_journal_ids = fields.Many2many(comodel_name='account.journal', compute='_compute_all_move_ids')
@@ -89,6 +101,8 @@ class OFOutlayAnalysis(models.Model):
         domain="[('id', 'in', all_income_journal_ids[0][2])]"
     )
 
+    # Lignes sélectionnées (via checkbox)
+
 
 
     # picking_ids = fields.Many2many(
@@ -105,18 +119,6 @@ class OFOutlayAnalysis(models.Model):
 
     # sale_order_ids = fields.Many2many(
     #     comodel_name='sale.order', string=u"Bons de commande", compute='_compute_sale_order_ids')
-    sales_total = fields.Float(string=u"CA", compute='_compute_sales_total')
-    # Les lignes sont les valeurs affichées en vue liste dans le formulaire de l'analyse
-    line_ids = fields.One2many(comodel_name='of.outlay.analysis.line', inverse_name='analysis_id', string=u"Lignes")
-    # Les valeurs servent à alimenter la vue graphe (courbe) des montants au cours du temps
-    value_ids = fields.One2many(comodel_name='of.outlay.analysis.value', inverse_name='analysis_id', string=u"Valeurs")
-    expected_margin_pct = fields.Float(string=u"Marge théorique (%)")
-    expected_margin = fields.Monetary(
-        string=u"Marge théorique", currency_field='currency_id', computed='_compute_expected_margin')
-    state = fields.Selection(
-        selection=[('open', u"Ouvert"), ('closed', u"Fermé")],
-        sttring=u"État", default='open', required=True
-    )
 
     @api.depends('sale_ids')
     def _compute_sales_total(self):

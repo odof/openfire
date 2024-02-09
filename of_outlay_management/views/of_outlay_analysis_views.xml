@@ -53,9 +53,20 @@
                             <field name="expense_journal_ids" widget="many2many_tags"/>
                         </group>
                     </group>
-                    <group string="Montants">
-                        <field name="line_ids" nolabel="1" colspan="2"/>
-                    </group>
+                    <notebook>
+                        <page string="Synthèse">
+                            <group string="Synthèse globale">
+                                <!-- La zone de Paul -->
+                            </group>
+                            <group string="Synthèse par section analytique">
+                                <field name="line_ids" nolabel="1" colspan="2"/>
+                            </group>
+                        </page>
+                        <page string="Produits">
+                        </page>
+                        <page string="Charges">
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
