@@ -11,6 +11,8 @@
         'of_sale_quote_template',
     ],
     'data': [
+        'views/account_move_line_views.xml',
+        'views/of_outlay_analysis_line_views.xml',
         'views/of_outlay_analysis_value_views.xml',
         'views/of_outlay_analysis_views.xml',
         'security/ir.model.access.csv',

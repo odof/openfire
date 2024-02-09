@@ -12,7 +12,7 @@ OUTLAY_VALUE_TYPES = [
 ]
 
 
-class OFOutlayAnalysis(models.Model):
+class OFOutlayAnalysisValue(models.Model):
     _name = 'of.outlay.analysis.value'
     _description = u"Valeurs d'analyse des débours"
 
