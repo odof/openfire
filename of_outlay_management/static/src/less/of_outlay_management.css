@@ -1,0 +1,10 @@
+/* On modifie l'aspect du tableau de synthèse des débours par section */
+
+.of_outlay_analysis_line tbody td.o_list_number:not(.o_readonly) {
+    background-color: #f9cb9c;
+}
+
+.of_outlay_analysis_line tbody tr.text-success {
+    background-color: #93c47d;
+    color: #666666;
+}

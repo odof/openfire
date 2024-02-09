@@ -23,10 +23,6 @@ class OFOutlayAnalysisLine(models.Model):
     _description = u"Lignes d'analyse des débours"
     _order = 'analytic_section_id, id'
 
-    @api.model
-    def _default_currency_id(self):
-        return self.env.user.company_id.currency_id
-
     analysis_id = fields.Many2one(comodel_name='of.outlay.analysis', string=u"Analyse de débours", required=True)
     currency_id = fields.Many2one(
         comodel_name='res.currency', related='analysis_id.currency_id', string=u"Devise", readonly=True
@@ -42,10 +38,10 @@ class OFOutlayAnalysisLine(models.Model):
     amount_invoiced = fields.Monetary(string=u"Montant facturé", currency_field='currency_id')
     amount_final = fields.Monetary(string=u"Montant sit. finale", currency_field='currency_id')
 
-    amount_init_pct = fields.Monetary(string=u"Montant initial (%)")
-    amount_compl_pct = fields.Monetary(string=u"Montant complémentaire (%)")
-    amount_studies_pct = fields.Monetary(string=u"Montant des études (%)")
-    amount_engaged_pct = fields.Monetary(string=u"Montant engagé (%)")
-    amount_current_pct = fields.Monetary(string=u"Montant sit. en cours (%)")
-    amount_invoiced_pct = fields.Monetary(string=u"Montant facturé (%)")
-    amount_final_pct = fields.Monetary(string=u"Montant sit. finale (%)")
+    amount_init_pct = fields.Float(string=u"Montant initial (%)")
+    amount_compl_pct = fields.Float(string=u"Montant complémentaire (%)")
+    amount_studies_pct = fields.Float(string=u"Montant des études (%)")
+    amount_engaged_pct = fields.Float(string=u"Montant engagé (%)")
+    amount_current_pct = fields.Float(string=u"Montant sit. en cours (%)")
+    amount_invoiced_pct = fields.Float(string=u"Montant facturé (%)")
+    amount_final_pct = fields.Float(string=u"Montant sit. finale (%)")

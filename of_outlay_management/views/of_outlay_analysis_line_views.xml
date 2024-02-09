@@ -5,32 +5,33 @@
         <field name="name">of.outlay.analysis.line.tree</field>
         <field name="model">of.outlay.analysis.line</field>
         <field name="arch" type="xml">
-            <tree editable="bottom" create="false">
+            <tree editable="bottom" class="of_outlay_analysis_line" create="false" delete="false" decoration-success="type in ('income_expected', 'to_invoice', 'expense_remaining')">
+                <field name="currency_id" invisible="1"/>
                 <field name="analytic_section_id" readonly="1"/>
                 <field name="type" readonly="1"/>
                 <field name="amount_init" readonly="1"/>
                 <field name="amount_init_pct"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_compl" readonly="1"/>
-                <field name="amount_compl_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                <field name="amount_compl_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_studies"
-                       attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real'))]}"/>
-                <field name="amount_studies_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                       attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
+                <field name="amount_studies_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_engaged" readonly="1"/>
-                <field name="amount_engaged_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                <field name="amount_engaged_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_current"
-                       attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real'))]}"/>
-                <field name="amount_current_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                       attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
+                <field name="amount_current_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_invoiced" readonly="1"/>
-                <field name="amount_invoiced_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                <field name="amount_invoiced_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
                 <field name="amount_final" readonly="1"/>
-                <field name="amount_final_pct" readonly="1"
-                       attrs="{'readonly': [('type', '!=', 'margin_theoretical')]}"/>
+                <field name="amount_final_pct"
+                       attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
             </tree>
         </field>
     </record>

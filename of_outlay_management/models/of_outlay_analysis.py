@@ -30,7 +30,10 @@ class OFOutlayAnalysis(models.Model):
     user_id = fields.Many2one(comodel_name='res.users', string=u"Responsable")
     create_date = fields.Datetime(string=u"Date de création", readonly=True)
     write_date = fields.Datetime(string=u"Dernière mise à jour", readonly=True)
-    company_id = fields.Many2one(comodel_name='res.company', string=u"Société")
+    company_id = fields.Many2one(
+        comodel_name='res.company', string=u"Société", required=True,
+        default=lambda self: self.env['res.company']._company_default_get('of.outlay.analysis')
+    )
     currency_id = fields.Many2one(
         comodel_name='res.currency', related='company_id.currency_id', string=u"Devise", readonly=True
     )
@@ -49,9 +52,12 @@ class OFOutlayAnalysis(models.Model):
     value_ids = fields.One2many(comodel_name='of.outlay.analysis.value', inverse_name='analysis_id', string=u"Valeurs")
 
     # Objets sélectionnés (vie champs m2m_tags)
-
     sale_ids = fields.Many2many(
         comodel_name='sale.order', string=u"Commandes client",
+        compute='_compute_sale_ids'
+    )
+    sale_init_ids = fields.Many2many(
+        comodel_name='sale.order', string=u"CC initiales",
         relation='of_outlay_analysis_sale_rel', column1='analysis_id', column2='order_id',
         domain="[('project_id', 'in', analytic_account_ids[0][2])]"
     )
@@ -102,43 +108,73 @@ class OFOutlayAnalysis(models.Model):
     )
 
     # Lignes sélectionnées (via checkbox)
+    sale_line_ids = fields.One2many(
+        comodel_name='sale.order.line',
+        compute='_compute_sale_line_ids',
+        inverse='_inverse_dummy',
+        string=u"Lignes de commande client",
+    )
+    sale_line_cost_ids = fields.One2many(
+        comodel_name='sale.order.line',
+        compute='_compute_sale_line_ids',
+        inverse='_inverse_dummy',
+        string=u"Lignes de commande client (coût)",
+    )
+    purchase_line_ids = fields.One2many(
+        comodel_name='purchase.order.line',
+        compute='_compute_purchase_line_ids',
+        inverse='_inverse_dummy',
+        string=u"Lignes d'achat",
+    )
+    in_invoice_line_ids = fields.One2many(
+        comodel_name='account.invoice.line',
+        compute='_compute_in_invoice_line_ids',
+        inverse='_inverse_dummy',
+        string=u"Lignes de facture client",
+    )
+    out_invoice_line_ids = fields.One2many(
+        comodel_name='account.invoice.line',
+        compute='_compute_out_invoice_line_ids',
+        inverse='_inverse_dummy',
+        string=u"Lignes de facture fournisseur",
+    )
 
+    # Lignes saisies manuellement
+    expense_entry_ids = fields.One2many(
+        comodel_name='of.outlay.analysis.entry', inverse_name='analysis_id',
+        string=u"Produits analytiques additionnels",
+        domain=[('type', '=', 'expense')]
+    )
+    income_entry_ids = fields.One2many(
+        comodel_name='of.outlay.analysis.entry', inverse_name='analysis_id',
+        string=u"Produits analytiques additionnels",
+        domain=[('type', '=', 'income')]
+    )
 
+    @api.depends('sale_init_ids', 'sale_compl_ids')
+    def _compute_sale_ids(self):
+        for analysis in self:
+            analysis.sale_ids = analysis.sale_init_ids | analysis.sale_compl_ids
 
-    # picking_ids = fields.Many2many(
-    #     comodel_name='stock.picking', string=u"BLs",
-    #
-    # )
-    # stock_move_ids = fields.Many2many(
-    #     comodel_name='stock.move', string=u"Bons de livraison",
-    #     domain="[('picking_type_id.code', '=', 'outgoing')]"
-    # )
-    # task_ids = fields.Many2many(comodel_name='project.task', string=u"Tâches")
-    # user_ids = fields.Many2many(comodel_name='res.users', string=u"Utilisateurs")
-    # intervention_ids = fields.Many2many(comodel_name='of.planning.intervention', string=u"RDVs")
-
-    # sale_order_ids = fields.Many2many(
-    #     comodel_name='sale.order', string=u"Bons de commande", compute='_compute_sale_order_ids')
-
-    @api.depends('sale_ids')
+    @api.depends('sale_init_ids')
     def _compute_sales_total(self):
         for analysis in self:
-            analysis.sales_total = sum(analysis.sale_ids.mapped('amount_untaxed'))
+            analysis.sales_total = sum(analysis.sale_init_ids.mapped('amount_untaxed'))
 
     @api.depends('sales_total', 'expected_margin_pct')
     def _compute_expected_margin(self):
         for analysis in self:
-            analysis.expected_margin = analysis.sales_total * analysis.expected_margin_pct
+            analysis.expected_margin = analysis.sales_total * analysis.expected_margin_pct / 100.0
 
-    @api.onchange('sale_ids')
-    def _onchange_init_sale_ids(self):
-        if self.sale_ids & self.sale_compl_ids:
-            self.sale_compl_ids -= self.sale_ids
+    @api.onchange('sale_init_ids')
+    def _onchange_sale_init_ids(self):
+        if self.sale_init_ids & self.sale_compl_ids:
+            self.sale_compl_ids -= self.sale_init_ids
 
     @api.onchange('sale_compl_ids')
     def _onchange_sale_compl_ids(self):
-        if self.sale_ids & self.sale_compl_ids:
-            self.sale_ids -= self.sale_compl_ids
+        if self.sale_init_ids & self.sale_compl_ids:
+            self.sale_init_ids -= self.sale_compl_ids
 
     @api.depends('analytic_account_ids')
     def _compute_all_move_ids(self):
@@ -163,10 +199,47 @@ class OFOutlayAnalysis(models.Model):
             analysis.all_expense_journal_ids = expense_moves.mapped('journal_id')
             analysis.all_income_journal_ids = income_moves.mapped('journal_id')
 
+    @api.depends('sale_init_ids', 'sale_compl_ids', 'analytic_account_ids')
+    def _compute_sale_line_ids(self):
+        for analysis in self:
+            sale_lines = (analysis.sale_init_ids | analysis.sale_compl_ids).mapped('order_line').filtered(
+                lambda line: line.of_order_project_id in analysis.analytic_account_ids
+            )
+            self.sale_line_ids = sale_lines
+            self.sale_line_cost_ids = sale_lines
+
+    @api.depends('purchase_ids')
+    def _compute_purchase_line_ids(self):
+        for analysis in self:
+            analysis.purchase_line_ids = analysis.purchase_ids.mapped('order_line').filtered(
+                lambda line: line.account_analytic_id in analysis.analytic_account_ids
+            )
+
+    @api.depends('in_invoice_ids')
+    def _compute_in_invoice_line_ids(self):
+        for analysis in self:
+            analysis.in_invoice_line_ids = analysis.in_invoice_ids.mapped('invoice_line_ids').filtered(
+                lambda line: line.account_analytic_id in analysis.analytic_account_ids
+            )
+
+    @api.depends('out_invoice_ids')
+    def _compute_out_invoice_line_ids(self):
+        for analysis in self:
+            analysis.out_invoice_line_ids = analysis.out_invoice_ids.mapped('invoice_line_ids').filtered(
+                lambda line: line.account_analytic_id in analysis.analytic_account_ids
+            )
+
+    @api.multi
+    def _inverse_dummy(self):
+        # Fonction vide, pour permettre d'avoir des champs computed editables
+        # Cependant, on traitera l'édition dans le write, plus efficace pour ne traiter que les écarts de valeurs
+        # (code [(1, id, values)] pour n'avoir que les valeurs modifiées)
+        pass
+
     @api.model
     def get_m2m_fields_to_recompute(self):
         return [
-            'sale_ids', 'purchase_ids',
+            'sale_init_ids', 'purchase_ids',
             'out_invoice_ids', 'in_invoice_ids',
             'expense_move_ids', 'income_move_ids',
             'expense_journal_ids', 'income_journal_ids'
@@ -192,6 +265,7 @@ class OFOutlayAnalysis(models.Model):
             field = self._fields[field_name]
             domain = safe_eval(field.domain.replace('[0][2]', '.ids'), globals_dict=eval_dict)
             self[field_name] = self.env[field.comodel_name].search(domain)
+        self.sale_compl_ids = False
 
     @api.multi
     def action_open(self):
@@ -249,7 +323,7 @@ class OFOutlayAnalysis(models.Model):
         section_amounts = {}
 
         # Partie initialisation (Commande client)
-        for order_line in self.sale_ids.mapped('order_line'):
+        for order_line in self.sale_init_ids.mapped('order_line'):
             amounts = get_section_amounts(order_line.of_analytic_section_id.id)
             if amounts is False:
                 continue
@@ -329,19 +403,18 @@ class OFOutlayAnalysis(models.Model):
             }
             # Valeurs renseignées
             sale_init_margin = amounts['sale_price'] - amounts['sale_cost']
-            sale_init_margin_pct = sale_init_margin / amounts['sale_price']
+            sale_init_margin_pct = amounts['sale_price'] and 100.0 * sale_init_margin / amounts['sale_price']
             sale_total_price = amounts['sale_price'] + amounts['sale_compl_price']
             sale_total_cost = amounts['sale_cost'] + amounts['sale_compl_cost']
             sale_total_margin = sale_total_price - sale_total_cost
-            sale_total_margin_pct = sale_total_margin / sale_total_price
+            sale_total_margin_pct = sale_total_price and 100.0 * sale_total_margin / sale_total_price
             invoice_price = amounts['sale_invoiced']
             invoice_cost = amounts['purchase_invoiced']
             misc_cost = amounts['misc_income'] - amounts['misc_expense']
             move_cost = invoice_cost + misc_cost
             move_margin = invoice_price - move_cost
-            move_margin_pct = move_margin / invoice_price
-            expected_margin = amounts['sale_price'] * self.expected_margin_pct
-            expected_invoiced = move_cost / (1 - sale_total_margin)
+            move_margin_pct = invoice_price and 100.0 * move_margin / invoice_price
+            expected_invoiced = move_cost / (1 - sale_total_margin) if sale_total_margin != 1 else sale_total_price
             sale_price_studies = get_line_value('income', 'amount_studies', sale_total_price)
             sale_price_current = get_line_value('income', 'amount_current', sale_total_price)
             section_values = [
@@ -390,26 +463,26 @@ class OFOutlayAnalysis(models.Model):
 
                     'amount_init':
                         get_line_value('margin_theoretical', 'amount_init_pct', sale_init_margin_pct)
-                        * amounts['sale_price'],
+                        * amounts['sale_price'] / 100.0,
                     'amount_compl':
-                        get_line_value('margin_theoretical', 'amount_compl_pct', sale_init_margin)
-                        * amounts['sale_compl_price'],
+                        get_line_value('margin_theoretical', 'amount_compl_pct', sale_init_margin_pct)
+                        * amounts['sale_compl_price'] / 100.0,
                     'amount_studies':
                         get_line_value('margin_theoretical', 'amount_studies_pct', sale_init_margin_pct)
-                        * sale_price_studies,
+                        * sale_price_studies / 100.0,
                     'amount_engaged':
                         get_line_value('margin_theoretical', 'amount_engaged_pct', sale_init_margin_pct)
-                        * sale_total_price,
+                        * sale_total_price / 100.0,
                     'amount_current': get_line_value('margin_theoretical', 'amount_current_pct', sale_init_margin_pct)
-                        * sale_price_current,
+                        * sale_price_current / 100.0,
                     'amount_invoiced':
                         get_line_value('margin_theoretical', 'amount_invoiced_pct', sale_init_margin_pct)
-                        * invoice_price,
+                        * invoice_price / 100.0,
                     'amount_final':
                         get_line_value('margin_theoretical', 'amount_final_pct', sale_init_margin_pct)
-                        * invoice_price,
+                        * invoice_price / 100.0,
                     'amount_init_pct': get_line_value('margin_theoretical', 'amount_init_pct', sale_init_margin_pct),
-                    'amount_compl_pct': get_line_value('margin_theoretical', 'amount_compl_pct', sale_init_margin),
+                    'amount_compl_pct': get_line_value('margin_theoretical', 'amount_compl_pct', sale_init_margin_pct),
                     'amount_studies_pct':
                         get_line_value('margin_theoretical', 'amount_studies_pct', sale_init_margin_pct),
                     'amount_engaged_pct':
@@ -425,13 +498,13 @@ class OFOutlayAnalysis(models.Model):
                     'analysis_id': self.id,
                     'analytic_section_id': section_id,
                     'type': 'margin_objective',
-                    'amount_init': expected_margin,
-                    'amount_compl': expected_margin,
-                    'amount_studies': expected_margin,
-                    'amount_engaged': expected_margin,
-                    'amount_current': expected_margin,
-                    'amount_invoiced': expected_margin,
-                    'amount_final': expected_margin,
+                    'amount_init': amounts['sale_price'] * self.expected_margin_pct / 100.0,
+                    'amount_compl': amounts['sale_compl_price'] * self.expected_margin_pct / 100.0,
+                    'amount_studies': sale_price_studies * self.expected_margin_pct / 100.0,
+                    'amount_engaged': sale_total_price * self.expected_margin_pct / 100.0,
+                    'amount_current': sale_price_current * self.expected_margin_pct / 100.0,
+                    'amount_invoiced': invoice_price * self.expected_margin_pct / 100.0,
+                    'amount_final': invoice_price * self.expected_margin_pct / 100.0,
                     'amount_init_pct': self.expected_margin_pct,
                     'amount_compl_pct': self.expected_margin_pct,
                     'amount_studies_pct': self.expected_margin_pct,
@@ -498,9 +571,9 @@ class OFOutlayAnalysis(models.Model):
         self.ensure_one()
         self = self.sudo()
         value_obj = self.env['of.outlay.analysis.value']
-        if not self.sale_order_ids:
+        if not self.sale_ids:
             raise UserError(u"Vous devez renseigner au moins 1 bon de commande client")
-        sale_order_lines = self.sale_order_ids.mapped('order_line').sorted(
+        sale_order_lines = self.sale_ids.mapped('order_line').sorted(
             key=lambda l: (l.date_order, l.order_id.project_id.id, l.of_analytic_section_id.id)
         )
         if not sale_order_lines:
@@ -546,7 +619,7 @@ class OFOutlayAnalysis(models.Model):
         # type out_expected : valeur saisie en dur
         date = date_min
         sale_amount = sum(sale_order_lines.mapped('price_subtotal'))
-        theoretical_expenses = sale_amount * self.expected_margin_pct
+        theoretical_expenses = sale_amount * self.expected_margin_pct / 100.0
         while date < date_max:
             value_obj.create({
                 'analysis_id': self.id,
@@ -623,3 +696,49 @@ class OFOutlayAnalysis(models.Model):
                             })
                     date_next += relativedelta(months=1)
                     date_next_str = fields.Date.to_string(date_next)
+
+    @api.model
+    def _apply_vals_to_o2m(self, vals):
+        o2m_related_fields = (
+            'sale_line_ids', 'sale_line_cost_ids',
+            'purchase_line_ids',
+            'in_invoice_line_ids', 'out_invoice_line_ids',
+        )
+        editable_fields = (
+            'of_outlay_analysis_selected', 'of_outlay_analysis_cost_selected', 'of_analytic_section_id'
+        )
+        for field_name in o2m_related_fields:
+            obj = self.env[self._fields[field_name].comodel_name]
+            for row in vals.pop(field_name, []):
+                if row[0] != 1:
+                    continue
+                record_vals = {}
+                for field_name in editable_fields:
+                    if field_name in row[2]:
+                        record_vals[field_name] = row[2][field_name]
+                if record_vals:
+                    obj.browse(row[1]).write(record_vals)
+
+    @api.model
+    def create(self, vals):
+        self._apply_vals_to_o2m(vals)
+        analysis = super(OFOutlayAnalysis, self).create(vals)
+        if analysis.sale_init_ids:
+            analysis.sale_init_ids.write({'of_outlay_analysis_type': 'init'})
+        if analysis.sale_compl_ids:
+            analysis.sale_compl_ids.write({'of_outlay_analysis_type': 'compl'})
+        return analysis
+
+    @api.multi
+    def write(self, vals):
+        self._apply_vals_to_o2m(vals)
+        res = super(OFOutlayAnalysis, self).write(vals)
+        if 'sale_init_ids' in vals:
+            sale_orders = self.mapped('sale_init_ids').filtered(lambda sale: sale.of_outlay_analysis_type != 'init')
+            if sale_orders:
+                sale_orders.write({'of_outlay_analysis_type': 'init'})
+        if 'sale_compl_ids' in vals:
+            sale_orders = self.mapped('sale_compl_ids').filtered(lambda sale: sale.of_outlay_analysis_type != 'compl')
+            if sale_orders:
+                sale_orders.write({'of_outlay_analysis_type': 'compl'})
+        return res

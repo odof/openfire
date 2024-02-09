@@ -4,7 +4,14 @@
     <record id="of_outlay_analysis_form" model="ir.ui.view">
         <field name="name">of.outlay.analysis.form</field>
         <field name="model">of.outlay.analysis</field>
+        <field name="inherit_id" ref="of_outlay_management.of_outlay_analysis_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='sale_line_ids']/tree/field[@name='line_type']" position="before">
+                <field name="of_subcontracted_service" readonly="1"/>
+            </xpath>
+            <xpath expr="//field[@name='sale_line_cost_ids']/tree/field[@name='line_type']" position="before">
+                <field name="of_subcontracted_service" readonly="1"/>
+            </xpath>
             <form>
                 <header>
                     <button name="action_open" type="object" states="closed" string="Rouvrir"/>
@@ -30,18 +37,9 @@
                         </h1>
                     </div>
                     <group>
-                        <group>
-                            <field name="create_date"/>
-                            <field name="write_date"/>
-                            <field name="analytic_account_ids" widget="many2many_tags"/>
-                            <field name="sales_total"/>
-                        </group>
-                        <group>
-                            <field name="user_id"/>
-                            <field name="company_id"/>
-                            <field name="analytic_section_ids" widget="many2many_tags"/>
-                            <field name="expected_margin_pct"/>
-                        </group>
+                        <field name="analytic_account_ids" widget="many2many_tags"/>
+                        <field name="sales_total"/>
+                        <field name="expected_margin_pct"/>
                     </group>
                     <group>
                         <group string="Sources produits" name="sale_shipping">
@@ -73,9 +71,7 @@
                             </group>
                         </page>
                         <page string="Produits">
-                            <separator string="Budget initial &amp; complémentaire"/>
-                            <label for="sale_line_ids" string="Produits réels"/>
-                            <field name="sale_line_ids">
+                            <field name="sale_line_ids" nolabel="1">
                                 <tree editable="bottom" create="false" delete="false">
                                     <field name="of_outlay_analysis_selected"/>
                                     <field name="order_id" readonly="1"/>
@@ -83,7 +79,7 @@
                                     <field name="product_id" readonly="1"/>
                                     <field name="name" readonly="1"/>
                                     <field name="of_order_project_id" readonly="1"/>
-                                    <field name="of_analytic_section_id"/>
+                                    <field name="of_analytic_section_id" readonly="1"/>
                                     <field name="product_uom_qty" readonly="1"/>
                                     <field name="qty_delivered" readonly="1"/>
                                     <field name="qty_invoiced" readonly="1"/>
@@ -91,33 +87,15 @@
                                     <field name="purchase_price" readonly="1"/>
                                     <field name="price_subtotal" readonly="1"/>
                                     <field name="of_purchase_price_subtotal" readonly="1"/>
+                                    <field name="of_subcontracted_service" readonly="1"/>
                                     <field name="of_outlay_analysis_type" readonly="1"/>
                                 </tree>
                             </field>
-                            <label for="income_entry_ids" string="Produits analytiques additionnels (ajouts manuels)"/>
-                            <field name="income_entry_ids"/>
-                            <separator string="Produits facturés"/>
-                            <label for="out_invoice_line_ids" string="Factures réelles"/>
-                            <field name="out_invoice_line_ids">
-                                <tree editable="bottom" create="false" delete="false">
-                                    <field name="of_outlay_analysis_selected"/>
-                                    <field name="invoice_id" readonly="1"/>
-                                    <field name="date_invoice" readonly="1"/>
-                                    <field name="product_id" readonly="1"/>
-                                    <field name="name" readonly="1"/>
-                                    <field name="account_analytic_id" readonly="1"/>
-                                    <field name="of_analytic_section_id"/>
-                                    <field name="quantity" readonly="1"/>
-                                    <field name="price_unit" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1"/>
-                                    <field name="origin" readonly="1"/>
-                                </tree>
-                            </field>
+
                         </page>
                         <page string="Charges">
-                            <separator string="Budget initial &amp; complémentaire"/>
-                            <label for="sale_line_cost_ids" string="Achats réels"/>
-                            <field name="sale_line_cost_ids">
+                            <label for="sale_line_cost_ids"/>
+                            <field name="sale_line_cost_ids" nolabel="1">
                                 <tree editable="bottom" create="false" delete="false">
                                     <field name="of_outlay_analysis_cost_selected"/>
                                     <field name="order_id" readonly="1"/>
@@ -125,17 +103,17 @@
                                     <field name="product_id" readonly="1"/>
                                     <field name="name" readonly="1"/>
                                     <field name="of_order_project_id" readonly="1"/>
-                                    <field name="of_analytic_section_id"/>
+                                    <field name="of_analytic_section_id" readonly="1"/>
                                     <field name="product_uom_qty" readonly="1"/>
                                     <field name="purchase_price" readonly="1"/>
                                     <field name="of_purchase_price_subtotal" readonly="1"/>
+                                    <field name="of_subcontracted_service" readonly="1"/>
                                     <field name="of_outlay_analysis_type" readonly="1"/>
                                 </tree>
                             </field>
-                            <separator string="Budget engagé"/>
-                            <label for="purchase_line_ids" string="Charges réelles"/>
-                            <field name="purchase_line_ids">
-                                <tree editable="bottom" create="false" delete="false">
+                            <separator string="Charges réelles" nolabel="1"/>
+                            <field name="purchase_line_ids" nolabel="1" colspan="2">
+                                <tree editable="bottom" create="false">
                                     <field name="of_outlay_analysis_selected"/>
                                     <field name="order_id" readonly="1"/>
                                     <field name="date_order" readonly="1"/>
@@ -148,25 +126,6 @@
                                     <field name="qty_invoiced" readonly="1"/>
                                     <field name="price_unit" readonly="1"/>
                                     <field name="price_subtotal" readonly="1"/>
-                                </tree>
-                            </field>
-                            <label for="expense_entry_ids" string="Charges analytiques additionnelles (ajouts manuels)"/>
-                            <field name="expense_entry_ids"/>
-                            <separator string="Charges facturées"/>
-                            <label for="in_invoice_line_ids" string="Factures réelles"/>
-                            <field name="in_invoice_line_ids">
-                                <tree editable="bottom" create="false" delete="false">
-                                    <field name="of_outlay_analysis_selected"/>
-                                    <field name="invoice_id" readonly="1"/>
-                                    <field name="date_invoice" readonly="1"/>
-                                    <field name="product_id" readonly="1"/>
-                                    <field name="name" readonly="1"/>
-                                    <field name="account_analytic_id" readonly="1"/>
-                                    <field name="of_analytic_section_id"/>
-                                    <field name="quantity" readonly="1"/>
-                                    <field name="price_unit" readonly="1"/>
-                                    <field name="price_subtotal" readonly="1"/>
-                                    <field name="origin" readonly="1"/>
                                 </tree>
                             </field>
                         </page>
