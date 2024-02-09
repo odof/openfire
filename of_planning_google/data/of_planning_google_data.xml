@@ -14,7 +14,6 @@
         <field eval="'synchronize_events_cron'" name="function" />
     </record>
 
-    xxx
     <record id="ir_cron_sync_all_cals" model="ir.cron">
         <field name="active" eval="False"/>
     </record>
