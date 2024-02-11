@@ -151,6 +151,11 @@ class OFOutlayAnalysis(models.Model):
         domain=[('type', '=', 'income')]
     )
 
+    kanban_record_ids = fields.One2many(
+        comodel_name='of.outlay.analysis.kanban.record', inverse_name='analysis_id',
+        string=u"Enregistrements Kanban"
+    )
+
     @api.depends('sale_init_ids', 'sale_compl_ids')
     def _compute_sale_ids(self):
         for analysis in self:
@@ -696,6 +701,9 @@ class OFOutlayAnalysis(models.Model):
                             })
                     date_next += relativedelta(months=1)
                     date_next_str = fields.Date.to_string(date_next)
+
+        # Kanban records computation
+        self.env['of.outlay.analysis.kanban.record'].recompute_records(self)
 
     @api.model
     def _apply_vals_to_o2m(self, vals):

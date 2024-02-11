@@ -10,6 +10,7 @@ from . import of_account_analytic_section
 from . import of_outlay_analysis
 from . import of_outlay_analysis_entry
 from . import of_outlay_analysis_line
+from . import of_outlay_analysis_kanban_record
 from . import of_outlay_analysis_value
 from . import of_planning_intervention
 from . import purchase_order

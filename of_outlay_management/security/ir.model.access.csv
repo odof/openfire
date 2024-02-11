@@ -9,3 +9,5 @@ access_of_outlay_analysis_line_user,access.of.outlay.analysis.line.user,model_of
 access_of_outlay_analysis_line_manager,access.of.outlay.analysis.line.manager,model_of_outlay_analysis_line,sales_team.group_sale_manager,1,1,1,1
 access_of_outlay_analysis_value_user,access.of.outlay.analysis.value.user,model_of_outlay_analysis_value,base.group_user,1,0,0,0
 access_of_outlay_analysis_value_manager,access.of.outlay.analysis.value.manager,model_of_outlay_analysis_value,sales_team.group_sale_manager,1,1,1,1
+access_of_outlay_analysis_kanban_record_user,access.of.outlay.analysis.kanban.record.user,model_of_outlay_analysis_kanban_record,base.group_user,1,0,0,0
+access_of_outlay_analysis_kanban_record_manager,access.of.outlay.analysis.kanban.record.manager,model_of_outlay_analysis_kanban_record,sales_team.group_sale_manager,1,1,1,1

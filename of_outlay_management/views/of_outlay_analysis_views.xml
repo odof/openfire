@@ -66,7 +66,79 @@
                     <notebook>
                         <page string="Synthèse">
                             <group string="Synthèse globale">
-                                <!-- La zone de Paul -->
+                                <field name="kanban_record_ids" mode="kanban" nolabel="1">
+                                    <kanban class="of_outlay_mngt_kanban o_kanban_small_column" default_group_by="category" drag_group="false"
+                                            group_create="false" group_edit="false" group_delete="false" create="false" edit="false" delete="false">
+                                        <field name="type"/>
+                                        <field name="category"/>
+                                        <field name="label1"/>
+                                        <field name="label2"/>
+                                        <field name="label3"/>
+                                        <field name="label4"/>
+                                        <field name="value1"/>
+                                        <field name="value2"/>
+                                        <field name="value3"/>
+                                        <field name="value4"/>
+                                        <field name="main_color"/>
+                                        <field name="color1"/>
+                                        <field name="color2"/>
+                                        <field name="color3"/>
+                                        <field name="color4"/>
+                                        <templates>
+                                            <t t-name="kanban-box">
+                                                <div class="of_outlay_mngt_kanban_main" t-att-style="'background-color: ' + record.main_color.raw_value + ';'">
+                                                    <div class="o_kanban_card_content">
+                                                        <div class="of_outlay_mngt_kanban_title">
+                                                            <span>
+                                                                <field name="type"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main1" t-att-style="'color: ' + record.color1.raw_value + ';' + (record.value2.raw_value == &apos;&apos; and ' padding-top: 15px;' or '')">
+                                                            <span class="of_outlay_mngt_kanban_label1">
+                                                                <field name="label1"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value1">
+                                                                <field name="value1"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main2" t-att-style="'color: ' + record.color2.raw_value + ';'">
+                                                            <span class="of_outlay_mngt_kanban_label2">
+                                                                <field name="label2"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value2">
+                                                                <field name="value2"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main3" t-att-style="'color: ' + record.color3.raw_value + ';' + (record.value4.raw_value == &apos;&apos; and ' padding-top: 5px;' or '')">
+                                                            <span class="of_outlay_mngt_kanban_label3">
+                                                                <field name="label3"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value3">
+                                                                <field name="value3"/>
+                                                            </span>
+                                                        </div>
+                                                        <br/>
+                                                        <div class="clearfix"/>
+                                                        <div class="of_outlay_mngt_kanban_main4" t-att-style="'color: ' + record.color4.raw_value + ';'">
+                                                            <span class="of_outlay_mngt_kanban_label4">
+                                                                <field name="label4"/>
+                                                            </span>
+                                                            <span class="of_outlay_mngt_kanban_value4">
+                                                                <field name="value4"/>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                        </templates>
+                                    </kanban>
+                                </field>
                             </group>
                             <group string="Synthèse par section analytique">
                                 <field name="line_ids" nolabel="1" colspan="2"/>
