@@ -9,28 +9,28 @@
                 <field name="currency_id" invisible="1"/>
                 <field name="analytic_section_id" readonly="1"/>
                 <field name="type" readonly="1"/>
-                <field name="amount_init" readonly="1"/>
-                <field name="amount_init_pct"
+                <field name="amount_init" string="Initial" readonly="1"/>
+                <field name="amount_init_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_compl" readonly="1"/>
-                <field name="amount_compl_pct"
+                <field name="amount_compl" string="Complémentaire" readonly="1"/>
+                <field name="amount_compl_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_studies"
+                <field name="amount_studies" string="Études"
                        attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
-                <field name="amount_studies_pct"
+                <field name="amount_studies_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_engaged" readonly="1"/>
-                <field name="amount_engaged_pct"
+                <field name="amount_engaged" string="Engagé" readonly="1"/>
+                <field name="amount_engaged_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_current"
+                <field name="amount_current" string="Situation en cours"
                        attrs="{'readonly': [('type', 'in', ('margin_theoretical', 'margin_objective', 'margin_real', 'income_expected', 'to_invoice', 'expense_remaining'))]}"/>
-                <field name="amount_current_pct"
+                <field name="amount_current_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_invoiced" readonly="1"/>
-                <field name="amount_invoiced_pct"
+                <field name="amount_invoiced" string="Facturé" readonly="1"/>
+                <field name="amount_invoiced_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
-                <field name="amount_final" readonly="1"/>
-                <field name="amount_final_pct"
+                <field name="amount_final" string="Situation finale" readonly="1"/>
+                <field name="amount_final_pct" string="(%)"
                        attrs="{'readonly': [('type', '!=', 'margin_objective')]}"/>
             </tree>
         </field>
