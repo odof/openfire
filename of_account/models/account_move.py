@@ -81,7 +81,7 @@ class AccountMove(models.Model):
             if move.journal_id:
                 if last_move := self.env['account.move'].search(
                     [
-                        ('journal_id', '=', self.journal_id.id),
+                        ('journal_id', '=', move.journal_id.id),
                         ('date', '!=', False),
                     ],
                     order='date DESC',
