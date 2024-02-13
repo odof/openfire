@@ -173,7 +173,10 @@ class ResPartner(models.Model):
                     ),
                 },
             )
-        return True
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'soft_reload',
+        }
 
     def _geo_localize_children(self):
         """Geolocalize children of partner if they have different address data"""
