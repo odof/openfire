@@ -77,7 +77,7 @@ class OFSurveySurvey(models.Model):
         ],
         string="Pagination",
         required=True,
-        default='page_per_section',
+        default='one_page',
     )
     questions_selection = fields.Selection(
         selection=[('all', "All questions")],
