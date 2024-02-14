@@ -11,6 +11,7 @@
                 <header/>
             </xpath>
 
+
             <!-- Hide standard fields to manage their positions -->
             <xpath expr="//group//field[@name='title']" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -61,9 +62,13 @@
                         attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
             </xpath>
 
-            <!-- Move Title after Type -->
-            <xpath expr="//group//field[@name='type']" position="after">
-                <field name="title" options='{"no_open": True}' placeholder="e.g. Mister" attrs="{'invisible': [('is_company', '=', True)]}"/>
+            <!-- Move Contact's title after Form title part -->
+            <xpath expr="//div[hasclass('oe_title')]" position="after">
+                <group>
+                    <group>
+                        <field name="title" options='{"no_open": True}' placeholder="e.g. Mister" attrs="{'invisible': [('is_company', '=', True)]}"/>
+                    </group>
+                </group>
             </xpath>
 
             <!-- Ajout aide du champ comment (notes internes / notes client) -->
