@@ -7,7 +7,8 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='sale_header']/group[@name='order_details']//field[@name='show_update_pricelist']" position="before">
+            <xpath expr="//field[@name='validity_date']" position="after">
+                <field name="of_requested_week"/>
                 <field name="of_technical_visit_date"/>
             </xpath>
         </field>
@@ -37,9 +38,7 @@
                 </div>
                 <field name="effective_date" attrs="{'invisible': [('effective_date', '=', False)]}"/>
             </xpath>
-            <xpath expr="//field[@name='effective_date']" position="after">
-                <field name="of_requested_week"/>
-            </xpath>
+
         </field>
     </record>
 

@@ -77,6 +77,14 @@
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
                 </xpath>
 
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <xpath expr="//field[@name='validity_date']" position="move"/>
+                </xpath>
+
+                <xpath expr="//field[@name='payment_term_id']" position="before">
+                    <xpath expr="//label[@for='fiscal_position_id']" position="move"/>
+                    <xpath expr="//field[@name='fiscal_position_id']/.." position="move"/>
+                </xpath>
                 <!-- Order lines -->
                 <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
                     <attribute name="groups">account.group_show_line_subtotals_tax_included,of_sale.of_group_display_tax_inclued_total_in_so_lines</attribute>
