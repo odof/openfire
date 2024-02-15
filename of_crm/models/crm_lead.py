@@ -24,9 +24,9 @@ class CrmLead(models.Model):
 
     # Custom CRM fields
     of_ref = fields.Char(string="Reference", copy=False)
-    of_canvasser_id = fields.Many2one(comodel_name='res.users', string="Canvasser")
+    of_canvasser_id = fields.Many2one(comodel_name='res.users', string="Canvasser", tracking=True)
     of_prospecting_date = fields.Date(string="Prospecting date", default=fields.Date.today)
-    of_closing_date = fields.Date(string="Closing date")
+    of_closing_date = fields.Date(string="Closing date", tracking=True)
     of_additionnal_infos = fields.Html(string="Additionnal informations")
     of_referred_id = fields.Many2one(comodel_name='res.partner', string="Brought by", help="Name of business referrer")
     description = fields.Html(string="Follow-up")

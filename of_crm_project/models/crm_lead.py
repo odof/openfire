@@ -6,7 +6,7 @@ from odoo import Command, _, api, fields, models
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
-    of_date_project = fields.Date(string="Project date")
+    of_date_project = fields.Date(string="Project date", tracking=True)
 
     # Linked Partner fields
     of_interlocutor = fields.Many2one(comodel_name='res.partner', string="Interlocutor")
