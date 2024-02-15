@@ -106,6 +106,9 @@
                 <field name="is_company"/>
                 <field name="of_website" widget="url"/>
             </xpath>
+            <xpath expr="//group[@name='opportunity_partner']//field[@name='partner_id']" position="before">
+                <field name="of_title" attrs="{'invisible': [('is_company','=',True)]}"/>
+            </xpath>
             <xpath expr="//page[@name='lead']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>
             </xpath>

@@ -6,16 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-25 15:34+0000\n"
-"PO-Revision-Date: 2023-10-25 15:34+0000\n"
+"POT-Creation-Date: 2024-02-19 08:08+0000\n"
+"PO-Revision-Date: 2024-02-19 08:08+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_quick_create_opportunity_form
@@ -28,9 +26,39 @@ msgid "<span>%</span>"
 msgstr ""
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__category
+msgid "Action"
+msgstr ""
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_mail_activity_type__category
+msgid ""
+"Actions may trigger specific behavior like opening calendar view or "
+"automatically mark as done when a document is uploaded"
+msgstr ""
+"Les actions peuvent déclencher des comportements spécifiques, tels que "
+"l’ouverture de la vue calendrier ou automatiquement marquer comme fait "
+"lorsqu’un document est téléchargé."
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_mail_activity_type__of_activities_type
+msgid "Activities"
+msgstr "Activités"
+
+#. module: of_crm
 #: model:ir.model.fields.selection,name:of_crm.selection__mail_activity_type__category__activities_lot
 msgid "Activities lot"
 msgstr "Lot d’activités"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_mail_activity
+msgid "Activity"
+msgstr "Activité"
+
+#. module: of_crm
+#: model:ir.model,name:of_crm.model_mail_activity_type
+msgid "Activity Type"
+msgstr "Type d'activité"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_stage__of_manual_activity_id
@@ -92,6 +120,11 @@ msgstr "Prospecteur"
 #: model:ir.model.fields,field_description:of_crm.field_res_users__of_lead_medium_id
 msgid "Channel"
 msgstr "Canal"
+
+#. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead__is_company
+msgid "Check if the contact is a company, otherwise it is a person"
+msgstr "Cochez si le contact est une société, sinon c’est une personne"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
@@ -348,8 +381,8 @@ msgid ""
 "Technical field used in the search view to filter on the date of the next "
 "action"
 msgstr ""
-"Champ technique utilisé dans la vue de recherche pour filtrer sur la date "
-"de la prochaine action"
+"Champ technique utilisé dans la vue de recherche pour filtrer sur la date de"
+" la prochaine action"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_res_partner__user_id
@@ -365,8 +398,8 @@ msgstr "Activités à faire cette semaine"
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_res_partner__campaign_id
 msgid ""
-"This is a name that helps you keep track of your different campaign "
-"efforts, e.g. Fall_Drive, Christmas_Special"
+"This is a name that helps you keep track of your different campaign efforts,"
+" e.g. Fall_Drive, Christmas_Special"
 msgstr ""
 "C’est le nom qui vous permet de suivre vos différentes campagnes, par "
 "exemple Offre de noël"
@@ -382,6 +415,11 @@ msgid ""
 "This is the source of the link, e.g. Search Engine, another domain, or name "
 "of email list"
 msgstr "C’est la source du lien, par exemple moteur de recherche"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_title
+msgid "Title"
+msgstr "Civilité"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter

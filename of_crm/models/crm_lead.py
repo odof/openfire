@@ -8,6 +8,8 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     # Partner related fields
+    of_title = fields.Many2one(related='partner_id.title', readonly=False)
+    is_company = fields.Boolean(string="Is a company", tracking=True, related='partner_id.is_company', readonly=False)
     of_website = fields.Char(related='partner_id.website')
     tag_ids = fields.Many2many(
         comodel_name='res.partner.category',
@@ -16,8 +18,8 @@ class CrmLead(models.Model):
         help="Classify and analyze your lead/opportunity categories like: Training, Service",
     )
     meeting_ids = fields.Many2many(comodel_name='calendar.event', string="Meetings", related='partner_id.meeting_ids')
+
     # Partner fields
-    is_company = fields.Boolean(string="Is a company")
     zip_id = fields.Many2one(comodel_name='res.city.zip', string="City/Location")
 
     # Custom CRM fields
