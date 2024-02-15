@@ -1524,12 +1524,15 @@ class OfContractLine(models.Model):
         Service = self.with_context(bloquer_recurrence=True).env['of.service']
         li = [(line, line._get_period()) for line in self]
         today = fields.Date.today()
+        # If period is not on current year, add current year
+        additional_li = []
         for line, period in li:
-            # If period is not on current year, add current year
             if not (period.date_start <= today <= period.date_end):
                 current_year_period = line.contract_id.period_ids.filtered(
                     lambda p: p.date_start <= today <= p.date_end)
-                li.append((line, current_year_period))
+                if current_year_period:
+                    additional_li.append((line, current_year_period))
+        li += additional_li
         for line, period in li:
             if not period or line.state != 'validated':
                 continue
