@@ -440,8 +440,7 @@ class OfPlanningIntervention(models.Model):
             active_ids=self.ids,
         ).default_get(tour_meetup_obj._fields.keys())
         default_values['duree'] = self.duree or self.tache_id.duree or 1.0
-        default_values['service_id'] = self.service_id.id or False
-        default_values['template_id'] = self.template_id.id or False
+        default_values['service_id'] = self.service_id.id
         default_values['origin_intervention_id'] = self.id
         time_slots_new = tour_meetup_obj.new(default_values)
         # onchange to compute fields on the time slots
