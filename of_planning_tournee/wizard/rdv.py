@@ -1265,7 +1265,6 @@ class OfTourneeRdv(models.TransientModel):
             template_id = service.template_id.id
         else:
             template_id = self.template_id.id or False
-            service = False
 
         tag_ids = \
             [(4, tag.id) for tag in service.tag_ids] \
@@ -1279,7 +1278,7 @@ class OfTourneeRdv(models.TransientModel):
             'address_id': self.partner_address_id.id,
             'tache_id': self.tache_id.id,
             'template_id': template_id,
-            'service_id': service.id if service else False,
+            'service_id': service.id,
             'employee_ids': [(4, self.employee_id.id, 0)],
             'tag_ids': tag_ids,
             'date': self.date_propos,
@@ -1287,18 +1286,11 @@ class OfTourneeRdv(models.TransientModel):
             'user_id': self._uid,
             'company_id': self.company_id.id,
             'name': name,
-            'equipe_id': self.origin_intervention_id.equipe_id.id,
-            'type_id': self.origin_intervention_id.type_id.id,
-            'parc_installe_id': self.origin_intervention_id.parc_installe_id.id,
-            'picking_manual_ids': [(6, 0, self.origin_intervention_id.picking_manual_ids.ids or [])],
-            'description_interne': self.origin_intervention_id.description_interne or '',
             'description': self.description or '',
             'state': 'confirm',
             'verif_dispo': True,
             'order_id': order_id,
             'picking_id': len(picking_list) == 1 and picking_list[0] or False,
-            'invoice_policy': self.origin_intervention_id.invoice_policy,
-            'fiscal_position_id': self.origin_intervention_id.fiscal_position_id.id or False,
             'origin_interface': u"Trouver un créneau (rdv.py)",
             'flexible': self.tache_id.flexible,
             'duration_one_way': self.res_line_id.duree_prec,
