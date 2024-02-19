@@ -84,7 +84,7 @@
 
             <!-- Gestion des numéros de téléphone -->
             <xpath expr="//group//field[@name='phone']" position="after">
-                <field name="of_phone_number_ids" string="Phones" class="of_phone_table">
+                <field name="of_phone_number_ids" string="Phones" class="of_phone_table" widget="of_light_x2many">
                     <tree editable="bottom" decoration-danger="not is_valid">
                         <field name="type" string="Type"/>
                         <field name="title_id" string="Title" options="{'no_open': True, 'no_create_edit': True}"/>

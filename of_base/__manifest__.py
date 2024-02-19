@@ -16,7 +16,8 @@
         'product',
         'mail',
         'contacts',
-        'base_view_inheritance_extension'
+        'base_view_inheritance_extension',
+        'of_web_widgets',
     ],
     'data': [
         'data/ir_cron.xml',

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+
+    <t t-name="of_web_widgets.OFLightListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary" owl="1">
+        <xpath expr="//table" position="attributes">
+            <attribute name="class" position="add" separator=" ">o_of_light_x2many</attribute>
+        </xpath>
+    </t>
+
+</templates>
