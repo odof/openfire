@@ -2211,7 +2211,7 @@ class OfPlanningInterventionLine(models.Model):
                 line.qty_invoiceable = 0.0
             elif line.invoice_policy == 'intervention':
                 line.qty_invoiceable = line.qty - line.qty_invoiced
-            elif self.invoice_policy == 'delivered':
+            elif line.invoice_policy == 'delivered':
                 line.qty_invoiceable = line.qty_delivered - line.qty_invoiced
 
     @api.depends('intervention_id.state', 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_invoiceable')

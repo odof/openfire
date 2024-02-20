@@ -1304,13 +1304,23 @@ class OfTourneeRdv(models.TransientModel):
                 l_dict = line.copy_data()[0]
                 l_dict.update({'intervention_id': False})
                 copied_lines.append((0, 0, l_dict))
-            values['line_ids'] = copied_lines
             copied_questions = []
             for question in self.origin_intervention_id.question_ids:
                 q_dict = question.copy_data()[0]
                 q_dict.update({'intervention_id': False})
                 copied_questions.append((0, 0, q_dict))
-            values['question_ids'] = copied_questions
+            values.update({
+                'line_ids': copied_lines,
+                'question_ids': copied_questions,
+                'equipe_id': self.origin_intervention_id.equipe_id.id,
+                'type_id': self.origin_intervention_id.type_id.id,
+                'parc_installe_id': self.origin_intervention_id.parc_installe_id.id,
+                'picking_manual_ids': [(6, 0, self.origin_intervention_id.picking_manual_ids.ids)],
+                'opportunity_id': self.origin_intervention_id.opportunity_id.id,
+                'invoice_policy': self.origin_intervention_id.invoice_policy,
+                'fiscal_position_id': self.origin_intervention_id.fiscal_position_id.id,
+                'description_interne': self.origin_intervention_id.description_interne or '',
+            })
         return values
 
     def _get_origin_arrival_addresses(self, sudo, employee, tournee):
