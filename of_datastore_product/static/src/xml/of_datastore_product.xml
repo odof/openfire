@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates>
+    <t t-extend="Sidebar">
+        <t t-jquery="a:has(.o_sidebar_delete_attachment)" t-operation="attributes">
+            <attribute name="t-att-class">item.id &lt; 0?'color_orangered':''</attribute>
+        </t>
+        <t t-jquery="span.o_sidebar_delete_attachment" t-operation="attributes">
+            <attribute name="t-if">section.name == 'files' and widget.options.editable and !item.callback and item.id > 0</attribute>
+        </t>
+    </t>
+</templates>

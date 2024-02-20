@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_datastore_brand_update" model="ir.cron">
+        <field name="name">Mise à jour du catalogue de marques centralisées</field>
+        <field name="model">of.datastore.brand</field>
+        <field name="function">update_brands</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <!-- Il faut que le cron se lance après la màj et le démarrage de la base de gestion -->
+        <field name="nextcall" eval="datetime.now().strftime('%Y-%m-%d 05:00:00')"/>
+        <field name="numbercall">-1</field>
+        <field name="active">true</field>
+        <field name="args">()</field>
+    </record>
+
+</odoo>
