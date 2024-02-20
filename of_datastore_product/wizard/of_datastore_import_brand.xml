@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_import_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.import.brand.form</field>
+        <field name="model">of.datastore.import.brand</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Import supplier brands">
+                <group>
+                    <field name="partner_id" required="1"/>
+                    <field name="product_categ_id" required="1"/>
+                    <field name="line_ids">
+                        <tree string="Brands" colors="green:state=='do';grey:state=='dont';">
+                            <button name="button_inverse" string="Reverse" type="object" icon="fa-refresh"
+                                attrs="{'invisible':[('state','=','done')]}"/>
+                            <field name="logo" invisible="1"/>
+                            <field name="datastore_brand_id" invisible="1"/>
+                            <field name="state" readonly="1"/>
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="partner_id"/>
+                            <field name="product_categ_id"/>
+                            <field name="note_maj"/>
+                        </tree>
+                    </field>
+                </group>
+                <footer>
+                    <button name="button_import_brands" string="Create brands" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_datastore_import_brand" model="ir.actions.act_window">
+        <field name="name">Import brands</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.datastore.import.brand</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
