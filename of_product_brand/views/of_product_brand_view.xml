@@ -73,7 +73,7 @@
                     <div class="oe_title">
                         <h1><field name="name" placeholder="OpenFire"/></h1>
                     </div>
-                    <group>
+                    <group name="main">
                         <field name="code" placeholder="OPE"/>
                         <field name="use_prefix"/>
                         <field name="product_change_warn" invisible="1"/>
@@ -88,6 +88,13 @@
                         <label for="note" colspan="2"/>
                         <field name="note" colspan="2" nolabel="1"/>
                     </group>
+                    <!--
+                        Notebook used through inheritance by connectors modules.
+                        We add this empty notebook to allow the connectors modules to add their own pages here.
+                        Note that an empty notebook is not displayed.
+                    -->
+                    <notebook name="config">
+                    </notebook>
                 </sheet>
             </form>
         </field>
