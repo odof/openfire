@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_of_remove_unused_products_form" model="ir.ui.view">
+        <field name="name">of.remove.unused.products.form</field>
+        <field name="model">of.remove.unused.products</field>
+        <field name="arch" type="xml">
+            <form string="Products removal">
+                <span>If you continue, all unused products from this brand will be removed.</span>
+                <footer>
+                    <button name="action_remove_unused_products" type="object" string="Remove" class="btn-primary"/>
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_of_remove_unused_products"
+        name="Remove unused products"
+        res_model="of.remove.unused.products" src_model="of.product.brand"
+        view_mode="form" target="new" view_type="form" />
+
+</odoo>
