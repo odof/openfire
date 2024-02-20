@@ -1,5 +1,9 @@
 image: "python:3.9"
 
+default:
+  tags:
+    - "16.0"
+
 before_script:
   - python --version
   - pip install flake8 flake8-print isort pylint black
