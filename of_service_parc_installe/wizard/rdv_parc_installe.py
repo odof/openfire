@@ -9,5 +9,6 @@ class OfTourneeRdv(models.TransientModel):
     @api.multi
     def get_values_intervention_create(self):
         vals = super(OfTourneeRdv, self).get_values_intervention_create()
-        vals['parc_installe_id'] = self.service_id.parc_installe_id.id
+        if not self.origin_intervention_id:
+            vals['parc_installe_id'] = self.service_id.parc_installe_id.id
         return vals
