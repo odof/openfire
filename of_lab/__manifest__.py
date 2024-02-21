@@ -36,6 +36,7 @@ Module OpenFire pour le Lab'
         'views/of_datastore_brand_views.xml',
         'views/tour_planning_optimization_views.xml',
         'views/templates.xml',
+        'wizards/yousign_direct_signature_wizard_views.xml',
     ],
     'installable': True,
     'auto_install': False,

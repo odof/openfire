@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="yousign_direct_signature_wizard_view_form" model="ir.ui.view">
+        <field name="name">yousign.direct.signature.wizard.view.form</field>
+        <field name="model">yousign.direct.signature.wizard</field>
+        <field name="inherit_id" ref="yousign_connector.yousign_direct_signature_wizard_view_form"/>
+        <field name="arch"  type="xml">
+            <xpath expr="//field[@name='request_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='signatory_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='validate']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@special='cancel']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

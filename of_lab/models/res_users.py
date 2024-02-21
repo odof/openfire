@@ -35,10 +35,10 @@ class ResUsers(models.Model):
 
         # Partner address
         user.partner_id.write({
-            'street': u"Boulevard de l'Europe",
-            'street2': u"EUREXPO",
-            'zip': u"69680",
-            'city': u"Chassieu",
+            'street': u"Rue des Iles Kerguelen",
+            'street2': u"Parc Edonia, Bâtiment E",
+            'zip': u"35760",
+            'city': u"Saint-Grégoire",
         })
 
         # Test partner firstname
