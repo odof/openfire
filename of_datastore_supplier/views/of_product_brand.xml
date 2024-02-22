@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='note']" position="before">
+                <separator string="Updates Notes"/>
+                <field name="update_note"/>
+                <separator string="Internals notes"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page name="stock" string="Stock">
+                    <group>
+                        <group>
+                            <field name="datastore_location_id" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                            <field name="datastore_stock_user_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

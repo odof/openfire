@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_template_property_form" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_template_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='inventory']" position="inside">
+                <group name="ds-stock-information" string="Stock Informations">
+                    <field name="of_stock_informations" nolabel="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_stock_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.datastore.supplier.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_purchase_stock.of_purchase_stock_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_seller_discount']" position="after">
+                <field name="of_next_price_list" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="of_next_price_list_date"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
