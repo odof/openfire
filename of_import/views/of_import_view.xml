@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ################## Vues marque ##################-->
+
+    <record id="of_product_brand_view_form" model="ir.ui.view">
+        <field name="name">of_import of.product.brand.form.view</field>
+        <field name="model">of.product.brand</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Appliquer les règles"/>
+            </xpath>
+            <xpath expr="//field[@name='use_prefix']" position="replace"/>
+            <xpath expr="//field[@name='show_in_sales']" position="replace"/>
+            <xpath expr="//label[@for='note']" position="replace"/>
+            <xpath expr="//field[@name='note']" position="replace"/>
+            <xpath expr="//field[@name='prices_date']" position="replace"/>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page name="import_config" string="Import">
+                        <group name="import_config">
+                            <separator string="Paramètres d'import par défaut" colspan="2"/>
+                            <field name="of_import_categ_id"/>
+                            <field name="of_import_remise"/>
+                            <field name="of_import_price"/>
+                            <field name="of_import_cout"/>
+                            <separator string="Correspondance des catégories d'articles" colspan="2"/>
+                            <field name="categ_ids" nolabel="1" colspan="2">
+                                <tree editable="bottom">
+                                    <field name="categ_origin"/>
+                                    <field name="of_import_categ_id"/>
+                                    <field name="of_import_remise"/>
+                                    <field name="of_import_price"/>
+                                    <field name="of_import_cout"/>
+                                    <button name="action_update_products" type="object" string="Mettre à jour" icon="fa-cogs" confirm="Attention !
+Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de tous les articles de cette catégorie."/>
+                                </tree>
+                            </field>
+                            <separator string="Articles ayant des règles spécifiques" colspan="2"/>
+                            <field name="product_config_ids" widget="many2many" nolabel="1" colspan="2">
+                                <tree editable="bottom">
+                                    <field name="default_code" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="of_import_categ_id"/>
+                                    <field name="of_import_remise"/>
+                                    <field name="of_import_price"/>
+                                    <field name="of_import_cout"/>
+                                    <button name="of_action_update_from_brand" type="object" string="Mettre à jour" icon="fa-cogs" confirm="Attention !
+Cette action irréversible recalculera la catégorie, le prix d'achat et le prix de vente de l'article."/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                    <page name="config" string="Paramètres">
+                        <group name="config">
+                            <field name="use_prefix"/>
+                            <field name="show_in_sales"/>
+                        </group>
+                        <group groups="base.group_system">
+                            <group>
+                                <field name="use_brand_description_sale"/>
+                            </group>
+                            <separator string="Description pour les devis" colspan="4"/>
+                            <field name="description_sale" nolabel="1" colspan="4"/>
+                        </group>
+                    </page>
+                    <page name="notes" string="Notes">
+                        <group>
+                            <field name="prices_date"/>
+                        </group>
+                        <field name="note"/>
+                    </page>
+                    <page name="aide" string="Aide">
+                        <group>
+                            <group>
+                                <div>
+                                    <p>Le module des marques permet de traiter les données reçues du fournisseur pour intégration sur votre base.</p>
+                                    <p>Les champs de <b>remise</b>, <b>prix de vente HT</b> et <b>prix de revient</b> acceptent des expressions python.</p>
+                                    <p>Les éléments spécifiques suivants sont reconnus dans les expressions (en plus des fonctions standard python):</p>
+                                    <ul>
+                                        <li><b>ppht</b>: Le prix public hors taxe, fourni par le fournisseur.</li>
+                                        <li><b>pa</b>: Le prix d'achat</li>
+                                        <li><b>cumul()</b> est une fonction qui sert à cumuler plusieurs remises. cumul(40.5,5) cumule une remise de 40.5% et une remise de 5% pour un total de 43.475% (Attention à la distinction entre point et virgule)</li>
+                                        <li><b>tr_a</b>: "Transport sur achat" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>tr_v</b>: "Transport sur vente" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>coef</b>: "Coefficient de vente" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>fr_l</b>: "Autres frais logistiques" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>taxe</b>: "Taxes divers" renseigné dans la structure de prix de l'article</li>
+                                        <li><b>fr_d</b>: "Frais divers" renseigné dans la structure de prix de l'article</li>
+                                    </ul>
+                                    <p>La remise est un champ optionnel qui peut donc être laissé vide, si par exemple vous importez votre propre tarif, avec un prix d'achat renseigné.</p>
+                                </div>
+                            </group>
+                            <group>
+                                <div>
+                                    <p>Exemples:</p>
+                                    <ul>
+                                        <li><b>40.5</b>: Utiliser une remise de 40.5%.</li>
+                                        <li><b>cumul(40.5,5)</b>: Utiliser deux remises, une de 40.5% plus une de 5%.</li>
+                                        <li><b>pa + 20</b>: Ajouter de 20€ de frais annexes au prix de revient de l'article.</li>
+                                        <li><b>(ppht + 20) * 1.15</b>: Vente de l'article au prix public + 20€ de frais annexes, le tout réhaussé de 15%.</li>
+                                        <li><b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Vente de l'article au prix public si inférieur à 1000€, sinon au prix public réhaussé de 20% et arrondi à l'euro plein.</li>
+                                    </ul>
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+
+    <!-- ################## Vues article ##################-->
+    <record id="of_import_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.import.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_of_import_update_product_brand_products_no_context)d" type="action" string="Appliquer les règles"
+                        context="{'default_product_ids': active_ids, 'default_brand_id': brand_id}"/>
+            </xpath>
+            <xpath expr="//field[@name='purchase_ok']" position="after">
+                <field name="of_is_net_price" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+        <!-- ################## Vues import tarif ##################-->
+
+        <!-- Vue tree -->
+        <record id="of_import_tree_view" model="ir.ui.view">
+            <field name="name">of.import.tree</field>
+            <field name="model">of.import</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="type_import"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="file_name"/>
+                    <field name="state"/>
+                    <field name="nb_total"/>
+                    <field name="nb_ajout"/>
+                    <field name="nb_maj"/>
+                    <field name="nb_echoue"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vue form -->
+        <record id="of_import_form_view" model="ir.ui.view">
+            <field name="name">of.import.form</field>
+            <field name="model">of.import</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="bouton_simuler" string="Simuler import" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}"/>
+                        <button name="bouton_importer" string="Importer" type="object" icon="fa-check" attrs="{'invisible': [('state','!=','brouillon')]}" confirm="Confirmez-vous l'import (non annulable) ?"/>
+                        <button name="bouton_remettre_brouillon" string="Remettre en brouillon" type="object" icon="fa-check" attrs="{'invisible': [('state','=','brouillon')]}" confirm="Remettre à l'état brouillon ?"/>
+                    </header>
+                    <separator string="Configuration" colspan="12"/>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <group>
+                                <field name="type_import"/>
+                                <field name="date" widget="date"/>
+                                <field name="file" filename="file_name"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-6">
+                            <group>
+                                <field name="name"/>
+                                <field name="prefixe"/>
+                                <field name="show_lang" invisible="1"/>
+                                <field name="lang_id" widget="selection" attrs="{'invisible': [('show_lang', '=', False)]}"/>
+                                <field name="separateur"/>
+                                <!-- <field name="separateur1" widget="selection" attrs="{'invisible': [('file_type', '!=', 'csv')]}"/> -->
+                                <!-- <field name="separateur2" placeholder="Séparateur personnalisé" options="{'no_open': True}" attrs="{'invisible': [('separateur1', '!=', 'x')]}"/> -->
+                            </group>
+                        </div>
+                    </div>
+                    <separator string="Informations" colspan="12"/>
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <group>
+                                <field name="file_name" attrs="{'effective_readonly': '1'}"/>
+                                <field name="file_type"/>
+                                <field name="file_encoding" attrs="{'invisible': [('file_encoding', '=', False)], 'effective_readonly': '1'}"/>
+                                <!-- <field name="separateur" string="Séparateur utilisé" attrs="{'invisible': [('file_type', '!=', 'csv')], 'effective_readonly': '1'}"/> -->
+                                <field name="file_size"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-3">
+                            <group>
+                                <field name="nb_total"/>
+                                <field name="nb_ajout"/>
+                                <field name="nb_maj"/>
+                                <field name="nb_echoue"/>
+                                <field name="nb_ignores"/>
+                            </group>
+                        </div>
+                        <div class="col-xs-4">
+                            <group>
+                                <field name="date_debut_import"/>
+                                <field name="date_fin_import"/>
+                                <field name="time_lapse"/>
+                                <field name="state"/>
+                            </group>
+                        </div>
+                    </div>
+                    <group string="Journal" col="3">
+                        <field name="import_error_ids" nolabel="1" style="margin-left: -10px;" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Erreurs"/>
+                            </tree>
+                        </field>
+                        <field name="import_warning_ids" nolabel="1" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Avertissements"/>
+                            </tree>
+                        </field>
+                        <field name="import_success_ids" nolabel="1" style="margin-left: 10px;" options="{'single_page_hidden': false}">
+                            <tree>
+                                <field name='message' string="Infos"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <separator string="Champs disponibles"/>
+                    <group colspan="4" col="4">
+                        <field name="sortie_note" nolabel="1" attrs="{'invisible': [('state','!=','brouillon')]}"
+                               style="max-height: 500px; overflow: auto;"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Menus -->
+
+        <!-- Action vue import -->
+        <record id="action_of_import" model="ir.actions.act_window">
+            <field name="name">OpenImport</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">of.import</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help">Import OpenFire</field>
+        </record>
+
+        <!-- Menu import (Configuration/OpenImport) -->
+        <menuitem id="menu_of_import" action="action_of_import" name="OpenImport"
+            parent="base.menu_administration" sequence="1"/>
+
+</odoo>
