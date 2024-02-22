@@ -1,0 +1,136 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_datastore_supplier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-10 14:50+0000\n"
+"PO-Revision-Date: 2024-10-10 14:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_ir_property
+msgid "Company Property"
+msgstr "Propriété de la société"
+
+#. module: of_datastore_supplier
+#: model_terms:ir.ui.view,arch_db:of_datastore_supplier.view_users_search
+msgid "Distributors"
+msgstr "Distributeurs"
+
+#. module: of_datastore_supplier
+#: model_terms:ir.ui.view,arch_db:of_datastore_supplier.of_datastore_supplier_brand_view_form
+msgid "Internals notes"
+msgstr "Notes internes"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_res_users__of_is_distributor
+msgid "Is a distributor"
+msgstr "Est un distributeur"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_res_users__of_user_ids
+msgid "Linked users"
+msgstr "Utilisateurs"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,help:of_datastore_supplier.field_of_product_brand__datastore_location_id
+msgid "Location where the stock is shared"
+msgstr "Lieu de partage du stock"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_product__of_next_pricelist
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_template__of_next_pricelist
+msgid "Next Pricelist"
+msgstr "Prochaine liste de prix"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_product__of_next_price_list_date
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_template__of_next_price_list_date
+msgid "Next Pricelist Date"
+msgstr "Date de la prochaine liste de prix"
+
+#. module: of_datastore_supplier
+#. odoo-python
+#: code:addons/of_datastore_supplier/models/product_template.py:0
+#, python-format
+msgid "No information"
+msgstr "Pas d'information"
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_of_product_brand
+msgid "Product brand"
+msgstr "Marque"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_of_product_brand__datastore_stock_user_ids
+msgid "Restrict by customer"
+msgstr "Restriction par client"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_of_product_brand__datastore_location_id
+msgid "Shared Location"
+msgstr "Emplacement partagé"
+
+#. module: of_datastore_supplier
+#: model_terms:ir.ui.view,arch_db:of_datastore_supplier.of_product_brand_view_form
+msgid "Stock"
+msgstr ""
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_product__of_stock_informations
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_template__of_stock_informations
+#: model_terms:ir.ui.view,arch_db:of_datastore_supplier.view_template_property_form
+msgid "Stock Informations"
+msgstr "Informations sur les stocks"
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "Liste de prix du fournisseur"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_product_product__of_template_image
+msgid "Template Image"
+msgstr "Modèle d'image"
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,help:of_datastore_supplier.field_of_product_brand__update_note
+msgid ""
+"This field is intended for distributors and allows to transmit information "
+"about the status of pricing."
+msgstr ""
+"Ce champ est destiné aux distributeurs et permet de transmettre des "
+"informations sur l'état de la liste de prix "
+
+#. module: of_datastore_supplier
+#: model:ir.model.fields,field_description:of_datastore_supplier.field_of_product_brand__update_note
+msgid "Update Note"
+msgstr "Note de mise à jour"
+
+#. module: of_datastore_supplier
+#: model_terms:ir.ui.view,arch_db:of_datastore_supplier.of_datastore_supplier_brand_view_form
+msgid "Updates Notes"
+msgstr ""
+
+#. module: of_datastore_supplier
+#: model:ir.model,name:of_datastore_supplier.model_res_users
+msgid "User"
+msgstr "Utilisateur"
