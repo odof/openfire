@@ -1591,8 +1591,8 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_cancel(self):
         self.write({'state': 'cancel'})
-        if self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')):
-            self.picking_ids.filtered(lambda p: p.state not in ('done', 'cancel')).action_cancel()
+        if self.mapped('picking_ids').filtered(lambda p: p.state not in ('done', 'cancel')):
+            self.mapped('picking_ids').filtered(lambda p: p.state not in ('done', 'cancel')).action_cancel()
         self.mapped('line_ids').mapped('procurement_ids').cancel()  # la fonctionne n'annule pas les appro déjà terminés
         self.mapped('line_ids').mapped('procurement_ids').filtered(lambda p: p.state == 'cancel')\
             .write({'of_intervention_line_id': False})
