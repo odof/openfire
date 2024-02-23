@@ -97,7 +97,8 @@ class Project(models.Model):
 
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
-        self.of_sale_id = False
+        if self.of_sale_id and self.of_sale_id.partner_id != self.partner_id:
+            self.of_sale_id = False
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
