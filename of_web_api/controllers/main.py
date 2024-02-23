@@ -4,6 +4,7 @@ import logging
 import json
 
 from odoo import http, tools, fields
+from odoo.exceptions import UserError
 from odoo.http import request
 from odoo.addons.of_web_api.models.of_web_api import MAGIC_AUTH_FIELDS
 
@@ -80,7 +81,7 @@ Fonctions de l'API :
         vals_clean = {k: vals[k] for k in authorized_fields_name if k in vals}
         # Gestion de retours à la ligne en fonction du type de champ
         for key, val in vals_clean.iteritems():
-            if '\n' in val:
+            if isinstance(val, basestring) and '\n' in val:
                 corresponding_field = authorized_fields.filtered(lambda f: f.name == key)
                 if corresponding_field.ttype == 'html':
                     vals_clean[key] = val.replace('\n', '<br/>')
@@ -88,6 +89,7 @@ Fonctions de l'API :
             record = self.create_record(model_name, vals_clean)
         except Exception as e:
             _logger.warning(u"OF ERROR api creation : impossible to create record\n%s\n" % e)
+            request.env.cr.rollback()
             return {
                 'code': 400,
                 'message': u"Impossible to create record",
