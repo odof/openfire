@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
                     'partner_id': self.partner_id.id,
                     'company_id': self.company_id.id,
                     'address_id': self.partner_shipping_id and self.partner_shipping_id.id or self.partner_id.id,
-                    'recurrence': False,
+                    'recurrence': self.of_template_id.of_intervention_template_id.tache_id.recurrence,
                     'date_next': today_str,
                     'date_fin': deux_semaines_str,
                     'origin': u"[Commande] " + self.name,
@@ -37,4 +37,5 @@ class SaleOrder(models.Model):
                     'parc_installe_id': self.of_parc_installe_ids and self.of_parc_installe_ids[0].id or False,
                 })
                 new_service.onchange_template_id()
+                new_service._onchange_tache_id()
         return res
