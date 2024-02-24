@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 # 1: imports of python lib
+import locale
 import pytz
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
@@ -30,6 +31,7 @@ class OfTourneeRdv(models.TransientModel):
         def format_date(date):
             return fields.Date.from_string(date).strftime('%A %d %B').capitalize()
         self.ensure_one()
+        locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         fin_matinee_flo = 13.0  # -> à récupérer depuis de la config en backend?
         debut_aprem_flo = 14.0  # -> à récupérer depuis de la config en backend?

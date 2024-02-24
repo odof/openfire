@@ -131,9 +131,33 @@ class OFWebsitePlanningBooking(http.Controller):
         # Le formulaire de l'étape sélection d'équipement a été soumis -> traitement
         if 'submitted' in values:
             values.pop('submitted')
-            if not values.get('parc_installe_id') and not values.get('create') and not values.get('service_id'):
+            # DEBUT MODIFS LAB
+            error_message = []
+            if not values.get('parc_installe_id') and not values.get('create'):
                 error['parc_installe_id'] = True
+            if not values.get('service_id'):
                 error['service_id'] = True
+            if not values.get('date_recherche_debut'):
+                error['date_recherche_debut'] = True
+            else:
+                # Validation de la date
+                search_date = fields.Date.from_string(values.get('date_recherche_debut'))
+                # La date de début de recherche doit être dans le futur
+                if search_date <= fields.Date.from_string(fields.Date.today()):
+                    error['date_recherche_debut'] = True
+                    error_message.append(u"La date de début de recherche doit être future.")
+                # La date de début doit être inférieur au paramètre de configuration
+                max_days = request.env['ir.values'].sudo().with_context(force_company=request.env.user.company_id.id)\
+                    .get_default('of.intervention.settings', 'website_booking_open_days_number')
+                max_search_date = fields.Date.from_string(fields.Date.today()) + timedelta(days=max_days)
+                if search_date > max_search_date:
+                    error['date_recherche_debut'] = True
+                    error_message.append(
+                        u"La date de début de recherche ne doit pas être à plus de %d jours." % max_days)
+
+            if error:
+                error['error_message'] = error_message
+            # FIN MODIFS LAB
             else:
                 validated = True
 
@@ -154,6 +178,20 @@ class OFWebsitePlanningBooking(http.Controller):
             if values.get('update'):
                 # On redirige vers le formulaire de MAJ du parc installé
                 return request.redirect('/new_booking/installed_park_create')
+            # DEBUT MODIFS LAB
+            # Passage directement à l'étape de choix des créneaux
+            service = request.env['of.service'].browse(request.session['rdv_service_id'])
+            request.session['rdv_site_adresse_id'] = service.address_id.id
+            request.session['rdv_tache_id'] = service.tache_id.id
+            request.session['rdv_date_recherche_debut'] = values['date_recherche_debut']
+            # Marquer pour une nouvelle recherche. les perfs pourraient être améliorées en vérifiant
+            # si l'adresse / la prestation / la date a effectivement changé depuis la denière recherche
+            # (en cas de retour a une étape précédente par exemple)
+            request.session['rdv_search_wiz_id'] = False
+            request.session['rdv_creneau_id'] = False
+            return request.redirect('/new_booking/slot')
+            # FIN MODIFS LAB
+            
             # Passage à l'étape sélection d'adresse
             # Supprimer la valeur d'adresse stockée en session (en cas de retour et changement de parc installé)
             request.session['site_adresse_id'] = False
@@ -182,9 +220,16 @@ class OFWebsitePlanningBooking(http.Controller):
             values['service'] = 'service_id' in values and values['service_id'] != '' and \
                                 request.env['of.service'].browse(int(values['service_id']))
 
-        if not values['service'] and len(values['service_list']) == 1:
+        # DEBUT MODIFS LAB
+        if not values['service'] and len(values['service_list']) == 1 and not error:
             values['service'] = values['service_list']
+            values['parc_installe_id'] = values['service'].parc_installe_id.id
             values['tache'] = values['service'].tache_id
+
+        # Si la session a déjà une date. Exemple clic sur 'retour' à l'étape creneau
+        if not values.get('date_recherche_debut') and request.session.get('rdv_date_recherche_debut'):
+            values['date_recherche_debut'] = request.session.get('rdv_date_recherche_debut')
+        # FIN MODIFS LAB
 
         # Création d'un parc installé extérieur
         if request.env.user.has_group('of_website_planning_booking.group_website_booking_allow_park_creation'):

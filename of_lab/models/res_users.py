@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, api, fields
+from odoo import api, fields, models
 
 
 class ResUsers(models.Model):
@@ -86,7 +86,33 @@ class ResUsers(models.Model):
         parc.onchange_product_id()
         parc._onchange_client_id()
         parc_vals = parc._convert_to_write(parc._cache)
-        self.env['of.parc.installe'].create(parc_vals)
+        parc = self.env['of.parc.installe'].create(parc_vals)
+
+        # Service creation
+        inter_template = self.env['of.planning.intervention.template'].search([('code', '=', u"GRA")], limit=1)
+        if not inter_template:
+            inter_template = self.env['of.planning.intervention.template'].search(
+                [('type', '=', self.env.ref('of_service.of_service_type_maintenance').id)], limit=1)
+            if not inter_template:
+                inter_template = self.env.ref('of_planning.of_planning_default_intervention_template')
+        service = self.env['of.service'].new({
+            'base_state': 'draft',
+            'partner_id': user.partner_id.id,
+            'address_id': user.partner_id.id,
+            'company_id': 1,
+            'date_next': fields.Date.today(),
+            'template_id': inter_template.id,
+            'parc_installe_id': parc.id,
+            'recurrence': True,
+        })
+        service._onchange_date_next()
+        service.onchange_template_id()
+        service.onchange_type_id()
+        service._onchange_tache_id()
+        service.onchange_fiscal_position_id()
+        service_vals = service._convert_to_write(service._cache)
+        service = self.env['of.service'].create(service_vals)
+        service.button_valider()
 
         # Sale order creation
         order = self.env['sale.order'].new({
