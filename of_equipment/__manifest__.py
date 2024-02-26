@@ -5,7 +5,7 @@
 ##############################################################################
 
 {
-    'name': u"OpenFire / Module Parc installé",
+    'name': "OpenFire / Equipment",
     'version': "10.0.1.0.0",
     'author': "OpenFire",
     'website': "www.openfire.fr",
