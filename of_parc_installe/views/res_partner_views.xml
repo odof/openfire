@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <!-- Mettre revendeur, installateur, payeur dans formulaire partenaires -->
+    <record id="of_res_partner_form_pi" model="ir.ui.view">
+        <field name="name">of.res.partner.form.pi</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="groups_id" eval="[(4, ref('project.group_project_user'))]"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="action"
+                    attrs="{'invisible': [('customer', '=', False)]}"
+                    name="%(of_parc_installe.action_view_of_parc_installe_sale)d"
+                    icon="fa-home"
+                    context="{'search_default_client_id': active_id}">
+                    <field string="Parc Installé" name="of_parc_installe_count" widget="statinfo"/>
+                </button>
+            </div>
+            <field name="user_id" position="after">
+                <field name="of_revendeur"/>
+                <field name="of_installateur"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
