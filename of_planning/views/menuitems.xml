@@ -9,7 +9,10 @@
     <menuitem id="menu_of_planning_intervention" name="Interventions" parent="of_planning.menu_of_planning_main" sequence="10"/>
     <menuitem id="menu_of_planning_calendar_event" name="Interventions" parent="of_planning.menu_of_planning_intervention" action="of_planning.action_calendar_event" sequence="10" />
     <menuitem id="menu_product_template" name="Products" parent="of_planning.menu_of_planning_intervention" action="sale.product_template_action" sequence="20" groups="sales_team.group_sale_salesman,account.group_account_invoice,stock.group_stock_user"/>
-    <menuitem id="menu_res_partner" name="Customers" parent="of_planning.menu_of_planning_intervention" action="of_planning.action_res_partner" sequence="30"/>
+
+    <!-- Customers -->
+    <menuitem id="menu_res_partner_main" name="Customers" parent="of_planning.menu_of_planning_main" action="of_planning.action_res_partner" sequence="20"/>
+    <menuitem id="menu_res_partner" name="Customers" parent="of_planning.menu_res_partner_main" action="of_planning.action_res_partner" sequence="10"/>
 
     <!-- Configuration -->
     <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning_main" sequence="100" groups="group_planning_intervention_responsible" />

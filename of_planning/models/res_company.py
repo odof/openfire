@@ -24,12 +24,3 @@ class ResCompany(models.Model):
         string="(OF) Auto. Sectors assignation",
         help="If you check this box, the sectors will be assigned automatically when the contact is created.",
     )
-    of_intervention_use_deliveries = fields.Selection(
-        selection=[
-            ('no', "Do not use delivery notes in Interventions"),
-            ('use', "Use delivery notes in Interventions"),
-        ],
-        default='no',
-        required=True,
-        string="(OF) Delivery notes management in Interventions",
-    )

@@ -1,0 +1,713 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_equipment
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-06 15:31+0000\n"
+"PO-Revision-Date: 2024-03-06 15:31+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_connector_config_settings__of_equipment_auto_create
+#: model:ir.model.fields,field_description:of_equipment.field_res_company__of_equipment_auto_create
+#: model:ir.model.fields,field_description:of_equipment.field_res_config_settings__of_equipment_auto_create
+msgid "(OF) Automatic creation of equipment"
+msgstr "(OF) Création automatique d'équipement"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Brand&amp;nbsp;:</span>"
+msgstr "<span>Marque&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Category&amp;nbsp;:</span>"
+msgstr "<span>Catégorie&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Compliant&amp;nbsp;:</span>"
+msgstr "<span>Conforme&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Installation Date&amp;nbsp;:</span>"
+msgstr "<span>Date d'installation&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Installation Type&amp;nbsp;:</span>"
+msgstr "<span>Type d'installation&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Installer&amp;nbsp;:</span>"
+msgstr "<span>Installateur&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Model&amp;nbsp;:</span>"
+msgstr "<span>Modèle&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Name&amp;nbsp;:</span>"
+msgstr "<span>Nom&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<span>Product&amp;nbsp;:</span>"
+msgstr "<span>Produit&amp;nbsp;:</span>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<strong>Equipment History</strong>"
+msgstr "<strong>Historique d'équipement</strong>"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "<strong>Equipment</strong>"
+msgstr "<strong>Équipement</strong>"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__active
+msgid "Active"
+msgstr ""
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Archived"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_connector_config_settings__of_equipment_auto_create
+#: model:ir.model.fields,help:of_equipment.field_res_company__of_equipment_auto_create
+#: model:ir.model.fields,help:of_equipment.field_res_config_settings__of_equipment_auto_create
+#: model_terms:ir.ui.view,arch_db:of_equipment.res_config_settings_view_form
+msgid ""
+"Automatically create the equipment on picking confirmation if a serial "
+"number is assigned."
+msgstr ""
+"Créer automatiquement un équipement à la confirmation du bon de livraison si"
+" celui-ci a un numéro de série de renseigné."
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__brand_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_brand_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_brand_id
+msgid "Brand"
+msgstr "Marque"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_create_equipment_wizard_view_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__product_category_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_product_category_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_product_category_id
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_res_partner__of_is_installer
+#: model:ir.model.fields,help:of_equipment.field_res_users__of_is_installer
+msgid "Check this box if this partner is a installer."
+msgstr "Coché cette case si le partenaire est un installateur"
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_res_partner__of_is_reseller
+#: model:ir.model.fields,help:of_equipment.field_res_users__of_is_reseller
+msgid "Check this box if this partner is a reseller."
+msgstr "Coché cette case si le partenaire est un revendeur"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_city
+msgid "City"
+msgstr "Ville"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__is_compliant
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_is_compliant
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_is_compliant
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Compliant"
+msgstr "Conforme"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_country_id
+msgid "Country"
+msgstr "Pays"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_create_equipment_wizard_view_form
+msgid "Create"
+msgstr "Créer"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_of_create_equipment_wizard
+msgid "Create Equipment Wizard from a Sale Order or an Invoice"
+msgstr ""
+"Assistant de création d'équipement à partir d'un bon de commande ou d'une "
+"facture"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_create_equipment_wizard_view_form
+msgid "Create and display"
+msgstr "Créer et afficher"
+
+#. module: of_equipment
+#: model:ir.actions.act_window,name:of_equipment.action_of_create_equipment_wizard_account_move
+#: model:ir.actions.act_window,name:of_equipment.action_of_create_equipment_wizard_sale_order
+msgid "Create equipment"
+msgstr "Créer un équipement"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__create_uid
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__create_date
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__customer_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__customer_id
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "Date"
+msgstr ""
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "Description"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__display_name
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment
+msgid "EQUIPMENT"
+msgstr "ÉQUIPEMENT"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__end_warranty_date
+msgid "End of Warranty"
+msgstr "Fin de garantie"
+
+#. module: of_equipment
+#. odoo-python
+#: code:addons/of_equipment/wizards/of_create_equipment_wizard.py:0
+#: model:ir.model,name:of_equipment.model_of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__product_id
+#: model:ir.model.fields,field_description:of_equipment.field_res_partner__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_res_users__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_stock_lot__of_equipment_id
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+#, python-format
+msgid "Equipment"
+msgstr "Équipement"
+
+#. module: of_equipment
+#: model:ir.actions.server,name:of_equipment.of_cron_equipment_warranty_type_daily_ir_actions_server
+#: model:ir.cron,cron_name:of_equipment.of_cron_equipment_warranty_type_daily
+msgid "Equipment: Recompute of warranty types for equipments"
+msgstr "Équipement : Recalcul du type de garantie pour les équipements"
+
+#. module: of_equipment
+#: model:ir.actions.act_window,name:of_equipment.action_view_of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_account_bank_statement_line__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_account_move__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_account_payment__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_calendar_event__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipments_count
+#: model:ir.ui.menu,name:of_equipment.menu_of_equipment
+#: model:ir.ui.menu,name:of_equipment.menu_of_equipment_planning
+#: model_terms:ir.ui.view,arch_db:of_equipment.account_move_view_form
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_tree
+#: model_terms:ir.ui.view,arch_db:of_equipment.res_partner_view_form
+#: model_terms:ir.ui.view,arch_db:of_equipment.sale_order_view_form
+msgid "Equipments"
+msgstr "Équipements"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_account_bank_statement_line__of_equipments_count
+#: model:ir.model.fields,field_description:of_equipment.field_account_move__of_equipments_count
+#: model:ir.model.fields,field_description:of_equipment.field_account_payment__of_equipments_count
+#: model:ir.model.fields,field_description:of_equipment.field_res_partner__of_equipments_count
+#: model:ir.model.fields,field_description:of_equipment.field_res_users__of_equipments_count
+msgid "Equipments count"
+msgstr "Nombre d'équipements"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__warranty_type__expired
+msgid "Expired"
+msgstr "Expiré"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__warranty_type__extension
+msgid "Extension"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__failure
+msgid "Failure"
+msgstr "Échec"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__geocoding_state
+msgid "Geocoding State"
+msgstr "État de geocoding"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__state__good
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Good"
+msgstr "Bon"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Group By"
+msgstr "Grouper par"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_calendar_event__of_history_equipment_ids
+msgid "History (Equipment)"
+msgstr "Historique (Équipement)"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__id
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__id
+msgid "ID"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__warranty_type__in_warranty
+msgid "In warranty"
+msgstr "Sous garantie"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Installation"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipment_address_id
+msgid "Installation Address"
+msgstr "Adresse d'installation"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__installation_date
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_installation_date
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_installation_date
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipment_date
+msgid "Installation Date"
+msgstr "Date d'installation"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__site_address_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_address_id
+msgid "Installation Site"
+msgstr "Site d'installation"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__installation_type
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_installation_type
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_installation_type
+msgid "Installation Type"
+msgstr "Type d'installation"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.sale_order_view_form
+msgid "Installed product"
+msgstr "Produit installé"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__installer_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__installer_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_installer_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_installer_id
+#: model:ir.model.fields,field_description:of_equipment.field_res_partner__of_is_installer
+#: model:ir.model.fields,field_description:of_equipment.field_res_users__of_is_installer
+msgid "Installer"
+msgstr "Installateur"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__installer_address_id
+msgid "Installer Address"
+msgstr "Adresse d'installateur"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Intervention History"
+msgstr "Historique d'intervention"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__intervention_ids
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Interventions"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__invoice_ids
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__invoices_count
+msgid "Invoices count"
+msgstr "Nombre de factures"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard____last_update
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__write_uid
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__write_date
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__partner_latitude
+msgid "Latitude"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__partner_longitude
+msgid "Longitude"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_stock_lot
+msgid "Lot/Serial"
+msgstr "Lot/N° série"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__manual
+msgid "Manual"
+msgstr "Manuel"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__customer_mobile
+msgid "Mobile"
+msgstr ""
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__res_model
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_model
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_model
+msgid "Model"
+msgstr "Modèle"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__res_id
+msgid "Model ID"
+msgstr "ID du modèle"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__model_name
+msgid "Model Name"
+msgstr "Nom du modèle"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__customer_name
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipment_id
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__state__new
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "New"
+msgstr "Nouveau"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "No"
+msgstr "Non"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Not Compliant"
+msgstr "Pas conforme"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__not_tried
+msgid "Not Tried"
+msgstr "Pas essayé"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__note
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_note
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_note
+#: model:ir.model.fields,field_description:of_equipment.field_sale_order__of_equipment_note
+msgid "Note"
+msgstr ""
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Open"
+msgstr "Ouvrir"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__operator_id
+msgid "Operator"
+msgstr "Technicien"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__order_ids
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Orders"
+msgstr "Commandes"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__orders_count
+msgid "Orders count"
+msgstr "Nombre de commandes"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__lot_id
+msgid "Origin Lot"
+msgstr "Lot d'origine"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_phone
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__piece_number
+msgid "Piece Number"
+msgstr "Numéro de pièce"
+
+#. module: of_equipment
+#. odoo-python
+#: code:addons/of_equipment/models/calendar_event.py:0
+#, python-format
+msgid "Please add at least one equipment."
+msgstr "Veuillez ajouter au moins un équipement"
+
+#. module: of_equipment
+#. odoo-python
+#: code:addons/of_equipment/models/calendar_event.py:0
+#, python-format
+msgid "Please add only one equipment."
+msgstr "Veuillez n'ajouter au maximum qu'un équipement"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__product_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_product_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_product_id
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Product ..."
+msgstr "Produit..."
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__reseller_id
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__reseller_id
+#: model:ir.model.fields,field_description:of_equipment.field_res_partner__of_is_reseller
+#: model:ir.model.fields,field_description:of_equipment.field_res_users__of_is_reseller
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Reseller"
+msgstr "Revendeur"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__name
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__name
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_name
+#: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_name
+msgid "Serial Number"
+msgstr "N° de série"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Serial Number ..."
+msgstr "N° de série..."
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__service_date
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__service_date
+msgid "Service Date"
+msgstr "Date de vente"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__state
+msgid "State"
+msgstr "État"
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_equipment__geocoding_state
+msgid "State of geocoding"
+msgstr "État de geocoding"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_street
+msgid "Street"
+msgstr "Rue"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_street2
+msgid "Street 2"
+msgstr "Rue 2"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__success
+msgid "Success"
+msgstr "Succès"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "Task"
+msgstr "Tâche"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
+msgid "Technical Data"
+msgstr "Données techniques"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "To Replace"
+msgstr "À remplacer"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__state__to_replace
+msgid "To replace"
+msgstr "À remplacer"
+
+#. module: of_equipment
+#: model:ir.model,name:of_equipment.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_calendar_event__of_use_equipment
+msgid "Use Equipment"
+msgstr "Équipements"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__state__used
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Used"
+msgstr "Usé"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__warranty_type
+msgid "Warranty Type"
+msgstr "Type de garantie"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__no_address
+msgid "Without address"
+msgstr "Sans adresse"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
+msgid "Yes"
+msgstr "Oui"
+
+#. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_zip
+msgid "Zip"
+msgstr "Code postal"
+
+#. module: of_equipment
+#: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
+msgid "Zip Code"
+msgstr "Code postal"

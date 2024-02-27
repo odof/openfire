@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="of_cron_equipment_warranty_type_daily" model="ir.cron">
+        <field name="name">Equipment: Recompute of warranty types for equipments</field>
+        <field name="model_id" ref="of_equipment.model_of_equipment" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now().replace(hour=3, minute=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')" />
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="True" />
+        <field name="active" eval="True" />
+        <field name="state">code</field>
+        <field name="code">model.cron_recompute_warranty_type_daily()</field>
+    </record>
+
+</odoo>

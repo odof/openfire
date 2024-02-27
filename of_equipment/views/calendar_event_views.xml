@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='what']/group" position="before">
+                <group colspan="4">
+                    <field name="of_use_equipment" />
+                    <field name="of_equipment_ids" colspan="2" nolabel="1" context="{'default_customer_id': of_partner_id, 'default_site_address_id': of_address_id}"
+                            attrs="{'invisible': [('of_use_equipment', '=', False)], 'required': [('of_use_equipment', '=', True)]}">
+                        <tree>
+                            <field name="name" />
+                            <field name="site_address_id" />
+                            <field name="model_name" />
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

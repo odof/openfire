@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sheet_second']" position="inside">
+                <field name="sheet_equipment" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+                <field name="sheet_equipment_name" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_product_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_model" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_brand_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_product_category_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_installation_date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_installation_type" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_is_compliant" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_installer_id" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+                <field name="sheet_equipment_note" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='report_second']" position="inside">
+                <field name="report_equipment" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                <field name="report_equipment_name" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_product_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_model" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_brand_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_product_category_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_installation_date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_installation_type" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_is_compliant" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_installer_id" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+                <field name="report_equipment_note" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

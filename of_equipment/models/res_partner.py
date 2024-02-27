@@ -1,54 +1,63 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-# -*- coding: utf-8 -*-
+
 from odoo import api, fields, models
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _inherit = 'res.partner'
 
-    of_revendeur = fields.Boolean(string=u"Revendeur", help=u"Cocher cette case si ce partenaire est un revendeur.")
-    of_installateur = fields.Boolean(
-        string=u"Installateur", help=u"Cocher cette case si ce partenaire est un installateur."
-    )
-    of_parc_installe_count = fields.Integer(string=u"Parc installé", compute='_compute_of_parc_installe_count')
-    of_parc_installe_ids = fields.One2many(
-        comodel_name='of.parc.installe', inverse_name='client_id', string=u"Parc installé"
-    )
+    of_is_reseller = fields.Boolean(string="Reseller", help="Check this box if this partner is a reseller.")
+    of_is_installer = fields.Boolean(string="Installer", help="Check this box if this partner is a installer.")
+    of_equipments_count = fields.Integer(string="Equipments count", compute='_compute_of_equipments_count')
+    of_equipment_ids = fields.One2many(comodel_name='of.equipment', inverse_name='customer_id', string="Equipment")
 
-    @api.multi
-    def _compute_of_parc_installe_count(self):
+    def _compute_of_equipments_count(self):
         for partner in self:
-            partner.of_parc_installe_count = self.env['of.parc.installe'].search_count([('client_id', '=', partner.id)])
+            partner.of_equipments_count = len(partner.of_equipment_ids)
 
-    @api.multi
+    def action_button_view_equipment(self):
+        equipments = self.mapped('of_equipment_ids')
+        action = self.env.ref('of_equipment.action_view_of_equipment').sudo().read()[0]
+        if len(equipments) > 1:
+            action['domain'] = [('id', 'in', equipments.ids)]
+        elif len(equipments) == 1:
+            action['views'] = [(self.env.ref('of_equipment.of_equipment_view_form').id, 'form')]
+            action['res_id'] = equipments.ids[0]
+        else:
+            action = {'type': 'ir.actions.act_window_close'}
+        return action
+
     def name_get(self):
-        """
-        Permet, dans un parc installé ou un pop-up de création de parc installé, de proposer les partenaires
-        qui ne sont pas revendeurs/installateurs entre parenthèse."""
-        revendeur_prio = self._context.get('of_revendeur_prio')
-        installateur_prio = self._context.get('of_installateur_prio')
-        if revendeur_prio or installateur_prio:
+        """In an equipment, allows to choose partners who are not resellers/installers in parentheses."""
+        is_reseller_prio = bool(self._context.get('of_is_reseller_prio'))
+        is_installer_prio = bool(self._context.get('of_is_installer_prio'))
+        if is_reseller_prio or is_installer_prio:
             result = []
             for employee in self:
-                est_prio = revendeur_prio and employee.of_revendeur or installateur_prio and employee.of_installateur
+                priority_display = (
+                    is_reseller_prio and employee.of_is_reseller or is_installer_prio and employee.of_is_installer
+                )
                 result.append(
-                    (employee.id, "%s%s%s" % ('' if est_prio else '(', employee.name, '' if est_prio else ')'))
+                    (
+                        employee.id,
+                        f"{'' if priority_display else '('}{employee.name}{'' if priority_display else ')'}",
+                    )
                 )
             return result
-        return super(ResPartner, self).name_get()
+        return super().name_get()
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        """Permet dans un parc installé de proposer en premier les partenaires revendeurs/installateurs"""
-        champ_prio = ''
-        if self._context.get('of_revendeur_prio'):
-            champ_prio = 'of_revendeur'
-        elif self._context.get('of_installateur_prio'):
-            champ_prio = 'of_installateur'
-        if champ_prio:
+        """In an equipment, displays resellers/installers first"""
+        field_priority = False
+        if self._context.get('of_is_reseller_prio'):
+            field_priority = 'of_is_reseller'
+        elif self._context.get('of_is_installer_prio'):
+            field_priority = 'of_is_installer'
+        if field_priority:
             args = args or []
-            res = super(ResPartner, self).name_search(name, args + [[champ_prio, '=', True]], operator, limit) or []
+            res = super().name_search(name, args + [[field_priority, '=', True]], operator, limit) or []
             limit = limit - len(res)
-            res += super(ResPartner, self).name_search(name, args + [[champ_prio, '=', False]], operator, limit) or []
+            res += super().name_search(name, args + [[field_priority, '=', False]], operator, limit) or []
             return res
-        return super(ResPartner, self).name_search(name, args, operator, limit)
+        return super().name_search(name, args, operator, limit)

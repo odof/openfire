@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_view_tree" model="ir.ui.view">
+        <field name="name">of.equipment.view.tree</field>
+        <field name="model">of.equipment</field>
+        <field name="arch" type="xml">
+            <tree string="Equipments">
+                <field name="customer_id"/>
+                <field name="product_id"/>
+                <field name="name"/>
+                <field name="site_address_id"/>
+                <field name="reseller_id"/>
+                <field name="installer_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_equipment_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.view.form</field>
+        <field name="model">of.equipment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header></header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <div class="oe_button_box" name="button_box">
+                        <field name="active" invisible="1" />
+                        <button name="action_button_view_order" type="object" class="oe_stat_button" icon="fa-usd">
+                            <field name="orders_count" string="Orders" widget="statinfo"/>
+                        </button>
+                        <button name="action_button_view_invoice" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <field name="invoices_count" string="Invoices" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group name="equipment" string="Equipment">
+                            <field name="name" placeholder="Serial Number ..." colspan="2"/>
+                            <field name="product_id" placeholder="Product ..."/>
+                            <field name="brand_id"/>
+                            <field name="product_category_id"/>
+                            <field name="model_name"/>
+                            <field name="state" required="1"/>
+                        </group>
+                        <group name="customer" string="Customer">
+                            <field name="customer_id"/>
+                            <field name="service_date"/>
+                            <field name="site_address_id" context="{'show_address': True}"/>
+                            <label for="site_street"/>
+                            <div class="o_address_format">
+                                <field name="site_street" class="o_address_street" nolabel="1"/>
+                                <field name="site_street2" class="o_address_street" nolabel="1"/>
+                                <field name="site_zip" class="o_address_zip" style="width: 20%" nolabel="1"/>
+                                <field name="site_city" class="o_address_city" style="width: 40%" nolabel="1"/>
+                                <field name="site_country_id" class="o_address_country" nolabel="1"/>
+                            </div>
+                            <label for="site_phone"/>
+                            <field name="site_phone" nolabel="1"/>
+                            <field name="installation_date"/>
+                            <field name="end_warranty_date"/>
+                            <field name="warranty_type"/>
+                        </group>
+                    </group>
+                    <group name="note">
+                        <field name="note"/>
+                    </group>
+                    <notebook>
+                        <page name="technical" string="Technical Data">
+                            <group name="installation" string="Installation">
+                                <field name="installation_type"/>
+                                <field name="is_compliant"/>
+                                <field name="reseller_id" context="{'default_of_is_reseller': 1, 'of_is_reseller_prio': 1}"/>
+                                <field name="installer_id" context="{'default_of_is_installer': 1, 'of_is_installer_prio': 1}"/>
+                                <field name="operator_id"/>
+                            </group>
+                        </page>
+                        <page string="Intervention History" name="intervention_history">
+                            <field name="intervention_ids" nolabel="1" context="{'default_of_address_id': site_address_id, 'default_of_use_equipment': True, 'default_of_equipment_ids': active_id}">
+                                <tree
+                                    string="Interventions"
+                                    decoration-success="of_state == 'confirmed'"
+                                    decoration-muted="of_state == 'cancel'"
+                                    decoration-danger="of_state == 'postponed'"
+                                    decoration-primary="of_state == 'done'"
+                                    decoration-info="of_state == 'unfinished'"
+                                >
+                                    <field name="of_state" invisible="1"/>
+                                    <field name="start"/>
+                                    <field name="of_employee_ids" widget="many2many_tags"/>
+                                    <field name="of_task_id"/>
+                                    <field name="duration" widget="float_time"/>
+                                    <button name="action_button_open_intervention" class="oe_link" type="object" string="Open"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_equipment_view_search" model="ir.ui.view">
+        <field name="name">of.equipment.view.search</field>
+        <field name="model">of.equipment</field>
+        <field name="arch" type="xml">
+            <search string="Equipments">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="customer_id"/>
+                <field name="site_phone"/>
+                <field name="service_date"/>
+                <field name="reseller_id"/>
+                <separator/>
+                <filter string="Compliant" name="compliant" domain="[('is_compliant', '=', True)]"/>
+                <filter string="Not Compliant" name="not_compliant" domain="[('is_compliant', '=', False)]"/>
+                <separator/>
+                <filter string="New" name="new" domain="[('state', '=', 'new')]"/>
+                <filter string="Good" name="good" domain="[('state', '=', 'good')]"/>
+                <filter string="Used" name="used" domain="[('state', '=', 'used')]"/>
+                <filter string="To Replace" name="to_replace" domain="[('state', '=', 'to_replace')]"/>
+                <group string="Group By" name="groupby">
+                    <filter name="customer_groupby" string="Customer" context="{'group_by': 'customer_id'}"/>
+                    <filter name="product_groupby" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="reseller_groupby" string="Reseller" context="{'group_by': 'reseller_id'}"/>
+                    <filter name="zip_groupby" string="Zip Code" context="{'group_by': 'site_zip'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_view_of_equipment" model="ir.actions.act_window">
+        <field name="name">Equipments</field>
+        <field name="res_model">of.equipment</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_equipment.of_equipment_view_tree"/>
+        <field name="search_view_id" ref="of_equipment.of_equipment_view_search"/>
+    </record>
+
+</odoo>

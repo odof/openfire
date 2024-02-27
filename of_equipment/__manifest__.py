@@ -1,35 +1,34 @@
-##############################################################################
-#
-#    OpenFire
-#
-##############################################################################
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Equipment",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Équipement",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "www.openfire.fr",
     'category': "OpenFire",
-    'description': u"""
-Module Parc installé : gestion des produits installés avec no de série.
-""",
+    'summary': "Gestion des équipements",
+    'website': "https://www.openfire.fr",
     'depends': [
-        'product',
-        'of_project_issue',
         'of_map_view',
-        'of_product_brand',
+        'of_planning',
     ],
     'data': [
-        'data/of_parc_installe_data.xml',
+        'data/ir_cron.xml',
+        'data/of_planning_default_intervention_template.xml',
         'security/ir.model.access.csv',
-        'views/of_parc_installe_views.xml',
-        'views/project_issue_views.xml',
+        'views/of_equipment_views.xml',
         'views/res_partner_views.xml',
         'views/sale_order_views.xml',
-        'views/of_parc_installe_views.xml',
-        'views/of_parc_installe_views.xml',
-        'views/of_parc_installe_views.xml',
-        'wizard/of_wizard_saleorder_to_parc_installe_view.xml',
+        'views/account_move_views.xml',
+        'views/calendar_event_views.xml',
+        'views/of_planning_intervention_template_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/menuitems.xml',
+        'reports/report_intervention_report.xml',
+        'reports/report_intervention_sheet.xml',
+        'wizards/of_create_equipment_wizard_views.xml',
     ],
     'installable': True,
+    'application': False,
+    'auto_install': False,
 }

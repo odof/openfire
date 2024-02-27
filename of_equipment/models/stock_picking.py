@@ -1,25 +1,23 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
-# -*- coding: utf-8 -*-
-from odoo import api, models
+
+from odoo import models
 
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
-    @api.multi
-    def do_transfer(self):
-        u"""
-        Créé automatiquement un parc installé pour le client si param de config et type BL
+    def _action_done(self):
         """
-        res = super(StockPicking, self).do_transfer()
+        Automatically create the equipment on picking confirmation if a serial number is assigned.
+        """
+        res = super()._action_done()
         if (
             len(self) == 1
             and res
             and self.user_has_groups('stock.group_production_lot')
             and self.picking_type_id.code == 'outgoing'
-            and self.env['ir.values'].get_default('stock.config.settings', 'of_parc_installe_auto')
+            and self.company_id.of_equipment_auto_create
         ):
-            lots = self.pack_operation_product_ids.mapped('pack_lot_ids').mapped('lot_id')
-            if lots:
-                lots.sudo().creer_parc_installe(self)
+            if lots := self.mapped('move_line_ids.lot_id'):
+                lots.sudo().action_create_equipment(picking=self)
         return res

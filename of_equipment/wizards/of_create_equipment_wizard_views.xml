@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_create_equipment_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.create.equipment.wizard.view.form</field>
+        <field name="model">of.create.equipment.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="customer_id" required="1"/>
+                        <field name="reseller_id" context="{'default_of_is_reseller': 1, 'of_is_reseller_prio': 1}"/>
+                        <field name="service_date"/>
+                    </group>
+                    <group>
+                        <field name="product_id" required="1" context="{'show_shorten_name': 120}" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="site_address_id"/>
+                        <field name="installer_id" context="{'default_of_is_installer': 1, 'of_is_installer_prio': 1}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Create and display" name="action_button_create_and_display_equipment" type="object" class="btn-primary"/>
+                    <button string="Create" name="action_button_create_equipment" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_create_equipment_wizard_sale_order" model="ir.actions.act_window">
+        <field name="name">Create equipment</field>
+        <field name="res_model">of.create.equipment.wizard</field>
+        <field name="binding_model_id" ref="sale.model_sale_order" />
+        <field name="binding_view_types">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_equipment.of_create_equipment_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_of_create_equipment_wizard_account_move" model="ir.actions.act_window">
+        <field name="name">Create equipment</field>
+        <field name="res_model">of.create.equipment.wizard</field>
+        <field name="binding_model_id" ref="account.model_account_move" />
+        <field name="binding_view_types">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_equipment.of_create_equipment_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+    <record id="of_planning.of_planning_default_intervention_template" model="of.planning.intervention.template">
+
+        <!-- Intervention sheet-->
+        <field name="sheet_equipment" eval="True" />
+        <field name="sheet_equipment_name" eval="True" />
+        <field name="sheet_equipment_product_id" eval="True" />
+        <field name="sheet_equipment_model" eval="True" />
+        <field name="sheet_equipment_brand_id" eval="True" />
+        <field name="sheet_equipment_product_category_id" eval="True" />
+        <field name="sheet_equipment_installation_date" eval="True" />
+        <field name="sheet_equipment_installation_type" eval="True" />
+        <field name="sheet_equipment_is_compliant" eval="True" />
+        <field name="sheet_equipment_installer_id" eval="True" />
+        <field name="sheet_equipment_note" eval="True" />
+
+        <!-- Intervention report-->
+        <field name="report_equipment" eval="True" />
+        <field name="report_equipment_name" eval="True" />
+        <field name="report_equipment_product_id" eval="True" />
+        <field name="report_equipment_model" eval="True" />
+        <field name="report_equipment_brand_id" eval="True" />
+        <field name="report_equipment_product_category_id" eval="True" />
+        <field name="report_equipment_installation_date" eval="True" />
+        <field name="report_equipment_installation_type" eval="True" />
+        <field name="report_equipment_is_compliant" eval="True" />
+        <field name="report_equipment_installer_id" eval="True" />
+        <field name="report_equipment_note" eval="True" />
+    </record>
+
+</odoo>
