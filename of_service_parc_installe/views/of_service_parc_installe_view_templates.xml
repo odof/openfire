@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- inherit from web assets backend -->
+    <template id="service_parc_installe_assets_backend" name="planning_view_assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/of_service_parc_installe/static/src/js/of_planning_views.js"/>
+        </xpath>
+    </template>
+
+</odoo>
