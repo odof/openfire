@@ -8,8 +8,14 @@ class OfService(models.Model):
 
     purchaseorder_ids = fields.Many2many(
         comodel_name='purchase.order', compute='_compute_purchaseorder_ids', string=u"Achats")
+    gb_purchaseorder_id = fields.Many2one(
+        comodel_name='purchase.order', compute=lambda s: None, search='_search_gb_purchaseorder_id',
+        string="Commandes d'achat", of_custom_groupby=True)
     purchase_invoice_ids = fields.One2many(
         comodel_name='account.invoice', compute='_compute_purchase_invoice_ids', string=u"Factures d'achat")
+    gb_purchase_invoice_id = fields.Many2one(
+        comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_purchase_invoice_id',
+        string="Factures d'achat", of_custom_groupby=True)
     purchaseorder_count = fields.Integer(string=u"# Achats", compute='_compute_purchaseorder_ids')
     purchase_invoice_count = fields.Integer(string=u"# Factures d'achat", compute='_compute_purchase_invoice_ids')
 
@@ -25,6 +31,68 @@ class OfService(models.Model):
             service.purchase_invoice_ids = service.line_ids.mapped('purchaseorder_line_id').mapped('invoice_lines') \
                 .mapped('invoice_id')
             service.purchase_invoice_count = len(service.purchase_invoice_ids)
+
+    @api.model
+    def _search_gb_purchaseorder_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return [
+                '|',
+                ('line_ids', '=', False),
+                ('line_ids.purchaseorder_line_id', '=', False),
+            ]
+        return [('line_ids.purchaseorder_line_id.order_id.id', operator, operand)]
+
+    @api.model
+    def _search_gb_purchase_invoice_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return [
+                '|', '|',
+                ('line_ids', '=', False),
+                ('line_ids.purchaseorder_line_id', '=', False),
+                ('line_ids.purchaseorder_line_id.invoice_lines', '=', False),
+            ]
+        return [('line_ids.purchaseorder_line_id.invoice_lines.invoice_id', operator, operand)]
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        """ Ajout de la possibilité de regrouper par commande(s) d'achat(s)
+            ou facture(s) de commande(s) d'achat(s)
+        """
+        if gb not in ('gb_purchaseorder_id', 'gb_purchase_invoice_id'):
+            return super(OfService, self)._read_group_process_groupby(gb, query)
+        elif gb == 'gb_purchaseorder_id':
+            alias, _ = query.add_join(
+                (self._table, 'of_service_line', 'id', 'service_id', '1'),
+                implicit=False, outer=True,
+            )
+            alias2, _ = query.add_join(
+                (alias, 'purchase_order_line', 'purchaseorder_line_id', 'id', '2'),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".order_id' % (alias2,)
+        elif gb == 'gb_purchase_invoice_id':
+            alias, _ = query.add_join(
+                (self._table, 'of_service_line', 'id', 'service_id', '1'),
+                implicit=False, outer=True,
+            )
+            alias2, _ = query.add_join(
+                (alias, 'purchase_order_line', 'purchaseorder_line_id', 'id', '2'),
+                implicit=False, outer=True,
+            )
+            alias3, _ = query.add_join(
+                (alias2, 'account_invoice_line', 'id', 'purchase_line_id', '3'),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".invoice_id' % (alias3,)
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': qualified_field
+        }
 
     @api.multi
     def action_view_purchaseorder(self):

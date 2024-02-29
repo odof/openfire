@@ -75,6 +75,9 @@ class OFService(models.Model):
     contract_line_frequency_type = fields.Selection(
         related='contract_line_id.frequency_type', string=u"Fréquence de facturation de la ligne de contrat associée",
         readonly=True)
+    gb_contract_invoice_id = fields.Many2one(
+        comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_contract_invoice_id',
+        string="Factures du contrat associé", of_custom_groupby=True)
 
     # @api.depends
 
@@ -105,6 +108,12 @@ class OFService(models.Model):
             if service.contract_id:
                 service.invoice_ids |= service.contract_id.invoice_ids
                 service.invoice_count = len(service.invoice_ids)
+
+    @api.model
+    def _search_gb_contract_invoice_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return ['|', ('contract_id', '=', False), ('contract_id.invoice_ids', '=', False)]
+        return [('contract_id.invoice_ids', operator, operand)]
 
     # @api.onchange
 
@@ -155,6 +164,30 @@ class OFService(models.Model):
         return action
 
     # Autres
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        """ Ajout de la possibilité de regrouper par facture(s) de contrat lié
+        """
+        if gb != 'gb_contract_invoice_id':
+            return super(OFService, self)._read_group_process_groupby(gb, query)
+        else:
+            field_name = 'gb_contract_invoice_id'
+            alias, _ = query.add_join(
+                (self._table, 'account_invoice', 'contract_id', 'of_contract_id', field_name),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".id' % (alias,)
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': qualified_field
+        }
 
     @api.multi
     def transform_to_contract(self):
