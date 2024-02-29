@@ -338,9 +338,9 @@ class OFServiceRequest(models.Model):
     # UX fields
     show_update_fpos = fields.Boolean(string="Has Fiscal Position Changed", store=False)
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Constrains methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.constrains('next_date', 'end_date')
     def check_alert_dates(self):
@@ -356,9 +356,9 @@ class OFServiceRequest(models.Model):
         ),
     ]
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('address_id', 'partner_id', 'task_id')
     def _compute_name(self):
@@ -687,9 +687,9 @@ class OFServiceRequest(models.Model):
             if request.type_id and request.type_id.stage_ids:
                 request.stage_id = request.type_id.stage_ids[0]
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Onchange methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.onchange('fiscal_position_id')
     def _onchange_fpos_id_show_update_fpos(self):
@@ -703,9 +703,9 @@ class OFServiceRequest(models.Model):
         if self.type_id and self.type_id != self.template_id.type_id:
             self.template_id = False
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # ORM methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -743,9 +743,9 @@ class OFServiceRequest(models.Model):
             for request in self
         ]
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Actions methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def action_button_create_intervention(self):
         wizard = self.env['of.service.request.create.intervention.wizard'].create(
@@ -848,9 +848,9 @@ class OFServiceRequest(models.Model):
             )
         )
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Business methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.model
     def _get_relative_delta(self, recurring_rule_type, interval):
@@ -923,10 +923,7 @@ class OFServiceRequest(models.Model):
 
         if forward:
             # si mode forward, l'occurence par défaut à étudier est dernière
-            if self.last_intervention_date:
-                date_from = max(date_eval, self.last_intervention_date)
-            else:
-                date_from = date_eval
+            date_from = max(date_eval, self.last_intervention_date) if self.last_intervention_date else date_eval
         else:
             # si mode backward, l'occurence par défaut à étudier est la prochaine
             date_from = min(date_eval, self.next_date)

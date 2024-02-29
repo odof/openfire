@@ -1,0 +1,365 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_equipment_service
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-07 15:11+0000\n"
+"PO-Revision-Date: 2024-03-07 15:11+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
+msgid "<span class=\"o_stat_text\">After-Sales SR</span>"
+msgstr "<span class=\"o_stat_text\">DI SAV</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
+msgid "<span class=\"o_stat_text\">Maintenance SR</span>"
+msgstr "<span class=\"o_stat_text\">DI Maintenance</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
+msgid "<span class=\"o_stat_text\">SR To Plan</span>"
+msgstr "<span class=\"o_stat_text\">DI à planifier</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Brand&amp;nbsp;:</span>"
+msgstr "<span>Marque&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Category&amp;nbsp;:</span>"
+msgstr "<span>Catégorie&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Compliant&amp;nbsp;:</span>"
+msgstr "<span>Conforme&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Installation Date&amp;nbsp;:</span>"
+msgstr "<span>Date d'installation&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Installation Type&amp;nbsp;:</span>"
+msgstr "<span>Type d'installation&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Installer&amp;nbsp;:</span>"
+msgstr "<span>Installateur&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Model&amp;nbsp;:</span>"
+msgstr "<span>Modèle&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Product&amp;nbsp;:</span>"
+msgstr "<span>Produit&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<span>Serial Number&amp;nbsp;:</span>"
+msgstr "<span>N° de série Number&amp;nbsp;:</span>"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "<strong>Equipment</strong>"
+msgstr "<strong>Équipement</strong>"
+
+#. module: of_equipment_service
+#: model:ir.actions.act_window,name:of_equipment_service.action_of_service_request_after_sales
+#: model:ir.ui.menu,name:of_equipment_service.menu_of_service_after_sales
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_search
+msgid "After Sales Service"
+msgstr "SAV"
+
+#. module: of_equipment_service
+#: model:of.service.request.type,name:of_equipment_service.of_service_request_type_after_sales
+msgid "After-Sales Service"
+msgstr "SAV"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#, python-format
+msgid "After-Sales Service Request"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__cancelled
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request__payer_mode__customer
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__start
+msgid "Date"
+msgstr ""
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Delays"
+msgstr "Délais"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__done
+msgid "Done"
+msgstr "Terminé"
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_equipment
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__equipment_id
+msgid "Equipment"
+msgstr "Équipement"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__equipment_intervention_ids
+msgid "Equipment Interventions"
+msgstr "Interventions sur équipements"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_calendar_event__of_equipment_ids
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__equipment_ids
+msgid "Equipments"
+msgstr "Équipements"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__event_id
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__request_id
+msgid "Event"
+msgstr "Intervention"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__id
+msgid "ID"
+msgstr ""
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Interventions"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#, python-format
+msgid "Maintenance Service Request"
+msgstr "Demande d'intervention Maintenance"
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request__payer_mode__manufacturer
+msgid "Manufacturer"
+msgstr "Fabricant"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__name
+msgid "Name"
+msgstr ""
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "No"
+msgstr "Non"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_calendar_event__of_equipment_ids_domain
+msgid "Of Equipment Ids Domain"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__open
+msgid "Open"
+msgstr "Ouvrir"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__operator_id
+msgid "Operator"
+msgstr "Intervenant"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__payer_mode
+msgid "Payer"
+msgstr "Payeur"
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__pending
+msgid "Pending"
+msgstr "En attente"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#, python-format
+msgid "Plan an intervention"
+msgstr "Planifier une intervention"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request.py:0
+#, python-format
+msgid "Please add at least one equipment."
+msgstr "Veuillez ajouter au moins un équipement"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request.py:0
+#, python-format
+msgid "Please add only one equipment."
+msgstr "Veuillez n'ajouter au maximum qu'un équipement"
+
+#. module: of_equipment_service
+#: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request__payer_mode__reseller
+msgid "Reseller"
+msgstr "Revendeur"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__response_time
+msgid "Response time (hours)"
+msgstr "Temps de prise en compte (heures)"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
+msgid "Service Request"
+msgstr "Demande d'intervention"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_after_sales_count
+msgid "Service Request After Sales Count"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_maintenance_count
+msgid "Service Request Maintenance Count"
+msgstr ""
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#, python-format
+msgid "Service Request To Plan"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_to_plan_count
+msgid "Service Request To Plan Count"
+msgstr "# DI à planifier"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request_stage
+msgid "Service Stage"
+msgstr "Étape Service"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__service_start
+msgid "Service Start"
+msgstr "Date de début de prise en charge"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__service_stop
+msgid "Service Stop"
+msgstr "Date de fin de prise en charge"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__service_time
+msgid "Service time (hours)"
+msgstr "Temps de gestion (heures)"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_line__start
+msgid "Start date of an event, without time for full days events"
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__state
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_stage__state
+msgid "State"
+msgstr "État"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__use_equipment
+msgid "Use Equipments"
+msgstr "Équipements"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request_create_intervention_wizard
+msgid "Wizard for creating Intervention from Service Requests"
+msgstr "Wizard de création d'intervention depuis les demandes d'intervention"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
+msgid "Yes"
+msgstr "Oui"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#: code:addons/of_equipment_service/models/of_equipment.py:0
+#, python-format
+msgid "[Equipment] %s"
+msgstr "[Équipement] %s"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request_equipment_line
+msgid "of.service.request.equipment.line"
+msgstr ""

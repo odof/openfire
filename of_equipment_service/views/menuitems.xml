@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_of_service_after_sales" name="After Sales Service" parent="of_planning.menu_of_planning_intervention" action="action_of_service_request_after_sales" sequence="17"/>
+
+</odoo>

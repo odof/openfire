@@ -28,9 +28,9 @@ class ProductTemplate(models.Model):
     # une gestion directement depuis les catégories d'articles
     cost_method = fields.Selection(of_unify_companies=True)
 
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Compute methods
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     @api.depends('product_variant_ids', 'product_variant_ids.of_theoretical_cost')
     def _compute_of_theoretical_cost(self):
@@ -69,17 +69,17 @@ class ProductTemplate(models.Model):
             else:  # division par 0!
                 product.of_margin = 0
 
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # CRUD methods
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     def _valid_field_parameter(self, field, name):
         # EXTENDS models
         return name == 'of_unify_companies' or super()._valid_field_parameter(field, name)
 
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # Business methods
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     def get_cost(self):
         self.ensure_one()

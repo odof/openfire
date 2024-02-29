@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_service_request_equipment_line_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.equipment.line.view.form</field>
+        <field name="model">of.service.request.equipment.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="equipment_id" />
+                        <field name="name" />
+                        <field name="operator_id" />
+                    </group>
+                    <group>
+                        <field name="start" widget="date" />
+                        <field name="event_id" />
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_service_request_equipment_line_view_tree" model="ir.ui.view">
+        <field name="name">of.service.request.equipment.line.view.tree</field>
+        <field name="model">of.service.request.equipment.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="equipment_id" />
+                <field name="name" />
+                <field name="operator_id" />
+                <field name="start" widget="date" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+
+</odoo>

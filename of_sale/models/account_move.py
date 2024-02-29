@@ -41,9 +41,9 @@ class AccountMove(models.Model):
         """Return the same selection as in sale.order.of_price_printing"""
         return self.env['sale.order'].fields_get(allfields=['of_price_printing'])['of_price_printing']['selection']
 
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
     def _compute_of_is_locked(self):
@@ -107,9 +107,9 @@ class AccountMove(models.Model):
     #         move.of_residual_equal = move.state == 'draft' or float_compare(move.of_residual, move.residual, 2) == 0
     # End of TODO: Migrate me and continue the migration when `of_account_invoice_report` module is migrated
 
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Action methods
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def action_button_view_delivery(self):
         """Open deliveries linked to the invoice. If there is only one delivery, open it in form view, otherwise open
@@ -161,9 +161,9 @@ class AccountMove(models.Model):
             self.action_button_validate_pickings()
         return result
 
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Reporting methods
-    # -------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def pdf_get_color_bg_section(self):
         return (

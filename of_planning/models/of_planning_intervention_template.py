@@ -211,9 +211,9 @@ class OFPlanningInterventionTemplate(models.Model):
     report_signature = fields.Boolean(string="SIGNATURES")
     report_signature_date = fields.Boolean(string="Signature date")
 
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('sheet_use_default')
     def _compute_is_default_template(self):
@@ -279,9 +279,9 @@ class OFPlanningInterventionTemplate(models.Model):
                     }
                 )
 
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Onchange methods
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.onchange('sheet_use_default')
     def _onchange_sheet_use_default(self):
@@ -363,9 +363,9 @@ class OFPlanningInterventionTemplate(models.Model):
             values = {key: True for key in intervention_keys}
             self.update(values)
 
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
     # ORM methods
-    # ---------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.model
     def create(self, vals):

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_request_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.view.form</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='note']" position="after">
+                <group name="delay" string="Delays" attrs="{'invisible': [('type_id', '!=', %(of_equipment_service.of_service_request_type_after_sales)d)]}">
+                    <field name="response_time" widget="float_time"/>
+                    <field name="service_time" widget="float_time"/>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='what']/group" position="before">
+                <group colspan="4">
+                    <field name="intervention_ids" invisible="1" />
+                    <field name="use_equipment" attrs="{'readonly': [('intervention_ids', '!=', [])]}"/>
+                    <field name="equipment_ids" colspan="2" nolabel="1" attrs="{'invisible': [('use_equipment', '=', False)], 'required': [('use_equipment', '=', True)]}">
+                        <tree>
+                            <field name="name"/>
+                            <field name="site_address_id"/>
+                            <field name="model_name"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='description']" position="after">
+                <field name="id" invisible="1"/>
+                <page string="Interventions" name="equipment_interventions" attrs="{'invisible': ['|', ('id', '=', False), ('use_equipment', '=', False)]}">
+                    <field name="equipment_intervention_ids" readonly="1" attrs="{'invisible': [('id', '=', False)]}"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_search" model="ir.ui.view">
+        <field name="name">of.service.request.view.search</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_techical_visit']" position="before">
+                <filter string="After Sales Service" name="filter_after_sales" domain="[('type_id', '=', %(of_equipment_service.of_service_request_type_after_sales)d)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_search_distinct_type" model="ir.ui.view">
+        <field name="name">of.service.request.search.view.distinct.type</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_search_distinct_type"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_after_sales']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_of_service_request_after_sales" model="ir.actions.act_window">
+        <field name="name">After Sales Service</field>
+        <field name="res_model">of.service.request</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="search_view_id" ref="of_service.of_service_request_view_search_distinct_type"/>
+        <field name="domain" eval="[('type_id', '=', ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+        <field name="context" eval="{'default_type_id': ref('of_equipment_service.of_service_request_type_after_sales'), 'of_kanban_steps': 'After-Sales Service'}"/>
+    </record>
+
+</odoo>

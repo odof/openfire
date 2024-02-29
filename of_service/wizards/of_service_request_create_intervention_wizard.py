@@ -38,6 +38,24 @@ class OFServiceRequestCreateInterventionWizard(models.TransientModel):
             else:
                 rec.show_warning = False
 
+    def _get_create_intervention_values(self, request):
+        self.ensure_one()
+        return {
+            'of_partner_id': request.partner_id.id,
+            'of_address_id': request.address_id.id,
+            'of_task_id': request.task_id.id,
+            'of_template_id': request.template_id.id,
+            'of_request_id': request.id,
+            'of_employee_id': self.employee_id.id,
+            'of_employee_ids': [Command.link(self.employee_id.id)],
+            'of_tag_ids': [Command.link(tag.id) for tag in request.tag_ids],
+            'duration': request.duration,
+            'user_id': self.env.user.id,
+            'of_company_id': request.company_id.id,
+            'of_internal_description': request.note,
+            'of_order_id': request.order_id.id,
+        }
+
     def action_button_create_intervention(self):
         self.ensure_one()
 
@@ -56,26 +74,10 @@ class OFServiceRequestCreateInterventionWizard(models.TransientModel):
             ]
             name = " ".join(name_parts)
 
-            intervention = event_obj.create(
-                {
-                    'of_partner_id': request.partner_id.id,
-                    'of_address_id': request.address_id.id,
-                    'of_task_id': request.task_id.id,
-                    'of_template_id': request.template_id.id,
-                    'of_request_id': request.id,
-                    'of_employee_id': self.employee_id.id,
-                    'of_employee_ids': [Command.link(self.employee_id.id)],
-                    'of_tag_ids': [Command.link(tag.id) for tag in request.tag_ids],
-                    'start': current_date,
-                    'stop': end_date,
-                    'duration': request.duration,
-                    'name': name,
-                    'user_id': self.env.user.id,
-                    'of_company_id': request.company_id.id,
-                    'of_internal_description': request.note,
-                    'of_order_id': request.order_id.id,
-                }
-            )
+            vals = self._get_create_intervention_values(request)
+            vals.update({'name': name, 'start': current_date, 'stop': end_date})
+
+            intervention = event_obj.create(vals)
             intervention._onchange_of_task_id()
             created_interventions |= intervention
 

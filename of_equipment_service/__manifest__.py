@@ -1,43 +1,31 @@
-
-##############################################################################
-#
-#    OpenFire
-#
-##############################################################################
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name' : u"OpenFire / Module de lien entre service, interventions et parc installé",
-    'version' : "10.0.1",
-    'author' : "OpenFire",
-    'website' : "www.openfire.fr",
-    'category' : "OpenFire",
-    'description': """
-Module de lien entre service, interventions et parc installé
-""",
+    'name': "OpenFire / Équipements et demandes d'intervention",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'category': "OpenFire",
+    'summary': "Module de lien entre les demandes d'intervention et les équipements",
+    'website': "https://www.openfire.fr",
     'depends' : [
-        'of_parc_installe',
-        'of_planning_tournee',
-        'of_planning_view',
-        'of_account',
+        'of_equipment',
+        'of_service',
     ],
     'data': [
-        'security/of_service_parc_installe_security.xml',
+        'data/of_service_request_type.xml',
+        'data/of_service_request_stage.xml',
         'security/ir.model.access.csv',
-        'data/of_service_parc_installe_data.xml',
-        'report/of_service_parc_installe_fiche_intervention.xml',
-        'report/of_planning_rapport_intervention.xml',
-        'report/of_service_parc_installe_demande_intervention_templates.xml',
-        'views/of_service_parc_installe_view.xml',
-        'views/of_planning_intervention_template_views.xml',
-        'views/of_service_parc_installe_view_templates.xml',
-        'views/project_issue_views.xml',
-        'views/config_settings_views.xml',
-        'wizard/of_wizard_invoice_to_parc_installe_view.xml',
-        'wizard/of_project_issue_migration_wizard_views.xml',
+        'views/of_service_request_stage_views.xml',
+        'views/of_service_request_equipment_line_views.xml',
+        'views/of_service_request_views.xml',
+        'views/of_equipment_views.xml',
+        'views/calendar_event_views.xml',
+        'views/menuitems.xml',
+        'reports/of_service_request_templates.xml',
     ],
-    'qweb': [
-        'static/src/xml/*.xml',
-        ],
+    'qweb': [],
+    'application': True,
     'installable': True,
     'auto_install': True,
 }

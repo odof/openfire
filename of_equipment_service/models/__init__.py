@@ -1,5 +1,7 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from . import of_service_parc_installe
-from . import of_planning_intervention_template
-from . import config_settings
-from . import project_issue
+from . import of_service_request_stage
+from . import of_service_request
+from . import of_equipment
+from . import of_service_request_equipment_line
+from . import calendar_event

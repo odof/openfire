@@ -348,9 +348,9 @@ class CalendarEvent(models.Model):
                             raise ValidationError(message)
                 raise ValidationError(_("Warning, this intervention is in conflict with another one."))
 
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('allday', 'start', 'stop')
     def _compute_dates(self):
@@ -655,9 +655,9 @@ class CalendarEvent(models.Model):
     def _search_of_gb_employee_id(self, operator, value):
         return [('of_employee_ids', operator, value)]
 
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Onchange methods
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.onchange('of_task_id')
     def _onchange_of_task_id(self):
@@ -685,9 +685,9 @@ class CalendarEvent(models.Model):
         ):
             self.of_show_update_fpos = True
 
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # ORM methods
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _valid_field_parameter(self, field, name):
         # EXTENDS models
@@ -732,9 +732,24 @@ class CalendarEvent(models.Model):
             return super(CalendarEvent, self.sudo()).check_access_rule(operation)
         return super().check_access_rule(operation)
 
-    # ---------------------------------------------------------------------
+    @api.model
+    def fields_get(self, allfields=None, attributes=None):
+        """Override to make `of_type` non-searchable.
+        Since we are using `calendar.event` as a model for both events and interventions, we need to make sure that
+        the `of_type` field is not searchable.
+
+        Its a technical field that should not be used in custom searches, and it is not relevant to the user.
+        """
+        res = super().fields_get(allfields, attributes=attributes)
+        for field in res:
+            if field != 'of_type':
+                continue
+            res[field]['searchable'] = False
+        return res
+
+    # --------------------------------------------------------------------------
     # Actions methods
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def action_button_confirm(self):
         self.write({'of_state': 'confirmed'})
@@ -990,9 +1005,9 @@ class CalendarEvent(models.Model):
     def action_create_invoice_list(self):
         return self.action_create_invoice(view_mode='tree')
 
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Business methods
-    # ---------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _affect_intervention_number(self):
         events = self.filtered(

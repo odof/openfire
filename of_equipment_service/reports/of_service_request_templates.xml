@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_service_request_document" inherit_id="of_service.report_service_request_document">
+        <xpath expr="//t[@t-if='doc.note']" position="before">
+            <t t-set="equipment" t-value="doc.equipment_ids and doc.equipment_ids[0]"/>
+            <div t-if="equipment" class="row mb-4" style="page-break-inside: avoid;">
+                <div class="col">
+                    <h5 name="title_equipment">
+                        <strong>Equipment</strong>
+                    </h5>
+                    <div class="border border-top-0 w-100 d-table">
+                        <div class="w-50 border-end d-table-cell">
+                            <div t-if="equipment.name" name="report_equipment_name" class="border-top">
+                                <div class="m-2">
+                                    <span>Serial Number&amp;nbsp;:</span>
+                                    <strong t-field="equipment.name" />
+                                </div>
+                            </div>
+                            <div t-if="equipment.product_id" name="report_equipment_product_id" class="border-top">
+                                <div class="m-2">
+                                    <span>Product&amp;nbsp;:</span>
+                                    <strong t-field="equipment.product_id.name" />
+                                </div>
+                            </div>
+                            <div t-if="equipment.model" name="report_equipment_model" class="border-top">
+                                <div class="m-2">
+                                    <span>Model&amp;nbsp;:</span>
+                                    <strong t-field="equipment.model" />
+                                </div>
+                            </div>
+                            <div t-if="equipment.brand_id" name="report_equipment_brand_id" class="border-top">
+                                <div class="m-2">
+                                    <span>Brand&amp;nbsp;:</span>
+                                    <strong t-field="equipment.brand_id.name" />
+                                </div>
+                            </div>
+                            <div t-if="equipment.product_category_id" name="report_equipment_product_category_id" class="border-top">
+                                <div class="m-2">
+                                    <span>Category&amp;nbsp;:</span>
+                                    <strong t-field="equipment.product_category_id.name" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-50 d-table-cell">
+                            <div t-if="equipment.installation_date" name="report_equipment_installation_date" class="border-top">
+                                <div class="m-2">
+                                    <span>Installation Date&amp;nbsp;:</span>
+                                    <strong t-field="equipment.installation_date" />
+                                </div>
+                            </div>
+                            <div t-if="equipment.installation" name="report_equipment_installation" class="border-top">
+                                <div class="m-2">
+                                    <span>Installation Type&amp;nbsp;:</span>
+                                    <strong t-field="equipment.installation" />
+                                </div>
+                            </div>
+                            <div name="report_equipment_compliant" class="border-top">
+                                <div class="m-2">
+                                    <span>Compliant&amp;nbsp;:</span>
+                                    <strong t-if="equipment.compliant">Yes</strong>
+                                    <strong t-else="">No</strong>
+                                </div>
+                            </div>
+                            <div t-if="equipment.installer_id" name="report_equipment_installer_id" class="border-top">
+                                <div class="m-2">
+                                    <span>Installer&amp;nbsp;:</span>
+                                    <strong t-field="equipment.installer_id.name" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div t-if="equipment.note" name="report_equipment_note" class="border border-top-0 w-100 d-table">
+                        <div class="w-100 d-table-cell">
+                            <div class="m-2">
+                                <span t-field="equipment.note" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

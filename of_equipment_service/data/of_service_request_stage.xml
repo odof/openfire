@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_service.of_service_request_stage_new" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_quote" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_sale" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_toplan" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_planned" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_toinvoice" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_closed" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+    <record id="of_service.of_service_request_stage_cancelled" model="of.service.request.stage">
+        <field name="type_ids" eval="[Command.link(ref('of_equipment_service.of_service_request_type_after_sales'))]"/>
+    </record>
+
+</odoo>

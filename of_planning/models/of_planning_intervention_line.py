@@ -91,9 +91,9 @@ class OFPlanningInterventionLine(models.Model):
         store=True,
     )
 
-    # -------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # Compute methods
-    # -------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
 
     @api.depends('product_id')
     def _compute_price_unit(self):
@@ -166,9 +166,9 @@ class OFPlanningInterventionLine(models.Model):
             taxes = line.company_id._of_filter_taxes(line.product_id.taxes_id)
             line.tax_ids = fiscal_position and fiscal_position.map_tax(taxes) or taxes
 
-    # -------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
     # Business methods
-    # -------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
 
     def _update_vals(self):
         for line in self.filtered(lambda line: line.order_line_id):

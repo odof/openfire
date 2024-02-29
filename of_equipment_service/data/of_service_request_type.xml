@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_service_request_type_after_sales" model="of.service.request.type">
+        <field name="name">After-Sales Service</field>
+    </record>
+
+</odoo>

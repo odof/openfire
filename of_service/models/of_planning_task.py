@@ -20,9 +20,9 @@ class OFPlanningTask(models.Model):
     recurring_interval = fields.Integer(string="Repeat every", default=1, help="Repeat (Months/Years)")
     recurrency_display = fields.Char(string="Recurrency", compute='_compute_recurrency_display')
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('request_ids')
     def _compute_request_count(self):
@@ -44,9 +44,9 @@ class OFPlanningTask(models.Model):
                     display += "years"
             task.recurrency_display = display
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # ORM methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.model
     def _name_search(self, name='', args=None, operator='ilike', limit=100):
@@ -71,9 +71,9 @@ class OFPlanningTask(models.Model):
             return task_ids
         return super()._name_search(name, args, operator, limit)
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Actions methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def action_button_view_of_service_request(self):
         self.ensure_one()
@@ -86,9 +86,9 @@ class OFPlanningTask(models.Model):
         )
         return self.mapped('request_ids')._get_service_request_action_views(action)
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Business methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _get_action_view_request_context(self, context=None):
         if context is None:

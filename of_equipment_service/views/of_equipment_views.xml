@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.view.form</field>
+        <field name="model">of.equipment</field>
+        <field name="inherit_id" ref="of_equipment.of_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_plan_intervention" string="Service Request" type="object"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_button_view_service_request_maintenance" type="object" icon="fa-home">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="service_request_maintenance_count"/></span>
+                        <span class="o_stat_text">Maintenance SR</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" name="action_button_view_service_request_after_sales" type="object" icon="fa-home">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="service_request_after_sales_count"/></span>
+                        <span class="o_stat_text">After-Sales SR</span>
+                    </div>
+                </button>
+                <button class="oe_stat_button" name="action_button_view_service_request_to_plan" type="object" icon="fa-calendar-o">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value"><field name="service_request_to_plan_count"/></span>
+                        <span class="o_stat_text">SR To Plan</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -68,9 +68,9 @@ class OFServiceRequestLine(models.Model):
         comodel_name='account.move.line', inverse_name='of_request_line_id', string="Invoice Line"
     )
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('qty', 'price_unit', 'tax_ids')
     def _compute_amount(self):
@@ -133,9 +133,9 @@ class OFServiceRequestLine(models.Model):
             if line.order_line_id:
                 line.invoice_status = 'no'
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Business methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def _prepare_intervention_line_vals(self):
         self.ensure_one()

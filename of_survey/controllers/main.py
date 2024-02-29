@@ -407,9 +407,9 @@ class OFSurvey(http.Controller):
             'of_survey.survey_page_fill', self._prepare_survey_data(access_data['survey_sudo'], answer_sudo, **post)
         )
 
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
     # ROUTES to handle question images + survey background transitions + Tool
-    # --------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
 
     @http.route(
         '/of_survey/<string:survey_token>/get_background_image', type='http', auth="public", website=True, sitemap=False

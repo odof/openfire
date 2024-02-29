@@ -23,9 +23,9 @@ class ResPartner(models.Model):
     )
     of_intervention_count = fields.Integer(string="# Interventions", compute='_compute_of_interventions_data')
 
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Compute methods
-    # -----------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     @api.depends('of_com_sector_id', 'zip')
     def _compute_of_tech_sector_id(self):
@@ -59,9 +59,9 @@ class ResPartner(models.Model):
             partner.of_intervention_ids = intervention_ids
             partner.of_intervention_count = len(intervention_ids)
 
-    # -----------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
     # Actions methods
-    # -----------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
 
     def action_button_view_intervention(self):
         action = self.env.ref('of_planning.action_calendar_event').sudo().read()[0]
@@ -71,9 +71,9 @@ class ResPartner(models.Model):
         action = self.mapped('of_intervention_ids')._get_calendar_event_action_views(action)
         return action
 
-    # -----------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
     # Business methods
-    # -----------------------------------------------------------------------
+    # ----------------------------------------------------------------------------
 
     def _get_action_view_intervention_context(self, context=None):
         if context is None:
