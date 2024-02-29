@@ -26,6 +26,18 @@
         </field>
     </record>
 
+    <record id="of_service_view_search" model="ir.ui.view">
+        <field name="name">of.service.view.search</field>
+        <field name="model">of.service</field>
+        <field name="inherit_id" ref="of_service.view_of_service_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="Commandes d'achat" name="groupby_purchase_orders" domain="[]" context="{'group_by':'gb_purchaseorder_id'}"/>
+                <filter string="Factures d'achat" name="groupby_purchase_orders_invoices" domain="[]" context="{'group_by':'gb_purchase_invoice_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Générer demande de prix depuis DI -->
     <record id="action_make_purchase_order" model="ir.actions.server">
         <field name="name">Générer commande fournisseur</field>

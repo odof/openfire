@@ -15,8 +15,8 @@ from odoo.addons.of_utils.models.of_utils import format_date
 
 
 class OfService(models.Model):
-    _name = "of.service"
-    _inherit = ["of.map.view.mixin", "mail.thread"]
+    _name = 'of.service'
+    _inherit = ['of.map.view.mixin', 'mail.thread', 'of.readgroup']
     _description = "Demande d'intervention"
 
     # Init
@@ -293,6 +293,15 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         comodel_name='account.invoice', compute='_compute_invoice_ids', string=u"Factures de ventes")
     saleorder_count = fields.Integer(string=u"# Ventes", compute='_compute_saleorder_ids')
     invoice_count = fields.Integer(string=u"# Factures de ventes", compute='_compute_invoice_ids')
+    gb_saleorder_id = fields.Many2one(
+        comodel_name='sale.order', compute=lambda s: None, search='_search_gb_saleorder_id',
+        string="Commandes de vente", of_custom_groupby=True)
+    gb_sale_invoice_id = fields.Many2one(
+        comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_sale_invoice_id',
+        string="Factures de vente", of_custom_groupby=True)
+    gb_invoice_id = fields.Many2one(
+        comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_invoice_id',
+        string="Factures de DI", of_custom_groupby=True)
     historique_interv_ids = fields.Many2many(
         string=u"Historique des interventions", comodel_name='of.planning.intervention',
         column1='of.service', column2='of.planning.intervention', relation='of_service_historique_interv_rel',
@@ -569,6 +578,33 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         for rec in self:
             rec.map_view_display_note = rec.note and rec.note[:300] or ""
 
+    @api.model
+    def _search_gb_saleorder_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return ['|', ('line_ids', '=', False), ('line_ids.saleorder_line_id', '=', False)]
+        return [('line_ids.saleorder_line_id.order_id', operator, operand)]
+
+    @api.model
+    def _search_gb_sale_invoice_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return [
+                '|', '|',
+                ('line_ids', '=', False),
+                ('line_ids.saleorder_line_id', '=', False),
+                ('line_ids.saleorder_line_id.invoice_lines', '=', False),
+            ]
+        return [('line_ids.saleorder_line_id.invoice_lines.invoice_id', operator, operand)]
+
+    @api.model
+    def _search_gb_invoice_id(self, operator, operand):
+        if operator == '=' and operand is False:
+            return [
+                '|',
+                ('line_ids', '=', False),
+                ('line_ids.invoice_line_ids', '=', False),
+            ]
+        return [('line_ids.invoice_line_ids.invoice_id', operator, operand)]
+
     # @api.onchange
 
     @api.onchange('partner_id')
@@ -683,6 +719,60 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         if vals.get('base_state') == 'calculated':
             self._affect_number()
         return res
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        """ Ajout de la possibilité de regrouper par facture(s) de contrat lié
+        """
+        if gb not in ('gb_saleorder_id', 'gb_invoice_id', 'gb_sale_invoice_id'):
+            return super(OfService, self)._read_group_process_groupby(gb, query)
+        elif gb == 'gb_saleorder_id':
+            alias, _ = query.add_join(
+                (self._table, 'of_service_line', 'id', 'service_id', '1'),
+                implicit=False, outer=True,
+            )
+            alias2, _ = query.add_join(
+                (alias, 'sale_order_line', 'saleorder_line_id', 'id', '2'),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".order_id' % (alias2,)
+        elif gb == 'gb_invoice_id':
+            alias, _ = query.add_join(
+                (self._table, 'of_service_line', 'id', 'service_id', '1'),
+                implicit=False, outer=True,
+            )
+            alias2, _ = query.add_join(
+                (alias, 'account_invoice_line', 'id', 'of_service_line_id', '2'),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".invoice_id' % (alias2,)
+        elif gb == 'gb_sale_invoice_id':
+            alias, _ = query.add_join(
+                (self._table, 'of_service_line', 'id', 'service_id', '1'),
+                implicit=False, outer=True,
+            )
+            alias2, _ = query.add_join(
+                (alias, 'sale_order_line', 'saleorder_line_id', 'id', '2'),
+                implicit=False, outer=True,
+            )
+            alias3, _ = query.add_join(
+                (alias2, 'sale_order_line_invoice_rel', 'id', 'order_line_id', '3'),
+                implicit=False, outer=True,
+            )
+            alias4, _ = query.add_join(
+                (alias3, 'account_invoice_line', 'invoice_line_id', 'id', '4'),
+                implicit=False, outer=True,
+            )
+            qualified_field = '"%s".invoice_id' % (alias4,)
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': qualified_field
+        }
 
     # Héritages
 

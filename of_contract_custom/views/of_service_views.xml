@@ -14,6 +14,9 @@
                 <field name="contract_line_id"/>
                 <field name="contract_id"/>
             </xpath>
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="Factures du contrat associé" name="groupby_contract_invoices" domain="[]" context="{'group_by':'gb_contract_invoice_id'}"/>
+            </xpath>
         </field>
     </record>
 

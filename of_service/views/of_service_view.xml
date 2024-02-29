@@ -456,6 +456,11 @@
                 <field name="date_fin" invisible="1"/>
                 <field name="date_fin_min" filter_domain="[('date_fin','&gt;=',self)]"/>
                 <field name="date_fin_max" filter_domain="[('date_fin','&lt;=',self)]"/>
+                <group expand="0" string="Regrouper par..." name="group_by">
+                    <filter string="Commandes de vente" name="groupby_sale_orders" domain="[]" context="{'group_by':'gb_saleorder_id'}"/>
+                    <filter string="Factures de vente" name="groupby_sale_invoices" domain="[]" context="{'group_by':'gb_sale_invoice_id'}"/>
+                    <filter string="Factures de DI" name="groupby_di_invoices" domain="[]" context="{'group_by':'gb_invoice_id'}"/>
+                </group>
             </search>
         </field>
     </record>
