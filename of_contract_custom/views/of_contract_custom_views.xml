@@ -37,6 +37,7 @@
                 <field name="reference"/>
                 <field name="recurring_invoicing_payment_id"/>
                 <field name="recurring_rule_type"/>
+                <field name="manager_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <separator/>
             </search>
@@ -127,6 +128,7 @@
                             <field name="category_ids" widget="many2many_tags"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             <field name="date_souscription" attrs="{'readonly': [('invoice_count','>',0)]}"/>
+                            <field name="manager_id"/>
                         </group>
                         <group col="2" colspan="2" string="Facturation" name="facturation">
                             <label for="recurring_invoicing_payment_id"/>

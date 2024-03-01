@@ -85,6 +85,11 @@ class OfContract(models.Model):
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
     account_analytic_id = fields.Many2one('account.analytic.account', string=u"Compte analytique")
+    manager_id = fields.Many2one(
+        comodel_name='res.users',
+        string=u"Gestionnaire",
+        required=True,
+        default=lambda self: self.env.user.id)
     company_id = fields.Many2one(
         'res.company', string=u'Société', required=True,
         default=lambda self: self.env.context.get('company_id', self.env.user.company_id.id))
