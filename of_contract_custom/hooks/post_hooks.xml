@@ -2,5 +2,6 @@
 <odoo>
 
     <function model="of.contract.custom.hook" name="_post_hook_v_10_0_2_1_0"/>
+    <function model="of.contract.custom.hook" name="_post_hook_v_10_0_2_1_1"/>
 
 </odoo>

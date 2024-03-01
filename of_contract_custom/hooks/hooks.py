@@ -26,3 +26,12 @@ class OFContractCustomHook(models.AbstractModel):
                         done_services[0].contract_invoice_id = invoice.id
                         done_services -= done_services[0]
                 contract_line._compute_dates()
+
+    @api.model
+    def _post_hook_v_10_0_2_1_1(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_contract_custom')])
+        actions_todo = module_self and module_self.latest_version < '10.0.2.1.1'
+        if actions_todo:
+            contracts = self.env['of.contract'].search([])
+            for contract in contracts:
+                contract.write({'manager_id': contract.create_uid.id})
