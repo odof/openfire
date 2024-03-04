@@ -4,14 +4,8 @@ from odoo import fields, models
 
 
 class ProductTemplate(models.Model):
-    _name = "product.template"
-    _inherit = ["product.template", "of.import.product.config.template"]
-
-    brand_id = fields.Many2one(inverse="_inverse_brand_id")
-
-    def _inverse_brand_id(self):
-        """Define a dummy inverse method, to get this fields available in `of.import`"""
-        pass
+    _name = 'product.template'
+    _inherit = ['product.template', 'of.import.product.config.template']
 
     of_is_net_price = fields.Boolean(
         string="Based on net price",
@@ -43,7 +37,7 @@ class ProductTemplate(models.Model):
                     )
                     if values := {
                         key: val
-                        for key, val in values.items()
+                        for key, val in values.iteritems()
                         if self._fields[key].convert_to_write(product[key], product) != val
                     }:
                         product.write(values)
