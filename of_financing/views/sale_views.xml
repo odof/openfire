@@ -14,14 +14,16 @@
                         <group>
                             <field name="of_financing_organism" string="Organisme"/>
                             <field name="of_financing_file_number" string="Numéro de dossier"/>
-                            <field name="of_financing_state" string="État"/>
                             <field name="of_financing_decision_date" string="Date de décision"/>
+                            <field name="of_financing_state" string="État"/>
+                            <field name="of_financing_printing" string="Impression"/>
                         </group>
                         <group>
-                            <field name="of_financing_amount" string="Montant"/>
+                            <field name="of_financing_amount"/>
                             <field name="of_financing_monthly_payment_number" string="Nombre de mensualités"/>
                             <field name="of_financing_rate" string="Taux (%)"/>
-                            <field name="of_financing_printing" string="Impression"/>
+                            <field name="of_financing_monthly_payment"/>
+
                         </group>
                         <field name="of_financing_notes" string="Mentions"/>
                     </group>
