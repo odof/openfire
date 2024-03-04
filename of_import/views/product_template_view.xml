@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_import_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.import.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product_brand.of_product_brand_product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_of_import_update_product_brand_products_no_context)d" type="action" string="Apply rules"
+                        context="{'default_product_ids': active_ids, 'default_brand_id': brand_id}"/>
+            </xpath>
+            <xpath expr="//field[@name='purchase_ok']" position="after">
+                <field name="of_is_net_price" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
