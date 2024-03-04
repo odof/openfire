@@ -76,7 +76,7 @@
                 <page name="help" string="Help">
                     <group>
                         <group>
-                            <div colspan="2">
+                            <div>
                                 <p>The brand module allows processing of data received from the supplier for integration into your database.</p>
                                 <p>The fields for <b>discount</b>, <b>selling price excluding taxes</b>, and <b>cost price</b> accept Python expressions.</p>
                                 <p>The following specific elements are recognized in the expressions (in addition to standard Python functions):</p>
@@ -95,7 +95,7 @@
                             </div>
                         </group>
                         <group>
-                            <div colspan="2">
+                            <div>
                                 <p>Examples:</p>
                                 <ul>
                                     <li><b>40.5</b>: Use a discount of 40.5%.</li>

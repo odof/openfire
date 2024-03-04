@@ -436,8 +436,8 @@ msgstr "Nom d’affichage"
 
 #. module: of_import
 #: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
-msgid "Can you confirm the import (this operation is not reversible) ?"
-msgstr "Confirmez-vous l'importation (cette opération n'est pas réversible) ?"
+msgid "Do you confirm import (not cancellable) ?"
+msgstr "Confirmez-vous l’import (non annulable) ?"
 
 #. module: of_import
 #: model:ir.model.fields.selection,name:of_import.selection__of_import__state__draft
@@ -614,7 +614,7 @@ msgstr ""
 #. module: of_import
 #: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
 msgid "Items with specific rules"
-msgstr "Éléments avec règles spécifiques"
+msgstr "Eléments avec règles spécifiques"
 
 #. module: of_import
 #: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view

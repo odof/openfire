@@ -4,12 +4,12 @@ from odoo import fields, models
 
 
 class OFImportMessage(models.Model):
-    _name = "of.import.message"
+    _name = 'of.import.message'
     _description = "Message from OpenImport journal"
-    _rec_name = "message"
+    _rec_name = 'message'
 
-    import_id = fields.Many2one(comodel_name="of.import", string="Import")
+    import_id = fields.Many2one(comodel_name='of.import', string="Import")
     type = fields.Selection(
-        selection=[("error", "Error"), ("warning", "Warning"), ("info", "Info")], string="Type of message"
+        selection=[('error', "Error"), ('warning', "Warning"), ('info', "Info")], string="Type of message"
     )
-    message = fields.Text()
+    message = fields.Text(string="Message")
