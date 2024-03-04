@@ -24,5 +24,5 @@ class OfProductBrandAddProducts(models.TransientModel):
 
             self.product_ids.write({"brand_id": self.brand_id.id})
 
-            for old_prefix, products in old_prefix_product_ids.iteritems():
+            for old_prefix, products in old_prefix_product_ids.items():
                 self.brand_id.update_products_default_code(products, remove_previous_prefix=old_prefix)

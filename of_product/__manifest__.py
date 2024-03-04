@@ -17,7 +17,7 @@
         "security/ir_rule.xml",
         "security/res_groups.xml",
         "views/product_views.xml",
-        "views/product_supplierinfo_view.xml",
+        "views/product_supplierinfo_views.xml",
         "views/of_product_tag_views.xml",
         "views/res_config_settings_views.xml",
         "views/product_category_views.xml",
