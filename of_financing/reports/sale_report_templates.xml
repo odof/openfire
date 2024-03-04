@@ -24,9 +24,10 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <t t-if="doc.of_financing_amount"><strong><span>Montant : </span></strong><span t-field="doc.of_financing_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></t>
+                                    <t t-if="doc.of_financing_amount"><strong><span>Montant du financement : </span></strong><span t-field="doc.of_financing_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></t>
                                     <t t-if="doc.of_financing_monthly_payment_number"> / <strong><span>Nombre de mensualités : </span></strong><span t-field="doc.of_financing_monthly_payment_number"/></t>
                                     <t t-if="doc.of_financing_rate"> / <strong><span>Taux : </span></strong><span t-field="doc.of_financing_rate"/> %</t>
+                                    <t t-if="doc.of_financing_monthly_payment"> / <strong><span>Montant de la mensualité : </span></strong><span t-field="doc.of_financing_monthly_payment" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/></t>
                                 </td>
                             </tr>
                             <tr t-if="doc.of_financing_notes">

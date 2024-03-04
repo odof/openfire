@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -19,3 +19,4 @@ class SaleOrder(models.Model):
     of_financing_rate = fields.Float(string=u"Taux de financement (%)")
     of_financing_printing = fields.Boolean(string=u"Impression de financement")
     of_financing_notes = fields.Text(string=u"Mentions du financement")
+    of_financing_monthly_payment = fields.Float(string=u"Montant de la mensualité")
