@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_import_message_tree" model="ir.ui.view">
+        <field name="name">of.import.message.tree</field>
+        <field name="model">of.import.message</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="message"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

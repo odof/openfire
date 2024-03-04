@@ -1,0 +1,1386 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_import
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-17 13:04+0000\n"
+"PO-Revision-Date: 2024-05-17 13:04+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid " [ authorized values : %(key_list)s ]"
+msgstr " [ valeurs autorisées : %(key_list)s ]"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"%(model_name)s ref. %(key)s exist %(duplicates)s times in the import file "
+"(lines %(lines)s). Only the first one is imported."
+msgstr ""
+"%(model_name)s ref. %(key)s existe %(duplicates)s fois dans le fichier "
+"d’importation (lignes %(lines)s). Seule la première est importée."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>(ppht + 20) * 1.15</b>: Sale of the item at the list price + 20€ of "
+"additional costs, all increased by 15%."
+msgstr ""
+"<b>(ppht + 20) * 1.15</b>: Vente de l’article au prix de liste + 20€ de "
+"coûts supplémentaires, le tout augmenté de 15%."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>40.5</b>: Use a discount of 40.5%."
+msgstr "<b>40.5</b>: Utiliser une remise de 40,5%."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>coef</b>: \"Selling coefficient\" specified in the item's price structure"
+msgstr ""
+"<b>coef</b>: \"Coefficient de vente\" renseigné dans la structure de prix de"
+" l’article"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>cumul()</b> is a function used to accumulate multiple discounts. "
+"cumul(40.5,5) accumulates a discount of 40.5% and a discount of 5% for a "
+"total of 43.475% (Pay attention to the distinction between dot and comma)"
+msgstr ""
+"<b>cumul()</b> est une fonction utilisée pour accumuler plusieurs remises. "
+"cumul(40.5,5) accumule une remise de 40,5 % et une remise de 5 % pour un "
+"total de 43,475 % (Attention à la distinction entre point et virgule)"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>cumul(40.5,5)</b>: Use two discounts, one of 40.5% plus one of 5%."
+msgstr ""
+"<b>cumul(40.5,5)</b>: Utiliser deux remises, une de 40,5 % plus une de 5 %."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>fr_d</b>: \"Various fees\" specified in the item's price structure"
+msgstr ""
+"<b>fr_d</b>: \"Frais divers\" renseigné dans la structure de prix de "
+"l’article"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>fr_l</b>: \"Other logistics fees\" specified in the item's price "
+"structure"
+msgstr ""
+"<b>fr_l</b>: \"Autres frais logistiques\" spécifiés dans la structure de "
+"prix de l’article"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>pa + 20</b>: Add 20€ of additional costs to the cost price of the item."
+msgstr ""
+"<b>pa + 20</b>: Ajoute 20€ de coûts supplémentaires au prix de revient de "
+"l’article."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>pa</b>: The purchase price"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Sale of the item at "
+"the list price if less than 1000€, otherwise at the list price increased by "
+"20% and rounded to the nearest euro."
+msgstr ""
+"<b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Vente de l’article au "
+"prix public s’il est inférieur à 1000€, sinon au prix public rehaussé de 20%"
+" et arrondi à l'euro plein."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>ppht</b>: The list price excluding taxes provided by the supplier."
+msgstr "<b>ppht</b>: Le prix public hors taxes fourni par le fournisseur."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>taxe</b>: \"Various taxes\" specified in the item's price structure"
+msgstr ""
+"<b>taxe</b>: \"Taxes diverses\" renseigné dans la structure de prix de "
+"l’article"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"<b>tr_a</b>: \"Purchase transport\" specified in the item's price structure"
+msgstr ""
+"<b>tr_a</b>: \"Transport d’achat\" renseigné dans la structure de prix de "
+"l’article"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "<b>tr_v</b>: \"Sales transport\" specified in the item's price structure"
+msgstr ""
+"<b>tr_v</b>: \"Transport de vente\" renseigné dans la structure de prix de "
+"l’article"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import_product_config_template.py:0
+#, python-format
+msgid ""
+"A formula must not consist solely of spaces.\n"
+"You must clear the field or provide it with a correct formula if it is required. (field : %(field)s, formula: %(code)s"
+msgstr ""
+"Une formule ne doit pas être composée uniquement d’espaces.\n"
+"Vous devez vider le champ ou le renseigner avec une formule correcte s’il est requis. (champ : %(field)s, formule : %(code)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"A prefix must be choose for the import, or a column in the file must define "
+"the product brand"
+msgstr ""
+"Un préfixe doit être choisi pour l’import, ou une colonne dans le fichier "
+"doit définir la marque de produit"
+
+#. module: of_import
+#: model:ir.model.constraint,message:of_import.constraint_of_import_product_categ_config_categ_origin_uniq
+msgid "A product category can only be entered once."
+msgstr "Une catégorie de produit ne peut être saisie qu'une seule fois."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid "Add products to brand"
+msgstr "Tous les produits de la marque"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__added_count
+msgid "Added Count"
+msgstr "Nb Ajout"
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import_product_categ_config__of_import_cost_price
+#: model:ir.model.fields,help:of_import.field_of_import_product_config_template__of_import_cost_price
+#: model:ir.model.fields,help:of_import.field_of_product_brand__of_import_cost_price
+#: model:ir.model.fields,help:of_import.field_product_product__of_import_cost_price
+#: model:ir.model.fields,help:of_import.field_product_template__of_import_cost_price
+msgid ""
+"Allows the calculation of the cost price based on the purchase price.\n"
+"\n"
+"Examples :\n"
+"    - pa : Retains the purchase price calculated from the formulas of the selling price and the discount.\n"
+"    - pa * 1.05 + 20 : Purchase price increased by 5%, then increased by 20€.\n"
+msgstr ""
+"Permet le calcul du prix de revient en fonction du prix d’achat.\n"
+"\n"
+"Exemples :\n"
+" pa : Retient le prix d’achat calculé à partir des formules du prix de vente et de la remise.\n"
+" pa * 1.05 + 20 : Prix d’achat augmenté de 5 %, puis augmenté de 20€.\n"
+
+#. module: of_import
+#: model:ir.actions.act_window,name:of_import.action_of_import_update_product_brand_products
+#: model:ir.actions.act_window,name:of_import.action_of_import_update_product_brand_products_no_context
+msgid "Apply brand rules"
+msgstr "Appliquer les règles de la marque"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_product_template_form_view
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_form
+msgid "Apply rules"
+msgstr "Appliquer les règles"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid ""
+"Attention! This action is irreversible and will recalculate the category, "
+"purchase price, and selling price of all items in this brand."
+msgstr ""
+"Attention! Cette action est irréversible et recalculera la catégorie, le "
+"prix"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"Attention! This action is irreversible and will recalculate the category, "
+"purchase price, and selling price of all items in this category."
+msgstr ""
+"Attention! Cette action est irréversible et recalculera la catégorie, le "
+"prix d’achat et le prix de vente de tous les articles de cette catégorie."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"Attention! This action is irreversible and will recalculate the category, "
+"purchase price, and selling price of the item."
+msgstr ""
+"Attention! Cette action est irréversible et recalculera la catégorie, le "
+"prix d’achat et le prix de vente de l’article."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Available fields"
+msgstr "Champs disponibles"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_product_product__of_is_net_price
+#: model:ir.model.fields,field_description:of_import.field_product_template__of_is_net_price
+msgid "Based on net price"
+msgstr "Basé sur le prix net"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__brand_id
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__brand_id
+msgid "Brand"
+msgstr "Marque"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"Brand %(brand_name)s : Add configuration for the category %(categ_origin)s "
+"(%(match)s)"
+msgstr ""
+"Marque %(brand_name)s : Ajout de la configuration pour la catégorie "
+"%(categ_origin)s (%(match)s)"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "CRM/Leads"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__file_type__csv
+msgid "CSV"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__state__canceled
+msgid "Canceled"
+msgstr "Annulé"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__categ_ids
+msgid "Categories"
+msgstr "Catégories"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__of_import_categ_id
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_config_template__of_import_categ_id
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__of_import_categ_id
+#: model:ir.model.fields,field_description:of_import.field_product_product__of_import_categ_id
+#: model:ir.model.fields,field_description:of_import.field_product_template__of_import_categ_id
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import_product_categ_config__of_import_sale_price
+#: model:ir.model.fields,help:of_import.field_of_import_product_config_template__of_import_sale_price
+#: model:ir.model.fields,help:of_import.field_of_product_brand__of_import_sale_price
+#: model:ir.model.fields,help:of_import.field_product_product__of_import_sale_price
+#: model:ir.model.fields,help:of_import.field_product_template__of_import_sale_price
+msgid ""
+"Change to apply on untaxed public price to compute sale price.\n"
+"\n"
+"Examples :\n"
+"    - ppht : Keep public price untaxed\n"
+"    - ppht * 1.05 + 10 : Increases the selling price by 5%, plus 10€\n"
+"    - pa * 100 / 60 : Sells the item to achieve a margin of 40% on the purchase price (not on the cost price!)."
+msgstr ""
+"Modification à appliquer sur le prix public hors taxes pour calculer le prix de vente.\n"
+"\n"
+"Exemples :\n"
+" ppht : Conserve le prix public hors taxes\n"
+" ppht * 1.05 + 10 : Augmente le prix de vente de 5 %, plus 10€\n"
+" pa * 100 / 60 : Vend l’article pour réaliser une marge de 40 % sur le prix d’achat (pas sur le prix de revient !)."
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_import_product_config_template
+msgid "Class for customizable parameters in tariff import configuration"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Configuration"
+msgstr ""
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__of_import_cost_price
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_config_template__of_import_cost_price
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__of_import_cost_price
+#: model:ir.model.fields,field_description:of_import.field_product_product__of_import_cost_price
+#: model:ir.model.fields,field_description:of_import.field_product_template__of_import_cost_price
+#, python-format
+msgid "Cost Price"
+msgstr "Coût"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Create attachment %(label_ref)s (line %(i)s)"
+msgstr "Création pièce jointe %(label_ref)s (ligne %(i)s)"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__create_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__create_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__create_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__create_uid
+msgid "Created by"
+msgstr "Créer par"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__create_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__create_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__create_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__create_date
+msgid "Created on"
+msgstr "Créer le"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Creation %(model_name)s %(label_ref)s (line %(i)s)"
+msgstr "Création %(model_name)s %(label_ref)s (ligne %(i)s)"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__date
+msgid "Date"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import__date
+msgid "Date to be assigned to imports as the value date."
+msgstr "Date à attribuer aux importations comme date de valeur."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Default import settings"
+msgstr "Paramètres d’import par défaut"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Description sale"
+msgstr "Description de vente"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__of_import_discount
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_config_template__of_import_discount
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__of_import_discount
+#: model:ir.model.fields,field_description:of_import.field_product_product__of_import_discount
+#: model:ir.model.fields,field_description:of_import.field_product_template__of_import_discount
+#, python-format
+msgid "Discount"
+msgstr "Remise"
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import_product_categ_config__of_import_discount
+#: model:ir.model.fields,help:of_import.field_of_import_product_config_template__of_import_discount
+#: model:ir.model.fields,help:of_import.field_of_product_brand__of_import_discount
+#: model:ir.model.fields,help:of_import.field_product_product__of_import_discount
+#: model:ir.model.fields,help:of_import.field_product_template__of_import_discount
+msgid ""
+"Discount to be applied to items from this supplier.\n"
+"        The discount is applied to the list price to calculate the purchase price.\n"
+"\n"
+"Examples :\n"
+"    - 40.5 : Force a discount of 40.5% (Attention, use a period and not a comma!)\n"
+"    - cumul(10,5) : Apply the recommended discount, then a discount of 10%, then a discount of 5%\n"
+"    - cumul(14.5) : Equivalent to the previous line, a discount of 10% then 5% totals 14.5% in total."
+msgstr ""
+"Remise à appliquer aux articles de ce fournisseur.\n"
+"La remise est appliquée sur le prix de liste pour calculer le prix d’achat.\n"
+"\n"
+"Exemples :\n"
+" 40.5 : Appliquer une remise de 40,5 % (Attention, utiliser un point et non une virgule !)\n"
+" cumul(10,5) : Appliquer la remise recommandée, puis une remise de 10 %, puis une remise de 5 %\n"
+" cumul(14.5) : Équivalent à la ligne précédente, une remise de 10 % puis 5 % totalise 14,5 % au total.\n"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__display_name
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__display_name
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__display_name
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__display_name
+msgid "Display Name"
+msgstr "Nom d’affichage"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Do you confirm import (not cancellable) ?"
+msgstr "Confirmez-vous l’import (non annulable) ?"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__date_end_import
+msgid "End"
+msgstr "Fin"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import_message__type__error
+msgid "Error"
+msgstr "Erreur"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/utils.py:0
+#, python-format
+msgid "Error cell found while reading XLS/XLSX file: %s"
+msgstr "Erreur trouvée lors de la lecture du fichier XLS/XLSX : %s"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__import_error_ids
+msgid "Errors"
+msgstr "Erreurs"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Examples:"
+msgstr "Exemples :"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__failed_count
+msgid "Failed Count"
+msgstr "Nb d’échecs"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__separator
+msgid "Field separator"
+msgstr "Séparateur de champs"
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import__separator
+msgid ""
+"Field separator character in the import file.\n"
+"    If not specified, the system will attempt to determine it automatically.\n"
+"    Use \\t for tabulation."
+msgstr ""
+"Caractère séparateur de champ dans le fichier d’importation.\n"
+"Si non spécifié, le système tentera de le déterminer automatiquement.\n"
+"Utilisez \\t pour la tabulation."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"Fields available for import (column headers) :\n"
+" %(output_note)s"
+msgstr ""
+"Champs disponibles pour l’import (en-têtes de colonne) :\n"
+"%(output_note)s"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__file
+msgid "File"
+msgstr "Fichier"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__file_type
+msgid "File Type"
+msgstr "Type de fichier"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__file_size
+msgid "File size"
+msgstr "Taille de fichier"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__file_name
+msgid "Filename"
+msgstr "Nom du fichier"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Help"
+msgstr "Aide"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__id
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__id
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__id
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__id
+msgid "ID"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_product_product__of_is_net_price
+#: model:ir.model.fields,help:of_import.field_product_template__of_is_net_price
+msgid ""
+"If this box is checked, the item prices are calculated based on a purchase price\n"
+"        provided by the supplier.\n"
+"        Otherwise, they are based on the net list price excluding taxes."
+msgstr ""
+"Si cette case est cochée, les prix des articles sont calculés en fonction d’un prix d’achat fourni par le fournisseur.\n"
+"Sinon, ils sont basés sur le prix de liste net hors taxes."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid ""
+"If you only want to update certain items of the brand, please select them "
+"from the list below :"
+msgstr ""
+"Si vous souhaitez uniquement mettre à jour certains articles de la marque, "
+"veuillez les sélectionner dans la liste ci-dessous :"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__ignored_count
+msgid "Ignored Count"
+msgstr "Nb ignorés"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Images/Attachments"
+msgstr "Images/pièces jointes"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__import_id
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Import"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.actions.act_window,help:of_import.action_of_import
+msgid "Import OpenFire"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__time_lapse
+msgid "Import in"
+msgstr "Importé en"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__state__imported
+msgid "Imported"
+msgstr "Importés"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import_message__type__info
+msgid "Info"
+msgstr ""
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"Info : column \"%s\" in the import file is not recognize. Ignored during the"
+" import."
+msgstr ""
+"Info : la colonne \"%s\" dans le fichier d’import n’est pas reconnue. "
+"Ignorée lors de l’import."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Informations"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Items with specific rules"
+msgstr "Eléments avec règles spécifiques"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Journal"
+msgstr ""
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Kit components"
+msgstr "Composants de kit"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import____last_update
+#: model:ir.model.fields,field_description:of_import.field_of_import_message____last_update
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config____last_update
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__write_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__write_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__write_uid
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__write_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__write_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__write_date
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__file_type__xls
+msgid "MS-Excel"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import__file_type__xlsx
+msgid "MS-Excel-10"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__lang_id
+msgid "Main Language"
+msgstr "Langue principale"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Matching of item categories"
+msgstr "Correspondance des catégories d’articles."
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__message
+msgid "Message"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_import_message
+msgid "Message from OpenImport journal"
+msgstr "Message du journal d’OpenImport"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "No brand correspond to the prefix %s."
+msgstr "Aucune marque ne correspond au préfixe %s."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#, python-format
+msgid ""
+"No formula is provided for %(text)s of this item (brand to be configured: "
+"%(name)s).."
+msgstr ""
+"Aucune formule n’est renseignée pour %(text)s de cet article (marque à "
+"configurer : %(name)s).."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#, python-format
+msgid ""
+"No formula is provided for %(text)s of this item (brand to configure: "
+"%(name)s).."
+msgstr ""
+"Aucune formule n’est renseignée pour %(text)s de cet article (marque à "
+"configurer : %(name)s).."
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__output_note
+msgid "Note"
+msgstr ""
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Notes"
+msgstr ""
+
+#. module: of_import
+#: model:ir.actions.act_window,name:of_import.action_of_import
+#: model:ir.ui.menu,name:of_import.menu_of_import
+msgid "OpenImport"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__categ_origin
+msgid "Origin Category"
+msgstr "Catégorie d’origine"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Partner bank journals"
+msgstr "Comptes en banque des partenaires"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Partners"
+msgstr "Partenaires"
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_product_template
+msgid "Product"
+msgstr "Article"
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_product_brand
+msgid "Product brand"
+msgstr "Marque"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__product_ids
+#: model:ir.model.fields,field_description:of_import.field_of_import_update_product_brand_products__product_ids
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__product_config_ids
+#, python-format
+msgid "Products"
+msgstr "Produits"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__prefix
+msgid "Reference prefix"
+msgstr "Préfixe de la référence"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#: code:addons/of_import/models/of_import.py:0
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "SIMULATION - nothing have been create/update."
+msgstr "SIMULATION - rien n’a été créé/modifié."
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_product_brand__of_import_sale_price
+msgid "Sale Price"
+msgstr "Prix de vente"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_categ_config__of_import_sale_price
+#: model:ir.model.fields,field_description:of_import.field_of_import_product_config_template__of_import_sale_price
+#: model:ir.model.fields,field_description:of_import.field_product_product__of_import_sale_price
+#: model:ir.model.fields,field_description:of_import.field_product_template__of_import_sale_price
+msgid "Sale price untaxed"
+msgstr "Prix de vente HT"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#, python-format
+msgid "Selling price excluding taxes"
+msgstr "Prix de vente hors taxes"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Services requests"
+msgstr "Demandes d'intervention"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Set Draft"
+msgstr "Passer en brouillon"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Set to draft ?"
+msgstr "Passer en brouillon ?"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Settings"
+msgstr "Configuration"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__show_lang
+msgid "Show Main Language"
+msgstr "Afficher la langue principale"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view
+msgid "Simulate import"
+msgstr "Simuler l’import"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__date_start_import
+msgid "Start"
+msgstr "Début"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__state
+msgid "State"
+msgstr "État"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__import_success_ids
+msgid "Success"
+msgstr "Succès"
+
+#. module: of_import
+#: model:ir.model.fields,help:of_import.field_of_import__prefix
+msgid "Text that will precede the reference."
+msgstr "Texte qui précédera la référence"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"The brand module allows processing of data received from the supplier for "
+"integration into your database."
+msgstr ""
+"Le module de marque permet le traitement des données reçues du fournisseur "
+"pour les intégrer dans votre base de données."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"The column %(file_field)s in the import file exist %(duplicates)s times"
+msgstr ""
+"La colonne %(file_field)s dans le fichier d’import existe %(duplicates)s "
+"fois"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"The discount is an optional field that can be left blank. For example, if "
+"you import your own price list with a specified purchase price."
+msgstr ""
+"La remise est un champ optionnel qui peut être laissé vide. Par exemple, si "
+"vous importez votre propre tarif, avec un prix d’achat renseigné."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"The fields for <b>discount</b>, <b>selling price excluding taxes</b>, and "
+"<b>cost price</b> accept Python expressions."
+msgstr ""
+"Les champs pour <b>remise</b>, <b>prix de vente hors taxes</b>, et <b>prix "
+"de revient</b> acceptent des expressions Python."
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid ""
+"The following specific elements are recognized in the expressions (in "
+"addition to standard Python functions):"
+msgstr ""
+"Les éléments spécifiques suivants sont reconnus dans les expressions (en "
+"plus des fonctions Python standard) :"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"The reference field which is needed to identify a %(model_name)s "
+"(%(primary_field)s) is not in the import file "
+msgstr ""
+"Le champ référence qui est nécessaire pour identifier un %(model_name)s "
+"(%(primary_field)s) n’est pas dans le fichier d’import"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"The relation field %(relation_field)s (after the /) in the column "
+"%(file_field)s does not exist."
+msgstr ""
+"Le champ relation %(relation_field)s (après le /) dans la colonne "
+"%(file_field)s n’existe pas."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import_product_config_template.py:0
+#, python-format
+msgid ""
+"The return format of the function is not as expected. (field : %(field)s, formula : %(code)s)\n"
+"This error may occur if you have used a comma instead of a period as the decimal separator."
+msgstr ""
+"Le format de retour de la fonction n’est pas celui attendu. (champ : %(field)s, formule : %(code)s)\n"
+"Cette erreur peut survenir si vous avez utilisé une virgule au lieu d’un point comme séparateur décimal."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#, python-format
+msgid "Theoretical cost"
+msgstr "Coût théorique"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid ""
+"This operation may take some time, depending on the number of items "
+"involved."
+msgstr ""
+"Cette opération peut prendre du temps, en fonction du nombre d’articles "
+"concernés."
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__total_count
+msgid "Total Count"
+msgstr "Nb total"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__type_import
+msgid "Type of import"
+msgstr "Type d’import"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import_message__type
+msgid "Type of message"
+msgstr "Type de message"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_product_brand.py:0
+#, python-format
+msgid "Unable to find the corresponding product category for %s"
+msgstr "Impossible de trouver la catégorie de produit correspondante pour %s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Unrecognized file type"
+msgstr "Type de fichier non reconnu"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Unrecognized file type !"
+msgstr "Type de fichier non reconnu !"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
+msgid "Update"
+msgstr "Mise à jour"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Update %(model_name)s %(label_ref)s (line %(i)s)"
+msgstr "Mise à jour %(model_name)s %(label_ref)s (ligne %(i)s)"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Update attachment %(label_ref)s (line %(i)s)"
+msgstr "Mise à jour pièce jointe %(label_ref)s (ligne %(i)s)"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "Update of field %(res_field)s %(label_ref)s (line %(i)s)"
+msgstr "Mise à jour du champ %(res_field)s %(label_ref)s (ligne %(i)s)"
+
+#. module: of_import
+#: model_terms:ir.ui.view,arch_db:of_import.of_import_update_product_brand_products_form_view
+msgid "Update products"
+msgstr "Mettre à jour les articles"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__updated_count
+msgid "Updated Count"
+msgstr "Nb MAJ"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__user_id
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"WARNING : this records have been create but have an empty reference field "
+"(duplicates possible in case of multiple import : line(s) %s)."
+msgstr ""
+"ATTENTION : ces enregistrements ont été créés mais ont un champ référence "
+"vide (doublons possibles en cas d’import multiple : ligne(s) %s)."
+
+#. module: of_import
+#: model:ir.model.fields.selection,name:of_import.selection__of_import_message__type__warning
+msgid "Warning"
+msgstr "Alerte"
+
+#. module: of_import
+#: model:ir.model.fields,field_description:of_import.field_of_import__import_warning_ids
+msgid "Warnings"
+msgstr "Alertes"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"a relation field (after the /) in the column %s is not possible for this "
+"field"
+msgstr ""
+"un champ relation (après le /) dans la colonne %s n’est pas possible pour ce"
+" champ"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "creation failed"
+msgstr "la création a échoué"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : %(e_name)s %(model)s not imported."
+msgstr "ligne %(i)s : %(e_name)s %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : %(mode)s %(res_model)s %(label_ref)s - Error : %(e)s"
+msgstr "ligne %(i)s : %(mode)s %(res_model)s %(label_ref)s - Erreur : %(e)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : %(model)s with reference %(ref)s has multiples matches in the "
+"database, impossible to know which one to update. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : %(model)s avec la référence %(ref)s a plusieurs exemplaires "
+"dans la base de données, impossible de savoir lequel mettre à jour. "
+"%(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : Update failed %(res_model)s %(label_ref)s - Error : %(e)s"
+msgstr ""
+"ligne %(i)s : Mise à jour échouée %(res_model)s %(label_ref)s - Erreur : "
+"%(e)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : You do not have right to access this file : %(file_path)s"
+msgstr ""
+"ligne %(i)s : Vous n’avez pas le droit d’accéder à ce fichier : "
+"%(file_path)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : creation failed %(model_name)s %(label_ref)s - Error : %(exp)s"
+msgstr ""
+"ligne %(i)s : création échouée %(model_name)s %(label_ref)s - Erreur : "
+"%(exp)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) empty but required. %(model)s "
+"not imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) vide mais requis. %(model)s "
+"non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) is not a number. %(model)s not"
+" imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) n’est pas un nombre. "
+"%(model)s non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) is not an id (integer) but the"
+" relation field (after the /) is an id. %(model)s not imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) n’est pas un id (entier) mais"
+" le champ relation (après le /) est un id. %(model)s non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) the choosen supplier "
+"(%(value)s) does not match the brand %(brand_name)s (%(partner_name)s). "
+"%(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) le fournisseur choisi "
+"(%(value)s) ne correspond pas à la marque %(brand_name)s (%(partner_name)s)."
+" "
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(tag)s\" has multiple"
+" matches. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(tag)s\" a "
+"plusieurs correspondances. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(tag)s\" has no "
+"match. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(tag)s\" n’a pas de"
+" correspondance. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" has "
+"multiple matches. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" a "
+"plusieurs correspondances. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" has "
+"multiple matches.%(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" a "
+"plusieurs correspondances. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" has no "
+"match. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" n’a pas "
+"de correspondance. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" has no "
+"match. %(model)snot imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" n’a pas "
+"de correspondance. %(model)s non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" has not "
+"the good format. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" n’a pas "
+"le bon format. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" not "
+"authorized (only : 0, 1, True, False, vrai, faux). %(model)s not imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" non "
+"autorisée (seulement : 0, 1, True, False, vrai, faux). %(model)s non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(file_field)s) value \"%(value)s\" not "
+"authorized. %(model)snot imported"
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(file_field)s) valeur \"%(value)s\" non "
+"autorisée. %(model)s non importé"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : field %(field)s (%(key)s) required but not present in the "
+"import file. %(model)s not imported."
+msgstr ""
+"ligne %(i)s : champ %(field)s (%(key)s) requis mais non présent dans le "
+"fichier d’import. %(model)s non importé."
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : field not found : %(res_model)s.%(res_field)s"
+msgstr "ligne %(i)s : champ non trouvé : %(res_model)s.%(res_field)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : file not found : %(file_path)s"
+msgstr "ligne %(i)s : fichier non trouvé : %(file_path)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : impossible to open the file : %(file_path)s"
+msgstr "ligne %(i)s : impossible d’ouvrir le fichier : %(file_path)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : model not recognize : %(res_model)s"
+msgstr "ligne %(i)s : modèle non reconnu : %(res_model)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : multiple attachments found : %(res_model)s - %(res_name)s : "
+"%(line_name)s"
+msgstr ""
+"ligne %(i)s : plusieurs pièces jointes trouvées : %(res_model)s - "
+"%(res_name)s : %(line_name)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : multiple results for : %(res_name)s"
+msgstr "ligne %(i)s : plusieurs résultats pour : %(res_name)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : no result found for : %(res_name)s"
+msgstr "ligne %(i)s : aucun résultat trouvé pour : %(res_name)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "line %(i)s : the file is empty : %(file_path)s"
+msgstr "ligne %(i)s : le fichier est vide : %(file_path)s"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid ""
+"line %(i)s : update failed %(model_name)s %(label_ref)s - Error : %(exp)s"
+msgstr ""
+"ligne %(i)s : mise à jour échouée %(model_name)s %(label_ref)s - Erreur : "
+"%(exp)s"
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_import
+msgid "of.import"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_import_product_categ_config
+msgid "of.import.product.categ.config"
+msgstr ""
+
+#. module: of_import
+#: model:ir.model,name:of_import.model_of_import_update_product_brand_products
+msgid "of.import.update.product.brand.products"
+msgstr ""
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "update failed"
+msgstr "la mise à jour a échoué"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "with match"
+msgstr "avec correspondance"
+
+#. module: of_import
+#. odoo-python
+#: code:addons/of_import/models/of_import.py:0
+#, python-format
+msgid "without match"
+msgstr "sans correspondance"
