@@ -66,8 +66,7 @@ def convert_phone_number(value, default_country_code=None, new_format="e164", st
                     result = phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
             else:
                 result = {
-                    key: phonenumbers.format_number(number, phone_format)
-                    for key, phone_format in phone_formats.iteritems()
+                    key: phonenumbers.format_number(number, phone_format) for key, phone_format in phone_formats.items()
                 }
     except phonenumbers.phonenumberutil.NumberParseException:
         _logger.error(
