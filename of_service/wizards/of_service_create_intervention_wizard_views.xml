@@ -14,7 +14,7 @@
                 </group>
                 <field name="show_warning" invisible="1"/>
                 <group attrs="{'invisible': [('show_warning', '=', False)]}">
-                    <p class="text-warning">Attention, l'intervenant sélectionné n'est pas totalement disponible à la date choisie, les dates des nouveaux RDV seront forcées.</p>
+                    <p class="text-warning">Attention : la date de début sélectionnée est en dehors des horaires de travail du technicien.</p>
                 </group>
                 <group string="Demandes d'intervention">
                     <field name="line_ids" nolabel="1" mode="tree">
@@ -26,6 +26,7 @@
                             <field name="service_address_zip" readonly="1"/>
                             <field name="service_address_city" readonly="1"/>
                             <field name="service_task_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="service_duration" readonly="1" widget="float_time"/>
                         </tree>
                     </field>
                 </group>

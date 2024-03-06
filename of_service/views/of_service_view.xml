@@ -259,6 +259,7 @@
                 <field name="partner_phone"/>
                 <field name="name"/>
                 <field name="date_next"/>
+                <field name="date_last"/>
                 <field name="map_view_display_note"/>
                 <templates>
                     <t t-name="of_map_record_box">
@@ -291,6 +292,9 @@
                                 </t>
                                 <t t-if="record.date_next.raw_value">
                                     <i class="of_map_record_main fa fa-truck"/><span class="of_ws"/><field name="date_next"/><br/>
+                                </t>
+                                <t t-if="record.date_last.raw_value">
+                                    <i class="of_map_record_main fa fa-calendar-check-o"/><span class="of_ws"/><field name="date_last"/><br/>
                                 </t>
                                 <t t-if="record.map_view_display_note.raw_value">
                                     <i class="of_map_record_main fa fa-sticky-note"/><span class="of_ws"/><field name="map_view_display_note"/><br/>
@@ -716,6 +720,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tache_id']" position="before">
                 <field name="type_id" options="{'no_open':True, 'no_create': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='tache_id']" position="after">
+                <field name="segmentation_allowed"/>
             </xpath>
         </field>
     </record>
