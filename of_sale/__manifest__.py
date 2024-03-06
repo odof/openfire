@@ -82,7 +82,7 @@ Droits utilisateurs:
         #"of_base", <- par of_base_location
         "of_base_location",
         "of_gesdoc",
-        "of_product",
+        "of_product_brand",
         "of_sale_discount",
         "sale",
         "sale_margin",
