@@ -173,8 +173,6 @@ class ResPartner(models.Model):
                     ),
                 },
             )
-        # send a message to the bus to refresh the map
-        self.env['bus.bus']._sendone('OFPartnerMap', message={'action': 'refresh'}, notification_type='notification')
 
     def _geo_localize_children(self):
         """Geolocalize children of partner if they have different address data"""
