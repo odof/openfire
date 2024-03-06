@@ -38,6 +38,9 @@ L.Control.RecordDisplayer = L.Control.extend({
         var container_class = 'o_record_display_control';
         this.container = L.DomUtil.create(container_tag, container_class);
         this.container.style.backgroundColor = 'transparent';
+        this.onResize();
+        L.DomEvent.on(this.container, 'mousewheel', L.DomEvent.stopPropagation);
+        L.DomEvent.on(window, 'resize', this.onResize, this);
 
         return this.container;
     },
@@ -158,6 +161,14 @@ L.Control.RecordDisplayer = L.Control.extend({
             }
         }else{
             console.log("couldn't find record id#"+id);
+        }
+    },
+    onResize: function () {
+        if (this.map.view.$el.css("height") == "100%" && this.map.view.$el.css("min-height").endsWith("px")) {
+            this.container.style.height = (parseFloat(this.map.view.$el.css("min-height").slice(0, -2)) - 90) + 'px';
+        }
+        else {
+            this.container.style.height = (this.map.view.$el.height() - 90) + 'px';
         }
     },
 });

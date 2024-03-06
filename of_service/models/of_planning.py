@@ -7,6 +7,7 @@ class OfPlanningInterventionTemplate(models.Model):
     _inherit = 'of.planning.intervention.template'
 
     type_id = fields.Many2one(comodel_name='of.service.type', string="Type")
+    segmentation_allowed = fields.Boolean(string=u"Segmentation autorisée")
 
     @api.multi
     def name_get(self):

@@ -247,7 +247,8 @@ class OFPlanningTournee(models.Model):
             # build the timeline for occupied timeslots of the day for the employee and check if it is full
             min_duration = self.env['ir.values'].get_default(
                 'of.intervention.settings', 'duree_min_creneaux_dispo') or DEFAULT_MIN_DURATION
-            day_timeline = tour._get_employee_day_unavailability_timeline(interventions, employee_wh, nb_timeslots)
+            day_timeline = self.env['of.planning.tournee']._get_employee_day_unavailability_timeline(
+                tour.date, interventions, employee_wh)
             is_full = True
             last_end = 0
             for start, end in day_timeline:
@@ -355,19 +356,19 @@ class OFPlanningTournee(models.Model):
             'return_address_id': return_address,
         }
 
-    @api.multi
-    def _get_employee_day_unavailability_timeline(self, interventions, employee_wh, nb_timeslots):
+    @api.model
+    def _get_employee_day_unavailability_timeline(self, date, interventions, employee_wh):
         """ Build the timeline of unavailability, based on
         the employee's working hours and interventions. The timeline starts at 0am and ends at 12pm.
 
+        :param date: Date of the day to check unavailability
         :param interventions: Intervention of the employee for the day (sorted by date)
         :param employee_wh: Working hours of the employee for the day
-        :param nb_timeslots: Number of timeslots of the employee for the day
         :return: Sorted list of tuples (start, end) of the timeline
         :rtype: list
         """
-        self.ensure_one()
-        date_local = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(self.date))
+        date_local = fields.Datetime.context_timestamp(self.env.user, fields.Datetime.from_string(date))
+        nb_timeslots = len(employee_wh)
 
         timeline = [(0.0, employee_wh[0][0])]
         timeline.extend((employee_wh[i - 1][1], employee_wh[i][0]) for i in range(1, nb_timeslots))
@@ -377,15 +378,17 @@ class OFPlanningTournee(models.Model):
 
         # add interventions to the unvailability timeline
         for intervention in interventions:
+            start_date = intervention.read(['date_prompt'])[0]['date_prompt']
             start_date_local = fields.Datetime.context_timestamp(
-                intervention, fields.Datetime.from_string(intervention.date))
+                intervention, fields.Datetime.from_string(start_date))
             if start_date_local.day != date_local.day:
                 start_flo = day_start
             else:
                 start_flo = (start_date_local.hour + start_date_local.minute / 60.0 + start_date_local.second / 3600.0)
 
+            end_date = intervention.read(['date_deadline_prompt'])[0]['date_deadline_prompt']
             end_date_local = fields.Datetime.context_timestamp(
-                intervention, fields.Datetime.from_string(intervention.date_deadline))
+                intervention, fields.Datetime.from_string(end_date))
             if end_date_local.day != date_local.day:
                 end_flo = day_end
             else:
