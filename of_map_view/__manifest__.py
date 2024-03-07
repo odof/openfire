@@ -7,13 +7,12 @@
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
-    'summary': "Ajout d'un type de vue carte (OpenStreetMap) dans les contacts",
+    'summary': "Ajout d'un type de vue carte (OpenStreetMap)",
     'depends': [
-        'contacts',
         'web',
         'of_geolocalize',
     ],
-    'data': ['views/of_partner_views.xml'],
+    'data': [],
     'assets': {
         'web.assets_backend': [
             '/of_map_view/static/src/**/*',
@@ -22,5 +21,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'uninstall_hook': '_uninstall_hook',
 }

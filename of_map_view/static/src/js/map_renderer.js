@@ -1,9 +1,9 @@
 /** @odoo-module */
 
-import {Component, useEffect, onWillUnmount, useRef} from "@odoo/owl";
-import {useService} from "@web/core/utils/hooks";
-import {renderToString} from "@web/core/utils/render";
-import {ListPopupMap} from "../components/popup";
+import { Component, useEffect, onWillUnmount, useRef } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
+import { renderToString } from "@web/core/utils/render";
+import { ListPopupMap } from "../components/popup";
 
 export class MapRenderer extends Component {
     static template = "of_map_view.MapRenderer";
@@ -13,11 +13,12 @@ export class MapRenderer extends Component {
     };
 
     setup() {
+        this.model = this.props.model;
         this.orm = useService("orm");
         this.actionService = useService("action");
         this.mapContainerRef = useRef("mapContainer");
         this.popups = {};
-        this.partners = this.props.model.data.partners.records;
+        this.records = this.props.model.data.records.records;
         this.map = false;
         this.markers = {};
         this.iconMarker = {};
@@ -26,6 +27,8 @@ export class MapRenderer extends Component {
 
         useEffect(
             () => {
+                const { latitudeField, longitudeField } = this.model.metaData;
+
                 if (!this.map) {
                     this.map = L.map(this.mapContainerRef.el).setView(
                         [48.056, -2.818],
@@ -33,11 +36,20 @@ export class MapRenderer extends Component {
                     );
                     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
                         center: [39.73, -104.99],
-                        minZoom: 5,
-                        maxZoom: 19,
-                        attribution:
-                            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                     }).addTo(this.map);
+
+                    let arrayOfMarkers = [];
+                    this.records.map((record) => {
+                        if (record[latitudeField] && record[longitudeField]) {
+                            arrayOfMarkers.push([record[latitudeField], record[longitudeField]])
+                        }
+                    });
+
+                    if (arrayOfMarkers.length) {
+                        var bounds = new L.LatLngBounds(arrayOfMarkers);
+                        this.map.fitBounds(bounds);
+                    };
 
                     // chargement des types d'icones
                     this.iconMarker["normal"] = L.AwesomeMarkers.icon({
@@ -63,62 +75,74 @@ export class MapRenderer extends Component {
 
                 this.updateMap();
             },
-            () => [this.props.model.data.partners.records]
+            () => [this.props.model.data.records.records]
         );
     }
 
-    switchView(partner_id) {
+    switchView(record_id) {
         this.actionService.doAction({
             type: "ir.actions.act_window",
             name: "Contact",
             views: [[false, "form"]],
             res_model: this.props.model.metaData.resModel,
-            res_id: partner_id,
+            res_id: record_id,
         });
     }
 
     updateMap() {
+        const { latitudeField, longitudeField } = this.model.metaData;
+
         this.removeMarkers();
-        this.props.model.data.partners.records.map((partner) => {
-            if (partner.partner_latitude && partner.partner_longitude) {
-                this.addMarker(partner);
+        this.closePopups();
+        let arrayOfMarkers = [];
+        this.props.model.data.records.records.map((record) => {
+            if (record[latitudeField] && record[longitudeField]) {
+                this.addMarker(record);
+                arrayOfMarkers.push([record[latitudeField], record[longitudeField]])
             }
         });
+
+        if (arrayOfMarkers.length) {
+            var bounds = new L.LatLngBounds(arrayOfMarkers);
+            this.map.fitBounds(bounds);
+        };
     }
 
-    onClickMarker(partner) {
-        this.popups[partner.id].toggle();
+    onClickMarker(record) {
+        this.popups[record.id].toggle();
     }
 
-    onMouseOverMarker(partner) {
-        this.popups[partner.id].highlight();
+    onMouseOverMarker(record) {
+        this.popups[record.id].highlight();
     }
 
-    onMouseOutMarker(partner) {
-        this.popups[partner.id].lowlight();
+    onMouseOutMarker(record) {
+        this.popups[record.id].lowlight();
     }
 
-    addMarker(partner) {
+    addMarker(record) {
+        const { latitudeField, longitudeField } = this.model.metaData;
+
         let markerLocation = new L.LatLng(
-            partner.partner_latitude,
-            partner.partner_longitude
+            record[latitudeField],
+            record[longitudeField]
         );
         let marker = new L.Marker(markerLocation, {icon: this.iconMarker["normal"]});
 
         // Ajout du tooltip
         const tooltip = L.tooltip({offset: [15, -25]})
-            .setLatLng([partner.partner_latitude, partner.partner_longitude])
-            .setContent(this.getTooltip(partner));
+            .setLatLng([record[latitudeField], record[longitudeField]])
+            .setContent(this.getTooltip(record));
 
         marker.bindTooltip(tooltip);
 
-        this.markers[partner.id] = marker;
+        this.markers[record.id] = marker;
         this.map.addLayer(marker);
 
         marker.on({
-            mouseup: this.onClickMarker.bind(this, partner),
-            tooltipopen: this.onMouseOverMarker.bind(this, partner),
-            tooltipclose: this.onMouseOutMarker.bind(this, partner),
+            mouseup: this.onClickMarker.bind(this, record),
+            tooltipopen: this.onMouseOverMarker.bind(this, record),
+            tooltipclose: this.onMouseOutMarker.bind(this, record),
         });
     }
 
@@ -130,8 +154,15 @@ export class MapRenderer extends Component {
         this.markers = {};
     }
 
-    getTooltip(partner) {
-        return renderToString("of_map_view.tooltipRenderer", {partner: partner});
+    closePopups() {
+        for (let index = 0; index < Object.keys(this.popups).length; index++) {
+            this.popups[Object.keys(this.popups)[index]].state.show = false;
+        };
+    }
+
+    getTooltip(record) {
+        const { tooltipView } = this.model.metaData;
+        return renderToString(tooltipView, {record: record})
     }
 
     // supprimer le popup en changement de page

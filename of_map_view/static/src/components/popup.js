@@ -5,17 +5,19 @@ export class PopupMap extends Component {
     static template = "of_map_view.PopupMap";
 
     static props = {
-        partner: Object,
+        record: Object,
         map: Object,
     };
 
     setup() {
-        this.value = this.props.partner;
+        this.value = this.props.record;
         this.state = useState({
             show: false,
-            color: "white",
+            color: 'white',
+            width: this.props.map.model.metaData.width,
         });
         this.props.map.popups[this.value.id] = this;
+        this.model = this.props.map.model.metaData.resModel;
     }
 
     onClick(evt) {
@@ -97,6 +99,12 @@ export class ListPopupMap extends Component {
     static props = {
         map: Object,
     };
+
+    setup() {
+        this.state = useState({
+            width: this.props.map.model.metaData.width,
+        });
+    }
 
     get rendererProps() {
         return {

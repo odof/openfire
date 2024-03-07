@@ -5,17 +5,7 @@
         <div class="map-renderer row g-0">
             <div class="col-md-12 col-lg-10 map-renderer--container" t-ref="mapContainer"/>
             <ListPopupMap map="this"/>
-
         </div>
     </t>
-
-    <t t-name="of_map_view.tooltipRenderer" owl="1">
-        <div>
-            <p><t t-esc="partner.name"/></p>
-            <p><t t-esc="partner.of_precision"/></p>
-        </div>
-    </t>
-
-
 
 </templates>

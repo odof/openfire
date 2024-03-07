@@ -5,8 +5,10 @@ import {Model} from "@web/views/model";
 export class MapModel extends Model {
     setup(params, {}) {
         this.data = {
-            partners: [],
-            partnerIds: [],
+            count: 0,
+            records: [],
+            recordIds: [],
+            records: [],
         };
         this.metaData = {
             ...params,
@@ -22,10 +24,10 @@ export class MapModel extends Model {
             ...this.metaData,
             ...params,
         };
-        this.data.partners = await this._fetchData(metaData);
-        this.data.partnerIds = [];
-        this.data.partners.records.map((record) => {
-            this.data.partnerIds.push(record.id);
+        this.data.records = await this._fetchData(metaData);
+        this.data.recordIds = [];
+        this.data.records.records.map((record) => {
+            this.data.recordIds.push(record.id);
         });
 
         this.notify();
@@ -37,20 +39,16 @@ export class MapModel extends Model {
      * @returns
      */
     async _fetchData(metaData) {
+        var decorationFields = metaData.decorationFields;
+        decorationFields.push(
+            metaData.latitudeField,
+            metaData.longitudeField,
+            'id',
+        );
         return this.orm.webSearchRead(
             metaData.resModel,
             metaData.domain,
-            [
-                "name",
-                "partner_latitude",
-                "partner_longitude",
-                "of_precision",
-                "city",
-                "zip",
-                "phone",
-                "mobile",
-                "id",
-            ],
+            decorationFields,
             {
                 order: metaData.orderBy.join(" "),
                 context: metaData.context,
