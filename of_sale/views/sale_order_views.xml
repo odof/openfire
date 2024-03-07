@@ -108,7 +108,7 @@
                         attrs="{'invisible': ['|', ('id', '=', False), ('state', 'in', ('done','cancel'))]}"/>
                     <field name="of_obsolete" invisible="1"/>
                     <button name="action_button_dummy" style="max-width: 39px;" class="btn-outline-danger disabled" aria-label="Obsolete"
-                            type="object" icon="fa-clock-o" title="Obsolete" attrs="{'invisible': [('of_obsolete', '=', False)]}"/>
+                            type="object" icon="fa-clock-o" title="Obsolete" attrs="{'column_invisible': [('of_obsolete', '=', False)], 'invisible': [('of_obsolete', '=', False)]}"/>
                 </xpath>
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='company_id']" position="after">
