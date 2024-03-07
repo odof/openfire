@@ -3,7 +3,7 @@
 
     <!-- Inhibition des connecteurs -->
     <record id="sanitize_query_datastore_sale" model="of.sanitize.query">
-        <field name="query">UPDATE of_datastore_sale SET login = '', password = ''</field>
+        <field name="query">UPDATE of_datastore_sale SET login = id, password = ''</field>
     </record>
 
 </odoo>
