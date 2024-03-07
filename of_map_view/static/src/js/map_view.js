@@ -1,10 +1,10 @@
 /** @odoo-module */
 
-import { registry } from "@web/core/registry";
-import { MapArchParser } from "./map_arch_parser";
-import { MapController } from "./map_controller";
-import { MapRenderer } from "./map_renderer";
-import { MapModel } from "./map_model";
+import {registry} from "@web/core/registry";
+import {MapArchParser} from "./map_arch_parser";
+import {MapController} from "./map_controller";
+import {MapRenderer} from "./map_renderer";
+import {MapModel} from "./map_model";
 
 export const mapView = {
     type: "map",
@@ -23,7 +23,7 @@ export const mapView = {
             const parser = new view.ArchParser();
             const archInfo = parser.parse(arch);
 
-            let formViewId = archInfo.formViewId;
+            let {formViewId} = archInfo;
             if (!formViewId) {
                 const formView = config.views.find((v) => v[1] === "form");
                 if (formView) {

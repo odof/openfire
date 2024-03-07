@@ -13,7 +13,7 @@ export class PopupMap extends Component {
         this.value = this.props.record;
         this.state = useState({
             show: false,
-            color: 'white',
+            color: "white",
             width: this.props.map.model.metaData.width,
         });
         this.props.map.popups[this.value.id] = this;

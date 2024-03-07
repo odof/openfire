@@ -9,22 +9,14 @@ Fonctionnalités
 ###############
 
 
-* Créer un nouveau type de vue map.
-* Placer les "markers" sur le map.
-* En Mouseover de marker :
-                - Afficher des popups sur les markers directement qui contiennent des informations.
-                - Colorer les popups qui sont en haut à gauche en jaune.
-* En Mouseout de marker :
-                - Fermer les petits popups qui sont directement sur les markers.
-                - Colorer les popups qui sont en haut à gauche en blanc.
+* Ajout d'un nouveau type de vue Carte (basé sur OpenStreetMap).
 
-* En cliquant sur le marker , il va nous afficher le popup en haut à gauche qui contient des informations.
+* Permet de placer des marker sur la vue carte en fonction de records auxquels la vue est associée.
 
-* En Mouseover de popup en haut à gauche :
-                - Colorer les markers en jaune.
+* En cliquant sur le marker, cela affiche une pop-in sur le côté gauche de la carte qui contient des informations sur le record associé.
+    -  en cliquant sur ce pop-in, cela redirige vers le formulaire de cet enregistrement.
+    -  sinon il est possible de fermer la pop-in.
 
-* En Mouseout de popup en haut à gauche :
-                - Colorer les markers en blanc.
-
-* En cliquant sur le popup, qui est en haut à gauche, il va nous rediriger vers le formulaire de cet enregistrement.
-* En cliquant sur le croix , le popup va etre supprimé .
+* Mise en place de fonctionnalités "MouseOver", "MouseOut" sur les markers :
+    - cela permet d'afficher des tooltips au dessus des markers qui contiennent des informations;
+    - cela permet  d'appliquer une coloration sur la pop-in ouverte liée au marker qui est survolé pour distinguer l'information rapidement.

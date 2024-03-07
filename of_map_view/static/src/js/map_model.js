@@ -6,7 +6,6 @@ export class MapModel extends Model {
     setup(params, {}) {
         this.data = {
             count: 0,
-            records: [],
             recordIds: [],
             records: [],
         };
@@ -39,16 +38,11 @@ export class MapModel extends Model {
      * @returns
      */
     async _fetchData(metaData) {
-        var decorationFields = metaData.decorationFields;
-        decorationFields.push(
-            metaData.latitudeField,
-            metaData.longitudeField,
-            'id',
-        );
+        metaData.decorationFields.push(metaData.latitudeField, metaData.longitudeField, "id");
         return this.orm.webSearchRead(
             metaData.resModel,
             metaData.domain,
-            decorationFields,
+            metaData.decorationFields,
             {
                 order: metaData.orderBy.join(" "),
                 context: metaData.context,

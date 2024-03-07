@@ -12,9 +12,10 @@ Fonctionnalités
 Clients
 -------
 
-* Ajoute la vue map
+* Activation de la vue map sur les clients dans les menus de facturation
+
 
 Fournisseurs
 ------------
 
-* Ajoute la vue map
+* Activation de la vue map sur les fournisseurs dans les menus de facturation

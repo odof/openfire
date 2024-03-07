@@ -2,7 +2,7 @@
 
 from odoo import Command, api, fields, models
 
-from odoo.addons.of_geolocalize.models.res_partner import GEOCODING_STATE
+from odoo.addons.of_geolocalize.models.res_partner import GEOCODING_STATE, OPENSTREETMAP_PRECISION
 
 
 class OFEquipment(models.Model):
@@ -107,6 +107,9 @@ class OFEquipment(models.Model):
     # Map view fields
     customer_name = fields.Char(related='customer_id.name')
     customer_mobile = fields.Char(related='customer_id.mobile')
+    precision = fields.Selection(
+        OPENSTREETMAP_PRECISION, compute='_compute_geocoding_data', string="Precision", store=True
+    )
     partner_latitude = fields.Float(string="Latitude", compute='_compute_geocoding_data', store=True)
     partner_longitude = fields.Float(string="Longitude", compute='_compute_geocoding_data', store=True)
     geocoding_state = fields.Selection(
@@ -162,10 +165,12 @@ class OFEquipment(models.Model):
 
     @api.depends(
         'customer_id',
+        'customer_id.of_precision',
         'customer_id.partner_latitude',
         'customer_id.partner_longitude',
         'customer_id.of_geocoding_state',
         'site_address_id',
+        'site_address_id.of_precision',
         'site_address_id.partner_latitude',
         'site_address_id.partner_longitude',
         'site_address_id.of_geocoding_state',
@@ -173,10 +178,12 @@ class OFEquipment(models.Model):
     def _compute_geocoding_data(self):
         for equipment in self:
             if equipment.site_address_id:
+                equipment.precision = equipment.site_address_id.of_precision
                 equipment.partner_latitude = equipment.site_address_id.partner_latitude
                 equipment.partner_longitude = equipment.site_address_id.partner_longitude
                 equipment.geocoding_state = equipment.site_address_id.of_geocoding_state
             else:
+                equipment.precision = equipment.customer_id.of_precision
                 equipment.partner_latitude = equipment.customer_id.partner_latitude
                 equipment.partner_longitude = equipment.customer_id.partner_longitude
                 equipment.geocoding_state = equipment.customer_id.of_geocoding_state

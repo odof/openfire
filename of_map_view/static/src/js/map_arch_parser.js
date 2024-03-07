@@ -1,9 +1,9 @@
 /** @odoo-module **/
 
-import { _t } from "@web/core/l10n/translation";
-import { XMLParser } from "@web/core/utils/xml";
+import {_t} from "@web/core/l10n/translation";
+import {XMLParser} from "@web/core/utils/xml";
 
-export class MapArchParser extends XMLParser{
+export class MapArchParser extends XMLParser {
     parse(arch) {
         let infoFromRootNode;
         const decorationFields = [];
@@ -21,7 +21,8 @@ export class MapArchParser extends XMLParser{
                     break;
                 }
                 case "templates": {
-                    popoverTemplate = node.querySelector("[t-name=map-popover]") || null;
+                    popoverTemplate =
+                        node.querySelector("[t-name=map-popover]") || null;
                     if (popoverTemplate) {
                         popoverTemplate.removeAttribute("t-name");
                     }
@@ -39,12 +40,12 @@ export class MapArchParser extends XMLParser{
 
 function getInfoFromRootNode(rootNode) {
     const attrs = {};
-    for (const { name, value } of rootNode.attributes) {
+    for (const {name, value} of rootNode.attributes) {
         attrs[name] = value;
     }
 
     return {
-        width: attrs.width ? attrs.width : '150px',
+        width: attrs.width || "150px",
         latitudeField: attrs.latitude,
         longitudeField: attrs.longitude,
         tooltipView: attrs.tooltip_view,

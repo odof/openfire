@@ -7,7 +7,7 @@
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
-    'summary': "Ajout d'un type de vue carte (OpenStreetMap) dans les contacts",
+    'summary': "Ajout de la vue carte (OpenStreetMap) pour les contacts",
     'depends': [
         'contacts',
         'of_map_view',

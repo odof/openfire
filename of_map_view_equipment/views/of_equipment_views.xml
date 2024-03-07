@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_view_map" model="ir.ui.view">
+        <field name="name">of.equipment.view.map</field>
+        <field name="model">of.equipment</field>
+        <field name="arch" type="xml">
+            <map form_view_id="%(of_equipment.of_equipment_view_form)d" tooltip_view="of_map_view_equipment.tooltipRenderer" width="200px" latitude="partner_latitude" longitude="partner_longitude">
+                <field name="name"/>
+                <field name="precision"/>
+                <field name="site_address_id"/>
+                <field name="site_city"/>
+                <field name="site_zip"/>
+                <field name="site_phones"/>
+                <field name="customer_mobile"/>
+                <field name="service_date"/>
+                <field name="installation_date"/>
+                <field name="end_warranty_date"/>
+            </map>
+        </field>
+    </record>
+
+    <record id="of_equipment.action_view_of_equipment" model="ir.actions.act_window">
+        <field name="view_mode">tree,form,map</field>
+    </record>
+
+</odoo>

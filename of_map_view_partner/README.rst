@@ -8,8 +8,7 @@ Module pour ajouter la vue map aux contacts
 Fonctionnalités
 ###############
 
+Clients
+-------
 
-Contacts
---------
-
-* Ajoute la vue map
+* Activation de la vue map pour les contacts

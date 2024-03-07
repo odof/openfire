@@ -1,9 +1,9 @@
 /** @odoo-module */
 
-import { Component, useEffect, onWillUnmount, useRef } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
-import { renderToString } from "@web/core/utils/render";
-import { ListPopupMap } from "../components/popup";
+import {Component, useEffect, onWillUnmount, useRef} from "@odoo/owl";
+import {useService} from "@web/core/utils/hooks";
+import {renderToString} from "@web/core/utils/render";
+import {ListPopupMap} from "../components/popup";
 
 export class MapRenderer extends Component {
     static template = "of_map_view.MapRenderer";
@@ -27,7 +27,7 @@ export class MapRenderer extends Component {
 
         useEffect(
             () => {
-                const { latitudeField, longitudeField } = this.model.metaData;
+                const {latitudeField, longitudeField} = this.model.metaData;
 
                 if (!this.map) {
                     this.map = L.map(this.mapContainerRef.el).setView(
@@ -36,20 +36,24 @@ export class MapRenderer extends Component {
                     );
                     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
                         center: [39.73, -104.99],
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                        attribution:
+                            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                     }).addTo(this.map);
 
                     let arrayOfMarkers = [];
                     this.records.map((record) => {
                         if (record[latitudeField] && record[longitudeField]) {
-                            arrayOfMarkers.push([record[latitudeField], record[longitudeField]])
+                            arrayOfMarkers.push([
+                                record[latitudeField],
+                                record[longitudeField],
+                            ]);
                         }
                     });
 
                     if (arrayOfMarkers.length) {
-                        var bounds = new L.LatLngBounds(arrayOfMarkers);
+                        const bounds = new L.LatLngBounds(arrayOfMarkers);
                         this.map.fitBounds(bounds);
-                    };
+                    }
 
                     // chargement des types d'icones
                     this.iconMarker["normal"] = L.AwesomeMarkers.icon({
@@ -90,7 +94,7 @@ export class MapRenderer extends Component {
     }
 
     updateMap() {
-        const { latitudeField, longitudeField } = this.model.metaData;
+        const {latitudeField, longitudeField} = this.model.metaData;
 
         this.removeMarkers();
         this.closePopups();
@@ -98,14 +102,14 @@ export class MapRenderer extends Component {
         this.props.model.data.records.records.map((record) => {
             if (record[latitudeField] && record[longitudeField]) {
                 this.addMarker(record);
-                arrayOfMarkers.push([record[latitudeField], record[longitudeField]])
+                arrayOfMarkers.push([record[latitudeField], record[longitudeField]]);
             }
         });
 
         if (arrayOfMarkers.length) {
-            var bounds = new L.LatLngBounds(arrayOfMarkers);
+            const bounds = new L.LatLngBounds(arrayOfMarkers);
             this.map.fitBounds(bounds);
-        };
+        }
     }
 
     onClickMarker(record) {
@@ -121,7 +125,7 @@ export class MapRenderer extends Component {
     }
 
     addMarker(record) {
-        const { latitudeField, longitudeField } = this.model.metaData;
+        const {latitudeField, longitudeField} = this.model.metaData;
 
         let markerLocation = new L.LatLng(
             record[latitudeField],
@@ -157,12 +161,12 @@ export class MapRenderer extends Component {
     closePopups() {
         for (let index = 0; index < Object.keys(this.popups).length; index++) {
             this.popups[Object.keys(this.popups)[index]].state.show = false;
-        };
+        }
     }
 
     getTooltip(record) {
-        const { tooltipView } = this.model.metaData;
-        return renderToString(tooltipView, {record: record})
+        const {tooltipView} = this.model.metaData;
+        return renderToString(tooltipView, {record: record});
     }
 
     // supprimer le popup en changement de page
