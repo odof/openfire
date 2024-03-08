@@ -505,6 +505,7 @@ class OfSaleOrderLayoutCategory(models.Model):
     quote_section_line_id = fields.Many2one(
         comodel_name='of.sale.quote.template.layout.category', string=u"Ligne d'origine")
     order_id = fields.Many2one(comodel_name='sale.order', string=u"Bon de commande", ondelete='cascade')
+    customer_view = fields.Boolean(string=u"Vue client/vendeur", related="order_id.of_client_view", readonly=True)
     state = fields.Selection(
         relation=[('draft', u"Estimation"),
                   ('sent', u"Devis"),
