@@ -1,0 +1,59 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_datastore_common_sp
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-08 11:19+0000\n"
+"PO-Revision-Date: 2024-03-08 11:19+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_datastore_common_sp
+#: model_terms:ir.ui.view,arch_db:of_datastore_common_sp.purchase_order_form
+#: model_terms:ir.ui.view,arch_db:of_datastore_common_sp.view_picking_form
+msgid "Anomaly"
+msgstr "Anomalie"
+
+#. module: of_datastore_common_sp
+#: model_terms:ir.ui.view,arch_db:of_datastore_common_sp.view_picking_internal_search
+#: model_terms:ir.ui.view,arch_db:of_datastore_common_sp.view_purchase_order_filter
+msgid "Reception anomaly"
+msgstr "Anomalie Réception"
+
+#. module: of_datastore_common_sp
+#: model:ir.model.fields,field_description:of_datastore_common_sp.field_purchase_order__of_datastore_anomaly
+#: model:ir.model.fields,field_description:of_datastore_common_sp.field_stock_picking__of_datastore_anomaly
+msgid "In Anomaly"
+msgstr "En anomalie"
+
+#. module: of_datastore_common_sp
+#: model:ir.model.fields,field_description:of_datastore_common_sp.field_stock_move__of_datastore_move_id
+msgid "Movement ID linked to connected base"
+msgstr "ID de mouvement lié à la base connectée"
+
+#. module: of_datastore_common_sp
+#: model:ir.model,name:of_datastore_common_sp.model_purchase_order
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: of_datastore_common_sp
+#: model:ir.model,name:of_datastore_common_sp.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: of_datastore_common_sp
+#: model:ir.model,name:of_datastore_common_sp.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_datastore_common_sp
+#: model:ir.model.fields,field_description:of_datastore_common_sp.field_stock_picking__of_datastore_id
+msgid "Transfer voucher ID connected base"
+msgstr "Transfert de l'ID à la base connectée"
