@@ -1,22 +1,18 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': u"OpenFire / Connecteur commun - achats/ventes",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Connecteur commun - achats/ventes",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "http://www.openfire.fr",
-    'category': "Openfire",
-    'summary': u"Openfire Connecteur commun - achats/ventes",
-    'description': u"""
-Module OpenFire / Connecteur commun - achats/ventes
-===================================================
-Module fournissant des champs/fonctionnalités communs aux modules of_datastore_sale et of_datastore_purchase
-""",
+    'website': "https://www.openfire.fr",
+    'category': "OpenFire",
+    'summary': "Module commun pour les connecteurs achats/ventes",
     'depends': [
         'of_datastore_connector',
         'of_sale',
         'purchase',
-        'of_stock',
+        'stock',
     ],
     'data': [
         'views/purchase_views.xml',
