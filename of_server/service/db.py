@@ -6,6 +6,7 @@ import logging
 import os
 import psycopg2
 import shutil
+import subprocess
 import tempfile
 import time
 import zipfile
@@ -14,6 +15,7 @@ import odoo
 from odoo import SUPERUSER_ID
 from odoo.service import db
 from odoo.service.db import exp_db_exist, _create_empty_database, _drop_conn, dump_db_manifest, exp_drop
+from odoo.tools.misc import exec_pg_environ, find_pg_tool
 
 _logger = logging.getLogger(__name__)
 
@@ -142,6 +144,8 @@ def exp_duplicate_database(db_original_name, db_name, sanitize=True, drop_existi
     Surcharge OpenFire:
     - ajoute des paramètres sanitize et drop_existing
     - utilise un nom de base temporaire pour éviter que la base soit chargée par un processus Odoo avant la fin
+    - utilise les fonctions dump/restore à la place de la duplication postgres, qui nécessitait une coupure des
+      transactions en cours
     """
     _logger.info('Duplicate database `%s` to `%s`.', db_original_name, db_name)
 
@@ -150,18 +154,35 @@ def exp_duplicate_database(db_original_name, db_name, sanitize=True, drop_existi
         _logger.info('DUPLICATE DB: %s already exists', db_name)
         raise Exception("Database %s already exists !" % db_name)
     temp_db_name = get_temp_db_name(db_name)
-    odoo.sql_db.close_db(db_original_name)
-    db = odoo.sql_db.db_connect('postgres')
-    with closing(db.cursor()) as cr:
-        cr.autocommit(True)     # avoid transaction block
-        _drop_conn(cr, db_original_name)
-        cr.execute("""CREATE DATABASE "%s" ENCODING 'unicode' TEMPLATE "%s" """ % (temp_db_name, db_original_name))
+    _create_empty_database(temp_db_name)
+
+    # Copie des données
+    pg_env = exec_pg_environ()
+    dump_process = subprocess.Popen(
+        (find_pg_tool('pg_dump'), '--no-owner', db_original_name),
+        bufsize=-1,
+        stdout=subprocess.PIPE,
+        close_fds=True,
+        env=pg_env
+    )
+    restore_process = subprocess.Popen(
+        (find_pg_tool('psql'), '--dbname=' + temp_db_name),
+        stdin=dump_process.stdout,
+        stdout=subprocess.PIPE,
+        env=pg_env
+    )
+    _, error = restore_process.communicate()
+    if error:
+        exp_drop(temp_db_name)
+        raise Exception(u"Erreur lors de la duplication de la base\n%s" % (error,))
+
     registry = odoo.modules.registry.Registry.new(temp_db_name)
     with registry.cursor() as cr:
         # if it's a copy of a database, force generation of a new dbuuid
         env = odoo.api.Environment(cr, SUPERUSER_ID, {})
         env['ir.config_parameter'].init(force=True)
 
+    # Déplacement du filestore
     from_fs = odoo.tools.config.filestore(db_original_name)
     to_fs = odoo.tools.config.filestore(db_name)
     if os.path.exists(from_fs) and not os.path.exists(to_fs):
@@ -190,6 +211,7 @@ def exp_duplicate_database(db_original_name, db_name, sanitize=True, drop_existi
     if existing:
         _logger.info('DUPLICATE DB: Dropping database %s', db_name)
         exp_drop(db_name)
+    db = odoo.sql_db.db_connect('postgres')
     with closing(db.cursor()) as cr:
         cr.autocommit(True)     # avoid transaction block
         _drop_conn(cr, temp_db_name)
