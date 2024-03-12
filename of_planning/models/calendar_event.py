@@ -842,7 +842,7 @@ class CalendarEvent(models.Model):
             raise UserError(_("No product to deliver in the selected interventions."))
         lines.with_context(check_state=False).sudo()._action_launch_stock_rule()
 
-    def action_create_invoice(self):
+    def action_create_invoice(self, view_mode='form'):
         """
         Create an invoice for the calendar event.
 
@@ -858,34 +858,101 @@ class CalendarEvent(models.Model):
         Returns:
             of.popup.wizard: The popup wizard with a message containing any relevant information or errors.
         """
-        move_obj = self.env['account.move']
+        if len(self) > 1:  # if method is called from a recordset of many records, we force view_mode to be 'tree'
+            view_mode = 'tree'
 
-        popup_messages = []
+        messages_by_events = {key: {'success': [], 'error': []} for key in self}
         for event in self:
             if not event.of_fiscal_position_id:
-                raise ValidationError(_("Please select a fiscal position."))
-
-            # Toutes les lignes sont liées à une commande (au moins une avec commande et aucune sans commande)
-            if event.of_link_order and not event.of_line_ids.filtered(lambda li: not li.order_line_id):
-                popup_messages.append(
-                    _(
-                        "Invoiceable lines from the intervention %s are linked to order lines. "
-                        "Please do the invoicing from the sale order."
-                    )
-                    % event.name
+                messages_by_events[event]['error'].append(
+                    _("Intervention is non billable, please select a fiscal position.")
                 )
                 continue
 
-            invoice_data, status_message = event._prepare_invoice()
-            popup_messages.append(status_message)
-            if invoice_data:
+            # All lines are linked to order lines so they should be invoiced from the sale order
+            if event.of_link_order and not event.of_line_ids.filtered(lambda li: not li.order_line_id):
+                messages_by_events[event]['error'].append(
+                    _("Invoiceable lines are linked to order lines. Please do the invoicing from the sale order.")
+                )
+                continue
+            if event.of_state not in ['confirmed', 'ongoing', 'done', 'unfinished', 'postponed']:
+                messages_by_events[event]['error'].append(
+                    _("Intervention is non billable because it must be confirmed.")
+                )
+
+            # Prepare the invoice data
+            invoice_data, messages = event._prepare_invoice()
+            messages_by_events[event]['error'].extend(messages)
+            if not messages_by_events[event]['error'] and invoice_data:
+                move_obj = self.env['account.move']
                 move = move_obj.create(invoice_data)
                 move.message_post_with_view(
                     'mail.message_origin_link',
                     values={'self': move, 'origin': event},
                     subtype_id=self.env.ref('mail.mt_note').id,
                 )
-        return self.env['of.popup.wizard'].popup_return(message=_("\n".join(popup_messages)))
+                messages_by_events[event]['success'].append(_("Invoice created successfully."))
+        if view_mode == 'form':
+            if error_messages := messages_by_events[event]['error']:
+                html_content_error = "<ul>" + "".join([f"<li>{msg}</li>" for msg in error_messages]) + "</ul>"
+                html_message = _("<p>Invoicing could not be completed because:<br/>%s<p>") % html_content_error
+            else:
+                html_message = messages_by_events[event]['success'][0]
+        else:
+            html_message = self._format_invoice_messages_html(messages_by_events)
+        return self.env['of.popup.wizard'].popup_return(message_html=html_message)
+
+    def _format_invoice_messages_html(self, messages_by_events):
+        """
+        Formats the invoice messages as HTML to display in the popup wizard.
+
+        Args:
+            messages_by_events (dict): A dictionary containing messages for each event.
+
+        Returns:
+            str: The formatted HTML content of the invoice messages.
+        """
+        has_success_message = any(messages_by_events[event]['success'] for event in self)
+        has_error_message = any(messages_by_events[event]['error'] for event in self)
+        html_content_success = self._build_event_details_message(messages_by_events, 'success')
+        html_content_error = self._build_event_details_message(messages_by_events, 'error')
+        html_message_success = (
+            _("<p><strong>Invoicing completed successfully for the following interventions:</strong><br/>%s</p>")
+            % html_content_success
+        )
+        html_message_error = (
+            _("<p><strong>Invoicing could not be completed because:</strong><br/>%s<p>") % html_content_error
+        )
+        result = ""
+        if has_success_message:
+            result += f"<p>{html_message_success}</p>"
+        if has_error_message:
+            result += f"<p>{html_message_error}</p>"
+        return result
+
+    def _build_event_details_message(self, messages_by_events, message_type):
+        """
+        Builds the event details message of error or success messages as an HTML unordered list.
+
+        Args:
+            messages_by_events (dict): A dictionary containing events as keys and a list of messages as values.
+            message_type (str): The type of message to format.
+
+        Returns:
+            str: The detail message as an HTML unordered list.
+        """
+        result = "<ul>"
+        for event, messages in messages_by_events.items():
+            if messages[message_type]:
+                result += f"<li>{event.name}"
+                if message_type == 'error':
+                    msg_details = "<ul>" + "".join([f"<li>{msg}</li>" for msg in messages[message_type]]) + "</ul>"
+                    result += f":<br/>{msg_details}</li>"
+        result += "</ul>"
+        return result
+
+    def action_create_invoice_list(self):
+        return self.action_create_invoice(view_mode='tree')
 
     # ---------------------------------------------------------------------
     # Business methods
@@ -911,14 +978,14 @@ class CalendarEvent(models.Model):
                 The error message is a string containing any error messages encountered during preparation.
         """
         self.ensure_one()
+        line_messages = []
         lines_data = []
-        error_msg = ''
         for line in self.of_line_ids.filtered(lambda li: li.invoice_status == 'to invoice' and not li.order_line_id):
-            line_data, line_error_message = line._prepare_invoice_line()
+            line_data, messages = line._prepare_invoice_line()
             lines_data.append(Command.create(line_data))
-            if line_error_message:
-                error_msg += f'{line_error_message}\n'
-        return lines_data, error_msg
+            if messages:
+                line_messages.extend(messages)
+        return lines_data, line_messages
 
     def _prepare_invoice(self):
         """
@@ -929,20 +996,21 @@ class CalendarEvent(models.Model):
                     If there is an error, it returns a tuple containing False and an error message.
         """
         self.ensure_one()
-
-        msg_success = _("SUCCESS: Creation of invoice from intervention %s")
-        msg_error = _("FAILURE: Invoice created from intervention %s : %s")
+        messages = []
+        invoice_data = {}
 
         # Get the partner
         partner = self.partner_id
+        partner = False
         if not partner:
-            if not self.address_id:
-                return (False, msg_error % (self.name, _("No partner defined.")))
+            if not self.of_address_id:
+                messages.append(_("No partner defined."))
+                return invoice_data, messages
 
             invoice_address_id = (
-                self.address_id.parent_id.address_get(['invoice'])['invoice']
-                if self.address_id.parent_id
-                else self.address_id.address_get(['invoice'])['invoice']
+                self.of_address_id.parent_id.address_get(['invoice'])['invoice']
+                if self.of_address_id.parent_id
+                else self.of_address_id.address_get(['invoice'])['invoice']
             )
             partner = self.env['res.partner'].browse(invoice_address_id)
 
@@ -950,26 +1018,27 @@ class CalendarEvent(models.Model):
         pricelist = partner.property_product_pricelist
         company = self._get_invoicing_company(partner)
 
-        fiscal_position_id = self.of_fiscal_position_id.id or partner.property_account_position_id.id
+        fiscal_position_id = self.of_fiscal_position_id.id
+        if not fiscal_position_id:
+            messages.append(_("Please define a fiscal position"))
+            return invoice_data, messages
 
         journal = self.env['account.journal'].search(
             [('company_id', '=', company.id), ('type', 'in', ['sale'])], limit=1
         )
         if not journal:
-            return False, msg_error % (
-                self.name,
-                _("You need to define a sales journal for this company (%s).") % company.name,
-            )
+            messages.append(_("You need to define a sales journal for this company (%s).") % company.name)
+            return invoice_data, messages
 
         # Get the invoice lines data
-        lines_data, error = self._prepare_invoice_lines()
-        if error:
-            return (False, msg_error % (self.name, error))
+        lines_data, line_messages = self._prepare_invoice_lines()
+        if line_messages:
+            messages.extend(line_messages)
         if not lines_data:
-            return (False, msg_error % (self.name, _("No invoiceable lines.")))
+            messages.append(_("There is no billing line present in the intervention."))
 
         # Get invoice data
-        invoice_data = {
+        invoice_data |= {
             'invoice_origin': self.of_number or "Intervention",
             'move_type': 'out_invoice',
             'partner_id': partner.id,
@@ -981,7 +1050,7 @@ class CalendarEvent(models.Model):
             'user_id': self._uid,
             'invoice_line_ids': lines_data,
         }
-        return (invoice_data, msg_success % (self.name,))
+        return invoice_data, messages
 
     def _recompute_taxes(self):
         self.ensure_one()

@@ -9,10 +9,10 @@ class OfPopupWizard(models.TransientModel):
     _name = 'of.popup.wizard'
 
     message = fields.Text()
+    message_html = fields.Html()
 
-    # Usage : return self.env['of.popup.wizard'].popup_return(message[, title])
     @api.model
-    def popup_return(self, message, title="Information"):
+    def popup_return(self, message='', message_html='', title="Information"):
         return {
             'type': 'ir.actions.act_window',
             'name': title,
@@ -21,5 +21,5 @@ class OfPopupWizard(models.TransientModel):
             'view_mode': 'form',
             'view_id': self.env.ref('of_base.of_popup_wizard_view').id,
             'target': 'new',
-            'context': {'default_message': message},
+            'context': {'default_message': message, 'default_message_html': message_html},
         }

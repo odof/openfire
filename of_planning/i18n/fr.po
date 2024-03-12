@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 16:52+0000\n"
-"PO-Revision-Date: 2024-03-13 16:52+0000\n"
+"POT-Creation-Date: 2024-03-19 14:31+0000\n"
+"PO-Revision-Date: 2024-03-19 14:31+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #, python-format
 msgid " (copy)"
-msgstr " (copie)"
+msgstr ""
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -63,14 +63,14 @@ msgstr "# Interventions liées"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "%s - Intervention Planning for %s"
-msgstr "%s - Planning d'intervention du %s"
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "%s<br/>from %s to %s"
-msgstr "le %s<br/>du %s au %s"
+msgstr ""
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
@@ -205,6 +205,33 @@ msgid ""
 msgstr ""
 "<i class=\"fa fa-warning\"/> Attention, cette intervention est en conflit "
 "avec une autre."
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid ""
+"<p><strong>Invoicing completed successfully for the following "
+"interventions:</strong><br/>%s</p>"
+msgstr ""
+"<p><strong>Facturation complétée avec succès pour les interventions "
+"suivantes :</strong><br/>%s</p>"
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid ""
+"<p><strong>Invoicing could not be completed because:</strong><br/>%s<p>"
+msgstr ""
+"<p><strong>La facturation n'a pas pu être complétée car :</strong><br/>%s<p>"
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "<p>Invoicing could not be completed because:<br/>%s<p>"
+msgstr "<p>La facturation n'a pas pu être complétée car :<br/>%s<p>"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
@@ -675,7 +702,7 @@ msgstr ""
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Compose Email"
-msgstr "Composer un email"
+msgstr ""
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_res_config_settings
@@ -997,8 +1024,6 @@ msgid ""
 "Employee %(employee)s has at least another intervention on this time slot:\n"
 " %(start)s: %(partner)s %(zip)s"
 msgstr ""
-"L'employé %(employee)s a au moins une autre intervention sur cette plage horaire :\n"
-" %(start)s: %(partner)s %(zip)s"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_category_id
@@ -1034,20 +1059,13 @@ msgstr "Événement"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Event without name"
-msgstr "Événement sans nom"
+msgstr ""
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_description
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_description
 msgid "External description"
 msgstr "Description externe"
-
-#. module: of_planning
-#. odoo-python
-#: code:addons/of_planning/models/calendar_event.py:0
-#, python-format
-msgid "FAILURE: Invoice created from intervention %s : %s"
-msgstr "ÉCHEC : Facture créée à partir de l'intervention %s : %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -1114,6 +1132,7 @@ msgstr "Général semaine"
 
 #. module: of_planning
 #: model:ir.actions.server,name:of_planning.action_of_planning_intervention_generate_invoice
+#: model:ir.actions.server,name:of_planning.action_of_planning_intervention_generate_invoice_tree_view
 msgid "Generate invoice"
 msgstr "Générer la facture"
 
@@ -1287,10 +1306,10 @@ msgstr "Société incohérente"
 #. odoo-python
 #: code:addons/of_planning/models/of_planning_intervention_line.py:0
 #, python-format
-msgid "Income accounts must be configured for the product category %s."
+msgid "Income accounts must be configured for the product category \"%s\"."
 msgstr ""
-"Les comptes de produits doivent être configurés pour la catégorie de produit"
-" %s."
+"Le compte de produit doit être configuré pour la catégorie de produit "
+"\"%s\"."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_inspection_visit_date
@@ -1330,14 +1349,14 @@ msgstr "Planning des interventions"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "Intervention Planning - %s<br/>Week %s from %s to %s"
-msgstr "Planning d'intervention - %s<br/>Semaine %s du %s au %s"
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "Intervention Planning - Week %s from %s to %s"
-msgstr "Planning d'intervention - Semaine %s du %s au %s"
+msgstr ""
 
 #. module: of_planning
 #: model:ir.actions.report,name:of_planning.action_report_intervention_report
@@ -1356,12 +1375,28 @@ msgstr "Fiche d'intervention"
 #: code:addons/of_planning/models/sale_order.py:0
 #, python-format
 msgid "Intervention Sheet - %s"
-msgstr "Fiche d'intervention - %s"
+msgstr ""
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_image__intervention_date
 msgid "Intervention date"
 msgstr "Date d'intervention"
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "Intervention is non billable because it must be confirmed."
+msgstr "L'intervention n'est pas facturable car elle doit être confirmée."
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "Intervention is non billable, please select a fiscal position."
+msgstr ""
+"L'intervention n'est pas facturable, veuillez sélectionner une position "
+"fiscale."
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_of_planning_intervention_line
@@ -1459,6 +1494,13 @@ msgid "Interventions"
 msgstr ""
 
 #. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "Invoice created successfully."
+msgstr "Facture créée avec succès."
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__invoice_line_ids
 msgid "Invoice line"
 msgstr "Ligne de facture"
@@ -1485,11 +1527,9 @@ msgstr "Statut de facturation"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid ""
-"Invoiceable lines from the intervention %s are linked to order lines. Please"
-" do the invoicing from the sale order."
+"Invoiceable lines are linked to order lines. Please do the invoicing from "
+"the sale order."
 msgstr ""
-"Les lignes facturables de l'intervention %s sont liées à des lignes de "
-"commande. Merci de faire la facturation depuis la commande."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__qty_invoiceable
@@ -1710,13 +1750,6 @@ msgid "Next week"
 msgstr "Semaine prochaine"
 
 #. module: of_planning
-#. odoo-python
-#: code:addons/of_planning/models/calendar_event.py:0
-#, python-format
-msgid "No invoiceable lines."
-msgstr "Aucune ligne facturable."
-
-#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_alert_unable
 msgid "No operator able"
 msgstr ""
@@ -1726,14 +1759,14 @@ msgstr ""
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No operator can perform this task."
-msgstr "Aucun intervenant ne peut réaliser la tâche."
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No partner"
-msgstr "Aucun partenaire"
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
@@ -1755,14 +1788,14 @@ msgstr "Aucun article à ajouter dans un bon de livraison: %s"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No product to deliver in the intervention."
-msgstr "Aucun produit à livrer dans l'intervention."
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No product to deliver in the selected interventions."
-msgstr "Aucun produit à livrer dans les interventions sélectionnées."
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
@@ -1770,7 +1803,7 @@ msgstr "Aucun produit à livrer dans les interventions sélectionnées."
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Not available in this version (P1)"
-msgstr "Non disponible dans cette version (P1)"
+msgstr ""
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -1950,25 +1983,19 @@ msgstr ""
 
 #. module: of_planning
 #. odoo-python
-#: code:addons/of_planning/models/of_planning_intervention_line.py:0
-#, python-format
-msgid "Please define a fiscal position for the intervention %s"
-msgstr "Veuillez définir une position fiscale pour l'intervention %s"
-
-#. module: of_planning
-#. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
-msgid "Please select a fiscal position."
-msgstr "Veuillez sélectionner une position fiscale"
+msgid "Please define a fiscal position"
+msgstr "Merci de définir une position fiscale"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/of_planning_intervention_line.py:0
 #, python-format
-msgid "Please select a warehouse in the invoicing tab of the intervention."
+msgid "Please select a warehouse in the invoicing tab of the intervention: %s"
 msgstr ""
-"Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention."
+"Merci de sélectionner un entrepôt dans l'onglet facturation de "
+"l'intervention: %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
@@ -2065,8 +2092,6 @@ msgstr "Produit"
 #, python-format
 msgid "Product taxes have been recomputed according to fiscal position %s."
 msgstr ""
-"Les taxes des produits ont été recalculées en fonction de la position "
-"fiscale %s."
 
 #. module: of_planning
 #: model:ir.ui.menu,name:of_planning.menu_product_template
@@ -2180,13 +2205,6 @@ msgstr "Restreindre l'accès à la configuration des RDVs"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_signature
 msgid "SIGNATURES"
 msgstr ""
-
-#. module: of_planning
-#. odoo-python
-#: code:addons/of_planning/models/calendar_event.py:0
-#, python-format
-msgid "SUCCESS: Creation of invoice from intervention %s"
-msgstr "SUCCÈS : Création de la facture à partir de l'intervention %s"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__so_number
@@ -2496,6 +2514,13 @@ msgid "The user's company"
 msgstr "Société de l'utilisateur"
 
 #. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "There is no billing line present in the intervention."
+msgstr "Il n'y a pas de ligne de facturation présente dans l'intervention."
+
+#. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_customer_notes
 msgid ""
 "These notes are taken from the customer master record under 'Internal "
@@ -2741,7 +2766,7 @@ msgstr "Entrepôt"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Warning, this intervention is in conflict with another one."
-msgstr "Attention, cette intervention est en conflit avec une autre"
+msgstr ""
 
 #. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_print_wizard__report_type__week
@@ -2788,14 +2813,14 @@ msgstr "Hier"
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #, python-format
 msgid "You cannot unlink the default template"
-msgstr "Vous ne pouvez pas supprimer le modèle par défaut"
+msgstr ""
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "You need to define a sales journal for this company (%s)."
-msgstr "Vous devez définir un journal de vente pour cette société (%s)."
+msgstr ""
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_zip
@@ -2807,7 +2832,7 @@ msgstr "Code postal"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "from %s %s<br/>to %s %s"
-msgstr "du %s %s<br/>au %s %s"
+msgstr ""
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_internal_layout

@@ -384,12 +384,11 @@ class OFPlanningInterventionLine(models.Model):
             tuple: A tuple containing the invoice line data and an empty string or an error message.
         """
         self.ensure_one()
+        line_data = {}
+        messages = []
 
         product = self.product_id
         partner = self.partner_id
-        if not self.intervention_id.of_fiscal_position_id:
-            return {}, _("Please define a fiscal position for the intervention %s") % self.name
-
         fiscal_position = self.intervention_id.of_fiscal_position_id
         taxes = self.tax_ids
         if taxes:
@@ -400,14 +399,15 @@ class OFPlanningInterventionLine(models.Model):
 
         line_account = product.property_account_income_id or product.categ_id.property_account_income_categ_id
         if not line_account:
-            return {}, _("Income accounts must be configured for the product category %s.") % product.name
+            messages.append(_("Income accounts must be configured for the product category \"%s\".") % product.name)
+            return line_data, messages
 
         # Mapping des comptes par taxe induit par le module of_account_tax
         for tax in taxes:
             line_account = tax.map_account(line_account)
 
         line_name = self.name or product.name_get()[0][1]
-        return {
+        line_data |= {
             'name': line_name,
             'account_id': line_account.id,
             'price_unit': self.price_unit,
@@ -417,4 +417,5 @@ class OFPlanningInterventionLine(models.Model):
             'product_id': product.id,
             'tax_ids': [Command.set(taxes.ids)],
             'of_intervention_line_id': self.id,
-        }, ''
+        }
+        return line_data, messages

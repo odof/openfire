@@ -20,7 +20,18 @@ records.action_generate_stock_picking()
         <field name="state">code</field>
         <field name="binding_view_types">form</field>
         <field name="code">
-action = records.action_create_invoice()
+action = record.action_create_invoice()
+        </field>
+    </record>
+
+    <record id="action_of_planning_intervention_generate_invoice_tree_view" model="ir.actions.server">
+        <field name="name">Generate invoice</field>
+        <field name="model_id" ref="calendar.model_calendar_event"/>
+        <field name="binding_model_id" ref="calendar.model_calendar_event"/>
+        <field name="state">code</field>
+        <field name="binding_view_types">tree</field>
+        <field name="code">
+action = records.action_create_invoice_list()
         </field>
     </record>
 
