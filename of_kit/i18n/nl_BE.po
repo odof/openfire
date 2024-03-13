@@ -1,0 +1,22 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* of_kit
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-10-24 13:34+0000\n"
+"PO-Revision-Date: 2018-10-24 13:34+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_kit
+#: model:ir.ui.view,arch_db:of_kit.of_kit_report_invoice_document
+#: model:ir.ui.view,arch_db:of_kit.of_report_saleorder_document
+msgid "<i style=\"font-size: small\">displayed quantities of kit components are their total quantities.</i>"
+msgstr "<i style=\"font-size: small\">De weergegeven hoeveelheden kitcomponenten zijn de totale hoeveelheden.</i>"
