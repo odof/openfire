@@ -70,16 +70,15 @@
                         <group>
                             <label for="partner_id" string="Customer" />
                             <div class="o_address_format">
-                                <div>
-                                    <field name="partner_id" />
-                                </div>
+                                <field name="partner_id" />
                                 <div attrs="{'invisible': [('partner_phone', '=', False)]}">
-                                    <i class="fa fa-phone pr-1" title="Phone button" />
-                                    <field name="partner_phone" />
+                                    <i class="fa fa-phone pe-1"/><field name="partner_phone" class="oe_inline"/>
                                 </div>
                                 <div attrs="{'invisible': [('partner_mobile', '=', False)]}">
-                                    <i class="fa fa-phone pr-1" title="Mobile button" />
-                                    <field name="partner_mobile" />
+                                    <i class="fa fa-phone pe-1"/><field name="partner_mobile"  class="oe_inline"/>
+                                </div>
+                                <div attrs="{'invisible': [('partner_email', '=', False)]}">
+                                    <i class="fa fa-envelope pe-1"/><field name="partner_email" class="oe_inline"/>
                                 </div>
                             </div>
                             <field name="partner_tag_ids" widget="many2many_tags" />
@@ -88,25 +87,11 @@
                         <group>
                             <label for="address_id" string="Intervention Address" />
                             <div class="o_address_format">
-                                <div>
-                                    <field name="address_id" />
-                                </div>
+                                <field name="address_id" />
                                 <field name="address_street" class="o_address_street" />
                                 <field name="address_street2" class="o_address_street" />
-                                <field name="address_zip" class="o_address_zip pr-1" />
+                                <field name="address_zip" class="o_address_zip pe-1" />
                                 <field name="address_city" class="o_address_city" />
-                                <div attrs="{'invisible': [('address_phone', '=', False)]}">
-                                    <i class="fa fa-phone pr-1" title="Phone button" />
-                                    <field name="address_phone" />
-                                </div>
-                                <div attrs="{'invisible': [('address_mobile', '=', False)]}">
-                                    <i class="fa fa-phone pr-1" title="Mobile button" />
-                                    <field name="address_mobile" />
-                                </div>
-                                <div attrs="{'invisible': [('address_email', '=', False)]}">
-                                    <i class="fa fa-envelope pr-1" title="Mail button" />
-                                    <field name="address_email" />
-                                </div>
                             </div>
                         </group>
                     </group>

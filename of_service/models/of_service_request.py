@@ -323,6 +323,7 @@ class OFServiceRequest(models.Model):
     partner_name = fields.Char(related='partner_id.name')
     partner_mobile = fields.Char(related='partner_id.mobile')
     partner_phone = fields.Char(related='partner_id.phone')
+    partner_email = fields.Char(related='partner_id.email')
     task_name = fields.Char(related='task_id.name', readonly=True)
     color = fields.Char(compute='_compute_color', help="Color of the request in the views")
     last_intervention_date = fields.Date(

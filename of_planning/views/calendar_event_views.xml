@@ -103,16 +103,25 @@
                 </group>
                 <group name="where" string="Where" class="of_blue_background mb-3 p-3">
                     <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
-                        <field name="of_partner_id" />
-                        <field name="of_email" widget="email" />
+                        <label for="of_partner_id" />
+                        <div class="o_address_format">
+                            <field name="of_partner_id" />
+                            <div attrs="{'invisible': [('of_mobile','=',False)]}">
+                                <i class="fa fa-phone pe-1"/><field name="of_mobile" class="oe_inline"/>
+                            </div>
+                            <div attrs="{'invisible': [('of_phone','=',False)]}">
+                                <i class="fa fa-phone pe-1"/><field name="of_phone" class="oe_inline"/>
+                            </div>
+                            <div attrs="{'invisible': [('of_email','=',False)]}">
+                                <i class="fa fa-envelope pe-1"/><field name="of_email" widget="email" class="oe_inline"/>
+                            </div>
+                        </div>
                         <field name="of_partner_tag_ids" widget="many2many_tags" />
                     </group>
                     <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
                         <label for="of_address_id" />
                         <div class="o_address_format">
-                            <div>
-                                <field name="of_address_id" />
-                            </div>
+                            <field name="of_address_id" />
                             <field name="of_geocoding_state" invisible="1" />
                             <button name="action_button_geolocalize" class="icon-red" string="Address not geolocalized" type="object" attrs="{'invisible': [('of_geocoding_state','not in',['not_tried','failure','no_address'])]}" icon="fa-map-marker" help="This address is not geolocalized, click here to try to geolocalize it"/>
                             <field name="of_address_street" attrs="{'invisible': [('of_address_street','=',False)]}" />
@@ -121,8 +130,6 @@
                                 <field name="of_address_zip" nolabel="1" />
                                 <field name="of_address_city" nolabel="1" />
                             </group>
-                            <field name="of_address_mobile" attrs="{'invisible': [('of_address_mobile','=',False)]}" />
-                            <field name="of_address_phone" attrs="{'invisible': [('of_address_phone','=',False)]}" />
                         </div>
                         <field name="of_sector_id" />
                     </group>

@@ -108,13 +108,14 @@ class CalendarEvent(models.Model):
         readonly=True,
     )
     of_email = fields.Char(string="Email", related='of_partner_id.email')
+    of_mobile = fields.Char(related='of_partner_id.mobile')
+    of_phone = fields.Char(related='of_partner_id.phone')
     of_partner_pricelist_id = fields.Many2one(
         comodel_name='product.pricelist', string="Pricelist", related='of_partner_id.property_product_pricelist'
     )
     of_history_intervention_ids = fields.One2many(
         comodel_name='calendar.event', compute='_compute_of_history_intervention_ids', string="History"
     )
-
     # Address
     of_address_id = fields.Many2one(
         comodel_name='res.partner',
