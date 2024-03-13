@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, tools
 from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 from odoo.addons.mail.models.mail_template import format_date, format_tz, format_amount
 
 import dateutil.relativedelta as relativedelta
@@ -14,6 +15,7 @@ import base64
 import logging
 import re
 import copy
+import fitz
 
 _logger = logging.getLogger(__name__)
 
@@ -120,6 +122,7 @@ class OfComposeMail(models.TransientModel):
         :param champs: Instances de of.gesdoc.chp ou de of.gesdoc.chp.tmp
         :return: Liste de tuples [('nom du champ', 'valeur à afficher dans le courrier')]
         """
+        champs = champs.filtered(lambda x: not x.name.endswith('_af_image'))
         objects = self._get_objects(obj)
         values = self._get_dict_values(obj, objects)
         result = []
@@ -129,6 +132,52 @@ class OfComposeMail(models.TransientModel):
                 chp.to_export and self._eval_text(chp.value_openfire, values) or '',
             ))
         return result
+
+    @api.model
+    def eval_image_champs(self, obj, champs):
+        u"""
+        :param obj: Objet (instance avec id unique) pour lequel est généré le courrier
+        :param champs: Instances de of.gesdoc.chp ou de of.gesdoc.chp.tmp
+        :return: Liste de tuples [(of.gesdoc.chp, image associée)]
+        """
+        objects = self._get_objects(obj)
+        values = self._get_dict_values(obj, objects)
+        result = []
+
+        for chp in champs:
+            value = chp.value_openfire and chp.value_openfire.strip('$').strip('{').strip('}') or ""
+            result.append((
+                chp,
+                chp.to_export and value and safe_eval(value, values) or "",
+            ))
+        return result
+
+    @api.model
+    def _insert_images(self, obj, pdf_path, chp_ids):
+        # Filtrage des champs sur la norme acrobat reader, le champ termine par _af_image
+        image_data = dict(self.eval_image_champs(obj, chp_ids.filtered(lambda x: x.name.endswith('_af_image'))))
+        doc = fitz.open(pdf_path)
+
+        for field, content in image_data.items():
+            content_base64 = None
+            if isinstance(content, str):
+                # Si le contenu est une string, on considère que l'image
+                # est une signature encodée base64
+                content_base64 = content
+            elif hasattr(content, 'data'):
+                # on va considèrer sinon que c'est une image
+                content_base64 = content.data
+
+            if content_base64 and (abs(field.x1 - field.x0) > 0) and (abs(field.y1 - field.y0) > 0):
+                page = doc[field.page_number]
+                page_height = page.rect[3]
+                rect = fitz.Rect(field.x0, page_height - field.y1, field.x1, page_height - field.y0)
+                img = base64.b64decode(content_base64)
+                pix = fitz.Pixmap(bytearray(img))
+                page.insertImage(rect, pixmap=pix)
+
+        doc.saveIncr()
+        doc.close()
 
     @api.model
     def eval_text(self, obj, text):
@@ -386,6 +435,11 @@ class OfComposeMail(models.TransientModel):
             'res_id': self.id,
             'context': self._context,
         }
+
+    @api.model
+    def fill_form(self, obj, file_path, data, generated_pdf, mail_template):
+        pypdftk.fill_form(file_path, data, out_file=generated_pdf, flatten=not mail_template.fillable)
+        self._insert_images(obj, generated_pdf, mail_template.chp_ids)
 
 
 class OfGesdocChpTmp(models.TransientModel):

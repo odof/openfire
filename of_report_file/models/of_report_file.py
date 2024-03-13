@@ -7,11 +7,6 @@ import os
 import base64
 import tempfile
 
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
-
 
 class OFReportFile(models.Model):
     _name = 'of.report.file'
@@ -107,6 +102,7 @@ class OFReportFileLine(models.Model):
     @api.multi
     def get_combined_doc(self, doc, record):
         self.ensure_one()
+        compose_mail_obj = self.env['of.compose.mail']
         data = []
         if doc.file:
             # Utilisation des documents pdf fournis
@@ -118,11 +114,11 @@ class OFReportFileLine(models.Model):
                     [('res_model', '=', doc._name),
                      ('res_field', '=', 'file'),
                      ('res_id', '=', doc.id)])
-                datas = dict(self.env['of.compose.mail'].eval_champs(record, doc.chp_ids))
+                datas = dict(compose_mail_obj.eval_champs(record, doc.chp_ids))
                 file_path = self.env['ir.attachment']._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
-                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not doc.fillable)
+                    compose_mail_obj.fill_form(record, file_path, datas, generated_pdf, doc)
                     with open(generated_pdf, "rb") as encode:
                         encoded_file = base64.b64encode(encode.read())
                 finally:
