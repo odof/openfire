@@ -75,8 +75,37 @@ class OfMailTemplate(models.Model):
             doc = PDFDocument(parser)
             fields = resolve1(doc.catalog.get('AcroForm', {})).get('Fields', [])
 
+            pages = resolve1(doc.catalog.get('Pages'))
+            page_kids = [str(ref) for ref in pages.get('Kids')]
+
             for i in fields:
                 field = resolve1(i)
+                page_ref = field.get('P')
+
+                page_number = None
+                if page_ref:
+                    page_number = page_kids.index(str(page_ref))
+
+                rect = field.get('Rect')
+                x0 = None
+                x1 = None
+                y0 = None
+                y1 = None
+
+                if not rect:
+                    # Si pas de rect, on va rechercher un enfant
+                    # Pas sur, sur de cette strat
+                    kids = field.get('Kids')
+                    if kids:
+                        kid = resolve1(kids[0])
+                        rect = kid.get('Rect')
+
+                if rect:
+                    x0 = rect[0]
+                    y0 = rect[1]
+                    x1 = rect[2]
+                    y1 = rect[3]
+
                 name = field.get('T').decode("unicode-escape", 'ignore')
                 value = pre_vals.get(name)
                 if not value:
@@ -90,7 +119,13 @@ class OfMailTemplate(models.Model):
                     'name': name,
                     'value_openfire': value,
                     'to_export': True,
+                    'page_number':  page_number,
+                    'x0': x0,
+                    'x1': x1,
+                    'y0': y0,
+                    'y1': y1,
                 }))
+
         self.chp_ids = chps
 
     @api.model
@@ -179,3 +214,8 @@ class OfGesdocChp(models.Model):
     template_id = fields.Many2one('of.mail.template', string=u'Modèle Courrier')
     to_export = fields.Boolean(string='Export', default=True)
     to_import = fields.Boolean(string='Import')
+    x0 = fields.Float(string=u"Coordonnée x0 du champ")
+    y0 = fields.Float(string=u"Coordonnée y0 du champ")
+    x1 = fields.Float(string=u"Coordonnée x1 du champ")
+    y1 = fields.Float(string=u"Coordonnée y1 du champ")
+    page_number = fields.Integer(string=u"Numéro de page du champ")

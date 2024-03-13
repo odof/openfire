@@ -36,6 +36,11 @@
                                     <field name="value_openfire"/>
                                     <field name="to_export"/>
                                     <field name="to_import"/>
+                                    <field name="x0" invisible="1"/>
+                                    <field name="x1" invisible="1"/>
+                                    <field name="y0" invisible="1"/>
+                                    <field name="y1" invisible="1"/>
+                                    <field name="page_number" invisible="1"/>
                                 </tree>
                             </field>
                         </group>

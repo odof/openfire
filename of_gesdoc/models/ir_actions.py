@@ -7,11 +7,6 @@ import tempfile
 import os
 import base64
 
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
-
 
 class IrActionsReportXml(models.Model):
     _inherit = 'ir.actions.report.xml'
@@ -36,7 +31,7 @@ class IrActionsReportXml(models.Model):
             file_path = attachment_obj._full_path(attachment.store_fname)
             fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
             try:
-                pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not template.fillable)
+                compose_mail_obj.fill_form(model, file_path, datas, generated_pdf, template)
                 with open(generated_pdf, "rb") as encode:
                     template_file = encode.read()
             finally:

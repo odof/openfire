@@ -5,11 +5,6 @@ import base64
 import tempfile
 from odoo import models, fields, api
 
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
-
 
 class OfDocumentsJoints(models.AbstractModel):
     """ Classe abstraite qui permet d'ajouter les documents joints.
@@ -64,7 +59,7 @@ class OfDocumentsJoints(models.AbstractModel):
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
-                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    compose_mail_obj.fill_form(self, file_path, datas, generated_pdf, mail_template)
                     with open(generated_pdf, "rb") as encode:
                         encoded_file = base64.b64encode(encode.read())
                 finally:

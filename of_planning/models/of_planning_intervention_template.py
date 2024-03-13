@@ -7,10 +7,6 @@ import odoo.addons.decimal_precision as dp
 import os
 import base64
 import tempfile
-try:
-    import pypdftk
-except ImportError:
-    pypdftk = None
 
 
 class OfPlanningInterventionTemplate(models.Model):
@@ -362,7 +358,7 @@ class OfPlanningInterventionTemplate(models.Model):
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
-                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    compose_mail_obj.fill_form(rdv, file_path, datas, generated_pdf, mail_template)
                     with open(generated_pdf, "rb") as encode:
                         encoded_file = base64.b64encode(encode.read())
                 finally:
@@ -415,7 +411,7 @@ class OfPlanningInterventionTemplate(models.Model):
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix='doc_joint_', suffix='.pdf')
                 try:
-                    pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not mail_template.fillable)
+                    compose_mail_obj.fill_form(rdv, file_path, datas, generated_pdf, mail_template)
                     with open(generated_pdf, "rb") as encode:
                         encoded_file = base64.b64encode(encode.read())
                 finally:
