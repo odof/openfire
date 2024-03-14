@@ -708,7 +708,10 @@ class OfTourneeRdv(models.TransientModel):
         if not self.origin_intervention_id:
             intervention.with_context(  # Charger les lignes de facturation
                 of_import_service_lines=True)._onchange_service_id()
-            intervention.with_context(of_import_service_lines=True)._onchange_tache_id()  # Load invoice lines
+            if not self.service_id and not self.template_id.line_ids:
+                intervention._onchange_tache_id()
+            else:
+                intervention.with_context(of_import_service_lines=True)._onchange_tache_id()
             # Load questionnary lines and more if coming from `res.partner` object
             intervention.with_context(
                 of_intervention_wizard=True,
