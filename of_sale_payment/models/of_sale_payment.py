@@ -14,7 +14,7 @@ class SaleOrder(models.Model):
     @api.depends('payment_ids')
     def _compute_of_payment_amount(self):
         for sale_order in self:
-            sale_order.of_payment_amount = sum(sale_order.payment_ids.mapped('amount'))
+            sale_order.of_payment_amount = sum(sale_order.payment_ids.mapped('of_amount_total'))
 
     @api.multi
     def action_view_payments(self):
