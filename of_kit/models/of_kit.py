@@ -294,6 +294,31 @@ class ProcurementOrder(models.Model):
             sale_order = sale_comp and sale_comp.order_id or False
         return sale_order
 
+    @api.multi
+    def _prepare_purchase_order_line(self, po, supplier):
+        res = super(ProcurementOrder, self)._prepare_purchase_order_line(po, supplier)
+        desc_option = self.env['ir.values'].get_default('purchase.config.settings', 'of_description_as_order_setting')
+        if desc_option == 1:
+            # recherche d'une ligne de kit associee
+            kit_line = self.of_sale_comp_id
+            if not kit_line:
+                # Si non trouvée, remonter la chaine des stock.move
+                move = self.move_dest_id
+                kit_line = move and move.procurement_id and move.procurement_id.of_sale_comp_id
+
+            # Si trouvée, prendre la description de la ligne de kit
+            # et ajouter éventuellement la description du produit
+            if kit_line:
+                name = kit_line.display_name
+                product_lang = self.product_id.with_context({
+                    'lang': supplier.name.lang,
+                    'partner_id': supplier.name.id,
+                })
+                if product_lang.description_purchase:
+                    name += '\n' + product_lang.description_purchase
+                res["name"] = name
+        return res
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
