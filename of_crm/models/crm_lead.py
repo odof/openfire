@@ -305,7 +305,7 @@ class CrmLead(models.Model):
             vals, partner_vals = self._of_extract_partner_values(vals)  # split vals
             partner_vals.update({
                 'name': vals.get('contact_name') or vals['name'],
-                'type': False,
+                'type': 'contact',
                 'customer': True,
             })
 
