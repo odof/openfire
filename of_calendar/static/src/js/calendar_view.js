@@ -102,6 +102,7 @@ CalendarView.include({
 
         this.color_ft_field = attrs.color_ft_field;
         this.color_bg_field = attrs.color_bg_field;
+        this.main_attendee_field = attrs.main_attendee;
         if (this.fields[this.color_field].type == "many2many") {
             this.attendee_multiple = true;
         }
@@ -1250,6 +1251,15 @@ CalendarView.include({
                                 }else if (self.attendee_multiple && isNullOrUndef(evt["virtuel"])) {
                                     var tempColorFT, tempColorBG;
                                     var now_id;
+                                    var main_employee;
+                                    var main_employee_id;
+
+                                    if (self.main_attendee_field) {
+                                        // Si l'employé principal fait partie des employés affichés sur le calendrier,
+                                        // on veut que la couleur de la tuile soit la sienne
+                                        main_employee = evt[self.main_attendee_field][0] in evt[self.attendee_people];
+                                        main_employee_id = evt[self.main_attendee_field][0];
+                                    }
 
                                     now_id = the_attendee_people;
                                     // if this attendee is not present in self.all_filters, it means they belong to a
@@ -1259,7 +1269,7 @@ CalendarView.include({
                                         tempColorFT = self.all_filters[self.res_ids_indexes[now_id]].color_ft;
                                         tempColorBG = self.all_filters[self.res_ids_indexes[now_id]].color_bg;
                                         // this will be the main color of the event
-                                        if (self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
+                                        if ((!isNullOrUndef(self.main_attendee_field) && ((main_employee && main_employee_id == now_id) || !main_employee) || isNullOrUndef(self.main_attendee_field)) && self.all_filters[self.res_ids_indexes[now_id]].is_checked && !found &&
                                             !isNullOrUndef(self.event_ids_attendees[evt["id"]]) &&
                                             !_.contains(self.event_ids_attendees[evt["id"]], now_id)) {
                                             // quand on montre les créneaux dispo,
