@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models
+from odoo import api, models
 
 
 class OFKitSaleHook(models.AbstractModel):
@@ -27,3 +27,25 @@ class OFKitSaleHook(models.AbstractModel):
                                     WHERE   imd2.model = 'res.groups'
                                     AND     imd2.module = 'base'
                                     AND     imd2.name IN ('group_user'));""")
+
+    @api.model
+    def _post_v_10_0_1_3_0_hook(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_kit'), ('state', 'in', ['installed', 'to upgrade'])])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.1.3.0'
+        if actions_todo:
+            self.env.cr.execute("""
+                UPDATE sale_order_line sol
+                SET of_invoice_date_prev=sub.min_date
+                FROM (SELECT oskl.kit_id kit_id, sp.min_date min_date
+                FROM of_saleorder_kit_line oskl
+                JOIN procurement_order po on po.of_sale_comp_id=oskl.id
+                JOIN stock_move sm ON sm.procurement_id=po.id
+                JOIN stock_picking sp ON sp.id=sm.picking_id
+                WHERE sp.state != 'cancel'
+                GROUP BY oskl.kit_id, sp.min_date
+                ORDER BY sp.min_date DESC) sub
+                WHERE sol.of_invoice_policy = 'ordered_delivery'
+                AND sub.kit_id = sol.kit_id
+                AND sol.of_is_kit"""
+            )

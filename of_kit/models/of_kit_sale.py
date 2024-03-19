@@ -293,32 +293,13 @@ class SaleOrderLine(models.Model):
                  'kit_id.kit_line_ids.procurement_ids.move_ids.picking_id.state')
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
-        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for line in self:
             if line.of_invoice_policy == 'ordered_delivery' and line.of_is_kit:
-                # Cas particulier pour les kits qui ne contiennent que des composants de type service non inclues
-                # dans le BL
-                # On reprend la même date de facturation prévisionnelle que celle de la commande
-                if not line.kit_id.kit_line_ids.mapped('product_id').filtered(lambda p: p.type != 'service') and \
-                        not inclure_service:
-                    pickings = line.order_id.picking_ids.filtered(
-                        lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
-                    if pickings:
-                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
-                    continue
+                pickings = line.kit_id.kit_line_ids.mapped('procurement_ids.move_ids.picking_id').filtered(
+                    lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                if pickings:
+                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
 
-                # Cas général
-                moves = line.kit_id.kit_line_ids.mapped('procurement_ids.move_ids')
-                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
-
-                if moves:
-                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
-                    if to_process_moves:
-                        line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(to_process_moves[0].date_expected))
-                    else:
-                        line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(moves[-1].date_expected))
 
     @api.onchange('of_pricing')
     def _onchange_of_pricing(self):
@@ -811,11 +792,15 @@ class OfSaleOrderKitLine(models.Model):
     @api.multi
     def _prepare_order_comp_procurement(self, group_id=False):
         self.ensure_one()
+        if self.order_id.of_date_de_pose:
+            date_planned = self.order_id.of_date_de_pose
+        else:
+            date_planned = datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(
+                days=self.customer_lead)
         return {
             'name': self.name,
             'origin': self.order_id.name,
-            'date_planned': datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(
-                days=self.customer_lead),
+            'date_planned': date_planned,
             'product_id': self.product_id.id,
             'product_qty': self.qty_total,
             'product_uom': self.product_uom_id.id,

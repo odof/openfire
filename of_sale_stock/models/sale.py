@@ -171,31 +171,12 @@ class SaleOrderLine(models.Model):
                  'procurement_ids.move_ids.picking_id.min_date', 'procurement_ids.move_ids.picking_id.state')
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
-        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for line in self:
             if line.of_invoice_policy == 'ordered_delivery':
-                # Cas particulier pour les lignes de type service non inclues dans le BL
-                # On reprend la même date de facturation prévisionnelle que celle de la commande
-                if line.product_id.type == 'service' and not inclure_service:
-                    pickings = line.order_id.picking_ids.filtered(
-                        lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
-                    if pickings:
-                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
-                    continue
-
-                # Cas général
-                moves = line.procurement_ids.mapped('move_ids')
-                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
-
-                if moves:
-                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
-                    if to_process_moves.mapped('picking_id'):
-                        line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(
-                                to_process_moves.mapped('picking_id').sorted('min_date')[0].min_date))
-                    elif moves.mapped('picking_id'):
-                        line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(moves.mapped('picking_id').sorted('min_date')[-1].min_date))
+                pickings = line.procurement_ids.mapped('move_ids.picking_id').filtered(
+                    lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                if pickings:
+                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
     def _compute_of_stock_moves_state(self):
