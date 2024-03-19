@@ -1634,6 +1634,7 @@ class OfPlanningIntervention(models.Model):
                     'qty': qty,
                     'price_unit': line.price_unit,
                     'name': line.name,
+                    'discount': line.discount,
                     'taxe_ids': [(4, tax.id) for tax in line.tax_id]
                 })
         return {'type': 'ir.actions.do_nothing'}
@@ -2304,6 +2305,7 @@ class OfPlanningInterventionLine(models.Model):
                 'qty': qty,
                 'price_unit': order_line.price_unit,
                 'name': order_line.name,
+                'discount': order_line.discount,
                 'taxe_ids': [(5, )] + [(4, tax.id) for tax in order_line.tax_id]
             })
 
