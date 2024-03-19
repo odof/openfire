@@ -3,6 +3,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.tools.safe_eval import safe_eval
 
 
 class OFSaleCommi(models.Model):
@@ -190,17 +191,22 @@ class OFSaleCommi(models.Model):
         if not profil:
             return 0
 
-        # Variable acompte utilisable dans les formules de profil via le statement "exec"
+        # Variable acompte utilisable dans les formules de profil
         acompte = 0
         if len(self.order_id.of_echeance_line_ids) > 1:
             acompte = self.order_id.of_echeance_line_ids[0].amount  # noqa F841
 
+        eval_context = {
+            'cond': False,
+            'acompte': acompte,
+            'self': self,
+        }
         taux_acompte = profil.taux_acompte
         for profil_line in profil.profcommi_line_ids.filtered(lambda line: line.type == 'acompte'):
-            cond = False
-            exec profil_line.regcommi_id.code
-            if cond:
-                taux_acompte = profil_line.taux_commi
+            eval_context['value'] = profil_line.taux_commi
+            safe_eval(profil_line.regcommi_id.code, eval_context, mode="exec", nocopy=True)
+            if eval_context['cond']:
+                taux_acompte = eval_context['value']
                 break
         return round(self.total_commi * taux_acompte / 100.0, 2)
 
