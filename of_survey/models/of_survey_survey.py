@@ -100,7 +100,7 @@ class OFSurveySurvey(models.Model):
         inverse_name='survey_id',
         string="User responses",
         readonly=True,
-        groups='of_survey.group_survey_user',
+        groups='of_survey.group_of_survey_user',
     )
     # security / access
     access_mode = fields.Selection(
