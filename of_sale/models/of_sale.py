@@ -153,13 +153,16 @@ class SaleOrder(models.Model):
             domain = ['&'] + domain + [('id', 'not in', zip(*order_ids)[0])]
         return domain
 
-    @api.depends('order_line.price_total')
+    @api.depends('order_line.price_total', 'order_line.price_subtotal', 'order_line.price_tax')
     def _amount_all(self):
         """Compute the total amounts of the SO."""
         # Le calcul standard diffère du calcul utilisé dans les factures, cela peut mener à des écarts dans certains cas
         # (quand l'option d'arrondi global de la tva est utilisée
         # et que la commande contient plusieurs lignes avec des taxes différentes).
         # On uniformise le calcul du montant des devis/commandes avec celui des factures.
+        order_line_obj = self.env['sale.order.line']
+        ids = [id for id in self.mapped('order_line.id') if not isinstance(id, int)]
+        order_line_obj.invalidate_cache(fnames=['price_subtotal', 'price_tax', 'price_total'], ids=ids)
         for order in self:
             order.amount_untaxed = sum(line.price_subtotal for line in order.order_line)
             order.amount_tax = sum(tax['amount'] for tax in order.of_get_taxes_values().itervalues())
