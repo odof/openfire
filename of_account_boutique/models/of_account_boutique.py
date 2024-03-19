@@ -51,7 +51,7 @@ class AccountInvoice(models.Model):
         """
         transfer_obj = self.env['stock.immediate.transfer']
         res = super(AccountInvoice, self).action_invoice_open()
-        for inv in self:
+        for inv in self.with_context(check_state=False):
             if not inv.of_boutique:
                 continue
             if inv.of_picking_ids:
@@ -136,8 +136,9 @@ class AccountInvoiceLine(models.Model):
         Créer les procurement.order des lignes de la facture ce qui va générer un BL
         """
         new_procs = self.env['procurement.order']  # Empty recordset
+        check_state = self._context.get('check_state', True)
         for line in self:
-            if line.invoice_id.state != 'open' or not line.product_id._need_procurement():
+            if check_state and line.invoice_id.state != 'open' or not line.product_id._need_procurement():
                 continue
             if not line.invoice_id.of_procurement_group_id:
                 vals = line.invoice_id._prepare_procurement_group()
