@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
+from odoo.tools.safe_eval import safe_eval
 
 
 class OFSaleProfcommi(models.Model):
@@ -34,13 +35,18 @@ class OFSaleProfcommi(models.Model):
         """
         self.ensure_one()
         taux = self.taux_commi
-        product = line.product_id  # noqa: F841. A utiliser dans les règles de commissionnement (regcommi_id.code).
-        cond = False
+        eval_context = {
+            'cond': False,
+            'line': line,
+            'product': line.product_id,
+            'self': self,
+        }
         for prof_line in self.profcommi_line_ids:
             if prof_line.type == 'commission':
-                exec prof_line.regcommi_id.code
-                if cond:
-                    taux = prof_line.taux_commi
+                eval_context['amount'] = prof_line.taux_commi
+                safe_eval(prof_line.regcommi_id.code, eval_context, mode="exec", nocopy=True)
+                if eval_context['cond']:
+                    taux = eval_context['amount']
                     break
         return taux
 
