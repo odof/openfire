@@ -4,7 +4,7 @@ import logging
 import re
 import threading
 
-from odoo import _, api, fields, models, tools
+from odoo import Command, _, api, fields, models, tools
 from odoo.exceptions import ValidationError
 from odoo.modules import get_module_resource
 
@@ -150,13 +150,12 @@ class ResPartner(models.Model):
             # Ne rien faire si le numéro est déjà présent
             if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
                 continue
-
             # On remplace la valeur actuelle s'il y en a une
-            if current_phone := rec.of_phone_number_ids.filtered(lambda p: p.type == number_type):
-                rec.of_phone_number_ids = [(1, current_phone[0].id, {'number': number})]
+            if number and (current_phone := rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)):
+                rec.of_phone_number_ids = [Command.update(current_phone[0].id, {'number': number})]
             # Sinon on crée le nouveau numéro si la valeur est non vide
             elif number:
-                rec.of_phone_number_ids = [(0, 0, {'number': number, 'type': number_type})]
+                rec.of_phone_number_ids = [Command.create({'number': number, 'type': number_type})]
 
     def _inverse_phone(self):
         for rec in self:
