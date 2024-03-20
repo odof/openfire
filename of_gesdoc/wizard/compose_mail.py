@@ -200,6 +200,12 @@ class OfComposeMail(models.TransientModel):
                     'value_openfire': self.format_body(chp[1]) if isinstance(chp[1], basestring) else chp[1]
                 })
                 for chp in self.eval_champs(obj, lettre.chp_ids)
+            ] + [
+                (0, 0, {
+                    'name': chp[0].name,
+                    'value_openfire': chp[1] and "image" or ""
+                })
+                for chp in self.eval_image_champs(obj, lettre.chp_ids.filtered(lambda x: x.name.endswith('_af_image')))
             ]
         else:
             self.chp_tmp_ids = []
@@ -404,7 +410,8 @@ class OfComposeMail(models.TransientModel):
             file_path = attachment_obj._full_path(attachment.store_fname)
             fd, generated_pdf = tempfile.mkstemp(prefix='gesdoc_', suffix='.pdf')
             try:
-                pypdftk.fill_form(file_path, datas, out_file=generated_pdf, flatten=not self.lettre_id.fillable)
+                obj = self.env[self._context.get('active_model')].browse(self._context.get('active_ids'))
+                self.fill_form(obj, file_path, datas, generated_pdf, self.lettre_id)
                 with open(generated_pdf, "rb") as encode:
                     encoded_file = base64.b64encode(encode.read())
             finally:
