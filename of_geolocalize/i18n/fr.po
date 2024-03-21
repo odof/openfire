@@ -61,7 +61,7 @@ msgstr "Les selectionnés sont tous géolocalisés manuellement"
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
 msgid "All Not Tried"
-msgstr "Tous les selectionnés qui ne sont pas tenté"
+msgstr "Tous les selectionnés qui ne sont pas géolocalisé"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
@@ -107,13 +107,13 @@ msgstr ""
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__yes
 msgid "Calculate geocoding values automatically"
-msgstr "Calculer automatiquement les valeurs de géocodage"
+msgstr "Calculer automatiquement les valeurs de géolocalisation"
 
 #. module: of_geolocalize
 #: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_create
 msgid "Calculate geocoding values automatically when a new partner is added"
 msgstr ""
-"Calculer automatiquement les valeurs de géocodage​​ lorsqu'un nouveau "
+"Calculer automatiquement les valeurs de géolocalisation lorsqu'un nouveau "
 "partenaire est ajouté"
 
 #. module: of_geolocalize
@@ -162,7 +162,7 @@ msgid ""
 "Do not calculate geocoding values (recommended when a large number of "
 "partners are imported)"
 msgstr ""
-"Ne pas calculer  les valeurs de géocodage (recommandé lorsqu'un grand nombre"
+"Ne pas calculer les valeurs de géolocalisation (recommandé lorsqu'un grand nombre"
 " de partenaires sont importés)"
 
 #. module: of_geolocalize
@@ -171,7 +171,7 @@ msgid ""
 "Do not recalculate geocoding values automatically (GPS coordinates are reset"
 " to zero if not entered at the same time.)"
 msgstr ""
-"Ne pas recalculer automatiquement les valeurs de géocodage (les coordonnées "
+"Ne pas recalculer automatiquement les valeurs de géolocalisation (les coordonnées "
 "GPS sont remis à zéro s'il n'est pas saisi en même temps.)"
 
 #. module: of_geolocalize
@@ -209,7 +209,7 @@ msgstr ""
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_gerolocalize_res_partner_geo_form
 msgid "Geocoding Response"
-msgstr "Réponse de géocodage"
+msgstr "Réponse de géolocalisation"
 
 #. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard_line__geocoding_state
@@ -217,7 +217,7 @@ msgstr "Réponse de géocodage"
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_users__of_geocoding_state
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_gerolocalize_res_partner_geo_form
 msgid "Geocoding State"
-msgstr "État de géocodage"
+msgstr "État de géolocalisation"
 
 #. module: of_geolocalize
 #: model:ir.model,name:of_geolocalize.model_of_geo_wizard
@@ -383,7 +383,7 @@ msgstr "Aucune correspondance trouvée pour les adresses de %(partner_names)."
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
 msgid "Not Tried"
-msgstr "Pas tenté"
+msgstr "Non géolocalisé"
 
 #. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_of_geo_wizard__number_selected_partners_to_geolocalize
@@ -464,7 +464,7 @@ msgid ""
 "Recalculate geocoding values (Geocoding is attempted if GPS coordinates"
 "                     are not entered at the same time.)"
 msgstr ""
-"Recalculer les valeurs de géocodage (Le géocodage est tenté si les "
+"Recalculer les valeurs de géolocalisation (La géolocalisation est tentéé si les "
 "coordonnées GPS ne sont pas saisis en même temps.)"
 
 #. module: of_geolocalize
@@ -508,7 +508,7 @@ msgstr "Les partenaires selectionnés"
 #: model:ir.model.fields,help:of_geolocalize.field_res_partner__of_geocoding_state
 #: model:ir.model.fields,help:of_geolocalize.field_res_users__of_geocoding_state
 msgid "State of geocoding"
-msgstr "État de géocodage"
+msgstr "État de géolocalisation"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
@@ -601,8 +601,8 @@ msgstr "Vous devez sélectionner un résultat avant de pouvoir valider"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
-msgid "failed geocoding"
-msgstr "Géocoding echoué"
+msgid "Failed geocoding"
+msgstr "Géolocalisation échouée"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
@@ -611,8 +611,8 @@ msgstr "Partenaires"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_partner_view_search
-msgid "successful geocoding"
-msgstr "Géocoding réussi"
+msgid "Successful geocoding"
+msgstr "Géolocalisation réussie"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view

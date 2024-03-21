@@ -31,9 +31,10 @@
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='inactive']" position="after">
+                <separator />
                 <filter string="Not Tried" name="not_tried" domain="[('of_geocoding_state','=', 'not_tried')]"/>
-                <filter string="successful geocoding" name="success" domain="[('of_geocoding_state','in', ['success', 'manual'])]"/>
-                <filter string="failed geocoding" name="failure" domain="[('of_geocoding_state','=', 'failure')]"/>
+                <filter string="Successful geocoding" name="success" domain="[('of_geocoding_state','in', ['success', 'manual'])]"/>
+                <filter string="Failed geocoding" name="failure" domain="[('of_geocoding_state','=', 'failure')]"/>
                 <separator/>
             </xpath>
         </field>
