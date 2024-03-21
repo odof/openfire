@@ -1,7 +1,63 @@
 # -*- coding: utf-8 -*-
 
 import re
-from odoo import models, api, tools, fields, SUPERUSER_ID, _
+from odoo import models, api, fields, registry
+
+from odoo.addons.mail.models.mail_mail import MailMail
+
+
+@api.multi
+def _postprocess_sent_message(self, mail_sent=True):
+    """Perform any post-processing necessary after sending ``mail``
+    successfully, including deleting it completely along with its
+    attachment if the ``auto_delete`` flag of the mail was set.
+    Overridden by subclasses for extra post-processing behaviors.
+
+    :param browse_record mail: the mail that was just sent
+    :return: True
+    """
+    notif_emails = self.filtered(lambda email: email.notification)
+    if notif_emails:
+        notifications = self.env['mail.notification'].search([
+            ('mail_message_id', 'in', notif_emails.mapped('mail_message_id').ids),
+            ('is_email', '=', True)])
+        # DEBUT MODIFICATION OPENFIRE
+        # Les notifications pour les utilisateurs ont déjà pu être supprimées par le JS (set_message_done)
+        # provoquant une exception lors de la mise à jour
+        # Utilisation d'un nouveau curseur db dédié
+        user_notifications = notifications.filtered(lambda n: not n.res_partner_id.partner_share)
+        if user_notifications:
+            with registry(self._cr.dbname).cursor() as cr_temp:
+                for notif in user_notifications.with_env(self.env(cr=cr_temp)):
+                    try:
+                        if mail_sent:
+                            notif.write({
+                                'email_status': 'sent',
+                            })
+                        else:
+                            notif.write({
+                                'email_status': 'exception',
+                            })
+                        cr_temp.commit()
+                    except Exception:
+                        cr_temp.rollback()
+
+        other_notifications = notifications - user_notifications
+        if mail_sent:
+            other_notifications.write({
+                'email_status': 'sent',
+            })
+        else:
+            other_notifications.write({
+                'email_status': 'exception',
+            })
+        # FIN MODIFICATION OPENFIRE
+    if mail_sent:
+        self.sudo().filtered(lambda self: self.auto_delete).unlink()
+    return True
+
+
+MailMail._postprocess_sent_message = _postprocess_sent_message
 
 
 class IrMailServer(models.Model):
