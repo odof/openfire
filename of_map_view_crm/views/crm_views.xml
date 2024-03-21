@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_crm_view_map" model="ir.ui.view">
+        <field name="name">crm.lead</field>
+        <field name="model">crm.lead</field>
+        <field name="arch" type="xml">
+            <map form_view_id="%(crm.crm_lead_view_form)d" tooltip_view="of_map_view_crm.tooltipRenderer" width="200px" latitude="of_partner_latitude" longitude="of_partner_longitude">
+                <field name="of_partner_name"/>
+                <field name="of_precision"/>
+                <field name="name"/>
+                <field name="of_zip"/>
+                <field name="of_city"/>
+                <field name="of_partner_phones"/>
+                <field name="of_lead_tags"/>
+            </map>
+        </field>
+    </record>
+
+    <record id="crm.crm_lead_action_pipeline" model="ir.actions.act_window">
+        <field name="view_mode">tree,form,map</field>
+    </record>
+
+</odoo>

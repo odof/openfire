@@ -13,6 +13,7 @@
         'of_base_location',  # -> of_base
         'of_utm',
         'of_utils',
+        'of_geolocalize',
     ],
     'data': [
         'security/ir.model.access.csv',

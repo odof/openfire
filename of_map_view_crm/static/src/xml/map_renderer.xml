@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_map_view_crm.tooltipRenderer" owl="1">
+        <div class="m-1">
+            <div><strong t-esc="record.of_partner_name"/></div>
+            <div t-if="record.of_precision" class="text-capitalize"><t t-esc="record.of_precision"/></div>
+        </div>
+    </t>
+
+</templates>
