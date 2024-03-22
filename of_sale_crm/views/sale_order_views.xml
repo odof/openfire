@@ -103,8 +103,8 @@
             <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='customer_notes']" position="after">
-                    <group col="4" colspan="4" name="followup_notes" string="Follow-up notes">
-                        <field name="of_notes" nolabel="1"/>
+                    <group string="Follow-up notes" name="followup_notes">
+                        <field name="of_notes" colspan="2" nolabel="1"/>
                     </group>
                 </xpath>
                 <xpath expr="//field[@name='payment_term_id']" position="after">

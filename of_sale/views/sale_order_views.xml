@@ -156,8 +156,8 @@
                 <xpath expr="//notebook/page[@name='other_information']" position="after">
                     <page string="Notes" name="notes">
                         <group string="Customer notes" name="customer_notes" attrs="{'invisible':[('of_customer_notes','=',False)]}">
-                            <field name="of_customer_notes" colspan="4" nolabel="1" readonly="1"/>
-                            <div class="text-muted" colspan="4">
+                            <field name="of_customer_notes" colspan="2" nolabel="1"/>
+                            <div class="text-muted" colspan="2">
                                 * These notes come from the customer's file. They can only be modified in the customer form.
                             </div>
                         </group>

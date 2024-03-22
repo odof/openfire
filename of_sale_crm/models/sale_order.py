@@ -66,7 +66,7 @@ class SaleOrder(models.Model):
         string='Follow-up tags',
     )
     of_priority = fields.Selection(selection=AVAILABLE_PRIORITIES, string='Priority', index=True, default='0')
-    of_notes = fields.Text(string='Follow-up notes')
+    of_notes = fields.Text(string="Follow-up notes")
     of_info = fields.Text(string='Info')
     of_reference_laying_date = fields.Date(string='Reference laying date')
     of_force_laying_date = fields.Boolean(string='Force laying date')
