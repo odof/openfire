@@ -56,6 +56,10 @@ class AccountInvoice(models.Model):
             for vals in result:
                 if vals[2].get('kit_id'):
                     vals[2]['kit_id'] = kit_obj.browse(vals[2]['kit_id']).copy().id
+                    # Si on ne fixe pas la tarification on peut ne pas avoir le bon prix unitaire.
+                    # Ex: avoir en mode brouillon
+                    # le lien vers la ligne de commande n'est pas fait donc le calcul ne prend pas en compte l'option
+                    vals[2]['of_pricing'] = 'fixed'
         return result
 
     def _prepare_invoice_line_from_po_line(self, line):
