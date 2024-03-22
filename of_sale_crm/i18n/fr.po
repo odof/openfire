@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 15:08+0000\n"
-"PO-Revision-Date: 2023-11-30 15:08+0000\n"
+"POT-Creation-Date: 2024-03-27 12:58+0000\n"
+"PO-Revision-Date: 2024-03-27 12:58+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -46,6 +46,12 @@ msgid ""
 msgstr ""
 "Permet d'indiquer quelle étape est associée à la perte d'opportunité à des "
 "fin d'analyse"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_warn_block
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_warn_block
+msgid "Blocking"
+msgstr "Bloquant"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_main_product_brand_id
@@ -138,14 +144,9 @@ msgid "Divers"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model,name:of_sale_crm.model_mail_compose_message
-msgid "Email composition wizard"
-msgstr "Assistant de composition d'emails"
-
-#. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__draft
 msgid "Estimate"
-msgstr "Estimation"
+msgstr "Devis"
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
@@ -341,7 +342,7 @@ msgstr ""
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sent
 msgid "Quotation"
-msgstr "Devis"
+msgstr "Envoyé"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_sent_quotation
@@ -367,7 +368,7 @@ msgstr "Reste à facturer en €"
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__crm_stage__of_auto_model_name__sale_order
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sale
 msgid "Sale Order"
-msgstr ""
+msgstr "Bon de commande"
 
 #. module: of_sale_crm
 #: model:ir.model,name:of_sale_crm.model_sale_report
@@ -452,15 +453,14 @@ msgid ""
 "This is a name that helps you keep track of your different campaign efforts "
 "Ex: Fall_Drive, Christmas_Special"
 msgstr ""
-"C'est un nom qui vous aide à suivre vos différents efforts de campagne. Ex :"
-" Fall_Drive, Christmas_Special"
+"Ce nom vous aidera à suivre vos différentes campagnes marketing, par ex. "
+"Campagne_automnale ou Spécial_Noël"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,help:of_sale_crm.field_sale_order__medium_id
 msgid "This is the method of delivery.Ex: Postcard, Email, or Banner Ad"
 msgstr ""
-"Il s'agit du mode de livraison. Ex : carte postale, e-mail ou bannière "
-"publicitaire."
+"Le mode de livraison, par ex. carte postale, email ou bannière publicitaire"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,help:of_sale_crm.field_sale_order__source_id
@@ -468,8 +468,8 @@ msgid ""
 "This is the source of the link Ex:Search Engine, another domain,or name of "
 "email list"
 msgstr ""
-"C'est la source du lien. Ex : Moteur de recherche, un autre domaine, ou le "
-"nom de liste de diffusion"
+"La source du lien, par ex. moteur de recherche, domaine externe ou nom de la"
+" liste d'adresses email"
 
 #. module: of_sale_crm
 #: model:ir.model.constraint,message:of_sale_crm.constraint_of_sale_followup_tag_name_uniq
@@ -480,6 +480,13 @@ msgstr "Ce nom de balise existe déjà"
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__3
 msgid "Very High"
 msgstr "Très haut"
+
+#. module: of_sale_crm
+#. odoo-python
+#: code:addons/of_sale_crm/models/crm_lead.py:0
+#, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour "
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_partner_lead_warn_form
