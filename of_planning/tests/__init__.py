@@ -4,3 +4,4 @@ from . import test_of_planning_intervention_template_line
 from . import test_calendar_event
 from . import test_of_planning_team
 from . import test_res_partner
+from . import test_partner_warnings

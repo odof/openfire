@@ -19,6 +19,19 @@
         </field>
     </record>
 
+    <record id="of_planning_view_partner_intervention_warn_form" model="ir.ui.view">
+        <field name="name">of.planning.res.partner.intervention.warn.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_sale.of_view_res_partner_sale_warn_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']//div[@name='of_div_account_warn']" position="after">
+                <div name="of_div_intervention_warn">
+                    <field name="of_is_intervention_warn" nolabel="1" class="oe_inline"/> interventions
+                </div>
+            </xpath>
+        </field>
+    </record>
+
     <record id="view_partner_form" model="ir.ui.view">
         <field name="name">res.partner.view.form</field>
         <field name="model">res.partner</field>

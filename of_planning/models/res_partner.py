@@ -22,6 +22,7 @@ class ResPartner(models.Model):
         comodel_name='calendar.event', string="Interventions", compute='_compute_of_interventions_data'
     )
     of_intervention_count = fields.Integer(string="# Interventions", compute='_compute_of_interventions_data')
+    of_is_intervention_warn = fields.Boolean(string="Interventions Warning")
 
     # --------------------------------------------------------------------------
     # Compute methods
@@ -58,6 +59,14 @@ class ResPartner(models.Model):
             )
             partner.of_intervention_ids = intervention_ids
             partner.of_intervention_count = len(intervention_ids)
+
+    @api.depends('of_is_intervention_warn')
+    def _compute_of_is_warn(self):
+        has_warn = self.filtered('of_is_intervention_warn')
+        for partner in has_warn:
+            partner.of_is_warn = True
+        partners_left = self - has_warn
+        super(ResPartner, partners_left)._compute_of_is_warn()
 
     # ----------------------------------------------------------------------------
     # Actions methods

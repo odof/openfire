@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 15:21+0000\n"
-"PO-Revision-Date: 2024-04-15 15:21+0000\n"
+"POT-Creation-Date: 2024-05-24 08:28+0000\n"
+"PO-Revision-Date: 2024-05-24 08:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -610,6 +610,11 @@ msgstr "Couleur de fond"
 #: model:ir.model.fields.selection,name:of_planning.selection__of_image__intervention_status__before
 msgid "Before"
 msgstr "Avant"
+
+#. module: of_planning
+#: model:ir.model.fields.selection,name:of_planning.selection__res_partner__intervention_warn__block
+msgid "Blocking Message"
+msgstr "Message bloquant"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_break_duration
@@ -1444,6 +1449,12 @@ msgid "Interventions"
 msgstr ""
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_res_partner__of_is_intervention_warn
+#: model:ir.model.fields,field_description:of_planning.field_res_users__of_is_intervention_warn
+msgid "Interventions Warning"
+msgstr "Avertissement des interventions"
+
+#. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
@@ -1695,6 +1706,11 @@ msgstr "Mois prochain"
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Next week"
 msgstr "Semaine prochaine"
+
+#. module: of_planning
+#: model:ir.model.fields.selection,name:of_planning.selection__res_partner__intervention_warn__no-message
+msgid "No Message"
+msgstr "Pas de message"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_alert_unable
@@ -2711,6 +2727,13 @@ msgstr "Entrepôt"
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
+msgid "Warning for %s"
+msgstr "Avertissement pour %s"
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
 msgid "Warning, this intervention is in conflict with another one."
 msgstr ""
 
@@ -2778,6 +2801,11 @@ msgstr "Code postal"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "from %s %s<br/>to %s %s"
+msgstr ""
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_view_partner_intervention_warn_form
+msgid "interventions"
 msgstr ""
 
 #. module: of_planning
