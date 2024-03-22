@@ -2280,7 +2280,7 @@ class OfPlanningInterventionLine(models.Model):
             'account_id': line_account.id,
             'price_unit': self.price_unit,
             'quantity': self.qty_invoiceable,
-            'discount': 0.0,
+            'discount': self.discount,
             'uom_id': product.uom_id.id,
             'product_id': product.id,
             'invoice_line_tax_ids': [(6, 0, taxes._ids)],
