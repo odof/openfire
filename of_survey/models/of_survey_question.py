@@ -77,6 +77,7 @@ class OFSurveyQuestion(models.Model):
             ('text_box', "Multiple Lines Text Box"),
             ('char_box', "Single Line Text Box"),
             ('date', "Date"),
+            ('image', 'Image'),
         ],
         compute='_compute_question_type',
         readonly=False,

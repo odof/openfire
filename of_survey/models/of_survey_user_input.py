@@ -157,7 +157,7 @@ class OFSurveyUserInput(models.Model):
             [('user_input_id', '=', self.id), ('question_id', '=', question.id)]
         )
 
-        if question.question_type in ['char_box', 'text_box', 'date']:
+        if question.question_type in ['char_box', 'text_box', 'date', 'image']:
             self._save_line_simple_answer(question, old_answers, answer)
             if question.save_as_email and answer:
                 self.write({'email': answer})

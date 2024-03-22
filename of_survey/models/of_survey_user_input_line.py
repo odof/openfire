@@ -30,11 +30,13 @@ class OFSurveyUserInputLine(models.Model):
             ('char_box', "Text"),
             ('date', "Date"),
             ('suggestion', "Suggestion"),
+            ('image', 'Image'),
         ],
     )
     value_char_box = fields.Char(string="Text answer")
     value_date = fields.Date(string="Date answer")
     value_text_box = fields.Text(string="Free Text answer")
+    value_image = fields.Binary(string="Image answer")
     suggested_answer_id = fields.Many2one(comodel_name='of.survey.question.answer', string="Suggested answer")
 
     @api.depends('answer_type')
@@ -50,6 +52,8 @@ class OFSurveyUserInputLine(models.Model):
                 )
             elif line.answer_type == 'suggestion':
                 line.display_name = line.suggested_answer_id.value
+            elif line.answer_type == 'image':
+                line.display_name = line.value_image.name
 
             if not line.display_name:
                 line.display_name = _("Skipped")
