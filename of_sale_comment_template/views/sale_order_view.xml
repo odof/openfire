@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sale config wizard -->
+    <record id="of_sale_view_sale_config_settings_comments" model="ir.ui.view">
+        <field name="name">of sale settings</field>
+        <field name="model">sale.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_sale_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='tax_invoicing']//field[@name='of_invoice_grouped']" position="before">
+                <label for="of_keep_comments"/>
+                <div name="of_keep_comments">
+                <field name="of_keep_comments" class="oe_inline" required="1"/>
+                <span> from the quote to the final invoice</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
