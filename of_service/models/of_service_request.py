@@ -459,7 +459,7 @@ class OFServiceRequest(models.Model):
             if request.task_id and not request.duration:
                 request.duration = request.task_id.duration
 
-    @api.depends('task_id')
+    @api.depends('task_id', 'next_date')
     def _compute_end_date(self):
         for request in self:
             request.end_date = self._get_end_date()
