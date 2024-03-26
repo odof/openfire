@@ -5,7 +5,7 @@
         <field name="name">of.equipment.view.map</field>
         <field name="model">of.equipment</field>
         <field name="arch" type="xml">
-            <map form_view_id="%(of_equipment.of_equipment_view_form)d" tooltip_view="of_map_view_equipment.tooltipRenderer" width="200px" latitude="partner_latitude" longitude="partner_longitude">
+            <map tooltip_view="of_map_view_equipment.tooltipRenderer" width="200" latitude="partner_latitude" longitude="partner_longitude">
                 <field name="name"/>
                 <field name="precision"/>
                 <field name="site_address_id"/>
@@ -16,6 +16,27 @@
                 <field name="service_date"/>
                 <field name="installation_date"/>
                 <field name="end_warranty_date"/>
+                <field name="precision"/>
+                <field name="partner_latitude"/>
+                <field name="partner_longitude"/>
+                <templates>
+                    <div t-name="map-popover" class="container-fluid">
+                        <div class="row g-0">
+                            <div class="col">
+                                <ul class="ps-1 mb-0 list-unstyled">
+                                    <li t-if="record.site_address_id"><i class="fa fa-user pe-1"/><strong t-esc="record.site_address_id[1]"/></li>
+                                    <li t-if="record.site_phones"><i class="fa fa-phone pe-1"/><span t-esc="record.site_phones"/></li>
+                                    <li t-if="record.customer_mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.customer_mobile"/></li>
+                                    <li t-if="record.site_zip or record.site_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.site_zip" t-esc="record.site_zip"/> <span t-if="record.site_city" t-esc="record.site_city"/></li>
+                                    <li t-if="record.name"><span t-esc="record.name"/></li>
+                                    <li t-if="record.service_date">Sale: <span t-esc="props.record.service_date"/></li>
+                                    <li t-if="record.installation_date">Install: <span t-esc="props.record.installation_date"/></li>
+                                    <li t-if="record.end_warranty_date">Warranty: <span t-esc="props.record.end_warranty_date"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
             </map>
         </field>
     </record>
