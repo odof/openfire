@@ -1,5 +1,6 @@
 /** @odoo-module */
-import {Component, useState} from "@odoo/owl";
+import {Component, useState, useEffect, xml} from "@odoo/owl";
+import {renderToMarkup} from "@web/core/utils/render";
 
 export class PopupMap extends Component {
     static template = "of_map_view.PopupMap";
@@ -7,21 +8,23 @@ export class PopupMap extends Component {
     static props = {
         record: Object,
         map: Object,
+        archInfo: Object,
     };
 
     setup() {
         this.value = this.props.record;
+        this.archInfo = this.props.archInfo;
         this.state = useState({
             show: false,
             color: "white",
-            width: this.props.map.model.metaData.width,
         });
+        this.model = this.props.map.model;
+        this.resModel = this.props.record.resModel;
         this.props.map.popups[this.value.id] = this;
-        this.model = this.props.map.model.metaData.resModel;
     }
 
     onClick(evt) {
-        this.props.map.switchView(this.value.id);
+        this.props.map.switchView(this.value.data.id);
     }
 
     onClose(evt) {
@@ -83,9 +86,35 @@ export class PopupMap extends Component {
         }
     }
 
-    setIconMarker(icon) {
-        let newIcon = this.props.map.iconMarker[icon];
+    setIconMarker(type) {
+        const {colorField} = this.props.archInfo;
+        let icon;
+        let color;
+
+        if (["highlight", "highlight-selected"].includes(type)) {
+            color = "red";
+        } else {
+            color = this.value.data[colorField] || "blue";
+        }
+
+        if (["selected", "highlight-selected"].includes(type)) {
+            icon = "check-circle";
+        } else {
+            icon = "circle";
+        }
+
+        let newIcon = L.AwesomeMarkers.icon({
+            icon: icon,
+            markerColor: color,
+        });
         this.props.map.markers[this.value.id].setIcon(newIcon);
+    }
+
+    getPopoverProps(props) {
+        const {popoverTemplate} = props.archInfo;
+        return renderToMarkup(xml`${popoverTemplate.outerHTML}`, {
+            record: props.record.data,
+        });
     }
 }
 
@@ -98,17 +127,27 @@ export class ListPopupMap extends Component {
 
     static props = {
         map: Object,
+        archInfo: Object,
     };
 
     setup() {
+        this.archInfo = this.props.archInfo;
+        this.map = this.props.map;
         this.state = useState({
-            width: this.props.map.model.metaData.width,
+            records: [],
         });
+        useEffect(
+            () => {
+                this.state.records = this.props.map.model.root.records;
+            },
+            () => [this.props.map.model.root.records]
+        );
     }
 
     get rendererProps() {
         return {
             map: this.props.map,
+            archInfo: this.props.archInfo,
         };
     }
 }

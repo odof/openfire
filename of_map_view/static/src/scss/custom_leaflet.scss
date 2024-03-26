@@ -4,7 +4,7 @@
 
 .map-renderer {
     position: relative;
-    height: 90%;
+    height: 100%;
 
     &--container {
         height: 100%;
@@ -17,9 +17,14 @@
     z-index: 800;
     top: 80px;
     float: inline-start;
+    height: calc(100% - 80px);
+    overflow: scroll;
+    pointer-events: none;
 }
 
 .map-popup {
+    pointer-events: all;
+    min-height: 24px;
     border: 1px solid rgb(75, 73, 73);
     border-radius: 5px;
     &--header {
