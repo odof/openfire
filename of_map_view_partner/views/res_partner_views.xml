@@ -5,7 +5,11 @@
         <field name="name">res.partner.view.map</field>
         <field name="model">res.partner</field>
         <field name="arch" type="xml">
-            <map form_view_id="%(base.view_partner_form)d" tooltip_view="of_map_view_partner.tooltipRenderer" latitude="partner_latitude" longitude="partner_longitude">
+            <map
+                tooltip_view="of_map_view_partner.tooltipRenderer"
+                latitude="partner_latitude"
+                longitude="partner_longitude">
+                <field name="id"/>
                 <field name="name"/>
                 <field name="city"/>
                 <field name="zip"/>
@@ -13,6 +17,23 @@
                 <field name="mobile"/>
                 <field name="of_precision"/>
                 <field name="of_partner_phones"/>
+                <field name="partner_latitude"/>
+                <field name="partner_longitude"/>
+                <field name="of_geocoding_state"/>
+                <templates>
+                    <div t-name="map-popover" class="container-fluid">
+                        <div class="row g-0">
+                            <div class="col">
+                                <ul class="ps-1 mb-0 list-unstyled">
+                                    <li t-if="record.name"><i class="fa fa-user pe-1"/><strong t-esc="record.name"/></li>
+                                    <li t-if="record.zip or record.city"><i class="fa fa-map-marker pe-1"/><span t-if="record.zip" t-esc="record.zip"/> <span t-if="record.city" t-esc="record.city"/></li>
+                                    <li t-if="record.of_partner_phones"><i class="fa fa-phone pe-1"/><span t-esc="record.of_partner_phones"/></li>
+                                    <li t-if="record.mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.mobile"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
             </map>
         </field>
     </record>
