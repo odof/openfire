@@ -5,14 +5,31 @@
         <field name="name">crm.lead</field>
         <field name="model">crm.lead</field>
         <field name="arch" type="xml">
-            <map form_view_id="%(crm.crm_lead_view_form)d" tooltip_view="of_map_view_crm.tooltipRenderer" width="200px" latitude="of_partner_latitude" longitude="of_partner_longitude">
+            <map tooltip_view="of_map_view_crm.tooltipRenderer" width="200" latitude="of_partner_latitude" longitude="of_partner_longitude">
                 <field name="of_partner_name"/>
                 <field name="of_precision"/>
                 <field name="name"/>
                 <field name="of_zip"/>
                 <field name="of_city"/>
                 <field name="of_partner_phones"/>
+                <field name="of_precision"/>
                 <field name="of_lead_tags"/>
+                <field name="of_partner_latitude"/>
+                <field name="of_partner_longitude"/>
+                <templates>
+                    <div t-name="map-popover" class="container-fluid">
+                        <div class="row g-0">
+                            <div class="col">
+                                <ul class="ps-1 mb-0 list-unstyled">
+                                    <li t-if="record.of_partner_name"><i class="fa fa-user pe-1"/><strong t-esc="record.of_partner_name"/></li>
+                                    <li t-if="record.of_zip or record.of_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_zip" t-esc="record.of_zip"/> <span t-if="record.of_city" t-esc="record.of_city"/></li>
+                                    <li t-if="record.of_partner_phones"><i class="fa fa-phone pe-1"/><span t-esc="record.of_partner_phones"/></li>
+                                    <li t-if="record.of_lead_tags"><i class="fa fa-tags pe-1"/><span t-esc="record.of_lead_tags"/></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
             </map>
         </field>
     </record>
