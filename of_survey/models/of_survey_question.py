@@ -77,11 +77,14 @@ class OFSurveyQuestion(models.Model):
             ('text_box', "Multiple Lines Text Box"),
             ('char_box', "Single Line Text Box"),
             ('date', "Date"),
-            ('image', 'Image'),
+            ('upload_file', "Upload File"),
         ],
         compute='_compute_question_type',
         readonly=False,
         store=True,
+    )
+    upload_multiple_file = fields.Boolean(
+        string="Upload Multiple File", help="Check this box if you " "want to allow users to upload multiple files"
     )
     # -- char_box
     save_as_email = fields.Boolean(

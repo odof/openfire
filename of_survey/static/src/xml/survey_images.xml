@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+
+
+    <t t-name="of_survey.form_images">
+        <div class="row">
+            <t t-foreach="images" t-as="image">
+                <div class="col-4">
+                    <div class="block-image row">
+                        <div class="col-4">
+                            <img t-att-src="image.src" class="img img-fluid"/>
+                        </div>
+                        <div class="col-6">
+                            <span t-esc="image.title" class="title"/><br/>
+                            <span t-esc="image.legend" class="legend"/>
+                        </div>
+                        <div class="col-2 align-middle">
+                            <a href="#" class="delete" ><i class="fa fa-trash-o"
+                                name="delete"
+                                aria-label="Delete image"
+                                tabindex="-1"
+                                t-att-id="image_index"
+                            /></a>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

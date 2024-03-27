@@ -315,6 +315,9 @@
             <t t-if="question.question_type == 'date'"><t t-call="of_survey.question_date"/></t>
             <t t-if="question.question_type == 'simple_choice'"><t t-call="of_survey.question_simple_choice"/></t>
             <t t-if="question.question_type == 'multiple_choice'"><t t-call="of_survey.question_multiple_choice"/></t>
+            <t t-if="question.question_type == 'upload_file'">
+                <t t-call="of_survey.multi_upload_file"/>
+            </t>
             <div class="o_survey_question_error overflow-hidden border-0 py-0 px-3 alert alert-danger" role="alert"></div>
         </div>
     </template>
@@ -508,6 +511,66 @@
         </div>
     </template>
 
+    <template id="multi_upload_file">
+        <div class="o_survey_upload_container">
+            <div class="o_survey_upload_box"/>
+            <div class="form_images">
+
+            </div>
+            <a href="#" class="btn btn-primary add-attachment">Add Picture</a>
+            <input type="file" class="o_survey_upload_file"
+                   data-oe-data=""
+                   t-att-data-question-type="question.question_type"
+                   t-att-name="question.id"
+                   t-att-multiple="question.upload_multiple_file"
+                   style="display:None"
+            />
+        </div>
+
+        <div class="modal" tabindex="-1" role="dialog" id="addAttachment">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Picture</h5>
+                <button type="button" class="close" name="modal_close" aria-label="Close">
+                  <span aria-hidden="true">X</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" class="form-control" id="title"/>
+                        </div>
+                        <br/>
+                        <div class="form-group">
+                            <label for="legend">Legend</label>
+                            <input type="text" class="form-control" id="legend"/>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label for="images" class="drop-container" id="dropcontainer">
+                            <img src="/web/static/img/placeholder.png" class="img img-fluid thumb"/>
+                            <input type="file" name="images" class="images" id="images"/>
+                        </label>
+                    </div>
+                </div>
+
+              </div>
+              <div class="modal-footer">
+                  <div class="row">
+                      <div class="col-12 ms-auto">
+                        <button type="button" class="btn btn-primary" name="save_attachment">Save</button>
+                        <button type="button" class="btn btn-primary" name="save_create_attachment">Save and Create</button>
+                        <button type="button" class="btn" name="modal_close">Cancel</button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </template>
 
     <template id="survey_selection_key">
         <div t-if="useKeySelection" t-att-class="'o_survey_choice_key bg-white rounded %s' % selection_key_class">

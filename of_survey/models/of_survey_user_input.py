@@ -163,6 +163,8 @@ class OFSurveyUserInput(models.Model):
                 self.write({'email': answer})
             if question.save_as_nickname and answer:
                 self.write({'nickname': answer})
+        elif question.question_type == 'upload_file':
+            self._save_line_file(question, old_answers, answer)
 
         elif question.question_type in ['simple_choice', 'multiple_choice']:
             self._save_line_choice(question, old_answers, answer, comment)
@@ -174,6 +176,21 @@ class OFSurveyUserInput(models.Model):
         if not old_answers:
             return self.env['of.survey.user_input.line'].create(vals)
         old_answers.write(vals)
+        return old_answers
+
+    def _save_line_file(self, question, old_answers, answer):
+        """Save the user's file upload answer for the given question."""
+        vals = self._get_line_answer_file_upload_values(question, 'upload_file', answer)
+        if old_answers:
+            old_answers.write(vals)
+        else:
+            old_answers = self.env['of.survey.user_input.line'].create(vals)
+
+        # ici, on met à jour les pièces jointes pour qu'elles soient bien associées à une ligne
+        for answer in old_answers:
+            for attachment in answer.value_file_data_ids:
+                attachment.res_id = answer.id
+
         return old_answers
 
     def _save_line_choice(self, question, old_answers, answers, comment):
@@ -224,6 +241,48 @@ class OFSurveyUserInput(models.Model):
             'answer_type': 'char_box',
             'value_char_box': comment,
         }
+
+    def _get_line_answer_file_upload_values(self, question, answer_type, answer):
+        """Get the values to use when creating or updating a user input line
+        for a file upload answer."""
+        vals = {
+            'user_input_id': self.id,
+            'question_id': question.id,
+            'skipped': False,
+            'answer_type': answer_type,
+        }
+        if answer_type == 'upload_file':
+            if len(answer) > 0:
+                attachment_ids = []
+
+                for file in answer[0]:
+                    name = file.get('title')
+                    if name == '':
+                        name = file.get('filename')
+
+                    # on regarde dans la data si on a l'information que c'est une image ou pas
+                    # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
+                    datas = file['src'].split(',')
+                    if len(datas) > 0:
+                        datas = datas[1]
+                    else:
+                        datas = datas[0]
+                    datas = bytes(datas, 'utf-8')
+
+                    attachment = self.env['ir.attachment'].create(
+                        {
+                            'name': name,
+                            'description': file.get('legend', ''),
+                            'type': 'binary',
+                            'datas': datas,
+                            'res_model': 'of.survey.user_input.line',
+                        }
+                    )
+                    attachment_ids.append(attachment.id)
+                vals['value_file_data_ids'] = attachment_ids
+            else:
+                vals['skipped'] = True
+        return vals
 
     # ------------------------------------------------------------
     # Conditional Questions Management

@@ -44,6 +44,10 @@
                             <group>
                                 <field name="question_id" readonly="1"/>
                                 <field name="answers" readonly="1"/>
+                                <field name="question_type" invisible="1"/>
+                                <field name="images" mode="kanban" attrs="{'invisible': [('question_type','!=','upload_file')]}">
+
+                                </field>
                             </group>
                         </form>
                     </field>

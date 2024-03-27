@@ -167,6 +167,13 @@
                         <field name="value_image" filename="value_image_filename" colspan='2' attrs="{'invisible': [('answer_type','!=','image')]}"/>
 
                         <field name="suggested_answer_id" colspan='2' attrs="{'invisible': [('answer_type','!=','suggestion')]}"/>
+                        <field name="value_file_data_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="file_size"/>
+                                <field name="type"/>
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
             </form>
