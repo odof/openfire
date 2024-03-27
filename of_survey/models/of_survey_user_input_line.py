@@ -30,12 +30,17 @@ class OFSurveyUserInputLine(models.Model):
             ('char_box', "Text"),
             ('date', "Date"),
             ('suggestion', "Suggestion"),
+            ('upload_file', "Upload File"),
         ],
     )
     value_char_box = fields.Char(string="Text answer")
     value_date = fields.Date(string="Date answer")
     value_text_box = fields.Text(string="Free Text answer")
     suggested_answer_id = fields.Many2one(comodel_name='of.survey.question.answer', string="Suggested answer")
+    value_file_data_ids = fields.Many2many(
+        comodel_name='ir.attachment',
+        help="The attachments " "corresponding to the user's " "file upload answer, if any.",
+    )
 
     @api.depends('answer_type')
     def _compute_display_name(self):
@@ -50,7 +55,8 @@ class OFSurveyUserInputLine(models.Model):
                 )
             elif line.answer_type == 'suggestion':
                 line.display_name = line.suggested_answer_id.value
-
+            elif line.answer_type == "upload_file":
+                line.display_name = f"{len(line.value_file_data_ids)} picture(s) taken"
             if not line.display_name:
                 line.display_name = _("Skipped")
 
@@ -62,6 +68,8 @@ class OFSurveyUserInputLine(models.Model):
 
             if line.answer_type == 'suggestion':
                 field_name = 'suggested_answer_id'
+            elif line.answer_type == 'upload_file':
+                field_name = False
             elif line.answer_type:
                 field_name = f'value_{line.answer_type}'
             else:  # skipped

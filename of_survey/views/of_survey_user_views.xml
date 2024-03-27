@@ -165,6 +165,13 @@
                         <field name="value_date" colspan='2' attrs="{'invisible': [('answer_type','!=','date')]}"/>
                         <field name="value_text_box" colspan='2' attrs="{'invisible': [('answer_type','!=','text_box')]}"/>
                         <field name="suggested_answer_id" colspan='2' attrs="{'invisible': [('answer_type','!=','suggestion')]}"/>
+                        <field name="value_file_data_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="file_size"/>
+                                <field name="type"/>
+                            </tree>
+                        </field>
                     </group>
                 </sheet>
             </form>
