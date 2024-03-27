@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_base_comment_template_form" model="ir.ui.view">
+        <field name="name">of.base.comment.template.view.form</field>
+        <field name="model">base.comment.template</field>
+        <field name="inherit_id" ref="base_comment_template.view_base_comment_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='domain']" position="replace">
+                <field name="domain" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="base_comment_template_view_o2m_tree" model="ir.ui.view">
+        <field name="name">of.base.comment.template.view.o2m.tree</field>
+        <field name="model">base.comment.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="position" />
+                <field name="company_id" groups="base.group_multi_company" />
+                <field name="partner_ids" string="Partners" />
+                <field name="models" optional="hide"/>
+                <field name="model_ids" groups="base.group_erp_manager" optional="hide"/>
+                <field name="domain" string="Domain" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

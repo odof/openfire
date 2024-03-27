@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="move_form_add_comment" model="ir.ui.view">
+        <field name="name">of.account.move.form.comment</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account_comment_template.move_form_add_comment" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='comment_template_ids']" position="attributes">
+                <attribute name="context" operation="update">
+                    {
+                        "tree_view_ref": "of_sale_comment_template.base_comment_template_view_o2m_tree",
+                    }
+                </attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

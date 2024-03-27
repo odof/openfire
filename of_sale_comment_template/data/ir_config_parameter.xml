@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_sale_comment_template_propagate_comments" model="ir.config_parameter">
+        <field name="key">of.sale.comment.template.propagate_comments</field>
+        <field name="value">do_not_keep_comments</field>
+    </record>
+
+</odoo>
