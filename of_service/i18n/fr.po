@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 10:49+0000\n"
-"PO-Revision-Date: 2024-02-27 10:49+0000\n"
+"POT-Creation-Date: 2024-04-02 14:46+0000\n"
+"PO-Revision-Date: 2024-04-02 14:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -101,21 +101,8 @@ msgid ""
 "<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', 'done')]}\"> remaining</em>\n"
 "                                <em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '!=', 'done')]}\"> This intervention is done</em>"
 msgstr ""
-
-#. module: of_service
-#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
-msgid "<i class=\"fa fa-envelope pr-1\" title=\"Mail button\"/>"
-msgstr "<i class=\"fa fa-envelope pr-1\" title=\"bouton Email\"/>"
-
-#. module: of_service
-#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
-msgid "<i class=\"fa fa-phone pr-1\" title=\"Mobile button\"/>"
-msgstr "<i class=\"fa fa-phone pr-1\" title=\"bouton Mobile\"/>"
-
-#. module: of_service
-#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
-msgid "<i class=\"fa fa-phone pr-1\" title=\"Phone button\"/>"
-msgstr "<i class=\"fa fa-phone pr-1\" title=\"bouton Telephone\"/>"
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', 'done')]}\"> restant</em>\n"
+"                                <em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '!=', 'done')]}\"> Cette intervention est terminée</em>"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
@@ -980,6 +967,11 @@ msgid "Nothing to Bill"
 msgstr "Rien à facturer"
 
 #. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__null
+msgid "Null"
+msgstr "Nul"
+
+#. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__number
 #: model:ir.model.fields,field_description:of_service.field_of_service_request_create_intervention_line_wizard__request_number
 msgid "Number"
@@ -1429,8 +1421,17 @@ msgstr "Date de début"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__state_punctual
-msgid "State"
-msgstr "État"
+msgid "State Punctual"
+msgstr "État ponctuel"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__state_punctual
+msgid ""
+"State for non recurrent request. If the request is recurrent, the punctual "
+"state is null."
+msgstr ""
+"État pour les DI non récurrentes. Si la DI est récurrente, l'état ponctuelle "
+"est nul."
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__address_street

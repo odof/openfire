@@ -70,9 +70,9 @@ class OFServiceRequest(models.Model):
             ('to_plan_quickly', "To Plan Quickly"),
             ('planned', "Planned"),
             ('late', "Late for planning"),
-            ('done', "Done"),
             ('part_planned', "Partially planned"),
             ('all_planned', "All planned"),
+            ('done', "Done"),
             ('cancel', "Cancelled"),
         ],
         string="Planning status",
@@ -94,18 +94,20 @@ class OFServiceRequest(models.Model):
     )
     state_punctual = fields.Selection(
         selection=[
+            ('null', "Null"),
             ('draft', "Draft"),
             ('to_plan', "To plan"),
+            ('ongoing', "Ongoing intervention"),
+            ('late', "Late for planning"),
             ('part_planned', "Partially planned"),
             ('all_planned', "All planned"),
-            ('late', "Late for planning"),
             ('done', "Done"),
-            ('ongoing', "Ongoing intervention"),
             ('cancel', "Cancelled"),
         ],
-        string="State",
-        compute='_compute_state',
+        string="State Punctual",
+        compute='_compute_state_punctual',
         store=True,
+        help="State for non recurrent request. If the request is recurrent, the punctual state is null.",
     )
 
     # Interventions
@@ -382,12 +384,36 @@ class OFServiceRequest(models.Model):
         for request in self:
             if not request.next_date and not request.end_date:
                 request.state = 'nothing_to_plan'
+            elif request.base_state != 'calculated':
+                request.state = request.base_state
             else:
-                request_state = request._get_state_from_date(fields.Date.context_today(self), to_plan_advance=True)
-                if not request.recurrency and request.state_punctual != request_state:
-                    request.state_punctual = request_state
-                if request.state != request_state:
-                    request.state = request_state
+                # self.base_state = 'cancelled' and self.base_state = 'draft' states are triggered manually.
+                state = request._get_state_from_date(fields.Date.context_today(self), to_plan_advance=True)
+                if request.state != state:
+                    request.state = state
+
+    @api.depends(
+        'base_state',
+        'duration',
+        'remaining_duration',
+        'next_date',
+        'last_next_date',
+        'end_date',
+        'contract_end_date',
+        'recurrency',
+        'intervention_ids',
+        'intervention_ids.of_state',
+    )
+    def _compute_state_punctual(self):
+        for request in self:
+            if request.recurrency:
+                request.state_punctual = 'null'
+            elif request.base_state != 'calculated':
+                request.state_punctual = self.base_state
+            else:
+                state = request._get_state_punctual_from_date(fields.Date.context_today(self), to_plan_advance=True)
+                if request.state_punctual != state:
+                    request.state_punctual = state
 
     @api.depends('intervention_ids', 'intervention_ids.of_state')
     def _compute_intervention_count(self):
@@ -558,7 +584,7 @@ class OFServiceRequest(models.Model):
             - red : request late for planning
             - black  : other requests"""
         for request in self:
-            if request.state in ('to_plan', 'planned', 'progress', 'done', 'part_planned', 'all_planned'):
+            if request.state in ('to_plan', 'planned', 'done', 'part_planned', 'all_planned'):
                 request.color = 'black'
             elif request.state in ('to_plan_quickly'):
                 request.color = 'orange'
@@ -880,10 +906,10 @@ class OFServiceRequest(models.Model):
 
         return date(year_int, month_int, 1)
 
-    def _get_next_date(self, date_str, forward=True):
+    def _get_next_date(self, date_eval, forward=True):
         """
         Compute the next date based on the given date and the recurring rule.
-        :params: date_str (str): The date string to compute the next date from.
+        :params: date_eval: The date to compute the next date from.
         :params: forward (bool, optional): If True, compute the next date in forward mode.
             If False, compute the next date in backward mode. Defaults to True.
         :return: datetime.date: The computed next date.
@@ -897,10 +923,13 @@ class OFServiceRequest(models.Model):
 
         if forward:
             # si mode forward, l'occurence par défaut à étudier est dernière
-            date_from = max(date_str, self.last_intervention_date)
+            if self.last_intervention_date:
+                date_from = max(date_eval, self.last_intervention_date)
+            else:
+                date_from = date_eval
         else:
             # si mode backward, l'occurence par défaut à étudier est la prochaine
-            date_from = min(date_str, self.next_date)
+            date_from = min(date_eval, self.next_date)
 
         if not date_from:
             raise UserError(_("No date to compute next date from"))
@@ -1038,7 +1067,6 @@ class OFServiceRequest(models.Model):
             - 'to_plan_quickly': The last intervention is less than a month after the given date.
             - 'planned': The last intervention was less than a month before the given date.
             - 'late': The end of the next planning is before the given date.
-            - 'progress': None of the above conditions are met, indicating the request is still in progress.
         :rtype: str
         """
         one_month_ago = date_eval - relativedelta(months=1)
@@ -1058,11 +1086,50 @@ class OFServiceRequest(models.Model):
             return 'planned'
         elif end_date < date_eval:
             return 'late'
-        return 'progress'
+        return 'to_plan'
 
-    def _compute_state_from_date(self, date_eval, end_date, last_next_date):
+    def _compute_state_from_date(self, date_eval, next_date, end_date, last_next_date):
         """
         Computes the state of the service request based on the given dates.
+
+        :param datetime date_eval: The date to evaluate the state.
+        :param datetime end_date: The end date of the service request.
+        :param datetime last_next_date: The date of the last planned intervention.
+
+        :return: The state of the service request. Possible values are:
+            - 'late': The remaining duration is not zero and the end date has passed.
+            - 'to_plan': The start of the planning period is still one month away.
+            - 'to_plan_quickly': The end of the planning period is in less than a month.
+            - 'part_planned': The remaining duration is not zero and the end date is in the future.
+            - 'all_planned': The remaining duration is zero and not all interventions are in 'done' state.
+            - 'done': The remaining duration is zero and all interventions are in 'done' state.
+        :rtype: str
+        """
+        if (
+            self.intervention_ids
+            and self.remaining_duration == 0
+            and all(state == 'done' for state in self.mapped('intervention_ids.of_state'))
+        ):
+            return 'done'
+        elif (
+            self.intervention_ids
+            and self.remaining_duration == 0
+            and any(state != 'done' for state in self.mapped('intervention_ids.of_state'))
+        ):
+            return 'all_planned'
+        elif self.intervention_ids and self.remaining_duration != 0:
+            return 'part_planned'
+        elif end_date < date_eval:
+            return 'late'
+        elif date_eval <= end_date <= (date_eval + relativedelta(months=1)):
+            return 'to_plan_quickly'
+        elif next_date and next_date > (date_eval + relativedelta(months=1)):
+            return 'to_plan'
+        return 'to_plan'
+
+    def _compute_state_punctual_from_date(self, date_eval, end_date, last_next_date):
+        """
+        Computes the punctual state of the service request based on the given dates.
 
         :param datetime date_eval: The date to evaluate the state.
         :param datetime end_date: The end date of the service request.
@@ -1100,22 +1167,33 @@ class OFServiceRequest(models.Model):
         """
         self.ensure_one()
 
-        if self.base_state and self.base_state == 'calculated':
-            # self.base_state = 'cancelled' and self.base_state = 'draft' states are triggered manually.
-            # 'next_date' field corresponds to start date of the planning range and the 'end_date' field corresponds
-            # to end date of the planning range
-            next_date = self.next_date
-            last_next_date = self.last_next_date or False
-            end_date = self.end_date or next_date + relativedelta(days=13)
-            return (
-                self._compute_state_from_date_for_recurrency(
-                    date_eval, to_plan_advance, next_date, end_date, last_next_date
-                )
-                if self.recurrency
-                else self._compute_state_from_date(date_eval, end_date, last_next_date)
+        next_date = self.next_date
+        last_next_date = self.last_next_date or False
+        end_date = self.end_date or next_date + relativedelta(days=13)
+        return (
+            self._compute_state_from_date_for_recurrency(
+                date_eval, to_plan_advance, next_date, end_date, last_next_date
             )
-        else:
-            return self.base_state
+            if self.recurrency
+            else self._compute_state_from_date(date_eval, next_date, end_date, last_next_date)
+        )
+
+    def _get_state_punctual_from_date(self, date_eval=fields.Date.today(), to_plan_advance=False):
+        """Calculates the punctual status of an intervention at a given date, intended to be used for non passed dates.
+        The punctual status is calculated from the next_date field and the end_date field.
+
+        :param date date_eval: Date on which we want to know the status of interventions,
+            defaults to fields.Date.today()
+        :param boolean to_plan_advance: Consider that an intervention is 'to_plan' 1 month before its `next_date`,
+            defaults to False
+        :return: Intervention punctual status at the given date
+        :rtype: str
+        """
+        self.ensure_one()
+
+        last_next_date = self.last_next_date or False
+        end_date = self.end_date or self.next_date + relativedelta(days=13)
+        return self._compute_state_punctual_from_date(date_eval, end_date, last_next_date)
 
     def _get_action_view_intervention_context(self, action_context=None):
         """Returns the context to open the intervention view from the service request.
