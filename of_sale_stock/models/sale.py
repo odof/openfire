@@ -171,12 +171,29 @@ class SaleOrderLine(models.Model):
                  'procurement_ids.move_ids.picking_id.min_date', 'procurement_ids.move_ids.picking_id.state')
     def _compute_of_invoice_date_prev(self):
         super(SaleOrderLine, self)._compute_of_invoice_date_prev()
+        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         for line in self:
             if line.of_invoice_policy == 'ordered_delivery':
+                # Cas particulier pour les lignes de type service non inclues dans le BL
+                # On reprend la même date de facturation prévisionnelle que celle de la commande
+                if line.product_id.type == 'service' and not inclure_service:
+                    pickings = line.order_id.picking_ids.filtered(
+                        lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                    if pickings:
+                        line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+                    continue
+
+                # Cas général
                 pickings = line.procurement_ids.mapped('move_ids.picking_id').filtered(
-                    lambda p: p.state != 'cancel').sorted('min_date', reverse=True)
+                    lambda p: p.state != 'cancel').sorted('min_date')
                 if pickings:
-                    line.of_invoice_date_prev = fields.Date.to_string(fields.Date.from_string(pickings[0].min_date))
+                    to_process_pickings = pickings.filtered(lambda p: p.state != 'done')
+                    if to_process_pickings:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(to_process_pickings[0].min_date))
+                    else:
+                        line.of_invoice_date_prev = fields.Date.to_string(
+                            fields.Date.from_string(pickings[-1].min_date))
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
     def _compute_of_stock_moves_state(self):

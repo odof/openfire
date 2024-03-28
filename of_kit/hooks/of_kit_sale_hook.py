@@ -35,17 +35,40 @@ class OFKitSaleHook(models.AbstractModel):
         actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.1.3.0'
         if actions_todo:
             self.env.cr.execute("""
-                UPDATE sale_order_line sol
-                SET of_invoice_date_prev=sub.min_date
-                FROM (SELECT oskl.kit_id kit_id, sp.min_date min_date
-                FROM of_saleorder_kit_line oskl
-                JOIN procurement_order po on po.of_sale_comp_id=oskl.id
-                JOIN stock_move sm ON sm.procurement_id=po.id
-                JOIN stock_picking sp ON sp.id=sm.picking_id
-                WHERE sp.state != 'cancel'
-                GROUP BY oskl.kit_id, sp.min_date
-                ORDER BY sp.min_date DESC) sub
-                WHERE sol.of_invoice_policy = 'ordered_delivery'
-                AND sub.kit_id = sol.kit_id
-                AND sol.of_is_kit"""
-            )
+                UPDATE  SALE_ORDER_LINE         SOL1
+                SET     of_invoice_date_prev    = COALESCE(SUB1.min_date, SUB2.min_date)
+                FROM    SALE_ORDER_LINE         SOL2
+                LEFT JOIN
+                        (   SELECT  OSKL.kit_id             AS kit_id
+                            ,       MIN(SP.min_date)        AS min_date
+                            FROM    of_saleorder_kit_line   OSKL
+                            JOIN    procurement_order       PO
+                                ON  PO.of_sale_comp_id      = OSKL.id
+                            JOIN    stock_move              SM
+                                ON  SM.procurement_id       = PO.id
+                            JOIN    stock_picking           SP
+                                ON  SP.id                   = SM.picking_id
+                            WHERE   SP.state                NOT IN ('done', 'cancel')
+                            GROUP BY
+                                    OSKL.kit_id
+                        )                       SUB1
+                    ON  SUB1.kit_id             = SOL2.kit_id
+                JOIN
+                        (   SELECT  OSKL.kit_id             AS kit_id
+                            ,       MAX(SP.min_date)        AS min_date
+                            FROM    of_saleorder_kit_line   OSKL
+                            JOIN    procurement_order       PO
+                                ON  PO.of_sale_comp_id      = OSKL.id
+                            JOIN    stock_move              SM
+                                ON  SM.procurement_id       = PO.id
+                            JOIN    stock_picking           SP
+                                ON  SP.id                   = SM.picking_id
+                            WHERE   SP.state                != 'cancel'
+                            GROUP BY
+                                    OSKL.kit_id
+                        )                       SUB2
+                    ON  SUB2.kit_id             = SOL2.kit_id
+                WHERE   SOL1.of_invoice_policy  = 'ordered_delivery'
+                AND     SOL2.id                 = SOL1.id
+                AND     SOL1.of_is_kit          = True
+                """)

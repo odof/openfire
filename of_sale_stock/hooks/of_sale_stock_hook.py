@@ -50,16 +50,35 @@ class OFSaleStockHook(models.AbstractModel):
         actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.3.1.0'
         if actions_todo:
             self.env.cr.execute("""
-                UPDATE sale_order_line sol
-                SET of_invoice_date_prev=sub.min_date
-                FROM (SELECT po.sale_line_id line_id, sp.min_date min_date
-                FROM procurement_order po
-                JOIN stock_move sm ON sm.procurement_id=po.id
-                JOIN stock_picking sp ON sp.id=sm.picking_id
-                WHERE sp.state != 'cancel'
-                GROUP BY po.sale_line_id, sp.min_date
-                ORDER BY sp.min_date DESC) sub
-                WHERE sol.of_invoice_policy = 'ordered_delivery'
-                AND sub.line_id = sol.id"""
-            )
-
+                UPDATE  SALE_ORDER_LINE         SOL1
+                SET     of_invoice_date_prev    = COALESCE(SUB1.min_date, SUB2.min_date)
+                FROM    SALE_ORDER_LINE         SOL2
+                LEFT JOIN
+                        (   SELECT  PO.sale_line_id     AS line_id
+                            ,       MIN(SP.min_date)    AS min_date
+                            FROM    procurement_order   PO
+                            JOIN    stock_move          SM
+                                ON  SM.procurement_id   = PO.id
+                            JOIN    stock_picking       SP
+                                ON  SP.id               = SM.picking_id
+                            WHERE   SP.state            NOT IN ('done', 'cancel')
+                            GROUP BY
+                                    PO.sale_line_id
+                        )                       SUB1
+                    ON  SUB1.line_id            = SOL2.id
+                JOIN
+                        (   SELECT  PO.sale_line_id     AS line_id
+                            ,       MAX(SP.min_date)    AS min_date
+                            FROM    procurement_order   PO
+                            JOIN    stock_move          SM
+                                ON  SM.procurement_id   = PO.id
+                            JOIN    stock_picking       SP
+                                ON  SP.id               = SM.picking_id
+                            WHERE   SP.state            != 'cancel'
+                            GROUP BY
+                                    PO.sale_line_id
+                        )                       SUB2
+                    ON  SUB2.line_id            = SOL2.id
+                WHERE   SOL1.of_invoice_policy  = 'ordered_delivery'
+                AND     SOL2.id                 = SOL1.id
+                """)
