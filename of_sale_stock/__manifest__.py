@@ -3,7 +3,7 @@
 
 {
     "name": "OpenFire / Stock ventes",
-    "version": "10.0.3.0.0",
+    "version": "10.0.3.1.0",
     "author": "OpenFire",
     'license': 'AGPL-3',
     'category': 'OpenFire modules',
@@ -33,7 +33,6 @@ Paramètres de ventes
     ],
     "data": [
         'security/of_sale_stock_security.xml',
-        'hooks/post_hook.xml',
         'wizard/of_delivery_division_wizard_views.xml',
         'wizard/of_additional_delivery_wizard_views .xml',
         'views/of_sale_stock_views.xml',
@@ -44,6 +43,7 @@ Paramètres de ventes
         'report/of_stock_reports.xml',
         'wizard/of_report_tableur_wizard_view.xml',
         'wizard/of_stock_inventory_valuation_views.xml',
+        'hooks/post_hook.xml',
     ],
     'installable': True,
     'application': False,

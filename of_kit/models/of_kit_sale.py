@@ -308,17 +308,16 @@ class SaleOrderLine(models.Model):
                     continue
 
                 # Cas général
-                moves = line.kit_id.kit_line_ids.mapped('procurement_ids.move_ids')
-                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
-
-                if moves:
-                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
-                    if to_process_moves:
+                pickings = line.kit_id.kit_line_ids.mapped('procurement_ids.move_ids.picking_id').filtered(
+                    lambda p: p.state != 'cancel').sorted('min_date')
+                if pickings:
+                    to_process_pickings = pickings.filtered(lambda p: p.state != 'done')
+                    if to_process_pickings:
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(to_process_moves[0].date_expected))
+                            fields.Date.from_string(to_process_pickings[0].min_date))
                     else:
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(moves[-1].date_expected))
+                            fields.Date.from_string(pickings[-1].min_date))
 
     @api.onchange('of_pricing')
     def _onchange_of_pricing(self):
@@ -811,11 +810,15 @@ class OfSaleOrderKitLine(models.Model):
     @api.multi
     def _prepare_order_comp_procurement(self, group_id=False):
         self.ensure_one()
+        if self.order_id.of_date_de_pose:
+            date_planned = self.order_id.of_date_de_pose
+        else:
+            date_planned = datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(
+                days=self.customer_lead)
         return {
             'name': self.name,
             'origin': self.order_id.name,
-            'date_planned': datetime.strptime(self.order_id.date_order, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(
-                days=self.customer_lead),
+            'date_planned': date_planned,
             'product_id': self.product_id.id,
             'product_qty': self.qty_total,
             'product_uom': self.product_uom_id.id,

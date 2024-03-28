@@ -184,18 +184,16 @@ class SaleOrderLine(models.Model):
                     continue
 
                 # Cas général
-                moves = line.procurement_ids.mapped('move_ids')
-                moves = moves.filtered(lambda m: m.picking_id.state != 'cancel').sorted('date_expected')
-
-                if moves:
-                    to_process_moves = moves.filtered(lambda m: m.picking_id.state != 'done')
-                    if to_process_moves.mapped('picking_id'):
+                pickings = line.procurement_ids.mapped('move_ids.picking_id').filtered(
+                    lambda p: p.state != 'cancel').sorted('min_date')
+                if pickings:
+                    to_process_pickings = pickings.filtered(lambda p: p.state != 'done')
+                    if to_process_pickings:
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(
-                                to_process_moves.mapped('picking_id').sorted('min_date')[0].min_date))
-                    elif moves.mapped('picking_id'):
+                            fields.Date.from_string(to_process_pickings[0].min_date))
+                    else:
                         line.of_invoice_date_prev = fields.Date.to_string(
-                            fields.Date.from_string(moves.mapped('picking_id').sorted('min_date')[-1].min_date))
+                            fields.Date.from_string(pickings[-1].min_date))
 
     @api.depends('procurement_ids', 'procurement_ids.move_ids', 'procurement_ids.move_ids.state')
     def _compute_of_stock_moves_state(self):

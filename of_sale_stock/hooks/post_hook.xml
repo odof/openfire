@@ -4,5 +4,6 @@
     <function model="of.sale.stock.hook" name="_init_field_procurement_purchase">
         <value eval="[]"/>
     </function>
+    <function model="of.sale.stock.hook" name="_post_v_10_0_3_1_0_hook"/>
 
 </odoo>

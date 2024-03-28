@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import models
+from odoo import api, models
 
 
 class OFKitSaleHook(models.AbstractModel):
@@ -27,3 +27,48 @@ class OFKitSaleHook(models.AbstractModel):
                                     WHERE   imd2.model = 'res.groups'
                                     AND     imd2.module = 'base'
                                     AND     imd2.name IN ('group_user'));""")
+
+    @api.model
+    def _post_v_10_0_1_3_0_hook(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_kit'), ('state', 'in', ['installed', 'to upgrade'])])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.1.3.0'
+        if actions_todo:
+            self.env.cr.execute("""
+                UPDATE  SALE_ORDER_LINE         SOL1
+                SET     of_invoice_date_prev    = COALESCE(SUB1.min_date, SUB2.min_date)
+                FROM    SALE_ORDER_LINE         SOL2
+                LEFT JOIN
+                        (   SELECT  OSKL.kit_id             AS kit_id
+                            ,       MIN(SP.min_date)        AS min_date
+                            FROM    of_saleorder_kit_line   OSKL
+                            JOIN    procurement_order       PO
+                                ON  PO.of_sale_comp_id      = OSKL.id
+                            JOIN    stock_move              SM
+                                ON  SM.procurement_id       = PO.id
+                            JOIN    stock_picking           SP
+                                ON  SP.id                   = SM.picking_id
+                            WHERE   SP.state                NOT IN ('done', 'cancel')
+                            GROUP BY
+                                    OSKL.kit_id
+                        )                       SUB1
+                    ON  SUB1.kit_id             = SOL2.kit_id
+                JOIN
+                        (   SELECT  OSKL.kit_id             AS kit_id
+                            ,       MAX(SP.min_date)        AS min_date
+                            FROM    of_saleorder_kit_line   OSKL
+                            JOIN    procurement_order       PO
+                                ON  PO.of_sale_comp_id      = OSKL.id
+                            JOIN    stock_move              SM
+                                ON  SM.procurement_id       = PO.id
+                            JOIN    stock_picking           SP
+                                ON  SP.id                   = SM.picking_id
+                            WHERE   SP.state                != 'cancel'
+                            GROUP BY
+                                    OSKL.kit_id
+                        )                       SUB2
+                    ON  SUB2.kit_id             = SOL2.kit_id
+                WHERE   SOL1.of_invoice_policy  = 'ordered_delivery'
+                AND     SOL2.id                 = SOL1.id
+                AND     SOL1.of_is_kit          = True
+                """)
