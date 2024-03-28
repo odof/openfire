@@ -3,7 +3,7 @@
 {
     'name': 'OpenFire / Kits',
     'author': 'OpenFire',
-    'version': '10.0.1.2.0',
+    'version': '10.0.1.3.0',
     'category': 'OpenFire modules',
     'summary': 'Kits',
     'description': """
@@ -20,6 +20,7 @@
     'website': 'openfire.fr',
     'depends': [
         'of_sale_stock',
+        'of_sale_report',
         'of_product',
         'sale_margin',
         'of_web_widgets',
