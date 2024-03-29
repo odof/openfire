@@ -26,7 +26,7 @@
 
     <record id="master_database_url" model="ir.config_parameter">
         <field name="key">of.openfire.database.url</field>
-        <field name="value">https://openfire.fr</field>
+        <field name="value">https://saas.openfire.fr</field>
     </record>
 
     <record id="of_config_parameter_documentation" model="ir.config_parameter">
@@ -36,7 +36,7 @@
 
     <record id="of_config_parameter_support" model="ir.config_parameter">
         <field name="key">of.support</field>
-        <field name="value">https://www.openfire.fr/support/ticket/submit</field>
+        <field name="value">https://back.openfire.fr/support/ticket/submit</field>
     </record>
 
 </odoo>
