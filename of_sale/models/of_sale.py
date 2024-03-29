@@ -522,30 +522,30 @@ class SaleOrder(models.Model):
         mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
         res = super(SaleOrder, self).write(vals)
         if mail_subtype and vals.get('partner_id'):
-            new_partners = self.mapped('partner_id')
-            # Récupération du nouveau vendeur des clients
-            if self.user_id.partner_id:
-                new_partners |= self.user_id.partner_id
-            else:
-                for new_partner in new_partners:
-                    if new_partner.user_id.partner_id:
-                        new_partners |= new_partner.user_id.partner_id
-            if self.create_uid.partner_id:
-                new_partners |= self.create_uid.partner_id
-            # subscribe new partner and unsubscribe the old ones
-            self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
-            message_followers = self.mapped('message_follower_ids')
-            message_followers.sudo().filtered(
-                lambda r: r.partner_id.id not in new_partners.ids).unlink()
+            for record in self:
+                new_partners = record.partner_id
+                # Récupération du nouveau vendeur des clients
+                if record.user_id.partner_id:
+                    new_partners |= record.user_id.partner_id
+                else:
+                    new_partners |= new_partners.user_id.partner_id
+                if record.create_uid.partner_id:
+                    new_partners |= record.create_uid.partner_id
+                # subscribe new partner and unsubscribe the old ones
+                record.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
+                message_followers = record.message_follower_ids
+                message_followers.sudo().filtered(
+                    lambda r: r.partner_id.id not in new_partners.ids).unlink()
         elif 'user_id' in vals and 'partner_id' not in vals and mail_subtype:
-            new_partners = self.mapped('partner_id')
-            if self.user_id.partner_id:
-                new_partners |= self.user_id.partner_id
-            if self.create_uid.partner_id:
-                new_partners |= self.create_uid.partner_id
-            self.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
-            message_followers = self.mapped('message_follower_ids')
-            message_followers.sudo().filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
+            for record in self:
+                new_partners = record.partner_id
+                if record.user_id.partner_id:
+                    new_partners |= record.user_id.partner_id
+                if record.create_uid.partner_id:
+                    new_partners |= record.create_uid.partner_id
+                record.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
+                message_followers = record.message_follower_ids
+                message_followers.sudo().filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
@@ -913,12 +913,9 @@ class SaleOrder(models.Model):
                         values['base'] += round_curr(val['base'])
                         break
                 else:
-                    tax_grouped.append({
-                        'id': key,
-                        'name': tax.description,
-                        'amount': val['amount'],
-                        'base': round_curr(val['base'])
-                    })
+                    tax_grouped.append(
+                        {'id': key, 'name': tax.description, 'amount': val['amount'], 'base': round_curr(val['base'])}
+                    )
         for values in tax_grouped:
             values['base'] = round_curr(values['base'])
             values['amount'] = round_curr(values['amount'])
