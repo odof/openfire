@@ -39,15 +39,17 @@ def _load_template(self, company, code_digits=None, transfer_account_id=None, ac
     account_template_ref = self.generate_account(taxes_ref, account_ref, code_digits, company)
     account_ref.update(account_template_ref)
 
+    # Modification OpenFire
     # writing tax values after creation of taxes and accounts
-    for key, value in taxes_ref.items():
+    for key, value in taxes_ref.iteritems():
         tax_tmpl = self.env['account.tax.template'].browse(key)
-        if tax_tmpl.account_ids:
+        if getattr(tax_tmpl, 'account_ids', False):
             self.env['account.tax'].browse(value).write({
                 'account_ids': [(0, 0, dict({'account_src_id': account_template_ref[t.account_src_id.id],
                                              'account_dest_id': account_template_ref[t.account_dest_id.id]}))
                                 for t in tax_tmpl.account_ids]
             })
+    # Fin modification OpenFire
 
     # writing account values after creation of accounts
     company.transfer_account_id = account_template_ref[transfer_account_id.id]
@@ -87,12 +89,16 @@ def generate_fiscal_position(self, tax_template_ref, acc_template_ref, company):
     self.ensure_one()
     positions = self.env['account.fiscal.position.template'].search([('chart_template_id', '=', self.id)])
     for position in positions:
-        new_fp = self.create_record_with_xmlid(
-            company, position, 'account.fiscal.position',
-            {'company_id': company.id,
-             'name': position.name,
-             'note': position.note,
-             'default_tax_ids': [(6, 0, [tax_template_ref[t.id] for t in position.default_tax_ids])]})
+        # Modification OpenFire
+        position_vals = {
+            'company_id': company.id,
+            'name': position.name,
+            'note': position.note,
+        }
+        if hasattr(position, 'default_tax_ids'):
+            position_vals['default_tax_ids'] = [(6, 0, [tax_template_ref[t.id] for t in position.default_tax_ids])]
+        new_fp = self.create_record_with_xmlid(company, position, 'account.fiscal.position', position_vals)
+        # Fin modification OpenFire
         for tax in position.tax_ids:
             self.create_record_with_xmlid(company, tax, 'account.fiscal.position.tax', {
                 'tax_src_id': tax_template_ref[tax.tax_src_id.id],
@@ -110,7 +116,6 @@ def generate_fiscal_position(self, tax_template_ref, acc_template_ref, company):
 
 AccountChartTemplate._load_template = _load_template
 AccountChartTemplate.generate_fiscal_position = generate_fiscal_position
-
 
 
 class AccountTax(models.Model):
