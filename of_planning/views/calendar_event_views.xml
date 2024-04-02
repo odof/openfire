@@ -16,7 +16,6 @@
                 <field name="of_sector_id" optional="hide" />
                 <field name="of_company_id" optional="show" />
                 <field name="of_state" />
-                <field name="categ_ids" />
                 <field name="of_internal_description" optional="show" attrs="{'readonly':[('recurrency','=',True)]}" />
                 <field name="description" optional="hide" attrs="{'readonly':[('recurrency','=',True)]}" />
                 <field name="recurrency" invisible="1" />
@@ -204,8 +203,8 @@
                     <group>
                         <field name="allday" force_save="1" />
                         <field name="of_force_dates" />
-                        <field name="alarm_ids" widget="many2many_tags" options="{'no_quick_create': True}" />
-                        <field name="categ_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" />
+                        <field name="alarm_ids" widget="many2many_tags" options="{'no_quick_create': True}" attrs="{'invisible':[('of_type', '=', 'intervention')]}"/>
+                        <field name="categ_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" attrs="{'invisible':[('of_type', '=', 'intervention')]}"/>
                         <field name="of_is_flexible" attrs="{'readonly': [('of_state','in',['done'])], 'invisible':[('of_type', '!=', 'intervention')]}" groups="of_planning.group_planning_intervention_read_all_write_own"/>
                     </group>
                     <group colspan="4">
@@ -242,7 +241,6 @@
                 </group>
             </xpath>
             <!-- /Body who/what/when/when part -->
-
 
             <!-- Page details part -->
             <xpath expr="//page[@name='page_details']" position="attributes">
