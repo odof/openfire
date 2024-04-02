@@ -44,6 +44,7 @@
     <record id="group_planning_intervention_manager" model="res.groups">
         <field name="name">Manager</field>
         <field name="category_id" ref="of_planning_intervention_category" />
+        <field name="users" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"/>
         <field name="implied_ids" eval="[(4, ref('group_planning_intervention_responsible'))]" />
     </record>
 
