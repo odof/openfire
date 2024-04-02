@@ -177,10 +177,10 @@ class AccountInvoice(models.Model):
             for commi_inv in invoice.of_commi_ids:
                 if commi_inv.state in ('draft', 'to_pay') and refund_mode in ('cancel', 'modify'):
                     commi_inv.state = 'cancel'
-                    # Si il y a des commandes annulées avec des commissions d'acompte liées à cette commission de solde
+                    # S'il y a des commandes annulées avec des commissions d'acompte liées à cette commission de solde
                     # alors on annule les commissions d'acompte non payées et on crée des commissions inverses pour
                     # annuler les paiements des commissions d'acompte déjà payées
-                    order_commis_to_cancel = commi_inv.mapped('order_commi_ids').filtered(
+                    order_commis_to_cancel = commi_inv.order_commi_ids.filtered(
                         lambda c: c.state != 'cancel' and c.order_id.state == 'cancel').sudo()
                     # commissions d'acompte non payées
                     commis_to_cancel = order_commis_to_cancel.filtered(lambda c: c.state in ('draft', 'to_pay'))

@@ -10,16 +10,6 @@ class OFSaleCommi(models.Model):
     _name = 'of.sale.commi'
     _description = u"Commissions sur les ventes"
 
-    @api.model
-    def _auto_init(self):
-        super(OFSaleCommi, self)._auto_init()
-        module_self = self.env['ir.module.module'].search([('name', '=', 'of_sale_commission')])
-        version = module_self and module_self.latest_version
-        if version and version < '10.0.1.1.0':
-            cr = self.env.cr
-            cr.execute("UPDATE of_sale_commi SET state = 'to_pay' WHERE state = 'to_cancel'")
-            cr.execute("UPDATE of_sale_commi SET state = 'paid' WHERE state = 'paid_cancel'")
-
     name = fields.Char(string=u"Libellé")
     type = fields.Selection(
         selection=[('acompte', u"Acompte"), ('solde', u"Solde"), ('avoir', u"Avoir")], string=u"Type", required=True)
@@ -39,7 +29,7 @@ class OFSaleCommi(models.Model):
             ('paid', u"Payé"),
         ], string=u"État", required=True, default='draft')
     total_vente = fields.Float(compute='_compute_total_vente', string=u"Total ventes HT")
-    total_commi = fields.Float(compute='_compute_total_commi', string=u"Total commissions")
+    total_commi = fields.Float(compute='_compute_total_commi', string=u"Total commission")
     total_du = fields.Float(
         string=u"Commission due", readonly=True,
         states={'draft': [('readonly', False)], 'to_pay': [('readonly', False)]})

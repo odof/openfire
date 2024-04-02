@@ -112,8 +112,8 @@
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_pay,paid" readonly="1"/>
                 </header>
                 <sheet>
-                    <group>
-                        <group>
+                    <group name="head">
+                        <group name="head_left">
                             <field name="name" invisible="1"/>
                             <field name="user_id" options="{'no_create_edit':True}"
                                    attrs="{'readonly':['|',('state','=','paid'),('cancel_commi_id','!=',False)]}" />
@@ -128,7 +128,7 @@
                             <field name="inv_commi_id" invisible="1"/>
                             <field name="compl_du" invisible="1"/>
                         </group>
-                        <group>
+                        <group name="head_right">
                             <field name="type" readonly="1" />
                             <field name="date_paiement" readonly="1"/>
                             <field name="date_valid" attrs="{'readonly':['|',('state','=','paid'),('cancel_commi_id','!=',False)]}"/>
@@ -137,7 +137,7 @@
                     <field name="commi_line_ids" colspan="6" nolabel="1" mode="tree"
                            attrs="{'readonly':['|',('user_id','=',False),('state','=','paid')]}"
                            context="{'commi_type': type}"/>
-                    <group class="oe_subtotal_footer oe_right">
+                    <group name="totals" class="oe_subtotal_footer oe_right">
                         <field name="total_vente" invisible="1" />
                         <field name="total_commi" invisible="1" attrs="{'readonly':[('state','=','paid')]}"/>
                         <field name="total_du" widget="monetary"

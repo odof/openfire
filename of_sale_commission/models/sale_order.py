@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -41,6 +41,39 @@ class SaleOrder(models.Model):
 
         commi_to_pay.action_to_pay()
         commit_not_to_pay.write({'state': 'draft'})
+
+    def of_compute_commissions(self):
+        commi_obj = to_unlink = to_draft = self.env['of.sale.commi'].sudo()
+        for order in self.sudo():
+            commi_vendeur = False
+            for commi in order.of_commi_ids:
+                if commi.state == 'paid':
+                    continue
+                if commi.user_id == order.user_id:
+                    commi_vendeur = True
+                if commi.cancel_commi_id:
+                    to_unlink += commi
+                elif commi.state == 'cancel':
+                    # Les commissions annulées sont restaurées
+                    to_draft += commi
+
+            if not commi_vendeur and order.user_id.of_profcommi_id:
+                commi_data = {
+                    'name': order.name,
+                    'state': 'draft',
+                    'user_id': order.user_id.id,
+                    'type': 'acompte',
+                    'order_id': order.id,
+                }
+                commi = commi_obj.create(commi_data)
+                commi.create_lines(order.order_line)
+
+        if to_draft:
+            to_draft.write({'state': 'draft'})
+            to_draft.update_commi()
+        if to_unlink:
+            to_unlink.unlink()
+        self.of_verif_acomptes()
 
     @api.multi
     def write(self, vals):
@@ -84,40 +117,7 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         super(SaleOrder, self).action_confirm()
-
-        commi_obj = self.env['of.sale.commi'].sudo()
-        to_unlink = self.env['of.sale.commi'].sudo()
-        to_draft = self.env['of.sale.commi'].sudo()
-        for order in self.sudo():
-            commi_vendeur = False
-            for commi in order.of_commi_ids:
-                if commi.state == 'paid':
-                    continue
-                if commi.user_id == order.user_id:
-                    commi_vendeur = True
-                if commi.cancel_commi_id:
-                    to_unlink += commi
-                elif commi.state == 'cancel':
-                    # Les commissions annnulées sont restaurées
-                    to_draft += commi
-
-            if not commi_vendeur and order.user_id.of_profcommi_id:
-                commi_data = {
-                    'name': order.name,
-                    'state': 'draft',
-                    'user_id': order.user_id.id,
-                    'type': 'acompte',
-                    'order_id': order.id,
-                }
-                commi = commi_obj.create(commi_data)
-                commi.create_lines(order.order_line)
-
-        if to_draft:
-            to_draft.write({'state': 'draft'})
-            to_draft.update_commi()
-        if to_unlink:
-            to_unlink.unlink()
-        self.of_verif_acomptes()
+        self.of_compute_commissions()
         return True
 
     @api.multi
