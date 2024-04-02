@@ -97,6 +97,7 @@ class GestionPrixLine(models.TransientModel):
     def get_reset_amount(self, line_rounding):
         self.ensure_one()
         order_line = self.order_line_id
+        # Recalcul du prix de vente des lignes de composants
         if order_line.of_is_kit and order_line.of_pricing == 'computed':
             values = {}
             kit_price_unit = 0.0
@@ -118,7 +119,17 @@ class GestionPrixLine(models.TransientModel):
             taxes = order_line.tax_id.compute_all(
                 price, order_line.currency_id, order_line.product_uom_qty, product=order_line.product_id,
                 partner=order_line.order_id.partner_id)
-
-            return values, taxes
         else:
-            return super(GestionPrixLine, self).get_reset_amount(line_rounding=line_rounding)
+            values, taxes = super(GestionPrixLine, self).get_reset_amount(line_rounding=line_rounding)
+
+        # Recalcul du coût des lignes de composants
+        if order_line.of_is_kit:
+            cost_total = 0
+            for kit_line in order_line.kit_id.kit_line_ids:
+                vals = values.setdefault(kit_line, {})
+                vals['cost_unit'] = kit_line.product_id.get_cost()
+                cost_total += vals['cost_unit'] * kit_line.qty_per_kit
+            # Modification du coût affiché dans le wizard de gestion prix
+            self.cout_total_ht_simul = cost_total * order_line.product_uom_qty
+
+        return values, taxes

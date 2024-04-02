@@ -694,9 +694,9 @@ class GestionPrixLine(models.TransientModel):
         to_distribute -= total_nonselect
         for line in lines_select:
             if mode == 'reset':
-                vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
                 line.cout_total_ht_simul = \
                     line.order_line_id.product_id.get_cost() * line.order_line_id.product_uom_qty
+                vals, taxes = line.get_reset_amount(line_rounding=line_rounding)
             else:
                 vals, taxes = line.get_distributed_amount(
                     to_distribute,
