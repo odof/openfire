@@ -53,3 +53,9 @@ class CrmLead(models.Model):
     of_my_company = fields.Boolean(
         string="Is my store ?", compute='_compute_is_my_company', search='_search_is_my_company'
     )
+
+    def action_schedule_meeting(self, smart_calendar=True):
+        self.ensure_one()
+        action = super().action_schedule_meeting()
+        action['context']['default_of_type'] = 'event'
+        return action
