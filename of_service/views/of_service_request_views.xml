@@ -72,13 +72,13 @@
                             <div class="o_address_format">
                                 <field name="partner_id" />
                                 <div attrs="{'invisible': [('partner_phone', '=', False)]}">
-                                    <i class="fa fa-phone pe-1"/><field name="partner_phone" class="oe_inline"/>
+                                    <i class="fa fa-phone pe-1" title="Phone" /><field name="partner_phone" class="oe_inline"/>
                                 </div>
                                 <div attrs="{'invisible': [('partner_mobile', '=', False)]}">
-                                    <i class="fa fa-phone pe-1"/><field name="partner_mobile"  class="oe_inline"/>
+                                    <i class="fa fa-phone pe-1" title="Phone"/><field name="partner_mobile"  class="oe_inline"/>
                                 </div>
                                 <div attrs="{'invisible': [('partner_email', '=', False)]}">
-                                    <i class="fa fa-envelope pe-1"/><field name="partner_email" class="oe_inline"/>
+                                    <i class="fa fa-envelope pe-1" title="Mail"/><field name="partner_email" class="oe_inline"/>
                                 </div>
                             </div>
                             <field name="partner_tag_ids" widget="many2many_tags" />

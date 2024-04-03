@@ -107,13 +107,13 @@
                         <div class="o_address_format">
                             <field name="of_partner_id" />
                             <div attrs="{'invisible': [('of_mobile','=',False)]}">
-                                <i class="fa fa-phone pe-1"/><field name="of_mobile" class="oe_inline"/>
+                                <i class="fa fa-phone pe-1" title="Phone"/><field name="of_mobile" class="oe_inline"/>
                             </div>
                             <div attrs="{'invisible': [('of_phone','=',False)]}">
-                                <i class="fa fa-phone pe-1"/><field name="of_phone" class="oe_inline"/>
+                                <i class="fa fa-phone pe-1" title="Phone"/><field name="of_phone" class="oe_inline"/>
                             </div>
                             <div attrs="{'invisible': [('of_email','=',False)]}">
-                                <i class="fa fa-envelope pe-1"/><field name="of_email" widget="email" class="oe_inline"/>
+                                <i class="fa fa-envelope pe-1" title="Mail" /><field name="of_email" widget="email" class="oe_inline"/>
                             </div>
                         </div>
                         <field name="of_partner_tag_ids" widget="many2many_tags" />
