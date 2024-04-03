@@ -539,14 +539,10 @@ class CalendarEvent(models.Model):
             else:
                 event.of_invoice_status = 'no'
 
-    @api.depends('of_procurement_group_id')
+    @api.depends('of_line_ids', 'of_line_ids.move_ids')
     def _compute_pickings(self):
         for event in self:
-            event.of_picking_ids = (
-                event.of_procurement_group_id
-                and self.env['stock.picking'].sudo().search([('group_id', '=', event.of_procurement_group_id.id)])
-                or []
-            )
+            event.of_picking_ids = event.of_line_ids and event.mapped('of_line_ids.move_ids.picking_id.id') or []
             event.of_delivery_count = len(event.of_picking_ids)
 
     @api.depends('of_partner_id', 'of_address_id')

@@ -1,10 +1,24 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from odoo import api, fields, models
 
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
+
+    of_intervention_line_id = fields.Many2one(
+        comodel_name='of.planning.intervention.line', string="Intervention Line", index='btree_not_null'
+    )
+
+    @api.model
+    def _prepare_merge_moves_distinct_fields(self):
+        distinct_fields = super()._prepare_merge_moves_distinct_fields()
+        distinct_fields.append('of_intervention_line_id')
+        return distinct_fields
+
+    def _get_source_document(self):
+        res = super()._get_source_document()
+        return self.of_intervention_line_id.intervention_id or res
 
     def write(self, vals):
         if self._context.get('of_create_line_from_confirmed_sale', False) and vals.get('picking_id', False):

@@ -94,6 +94,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
                 'start': fields.Datetime.now(),
                 'stop': fields.Datetime.now() + timedelta(hours=1),
                 'of_company_id': self.company_fr.id,
+                'of_partner_id': self.customer_a.id,
             }
         )
         event2 = self.env['calendar.event'].create(
@@ -103,6 +104,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
                 'start': fields.Datetime.now(),
                 'stop': fields.Datetime.now() + timedelta(hours=1),
                 'of_company_id': self.company_fr.id,
+                'of_partner_id': self.customer_a.id,
             }
         )
 
@@ -125,6 +127,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
             }
         ).execute()
 
+        # On ajoute une ligne de facturation
         self.event.of_invoice_policy = 'delivery'
         self.env['of.planning.intervention.line'].create(
             {
@@ -135,21 +138,67 @@ class TestCalendarEvent(TestOFPlanningCommon):
         )
         self.event.action_button_confirm()
 
+        # La génération d'un BL nécessite le renseignement d'un entrepôt
         with self.assertRaises(UserError) as error:
             self.event.action_generate_stock_picking()
         self.assertEqual(
             error.exception.args[0],
-            "Merci de sélectionner un entrepôt dans l'onglet facturation de l'intervention: %s" % self.event.name,
+            f"Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention: {self.event.name}",
         )
         self.event.of_warehouse_id = self.warehouse_1
-        self.event.action_generate_stock_picking()
 
+        # Un premier BL est généré
+        self.event.action_generate_stock_picking()
         self.assertEqual(len(self.event.of_picking_ids), 1)
         self.assertEqual(self.event.of_picking_ids[0].state, 'confirmed')
         self.assertEqual(len(self.event.of_picking_ids[0].move_ids_without_package), 1)
         self.assertEqual(
             self.event.of_picking_ids[0].move_ids_without_package[0].product_id, self.product_ash_vacuum_cleaner
         )
+
+        self.env['of.planning.intervention.line'].create(
+            {
+                'intervention_id': self.event.id,
+                'product_id': self.product_wood_stove.id,
+                'qty': 1,
+            }
+        )
+
+        # Une ligne est ajouté au premier BL
+        self.event.action_generate_stock_picking()
+        self.assertEqual(len(self.event.of_picking_ids), 1)
+        self.assertEqual(self.event.of_picking_ids[0].state, 'confirmed')
+        self.assertEqual(len(self.event.of_picking_ids[0].move_ids_without_package), 2)
+        self.assertEqual(self.event.of_picking_ids[0].move_ids_without_package[1].product_id, self.product_wood_stove)
+
+        # Rien a ajouter au BL existant
+        with self.assertRaises(UserError) as error:
+            self.event.action_generate_stock_picking()
+        self.assertEqual(
+            error.exception.args[0],
+            f"Aucun article à ajouter dans un bon de livraison: {[self.event.name]}",
+        )
+
+        # On confirme le premier BL
+        self.event.of_picking_ids[0].move_ids_without_package[0].quantity_done = 1
+        self.event.of_picking_ids[0].move_ids_without_package[1].quantity_done = 1
+        self.event.of_picking_ids[0].button_validate()
+        self.assertEqual(self.event.of_picking_ids[0].state, 'done')
+
+        # On rajoute une ligne de facturation, on regénère un BL.
+        # Un nouveau BL doit être généré car le premier est confirmé
+        self.env['of.planning.intervention.line'].create(
+            {
+                'intervention_id': self.event.id,
+                'product_id': self.product_wood_stove.id,
+                'qty': 1,
+            }
+        )
+        self.event.action_generate_stock_picking()
+        self.assertEqual(len(self.event.of_picking_ids), 2)
+        self.assertEqual(self.event.of_picking_ids[1].state, 'confirmed')
+        self.assertEqual(len(self.event.of_picking_ids[1].move_ids_without_package), 1)
+        self.assertEqual(self.event.of_picking_ids[1].move_ids_without_package[0].product_uom_qty, 1)
 
     def test_07_action_create_invoice(self):
         """

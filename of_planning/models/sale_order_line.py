@@ -58,7 +58,7 @@ class SaleOrderLine(models.Model):
             if vals.get('order_id', False):
                 order = order_obj.browse(vals['order_id'])
                 if order and order.state == 'sale':
-                    # Ajout d'un contexte afin de ne pas recalculer la date du BL si ce dernier est lié à des RDVs
-                    # d'intervention
+                    # Force move date to the picking scheduled date if we are creating a move
+                    # from a confirmed sale order
                     self = self.with_context(of_create_line_from_confirmed_sale=True)
         return super(SaleOrderLine, self).create(vals_list)

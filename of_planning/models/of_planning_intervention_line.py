@@ -52,6 +52,9 @@ class OFPlanningInterventionLine(models.Model):
         ondelete='restrict',
     )
 
+    # Picking
+    move_ids = fields.One2many(comodel_name='stock.move', inverse_name='of_intervention_line_id', string="Stock Moves")
+
     # Pricing
     price_unit = fields.Float(
         string="Unit price",
@@ -199,7 +202,7 @@ class OFPlanningInterventionLine(models.Model):
         """
         self.ensure_one()
         qty = 0.0
-        for move in self.mapped('intervention_id.of_procurement_group_id.stock_move_ids').filtered(
+        for move in self.move_ids.filtered(
             lambda m: m.state == 'done' and not m.scrapped and m.product_id == self.product_id
         ):
             if move.location_dest_id.usage == 'customer':
@@ -244,7 +247,7 @@ class OFPlanningInterventionLine(models.Model):
         outgoing_moves = self.env['stock.move']
         incoming_moves = self.env['stock.move']
 
-        moves = self.mapped('intervention_id.of_procurement_group_id.stock_move_ids').filtered(
+        moves = self.move_ids.filtered(
             lambda r: r.state != 'cancel' and not r.scrapped and self.product_id == r.product_id
         )
         for move in moves:
@@ -304,6 +307,7 @@ class OFPlanningInterventionLine(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         intervention_skipped = self.env['calendar.event']
         procurements = []
+        line_treated = []
         for line in self:
             if not line.intervention_id.of_warehouse_id:
                 raise UserError(
@@ -323,11 +327,10 @@ class OFPlanningInterventionLine(models.Model):
 
             qty = line._get_qty_procurement()
             if float_compare(qty, line.qty, precision_digits=precision) == 0:
-                raise UserError(
-                    _("No product to add in a stock picking for the following intervention: %s")
-                    % line.intervention_id.name
-                )
+                # La ligne a déjà été traitée dans une précédente génération de BL
+                continue
 
+            line_treated.append(line)
             group_id = line._get_procurement_group()
             if not group_id:
                 group_id = self.env['procurement.group'].create(line._prepare_procurement_group_vals())
@@ -366,6 +369,12 @@ class OFPlanningInterventionLine(models.Model):
             if self.env.context.get('import_file'):
                 procurement_group = procurement_group.with_context(import_file=False)
             procurement_group.run(procurements)
+
+        if not line_treated:
+            raise UserError(
+                _("No product to add in a stock picking for the following intervention: %s")
+                % self.mapped('intervention_id.name')
+            )
 
         # This next block is currently needed only because the scheduler trigger is done by picking confirmation
         # rather than stock.move confirmation

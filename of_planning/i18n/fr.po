@@ -1362,6 +1362,11 @@ msgid "Intervention :"
 msgstr ""
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_stock_move__of_intervention_line_id
+msgid "Intervention Line"
+msgstr "Ligne d'intervention"
+
+#. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_calendar_event
 msgid "Intervention Planning"
 msgstr "Planning des interventions"
@@ -2010,8 +2015,8 @@ msgstr "Merci de définir une position fiscale"
 #, python-format
 msgid "Please select a warehouse in the invoicing tab of the intervention: %s"
 msgstr ""
-"Merci de sélectionner un entrepôt dans l'onglet facturation de "
-"l'intervention: %s"
+"Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention:"
+" %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
@@ -2230,7 +2235,7 @@ msgstr "Numéro de commande"
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_sale_order
 msgid "Sales Order"
-msgstr "Bon de commande"
+msgstr "Commandes clients"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_sale_order_line
@@ -2370,6 +2375,16 @@ msgstr "État de géocodage"
 #: model:ir.model,name:of_planning.model_stock_move
 msgid "Stock Move"
 msgstr "Mouvement de stock"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__move_ids
+msgid "Stock Moves"
+msgstr "Mouvements de stock"
+
+#. module: of_planning
+#: model:ir.model,name:of_planning.model_stock_rule
+msgid "Stock Rule"
+msgstr "Règle de stock minimum"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_picking_manual_ids
