@@ -48,7 +48,9 @@
     </record>
 
     <record id="of_planning.action_calendar_event" model="ir.actions.act_window">
-        <field name="view_mode">tree,kanban,form,calendar,planning,pivot,map</field>
+        <!-- On met la vue planning quand bien même of_map_view_planning ne dépend pas de of_planning_view. -->
+        <!-- Ne déclenche pas d'erreur et permet de se passer de dépendances -->
+        <field name="view_mode">planning,tree,form,calendar,pivot,map</field>
     </record>
 
     <record id="of_planning.action_report_intervention_report" model="ir.actions.report">
