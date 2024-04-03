@@ -11,7 +11,7 @@
                 <field name="site_address_id"/>
                 <field name="site_city"/>
                 <field name="site_zip"/>
-                <field name="site_phones"/>
+                <field name="site_phone_number_ids"/>
                 <field name="customer_mobile"/>
                 <field name="service_date"/>
                 <field name="installation_date"/>
@@ -25,7 +25,9 @@
                             <div class="col">
                                 <ul class="ps-1 mb-0 list-unstyled">
                                     <li t-if="record.site_address_id"><i class="fa fa-user pe-1"/><strong t-esc="record.site_address_id[1]"/></li>
-                                    <li t-if="record.site_phones"><i class="fa fa-phone pe-1"/><span t-esc="record.site_phones"/></li>
+                                    <li t-foreach="record.site_phone_number_ids.records" t-as="number" t-key="number_index">
+                                        <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                                    </li>
                                     <li t-if="record.customer_mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.customer_mobile"/></li>
                                     <li t-if="record.site_zip or record.site_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.site_zip" t-esc="record.site_zip"/> <span t-if="record.site_city" t-esc="record.site_city"/></li>
                                     <li t-if="record.name"><span t-esc="record.name"/></li>

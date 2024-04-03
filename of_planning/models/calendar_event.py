@@ -134,8 +134,7 @@ class CalendarEvent(models.Model):
     of_address_street2 = fields.Char(related='of_address_id.street2', string="Street 2", readonly=True)
     of_address_city = fields.Char(related='of_address_id.city', string="City", readonly=True)
     of_address_zip = fields.Char(related='of_address_id.zip', string="Zip", readonly=True)
-    of_address_phone = fields.Char(related='of_address_id.phone', string="Phone", readonly=True)
-    of_address_mobile = fields.Char(related='of_address_id.mobile', string="Mobile", readonly=True)
+    of_address_phone_number_ids = fields.One2many(related='of_address_id.of_phone_number_ids', readonly=True)
     of_sector_id = fields.Many2one(related='of_address_id.of_tech_sector_id', string="Sector", readonly=True)
     of_department_id = fields.Many2one(
         comodel_name='res.country.department',

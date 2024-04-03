@@ -15,8 +15,7 @@
                 <field name="display_name"/>
                 <field name="of_address_city"/>
                 <field name="of_address_zip"/>
-                <field name="of_address_phone"/>
-                <field name="of_address_mobile"/>
+                <field name="of_address_phone_number_ids"/>
                 <field name="of_task_id"/>
                 <field name="start"/>
                 <field name="of_precision"/>
@@ -30,8 +29,9 @@
                                 <ul class="ps-1 mb-0 list-unstyled">
                                     <li t-if="record.display_name"><i class="fa fa-user pe-1"/><strong t-esc="record.display_name"/></li>
                                     <li t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></li>
-                                    <li t-if="record.of_address_phone"><i class="fa fa-phone pe-1"/><span t-esc="record.of_address_phone"/></li>
-                                    <li t-if="record.of_address_mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.of_address_mobile"/></li>
+                                    <li t-foreach="record.of_address_phone_number_ids.records" t-as="number" t-key="number_index">
+                                        <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                                    </li>
                                     <li t-if="record.of_task_id"><i class="fa fa-cog pe-1"/><span t-esc="record.of_task_id[1]"/></li>
                                     <li t-if="record.start">
                                         <i class="fa fa-truck pe-1"/>

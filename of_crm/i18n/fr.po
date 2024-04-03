@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 08:08+0000\n"
-"PO-Revision-Date: 2024-02-19 08:08+0000\n"
+"POT-Creation-Date: 2024-04-18 06:13+0000\n"
+"PO-Revision-Date: 2024-04-18 06:13+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -127,6 +127,11 @@ msgid "Check if the contact is a company, otherwise it is a person"
 msgstr "Cochez si le contact est une société, sinon c’est une personne"
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_city
+msgid "City"
+msgstr "Ville"
+
+#. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "City completion"
 msgstr "Complétion de la ville"
@@ -198,6 +203,16 @@ msgid "Description"
 msgstr ""
 
 #. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__excellent
+msgid "Excellent"
+msgstr ""
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_geocoding_state__failure
+msgid "Failure"
+msgstr "Echec"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_stage__of_auto_field_id
 msgid "Field"
 msgstr "Champ"
@@ -211,6 +226,11 @@ msgstr "Suivi"
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_color_ft
 msgid "Font color"
 msgstr "Couleur de police"
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__high
+msgid "High"
+msgstr "Haute"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__is_company
@@ -228,9 +248,30 @@ msgid "Latest modifications"
 msgstr "Dernières modifications"
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_partner_latitude
+msgid "Latitude"
+msgstr ""
+
+#. module: of_crm
 #: model:ir.model,name:of_crm.model_crm_lead
 msgid "Lead/Opportunity"
 msgstr "Piste/Opportunité"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_partner_longitude
+msgid "Longitude"
+msgstr ""
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__low
+msgid "Low"
+msgstr "Basse"
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_geocoding_state__manual
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__manual
+msgid "Manual"
+msgstr "Manuel"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_color_map
@@ -240,6 +281,11 @@ msgstr "Couleur du marqueur"
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
 msgid "Marketing"
+msgstr ""
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__medium
+msgid "Medium"
 msgstr ""
 
 #. module: of_crm
@@ -270,6 +316,11 @@ msgid "Modified this week"
 msgstr "Modifié cette semaine"
 
 #. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_partner_name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_crm_lead__of_referred_id
 msgid "Name of business referrer"
 msgstr "Nom de l'apporteur d'affaire"
@@ -285,9 +336,19 @@ msgid "Next activity name"
 msgstr "Nom de la prochaine activité"
 
 #. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_geocoding_state__not_tried
+msgid "Not Tried"
+msgstr "Pas essayé"
+
+#. module: of_crm
 #: model_terms:ir.actions.act_window,help:of_crm.of_crm_action_prospect_act
 msgid "Odoo helps you track all activities related to your contacts."
 msgstr "Odoo vous aide à suivre les activités liées à vos contacts"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_geocoding_state
+msgid "Of Geocoding State"
+msgstr ""
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
@@ -303,6 +364,16 @@ msgstr "Origine"
 #: model_terms:ir.ui.view,arch_db:of_crm.of_view_crm_case_opportunities_filter
 msgid "Overdue Activities"
 msgstr "Activités en retard"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_phone_number_ids
+msgid "Phone numbers"
+msgstr "Numéros de téléphone"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_precision
+msgid "Precision"
+msgstr "Précision"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_quick_create_opportunity_form
@@ -371,6 +442,16 @@ msgid "Stage automation"
 msgstr "Automatisation des étapes"
 
 #. module: of_crm
+#: model:ir.model.fields,help:of_crm.field_crm_lead__of_geocoding_state
+msgid "State of geocoding"
+msgstr ""
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_geocoding_state__success
+msgid "Success"
+msgstr "Succès"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__tag_ids
 msgid "Tags"
 msgstr "Étiquettes"
@@ -427,6 +508,21 @@ msgid "Today Activities"
 msgstr "Activités du jour"
 
 #. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__unknown
+msgid "Unknown"
+msgstr "Inconnu"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_website
 msgid "Website Link"
 msgstr "Siteweb"
+
+#. module: of_crm
+#: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_geocoding_state__no_address
+msgid "Without address"
+msgstr "Sans adresse"
+
+#. module: of_crm
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_zip
+msgid "Zip"
+msgstr "Code postal"

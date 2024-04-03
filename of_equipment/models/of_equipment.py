@@ -68,7 +68,7 @@ class OFEquipment(models.Model):
         store=True,
         readonly=False,
     )
-    site_phone = fields.Char(string="Phone", related='site_address_id.phone')
+    site_phone_number_ids = fields.One2many(related='site_address_id.of_phone_number_ids')
     site_street = fields.Char(string="Street", related='site_address_id.street')
     site_street2 = fields.Char(string="Street 2", related='site_address_id.street2')
     site_zip = fields.Char(string="Zip", related='site_address_id.zip', store=True)

@@ -37,6 +37,7 @@ class CrmLead(models.Model):
     of_color_bg = fields.Char(string="Background color")
 
     # Map view fields
+    of_phone_number_ids = fields.One2many(related='partner_id.of_phone_number_ids')
     of_next_activity_name = fields.Char(string="Next activity name")
     of_color_map = fields.Char(string="Marker color")
     of_date_action = fields.Datetime(  # store=True car of_date_action est la date de référence pour la vue calendar
@@ -91,12 +92,6 @@ class CrmLead(models.Model):
                 lead.of_geocoding_state = lead.partner_id.of_geocoding_state
                 lead.of_zip = lead.partner_id.zip
                 lead.of_city = lead.partner_id.city
-
-    def _compute_of_popin_data(self):
-        for lead in self:
-            phones = lead.partner_id.mapped('of_phone_number_ids.number_display')
-            lead.of_partner_phones = ', '.join(phones) if phones else ''
-            lead.of_lead_tags = ', '.join(lead.tag_ids.mapped('name')) if lead.tag_ids else ''
 
     # ---------------------------------------------------------------------
     # Action methods

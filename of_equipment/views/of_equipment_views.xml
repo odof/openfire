@@ -54,8 +54,8 @@
                                 <field name="site_city" class="o_address_city" style="width: 40%" nolabel="1"/>
                                 <field name="site_country_id" class="o_address_country" nolabel="1"/>
                             </div>
-                            <label for="site_phone"/>
-                            <field name="site_phone" nolabel="1"/>
+                            <label for="site_phone_number_ids"/>
+                            <field name="site_phone_number_ids" widget="many2many_tags" nolabel="1"/>
                             <field name="installation_date"/>
                             <field name="end_warranty_date"/>
                             <field name="warranty_type"/>
@@ -107,7 +107,7 @@
                 <field name="name"/>
                 <field name="product_id"/>
                 <field name="customer_id"/>
-                <field name="site_phone"/>
+                <field name="site_phone_number_ids"/>
                 <field name="service_date"/>
                 <field name="reseller_id"/>
                 <separator/>

@@ -11,6 +11,7 @@
     'depends': [
         'web',
         'of_geolocalize',
+        'of_base',
     ],
     'data': [],
     'assets': {

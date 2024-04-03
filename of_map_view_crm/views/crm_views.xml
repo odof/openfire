@@ -11,9 +11,9 @@
                 <field name="name"/>
                 <field name="of_zip"/>
                 <field name="of_city"/>
-                <field name="of_partner_phones"/>
+                <field name="of_phone_number_ids"/>
+                <field name="tag_ids"/>
                 <field name="of_precision"/>
-                <field name="of_lead_tags"/>
                 <field name="of_partner_latitude"/>
                 <field name="of_partner_longitude"/>
                 <templates>
@@ -23,8 +23,12 @@
                                 <ul class="ps-1 mb-0 list-unstyled">
                                     <li t-if="record.of_partner_name"><i class="fa fa-user pe-1"/><strong t-esc="record.of_partner_name"/></li>
                                     <li t-if="record.of_zip or record.of_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_zip" t-esc="record.of_zip"/> <span t-if="record.of_city" t-esc="record.of_city"/></li>
-                                    <li t-if="record.of_partner_phones"><i class="fa fa-phone pe-1"/><span t-esc="record.of_partner_phones"/></li>
-                                    <li t-if="record.of_lead_tags"><i class="fa fa-tags pe-1"/><span t-esc="record.of_lead_tags"/></li>
+                                    <li t-foreach="record.of_phone_number_ids.records" t-as="number" t-key="number_index">
+                                        <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                                    </li>
+                                    <li t-foreach="record.tag_ids.records" t-as="tag" t-key="tag_index">
+                                        <i class="fa fa-tags pe-1"/><span t-esc="tag.data.display_name"/>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

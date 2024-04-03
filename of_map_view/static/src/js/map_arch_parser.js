@@ -73,6 +73,11 @@ export class MapArchParser extends XMLParser {
                     }
                 }
             } else if (node.tagName === "field") {
+                // In map, we display one2many fields as tags by default
+                const widget = node.getAttribute("widget");
+                if (!widget && ["one2many", "many2many"].includes(models[modelName][node.getAttribute("name")].type)) {
+                    node.setAttribute("widget", "many2many_tags");
+                }
                 const fieldName = node.getAttribute("name");
                 decorationFields.push(fieldName);
                 const fieldInfo = this.parseFieldNode(node, models, modelName);

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 13:32+0000\n"
-"PO-Revision-Date: 2024-04-04 13:32+0000\n"
+"POT-Creation-Date: 2024-04-18 06:19+0000\n"
+"PO-Revision-Date: 2024-04-18 06:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -571,9 +571,9 @@ msgid "Origin Lot"
 msgstr "Lot d'origine"
 
 #. module: of_equipment
-#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_phone
-msgid "Phone"
-msgstr "Téléphone"
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_phone_number_ids
+msgid "Phone numbers"
+msgstr "Numéros de téléphone"
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_equipment__piece_number

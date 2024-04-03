@@ -10,12 +10,9 @@
                 <t t-if="props.record.zip or props.record.city">
                     <i class="fa fa-map-marker pe-1"/><span t-if="props.record.zip" t-esc="props.record.zip"/> <span t-if="props.record.city" t-esc="props.record.city"/><br/>
                 </t>
-                <t t-if="props.record.of_partner_phones">
-                    <i class="fa fa-phone pe-1"/><span t-esc="props.record.of_partner_phones"/><br/>
-                </t>
-                <t t-if="props.record.mobile">
-                    <i class="fa fa-phone pe-1"/><span t-esc="props.record.mobile"/><br/>
-                </t>
+                <li t-foreach="props.record.of_phone_number_ids.records" t-as="number" t-key="number_index">
+                    <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                </li>
             </t>
         </xpath>
     </t>
