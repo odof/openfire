@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResPartner(models.Model):
@@ -15,13 +15,13 @@ class ResPartner(models.Model):
         "an invoice. This field is updated automatically on order confirmation and invoice validation.",
     )
     of_is_lead_warn = fields.Boolean(string="Leads warning")
-    of_warn_block = fields.Boolean(string="Blocking")
 
     def _add_missing_default_values(self, values):
         if not values.get('of_customer_state', False):
             values['of_customer_state'] = 'lead'
         return super()._add_missing_default_values(values)
 
+    @api.depends('of_is_lead_warn')
     def _compute_of_is_warn(self):
         has_warn = self.filtered('of_is_lead_warn')
         for partner in has_warn:
