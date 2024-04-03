@@ -2,9 +2,15 @@
 
 import re
 import unicodedata
+from PIL import Image
 from math import asin, sin, cos, sqrt, radians
-from odoo import models, fields, _
+from odoo import models, fields, _, tools
 from odoo.tools.safe_eval import safe_eval
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 
 def get_selection_label(self, object, field_name, field_value):
@@ -139,6 +145,22 @@ def intersect_couple(hour_couple1, hour_couple2):
     if hour_debut > hour_fin:
         hour_debut, hour_fin = (0, 0)
     return (hour_debut, hour_fin)
+
+
+def resize_image(image_data, width, height):
+    # Decode the base64 image to bytes
+    image_stream = StringIO.StringIO(image_data.decode('base64'))
+    image_opened = Image.open(image_stream)
+    if image_opened.size[0] > width or image_opened.size[1] > height:
+        # inverser width et height permet de passer de paysage à portrait
+        size = (width, height) if image_opened.size[0] > image_opened.size[1] else (height, width)
+        resized_image = tools.image_resize_and_sharpen(
+            image_opened, size, preserve_aspect_ratio=True
+        )
+        background_stream = StringIO.StringIO()
+        resized_image.save(background_stream, image_opened.format)
+        image_data = background_stream.getvalue().encode('base64')
+    return image_data
 
 
 class BigInteger(fields.Integer):
