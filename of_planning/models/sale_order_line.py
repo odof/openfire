@@ -61,4 +61,4 @@ class SaleOrderLine(models.Model):
                     # Ajout d'un contexte afin de ne pas recalculer la date du BL si ce dernier est lié à des RDVs
                     # d'intervention
                     self = self.with_context(of_create_line_from_confirmed_sale=True)
-        return super(SaleOrderLine, self).create(vals)
+        return super(SaleOrderLine, self).create(vals_list)
