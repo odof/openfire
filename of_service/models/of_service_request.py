@@ -1201,9 +1201,8 @@ class OFServiceRequest(models.Model):
         if action_context is None:
             action_context = {}
 
-        default_start = fields.Datetime.now().replace(  # default start date is the next_date at 8:00
-            day=self.next_date.day, month=self.next_date.month, year=self.next_date.year, hour=7, minute=0, second=0
-        )
+        next_date = self.next_date or fields.Date.today()
+        default_start = fields.Datetime.now().replace(day=next_date.day, month=next_date.month, year=next_date.year)
         default_stop = default_start + relativedelta(hours=self.duration)
         action_context.update(
             {

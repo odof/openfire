@@ -171,8 +171,9 @@ class OFServiceRequest(models.Model):
             context = {}
 
         context = super()._get_action_view_intervention_context(context)
-        context['default_use_equipment'] = self.equipment_ids and self.equipment_ids.ids or False
-        context['default_equipment_ids'] = [Command.set(self.equipment_ids and self.equipment_ids.ids or [])]
+        context['default_of_use_equipment'] = self.equipment_ids and self.equipment_ids.ids or False
+        context['default_of_equipment_ids'] = [Command.set(self.equipment_ids and self.equipment_ids.ids or [])]
+
         return context
 
     def _populate_service_request_equipment_line(self):
