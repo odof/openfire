@@ -23,10 +23,10 @@
                                     <strong t-field="equipment.product_id.name" />
                                 </div>
                             </div>
-                            <div t-if="equipment.model" name="report_equipment_model" class="border-top">
+                            <div t-if="equipment.model_name" name="report_equipment_model" class="border-top">
                                 <div class="m-2">
                                     <span>Model&amp;nbsp;:</span>
-                                    <strong t-field="equipment.model" />
+                                    <strong t-field="equipment.model_name" />
                                 </div>
                             </div>
                             <div t-if="equipment.brand_id" name="report_equipment_brand_id" class="border-top">
@@ -49,16 +49,16 @@
                                     <strong t-field="equipment.installation_date" />
                                 </div>
                             </div>
-                            <div t-if="equipment.installation" name="report_equipment_installation" class="border-top">
+                            <div t-if="equipment.installation_type" name="report_equipment_installation" class="border-top">
                                 <div class="m-2">
                                     <span>Installation Type&amp;nbsp;:</span>
-                                    <strong t-field="equipment.installation" />
+                                    <strong t-field="equipment.installation_type" />
                                 </div>
                             </div>
                             <div name="report_equipment_compliant" class="border-top">
                                 <div class="m-2">
                                     <span>Compliant&amp;nbsp;:</span>
-                                    <strong t-if="equipment.compliant">Yes</strong>
+                                    <strong t-if="equipment.is_compliant">Yes</strong>
                                     <strong t-else="">No</strong>
                                 </div>
                             </div>
