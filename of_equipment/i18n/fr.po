@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-06 15:31+0000\n"
-"PO-Revision-Date: 2024-03-06 15:31+0000\n"
+"POT-Creation-Date: 2024-04-04 13:32+0000\n"
+"PO-Revision-Date: 2024-04-04 13:32+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -67,14 +67,14 @@ msgstr "<span>Modèle&amp;nbsp;:</span>"
 #. module: of_equipment
 #: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
 #: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
-msgid "<span>Name&amp;nbsp;:</span>"
-msgstr "<span>Nom&amp;nbsp;:</span>"
+msgid "<span>Product&amp;nbsp;:</span>"
+msgstr "<span>Produit&amp;nbsp;:</span>"
 
 #. module: of_equipment
 #: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
 #: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_sheet_document
-msgid "<span>Product&amp;nbsp;:</span>"
-msgstr "<span>Produit&amp;nbsp;:</span>"
+msgid "<span>Serial Number&amp;nbsp;:</span>"
+msgstr "<span>N° de série&amp;nbsp;:</span>"
 
 #. module: of_equipment
 #: model_terms:ir.ui.view,arch_db:of_equipment.report_intervention_report_document
@@ -298,6 +298,11 @@ msgid "Equipments count"
 msgstr "Nombre d'équipements"
 
 #. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__excellent
+msgid "Excellent"
+msgstr ""
+
+#. module: of_equipment
 #: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__warranty_type__expired
 msgid "Expired"
 msgstr "Expiré"
@@ -327,6 +332,11 @@ msgstr "Bon"
 #: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_search
 msgid "Group By"
 msgstr "Grouper par"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__high
+msgid "High"
+msgstr "Haut"
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_calendar_event__of_history_equipment_ids
@@ -461,9 +471,20 @@ msgid "Lot/Serial"
 msgstr "Lot/N° série"
 
 #. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__low
+msgid "Low"
+msgstr "Bas"
+
+#. module: of_equipment
 #: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__geocoding_state__manual
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__manual
 msgid "Manual"
 msgstr "Manuel"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__medium
+msgid "Medium"
+msgstr "Moyen"
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_equipment__customer_mobile
@@ -574,6 +595,11 @@ msgid "Please add only one equipment."
 msgstr "Veuillez n'ajouter au maximum qu'un équipement"
 
 #. module: of_equipment
+#: model:ir.model.fields,field_description:of_equipment.field_of_equipment__precision
+msgid "Precision"
+msgstr "Précision"
+
+#. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_equipment__product_id
 #: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__report_equipment_product_id
 #: model:ir.model.fields,field_description:of_equipment.field_of_planning_intervention_template__sheet_equipment_product_id
@@ -674,6 +700,11 @@ msgstr "À remplacer"
 #: model:ir.model,name:of_equipment.model_stock_picking
 msgid "Transfer"
 msgstr "Transfert"
+
+#. module: of_equipment
+#: model:ir.model.fields.selection,name:of_equipment.selection__of_equipment__precision__unknown
+msgid "Unknown"
+msgstr "Inconnu"
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_calendar_event__of_use_equipment

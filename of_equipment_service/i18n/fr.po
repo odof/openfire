@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-07 15:11+0000\n"
-"PO-Revision-Date: 2024-03-07 15:11+0000\n"
+"POT-Creation-Date: 2024-04-04 13:21+0000\n"
+"PO-Revision-Date: 2024-04-04 13:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -73,7 +73,7 @@ msgstr "<span>Produit&amp;nbsp;:</span>"
 #. module: of_equipment_service
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
 msgid "<span>Serial Number&amp;nbsp;:</span>"
-msgstr "<span>N° de série Number&amp;nbsp;:</span>"
+msgstr "<span>N° de série&amp;nbsp;:</span>"
 
 #. module: of_equipment_service
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
@@ -276,6 +276,13 @@ msgid "Response time (hours)"
 msgstr "Temps de prise en compte (heures)"
 
 #. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request_equipment_line
+msgid ""
+"See for which equipment of a Service Request an intervention is "
+"planned/done."
+msgstr "Voyez pour quel équipement d'une DI une intervention est planifiée/terminée"
+
+#. module: of_equipment_service
 #: model:ir.model,name:of_equipment_service.model_of_service_request
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
 msgid "Service Request"
@@ -335,6 +342,15 @@ msgid "State"
 msgstr "État"
 
 #. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_calendar_event__of_equipment_ids_domain
+msgid ""
+"Technical field to compute domain for equipment_ids field based on the "
+"related service request"
+msgstr ""
+"Champ technique pour calculer le domaine d'equipment_ids à partie de la "
+"demande d'intervention liée"
+
+#. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__use_equipment
 msgid "Use Equipments"
 msgstr "Équipements"
@@ -358,8 +374,3 @@ msgstr "Oui"
 #, python-format
 msgid "[Equipment] %s"
 msgstr "[Équipement] %s"
-
-#. module: of_equipment_service
-#: model:ir.model,name:of_equipment_service.model_of_service_request_equipment_line
-msgid "of.service.request.equipment.line"
-msgstr ""

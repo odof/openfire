@@ -50,7 +50,7 @@
                         <div class="w-50 border-end d-table-cell">
                             <div t-if="template.sheet_equipment_name and equipment.name" name="sheet_equipment_name" class="border-top">
                                 <div class="m-2">
-                                    <span>Name&amp;nbsp;:</span>
+                                    <span>Serial Number&amp;nbsp;:</span>
                                     <strong t-field="equipment.name" />
                                 </div>
                             </div>
