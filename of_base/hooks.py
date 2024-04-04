@@ -44,3 +44,12 @@ def post_init_hook(cr, registry):
     # data migration
     _set_partner_bank_account_type(env)
     _set_partner_phones(env, cr)
+
+
+def pre_init_hook(cr):
+    """Deactivate the search view of the sms module causing the problem and we re-enable it in `of_base_sms`.
+    That view is in conflict with our search view, so we deactivate it to resolve the conflict in a specific
+    auto-installed module depending on `sms` and `of_base`."""
+    env = api.Environment(cr, SUPERUSER_ID, {})
+    if env['ir.module.module']._get('sms').state == 'installed':
+        env.ref('sms.res_partner_view_search').active = False

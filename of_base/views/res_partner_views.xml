@@ -83,7 +83,7 @@
             </xpath>
 
             <!-- Gestion des numéros de téléphone -->
-            <xpath expr="//group//field[@name='phone']" position="after">
+            <xpath expr="//group//field[@name='function']" position="after">
                 <field name="of_phone_number_ids" string="Phones" class="of_phone_table" widget="of_light_x2many">
                     <tree editable="bottom" decoration-danger="not is_valid">
                         <field name="type" string="Type"/>
@@ -166,13 +166,11 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='phone']" position="replace"/>
             <xpath expr="//field[@name='name']" position="after">
                 <field name="street" string="Street or additional address"
                     filter_domain="['|', ('street', 'ilike', self), ('street2', 'ilike', self)]"/>
                 <field name="zip"/>
                 <field name="city"/>
-                <field name="phone" filter_domain="[('of_phone_number_ids.number', 'ilike', self)]"/>
             </xpath>
             <xpath expr="//field[@name='user_id']" position="attributes">
                 <attribute name="string">Salesperson</attribute>
@@ -190,6 +188,19 @@
             <xpath expr="//search//filter[@name='group_company']" position="replace">
                 <filter string="Parent" name="group_parent" context="{'group_by': 'parent_id'}"/>
                 <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Specific view for phone number filter, to be able disable it in `of_base_sms` -->
+    <record id="of_res_partner_phone_filter" model="ir.ui.view">
+        <field name="name">of.res.partner.phone.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="replace"/>
+            <xpath expr="//field[@name='city']" position="after">
+                <field name="phone" filter_domain="[('of_phone_number_ids.number', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>

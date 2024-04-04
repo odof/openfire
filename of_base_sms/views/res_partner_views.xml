@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="res_partner_view_search" model="ir.ui.view">
+        <field name="name">of.res.partner.filter.phone.sms</field>
+        <field name="model">res.partner</field>
+        <!-- Deactivated by default because its enabled in a post init hook in a proper order -->
+        <field name="active">False</field>
+        <field name="inherit_id" ref="sms.res_partner_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone_mobile_search']" position="after">
+                <field name="phone" filter_domain="[('of_phone_number_ids.number', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
