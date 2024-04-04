@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-19 14:31+0000\n"
-"PO-Revision-Date: 2024-03-19 14:31+0000\n"
+"POT-Creation-Date: 2024-04-04 09:27+0000\n"
+"PO-Revision-Date: 2024-04-04 09:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -179,6 +179,16 @@ msgstr ""
 "        Cordialement,\n"
 "    </p>\n"
 "</div>\n"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+msgid "<i class=\"fa fa-envelope pe-1\" title=\"Mail\"/>"
+msgstr "<i class=\"fa fa-envelope pe-1\" title=\"Mail\"/>"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+msgid "<i class=\"fa fa-phone pe-1\" title=\"Phone\"/>"
+msgstr "<i class=\"fa fa-phone pe-1\" title=\"Téléphone\"/>"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -531,6 +541,11 @@ msgstr "Accéder à mes interventions"
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_team_view_search
 msgid "Active"
 msgstr "Actif"
+
+#. module: of_planning
+#: model:ir.model,name:of_planning.model_mail_activity
+msgid "Activity"
+msgstr "Activité"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_task_view_form
@@ -1721,6 +1736,7 @@ msgstr "Compte-rendu de l'intervention précédente"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_mobile
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_mobile
 msgid "Mobile"
 msgstr ""
 
@@ -1788,22 +1804,14 @@ msgstr "Aucun article à ajouter dans un bon de livraison: %s"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No product to deliver in the intervention."
-msgstr ""
+msgstr "Aucun produit à livrer dans l'intervention."
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No product to deliver in the selected interventions."
-msgstr ""
-
-#. module: of_planning
-#. odoo-python
-#: code:addons/of_planning/models/calendar_event.py:0
-#: code:addons/of_planning/models/calendar_event.py:0
-#, python-format
-msgid "Not available in this version (P1)"
-msgstr ""
+msgstr "Aucun produit à livrer dans les interventions sélectionnées."
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -1931,6 +1939,7 @@ msgstr "Paiements"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_phone
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_phone
 msgid "Phone"
 msgstr "Téléphone"
 
@@ -2519,6 +2528,13 @@ msgstr "Société de l'utilisateur"
 #, python-format
 msgid "There is no billing line present in the intervention."
 msgstr "Il n'y a pas de ligne de facturation présente dans l'intervention."
+
+#. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "There is no order linked to the intervention."
+msgstr "Il n'y a pas de commande liée à l'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_customer_notes

@@ -139,7 +139,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
             self.event.action_generate_stock_picking()
         self.assertEqual(
             error.exception.args[0],
-            "Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention.",
+            "Merci de sélectionner un entrepôt dans l'onglet facturation de l'intervention: %s" % self.event.name,
         )
         self.event.of_warehouse_id = self.warehouse_1
         self.event.action_generate_stock_picking()
@@ -162,7 +162,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
         1. Create a calendar event with required fields.
         2. Verify that an error is raised when there is no fiscal position selected.
         3. Set a fiscal position and verify that a popup wizard is returned with a failure message when there are no
-        invoiceable lines.
+            invoiceable lines.
         4. Set a template and confirm the event.
         5. Verify that a popup wizard is returned with a success message when creating an invoice.
         6. Verify the created invoice and its invoice lines.
@@ -175,19 +175,25 @@ class TestCalendarEvent(TestOFPlanningCommon):
         """
 
         # No fiscal position
-        with self.assertRaises(ValidationError) as create_invoice_error:
-            self.event.action_create_invoice()
-        self.assertEqual("Veuillez sélectionner une position fiscale", create_invoice_error.exception.args[0])
-
+        # with self.assertRaises(ValidationError) as create_invoice_error:
+        self.event.of_fiscal_position_id = False
+        self._assert_invoice_create_result(
+            "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>L'intervention n'est pas facturable, "
+            "veuillez sélectionner une position fiscale.</li></ul><p>",
+        )
         self.event.of_fiscal_position_id = self.fiscal_pos_20
 
-        # No line
-        result = self.event.action_create_invoice()
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(
-            result['context']['default_message'],
-            "ÉCHEC : Facture créée à partir de l'intervention Test Event : Aucune ligne facturable.",
+        self._assert_invoice_create_result(
+            "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>L'intervention n'est pas facturable car elle"
+            " doit être confirmée.</li><li>Il n'y a pas de ligne de facturation présente dans l'intervention."
+            "</li></ul><p>",
+        )
+
+        # Confirm the event to be able to invoice it but there is no line to invoice, so it should fail
+        self.event.action_button_confirm()
+        self._assert_invoice_create_result(
+            "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>Il n'y a pas de ligne de facturation "
+            "présente dans l'intervention.</li></ul><p>",
         )
 
         # Add a line to invoice from the template
@@ -195,13 +201,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
 
         # Confirm the event to be able to invoice it
         self.event.action_button_confirm()
-        result = self.event.action_create_invoice()
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(
-            result['context']['default_message'],
-            "SUCCÈS : Création de la facture à partir de l'intervention Test Event",
-        )
+        self._assert_invoice_create_result("Facture créée avec succès.")
 
         # Check the invoice
         self.assertEqual(len(self.event.of_invoice_ids), 1)
@@ -214,14 +214,9 @@ class TestCalendarEvent(TestOFPlanningCommon):
             self.event.of_invoice_ids.invoice_line_ids,
             [{'product_id': self.product_ash_vacuum_cleaner.id, 'quantity': 1, 'price_unit': 125.0}],
         )
-
-        # Try to invoice again
-        result = self.event.action_create_invoice()
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(
-            result['context']['default_message'],
-            "ÉCHEC : Facture créée à partir de l'intervention Test Event : Aucune ligne facturable.",
+        self._assert_invoice_create_result(
+            "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>Il n'y a pas de ligne de facturation "
+            "présente dans l'intervention.</li></ul><p>",
         )
 
         # Add a new line falsy linked to a sale order line that should not be invoiced
@@ -254,13 +249,9 @@ class TestCalendarEvent(TestOFPlanningCommon):
                 ]
             }
         )
-
-        result = self.event.action_create_invoice()
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(
-            result['context']['default_message'],
-            "ÉCHEC : Facture créée à partir de l'intervention Test Event : Aucune ligne facturable.",
+        self._assert_invoice_create_result(
+            "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>Il n'y a pas de ligne de facturation "
+            "présente dans l'intervention.</li></ul><p>",
         )
 
         # Unlink false order lines and try to invoice again
@@ -270,16 +261,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
         # Force recomputation of invoiceable quantity and invoice status because of the unlink of the false order
         self.event.of_line_ids._compute_qty_invoiceable()
         self.event.of_line_ids._compute_invoice_status()
-
-        # The new line is now invoiceable
-        result = self.event.action_create_invoice()
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(
-            result['context']['default_message'],
-            "SUCCÈS : Création de la facture à partir de l'intervention Test Event",
-        )
-
+        self._assert_invoice_create_result("Facture créée avec succès.")
         self.assertEqual(len(self.event.of_invoice_ids), 2)
         self.assertRecordValues(
             self.event.of_invoice_ids,
@@ -289,3 +271,9 @@ class TestCalendarEvent(TestOFPlanningCommon):
             ],
         )
         self.assertEqual(len(self.event.of_invoice_ids.invoice_line_ids), 2)
+
+    def _assert_invoice_create_result(self, message):
+        result = self.event.action_create_invoice()
+        self.assertIsInstance(result, dict)
+        self.assertEqual(result['res_model'], 'of.popup.wizard')
+        self.assertEqual(result['context']['default_message_html'], message)

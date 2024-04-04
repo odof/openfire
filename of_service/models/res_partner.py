@@ -39,7 +39,7 @@ class ResPartner(models.Model):
                 ]
             )
             partner.request_to_schedule_ids = request_ids.filtered(
-                lambda s: s.state in ['draft', 'to_plan', 'part_planned', 'late']
+                lambda s: s.state in ['draft', 'to_plan', 'to_plan_quickly', 'part_planned', 'late']
             )
             partner.request_to_schedule_count = len(partner.request_to_schedule_ids)
             partner.recurring_request_ids = request_ids.filtered(
