@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_map_view_planning.tooltipRenderer" owl="1">
+        <div class="m-1">
+            <div><strong t-esc="record.display_name"/></div>
+            <div t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></div>
+            <div t-if="record.of_task_id"><i class="fa fa-cog pe-1"/><span t-esc="record.of_task_id[1]"/></div>
+            <div t-if="record.start">
+                <i class="fa fa-truck pe-1"/>
+                <t t-if="record.start.c.day &lt; 10">0</t><span t-esc="record.start.c.day"/>/<t t-if="record.start.c.month &lt; 10">0</t><span t-esc="record.start.c.month"/>/<span t-esc="record.start.c.year" class="pe-1"/>
+                <t t-if="record.start.c.hour &lt; 10">0</t><span t-esc="record.start.c.hour"/>:<t t-if="record.start.c.minute &lt; 10">0</t><span t-esc="record.start.c.minute"/>
+            </div>
+            <div t-if="record.of_precision"><t t-esc="record.of_precision"/></div>
+        </div>
+    </t>
+
+</templates>

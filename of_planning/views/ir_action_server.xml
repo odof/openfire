@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
+<odoo>
 
     <record id="action_of_planning_intervention_generate_delivery" model="ir.actions.server">
         <field name="name">Generate stock picking</field>
@@ -29,7 +29,7 @@ action = record.action_create_invoice()
         <field name="model_id" ref="calendar.model_calendar_event"/>
         <field name="binding_model_id" ref="calendar.model_calendar_event"/>
         <field name="state">code</field>
-        <field name="binding_view_types">tree</field>
+        <field name="binding_view_types">list</field>
         <field name="code">
 action = records.action_create_invoice_list()
         </field>

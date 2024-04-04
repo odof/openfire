@@ -1,0 +1,46 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_map_view_planning
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-26 11:47+0000\n"
+"PO-Revision-Date: 2024-03-26 11:47+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_map_view_planning
+#: model:ir.model,name:of_map_view_planning.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_map_view_planning
+#: model:ir.model.fields,field_description:of_map_view_planning.field_calendar_event__of_color_map
+msgid "Color map"
+msgstr "Couleur carte"
+
+#. module: of_map_view_planning
+#: model:ir.model.fields,field_description:of_map_view_planning.field_calendar_event__of_partner_latitude
+msgid "Geo Latitude"
+msgstr ""
+
+#. module: of_map_view_planning
+#: model:ir.model.fields,field_description:of_map_view_planning.field_calendar_event__of_partner_longitude
+msgid "Geo Longitude"
+msgstr ""
+
+#. module: of_map_view_planning
+#: model:ir.model.fields,help:of_map_view_planning.field_calendar_event__of_precision
+msgid "Level of geolocalization 's precision"
+msgstr "Niveau de précision de la géolocalisation"
+
+#. module: of_map_view_planning
+#: model:ir.model.fields,field_description:of_map_view_planning.field_calendar_event__of_precision
+msgid "Precision"
+msgstr "Précision"

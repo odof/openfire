@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_map" model="ir.ui.view">
+        <field name="name">of.map.view.planning.calendar.event</field>
+        <field name="model">calendar.event</field>
+        <field name="arch" type="xml">
+            <map
+                tooltip_view="of_map_view_planning.tooltipRenderer"
+                width="180"
+                latitude="of_partner_latitude"
+                longitude="of_partner_longitude"
+                color="of_color_map">
+                <field name="id"/>
+                <field name="display_name"/>
+                <field name="of_address_city"/>
+                <field name="of_address_zip"/>
+                <field name="of_address_phone"/>
+                <field name="of_address_mobile"/>
+                <field name="of_task_id"/>
+                <field name="start"/>
+                <field name="of_precision"/>
+                <field name="of_partner_latitude"/>
+                <field name="of_partner_longitude"/>
+                <field name="of_color_map"/>
+                <templates>
+                    <div t-name="map-popover" class="container-fluid">
+                        <div class="row g-0">
+                            <div class="col">
+                                <ul class="ps-1 mb-0 list-unstyled">
+                                    <li t-if="record.display_name"><i class="fa fa-user pe-1"/><strong t-esc="record.display_name"/></li>
+                                    <li t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></li>
+                                    <li t-if="record.of_address_phone"><i class="fa fa-phone pe-1"/><span t-esc="record.of_address_phone"/></li>
+                                    <li t-if="record.of_address_mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.of_address_mobile"/></li>
+                                    <li t-if="record.of_task_id"><i class="fa fa-cog pe-1"/><span t-esc="record.of_task_id[1]"/></li>
+                                    <li t-if="record.start">
+                                        <i class="fa fa-truck pe-1"/>
+                                        <t t-if="record.start.c.day &lt; 10">0</t><span t-esc="record.start.c.day"/>/<t t-if="record.start.c.month &lt; 10">0</t><span t-esc="record.start.c.month"/>/<span t-esc="record.start.c.year" class="pe-1"/>
+                                        <t t-if="record.start.c.hour &lt; 10">0</t><span t-esc="record.start.c.hour"/>:<t t-if="record.start.c.minute &lt; 10">0</t><span t-esc="record.start.c.minute"/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </templates>
+            </map>
+        </field>
+    </record>
+
+    <record id="of_planning.action_calendar_event" model="ir.actions.act_window">
+        <field name="view_mode">tree,kanban,form,calendar,planning,pivot,map</field>
+    </record>
+
+    <record id="of_planning.action_report_intervention_report" model="ir.actions.report">
+        <field name="binding_view_types">list,form,map</field>
+    </record>
+
+    <record id="of_planning.action_report_intervention_sheet" model="ir.actions.report">
+        <field name="binding_view_types">list,form,map</field>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_generate_invoice_tree_view" model="ir.actions.server">
+        <field name="binding_view_types">list,map</field>
+    </record>
+
+    <record id="of_planning.action_of_planning_intervention_generate_delivery" model="ir.actions.server">
+        <field name="binding_view_types">form,map</field>
+    </record>
+
+</odoo>

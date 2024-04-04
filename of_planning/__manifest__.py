@@ -46,7 +46,7 @@
         'reports/report_planning_week.xml',
         'reports/report_planning_day.xml',
         'wizards/of_planning_print_wizard_views.xml',
-        'data/ir_action_server.xml',
+        'views/ir_action_server.xml',
     ],
     'installable': True,
     'application': False,
