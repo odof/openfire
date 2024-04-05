@@ -61,13 +61,18 @@
                                         <i class="fa fa-calendar" role="img" aria-label="Calendar" title="Calendar"/>
                                     </p>
                                 </div>
+                                <!-- Upload File -->
+                                <div attrs="{'invisible': ['|',('question_type', '!=', 'multi_image'),('add_pictures','=',True)]}">
+                                    <span>Upload Images</span><br/>
+                                    <p class="o_image"/>
+                                </div>
                             </div>
                         </group>
                     </group>
                     <notebook>
                         <page string="Answers" name="answers" attrs="{'invisible': ['|', '|',
                             ('is_page', '=', True), ('question_type', '=', 'text_box'),
-                            ('question_type', 'in', ['numerical_box', 'date', 'datetime']),
+                            ('question_type', 'in', ['numerical_box', 'date', 'datetime','multi_image']),
                         ]}">
                             <group>
                                 <group attrs="{'invisible': [('question_type', 'not in', ['char_box', 'date'])]}">
@@ -96,7 +101,7 @@
                         </page>
                         <page string="Options" name="options" attrs="{'invisible': [('is_page', '=', True)]}">
                             <group>
-                                <group string="Answers">
+                                <group string="Answers" attrs="{'invisible':[('question_type','=','multi_image')]}">
                                     <!-- Global validation setting -->
                                     <field name="validation_required" invisible="1"/>
                                     <!-- Char -->
@@ -125,6 +130,7 @@
                                         placeholder="If other, please specify:"/>
                                     <field name='comment_count_as_answer'
                                         attrs="{'invisible': ['|', ('question_type', 'not in', ['simple_choice','multiple_choice']), ('comments_allowed', '=', False)]}"/>
+                                    <field name="add_pictures"/>
                                 </group>
                             </group>
                             <group>

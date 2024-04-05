@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-28 15:56+0000\n"
-"PO-Revision-Date: 2023-11-28 15:56+0000\n"
+"POT-Creation-Date: 2024-04-11 07:03+0000\n"
+"PO-Revision-Date: 2024-04-11 07:03+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,22 +16,15 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_base
-#. odoo-javascript
-#: code:addons/of_base/static/src/js/of_form.js:0
-#, python-format
-msgid " & Close"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_html_sanitize_wizard
-msgid "HTML field cleaning wizard"
-msgstr "Assistant de nettoyage des champs HTML"
-
-#. module: of_base
 #. odoo-python
 #: code:addons/of_base/monkeypatch.py:0
 #, python-format
 msgid "\"group_by\" value must be a string %(attribute)s=%(value)r"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_presence_control_email_amount
+msgid "# emails to send"
 msgstr ""
 
 #. module: of_base
@@ -80,6 +73,16 @@ msgstr ""
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "<span class=\"fa fa-star\">&amp;nbsp;</span>"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_image_view_form
+msgid "<span class=\"of_ws_lr\">Rotate image</span>"
+msgstr "<span class=\"of_ws_lr\">Tourner l'image</span>"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__geoloc_provider_id
+msgid "API"
 msgstr ""
 
 #. module: of_base
@@ -144,6 +147,11 @@ msgstr ""
 #: model:res.groups,name:of_base.of_group_root_only
 msgid "Admin only"
 msgstr "Admin seulement"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_hr_presence
+msgid "Advanced Presence Control"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_sale_pricelist
@@ -328,6 +336,26 @@ msgid "Base Tax Received Account"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_presence_control_ip
+msgid "Based on IP Address"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_hr_attendance
+msgid "Based on attendances"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_presence_control_email
+msgid "Based on number of emails sent"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_presence_control_login
+msgid "Based on user status in system"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_stock_picking_batch
 msgid "Batch Transfers"
 msgstr ""
@@ -353,10 +381,22 @@ msgid "CP"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__geocoding_on_create
+msgid "Calculate geocoding values automatically when a new partner is added"
+msgstr ""
+"Calcul automatiquement les valeurs de géolocalisation quand un partenaire "
+"est ajouté"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__can_image_1024_be_zoomed
+msgid "Can Image 1024 be zoomed"
+msgstr "Est ce que l'image 1024 peut-être zoomée"
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_connector_config_settings_view
 #: model_terms:ir.ui.view,arch_db:of_base.of_html_sanitize_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__cancel
@@ -369,6 +409,16 @@ msgstr "Annulé"
 #, python-format
 msgid "Cannot aggregate field %r."
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__caption
+msgid "Caption"
+msgstr "Légende"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_image_view_kanban
+msgid "Caption :"
+msgstr "Légende :"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__tax_exigibility
@@ -419,13 +469,6 @@ msgid "Clean"
 msgstr "Nettoyer"
 
 #. module: of_base
-#. odoo-javascript
-#: code:addons/of_base/static/src/js/of_form.js:0
-#, python-format
-msgid "Close"
-msgstr ""
-
-#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Communication"
 msgstr ""
@@ -454,6 +497,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_name
 msgid "Company Name"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__resource_calendar_id
+msgid "Company Working Hours"
 msgstr ""
 
 #. module: of_base
@@ -528,20 +576,24 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_image__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__create_uid
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_image__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__create_date
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__create_date
 msgid "Created on"
 msgstr ""
 
@@ -675,13 +727,6 @@ msgid "Digest Emails"
 msgstr ""
 
 #. module: of_base
-#. odoo-javascript
-#: code:addons/of_base/static/src/js/of_form.js:0
-#, python-format
-msgid "Discard"
-msgstr ""
-
-#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_discount_per_so_line
 msgid "Discounts"
 msgstr ""
@@ -699,12 +744,14 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_image__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__display_name
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nom affiché"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__qr_code
@@ -748,6 +795,13 @@ msgid "Document Template"
 msgstr ""
 
 #. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/user_menu_item.js:0
+#, python-format
+msgid "Documentation"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_reports
 msgid "Dynamic Reports"
 msgstr ""
@@ -781,7 +835,7 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_mail_template
 msgid "Email Templates"
-msgstr "Modèles d'emails"
+msgstr "Modèles d'email"
 
 #. module: of_base
 #. odoo-python
@@ -795,6 +849,11 @@ msgstr ""
 #: model:ir.model,name:of_base.model_mail_compose_message
 msgid "Email composition wizard"
 msgstr "Assistant de composition d'emails"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_employee_self_edit
+msgid "Employee Editing"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__auth_signup_reset_password
@@ -951,11 +1010,21 @@ msgid "Gmail Client Secret"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__geoloc_provider_googlemap_key
+msgid "Google Map API Key"
+msgstr ""
+
+#. module: of_base
 #. odoo-python
 #: code:addons/of_base/models/res_users.py:0
 #, python-format
 msgid "Group \"%s\" cannot be added to a user!"
 msgstr "Le groupe \"%s\" ne peut être ajouté à un utilisateur !"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_image_view_search
+msgid "Group By"
+msgstr "Grouper par"
 
 #. module: of_base
 #: model:res.groups,comment:of_base.of_group_root_only
@@ -968,10 +1037,20 @@ msgid "Group your move operations in wave transfer to process them together"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_html_sanitize_wizard
+msgid "HTML field cleaning wizard"
+msgstr "Assistant de nettoyage des champs HTML"
+
+#. module: of_base
 #: model:ir.actions.act_window,name:of_base.of_html_sanitize_wizard_action
 #: model:ir.ui.menu,name:of_base.of_html_sanitize_wizard_menu
 msgid "HTML field cleanup"
 msgstr "Nettoyage des champs HTML"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_ir_http
+msgid "HTTP Routing"
+msgstr "Routage HTTP"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_accounting_entries
@@ -1004,6 +1083,11 @@ msgid "Home"
 msgstr "Domicile"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_hr_homeworking
+msgid "Homeworking"
+msgstr "Télétravail"
+
+#. module: of_base
 #. odoo-python
 #: code:addons/of_base/models/res_partner_bank.py:0
 #, python-format
@@ -1013,12 +1097,24 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__id
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__id
+#: model:ir.model.fields,field_description:of_base.field_of_image__id
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__id
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__id
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__id
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__id
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__id
 msgid "ID"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__geocoding_on_create
+msgid "If a partner is added"
+msgstr "Si un partenaire est ajouté"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__geocoding_on_write
+msgid "If an address is changed"
+msgstr "Si une adresse est changée"
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_needaction
@@ -1041,6 +1137,43 @@ msgstr ""
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__use_twilio_rtc_servers
 msgid "If you want to use twilio as TURN/STUN server provider"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_image
+#: model:ir.model.fields,field_description:of_base.field_of_image__image_1920
+#: model_terms:ir.ui.view,arch_db:of_base.of_image_view_kanban
+msgid "Image"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__image_1024
+msgid "Image 1024"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__image_128
+msgid "Image 128"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__image_256
+msgid "Image 256"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__image_512
+msgid "Image 512"
+msgstr ""
+
+#. module: of_base
+#: model:ir.actions.act_window,name:of_base.action_of_image
+msgid "Images"
+msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_image_view_tree
+msgid "Images list"
+msgstr "Liste d'images"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_account_bank_statement_import_qif
@@ -1174,30 +1307,36 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_image____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_log_message____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone____last_update
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_image__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__write_uid
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_image__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__write_date
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -1234,6 +1373,7 @@ msgid ""
 "entered code.Use the Bank type for any other type of account, no "
 "verification will be performed."
 msgstr ""
+"Type de compte banque: normal ou IBAN. Déterminé par le numéro de compte."
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_company__of_legal_form
@@ -1294,11 +1434,6 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_production_lot
 msgid "Lots & Serial Numbers"
-msgstr ""
-
-#. module: of_base
-#: model:mail.message.subtype,name:of_base.mt_of_sale_mail_subscription
-msgid "E-Mail"
 msgstr ""
 
 #. module: of_base
@@ -1378,6 +1513,11 @@ msgid "Message Delivery error"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_popup_wizard__message_html
+msgid "Message Html"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_ids
 #: model:ir.ui.menu,name:of_base.of_log_message_menu
 msgid "Messages"
@@ -1449,6 +1589,7 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__name
 #: model:ir.model.fields,field_description:of_base.field_res_partner__name
 #: model:ir.model.fields,field_description:of_base.field_res_users__name
 msgid "Name"
@@ -1504,8 +1645,8 @@ msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_needaction_counter
-msgid "Number of messages which requires an action"
-msgstr ""
+msgid "Number of messages requiring action"
+msgstr "Nombre de message requérant une action"
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_res_partner_phone__message_has_error_counter
@@ -1516,6 +1657,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__type
 msgid "Number type"
 msgstr "Type de numéro"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_form_readonly
+msgid "OF Form Readonly Abstract Model"
+msgstr ""
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_check_duplications_form_view
@@ -1700,9 +1846,14 @@ msgid "Print GS1 Barcodes for Lots & Serial Numbers"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__printable
+msgid "Print in reports"
+msgstr "Imprimer sur les rapports"
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_product_template
 msgid "Product"
-msgstr "Modèle d'article"
+msgstr "Produit"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_packaging
@@ -1797,6 +1948,16 @@ msgid "Quality Worksheet"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__query
+msgid "Query"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_sanitize_query__query_if
+msgid "Query If"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__quick_edit_mode
 msgid "Quick encoding"
 msgstr ""
@@ -1805,6 +1966,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_res_users__of_reactivated_user
 msgid "Reactivated user"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__geocoding_on_write
+msgid ""
+"Recalculate geocoding values automatically when a partner's address is "
+"changed"
+msgstr ""
+"Recalcul les valeurs de géolocalisation automatiquement quand une adresse "
+"partenaires est modifiée"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_send_reminder
@@ -1882,20 +2052,6 @@ msgid "Salesperson"
 msgstr "Commercial"
 
 #. module: of_base
-#. odoo-javascript
-#: code:addons/of_base/static/src/js/of_form.js:0
-#, python-format
-msgid "Save"
-msgstr ""
-
-#. module: of_base
-#. odoo-javascript
-#: code:addons/of_base/static/src/js/of_form.js:0
-#, python-format
-msgid "Save & New"
-msgstr ""
-
-#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_po_lead
 msgid "Security Lead Time for Purchase"
 msgstr ""
@@ -1921,6 +2077,7 @@ msgid "Sent"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_image__sequence
 #: model:ir.model.fields,field_description:of_base.field_res_partner_title__sequence
 msgid "Sequence"
 msgstr "Séquence"
@@ -1943,6 +2100,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_sign_delivery
 msgid "Signature"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_hr_skills
+msgid "Skills Management"
 msgstr ""
 
 #. module: of_base
@@ -2001,6 +2163,13 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_base
+#. odoo-javascript
+#: code:addons/of_base/static/src/js/user_menu_item.js:0
+#, python-format
+msgid "Support"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_google_gmail
 msgid "Support Gmail Authentication"
 msgstr ""
@@ -2028,6 +2197,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__early_pay_discount_computation
 msgid "Tax setting"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__geoloc_provider_techname
+msgid "Tech Name"
 msgstr ""
 
 #. module: of_base
@@ -2143,6 +2317,11 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__timeout
+msgid "Timeout"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__name
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
@@ -2229,7 +2408,7 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_base_module_upgrade
 msgid "Upgrade Module"
-msgstr "Module de mise à jour"
+msgstr "Module de mise à niveau"
 
 #. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__res_company__of_ref_mode__id
@@ -2290,6 +2469,11 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__hr_presence_control_ip_list
+msgid "Valid IP addresses"
+msgstr "Adresses IP valides"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_base_module_upgrade__of_validation_code
 msgid "Validation code"
 msgstr "Code de validation"
@@ -2303,6 +2487,15 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__vat_check_vies
 msgid "Verify VAT Numbers"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__geoloc_provider_googlemap_key
+msgid ""
+"Visit https://developers.google.com/maps/documentation/geocoding/get-api-key"
+" for more information."
+msgstr ""
+"Visitez https://developers.google.com/maps/documentation/geocoding/get-api-"
+"key pour plus d'information."
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__product_volume_volume_in_cubic_feet
@@ -2374,8 +2567,7 @@ msgid ""
 "You're about to start cleaning all the HTML fields in the database.\n"
 "                    Are you sure you want to continue ?"
 msgstr ""
-"Vous êtes sur le point de nettoyer tous les champs HTML de la base de "
-"données.\n"
+"Vous êtes sur le point de nettoyer tous les champs HTML de la base de données.\n"
 "                    Êtes-vous sûr de vouloir continuer ?"
 
 #. module: of_base
@@ -2402,11 +2594,6 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_of_base_hooks_installed
 msgid "of.base.hooks.installed"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_form_readonly
-msgid "of.form.readonly"
 msgstr ""
 
 #. module: of_base
@@ -2437,6 +2624,11 @@ msgstr ""
 #. module: of_base
 #: model:ir.model,name:of_base.model_of_res_partner_phone
 msgid "of.res.partner.phone"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_sanitize_query
+msgid "of.sanitize.query"
 msgstr ""
 
 #. module: of_base

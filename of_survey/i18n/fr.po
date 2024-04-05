@@ -6,16 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 14:18+0000\n"
-"PO-Revision-Date: 2024-04-19 14:18+0000\n"
+"POT-Creation-Date: 2024-04-19 14:22+0000\n"
+"PO-Revision-Date: 2024-04-19 14:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_count
@@ -81,8 +79,12 @@ msgstr "<i class=\"fa fa-square-o fa-lg me-2\"/>réponse"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
-msgid "<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-tooltip\"> or press Enter</span>"
-msgstr "<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-tooltip\">ou appuyer sur Enter</span>"
+msgid ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
+"tooltip\"> or press Enter</span>"
+msgstr ""
+"<span class=\"fw-bold text-muted ms-2 d-none d-md-inline\" id=\"enter-"
+"tooltip\">ou appuyer sur Enter</span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
@@ -108,17 +110,23 @@ msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_start
-msgid "<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">or press Enter</span>"
-msgstr "<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">ou appuyer sur Enter</span>"
+msgid ""
+"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">or"
+" press Enter</span>"
+msgstr ""
+"<span class=\"o_survey_enter fw-bold text-muted ms-2 d-none d-md-inline\">ou"
+" appuyer sur Enter</span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_selection_key
 msgid ""
-"<span class=\"o_survey_key text-center position-absolute bg-white rounded-start py-0 ps-2\"><span class=\"text-primary text-center text-center "
-"w-100 position-relative\">Key</span></span>"
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
+"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
+"position-relative\">Key</span></span>"
 msgstr ""
-"<span class=\"o_survey_key text-center position-absolute bg-white rounded-start py-0 ps-2\"><span class=\"text-primary text-center text-center "
-"w-100 position-relative\">Clé</span></span>"
+"<span class=\"o_survey_key text-center position-absolute bg-white rounded-"
+"start py-0 ps-2\"><span class=\"text-primary text-center text-center w-100 "
+"position-relative\">Clé</span></span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -146,7 +154,13 @@ msgstr ""
 "                                    <i class=\"fa fa-minus fa-4x\" role=\"img\" aria-label=\"Single Line\" title=\"Ligne unique\"/>"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<span>Upload Images</span><br/>"
+msgstr "<span>Charger des images</span><br/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
 msgid "<span>Waiting for attendees...</span>"
 msgstr "<span>En attente de participants...</span>"
 
@@ -244,6 +258,11 @@ msgid "Activity Type Icon"
 msgstr "Icône de type d'activité"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
+msgid "Add Picture"
+msgstr "Ajouter image"
+
+#. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Add a question"
 msgstr "Ajouter une question"
@@ -259,6 +278,11 @@ msgstr "Ajouter une section"
 #, python-format
 msgid "Add condition"
 msgstr "Ajouter une condition"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__add_pictures
+msgid "Add picture(s)"
+msgstr "Ajouter image(s)"
 
 #. module: of_survey
 #: model:res.groups,name:of_survey.group_of_survey_manager
@@ -290,7 +314,8 @@ msgstr "Type de réponse"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__answer_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__user_input_line_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__user_input_line_ids
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
 msgid "Answers"
 msgstr "Réponses"
 
@@ -305,7 +330,8 @@ msgid "Anyone with the link"
 msgstr "Toute personne avec le lien"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Archived"
 msgstr "Archivé"
 
@@ -317,8 +343,12 @@ msgstr "Nombre de pièces jointes"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_user_input__nickname
-msgid "Attendee nickname, mainly used to identify them in the survey session leaderboard."
-msgstr "Surnom du participant, principalement utilisé pour l'identifier dans le classement de la session de Questionnaire."
+msgid ""
+"Attendee nickname, mainly used to identify them in the survey session "
+"leaderboard."
+msgstr ""
+"Surnom du participant, principalement utilisé pour l'identifier dans le "
+"classement de la session de Questionnaire."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -338,11 +368,17 @@ msgid "Background Url"
 msgstr "URL de l'arrière-plan"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "Choices"
 msgstr "Choix"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
 msgid "Close"
 msgstr "Fermer"
@@ -355,7 +391,8 @@ msgstr "Couleur"
 #. module: of_survey
 #: model_terms:ir.actions.act_window,help:of_survey.action_of_survey_question_form
 msgid "Come back once you have added questions to your Surveys."
-msgstr "Revenez une fois que vous avez ajouté des questions à vos Questionnaires."
+msgstr ""
+"Revenez une fois que vous avez ajouté des questions à vos Questionnaires."
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__comments_message
@@ -398,7 +435,9 @@ msgstr ""
 #: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
 #, python-format
 msgid "Congratulations! You are now ready to collect feedback like a pro :-)"
-msgstr "Toutes nos félicitations ! Vous êtes maintenant prêt à recueillir des feedbacks comme un pro :-)"
+msgstr ""
+"Toutes nos félicitations ! Vous êtes maintenant prêt à recueillir des "
+"feedbacks comme un pro :-)"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -470,22 +509,33 @@ msgstr "La création d'un jeton de test n'est pas autorisée pour vous."
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
-msgid "Creating token for anybody else than employees is not allowed for internal surveys."
-msgstr "La création de jeton pour toute personne autre que les employés n'est pas autorisée pour les Questionnaires internes."
+msgid ""
+"Creating token for anybody else than employees is not allowed for internal "
+"surveys."
+msgstr ""
+"La création de jeton pour toute personne autre que les employés n'est pas "
+"autorisée pour les Questionnaires internes."
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
 msgid "Creating token for closed/archived surveys is not allowed."
-msgstr "La création de jetons pour les Questionnaires fermés/archivés n'est pas autorisée."
+msgstr ""
+"La création de jetons pour les Questionnaires fermés/archivés n'est pas "
+"autorisée."
 
 #. module: of_survey
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_survey.py:0
+#: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
-msgid "Creating token for external people is not allowed for surveys requesting authentication."
-msgstr "La création de jeton pour des personnes externes n'est pas autorisée pour les Questionnaires demandant une authentification."
+msgid ""
+"Creating token for external people is not allowed for surveys requesting "
+"authentication."
+msgstr ""
+"La création de jeton pour des personnes externes n'est pas autorisée pour "
+"les Questionnaires demandant une authentification."
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__session_question_id
@@ -524,14 +574,23 @@ msgid "Default Text"
 msgstr "Texte par défaut"
 
 #. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_images.xml:0
+#, python-format
+msgid "Delete image"
+msgstr "Supprimer image"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__description
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__description
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Description"
 msgstr ""
 
 #. module: of_survey
-#: model:ir.actions.act_window,name:of_survey.survey_user_input_line_action model:ir.ui.menu,name:of_survey.of_menu_survey_response_line_form
+#: model:ir.actions.act_window,name:of_survey.survey_user_input_line_action
+#: model:ir.ui.menu,name:of_survey.of_menu_survey_response_line_form
 msgid "Detailed Answers"
 msgstr "Réponses détaillées"
 
@@ -550,6 +609,13 @@ msgstr "Nom d'affichage"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__progression_mode
 msgid "Display Progress as"
 msgstr "Afficher la progression comme"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/xml/survey_images.xml:0
+#, python-format
+msgid "Edit image"
+msgstr "Modifier image"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
@@ -578,6 +644,13 @@ msgid "Enter Session Code"
 msgstr "Entrer le code de la session"
 
 #. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "Error"
+msgstr "Erreur"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__constr_error_msg
 msgid "Error message"
 msgstr "Message d'erreur"
@@ -589,7 +662,8 @@ msgstr "Exclure les tests"
 
 #. module: of_survey
 #. odoo-javascript
-#: code:addons/of_survey/static/src/js/survey_session_manage.js:0 model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: code:addons/of_survey/static/src/js/survey_session_manage.js:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
 #, python-format
 msgid "Final Leaderboard"
 msgstr "Classement final"
@@ -628,7 +702,8 @@ msgid "Free Text answer"
 msgstr "Réponse en texte libre"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
 msgid "Group By"
@@ -685,10 +760,13 @@ msgstr "Jeton d'identification"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__progression_mode
-msgid "If Number is selected, it will display the number of questions answered on the total number of question to answer."
+msgid ""
+"If Number is selected, it will display the number of questions answered on "
+"the total number of question to answer."
 msgstr ""
-"Si Nombre est sélectionné, il affichera le nombre de questions auxquelles vous avez répondu par rapport au nombre total de questions auxquelles "
-"il faut encore répondre."
+"Si Nombre est sélectionné, il affichera le nombre de questions auxquelles "
+"vous avez répondu par rapport au nombre total de questions auxquelles il "
+"faut encore répondre."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_needaction
@@ -704,8 +782,11 @@ msgstr "Si coché, certains messages ont une erreur de livraison."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_email
-msgid "If checked, this option will save the user's answer as its email address."
-msgstr "Si cochée, cette option enregistrera la réponse de l'utilisateur sous son adresse email."
+msgid ""
+"If checked, this option will save the user's answer as its email address."
+msgstr ""
+"Si cochée, cette option enregistrera la réponse de l'utilisateur sous son "
+"adresse email."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__is_conditional
@@ -723,24 +804,35 @@ msgstr "Si coché, les utilisateurs peuvent revenir aux pages précédentes."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__users_login_required
-msgid "If checked, users have to login before answering even with a valid token."
-msgstr "Si coché, les utilisateurs doivent se connecter avant de répondre, même avec un jeton valide."
+msgid ""
+"If checked, users have to login before answering even with a valid token."
+msgstr ""
+"Si coché, les utilisateurs doivent se connecter avant de répondre, même avec"
+" un jeton valide."
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "If other, please specify:"
 msgstr "Si autre, veuillez préciser :"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__questions_selection
-msgid "If randomized is selected, add the number of random questions next to the section."
-msgstr "Si aléatoire est sélectionné, ajoutez le nombre de questions aléatoires à côté de la section."
+msgid ""
+"If randomized is selected, add the number of random questions next to the "
+"section."
+msgstr ""
+"Si aléatoire est sélectionné, ajoutez le nombre de questions aléatoires à "
+"côté de la section."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__questions_selection
-msgid "If randomized is selected, you can configure the number of random questions by section. This mode is ignored in live session."
+msgid ""
+"If randomized is selected, you can configure the number of random questions "
+"by section. This mode is ignored in live session."
 msgstr ""
-"Si aléatoire est sélectionné, vous pouvez configurer le nombre de questions aléatoires par section. Ce mode est ignoré dans la session en direct."
+"Si aléatoire est sélectionné, vous pouvez configurer le nombre de questions "
+"aléatoires par section. Ce mode est ignoré dans la session en direct."
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_image
@@ -758,6 +850,23 @@ msgstr "Nom du fichier image"
 #, python-format
 msgid "Image Zoom Dialog"
 msgstr "Boite de dialogue du zoom sur image"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_image
+msgid "Image answer"
+msgstr "Réponse image"
+
+#. module: of_survey
+#. odoo-javascript
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "Image is required"
+msgstr "Une image est requise"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__images
+msgid "Images"
+msgstr ""
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input__state__in_progress
@@ -821,7 +930,9 @@ msgstr "Ordre séquentiel d'étiquette"
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__suggested_answer_ids
 msgid "Labels used for proposed choices: simple choice, multiple choice"
-msgstr "Étiquettes utilisées pour les choix proposés : choix simple, choix multiple et colonnes de matrice"
+msgstr ""
+"Étiquettes utilisées pour les choix proposés : choix simple, choix multiple "
+"et colonnes de matrice"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers____last_update
@@ -887,6 +998,11 @@ msgid "Leaderboard"
 msgstr "Classement"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
+msgid "Legend"
+msgstr "Légende"
+
+#. module: of_survey
 #. odoo-javascript
 #: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
 #, python-format
@@ -944,7 +1060,8 @@ msgstr "La date maximale ne peut pas être inférieure à la date minimale !"
 #. module: of_survey
 #: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_length
 msgid "Max length cannot be smaller than min length!"
-msgstr "La longueur maximale ne peut pas être inférieure à la longueur minimale !"
+msgstr ""
+"La longueur maximale ne peut pas être inférieure à la longueur minimale !"
 
 #. module: of_survey
 #: model:ir.model.constraint,message:of_survey.constraint_of_survey_question_validation_float
@@ -1199,7 +1316,8 @@ msgid "OpenFire Survey"
 msgstr "Questionnaire OpenFire"
 
 #. module: of_survey
-#: model:ir.ui.menu,name:of_survey.menu_of_survey_form model:ir.ui.menu,name:of_survey.menu_of_surveys_main
+#: model:ir.ui.menu,name:of_survey.menu_of_survey_form
+#: model:ir.ui.menu,name:of_survey.menu_of_surveys_main
 msgid "OpenFire Surveys"
 msgstr "Questionnaires"
 
@@ -1209,7 +1327,8 @@ msgid "Operator"
 msgstr "Opérateur"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Options"
 msgstr ""
 
@@ -1223,7 +1342,9 @@ msgstr ""
 #: code:addons/of_survey/models/of_survey_survey.py:0
 #, python-format
 msgid "Page id is needed for question layout 'page_per_section'"
-msgstr "L'identifiant de la page est nécessaire pour la mise en page 'page_par_section'"
+msgstr ""
+"L'identifiant de la page est nécessaire pour la mise en page "
+"'page_par_section'"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__page_ids
@@ -1241,7 +1362,8 @@ msgid "Participant"
 msgstr ""
 
 #. module: of_survey
-#: model:ir.actions.act_window,name:of_survey.action_survey_user_input model:ir.ui.menu,name:of_survey.menu_of_survey_type_form1
+#: model:ir.actions.act_window,name:of_survey.action_survey_user_input
+#: model:ir.ui.menu,name:of_survey.menu_of_survey_type_form1
 msgid "Participations"
 msgstr ""
 
@@ -1268,11 +1390,12 @@ msgstr ""
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_void_content
 msgid ""
-"Please make sure you have at least one question in your survey. You also need at least one section if you chose the \"Page per section\" layout."
-"<br/>"
+"Please make sure you have at least one question in your survey. You also "
+"need at least one section if you chose the \"Page per section\" layout.<br/>"
 msgstr ""
-"Veuillez vous assurer d'avoir au moins une question dans votre Questionnaire. Vous avez également besoin d'au moins une section si vous avez "
-"choisi la mise en page \"Page par section\". <br/>"
+"Veuillez vous assurer d'avoir au moins une question dans votre "
+"Questionnaire. Vous avez également besoin d'au moins une section si vous "
+"avez choisi la mise en page \"Page par section\". <br/>"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__predefined_question_ids
@@ -1289,7 +1412,8 @@ msgstr "Imprimer"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_id
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "Question"
 msgstr ""
 
@@ -1315,6 +1439,7 @@ msgid "Question Selection"
 msgstr "Sélection de questions"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__question_type
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__question_type
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_type
 msgid "Question Type"
@@ -1338,7 +1463,8 @@ msgstr "Le type de question doit être vide pour ces pages : %s"
 #: model:ir.actions.act_window,name:of_survey.action_of_survey_question_form
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__question_ids
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__question_ids
-#: model:ir.ui.menu,name:of_survey.of_menu_of_survey_question_form1 model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model:ir.ui.menu,name:of_survey.of_menu_of_survey_question_form1
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 msgid "Questions"
 msgstr ""
 
@@ -1386,6 +1512,16 @@ msgid "Responsible User"
 msgstr "Utilisateur responsable"
 
 #. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
+msgid "Save"
+msgstr "Sauvegarder"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
+msgid "Save and Create"
+msgstr "Sauvegarder et créer"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__save_as_email
 msgid "Save as user email"
 msgstr "Enregistrer comme email de l'utilisateur"
@@ -1422,6 +1558,23 @@ msgid "Sections and Questions"
 msgstr "Sections et Questions"
 
 #. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input.py:0
+#, python-format
+msgid "See file(s) for the answer"
+msgstr "Voir fichier(s) pour la réponse"
+
+#. module: of_survey
+#. odoo-python
+#. odoo-javascript
+#: code:addons/of_survey/models/of_survey_user_input.py:0
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#: code:addons/of_survey/static/src/js/survey_form.js:0
+#, python-format
+msgid "See file(s) for the answser"
+msgstr "Voir fichier(s) pour la réponse"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__sequence
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__sequence
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_sequence
@@ -1443,7 +1596,9 @@ msgstr "Afficher la question si"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
 msgid "Show all records which has next action date is before today"
-msgstr "Afficher tous les enregistrements dont la date de la prochaine action est antérieure à aujourd'hui"
+msgstr ""
+"Afficher tous les enregistrements dont la date de la prochaine action est "
+"antérieure à aujourd'hui"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__show_end
@@ -1509,7 +1664,8 @@ msgid "Submit"
 msgstr "Soumettre"
 
 #. module: of_survey
-#: model:ir.actions.act_window,name:of_survey.survey_question_answer_action model:ir.ui.menu,name:of_survey.of_menu_survey_label_form1
+#: model:ir.actions.act_window,name:of_survey.survey_question_answer_action
+#: model:ir.ui.menu,name:of_survey.of_menu_survey_label_form1
 msgid "Suggested Values"
 msgstr "Valeurs suggérées"
 
@@ -1529,11 +1685,14 @@ msgid "Suggestion"
 msgstr ""
 
 #. module: of_survey
-#: model:ir.model,name:of_survey.model_of_survey_survey model:ir.model.fields,field_description:of_survey.field_of_survey_question__survey_id
+#: model:ir.model,name:of_survey.model_of_survey_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__survey_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__survey_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__survey_id
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_tree
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_tree
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
 msgid "Survey"
@@ -1550,7 +1709,8 @@ msgid "Survey Conditional Question"
 msgstr "Question conditionnelle du Questionnaire"
 
 #. module: of_survey
-#: model:ir.model,name:of_survey.model_of_survey_question_answer model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_tree
+#: model:ir.model,name:of_survey.model_of_survey_question_answer
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_tree
 msgid "Survey Label"
 msgstr "Étiquette du Questionnaire"
 
@@ -1562,7 +1722,8 @@ msgid "Survey Participant"
 msgstr "Participant du Questionnaire"
 
 #. module: of_survey
-#: model:ir.model,name:of_survey.model_of_survey_question model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+#: model:ir.model,name:of_survey.model_of_survey_question
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_tree
 msgid "Survey Question"
 msgstr "Question du Questionnaire"
@@ -1589,7 +1750,8 @@ msgid "Survey User Input Line"
 msgstr "Ligne d'entrée utilisateur du Questionnaire"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_tree
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_tree
 msgid "Survey User inputs"
 msgstr "Entrées utilisateur du Questionnaire"
 
@@ -1637,20 +1799,16 @@ msgid "Text answer"
 msgstr "Réponse texte"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_done
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_done
 msgid "Thank you!"
 msgstr "Merci !"
 
 #. module: of_survey
 #. odoo-python
-#: code:addons/of_survey/models/of_survey_user_input_line.py:0
-#, python-format
-msgid "The answer must be in the right type"
-msgstr "La réponse doit être du bon type"
-
-#. module: of_survey
-#. odoo-python
-#: code:addons/of_survey/models/of_survey_question.py:0 model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 #, python-format
 msgid "The answer you entered is not valid."
@@ -1701,11 +1859,18 @@ msgstr ""
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__description
 msgid ""
-"The description will be displayed on the home page of the survey. You can use this to give the purpose and guidelines to your candidates before "
-"they start it."
+"The description will be displayed on the home page of the survey. You can "
+"use this to give the purpose and guidelines to your candidates before they "
+"start it."
 msgstr ""
-"La description sera affichée sur la page d'accueil du Questionnaire. Vous pouvez l'utiliser pour donner le but et les directives à vos candidats "
-"avant qu'ils ne commencent."
+"La description sera affichée sur la page d'accueil du Questionnaire. Vous "
+"pouvez l'utiliser pour donner le but et les directives à vos candidats avant"
+" qu'ils ne commencent."
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input_line__value_image_ids
+msgid "The images corresponding to the user's upload answer, if any."
+msgstr "Les images correspondants à la réponse de l'utilisateur"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
@@ -1731,8 +1896,12 @@ msgstr "Le Questionnaire a déjà commencé."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__session_question_start_time
-msgid "The time at which the current question has started, used to handle the timer for attendees."
-msgstr "L'heure à laquelle la question en cours a commencé, utilisée pour gérer le minuteur des participants."
+msgid ""
+"The time at which the current question has started, used to handle the timer"
+" for attendees."
+msgstr ""
+"L'heure à laquelle la question en cours a commencé, utilisée pour gérer le "
+"minuteur des participants."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
@@ -1741,7 +1910,8 @@ msgstr "Une erreur s'est produite lors de la validation du Questionnaire."
 
 #. module: of_survey
 #. odoo-python
-#: code:addons/of_survey/models/of_survey_question.py:0 code:addons/of_survey/tests/test_survey.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/tests/test_survey.py:0
 #, python-format
 msgid "This answer must be an email address"
 msgstr "La réponse doit être une adresse email"
@@ -1761,7 +1931,8 @@ msgstr "Ceci est un Questionnaire test."
 #. module: of_survey
 #. odoo-python
 #. odoo-javascript
-#: code:addons/of_survey/models/of_survey_question.py:0 code:addons/of_survey/static/src/js/survey_form.js:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/static/src/js/survey_form.js:0
 #: code:addons/of_survey/tests/test_survey.py:0
 #, python-format
 msgid "This is not a date"
@@ -1774,7 +1945,9 @@ msgstr "Ce message sera affiché lorsque le Questionnaire est terminé"
 
 #. module: of_survey
 #. odoo-python
-#: code:addons/of_survey/models/of_survey_question.py:0 model_terms:ir.ui.view,arch_db:of_survey.of_question_container
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
+#: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
 #, python-format
 msgid "This question requires an answer."
 msgstr "Cette question requiert une réponse."
@@ -1802,18 +1975,24 @@ msgstr "Limite de temps (secondes)"
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__title
+#: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
 msgid "Title"
 msgstr "Titre"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
+#: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_open
 msgid "To join:"
 msgstr "À rejoindre :"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form
-msgid "To take this survey, please close all other tabs on <strong class=\"text-danger\"/>."
-msgstr "Pour répondre à ce Questionnaire, veuillez fermer tous les autres onglets sur <strong class=\"text-danger\"/>."
+msgid ""
+"To take this survey, please close all other tabs on <strong class=\"text-"
+"danger\"/>."
+msgstr ""
+"Pour répondre à ce Questionnaire, veuillez fermer tous les autres onglets "
+"sur <strong class=\"text-danger\"/>."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
@@ -1847,6 +2026,12 @@ msgid "Upcoming Activities"
 msgstr ""
 
 #. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__multi_image
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__multi_image
+msgid "Upload Image"
+msgstr "Charger une image"
+
+#. module: of_survey
 #. odoo-javascript
 #: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
 #, python-format
@@ -1855,8 +2040,12 @@ msgstr "Utilisez le fil d'Ariane pour revenir rapidement au tableau de bord."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__description
-msgid "Use this field to add additional explanations about your question or to illustrate it with pictures or a video"
-msgstr "Utilisez ce champ pour ajouter des explications supplémentaires à propos de votre question ou pour l'illustrer avec des images ou une vidéo"
+msgid ""
+"Use this field to add additional explanations about your question or to "
+"illustrate it with pictures or a video"
+msgstr ""
+"Utilisez ce champ pour ajouter des explications supplémentaires à propos de "
+"votre question ou pour l'illustrer avec des images ou une vidéo"
 
 #. module: of_survey
 #: model:res.groups,name:of_survey.group_of_survey_user
@@ -1864,6 +2053,7 @@ msgid "User"
 msgstr ""
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__user_input
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__user_input_id
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
 msgid "User Input"
@@ -1900,16 +2090,38 @@ msgid "Validation Error message"
 msgstr "Message d'erreur de validation"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_image_ids
+msgid "Value Image"
+msgstr "Valeur image"
+
+#. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
-msgid "We have registered your answer! Please wait for the host to go to the next question."
-msgstr "Nous avons enregistré votre réponse ! Veuillez attendre que l'hôte passe à la question suivante."
+msgid ""
+"We have registered your answer! Please wait for the host to go to the next "
+"question."
+msgstr ""
+"Nous avons enregistré votre réponse ! Veuillez attendre que l'hôte passe à "
+"la question suivante."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__website_message_ids
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__website_message_ids
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__website_message_ids
+msgid "Website communication history"
+msgstr ""
 
 #. module: of_survey
 #. odoo-javascript
 #: code:addons/of_survey/static/src/js/tours/survey_tour.js:0
 #, python-format
 msgid "Whenever you pick an answer, Odoo saves it for you."
-msgstr "Chaque fois que vous choisissez une réponse, Odoo l'enregistre pour vous."
+msgstr ""
+"Chaque fois que vous choisissez une réponse, Odoo l'enregistre pour vous."
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -1922,8 +2134,12 @@ msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.actions.act_window,help:of_survey.action_survey_user_input
-msgid "You can share your links through different means: email, invite shortcut, live presentation, ..."
-msgstr "Vous pouvez partager vos liens par différents moyens : email, raccourci d'invitation, présentation en direct, ..."
+msgid ""
+"You can share your links through different means: email, invite shortcut, "
+"live presentation, ..."
+msgstr ""
+"Vous pouvez partager vos liens par différents moyens : email, raccourci "
+"d'invitation, présentation en direct, ..."
 
 #. module: of_survey
 #. odoo-javascript
@@ -1948,6 +2164,7 @@ msgstr "Image zoomée"
 
 #. module: of_survey
 #. odoo-javascript
+#: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
 #: code:addons/of_survey/static/src/xml/conditional_questions.xml:0
 #, python-format
 msgid "answer"
@@ -1983,7 +2200,9 @@ msgstr "par ex. 4812"
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "e.g. Guidelines, instructions, picture, ... to help attendees answer"
-msgstr "par ex. Lignes directrices, instructions, image, ... pour aider les participants à répondre"
+msgstr ""
+"par ex. Lignes directrices, instructions, image, ... pour aider les "
+"participants à répondre"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
@@ -2059,3 +2278,10 @@ msgstr "la question"
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
 msgid "this page"
 msgstr "cette page"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#, python-format
+msgid "{} picture(s) taken"
+msgstr "{} photo(s) prise(s)"

@@ -13,6 +13,7 @@ from . import ir_ui_menu
 from . import mail_message
 from . import mail_template
 from . import of_form_readonly
+from . import of_image
 from . import of_log_message
 from . import of_read_group
 from . import of_res_partner_phone

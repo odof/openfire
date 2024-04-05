@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-05 12:33+0000\n"
-"PO-Revision-Date: 2024-04-05 12:33+0000\n"
+"POT-Creation-Date: 2024-04-11 07:05+0000\n"
+"PO-Revision-Date: 2024-04-11 07:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -268,11 +268,6 @@ msgid ""
 "<span class=\"fa fa-times\"/>\n"
 "                                <span> Clear meeting</span>"
 msgstr ""
-
-#. module: of_planning
-#: model_terms:ir.ui.view,arch_db:of_planning.of_image_view_form
-msgid "<span class=\"of_ws_lr\">Rotate image</span>"
-msgstr "<span class=\"of_ws_lr\">Tourner l'image</span>"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
@@ -636,11 +631,6 @@ msgid "Calendar Event"
 msgstr "Calendrier de l'événement"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__can_image_1024_be_zoomed
-msgid "Can Image 1024 be zoomed"
-msgstr "Est ce que l'image 1024 peut-être zoomée"
-
-#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_print_wizard_view_form
 msgid "Cancel"
@@ -651,16 +641,6 @@ msgstr "Annuler"
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Cancelled"
 msgstr "Annulé"
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__caption
-msgid "Caption"
-msgstr "Légende"
-
-#. module: of_planning
-#: model_terms:ir.ui.view,arch_db:of_planning.of_image_view_kanban
-msgid "Caption :"
-msgstr "Légende :"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__category_ids
@@ -767,7 +747,6 @@ msgid "Contact"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__create_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__create_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__create_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__create_uid
@@ -779,7 +758,6 @@ msgid "Created by"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__create_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__create_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__create_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__create_date
@@ -956,7 +934,6 @@ msgid "Discount (%)"
 msgstr "Remise (%)"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__display_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__display_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__display_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__display_name
@@ -1200,7 +1177,6 @@ msgid "History"
 msgstr "Historique"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__id
@@ -1264,40 +1240,8 @@ msgstr ""
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_of_image
-#: model:ir.model.fields,field_description:of_planning.field_of_image__image_1920
-#: model_terms:ir.ui.view,arch_db:of_planning.of_image_view_kanban
 msgid "Image"
 msgstr ""
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__image_1024
-msgid "Image 1024"
-msgstr ""
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__image_128
-msgid "Image 128"
-msgstr ""
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__image_256
-msgid "Image 256"
-msgstr ""
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__image_512
-msgid "Image 512"
-msgstr ""
-
-#. module: of_planning
-#: model:ir.actions.act_window,name:of_planning.action_of_image
-msgid "Images"
-msgstr ""
-
-#. module: of_planning
-#: model_terms:ir.ui.view,arch_db:of_planning.of_image_view_tree
-msgid "Images list"
-msgstr "Liste d'image"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -1627,7 +1571,6 @@ msgid "Lang"
 msgstr "Langue"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image____last_update
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line____last_update
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template____last_update
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line____last_update
@@ -1639,7 +1582,6 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__write_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__write_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__write_uid
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__write_uid
@@ -1651,7 +1593,6 @@ msgid "Last Updated by"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__write_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__write_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__write_date
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__write_date
@@ -1758,7 +1699,6 @@ msgid "My Interventions"
 msgstr "Mes interventions"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_name
@@ -2080,11 +2020,6 @@ msgid "Print Intervention Planning Wizard"
 msgstr "Wizard d'impression du planning d'intervention"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__printable
-msgid "Print in reports"
-msgstr "Imprimer sur les rapports"
-
-#. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_print_wizard
 msgid "Print interventions"
 msgstr "Imprimer interventions"
@@ -2298,7 +2233,6 @@ msgid "Sent to employees who wish to receive tomorrow's schedule"
 msgstr "Envoyé aux employés qui souhaitent recevoir le planning du lendemain"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_image__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sequence_id

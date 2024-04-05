@@ -77,11 +77,13 @@ class OFSurveyQuestion(models.Model):
             ('text_box', "Multiple Lines Text Box"),
             ('char_box', "Single Line Text Box"),
             ('date', "Date"),
+            ('multi_image', "Upload Image"),
         ],
         compute='_compute_question_type',
         readonly=False,
         store=True,
     )
+    add_pictures = fields.Boolean(string="Add picture(s)")
     # -- char_box
     save_as_email = fields.Boolean(
         string="Save as user email",

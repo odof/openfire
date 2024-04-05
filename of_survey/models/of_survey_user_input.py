@@ -148,34 +148,50 @@ class OFSurveyUserInput(models.Model):
     # CREATE / UPDATE LINES FROM SURVEY FRONTEND INPUT
     # ------------------------------------------------------------
 
-    def save_lines(self, question, answer, comment=None):
+    def save_lines(self, question, answer, comment=None, attachments=None):
         """Save answers to questions, depending on question type
 
         If an answer already exists for question and user_input_id, it will be
         overwritten (or deleted for 'choice' questions) (in order to maintain data consistency).
         """
+        if attachments is None:
+            attachments = []
+
         old_answers = self.env['of.survey.user_input.line'].search(
             [('user_input_id', '=', self.id), ('question_id', '=', question.id)]
         )
-
         if question.question_type in ['char_box', 'text_box', 'date']:
-            self._save_line_simple_answer(question, old_answers, answer)
+            if answer in ("[]", "") and len(attachments) > 0:
+                answer = _("See file(s) for the answer")
+            self._save_line_simple_answer(question, old_answers, answer, attachments)
             if question.save_as_email and answer:
                 self.write({'email': answer})
-
+        elif question.question_type == 'multi_image':
+            self._save_line_file(question, old_answers, answer)
         elif question.question_type in ['simple_choice', 'multiple_choice']:
-            self._save_line_choice(question, old_answers, answer, comment)
+            self._save_line_choice(question, old_answers, answer, comment, attachments)
         else:
             raise AttributeError(f"{question.question_type}: This type of question has no saving function")
 
-    def _save_line_simple_answer(self, question, old_answers, answer):
-        vals = self._get_line_answer_values(question, answer, question.question_type)
+    def _save_line_simple_answer(self, question, old_answers, answer, attachments):
+        vals = self._get_line_answer_values(question, answer, question.question_type, attachments)
         if not old_answers:
             return self.env['of.survey.user_input.line'].create(vals)
         old_answers.write(vals)
+
         return old_answers
 
-    def _save_line_choice(self, question, old_answers, answers, comment):
+    def _save_line_file(self, question, old_answers, answer):
+        """Save the user's file upload answer for the given question."""
+        vals = self._get_line_answer_file_upload_values(question, 'multi_image', answer)
+        if old_answers:
+            old_answers.write(vals)
+        else:
+            old_answers = self.env['of.survey.user_input.line'].create(vals)
+
+        return old_answers
+
+    def _save_line_choice(self, question, old_answers, answers, comment, attachments):
         if not (isinstance(answers, list)):
             answers = [answers]
 
@@ -188,41 +204,147 @@ class OFSurveyUserInput(models.Model):
 
         if question.question_type == 'simple_choice':
             if not question.comment_count_as_answer or not question.comments_allowed or not comment:
-                vals_list = [self._get_line_answer_values(question, answer, 'suggestion') for answer in answers]
+                vals_list = [
+                    self._get_line_answer_values(question, answer, 'suggestion', attachments) for answer in answers
+                ]
         elif question.question_type == 'multiple_choice':
-            vals_list = [self._get_line_answer_values(question, answer, 'suggestion') for answer in answers]
+            vals_list = [
+                self._get_line_answer_values(question, answer, 'suggestion', attachments) for answer in answers
+            ]
 
         if comment:
-            vals_list.append(self._get_line_comment_values(question, comment))
+            vals_list.append(self._get_line_comment_values(question, comment, attachments))
 
         old_answers.sudo().unlink()
         return self.env['of.survey.user_input.line'].create(vals_list)
 
-    def _get_line_answer_values(self, question, answer, answer_type):
+    def _get_line_answer_values(self, question, answer, answer_type, attachments):
         vals = {
             'user_input_id': self.id,
             'question_id': question.id,
             'skipped': False,
             'answer_type': answer_type,
         }
+
         if not answer or (isinstance(answer, str) and not answer.strip()):
-            vals.update(answer_type=None, skipped=True)
-            return vals
+            if len(attachments) == 0:
+                vals.update(answer_type=None, skipped=True)
+                return vals
 
         if answer_type == 'suggestion':
-            vals['suggested_answer_id'] = int(answer)
+            if not answer or (isinstance(answer, str) and not answer.strip()):
+                vals['suggested_answer_id'] = False
+            else:
+                vals['suggested_answer_id'] = int(answer)
         else:
+            if not answer or (isinstance(answer, str) and not answer.strip()):
+                if len(attachments) > 0:
+                    answer = _("See file(s) for the answser")
+
             vals[f'value_{answer_type}'] = answer
+
+        # si la question permet d'ajouter des images, il faut aussi les mettre
+        if question.add_pictures:
+            attachment_ids = []
+            for attachment in attachments:
+                name = attachment.get('title')
+                if name == '':
+                    name = attachment.get('filename')
+                # on regarde dans la data si on a l'information que c'est une image ou pas
+                # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
+                datas = attachment['src'].split(',')
+                if len(datas) > 1:
+                    datas = datas[1]
+                else:
+                    datas = datas[0]
+                datas = bytes(datas, 'utf-8')
+
+                attachment = self.env['of.image'].create(
+                    {
+                        'name': name,
+                        'caption': attachment.get('legend', ''),
+                        'image_1920': datas,
+                    }
+                )
+                attachment_ids.append(attachment.id)
+            vals['value_image_ids'] = attachment_ids
         return vals
 
-    def _get_line_comment_values(self, question, comment):
-        return {
+    def _get_line_comment_values(self, question, comment, attachments):
+        vals = {
             'user_input_id': self.id,
             'question_id': question.id,
             'skipped': False,
             'answer_type': 'char_box',
             'value_char_box': comment,
         }
+
+        # si la question permet d'ajouter des images, il faut aussi les mettre
+        if question.add_pictures:
+            attachment_ids = []
+            for attachment in attachments:
+                name = attachment.get('title')
+                if name == '':
+                    name = attachment.get('filename')
+                # on regarde dans la data si on a l'information que c'est une image ou pas
+                # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
+                datas = attachment['src'].split(',')
+                if len(datas) > 0:
+                    datas = datas[1]
+                else:
+                    datas = datas[0]
+                datas = bytes(datas, 'utf-8')
+
+                attachment = self.env['of.image'].create(
+                    {
+                        'name': name,
+                        'caption': attachment.get('legend', ''),
+                        'image_1920': datas,
+                    }
+                )
+                attachment_ids.append(attachment.id)
+            vals['value_image_ids'] = attachment_ids
+        return vals
+
+    def _get_line_answer_file_upload_values(self, question, answer_type, answer):
+        """Get the values to use when creating or updating a user input line
+        for a file upload answer."""
+        vals = {
+            'user_input_id': self.id,
+            'question_id': question.id,
+            'skipped': False,
+            'answer_type': answer_type,
+        }
+        if answer_type == 'multi_image':
+            if len(answer) > 0:
+                attachment_ids = []
+
+                for file in answer[0]:
+                    name = file.get('title')
+                    if name == '':
+                        name = file.get('filename')
+
+                    # on regarde dans la data si on a l'information que c'est une image ou pas
+                    # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
+                    datas = file['src'].split(',')
+                    if len(datas) > 0:
+                        datas = datas[1]
+                    else:
+                        datas = datas[0]
+                    datas = bytes(datas, 'utf-8')
+
+                    attachment = self.env['of.image'].create(
+                        {
+                            'name': name,
+                            'caption': file.get('legend', ''),
+                            'image_1920': datas,
+                        }
+                    )
+                    attachment_ids.append(attachment.id)
+                vals['value_image_ids'] = attachment_ids
+            else:
+                vals['skipped'] = True
+        return vals
 
     # ------------------------------------------------------------
     # Conditional Questions Management

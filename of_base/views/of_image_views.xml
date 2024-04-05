@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_image_view_tree" model="ir.ui.view">
+        <field name="name">of.image.view.tree</field>
+        <field name="model">of.image</field>
+        <field name="arch" type="xml">
+            <tree string="Images list">
+                <field name="sequence" widget="handle" />
+                <field name="create_date"/>
+                <field name="create_uid"/>
+                <field name="name" />
+                <field name="caption" />
+                <field name="printable" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_image_view_form" model="ir.ui.view">
+        <field name="name">of.image.view.form</field>
+        <field name="model">of.image</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_avatar">
+                        <center>
+                            <field name="image_1920" widget="image" options="{'preview_image': 'image_256'}"/> <br/>
+                            <button name="action_button_rotate_left" type="object" class="oe_inline fa fa-rotate-left"/>
+                            <span class="of_ws_lr">Rotate image</span>
+                            <button name="action_button_rotate_right" type="object" class="oe_inline fa fa-rotate-right"/>
+                        </center>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <label for="caption"/>
+                        <h2>
+                            <field name="caption"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="printable" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_image_view_kanban" model="ir.ui.view">
+        <field name="name">of.image.view.kanban</field>
+        <field name="model">of.image</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="image_1920"/>
+                <field name="caption"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image me-1">
+                                <img t-att-src="kanban_image('of.image', 'image_1920', record.id.raw_value)" alt="Image" class="o_image_64_contain"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong><field name="name"/></strong><br/>
+                                <small id="caption">Caption : <field name="caption"/></small><br/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_image_view_search" model="ir.ui.view">
+        <field name="name">of.image.view.search</field>
+        <field name="model">of.image</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <group string="Group By" name="groupby">
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_image" model="ir.actions.act_window">
+        <field name="name">Images</field>
+        <field name="res_model">of.image</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_image_view_tree" />
+        <field name="search_view_id" ref="of_image_view_search" />
+    </record>
+
+</odoo>

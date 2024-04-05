@@ -19,6 +19,17 @@
                                         <td>
                                             <strong t-field="answer.question_id.title" />
                                             <span t-if="not answer.question_id.is_page"> : <span t-field="answer.answers" /></span>
+                                            <t t-if="answer.question_id.add_pictures">
+                                            <br/>
+                                                <t t-foreach="answer.images" t-as="image">
+                                                    <div class="col-3">
+                                                        <figure class="figure">
+                                                            <img t-attf-src="data:image/*;base64,{{image.datas}}" class="figure-img img img-fluid"/>
+                                                            <figcaption class="figure-caption"><span t-esc="image.description"/></figcaption>
+                                                        </figure>
+                                                    </div>
+                                                </t>
+                                            </t>
                                         </td>
                                     </tr>
                                 </t>

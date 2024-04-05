@@ -79,6 +79,9 @@
                                                 </t>
                                             </t>
                                         </t>
+                                        <t t-if="question.question_type == 'multi_image'">
+                                            <t t-call="of_survey.multi_image_answer"/>
+                                        </t>
                                         <div class="o_survey_question_error overflow-hidden border-0 py-0 px-3 alert alert-danger" role="alert"></div>
                                     </div>
                                 </t>
@@ -88,6 +91,21 @@
                         </fieldset>
                     </div>
                 </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="multi_image_answer">
+        <t t-if="answer_lines.value_image_ids">
+            <div>
+                <t t-foreach="answer_lines.value_image_ids"
+                   t-as="attachment">
+                    <a t-attf-href="/web/content/{{of.image}}/{{ attachment.id }}/{{image_1920}}?download=true">
+                        <i class="fa fa-download"/>
+                        <t t-esc="attachment.name"/>
+                    </a>
+                    <br/>
+                </t>
             </div>
         </t>
     </template>

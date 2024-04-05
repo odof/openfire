@@ -537,7 +537,10 @@ class OFSurvey(http.Controller):
             answer, comment = self._extract_comment_from_answers(question, post.get(str(question.id)))
             errors |= question.validate_question(answer, comment)
             if not errors.get(question.id):
-                answer_sudo.save_lines(question, answer, comment)
+                attachments = post.get('images').get(str(question.id))
+                if not attachments:
+                    attachments = []
+                answer_sudo.save_lines(question, answer, comment, attachments)
 
         if errors:
             return {'error': 'validation', 'fields': errors}
@@ -582,7 +585,7 @@ class OFSurvey(http.Controller):
 
         :return: tuple(
           same structure without comment,
-          extracted comment for given question
+          extracted comment for given question,
         )"""
         comment = None
         answers_no_comment = []
@@ -594,6 +597,7 @@ class OFSurvey(http.Controller):
                     comment = answer['comment'].strip()
                 else:
                     answers_no_comment.append(answer)
+
             if len(answers_no_comment) == 1:
                 answers_no_comment = answers_no_comment[0]
         return answers_no_comment, comment

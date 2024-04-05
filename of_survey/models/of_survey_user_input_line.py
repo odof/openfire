@@ -30,12 +30,18 @@ class OFSurveyUserInputLine(models.Model):
             ('char_box', "Text"),
             ('date', "Date"),
             ('suggestion', "Suggestion"),
+            ('multi_image', "Upload Image"),
         ],
     )
     value_char_box = fields.Char(string="Text answer")
     value_date = fields.Date(string="Date answer")
     value_text_box = fields.Text(string="Free Text answer")
+    value_image = fields.Binary(string="Image answer")
     suggested_answer_id = fields.Many2one(comodel_name='of.survey.question.answer', string="Suggested answer")
+    value_image_ids = fields.Many2many(
+        comodel_name='of.image',
+        help="The images corresponding to the user's upload answer, if any.",
+    )
 
     @api.depends('answer_type')
     def _compute_display_name(self):
@@ -50,22 +56,16 @@ class OFSurveyUserInputLine(models.Model):
                 )
             elif line.answer_type == 'suggestion':
                 line.display_name = line.suggested_answer_id.value
-
+            elif line.answer_type == "multi_image":
+                line.display_name = _("{} picture(s) taken").format(len(line.value_image_ids))
             if not line.display_name:
-                line.display_name = _("Skipped")
+                if len(line.value_image_ids) > 0:
+                    line.display_name = _("See file(s) for the answser")
+                else:
+                    line.display_name = _("Skipped")
 
     @api.constrains('skipped', 'answer_type')
     def _check_answer_type_skipped(self):
         for line in self:
             if line.skipped == bool(line.answer_type):
                 raise ValidationError(_("A question can either be skipped or answered, not both."))
-
-            if line.answer_type == 'suggestion':
-                field_name = 'suggested_answer_id'
-            elif line.answer_type:
-                field_name = f'value_{line.answer_type}'
-            else:  # skipped
-                field_name = False
-
-            if field_name and not line[field_name]:
-                raise ValidationError(_("The answer must be in the right type"))

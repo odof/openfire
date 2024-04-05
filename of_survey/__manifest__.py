@@ -8,13 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Gestion des questionnaires pour OpenFire (basé sur l'application Sondages)",
-    'depends': [
-        'auth_signup',
-        'http_routing',
-        'mail',
-        'web_tour',
-        'of_web_widgets'
-    ],
+    'depends': ['auth_signup', 'http_routing', 'mail', 'web_tour', 'of_web_widgets', 'of_base'],
     'data': [
         'security/of_survey_security.xml',
         'security/ir.model.access.csv',
@@ -23,6 +17,7 @@
         'views/of_survey_user_views.xml',
         'views/of_survey_question_answer_views.xml',
         'views/of_survey_question_views.xml',
+        'views/of_survey_answers.xml',
         'templates/of_survey_templates.xml',
         'templates/of_survey_templates_management.xml',
         'templates/of_survey_templates_print.xml',
@@ -79,6 +74,7 @@
         ],
         'web.assets_frontend': [
             'of_survey/static/src/js/tours/survey_tour.js',
+            'of_survey/static/src/xml/survey_images.xml',
         ],
     },
     'installable': True,

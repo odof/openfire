@@ -531,6 +531,65 @@ _::-webkit-full-page-media, _:future, :root .o_survey_wrap {
     }
 }
 
+.drop-container {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  padding: 20px;
+  border: 2px solid #dee2e6;
+  color: #444;
+  cursor: pointer;
+  transition: background .2s ease-in-out, border .2s ease-in-out;
+}
+
+.drop-container:hover {
+  background: #eee;
+  border-color: #111;
+}
+
+.modal-footer {
+    text-align: left;
+}
+
+input.images {
+    display: None;
+}
+
+.block-image {
+    margin: 0px;
+    padding: 10px;
+    border: 1px solid #35979c;
+    height: 100px;
+    .title {
+        font-weight: bold;
+    }
+    i {
+        font-size: x-large;
+    }
+    img {
+        max-height: 80px;
+        display: flex;
+        margin: auto;
+    }
+    .button {
+        padding: 0px;
+        margin-top: 30px;
+    }
+    .legend {
+        overflow: scroll;
+        display: block;
+        max-height: 70px;
+    }
+}
+
+
+ a.add-attachment {
+     margin-top: 10px;
+ }
 // Avoid shifting (due to scroll bar) when opening the image zoom widget
 .modal-open {
     .o_survey_background {

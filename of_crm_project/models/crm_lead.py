@@ -54,12 +54,17 @@ class CrmLead(models.Model):
                     )
                 if len(question_answers) == 1:
                     if question_answers.answers != answers:
-                        question_answers_ids.append(Command.update(question_answers.id, {'answers': answers}))
+                        question_answers_ids.append(
+                            Command.update(
+                                question_answers.id, {'answers': answers, 'user_input': lead.of_survey_user_input.id}
+                            )
+                        )
                 else:
                     question_answers_value = {
                         'question_id': question.id,
                         'answers': answers,
                         'sequence': question.sequence,
+                        'user_input': lead.of_survey_user_input.id,
                     }
                     question_answers_ids.append(Command.create(question_answers_value))
             lead.of_answers_ids = question_answers_ids
