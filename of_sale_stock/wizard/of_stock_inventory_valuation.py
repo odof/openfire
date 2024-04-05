@@ -23,7 +23,8 @@ class OFStockInventoryValuation(models.TransientModel):
         return self.env['stock.location'].search([('usage', '=', 'internal')]).mapped('company_id')
 
     allowed_company_ids = fields.Many2many(
-        comodel_name='res.company', default=lambda self: self._default_allowed_company_ids(), store=False)
+        comodel_name='res.company', default=lambda self: self._default_allowed_company_ids(),
+        compute='_compute_allowed_company_ids')
     company_id = fields.Many2one(
         comodel_name='res.company', string=u"Société", required=True,
         domain="[('id', 'in', allowed_company_ids[0][2])]")
@@ -40,6 +41,11 @@ class OFStockInventoryValuation(models.TransientModel):
     location_ids = fields.Many2many(
         comodel_name='stock.location', string="Emplacements", required=True,
         domain="[('usage', '=', 'internal'), ('company_id', '=', company_id)]")
+
+    def _compute_allowed_company_ids(self):
+        companies = self.env['stock.location'].search([('usage', '=', 'internal')]).mapped('company_id')
+        for wizard in self:
+            wizard.allowed_company_ids = companies
 
     @api.onchange('location_ids')
     def _onchange_location_ids(self):
