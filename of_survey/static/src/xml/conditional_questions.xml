@@ -2,7 +2,7 @@
 <templates id="template" xml:space="preserve">
 
     <t t-name="of_survey.ConditionalQuestionsQuestion" owl="1">
-        <select name="question" class="o_input" t-on-change="(ev) => this.onChangeQuestion(ev,conditional)">
+        <select name="question" class="o_input select-overflow-ellipsis" t-on-change="(ev) => this.onChangeQuestion(ev,conditional)">
             <option value="0"></option>
             <t t-foreach="questions" t-as="question" t-key="question.data.id">
                 <t t-if="conditional.data.question_id">
@@ -26,7 +26,7 @@
         <div class="row">
             <div class="col-5">
                 <t t-if="conditional.data.triggering_question_id">
-                    <select name="answers" class="o_input" t-on-change="(ev) => this.onChangeAnswer(ev,conditional)">
+                    <select name="answers" class="o_input select-overflow-ellipsis" t-on-change="(ev) => this.onChangeAnswer(ev,conditional)">
                         <option value="0"></option>
                         <t t-foreach="suggested_answers[conditional.data.triggering_question_id[0]]" t-as="answer_id" t-key="answer_id_index">
                             <option t-att-value="answer_id"><t t-esc="all_answers[answer_id]"/></option>
@@ -36,7 +36,12 @@
             </div>
             <div class="col-7">
                 <t t-foreach="conditional.data.answer_ids.records" t-as="answer" t-key="answer_index">
-                <span class="badge rounded-pill d-inline-flex align-items-center mw-100"><t t-esc="all_answers[answer.data.id]"/> <a href="#" style="margin-left: 5px" class="fa fa-times" t-on-click.stop.prevent="(ev) => this.onDeleteAnswer(ev,answer,conditional)"/></span>
+                <span class="badge rounded-pill d-inline-flex align-items-center mw-100">
+                    <div class="o_tag_badge_text">
+                        <t t-esc="all_answers[answer.data.id]"/>
+                    </div>
+                    <a href="#" style="margin-left: 5px" class="fa fa-times" t-on-click.stop.prevent="(ev) => this.onDeleteAnswer(ev,answer,conditional)"/>
+                </span>
                 </t>
             </div>
         </div>
@@ -67,7 +72,7 @@
             <t t-else="">
                 <div class="row">
                     <div class="col-1">
-                        <select name="operator" class="o_input" t-on-change.stop.prevent="(ev) => this.onChangeOperator(ev,conditional)">
+                        <select name="operator" class="o_input" style="text-overflow: ellipsis; white-space: nowrap;" t-on-change.stop.prevent="(ev) => this.onChangeOperator(ev,conditional)">
                             <t t-foreach="operators" t-as="operator" t-key="operator_index">
                                 <t t-if="conditional.data.operator">
                                     <t t-if="conditional.data.operator == operator">
