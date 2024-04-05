@@ -742,13 +742,6 @@ msgstr ""
 "adresse email."
 
 #. module: of_survey
-#: model:ir.model.fields,help:of_survey.field_of_survey_question__save_as_nickname
-msgid "If checked, this option will save the user's answer as its nickname."
-msgstr ""
-"Si coché, cette option enregistrera la réponse de l'utilisateur sous son "
-"surnom."
-
-#. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_question__is_conditional
 msgid ""
 "If checked, this question will be displayed only\n"
@@ -1447,11 +1440,6 @@ msgstr "Utilisateur responsable"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__save_as_email
 msgid "Save as user email"
 msgstr "Enregistrer comme email de l'utilisateur"
-
-#. module: of_survey
-#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__save_as_nickname
-msgid "Save as user nickname"
-msgstr "Enregistrer comme surnom de l'utilisateur"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_answer_view_search

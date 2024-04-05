@@ -73,9 +73,7 @@
                                 <group attrs="{'invisible': [('question_type', 'not in', ['char_box', 'date'])]}">
                                     <field name="validation_email" attrs="{'invisible': [('question_type', '!=', 'char_box')]}"/>
                                     <field name="save_as_email" attrs="{'invisible': ['|', ('validation_email', '=', False), ('question_type', '!=', 'char_box')]}"/>
-                                    <field name="save_as_nickname" attrs="{'invisible': [('question_type', '!=', 'char_box')]}"/>
                                 </group>
-
                             </group>
 
                             <group attrs="{'invisible': [('question_type', 'not in', ['simple_choice', 'multiple_choice'])]}">

@@ -161,8 +161,6 @@ class OFSurveyUserInput(models.Model):
             self._save_line_simple_answer(question, old_answers, answer)
             if question.save_as_email and answer:
                 self.write({'email': answer})
-            if question.save_as_nickname and answer:
-                self.write({'nickname': answer})
 
         elif question.question_type in ['simple_choice', 'multiple_choice']:
             self._save_line_choice(question, old_answers, answer, comment)

@@ -273,13 +273,11 @@ class OFSurveySurvey(models.Model):
             user_inputs += user_inputs.create(answer_vals)
 
         for question in self.mapped('question_ids').filtered(
-            lambda q: q.question_type == 'char_box' and (q.save_as_email or q.save_as_nickname)
+            lambda q: q.question_type == 'char_box' and (q.save_as_email)
         ):
             for user_input in user_inputs:
                 if question.save_as_email and user_input.email:
                     user_input.save_lines(question, user_input.email)
-                if question.save_as_nickname and user_input.nickname:
-                    user_input.save_lines(question, user_input.nickname)
 
         return user_inputs
 

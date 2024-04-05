@@ -91,14 +91,6 @@ class OFSurveyQuestion(models.Model):
         copy=True,
         help="If checked, this option will save the user's answer as its email address.",
     )
-    save_as_nickname = fields.Boolean(
-        string="Save as user nickname",
-        compute='_compute_save_as_nickname',
-        readonly=False,
-        store=True,
-        copy=True,
-        help="If checked, this option will save the user's answer as its nickname.",
-    )
     # -- simple choice / multiple choice
     suggested_answer_ids = fields.One2many(
         comodel_name='of.survey.question.answer',
@@ -270,12 +262,6 @@ class OFSurveyQuestion(models.Model):
         for question in self:
             if question.question_type != 'char_box' or not question.validation_email:
                 question.save_as_email = False
-
-    @api.depends('question_type')
-    def _compute_save_as_nickname(self):
-        for question in self:
-            if question.question_type != 'char_box':
-                question.save_as_nickname = False
 
     @api.depends('question_type')
     def _compute_validation_required(self):
