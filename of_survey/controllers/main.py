@@ -292,7 +292,7 @@ class OFSurvey(http.Controller):
             new_previous_id = survey_sudo._get_next_page_or_question(
                 answer_sudo, previous_page_or_question_id, go_back=True
             ).id
-            page_or_question = request.env['survey.question'].sudo().browse(previous_page_or_question_id)
+            page_or_question = request.env['of.survey.question'].sudo().browse(previous_page_or_question_id)
             data |= {
                 page_or_question_key: page_or_question,
                 'previous_page_id': new_previous_id,
