@@ -19,11 +19,6 @@
         'reports/report_intervention_report.xml',
         'reports/report_intervention_sheet.xml',
     ],
-    'assets': {
-        'web.assets_frontend': [
-            'of_planning_survey/static/src/js/survey.js',
-        ],
-    },
     'installable': True,
     'application': False,
     'auto_install': True,

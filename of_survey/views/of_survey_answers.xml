@@ -10,9 +10,8 @@
                     <field name="question_id"/>
                     <field name="answers"/>
                     <field name="question_type" invisible="1"/>
-                    <field name="images" mode="kanban" attrs="{'invisible': [('images','=',[])]}">
-
-                    </field>
+                    <field name="image_ids" mode="kanban" attrs="{'invisible': [('image_ids','=',[])]}"/>
+                    <field name="form" attrs="{'invisible': [('form','=',False)]}"/>
                 </group>
             </form>
         </field>
@@ -28,7 +27,5 @@
             </tree>
         </field>
     </record>
-
-
 
 </odoo>

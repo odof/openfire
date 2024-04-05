@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 14:36+0000\n"
-"PO-Revision-Date: 2024-04-19 14:36+0000\n"
+"POT-Creation-Date: 2024-04-26 12:53+0000\n"
+"PO-Revision-Date: 2024-04-26 12:53+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,15 @@ msgstr "(Cocher pour mettre par défaut)"
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_403_page
 msgid "403: Forbidden"
 msgstr "403 : Interdit"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid ""
+"<i class=\"fa fa-align-justify fa-4x\" role=\"img\" aria-label=\"Multiple "
+"lines\" title=\"Multiple Lines\"/>"
+msgstr ""
+"<i class=\"fa fa-align-justify fa-4x\" role=\"img\" aria-label=\"Multiple "
+"lines\" title=\"Lignes multiples\"/>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -145,6 +154,11 @@ msgstr ""
 "<span attrs=\"{'invisible': [('has_conditional_questions','=',False)]}\">La "
 "progression ne peut-être affichée car il existe une ou plusieurs questions "
 "conditionnelles</span>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "<span>Fill PDF</span><br/>"
+msgstr "<span>Remplir PDF</span><br/>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -371,6 +385,11 @@ msgstr "Les participants répondent à la question..."
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image
 msgid "Background Image"
 msgstr "Image d'arrière-plan"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__background_image_pdf
+msgid "Background Image for PDF"
+msgstr "Image de fond pour PDF"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__background_image_url
@@ -634,6 +653,11 @@ msgid "Edit in backend"
 msgstr "Editer dans le backend"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__editable_pdf
+msgid "Editable PDF"
+msgstr "PDF éditable"
+
+#. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__email
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
 msgid "Email"
@@ -672,6 +696,11 @@ msgid "Exclude Tests"
 msgstr "Exclure les tests"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__form_filename
+msgid "Filename"
+msgstr "Nom de fichier"
+
+#. module: of_survey
 #. odoo-javascript
 #: code:addons/of_survey/static/src/js/survey_session_manage.js:0
 #: model_terms:ir.ui.view,arch_db:of_survey.of_user_input_session_manage_content
@@ -701,6 +730,25 @@ msgstr "Abonnés (Partenaires)"
 #: model:ir.model.fields,help:of_survey.field_of_survey_user_input__activity_type_icon
 msgid "Font awesome icon e.g. fa-tasks"
 msgstr "Icône Font Awesome par ex. fa-tasks"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__form
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__form
+msgid "Form"
+msgstr "Formulaire"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__form
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_form
+msgid "Form PDF"
+msgstr "Formulaire PDF"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_answers.py:0
+#, python-format
+msgid "Form-%(answer_id)s.pdf"
+msgstr "Formulaire-%(answer_id)s.pdf"
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__text_box
@@ -847,6 +895,7 @@ msgstr ""
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_image
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_form_image
 msgid "Image"
 msgstr ""
 
@@ -875,7 +924,7 @@ msgid "Image is required"
 msgstr "Une image est requise"
 
 #. module: of_survey
-#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__images
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__image_ids
 msgid "Images"
 msgstr ""
 
@@ -926,7 +975,7 @@ msgstr "Est dans une session"
 #: model:ir.model.fields,help:of_survey.field_of_survey_user_input__is_session_answer
 msgid "Is that user input part of a survey session or not."
 msgstr ""
-"Cette entrée de l'utilisateur fait-elle partie d'un Questionnaire ou non."
+"Cette entrée de l'utilisateur fait-elle partie d'un Questionnaire ou non ?"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_session_code
@@ -1570,20 +1619,21 @@ msgstr "Sections et Questions"
 
 #. module: of_survey
 #. odoo-python
+#. odoo-javascript
 #: code:addons/of_survey/models/of_survey_user_input.py:0
+#: code:addons/of_survey/models/of_survey_user_input.py:0
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#: code:addons/of_survey/static/src/js/survey_form.js:0
 #, python-format
 msgid "See file(s) for the answer"
 msgstr "Voir fichier(s) pour la réponse"
 
 #. module: of_survey
-#. odoo-javascript
 #. odoo-python
-#: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/models/of_survey_user_input_line.py:0
-#: code:addons/of_survey/static/src/js/survey_form.js:0
 #, python-format
-msgid "See file(s) for the answser"
-msgstr "Voir fichier(s) pour la réponse"
+msgid "See files"
+msgstr "Voir fichiers"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__sequence
@@ -1667,7 +1717,7 @@ msgstr ""
 "Statut basé sur les activités\n"
 "En retard : la date d'échéance est déjà dépassée\n"
 "Aujourd'hui : la date d'activité est aujourd'hui\n"
-"Planifiée : activités futures."
+"Planifiée : activités futures"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_fill_form_in_progress
@@ -1817,6 +1867,13 @@ msgstr "Merci !"
 
 #. module: of_survey
 #. odoo-python
+#: code:addons/of_survey/models/of_survey_user_input_line.py:0
+#, python-format
+msgid "The answer must be in the right type"
+msgstr ""
+
+#. module: of_survey
+#. odoo-python
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
@@ -1940,8 +1997,8 @@ msgid "This is a Test Survey."
 msgstr "Ceci est un Questionnaire test."
 
 #. module: of_survey
-#. odoo-javascript
 #. odoo-python
+#. odoo-javascript
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/static/src/js/survey_form.js:0
 #: code:addons/of_survey/tests/test_survey.py:0

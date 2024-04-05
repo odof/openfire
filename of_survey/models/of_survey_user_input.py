@@ -170,6 +170,8 @@ class OFSurveyUserInput(models.Model):
             self._save_line_file(question, old_answers, answer)
         elif question.question_type in ['simple_choice', 'multiple_choice']:
             self._save_line_choice(question, old_answers, answer, comment, attachments)
+        elif question.question_type == 'form':
+            self._save_line_pdf(question, old_answers, answer)
         else:
             raise AttributeError(f"{question.question_type}: This type of question has no saving function")
 
@@ -189,6 +191,18 @@ class OFSurveyUserInput(models.Model):
         else:
             old_answers = self.env['of.survey.user_input.line'].create(vals)
 
+        return old_answers
+
+    def _save_line_pdf(self, question, old_answers, answer):
+        if answer:
+            datas = answer.split(",")
+            datas = datas[1] if len(datas) > 1 else datas[0]
+            answer = bytes(datas, 'utf-8')
+
+        vals = self._get_line_answer_values(question, answer, question.question_type)
+        if not old_answers:
+            return self.env['of.survey.user_input.line'].create(vals)
+        old_answers.write(vals)
         return old_answers
 
     def _save_line_choice(self, question, old_answers, answers, comment, attachments):
@@ -218,7 +232,7 @@ class OFSurveyUserInput(models.Model):
         old_answers.sudo().unlink()
         return self.env['of.survey.user_input.line'].create(vals_list)
 
-    def _get_line_answer_values(self, question, answer, answer_type, attachments):
+    def _get_line_answer_values(self, question, answer, answer_type, attachments=None):
         vals = {
             'user_input_id': self.id,
             'question_id': question.id,
@@ -239,7 +253,7 @@ class OFSurveyUserInput(models.Model):
         else:
             if not answer or (isinstance(answer, str) and not answer.strip()):
                 if len(attachments) > 0:
-                    answer = _("See file(s) for the answser")
+                    answer = _("See file(s) for the answer")
 
             vals[f'value_{answer_type}'] = answer
 

@@ -590,6 +590,28 @@ input.images {
  a.add-attachment {
      margin-top: 10px;
  }
+// CSS pour la partie annotation des PDF
+
+.annotation-layer{
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 1;
+}
+
+.annotation-layer section{
+  position: absolute;
+  cursor: pointer;
+}
+
+.annotation-layer section a{
+  display: block;
+  width: 100%;
+  height: 10px;
+}
+
 // Avoid shifting (due to scroll bar) when opening the image zoom widget
 .modal-open {
     .o_survey_background {

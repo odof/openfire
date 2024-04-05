@@ -66,6 +66,13 @@
                                     <span>Upload Images</span><br/>
                                     <p class="o_image"/>
                                 </div>
+                                <!-- Form -->
+                                <div attrs="{'invisible': [('question_type', '!=', 'form')]}">
+                                    <span>Fill PDF</span><br/>
+                                    <div class="w-lg-50 d-none d-sm-block o_preview_form" style="">
+                                        <i class="fa fa-align-justify fa-4x" role="img" aria-label="Multiple lines" title="Multiple Lines"/>
+                                    </div>
+                                </div>
                             </div>
                         </group>
                     </group>
@@ -94,6 +101,10 @@
                                     </tree>
                                 </field>
                             </group>
+                            <group attrs="{'invisible': [('question_type','!=','form')]}">
+                                <field name="editable_pdf" attrs="{'required': [('question_type','=','form')]}"/>
+                                <field name="background_image_pdf" attrs="{'required': [('question_type','=','form')]}"/>
+                            </group>
                         </page>
                         <page string="Description" name="survey_description">
                             <field name="description" widget="html"
@@ -101,7 +112,7 @@
                         </page>
                         <page string="Options" name="options" attrs="{'invisible': [('is_page', '=', True)]}">
                             <group>
-                                <group string="Answers" attrs="{'invisible':[('question_type','=','multi_image')]}">
+                                <group string="Answers" attrs="{'invisible':[('question_type','in',['multi_image','form'])]}">
                                     <!-- Global validation setting -->
                                     <field name="validation_required" invisible="1"/>
                                     <!-- Char -->

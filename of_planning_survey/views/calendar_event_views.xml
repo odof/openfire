@@ -26,7 +26,9 @@
                                     <field name="question_id" readonly="1"/>
                                     <field name="answers" readonly="1"/>
                                     <field name="question_type" invisible="1"/>
-                                    <field name="images" mode="kanban"/>
+                                    <field name="image_ids" mode="kanban" attrs="{'invisible': [('image_ids','=',[])]}"/>
+                                    <field name="form_filename" invisible="1"/>
+                                    <field name="form" attrs="{'invisible': [('form','=',False)]}" filename="form_filename"/>
                                 </group>
                             </form>
                         </field>

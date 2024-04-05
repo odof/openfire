@@ -1,5 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+import base64
+import io
 
+import pypdfium2 as pdfium
 
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import ValidationError
@@ -78,6 +81,7 @@ class OFSurveyQuestion(models.Model):
             ('char_box', "Single Line Text Box"),
             ('date', "Date"),
             ('multi_image', "Upload Image"),
+            ('form', 'Form'),
         ],
         compute='_compute_question_type',
         readonly=False,
@@ -101,6 +105,9 @@ class OFSurveyQuestion(models.Model):
         copy=True,
         help="Labels used for proposed choices: simple choice, multiple choice",
     )
+    # -- form
+    editable_pdf = fields.Binary(string="Editable PDF")
+    background_image_pdf = fields.Binary(string="Background Image for PDF")
 
     time_limit = fields.Integer(string="Time limit (seconds)")
     # -- comments (simple choice, multiple choice)
@@ -339,6 +346,25 @@ class OFSurveyQuestion(models.Model):
             )
             and all(len(answer_ids) > 0 for answer_ids in self.conditional_questions.mapped('answer_ids'))
         )
+
+    # ------------------------------------------------------------
+    # onchange method
+    # ------------------------------------------------------------
+
+    @api.onchange('editable_pdf')
+    def _onchange_editable_pdf(self):
+        if self.editable_pdf:
+            # on convertit la première page du form en image
+            pdf = pdfium.PdfDocument(base64.b64decode(self.editable_pdf))
+            page = pdf[0]
+            bitmap = page.render(scale=1)
+            image = bitmap.to_pil()
+            with io.BytesIO() as output:
+                image.save(output, format="PNG")
+                contents = output.getvalue()
+            self.background_image_pdf = base64.b64encode(contents)
+        else:
+            self.background_image_pdf = False
 
     # ------------------------------------------------------------
     # VALIDATION

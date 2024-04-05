@@ -173,6 +173,8 @@
                                 <field name="caption"/>
                             </tree>
                         </field>
+                        <field name="value_form" colspan='2' attrs="{'invisible': [('answer_type','!=','form')]}"/>
+                        <field name="value_form_image" colspan='2' attrs="{'invisible': [('answer_type','!=','form')]}" widget="image"/>
                     </group>
                 </sheet>
             </form>

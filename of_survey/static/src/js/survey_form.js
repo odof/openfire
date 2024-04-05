@@ -1,4 +1,4 @@
-odoo.define('of_survey.form', function(require) {
+odoo.define("of_survey.form", function (require) {
     "use strict";
 
     var field_utils = require("web.field_utils");
@@ -13,9 +13,18 @@ odoo.define('of_survey.form', function(require) {
     const {getCookie, setCookie, deleteCookie} = require("web.utils.cookies");
 
     var OFSurveyPreloadImageMixin = require("of_survey.preload_image_mixin");
+    const { OFSurveyImageZoomer } = require("@of_survey/js/survey_image_zoomer");
 
     var _t = core._t;
     var isMac = navigator.platform.toUpperCase().includes("MAC");
+
+    function blobToBase64(blob) {
+        return new Promise((resolve, _) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
+    }
 
     publicWidget.registry.OFSurveyFormWidget = publicWidget.Widget.extend(
         OFSurveyPreloadImageMixin,
@@ -52,56 +61,71 @@ odoo.define('of_survey.form', function(require) {
                 this.questions_answers = [];
                 this.images = {};
                 this.current_question_id = false;
+                this.form_pdf = [];
                 return this._super
                     .apply(this, arguments)
                     .then(function () {
                         self.options = self.$target.find("form").data();
-                        self.readonly = self.options.readonly;
-                        self.imgZoomer = false;
+                        if (self.options) {
+                            self.readonly = self.options.readonly;
+                            self.imgZoomer = false;
 
-                        // Add Survey cookie to retrieve the survey if you quit the page and restart the survey.
-                        if (!getCookie("survey_" + self.options.surveyToken)) {
-                            setCookie(
-                                "survey_" + self.options.surveyToken,
-                                self.options.answerToken,
-                                60 * 60 * 24,
-                                "optional"
-                            );
-                        }
+                            // Add Survey cookie to retrieve the survey if you quit the page and restart the survey.
+                            if (!getCookie("survey_" + self.options.surveyToken)) {
+                                setCookie(
+                                    "survey_" + self.options.surveyToken,
+                                    self.options.answerToken,
+                                    60 * 60 * 24,
+                                    "optional"
+                                );
+                            }
 
-                        // Init fields
-                        if (!self.options.isStartScreen && !self.readonly) {
-                            self._initBreadcrumb();
-                        }
-                        self.$("div.o_survey_form_date").each(function () {
-                            self._initDateTimePicker($(this));
-                        });
-                        self._initChoiceItems();
-                        self._initTextArea();
-                        self._focusOnFirstInput();
-                        // Init event listener
-                        if (!self.readonly) {
-                            $(document).on("keydown", self._onKeyDown.bind(self));
-                        }
-                        if (
-                            self.options.sessionInProgress &&
-                            (self.options.isStartScreen ||
-                                self.options.hasAnswered ||
-                                self.options.isPageDescription)
-                        ) {
-                            self.preventEnterSubmit = true;
-                        }
-                        self._initSessionManagement();
+                            // Init fields
+                            if (!self.options.isStartScreen && !self.readonly) {
+                                self._initBreadcrumb();
+                            }
+                            self.$("div.o_survey_form_date").each(function () {
+                                self._initDateTimePicker($(this));
+                            });
+                            self.$(".o_survey_pdf_container").each(function () {
+                                let widgetPDF =
+                                    new publicWidget.registry.OFSurveyFormPDFWidget(
+                                        this,
+                                        {
+                                            question_id: $(this).attr("id"),
+                                        }
+                                    );
+                                widgetPDF.appendTo($(this));
+                                self.form_pdf.push(widgetPDF);
+                            });
 
-                        // Needs global selector as progress/navigation are not within the survey form, but need
-                        //to be updated at the same time
-                        self.$surveyProgress = $(".o_survey_progress_wrapper");
-                        self.$surveyNavigation = $(".o_survey_navigation_wrapper");
-                        self.$surveyNavigation
-                            .find(".o_survey_navigation_submit")
-                            .on("click", self._onSubmit.bind(self));
+                            self._initChoiceItems();
+                            self._initTextArea();
+                            self._focusOnFirstInput();
+                            // Init event listener
+                            if (!self.readonly) {
+                                $(document).on("keydown", self._onKeyDown.bind(self));
+                            }
+                            if (
+                                self.options.sessionInProgress &&
+                                (self.options.isStartScreen ||
+                                    self.options.hasAnswered ||
+                                    self.options.isPageDescription)
+                            ) {
+                                self.preventEnterSubmit = true;
+                            }
+                            self._initSessionManagement();
 
-                        self.$('button[type="submit"]').removeClass("disabled");
+                            // Needs global selector as progress/navigation are not within the survey form, but need
+                            //to be updated at the same time
+                            self.$surveyProgress = $(".o_survey_progress_wrapper");
+                            self.$surveyNavigation = $(".o_survey_navigation_wrapper");
+                            self.$surveyNavigation
+                                .find(".o_survey_navigation_submit")
+                                .on("click", self._onSubmit.bind(self));
+
+                            self.$('button[type="submit"]').removeClass("disabled");
+                        }
                     })
                     .then(function () {
                         if ($(".show_start").attr("data-show") == "no") {
@@ -116,6 +140,68 @@ odoo.define('of_survey.form', function(require) {
 
             // Handlers
             // -------------------------------------------------------------------------
+
+            /**
+             * Handle keyboard navigation:
+             * - 'enter' or 'arrow-right' => submit form
+             * - 'arrow-left' => submit form (but go back backwards)
+             * - other alphabetical character ('a', 'b', ...)
+             *   Select the related option in the form (if available)
+             *
+             * @param {Event} event
+             */
+            _onKeyDown: function (event) {
+                var self = this;
+                var keyCode = event.keyCode;
+
+                // If user is answering a text input, do not handle keydown
+                // CTRL+enter will force submission (meta key for Mac)
+                if (
+                    (this.$("textarea").is(":focus") || this.$("input").is(":focus")) &&
+                    (!(event.ctrlKey || event.metaKey) || keyCode !== 13)
+                ) {
+                    return;
+                }
+                // If in session mode and question already answered, do not handle keydown
+                if (this.$('fieldset[disabled="disabled"]').length !== 0) {
+                    return;
+                }
+                // Disable all navigation keys when zoom modal is open, except the ESC.
+                if (this.imgZoomer && !this.imgZoomer.isDestroyed() && keyCode !== 27) {
+                    return;
+                }
+
+                var letter = String.fromCharCode(keyCode).toUpperCase();
+
+                // Handle Start / Next / Submit
+                if (keyCode === 13 || keyCode === 39) {
+                    // Enter or arrow-right: go Next
+                    event.preventDefault();
+                    if (!this.preventEnterSubmit) {
+                        var isFinish = this.$('button[value="finish"]').length !== 0;
+                        this._submitForm({ isFinish: isFinish });
+                    }
+                } else if (keyCode === 37) {
+                    // arrow-left: previous (if available)
+                    // It's easier to actually click on the button (if in the DOM) as it contains necessary
+                    // data that are used in the event handler.
+                    // Again, global selector necessary since the navigation is outside of the form.
+                    $('.o_survey_navigation_submit[value="previous"]').click();
+                } else if (
+                    self.options.questionsLayout === "page_per_question" &&
+                    letter.match(/[a-z]/i)
+                ) {
+                    var $choiceInput = this.$(`input[data-selection-key=${letter}]`);
+                    if ($choiceInput.length === 1) {
+                        $choiceInput
+                            .prop("checked", !$choiceInput.prop("checked"))
+                            .trigger("change");
+
+                        // Avoid selection key to be typed into the textbox if 'other' is selected by key
+                        event.preventDefault();
+                    }
+                }
+            },
 
             // -------------------------------------------------------------------------
             // Gestion de la partie upload d'images
@@ -277,67 +363,6 @@ odoo.define('of_survey.form', function(require) {
             // Fin de gestion de la partie upload d'images
             // -------------------------------------------------------------------------
 
-            /**
-             * Handle keyboard navigation:
-             * - 'enter' or 'arrow-right' => submit form
-             * - 'arrow-left' => submit form (but go back backwards)
-             * - other alphabetical character ('a', 'b', ...)
-             *   Select the related option in the form (if available)
-             *
-             * @param {Event} event
-             */
-            _onKeyDown: function (event) {
-                var self = this;
-                var keyCode = event.keyCode;
-
-                // If user is answering a text input, do not handle keydown
-                // CTRL+enter will force submission (meta key for Mac)
-                if (
-                    (this.$("textarea").is(":focus") || this.$("input").is(":focus")) &&
-                    (!(event.ctrlKey || event.metaKey) || keyCode !== 13)
-                ) {
-                    return;
-                }
-                // If in session mode and question already answered, do not handle keydown
-                if (this.$('fieldset[disabled="disabled"]').length !== 0) {
-                    return;
-                }
-                // Disable all navigation keys when zoom modal is open, except the ESC.
-                if (this.imgZoomer && !this.imgZoomer.isDestroyed() && keyCode !== 27) {
-                    return;
-                }
-
-                var letter = String.fromCharCode(keyCode).toUpperCase();
-
-                // Handle Start / Next / Submit
-                if (keyCode === 13 || keyCode === 39) {
-                    // Enter or arrow-right: go Next
-                    event.preventDefault();
-                    if (!this.preventEnterSubmit) {
-                        var isFinish = this.$('button[value="finish"]').length !== 0;
-                        this._submitForm({isFinish: isFinish});
-                    }
-                } else if (keyCode === 37) {
-                    // arrow-left: previous (if available)
-                    // It's easier to actually click on the button (if in the DOM) as it contains necessary
-                    // data that are used in the event handler.
-                    // Again, global selector necessary since the navigation is outside of the form.
-                    $('.o_survey_navigation_submit[value="previous"]').click();
-                } else if (
-                    self.options.questionsLayout === "page_per_question" &&
-                    letter.match(/[a-z]/i)
-                ) {
-                    var $choiceInput = this.$(`input[data-selection-key=${letter}]`);
-                    if ($choiceInput.length === 1) {
-                        $choiceInput
-                            .prop("checked", !$choiceInput.prop("checked"))
-                            .trigger("change");
-
-                        // Avoid selection key to be typed into the textbox if 'other' is selected by key
-                        event.preventDefault();
-                    }
-                }
-            },
 
             /**
              * Checks, if the 'other' choice is checked. Applies only if the comment count as answer.
@@ -472,7 +497,7 @@ odoo.define('of_survey.form', function(require) {
 
                             self._rpc({
                                 route: `/of_survey/conditional-questions-from-answer/${self.options.userInputId}`,
-                                params: {questions_answers: self.questions_answers},
+                                params: { questions_answers: self.questions_answers },
                             }).then(function (results) {
                                 // on cache les questions inactives
                                 self._getInactiveConditionalQuestionIds().then(
@@ -571,7 +596,7 @@ odoo.define('of_survey.form', function(require) {
 
                             this._rpc({
                                 route: `/of_survey/conditional-questions-from-answer/${self.options.userInputId}/`,
-                                params: {questions_answers: self.questions_answers},
+                                params: { questions_answers: self.questions_answers },
                             }).then(function (results) {
                                 // on cache les questions inactives
                                 self._getInactiveConditionalQuestionIds().then(
@@ -665,8 +690,30 @@ odoo.define('of_survey.form', function(require) {
                 }
             },
 
-            _onSubmit: function (event) {
+            _onSubmit: async function (event) {
                 event.preventDefault();
+                var self = this;
+                // on demande aux PDF de se sauvegarder s'il y en a
+                var pdf_containers = this.$(".o_survey_pdf_container");
+                await Promise.all(
+                    pdf_containers.map(async (container) => {
+                        await Promise.all(
+                            self.form_pdf.map(async (f_pdf) => {
+                                var data = await f_pdf.pdf.saveDocument();
+                                var blob = new Blob([data], {
+                                    type: "application/pdf",
+                                });
+                                var base64data = await blobToBase64(blob);
+                                var $input = $(`input[name="${f_pdf.question_id}"]`);
+                                $input.attr("data-oe-data", base64data);
+                            })
+                        );
+                    })
+                );
+
+                // on vide la liste des PDF
+                this.form_pdf = [];
+
                 var options = {};
                 var $target = $(event.currentTarget);
                 if ($target.val() === "previous") {
@@ -698,7 +745,7 @@ odoo.define('of_survey.form', function(require) {
             },
 
             _onBreadcrumbClick: function (event) {
-                this._submitForm({previousPageId: event.data.previousPageId});
+                this._submitForm({ previousPageId: event.data.previousPageId });
             },
 
             /**
@@ -725,7 +772,7 @@ odoo.define('of_survey.form', function(require) {
              * @param {CustomEvent} ev
              * @param {Array[]} [ev.detail] notifications structured as specified by the bus feature
              */
-            _onNotification: function ({detail: notifications}) {
+            _onNotification: function ({ detail: notifications }) {
                 var nextPageEvent = false;
                 if (notifications && notifications.length !== 0) {
                     notifications.forEach(function (notification) {
@@ -806,7 +853,7 @@ odoo.define('of_survey.form', function(require) {
                     params.previous_page_id = options.previousPageId;
                 }
                 var route = "/of_survey/submit";
-                if (this.options.isStartScreen) {
+                if (this.options && this.options.isStartScreen) {
                     route = "/of_survey/begin";
                     // Hide survey title in 'page_per_question' layout: it takes too much space
                     if (this.options.questionsLayout === "page_per_question") {
@@ -946,6 +993,18 @@ odoo.define('of_survey.form', function(require) {
                     this.$("div.o_survey_form_date").each(function () {
                         self._initDateTimePicker($(this));
                     });
+
+                    this.$(".o_survey_pdf_container").each(function () {
+                        let widgetPDF = new publicWidget.registry.OFSurveyFormPDFWidget(
+                            this,
+                            {
+                                question_id: $(this).attr("id"),
+                            }
+                        );
+                        widgetPDF.appendTo($(this));
+                        self.form_pdf.push(widgetPDF);
+                    });
+
                     if (this.options.isStartScreen || (options && options.initTimer)) {
                         this.options.isStartScreen = false;
                     } else {
@@ -986,7 +1045,7 @@ odoo.define('of_survey.form', function(require) {
                         );
                     }
                     this.$(".o_survey_form_content").fadeIn(this.fadeInOutDelay);
-                    $("html, body").animate({scrollTop: 0}, this.fadeInOutDelay);
+                    $("html, body").animate({ scrollTop: 0 }, this.fadeInOutDelay);
 
                     this.$('button[type="submit"]').removeClass("disabled");
 
@@ -1005,6 +1064,7 @@ odoo.define('of_survey.form', function(require) {
                 let model = $(".show_end").attr("res-model");
                 let action_id = $(".show_end").attr("action-id");
                 let survey_id = $(".show_end").attr("survey-id");
+                let menu_id = $(".show_end").attr("menu-id");
                 if (show_end == "no") {
                     if (record_id && model && action_id) {
                         window.location =
@@ -1013,7 +1073,9 @@ odoo.define('of_survey.form', function(require) {
                             "&model=" +
                             model +
                             "&view_type=form&action=" +
-                            action_id;
+                            action_id +
+                            "&menu_id=" +
+                            menu_id;
                     } else {
                         window.location =
                             "/web/#id=" +
@@ -1149,6 +1211,11 @@ odoo.define('of_survey.form', function(require) {
                                 }
                             }
                             break;
+                        case "form":
+                            if (questionRequired && !$input.attr("data-oe-data")) {
+                                errors[questionId] = constrErrorMsg;
+                            }
+                            break;
                     }
                 });
                 if (_.keys(errors).length > 0) {
@@ -1229,6 +1296,9 @@ odoo.define('of_survey.form', function(require) {
                         case "matrix":
                             params = self._prepareSubmitAnswersMatrix(params, $(this));
                             break;
+                        case "form":
+                            params[this.name] = $(this).data("oe-data");
+                            break;
                     }
                 });
             },
@@ -1240,7 +1310,7 @@ odoo.define('of_survey.form', function(require) {
              */
             _prepareSubmitDates: function (params, questionId, value, isDateTime) {
                 var momentDate = isDateTime
-                    ? field_utils.parse.datetime(value, null, {timezone: true})
+                    ? field_utils.parse.datetime(value, null, { timezone: true })
                     : field_utils.parse.date(value);
                 var formattedDate = momentDate ? momentDate.toJSON() : "";
                 params[questionId] = formattedDate;
@@ -1278,7 +1348,7 @@ odoo.define('of_survey.form', function(require) {
                     // si la valeur est vide mais qu'il y a un attachment, on mets dans value
                     // une valeur pour dire de regarder la pièce jointe
                     if (this.images[questionId].length > 0) {
-                        value = _t("See file(s) for the answser");
+                        value = _t("See file(s) for the answer");
                     }
                 }
                 if (questionId in params) {
@@ -1303,7 +1373,7 @@ odoo.define('of_survey.form', function(require) {
                 var self = this;
                 $parent.find("textarea").each(function () {
                     if (this.value) {
-                        var value = {comment: this.value};
+                        var value = { comment: this.value };
                         if (isMatrix) {
                             params = self._prepareSubmitAnswerMatrix(
                                 params,
@@ -1423,7 +1493,7 @@ odoo.define('of_survey.form', function(require) {
 
                 var minDate = minDateData
                     ? this._formatDateTime(minDateData, datetimepickerFormat)
-                    : moment({y: 1000});
+                    : moment({ y: 1000 });
 
                 var maxDate = maxDateData
                     ? this._formatDateTime(maxDateData, datetimepickerFormat)
@@ -1592,7 +1662,7 @@ odoo.define('of_survey.form', function(require) {
                 var errorKeys = _.keys(errors);
                 _.each(errorKeys, function (key) {
                     self.$("#" + key + ">.o_survey_question_error")
-                        .append($("<p>", {text: errors[key]}))
+                        .append($("<p>", { text: errors[key] }))
                         .addClass("slide_in");
                     if (errorKeys[0] === key) {
                         self._scrollToError(self.$(".js_question-wrapper#" + key));

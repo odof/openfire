@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+<t t-name="of_survey.survey_form_pdf_template">
+    <div id="viewerContainer">
+        <div t-attf-id="viewer_{{widget.question_id}}" class="pdfViewer" t-attf-data="/web/content/of.survey.question/{{widget.question_id}}/editable_pdf">
+        <canvas t-attf-id="canvas_{{widget.question_id}}"></canvas>
+        <div t-attf-id="annotate_{{widget.question_id}}" class="annotationLayer"></div>
+        </div>
+
+    </div>
+</t>
+
+</templates>
