@@ -14,6 +14,7 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='of.sale.of_deposit_product_categ_id',
     )
     module_of_order_line_option = fields.Boolean(string="(OF) Order line option")
+    module_of_sale_layout_category = fields.Boolean(string="(OF) Sale Layout Category")
     of_fiscal_position_required = fields.Boolean(
         string="(OF) Fiscal position", config_parameter='of.sale.of_fiscal_position_required'
     )

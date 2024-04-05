@@ -1,0 +1,79 @@
+
+// The goal of this file is to contain CSS hacks related to allowing
+// section and note on sale order and invoice.
+
+table.o_of_section_list_view tr.o_data_row.o_is_line_note,
+table.o_of_section_list_view tr.o_data_row.o_is_line_note textarea[name="name"],
+div.oe_kanban_card.o_is_line_note {
+    font-style: italic;
+}
+
+table.o_of_section_list_view tr.o_data_row.o_is_line_section,
+div.oe_kanban_card.o_is_line_section {
+    font-weight: bold;
+    background-color: #b6b6b6;
+    &.brighter-1 {
+        background-color: hsl(0, 0%, 75%);
+    }
+    &.brighter-2 {
+        background-color: hsl(0, 0%, 80%);
+    }
+    &.brighter-3 {
+        background-color: hsl(0, 0%, 85%);
+    }
+    &.brighter-4 {
+        background-color: hsl(0, 0%, 90%);
+    }
+    &.brighter-5 {
+        background-color: hsl(0, 0%, 95%);
+    }
+    &.brighter-6 {
+        background-color: hsl(0, 0%, 100%);
+    }
+
+}
+
+table.o_of_section_list_view tr.o_data_row.o_is_line_section,
+div.oe_kanban_card.o_is_line_section .section_action{
+    font-weight: normal;
+}
+
+table.o_of_section_list_view .o_field_widget .o_row_handle {
+    color: #66598f;
+}
+
+table.o_of_section_list_view tr.o_data_row.o_is_line_section {
+    border-top: 1px solid #BBB;
+    border-bottom: 1px solid #BBB;
+    &.o_dragged_section {
+        background-color: rgb(113, 98, 158);
+        color: white;
+    }
+}
+
+table.o_of_section_list_view tr.o_data_row {
+    &.o_is_line_note,
+    &.o_is_line_section {
+        td {
+            // There is an undeterministic CSS behaviour in Chrome related to
+            // the combination of the row's and its children's borders.
+            border: none !important;
+        }
+    }
+}
+
+.o_field_section_and_note_text {
+    > span {
+        white-space: pre-wrap !important;
+    }
+}
+
+.popupover-info {
+    padding: 10px;
+
+    &.tree li {
+
+        display: block;
+
+    }
+}

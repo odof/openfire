@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="of_sale_layout_category.popupover_info" owl="1">
+        <t t-if="props.options.html">
+            <div class="popupover-info">
+                <t t-out="props.options.html"/>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="of_sale_layout_category.popupover_delete" owl="1">
+        <div class="container">
+            <form>
+                <div class="col-12 mt-3">
+                    <div class="form">
+                        <legend> What do you want to delete ?</legend>
+                        <div class="form-check">
+                          <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete1" value="all" checked="checked"/>
+                          <label class="form-check-label" for="radioDelete1">
+                            This section and all its content(s)
+                          </label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete2" value="one"/>
+                          <label class="form-check-label" for="radioDelete2">
+                            This section and move its content(s)
+                          </label>
+                        </div>
+                        <t t-if="state.section=='one'">
+                            <div class="form">
+                                <p>Move content(s) to this section :</p>
+                                <select name="section" class="form-select" t-model="state.sectionSelected">
+                                    <t t-foreach="sections" t-as="section" t-key="section_index">
+                                        <option t-att-value="section.id"><t t-esc="section.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <footer class="mt-3 mb-3 text-center">
+                    <button type="button" class="btn" t-on-click="cancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" t-on-click.stop.prevent="(ev) => this.delete(ev)">Delete</button>
+                </footer>
+            </form>
+        </div>
+    </t>
+
+</templates>

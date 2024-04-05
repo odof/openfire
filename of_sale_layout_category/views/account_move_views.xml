@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_move_view_form" model="ir.ui.view">
+        <field name="name">account.move.view.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="widget">of_invoice_section_one2many</attribute>
+            </xpath>
+            <xpath expr="//tree/field[@name='display_type']" position="after">
+                <field name="of_section_name" invisible="1"/>
+                <field name="of_node_id" invisible="1"/>
+                <field name="of_parent_node_id" invisible="1"/>
+                <field name="of_position_node" invisible="1"/>
+                <field name="of_level" invisible="1"/>
+            </xpath>
+            <!-- Limite arbitraire de 1000 lignes pour gérer correctement les sections -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="limit">1000</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

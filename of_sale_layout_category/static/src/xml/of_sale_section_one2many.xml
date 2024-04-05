@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+
+    <t t-name="of_sale_layout_category.OFSaleSectionListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary" owl="1">
+        <xpath expr="//table" position="attributes">
+            <attribute name="class" position="add" separator=" ">o_of_section_list_view</attribute>
+        </xpath>
+    </t>
+
+    <t t-name="of_sale_layout_category.OFSaleSectionLine" owl="1">
+        <td class="o_data_cell cursor-pointer o_field_cell o_list_number o_handle_cell" data-tooltip-delay="1000" tabindex="-1" name="sequence">
+           <t t-set="handle_column" t-value="getHandleColumn()"/>
+           <div
+                t-on-click="(ev) => this.onCellClicked(props.record)"
+                class="o_data_cell cursor-pointer"
+                name="name"
+                tabindex="-1">
+               <Field name="handle_column.name" record="props.record" type="handle_column.widget" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+           </div>
+        </td>
+        <td t-att-colspan="nbColumns-1">
+            <t t-if="state.active_layout_category">
+                <div class="row">
+                    <div class="col-1">
+                        <a href="#" t-on-click.stop.prevent="moveUp">
+                            <i class="fa fa-caret-left me-2"/>
+                        </a>
+                        <t t-esc="props.record.data.of_section_name"/>
+                        <a href="#" t-on-click.stop.prevent="moveDown">
+                            <i class="fa fa-caret-right ms-2"/>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <t t-set="section_column" t-value="getSectionColumn()"/>
+                        <t t-set="section_class" t-value="getSectionClass()"/>
+                        <div
+                            t-on-click="(ev) => this.onCellClicked(props.record)"
+                            class="o_data_cell cursor-pointer"
+                            name="name"
+                            tabindex="-1"
+                            t-ref="section_name">
+                            <Field name="section_column.name" record="props.record" type="section_column.widget" class="section_class" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+                        </div>
+                    </div>
+                    <div class="col text-end section_action">
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.addProduct(ev)" class="me-2">
+                            Add Product
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.duplicate(ev)">
+                            <i class="fa fa-copy me-2"/>
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.addSection(ev)">
+                            <i class="fa fa-plus me-2" />
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.deleteAsk(ev)">
+                            <i class="fa fa-trash-o me-2"/>
+                        </a>
+                    </div>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="row">
+                    <div class="col-6">
+                        <t t-set="section_column" t-value="getSectionColumn()"/>
+                        <t t-set="section_class" t-value="getSectionClass()"/>
+                        <div
+                            t-on-click="(ev) => this.onCellClicked(props.record)"
+                            class="o_data_cell cursor-pointer"
+                            name="name"
+                            tabindex="-1"
+                            t-ref="section_name">
+                            <Field name="section_column.name" record="props.record" type="section_column.widget" class="section_class" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+                        </div>
+                    </div>
+                    <div class="col text-end section_action">
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
+                            <i class="fa fa-trash-o me-2"/>
+                        </a>
+                    </div>
+                </div>
+            </t>
+        </td>
+    </t>
+
+</templates>

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//td[@name='td_section_line']" position="replace">
+            <td name="td_section_line" colspan="99">
+                <t t-if="doc.of_layout_category_active"><span t-field="line.of_section_name"/> - </t><span t-field="line.name"/>
+            </td>
+        </xpath>
+    </template>
+
+</odoo>

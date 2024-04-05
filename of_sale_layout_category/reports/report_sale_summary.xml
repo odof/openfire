@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_sale_summary">
+        <div class="container">
+            <h2>Sale Summary</h2>
+
+            <table class="table mt-3">
+                <thead>
+                    <tr>
+                        <th>Section</th>
+                        <th>Cost</th>
+                        <th>Sale Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="sale_id.order_line.filtered(lambda r: r.display_type == 'line_section')" t-as="section" t-key="section.id">
+                        <t t-set="section_lines" t-value="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == section.of_node_id)" />
+                        <tr>
+                            <td><t t-esc="section.of_section_name" /> - <t t-esc="section.name" /></td>
+                            <td>
+                                <span t-esc="sum(section_lines.mapped('purchase_price'))" />
+                            </td>
+                            <td>
+                                <span t-esc="sum(section_lines.mapped('price_subtotal'))" />
+                            </td>
+                            <td>
+                                <span t-esc="sum(section_lines.mapped('product_uom_qty'))" />
+                            </td>
+                        </tr>
+                    </t>
+                    <t t-set="lines_without_section" t-value="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == 0)" />
+                    <tr t-if="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == 0)">
+                        <td>
+                            <strong>Sans section</strong>
+                        </td>
+                        <td>
+                            <span t-esc="sum(lines_without_section.mapped('purchase_price'))" />
+                        </td>
+                        <td>
+                            <span t-esc="sum(lines_without_section.mapped('price_subtotal'))" />
+                        </td>
+                        <td>
+                            <span t-esc="sum(lines_without_section.mapped('product_uom_qty'))" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Total</strong>
+                        </td>
+                        <td>
+                            <span t-esc="sum(sale_id.order_line.mapped('purchase_price'))" />
+                        </td>
+                        <td>
+                            <span t-esc="sum(sale_id.order_line.mapped('price_subtotal'))" />
+                        </td>
+                        <td>
+                            <span t-esc="sum(sale_id.order_line.mapped('product_uom_qty'))" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+</odoo>

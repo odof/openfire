@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <template id="of_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='current_section']/.." position="replace">
+            <t t-if="line.display_type == 'line_section'">
+                <td colspan="99">
+                    <span t-field="line.of_section_name"/> - <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                </td>
+                <t t-set="current_section" t-value="line"/>
+                <t t-set="current_subtotal" t-value="0"/>
+            </t>
+        </xpath>
+    </template>
+
+</odoo>

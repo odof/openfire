@@ -141,6 +141,14 @@ class TestOFAccountCommon(TestOFProductCommon):
                 'list_price': 100,
             }
         )
+        cls.product_consu_b = cls.create_product(
+            {
+                'name': 'Product Consu B',
+                'default_code': 'PCA_456',
+                'standard_price': 19.99,
+                'list_price': 29.99,
+            }
+        )
 
         # Journal data
         cls.journal_purchase = cls.env['account.journal'].search(

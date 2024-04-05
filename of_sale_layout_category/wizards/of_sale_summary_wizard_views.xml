@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_summary_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.sale.summary.wizard.view.form</field>
+        <field name="model">of.sale.summary.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="doc" readonly="1"/>
+                <footer>
+                    <button special="cancel" string="Close" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+</odoo>

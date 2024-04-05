@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="widget">of_sale_section_one2many</attribute>
+            </xpath>
+
+            <!-- Column name is mandatory for the new widget -->
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                <attribute name="optional"></attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']" position="before">
+                <div class="row mb-2">
+                    <div class="col-3">
+                        <label for="of_layout_category_active">Layout Category</label>
+                        <field name="of_layout_category_active" widget="boolean_toggle"/>
+                    </div>
+                    <div class="col-3" attrs="{'invisible': [('of_layout_category_active','=',False)]}">
+                        <label for="of_show_products">Show Products</label>
+                        <field name="of_show_products" widget="boolean_toggle"/>
+                    </div>
+                    <div class="col-2 offset-4" attrs="{'invisible': [('of_layout_category_active','=',False)]}">
+                        <button class="btn btn-md btn-primary float-right" name="show_summary" type="object" string="Show Summary"/>
+                    </div>
+                </div>
+            </xpath>
+
+            <xpath expr="//field[@name='order_line']//tree/field[@name='display_type']" position="after">
+                <field name="of_section_name" invisible="1"/>
+                <field name="of_node_id" invisible="1"/>
+                <field name="of_parent_node_id" invisible="1"/>
+                <field name="of_position_node" invisible="1"/>
+                <field name="of_level" invisible="1"/>
+                <field name="of_show" invisible="1"/>
+            </xpath>
+
+            <!-- Limite arbitraire de 1000 lignes pour gérer correctement les sections -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="limit">1000</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

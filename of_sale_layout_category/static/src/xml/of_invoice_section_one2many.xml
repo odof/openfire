@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+
+    <t t-name="of_sale_layout_category.OFInvoiceSectionListRenderer" t-inherit="web.ListRenderer" t-inherit-mode="primary" owl="1">
+        <xpath expr="//table" position="attributes">
+            <attribute name="class" position="add" separator=" ">o_of_section_list_view</attribute>
+        </xpath>
+    </t>
+
+    <t t-name="of_sale_layout_category.OFInvoiceSectionLine" owl="1">
+        <td t-att-colspan="nbColumns">
+            <div class="row">
+                <div class="col-1">
+                    <t t-esc="props.record.data.of_section_name"/>
+                </div>
+                <div class="col-6">
+                    <t t-esc="props.record.data.name"/>
+                </div>
+                <div class="col text-end section_action">
+                    <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
+                        <i class="fa fa-trash-o me-2"/>
+                    </a>
+                </div>
+            </div>
+        </td>
+    </t>
+
+</templates>

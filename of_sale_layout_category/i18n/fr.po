@@ -1,0 +1,268 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_layout_category
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-27 15:41+0000\n"
+"PO-Revision-Date: 2024-03-27 15:41+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "<strong>Total</strong>"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "<strong>XXX%</strong>"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "<strong>XXX</strong>"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order__of_layout_category_active
+msgid "Active Layout Category"
+msgstr "Activer les sections avancées"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Add Product"
+msgstr "Ajouter un produit"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.of_sale_summary_wizard_view_form
+msgid "Close"
+msgstr "Fermer"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "Cost"
+msgstr "Coût"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "Delete"
+msgstr "Supprimer"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_invoice_section_listrenderer.xml:0
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_listrenderer.xml:0
+#, python-format
+msgid "Delete row"
+msgstr "Supprimer la ligne"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__doc
+msgid "Doc"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.sale_order_view_form
+msgid "Layout Category"
+msgstr "Section"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_level
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_level
+msgid "Level"
+msgstr "Niveau"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "Move content(s) to this section :"
+msgstr "Déplacer le contenu vers cette section :"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_node_id
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_node_id
+msgid "Node ID"
+msgstr "Id du noeud"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_position_node
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_position_node
+msgid "Node's Position"
+msgstr "Position du noeud"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_parent_node_id
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_parent_node_id
+msgid "Parent Node ID"
+msgstr "Id du noeud parent"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "Percent."
+msgstr "Pourcent."
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__sale_id
+msgid "Sale Order"
+msgstr "Commande client"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "Sale Price"
+msgstr "Prix de vente"
+
+#. module: of_sale_layout_category
+#. odoo-python
+#: code:addons/of_sale_layout_category/models/sale_order.py:0
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+#, python-format
+msgid "Sale Summary"
+msgstr "Résumé de vente"
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_of_sale_summary_wizard
+msgid "Sale Summary Wizard"
+msgstr "Wizard de résumé de vente"
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_stock_move__of_section
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "Section"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_section_name
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_section_name
+msgid "Section name"
+msgstr "Nom de la section"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order__of_show_products
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.sale_order_view_form
+msgid "Show Products"
+msgstr "Afficher produits"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.sale_order_view_form
+msgid "Show Summary"
+msgstr "Afficher résumé"
+
+#. module: of_sale_layout_category
+#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_show
+msgid "Show line"
+msgstr "Afficher ligne"
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_stock_move
+msgid "Stock Move"
+msgstr "Mouvement de stock"
+
+#. module: of_sale_layout_category
+#: model:ir.model,name:of_sale_layout_category.model_stock_rule
+msgid "Stock Rule"
+msgstr "Règle de stock minimum"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "This section and all its content(s)"
+msgstr "Cette section et tout son contenu"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "This section and move its content(s)"
+msgstr "Cette section et déplacer son contenu"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "What do you want to delete ?"
+msgstr "Que voulez-vous supprimer ?"
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "XXX"
+msgstr ""
+
+#. module: of_sale_layout_category
+#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
+msgid "XXX%"
+msgstr ""
