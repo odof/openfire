@@ -722,6 +722,15 @@ class CalendarEvent(models.Model):
             return super(CalendarEvent, self.sudo()).read(fields, load)
         return super().read(fields, load)
 
+    def write(self, vals):
+        res = super().write(vals)
+        if 'of_line_ids' in vals:
+            for intervention in self.filtered(
+                lambda i: i.of_type == 'intervention' and i.of_state in ['confirmed', 'done']
+            ):
+                intervention.action_generate_stock_picking()
+        return res
+
     def check_access_rule(self, operation):
         """Override to allow access to interventions with a specific context"""
         if not self.env.is_admin() and operation == 'read' and self.env.context.get('of_force_read'):
@@ -767,6 +776,7 @@ class CalendarEvent(models.Model):
 
     def action_button_confirm(self):
         self.write({'of_state': 'confirmed'})
+        self.action_generate_stock_picking()
 
     def action_button_ongoing(self):
         self.write({'of_state': 'ongoing'})
@@ -799,6 +809,7 @@ class CalendarEvent(models.Model):
 
     def action_button_cancel(self):
         self.write({'of_state': 'cancel'})
+        self.cancel_deliveries()
 
     def action_button_draft(self):
         self.write({'of_state': 'draft'})
@@ -1269,3 +1280,8 @@ class CalendarEvent(models.Model):
         return (
             task_name + (task_name and partner_name and ' - ' or '') + f'{partner_name} {start_date}'.replace('/', '-')
         ) or "report"
+
+    def cancel_deliveries(self):
+        """Cancel the stock pickings related to the calendar event."""
+        for picking in self.of_picking_ids:
+            picking.action_cancel()
