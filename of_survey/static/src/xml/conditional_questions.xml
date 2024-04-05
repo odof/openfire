@@ -101,7 +101,7 @@
                         <t t-call="of_survey.ConditionalQuestionsAnswers"/>
                     </div>
                     <div class="col-1">
-                        <a href="#" t-on-click.stop.prevent="DeleteCondition"><i class="fa fa-trash-o"></i></a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.DeleteCondition(ev,conditional)"><i class="fa fa-trash-o"></i></a>
                     </div>
                 </div>
             </t>
