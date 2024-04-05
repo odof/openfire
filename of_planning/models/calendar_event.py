@@ -357,8 +357,10 @@ class CalendarEvent(models.Model):
         """Override to always compute simple dates for interventions"""
         events = self.filtered(lambda e: e.of_type == 'intervention')
         for event in events:
-            event.start_date = event.start.date()
-            event.stop_date = event.stop.date()
+            if event.start:
+                event.start_date = event.start.date()
+            if event.stop:
+                event.stop_date = event.stop.date()
         return super(CalendarEvent, self - events)._compute_dates()
 
     @api.depends('of_partner_id', 'user_id')
@@ -867,6 +869,8 @@ class CalendarEvent(models.Model):
         )
 
     def action_generate_stock_picking(self):
+        if not self.of_address_id:
+            raise UserError(_("A customer address is required to generate a stock picking."))
         lines = self.mapped('of_line_ids')
         if all(line.product_id.type == 'service' for line in lines):
             if len(self) == 1:
@@ -994,7 +998,7 @@ class CalendarEvent(models.Model):
         events = self.filtered(
             lambda e: e.of_state in ['confirmed', 'ongoing', 'done', 'unfinished', 'postponed'] and not e.of_number
         )
-        for event in events:
+        for event in events.filtered(lambda e: e.of_template_id and e.of_template_id.sequence_id):
             event.write({'of_number': event.of_template_id.sequence_id.next_by_id()})
 
     def _get_invoicing_company(self, partner):
