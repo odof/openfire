@@ -100,17 +100,18 @@ class Base(models.AbstractModel):
         """Add empty records for groups without record.
         That allows to display empty rows for Resource that have no record in the view.
         """
-        resource_ids = [group[groupby[0]] for group in final_result['groups']]
-        resource_ids = list(map(lambda x: x and x[0], resource_ids))
-        if not resource_ids:
-            return
-        domain = self._planning_add_empty_records_domain(resource_ids)
-        for resource in self.env['resource.resource'].search(domain):
-            record = {groupby[0]: (resource.id, resource.name), '__record_ids': [], f'{groupby[0]}_count': 0}
+        res_ids = [group[groupby[0]] for group in final_result['groups']]
+        res_ids = list(map(lambda x: x and x[0], res_ids))
+        field_id = self.env['ir.model.fields'].sudo().search([('name', '=', groupby[0]), ('model_id', '=', self._name)])
+        domain = self._planning_add_empty_records_domain(res_ids, field_id)
+        for res_id in self.env[field_id.relation].search(domain):
+            record = {groupby[0]: (res_id.id, res_id.name), '__record_ids': [], f'{groupby[0]}_count': 0}
             final_result['groups'].append(record)
 
-    def _planning_add_empty_records_domain(self, resource_ids):
-        return [('resource_type', '=', 'user'), ('id', 'not in', resource_ids)]
+    def _planning_add_empty_records_domain(self, res_ids, field_id):
+        if field_id.relation == 'resource.resource':
+            return [('resource_type', '=', 'user'), ('id', 'not in', res_ids)]
+        return [('id', 'not in', res_ids)]
 
     @api.model
     def planning_unavailability(self, start_date, end_date, scale, group_bys=None, rows=None):

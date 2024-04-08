@@ -7,16 +7,17 @@ from odoo.osv import expression
 class Base(models.AbstractModel):
     _inherit = 'base'
 
-    def _planning_add_empty_records_domain(self, resource_ids):
-        domain = super()._planning_add_empty_records_domain(resource_ids)
-        domain = expression.AND(
-            [
-                domain,
+    def _planning_add_empty_records_domain(self, resource_ids, field_id):
+        domain = super()._planning_add_empty_records_domain(resource_ids, field_id)
+        if field_id.relation == 'resource.resource':
+            domain = expression.AND(
                 [
-                    '|',
-                    ('employee_id.of_is_operator', '=', 'True'),
-                    ('employee_id.of_is_salesperson', '=', 'True'),
-                ],
-            ]
-        )
+                    domain,
+                    [
+                        '|',
+                        ('employee_id.of_is_operator', '=', 'True'),
+                        ('employee_id.of_is_salesperson', '=', 'True'),
+                    ],
+                ]
+            )
         return domain
