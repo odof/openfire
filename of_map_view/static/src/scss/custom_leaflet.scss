@@ -20,6 +20,16 @@
     height: calc(100% - 80px);
     overflow: scroll;
     pointer-events: none;
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
 }
 
 .map-popup {
@@ -27,6 +37,7 @@
     min-height: 24px;
     border: 1px solid rgb(75, 73, 73);
     border-radius: 5px;
+
     &--header {
         text-align: end;
     }
