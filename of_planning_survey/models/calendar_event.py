@@ -14,10 +14,16 @@ class CalendarEvent(models.Model):
         store=True,
         readonly=False,
     )
-    of_survey_user_input = fields.Many2one(comodel_name='of.survey.user_input', string="Survey User Input")
-    of_survey_user_input_line = fields.One2many(
+    of_survey_user_input_id = fields.Many2one(
+        comodel_name='of.survey.user_input',
+        string="Survey User Input",
+        compute='_compute_of_survey_user_input_id',
+        store=True,
+        readonly=False,
+    )
+    of_survey_user_input_line_ids = fields.One2many(
         comodel_name='of.survey.user_input.line',
-        related='of_survey_user_input.user_input_line_ids',
+        related='of_survey_user_input_id.user_input_line_ids',
         string="Survey User Input Line",
     )
     of_question_ids = fields.One2many(
@@ -34,12 +40,25 @@ class CalendarEvent(models.Model):
 
     @api.depends('of_template_id')
     def _compute_of_survey_id(self):
-        for event in self.filtered(lambda i: i.of_template_id and not i.of_survey_id):
+        for event in self:
             event.of_survey_id = event.of_template_id.survey_id
 
-    @api.depends('of_survey_user_input_line', 'of_question_ids')
+    @api.depends('of_survey_id')
+    def _compute_of_survey_user_input_id(self):
+        for event in self:
+            if event.of_survey_id:
+                event.of_survey_user_input_id = event.of_survey_id._create_answer(
+                    user=self.env.user, email=self.env.user.email
+                )
+                event.of_survey_user_input_id.res_model = event._name
+                event.of_survey_user_input_id.res_id = event._origin.id
+                event.of_survey_user_input_id.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
+                event.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+
+    @api.depends('of_survey_user_input_line_ids', 'of_question_ids')
     def _compute_question_answers_ids(self):
         for event in self:
+            event.of_answers_ids = False
             question_answers_ids = []
 
             for question in event.of_question_ids:
@@ -50,7 +69,7 @@ class CalendarEvent(models.Model):
                     answers = ""
                 else:
                     answers = ", ".join(
-                        event.of_survey_user_input_line.filtered(lambda r: r.question_id.id == question.id).mapped(
+                        event.of_survey_user_input_line_ids.filtered(lambda r: r.question_id.id == question.id).mapped(
                             'display_name'
                         )
                     )
@@ -58,7 +77,8 @@ class CalendarEvent(models.Model):
                     if question_answers.answers != answers:
                         question_answers_ids.append(
                             Command.update(
-                                question_answers.id, {'answers': answers, 'user_input': event.of_survey_user_input.id}
+                                question_answers.id,
+                                {'answers': answers, 'user_input': event.of_survey_user_input_id.id},
                             )
                         )
                 else:
@@ -66,20 +86,10 @@ class CalendarEvent(models.Model):
                         'question_id': question.id,
                         'answers': answers,
                         'sequence': question.sequence,
-                        'user_input': event.of_survey_user_input.id,
+                        'user_input': event.of_survey_user_input_id.id,
                     }
                     question_answers_ids.append(Command.create(question_answers_value))
             event.of_answers_ids = question_answers_ids
-
-    @api.onchange('of_survey_id')
-    def _onchange_of_survey_id(self):
-        if self.of_survey_id:
-            self.of_answers_ids = False
-            self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.res_model = self._name
-            self.of_survey_user_input.res_id = self._origin.id
-            self.of_survey_user_input.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
-            self.of_survey_user_input.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
 
     def action_button_open_survey(self):
         self.ensure_one()
@@ -90,13 +100,13 @@ class CalendarEvent(models.Model):
                 ('res_id', '=', self._origin.id),
             ]
         ).unlink()
-        self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-        self.of_survey_user_input.res_model = self._name
-        self.of_survey_user_input.res_id = self._origin.id
-        self.of_survey_user_input.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
-        self.of_survey_user_input.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+        self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
+        self.of_survey_user_input_id.res_model = self._name
+        self.of_survey_user_input_id.res_id = self._origin.id
+        self.of_survey_user_input_id.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
+        self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
 
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
+        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
         return {
             'type': 'ir.actions.act_url',
             'name': _("Start Survey"),
@@ -106,12 +116,12 @@ class CalendarEvent(models.Model):
 
     def action_button_edit_survey(self):
         # on passe le survey en cours
-        self.of_survey_user_input._mark_in_progress()
+        self.of_survey_user_input_id._mark_in_progress()
 
         # on met sur la première question
-        self.of_survey_user_input.last_displayed_page_id = 0
+        self.of_survey_user_input_id.last_displayed_page_id = 0
 
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
+        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
         return {
             'type': 'ir.actions.act_url',
             'name': _("Edit Survey"),

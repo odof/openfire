@@ -17,10 +17,16 @@ class CrmLead(models.Model):
     of_engineering_office = fields.Many2one(comodel_name='res.partner', string="Engineering office")
 
     of_survey_id = fields.Many2one(comodel_name='of.survey.survey', string="Survey")
-    of_survey_user_input = fields.Many2one(comodel_name='of.survey.user_input', string="Survey User Input")
-    of_survey_user_input_line = fields.One2many(
+    of_survey_user_input_id = fields.Many2one(
+        comodel_name='of.survey.user_input',
+        string="Survey User Input",
+        compute='_compute_of_survey_user_input_id',
+        store=True,
+        readonly=False,
+    )
+    of_survey_user_input_line_ids = fields.One2many(
         comodel_name='of.survey.user_input.line',
-        related='of_survey_user_input.user_input_line_ids',
+        related='of_survey_user_input_id.user_input_line_ids',
         string="Survey User Input Line",
     )
     of_question_ids = fields.One2many(
@@ -35,7 +41,7 @@ class CrmLead(models.Model):
         readonly=False,
     )
 
-    @api.depends('of_survey_user_input_line', 'of_question_ids')
+    @api.depends('of_survey_user_input_line_ids', 'of_question_ids')
     def _compute_question_answers_ids(self):
         for lead in self:
             question_answers_ids = []
@@ -48,7 +54,7 @@ class CrmLead(models.Model):
                     answers = ""
                 else:
                     answers = ", ".join(
-                        lead.of_survey_user_input_line.filtered(lambda r: r.question_id.id == question.id).mapped(
+                        lead.of_survey_user_input_line_ids.filtered(lambda r: r.question_id.id == question.id).mapped(
                             'display_name'
                         )
                     )
@@ -56,7 +62,7 @@ class CrmLead(models.Model):
                     if question_answers.answers != answers:
                         question_answers_ids.append(
                             Command.update(
-                                question_answers.id, {'answers': answers, 'user_input': lead.of_survey_user_input.id}
+                                question_answers.id, {'answers': answers, 'user_input': lead.of_survey_user_input_id.id}
                             )
                         )
                 else:
@@ -64,7 +70,7 @@ class CrmLead(models.Model):
                         'question_id': question.id,
                         'answers': answers,
                         'sequence': question.sequence,
-                        'user_input': lead.of_survey_user_input.id,
+                        'user_input': lead.of_survey_user_input_id.id,
                     }
                     question_answers_ids.append(Command.create(question_answers_value))
             lead.of_answers_ids = question_answers_ids
@@ -73,11 +79,18 @@ class CrmLead(models.Model):
     def _onchange_of_survey_id(self):
         if self.of_survey_id:
             self.of_answers_ids = False
-            self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-            self.of_survey_user_input.res_model = self._name
-            self.of_survey_user_input.res_id = self._origin.id
-            self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
-            self.of_survey_user_input.menu_id = self.env.ref('crm.crm_menu_root').id
+
+    @api.depends('of_survey_id')
+    def _compute_of_survey_user_input_id(self):
+        for lead in self:
+            if lead.of_survey_id:
+                lead.of_survey_user_input_id = lead.of_survey_id._create_answer(
+                    user=self.env.user, email=self.env.user.email
+                )
+                lead.of_survey_user_input_id.res_model = lead._name
+                lead.of_survey_user_input_id.res_id = lead._origin.id
+                lead.of_survey_user_input_id.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
+                lead.of_survey_user_input_id.menu_id = self.env.ref('crm.crm_menu_root').id
 
     def action_button_open_survey(self):
         # on nettoie les anciennes données
@@ -87,12 +100,12 @@ class CrmLead(models.Model):
                 ('res_id', '=', self._origin.id),
             ]
         ).unlink()
-        self.of_survey_user_input = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-        self.of_survey_user_input.res_model = self._name
-        self.of_survey_user_input.res_id = self._origin.id
-        self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
-        self.of_survey_user_input.menu_id = self.env.ref('crm.crm_menu_root').id
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
+        self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
+        self.of_survey_user_input_id.res_model = self._name
+        self.of_survey_user_input_id.res_id = self._origin.id
+        self.of_survey_user_input_id.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
+        self.of_survey_user_input_id.menu_id = self.env.ref('crm.crm_menu_root').id
+        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
         return {
             'type': 'ir.actions.act_url',
             'name': _("Start Survey"),
@@ -102,12 +115,12 @@ class CrmLead(models.Model):
 
     def action_button_edit_survey(self):
         # on passe le survey en cours
-        self.of_survey_user_input._mark_in_progress()
+        self.of_survey_user_input_id._mark_in_progress()
 
         # on met sur la première question
-        self.of_survey_user_input.last_displayed_page_id = 0
+        self.of_survey_user_input_id.last_displayed_page_id = 0
 
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
+        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
         return {
             'type': 'ir.actions.act_url',
             'name': _("Edit Survey"),

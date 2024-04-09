@@ -35,7 +35,6 @@
                 <header attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
                     <field name="of_is_closed" invisible="1" />
                     <button name="action_button_confirm" string="Confirm" type="object" attrs="{'invisible': [('of_state', 'not in', ['draft'])]}" />
-                    <button name="action_button_ongoing" string="Ongoing" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed', 'postponed'])]}" />
                     <button name="action_button_done" string="Done" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed', 'ongoing'])]}" />
                     <button name="action_button_unfinished" string="Unfinished" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed'])]}" />
                     <button name="action_button_postponed" string="Postponed" type="object" attrs="{'invisible': [('of_state', 'not in', ['confirmed'])]}" />
@@ -44,7 +43,7 @@
                     <button name="action_button_send_email" string="Send email" type="object" />
                     <button name="action_button_close" string="Close" type="object" attrs="{'invisible': [('of_is_closed', '=', True)]}" />
                     <button name="action_button_open" string="Reopen" type="object" attrs="{'invisible': [('of_is_closed', '=', False)]}" />
-                    <field name="of_state" widget="statusbar" statusbar_visible="draft,confirmed,ongoing,done" nolabel="1" />
+                    <field name="of_state" widget="statusbar" statusbar_visible="draft,confirmed,done" nolabel="1" />
                 </header>
             </xpath>
             <!-- /Header part -->

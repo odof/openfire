@@ -25,7 +25,7 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="project" string="Project">
-                    <field name="of_survey_user_input_line" invisible="1"/>
+                    <field name="of_survey_user_input_line_ids" invisible="1"/>
                     <div class="row mb-2">
                         <div class="col-6">
                             <label for="of_survey_id"/>
@@ -56,7 +56,7 @@
                     </field>
 
                     <group>
-                        <field name="of_survey_user_input" invisible="1"/>
+                        <field name="of_survey_user_input_id" invisible="1"/>
                     </group>
                 </page>
             </xpath>

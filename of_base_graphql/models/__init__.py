@@ -1,0 +1,14 @@
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+
+from . import of_graphql
+from . import of_image
+from . import ir_attachment
+from . import hr_employee
+from . import of_res_partner_phone
+from . import res_partner_category
+from . import res_partner_title
+from . import product_product
+from . import product_template
+from . import res_company
+from . import res_partner
+from . import product_category

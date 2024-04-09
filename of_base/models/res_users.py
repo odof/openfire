@@ -75,6 +75,48 @@ class ResUsers(models.Model):
                 user.email = user._get_default_email()
         return user
 
+    def action_send_notifications(self, notifications):
+        """
+        Fonction pour envoyer des notifications aux utilisateurs connectés, à la fois dans le backoffice
+        et vers des systèmes de notifications externes (comme Firebase)
+        Le format du message suit en premier lieu les besoins des notifications internes de Odoo pour le backoffice
+        {
+            'backoffice : {
+                'message': STRING,
+                'message_is_html': BOOLEAN,
+                'sticky' : BOOLEAN,
+                'title' : STRING,
+                'warning': BOOLEAN,
+            }
+        }
+        Si besoin d'envoyer vers des notifications externes :
+
+        Par exemple pour Firebase :
+            'firebase' : {
+                'user_ids' : list ids,
+                'kind' : 'data' ou 'message_with_data',
+                'title' : STRING, (si message_with_data)
+                'message': STRING, (si message_with_data)
+                'payload': JSON
+            }
+
+        """
+
+        for user in self:
+            for notification_type in notifications:
+                if notification_type == 'backoffice':
+                    self.env['bus.bus']._sendone(
+                        user.partner_id,
+                        'simple_notification',
+                        notifications[notification_type],
+                    )
+                else:
+                    self.env['bus.bus']._sendone(
+                        user.partner_id,
+                        notification_type,
+                        notifications[notification_type],
+                    )
+
     def _check_admin_only_group(self):
         for user in self:
             group_root = self.env.ref('of_base.of_group_root_only').sudo()

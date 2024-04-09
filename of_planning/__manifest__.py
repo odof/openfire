@@ -21,6 +21,8 @@
         'data/report_paperformat.xml',
         'data/cron_planning.xml',
         'data/email_planning.xml',
+        'reports/report_intervention_report.xml',  # required before email_intervention.xml for email template
+        'data/email_intervention.xml',
         'security/res_groups.xml',
         'security/ir.model.access.csv',
         'views/of_sector_views.xml',
@@ -41,7 +43,6 @@
         'views/menuitems.xml',
         'reports/report_intervention_template.xml',
         'reports/report_intervention_sheet.xml',
-        'reports/report_intervention_report.xml',
         'reports/report_planning_general_week.xml',
         'reports/report_planning_week.xml',
         'reports/report_planning_day.xml',

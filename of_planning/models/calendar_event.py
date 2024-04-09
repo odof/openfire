@@ -4,7 +4,7 @@ import base64
 from datetime import timedelta
 
 from odoo import Command, _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 
 class CalendarEvent(models.Model):
@@ -308,6 +308,7 @@ class CalendarEvent(models.Model):
 
     # Reports fields
     of_attach_report = fields.Boolean(related='of_template_id.attach_report')
+    of_report_send_date = fields.Datetime(string="Send date report")
 
     @api.constrains('of_alert_unable')
     def _check_of_alert_unable(self):
@@ -830,6 +831,10 @@ class CalendarEvent(models.Model):
             )
 
         self.write({'of_state': 'done'})
+        if events_report_auto := self.filtered(
+            lambda e: e.of_template_id and e.of_template_id.send_reports == 'auto_done'
+        ):
+            events_report_auto.action_send_reports()
 
     def action_button_unfinished(self):
         self.write({'of_state': 'unfinished'})
@@ -868,6 +873,20 @@ class CalendarEvent(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    def action_send_reports(self):
+        for event in self:
+            try:
+                email_template = self.env.ref('of_planning.email_template_of_planning_intervention_report')
+            except Exception as e:
+                raise AccessError(_("Unable to find email template")) from e
+
+            if self.env.user.email:
+                email_template = self.env.ref(
+                    'of_planning.email_template_of_planning_intervention_report'
+                ).with_context(default_email_from=self.env.user.email_formatted)
+                email_template.with_context(force_attachment=True).send_mail(event.id, force_send=True)
+                event.of_report_send_date = fields.Datetime.now()
 
     def action_button_import_order_line(self):
         self.ensure_one()

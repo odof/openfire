@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="email_template_of_planning_intervention_report" model="mail.template">
+            <field name="name">Calendar Event - Intervention report</field>
+            <field name="partner_to">{{object.of_address_id.email and object.of_address_id.id or object.of_partner_id.id}}</field>
+            <field name="subject">Your intervention's report from {{format_date(object.start)}}</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="auto_delete" eval="False"/>
+            <field name="lang">{{object.of_address_id.lang}}</field>
+            <field name="report_template" ref="of_planning.action_report_intervention_report"/>
+            <field name="report_name">Intervention</field>
+            <field name="body_html"><![CDATA[
+    <p>Hello <span t-field="object.of_address_id.name"/>,
+    <br/><br/>
+    Please find attached your intervention's report of <span t-field="object.start" t-options="{'widget': 'date'}"/>.
+    </p>
+    ]]></field>
+        </record>
+
+</odoo>

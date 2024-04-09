@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_planning.of_planning_default_intervention_template" model="of.planning.intervention.template">
+        <field name="mobile" eval="True" />
+        <field name="section_to_display_ids" eval="[
+            Command.link(ref('of_mobile.of_planning_intervention_section_equipment')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_photos')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_invoice')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_report')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_signature')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_payment')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_sale_order')),
+       ]" />
+    </record>
+
+</odoo>

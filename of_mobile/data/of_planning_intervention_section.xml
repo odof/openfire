@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_planning_intervention_section_equipment" model="of.planning.intervention.section">
+        <field name="name">Equipment</field>
+        <field name="ttype">equipment</field>
+    </record>
+
+    <record id="of_planning_intervention_section_photos" model="of.planning.intervention.section">
+        <field name="name">Photos</field>
+        <field name="ttype">photos</field>
+    </record>
+
+    <record id="of_planning_intervention_section_invoice" model="of.planning.intervention.section">
+        <field name="name">Invoice</field>
+        <field name="ttype">invoice</field>
+    </record>
+
+    <record id="of_planning_intervention_section_report" model="of.planning.intervention.section">
+        <field name="name">Minutes</field>
+        <field name="ttype">report</field>
+    </record>
+
+    <record id="of_planning_intervention_section_signature" model="of.planning.intervention.section">
+        <field name="name">Signature</field>
+        <field name="ttype">signature</field>
+    </record>
+
+    <record id="of_planning_intervention_section_payment" model="of.planning.intervention.section">
+        <field name="name">Payment</field>
+        <field name="ttype">payment</field>
+    </record>
+
+    <record id="of_planning_intervention_section_sale_order" model="of.planning.intervention.section">
+        <field name="name">Order</field>
+        <field name="ttype">sale_order</field>
+    </record>
+
+</odoo>

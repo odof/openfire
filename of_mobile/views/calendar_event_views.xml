@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">of.mobile.calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='origin']" position="after">
+                <group name="misc" string="Misc.">
+                    <field name="of_section_to_display_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                    <field name="of_additional_sale_order_id" readonly="1" attrs="{'invisible': [('of_additional_sale_order_id','=',False)]}"/>
+
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='of_picking_amount_total']" position="after">
+                <field name="of_payment_intervention" />
+                <field name="of_payment_sale"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

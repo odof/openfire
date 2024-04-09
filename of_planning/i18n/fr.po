@@ -582,7 +582,7 @@ msgstr "Participants"
 #. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_intervention_template__send_reports__auto_done
 msgid "Automatic dispatch when the intervention is done"
-msgstr "Envoi automatique à la clôture de l'intervention"
+msgstr "Envoi automatique lorsque l'intervention est terminée"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_attach_report
@@ -661,7 +661,7 @@ msgstr "Ville"
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Close"
-msgstr "Fermer"
+msgstr "Clôturer"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_is_closed
