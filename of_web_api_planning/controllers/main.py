@@ -4,6 +4,7 @@
 from odoo import fields
 from odoo.http import request
 from odoo.addons.of_web_api.controllers.main import OFAPIWeb
+from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
 import pytz
 
@@ -37,8 +38,10 @@ class OFAPIWebPlanning(OFAPIWeb):
             if rdv:
                 # on a trouvé un RDV, on met à jour au lieu de créer
                 # retirer de vals les données qui ne seront pas mises à jour
+                service_id = vals.pop('service_id', False)
+                if service_id and service_id != rdv.service_id.id:
+                    raise UserError(u"La MAJ du RDV ne peut pas être effectuée. L'id du service ne correspond pas.")
                 vals.pop('company_id', False)
-                vals.pop('service_id', False)
                 vals.pop('external_id')
                 if vals.get('date') and vals['date'] == rdv.date:
                     vals.pop('date')

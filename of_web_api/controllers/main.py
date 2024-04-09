@@ -88,7 +88,7 @@ Fonctions de l'API :
         try:
             record = self.create_record(model_name, vals_clean)
         except Exception as e:
-            _logger.warning(u"OF ERROR api creation : impossible to create record\n%s\n" % e)
+            _logger.warning(u"OF ERROR api creation : impossible to create record\n%s\n" % e.message.decode('utf8'))
             request.env.cr.rollback()
             return {
                 'code': 400,
