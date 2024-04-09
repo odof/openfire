@@ -1,0 +1,33 @@
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+
+import graphene
+
+from odoo.addons.graphql_base import OdooObjectType
+
+
+class ServiceRequestStage(OdooObjectType):
+    _name = 'ServiceRequestStage'
+    _type = 'types'
+
+    id = graphene.Int(required=True)
+    name = graphene.String()
+
+
+class ServiceRequestStageInput(graphene.InputObjectType):
+    _name = 'ServiceRequestStageInput'
+    _type = 'types'
+
+    id = graphene.Int()
+    name = graphene.String()
+
+
+class ServiceRequestStageFilterInput(ServiceRequestStageInput):
+    _name = 'ServiceRequestStageFilterInput'
+
+
+class ServiceRequestStageCreateInput(ServiceRequestStageInput):
+    _name = 'ServiceRequestStageCreateInput'
+
+
+class ServiceRequestStageUpdateInput(ServiceRequestStageInput):
+    _name = 'ServiceRequestStageUpdateInput'

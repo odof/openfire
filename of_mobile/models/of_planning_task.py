@@ -1,0 +1,17 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+
+from odoo import models
+
+
+class OFPlanningTask(models.Model):
+    _inherit = 'of.planning.task'
+
+    def write(self, vals):
+        res = super().write(vals)
+        self.env['calendar.event'].action_update_date([('of_task_id', '=', self.id)])
+        return res
+
+    def unlink(self):
+        self.env['calendar.event'].action_update_date([('of_task_id', '=', self.id)])
+        return super().unlink()
