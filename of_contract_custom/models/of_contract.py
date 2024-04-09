@@ -891,20 +891,21 @@ class OfContractLine(models.Model):
     contract_product_ids = fields.One2many(
         comodel_name="of.contract.product", inverse_name='line_id', string="Articles", copy=False)
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
-    next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_prices')
-    year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_prices')
+    next_purchase_price = fields.Float(string=u"Prochain coût", compute='_compute_prices', store=True)
+    year_purchase_price = fields.Float(string=u"Coût annuel", compute='_compute_prices', store=True)
     amount_subtotal = fields.Monetary(
         string="Prochain Total HT", compute='_compute_prices', currency_field='company_currency_id',
-        digits=dp.get_precision('Account'))
-    amount_taxes = fields.Monetary(string="Taxes ", compute='_compute_prices', currency_field='company_currency_id')
+        digits=dp.get_precision('Account'), store=True)
+    amount_taxes = fields.Monetary(
+        string="Taxes ", compute='_compute_prices', currency_field='company_currency_id', store=True)
     amount_total = fields.Monetary(
-        string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id')
+        string="Prochain Total", compute='_compute_prices', currency_field='company_currency_id', store=True)
     year_subtotal = fields.Float(
-        string="Total HT annuel", compute='_compute_prices', digits=dp.get_precision('Account'))
+        string="Total HT annuel", compute='_compute_prices', digits=dp.get_precision('Account'), store=True)
     year_taxes = fields.Monetary(
-        string="Taxes annuelles", compute='_compute_prices', currency_field='company_currency_id')
+        string="Taxes annuelles", compute='_compute_prices', currency_field='company_currency_id', store=True)
     year_total = fields.Monetary(
-        string="Total annuel", compute='_compute_prices', currency_field='company_currency_id')
+        string="Total annuel", compute='_compute_prices', currency_field='company_currency_id', store=True)
 
     service_ids = fields.One2many(
             comodel_name='of.service', inverse_name='contract_line_id', string=u"Demandes d'intervention")
@@ -1132,6 +1133,11 @@ class OfContractLine(models.Model):
             else:
                 contract_line.warning_next_date = False
 
+    @api.depends(
+        'contract_product_ids.amount_subtotal', 'contract_product_ids.amount_taxes',
+        'contract_product_ids.next_purchase_price', 'contract_product_ids.year_subtotal',
+        'contract_product_ids.year_taxes', 'contract_product_ids.year_purchase_price'
+    )
     def _compute_prices(self):
         """ Calcule les différents montants facturés générés par la ligne de contrat """
         for contract_line in self:

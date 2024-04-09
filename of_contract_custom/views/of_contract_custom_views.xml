@@ -321,6 +321,7 @@
                 <field name="year_purchase_price" sum="Coût annuel"/>
                 <field name="year_total" sum="Total annuel"/>
                 <field name="next_purchase_price" sum="Prochain coût"/>
+                <field name="amount_subtotal" sum="Prochain total HT"/>
                 <field name="amount_total" sum="Prochain total"/>
                 <field name="company_id" groups="base.group_multi_company"/>
                 <field name="state"/>
