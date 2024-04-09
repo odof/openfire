@@ -1,0 +1,17 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+
+from odoo import models
+
+
+class OFEquipment(models.Model):
+    _inherit = 'of.equipment'
+
+    def write(self, vals):
+        res = super().write(vals)
+        self.env['calendar.event'].action_update_date([('of_equipment_ids', 'in', self.id)])
+        return res
+
+    def unlink(self):
+        self.env['calendar.event'].action_update_date([('of_equipment_ids', 'in', self.id)])
+        return super().unlink()

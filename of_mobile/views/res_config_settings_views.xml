@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mobile</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="7"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Mobile" string="Mobile" data-key="of_mobile">
+                    <h2>Planning display</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string='Planning period' for="of_mobile_display_planning_days_before"/>
+                                <div class="text-muted">
+                                Define the planning period available on mobile. 30 days max before and 60 days max after the current date.
+                                </div>
+                                <div class = "content-group mt16">
+                                    <label for="of_mobile_display_planning_days_before" class="o_light_label"/>
+                                    <field name="of_mobile_display_planning_days_before" />
+                                </div>
+                                <div class = "content-group">
+                                    <label for="of_mobile_display_planning_days_after" class="o_light_label"/>
+                                    <field name="of_mobile_display_planning_days_after" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Interventions synchronization</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="of_mobile_history_limit"/>
+                                <div class="text-muted">
+                                Define the number of month of synchronized history. Maximum 24 months.   
+                                </div>
+                                <field name="of_mobile_history_limit" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string='Images size' for="of_mobile_image_resolution_width"/>
+                                <div class="text-muted">
+                                Define the maximum resolution of the synchronized images.
+                                </div>
+                                <div class = "content-group mt16">
+                                    <label for="of_mobile_image_resolution_width" class="o_light_label"/>
+                                    <field name="of_mobile_image_resolution_width" />
+                                </div>
+                                <div class = "content-group">
+                                    <label for="of_mobile_image_resolution_height" class="o_light_label"/>
+                                    <field name="of_mobile_image_resolution_height" />
+                                </div>
+                            </div>
+                        </div>
+ 
+                    </div>
+ 
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="of_mobile_max_size_attachment"/>
+                                <div class="text-muted">
+                                Define the maximum size of an attachment which can be synchronized in megabytes.
+                                </div>
+                                <field name="of_mobile_max_size_attachment" />
+                            </div>
+                        </div>
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="of_mobile_max_nb_attachment"/>
+                                <div class="text-muted">
+                                Define the maximum number of attachments which can be synchronized for an intervention.
+                                </div>
+                                <field name="of_mobile_max_nb_attachment"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2>Intervention modification</h2>
+                     <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <label string='Modification period' for="of_mobile_display_planning_days_before"/>
+                                <div class="text-muted">
+                                Define the number of days before and after the intervention date when the technician can modify the intervention.
+                                </div>
+                                <div class = "content-group mt16">
+                                    <label string="Number of days before" for="of_mobile_can_edit_days_before" class="o_light_label"/>
+                                    <field name="of_mobile_can_edit_days_before" />
+                                </div>
+                                <div class = "content-group">
+                                    <label string="Number of days after" for="of_mobile_can_edit_days_after" class="o_light_label"/>
+                                    <field name="of_mobile_can_edit_days_after" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h2>Time tracking</h2>
+                    <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="of_mobile_meeting_timesheet"/>
+                                <div class="text-muted">
+                                    Define the time tracking mode.
+                                </div>
+                                <field name="of_mobile_meeting_timesheet"/>
+                                <div attrs="{'invisible': [('of_mobile_meeting_timesheet', '=', 'no')]}">
+                                    <field name="of_mobile_meeting_timesheet_force"/>
+                                    <label for="of_mobile_meeting_timesheet_force"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+ 
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,55 @@
+import graphene
+
+from odoo.addons.graphql_base import OdooObjectType
+
+
+class User(OdooObjectType):
+    _name = 'User'
+    _type = 'types'
+
+    interventions_access_right = graphene.String(required=True)
+    sales_access_right = graphene.String(required=True)
+    account_access_right = graphene.String(required=True)
+    partner_manager_access_right = graphene.String(required=True)
+
+    @staticmethod
+    def resolve_interventions_access_right(root, info):
+        if root.has_group('of_planning.group_planning_intervention_manager'):
+            return 'manager'
+        elif root.has_group('of_planning.group_planning_intervention_responsible'):
+            return 'responsible'
+        elif root.has_group('of_planning.group_planning_intervention_read_all_write_own'):
+            return 'modification'
+        else:
+            return 'access'
+
+    @staticmethod
+    def resolve_sales_access_right(root, info):
+        if root.has_group('sales_team.group_sale_manager'):
+            return 'manager'
+        elif root.has_group('of_access_control.of_group_sale_responsible'):
+            return 'responsible'
+        elif root.has_group('sales_team.group_sale_salesman_all_leads'):
+            return 'salesman_all_leads'
+        elif root.has_group('sales_team.group_sale_salesman'):
+            return 'salesman'
+        else:
+            return 'none'
+
+    @staticmethod
+    def resolve_account_access_right(root, info):
+        if root.has_group('account.group_account_manager'):
+            return 'adviser'
+        elif root.has_group('account.group_account_user'):
+            return 'accountant'
+        elif root.has_group('account.group_account_invoice'):
+            return 'billing'
+        else:
+            return 'none'
+
+    @staticmethod
+    def resolve_partner_manager_access_right(root, info):
+        if root.has_group('base.group_partner_manager'):
+            return 'manager'
+        else:
+            return 'none'

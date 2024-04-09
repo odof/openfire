@@ -1,0 +1,199 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_mobile
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-16 13:18+0000\n"
+"PO-Revision-Date: 2023-11-16 13:18+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_mobile
+#: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__auto
+#: model:ir.model.fields.selection,name:of_mobile.selection__res_config_settings__of_mobile_meeting_timesheet__auto
+msgid "Automatic tracking"
+msgstr ""
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid ""
+"Define the maximum number of attachments which can be synchronized for an "
+"intervention."
+msgstr ""
+"Définir le nombre maximum de pièces jointes qui peuvent être "
+"synchronisées par intervention."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Define the maximum resolution of the synchronized images."
+msgstr "Définir la résolution maximale des images synchronisées."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid ""
+"Define the maximum size of an attachment which can be synchronized in "
+"megabytes."
+msgstr ""
+"Définir la taille maximum d'une pièce jointe pour être synchronisée. (En "
+"mégaoctet)"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid ""
+"Define the number of days before and after the intervention date when the "
+"technician can modify the intervention."
+msgstr ""
+"Définir le nombre de jour avant et après la date de l'intervention où le "
+"technicien peut éditer l'intervention."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Define the number of month of synchronized history. Maximum 24 months."
+msgstr ""
+"Définir le nombre maximum d'historique qui seront remontés. Maximum 24 mois."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid ""
+"Define the planning period available on mobile. 30 days max before and 60 "
+"days max after the current date."
+msgstr ""
+"Définir la période de planning synchronisée sur le mobile. Maximum 30 jour "
+"avant la date courante et 60 jours après."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Define the time tracking mode."
+msgstr "Définir le mode de suivi du temps."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Images size"
+msgstr "Taille des images"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Intervention modification"
+msgstr "Modification d'intervention"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Interventions synchronization"
+msgstr "Synchronization des interventions"
+
+#. module: of_mobile
+#: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__manual
+#: model:ir.model.fields.selection,name:of_mobile.selection__res_config_settings__of_mobile_meeting_timesheet__manual
+msgid "Manual tracking"
+msgstr "Suivi manuel"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_max_size_attachment
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_max_size_attachment
+msgid "Maximum attachements size"
+msgstr "Taille des pièces jointes maximum"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_image_resolution_height
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_image_resolution_height
+msgid "Maximum height"
+msgstr "Hauteur maximale"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_history_limit
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_history_limit
+msgid "Maximum history retrieval"
+msgstr "Historique maximum"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_max_nb_attachment
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_max_nb_attachment
+msgid "Maximum number of attachments"
+msgstr "Nombre maximum de pièces jointes"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_image_resolution_width
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_image_resolution_width
+msgid "Maximum width"
+msgstr "Largeur maximale"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Mobile"
+msgstr "Mobile"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Modification period"
+msgstr "Période de modification"
+
+#. module: of_mobile
+#: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__no
+#: model:ir.model.fields.selection,name:of_mobile.selection__res_config_settings__of_mobile_meeting_timesheet__no
+msgid "No tracking"
+msgstr "Aucun suivi"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_display_planning_days_after
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_display_planning_days_after
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Number of days after"
+msgstr "Nombre de jours après"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_can_edit_days_after
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_can_edit_days_after
+msgid "Number of days after can edit"
+msgstr "Nombre de jours après"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_display_planning_days_before
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_display_planning_days_before
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Number of days before"
+msgstr "Nombre de jours avant"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_can_edit_days_before
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_can_edit_days_before
+msgid "Number of days before can edit"
+msgstr "Nombre de jours avant"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Planning display"
+msgstr "Affichage du planning"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Planning period"
+msgstr "Période du planning"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Time tracking"
+msgstr "Suivi du temps"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_meeting_timesheet_force
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_meeting_timesheet_force
+msgid "Time tracking mandatory"
+msgstr "Suivi du temps obligatoire"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_meeting_timesheet
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_meeting_timesheet
+msgid "Time tracking mode"
+msgstr "Mode de suivi du temps"
