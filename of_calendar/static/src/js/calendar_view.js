@@ -335,7 +335,7 @@ CalendarView.include({
      *  builds domain to filter attendees to be displayed in the right panel
      */
     build_attendee_domain: function() {
-        var attendee_domain = ['|', ['company_id', '=', false], ['company_id', 'in', this.company_ids]];
+        var attendee_domain = ['|', '|', ['company_id', '=', false], ['company_id', 'in', this.company_ids], ['user_id.company_ids', 'in', this.company_ids]];
         return new CompoundDomain(attendee_domain);
     },
     make_attendee_columns: function(){

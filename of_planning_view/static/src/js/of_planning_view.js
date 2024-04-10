@@ -287,7 +287,7 @@ var PlanningView = View.extend({
 
         // récupérer les infos des employés pour générer les filtres de droite
         Attendees.query(['id', self.color_ft, self.color_bg, 'name', 'sequence', 'of_est_intervenant',
-                         'of_est_commercial', 'company_id'])
+                         'of_est_commercial', 'company_id', 'of_user_company_ids'])
             .filter([['id', 'in', self.view_res_ids || []]]) // id
             .order_by(['sequence'])
             .all()
@@ -307,6 +307,7 @@ var PlanningView = View.extend({
                         est_intervenant: a['of_est_intervenant'],
                         est_commercial: a['of_est_commercial'],
                         company_id: a['company_id'],
+                        user_company_ids: a['of_user_company_ids'],
                         value: a['id'],
                         input_id: a['id'] + "_input",
                         is_checked: true,
@@ -318,7 +319,9 @@ var PlanningView = View.extend({
                       self.attendee_mode == 'com' && a['of_est_commercial'] || self.attendee_mode == 'comtech') {
                         if (!a['company_id']
                           || !self.now_company_id && _.contains(all_company_ids, a['company_id'][0])
-                          || a['company_id'][0] == self.now_company_id) {
+                          || !self.now_company_id && _.intersection(all_company_ids, a['of_user_company_ids'])
+                          || a['company_id'][0] == self.now_company_id
+                          || _.contains(a['of_user_company_ids'], self.now_company_id)) {
                             self.actual_res_ids.push(a['id']);
                             filter_item.is_visible = true;
                         }
@@ -773,7 +776,9 @@ var PlanningView = View.extend({
 
             if (!this.all_filters[i].company_id
                 || !this.now_company_id && _.contains(all_company_ids, this.all_filters[i].company_id[0])
-                || this.all_filters[i].company_id[0] == this.now_company_id) {
+                || !this.now_company_id && _.intersection(all_company_ids, this.all_filters[i].user_company_ids)
+                || this.all_filters[i].company_id[0] == this.now_company_id
+                || _.contains(this.all_filters[i].user_company_ids, this.now_company_id)) {
                 if (this.attendee_mode == "tech" && this.all_filters[i].est_intervenant
                   || this.attendee_mode == "com" && this.all_filters[i].est_commercial
                   || this.attendee_mode == "comtech") {

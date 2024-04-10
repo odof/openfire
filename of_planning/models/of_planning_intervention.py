@@ -38,6 +38,8 @@ class HREmployee(models.Model):
     of_daily_email = fields.Boolean(
         string=u"Envoi email veille de RDV", default=False,
         help=u"Active l'envoi chaque soir du planning au courriel de l'employé, quand celui-ci a des RDV le lendemain.")
+    of_user_company_ids = fields.Many2many(
+        related='user_id.company_ids', string=u"Sociétés autorisées de l'utilisateur associé", readonly=True)
 
     @api.onchange('of_est_intervenant', 'of_est_commercial')
     def _onchange_est_intervenant(self):
