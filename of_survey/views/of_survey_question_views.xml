@@ -82,9 +82,10 @@
                                         <field name="id" invisible="1"/>
                                         <field name="sequence" widget="handle"/>
                                         <field name="value" string="Choices"/>
-                                        <button class="btn" name="action_button_check_suggested_answer_ids" type="object" icon="fa-square" context="{'active_answer': id}" attrs="{'invisible': [('is_default','=',True)]}"/>
-                                        <button class="btn" name="action_button_uncheck_suggested_answer_ids" type="object" icon="fa-check-square" context="{'active_answer': id}" attrs="{'invisible': [('is_default','=',False)]}"/>
+
                                         <field name="is_default" invisible="1"/>
+                                        <button class="btn" name="action_button_check_suggested_answer_ids" type="object" icon="fa-square-o" context="{'active_answer': id}" attrs="{'invisible': ['|', ('is_default','=',True), ('id','=',False)]}" string="(Tick to set as default)"/>
+                                        <button class="btn" name="action_button_uncheck_suggested_answer_ids" type="object" icon="fa-check-square" context="{'active_answer': id}" attrs="{'invisible': ['|', ('is_default','=',False), ('id','=',False)]}" string="(Tick to set as default)"/>
                                     </tree>
                                 </field>
                             </group>
