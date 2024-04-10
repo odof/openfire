@@ -74,6 +74,7 @@ class CalendarEvent(models.Model):
             self.of_survey_user_input.res_model = self._name
             self.of_survey_user_input.res_id = self._origin.id
             self.of_survey_user_input.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
+            self.of_survey_user_input.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
 
     def action_button_open_survey(self):
         self.ensure_one()
@@ -88,6 +89,8 @@ class CalendarEvent(models.Model):
         self.of_survey_user_input.res_model = self._name
         self.of_survey_user_input.res_id = self._origin.id
         self.of_survey_user_input.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
+        self.of_survey_user_input.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+
         url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
         return {
             'type': 'ir.actions.act_url',

@@ -169,6 +169,10 @@ class OFSurvey(http.Controller):
         survey_sudo, dummy = self._fetch_from_access_token(survey_token, False)
         try:
             answer_sudo = survey_sudo._create_answer(user=request.env.user, test_entry=True)
+            answer_sudo.res_model = survey_sudo._name
+            answer_sudo.res_id = survey_sudo.id
+            answer_sudo.redirect_action_id = request.env.ref('of_survey.of_action_survey_form').id
+            answer_sudo.menu_id = request.env.ref('of_survey.menu_of_survey_form').id
         except Exception as e:
             _logger.info("Error while creating test answer for survey %s: %s", survey_sudo, e)
             return request.redirect('/')

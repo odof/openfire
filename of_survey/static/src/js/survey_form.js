@@ -674,11 +674,12 @@ odoo.define('of_survey.form', function(require) {
          let model = $('.show_end').attr('res-model');
          let action_id = $('.show_end').attr('action-id');
          let survey_id = $('.show_end').attr('survey-id');
+         let menu_id = $('.show_end').attr('menu-id');
          if (show_end=='no'){
                if (record_id && model && action_id){
-                  window.location = "/web/#id="+record_id+"&model="+model+"&view_type=form&action="+action_id;
+                  window.location = `/web/#id=${record_id}&model=${model}&view_type=form&action=${action_id}&menu_id=${menu_id}`;
                } else {
-                  window.location = "/web/#id="+survey_id+"&model=of.survey.survey&view_type=form";
+                  window.location = `/web/#id=${survey_id}&model=of.survey.survey&view_type=form`;
                }
          }
       },

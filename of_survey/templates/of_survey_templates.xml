@@ -261,13 +261,13 @@
                             <p>
                                 <a role="button" t-if="answer.res_model and answer.res_id"
                                     class="btn btn-primary btn-lg btn-end"
-                                    t-attf-href="/web#id={{answer.res_id}}&amp;model={{answer.res_model}}&amp;view_type=form">Finish</a>
+                                    t-attf-href="/web#id={{answer.res_id}}&amp;model={{answer.res_model}}&amp;view_type=form&amp;action={{answer.redirect_action_id.xml_id}}&amp;menu_id={{answer.menu_id.id}}">Finish</a>
                                 <a role="button" t-else=""
                                     class="btn btn-primary btn-lg btn-end"
                                     t-attf-href="/web#id={{survey.id}}&amp;model=of.survey.survey&amp;view_type=form">Finish</a>
                             </p>
                             <div class="show_end" t-attf-survey-id="{{survey.id}}" t-attf-res-model="{{ answer.res_model }}" t-attf-res-id="{{answer.res_id}}"
-                                    t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}" t-attf-action-id="{{answer.redirect_action_id.id}}"/>
+                                    t-attf-data-show="{{survey.show_end and 'yes' or 'no'}}" t-attf-action-id="{{answer.redirect_action_id.xml_id}}" t-attf-menu-id="{{answer.menu_id.id}}"/>
                         </div>
                     </div>
                 </div>

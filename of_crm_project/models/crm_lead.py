@@ -21,7 +21,7 @@ class CrmLead(models.Model):
     of_survey_user_input_line = fields.One2many(
         comodel_name='of.survey.user_input.line',
         related='of_survey_user_input.user_input_line_ids',
-        string="Surver User Input Line",
+        string="Survey User Input Line",
     )
     of_question_ids = fields.One2many(
         comodel_name='of.survey.question', related='of_survey_id.question_and_page_ids', string="Questions"
@@ -72,6 +72,7 @@ class CrmLead(models.Model):
             self.of_survey_user_input.res_model = self._name
             self.of_survey_user_input.res_id = self._origin.id
             self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
+            self.of_survey_user_input.menu_id = self.env.ref('crm.crm_menu_root').id
 
     def action_button_open_survey(self):
         # on nettoie les anciennes données
@@ -85,6 +86,7 @@ class CrmLead(models.Model):
         self.of_survey_user_input.res_model = self._name
         self.of_survey_user_input.res_id = self._origin.id
         self.of_survey_user_input.redirect_action_id = self.env.ref('crm.crm_lead_action_pipeline').id
+        self.of_survey_user_input.menu_id = self.env.ref('crm.crm_menu_root').id
         url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
         return {
             'type': 'ir.actions.act_url',

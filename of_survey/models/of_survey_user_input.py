@@ -55,7 +55,7 @@ class OFSurveyUserInput(models.Model):
     is_session_answer = fields.Boolean(
         string="Is in a Session", help="Is that user input part of a survey session or not."
     )
-    # linked record and redirect action
+    # linked record and redirect action, menu
     res_model = fields.Char(string="Related Document Model", help="Model of the related document.")
     res_id = fields.Integer(string="Related Document ID", help="ID of the related document.")
     redirect_action_id = fields.Many2one(
@@ -63,6 +63,7 @@ class OFSurveyUserInput(models.Model):
         string="Redirect Action",
         help="Action to redirect to the related document.",
     )
+    menu_id = fields.Many2one(comodel_name='ir.ui.menu', string="Menu")
 
     _sql_constraints = [
         ('unique_token', 'UNIQUE (access_token)', "An access token must be unique!"),
