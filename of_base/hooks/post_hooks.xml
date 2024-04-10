@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.base.hook" name="_update_version_10_0_1_2_0_hook"/>
+
+</odoo>

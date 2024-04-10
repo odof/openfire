@@ -35,3 +35,15 @@ class OFBaseHook(models.AbstractModel):
                     phone_number_ids.append((0, 0, {'number': number, 'type': code}))
             if phone_number_ids:
                 partner.write({'of_phone_number_ids': phone_number_ids})
+
+    @api.model
+    def _update_version_10_0_1_2_0_hook(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_base'), ('state', 'in', ['installed', 'to upgrade'])])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.1.2.0'
+        if actions_todo:
+            rule = self.env.ref('of_base.of_base_res_partner_rule', raise_if_not_found=False)
+            if rule:
+                rule.write(
+                    {'domain_force': "['|', '|', ('company_id', 'child_of', user.company_ids.ids), "
+                        "('company_id', '=', False), ('supplier', '=', True)]"})

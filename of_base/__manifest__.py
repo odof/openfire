@@ -3,7 +3,7 @@
 
 {
     'name': "OpenFire / Base",
-    'version': "10.0.1.1.0",
+    'version': "10.0.1.2.0",
     'author': "OpenFire",
     'license': '',
     'complexity': "easy",
@@ -61,6 +61,7 @@ Ajout d'un modèle servant de log interne :
         'security/of_group_intranet_security.xml',
         'security/ir.model.access.csv',
         'hooks/init_hook.xml',
+        'hooks/post_hooks.xml',
         'views/of_base_view.xml',
         'views/of_log_message_views.xml',
         'views/mail_views.xml',
