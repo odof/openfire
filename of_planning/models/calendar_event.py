@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import base64
 from datetime import timedelta
 
 from odoo import Command, _, api, fields, models
@@ -308,6 +309,9 @@ class CalendarEvent(models.Model):
     # Helpers UX, UI fields
     of_is_flexible = fields.Boolean(string="Flexible")
     of_show_update_fpos = fields.Boolean(string="Has Fiscal Position Changed", store=False)
+
+    # Reports fields
+    of_attach_report = fields.Boolean(related='of_template_id.attach_report')
 
     @api.constrains('of_alert_unable')
     def _check_of_alert_unable(self):
@@ -737,6 +741,23 @@ class CalendarEvent(models.Model):
         self.write({'of_state': 'ongoing'})
 
     def action_button_done(self):
+        # on lance l'impression du rapport si besoin
+        if self.of_attach_report:
+            pdf, extension = self.env['ir.actions.report']._render_qweb_pdf(
+                'of_planning.report_intervention_report', res_ids=self.ids
+            )
+
+            self.env['ir.attachment'].sudo().create(
+                {
+                    'name': _("Intervention Report"),
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf),
+                    'mimetype': 'application/pdf',
+                    'res_model': 'calendar.event',
+                    'res_id': self.id,
+                }
+            )
+
         self.write({'of_state': 'done'})
 
     def action_button_unfinished(self):
