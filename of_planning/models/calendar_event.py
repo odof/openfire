@@ -81,6 +81,7 @@ class CalendarEvent(models.Model):
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
     )
+    partner_ids = fields.Many2many(compute='_compute_partner_ids', readonly=False, store=True)
     of_employee_id = fields.Many2one(
         comodel_name='hr.employee',
         string="Main operator",
@@ -377,6 +378,13 @@ class CalendarEvent(models.Model):
         for event in self:
             if not event.of_employee_id:
                 event.of_employee_id = event.of_employee_ids[:1]
+
+    @api.depends('of_employee_ids')
+    def _compute_partner_ids(self):
+        for event in self:
+            event.partner_ids = event.mapped('of_employee_ids.related_contact_ids').filtered(
+                lambda c: c.type == 'contact'
+            )
 
     @api.depends('of_employee_ids', 'of_task_id')
     def _compute_of_alert_unable(self):
