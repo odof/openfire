@@ -24,6 +24,10 @@ class AccountInvoice(models.Model):
              "- Collapse: One line per kit, with minimal info\n"
              "- Expand: One line per kit, plus one line per component")
 
+    def _get_refund_prepare_fields(self):
+        res = super(AccountInvoice, self)._get_refund_prepare_fields()
+        return res + ['of_kit_display_mode']
+
     @api.multi
     @api.depends('invoice_line_ids.product_id')
     def _compute_of_contains_kit(self):
