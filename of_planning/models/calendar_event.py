@@ -426,9 +426,11 @@ class CalendarEvent(models.Model):
         for event in self.filtered('of_line_ids.order_line_id'):
             event.of_link_order = True
 
-    @api.depends('of_state', 'of_template_id')
+    @api.depends('of_template_id')
     def _compute_of_task_id(self):
-        for event in self.filtered(lambda e: e.of_state in ['draft', 'confirmed'] and e.of_template_id):
+        for event in self.filtered(
+            lambda e: e.of_state in ['draft', 'confirmed'] and e.of_template_id and e.of_template_id.task_id
+        ):
             event.of_task_id = event.of_template_id.task_id
 
     @api.depends('of_template_id')
