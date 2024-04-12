@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_of_move_intervention_to_next_week_wizard,Access to Move Intervention to Next Week Wizard,model_of_move_intervention_to_next_week_wizard,base.group_user,1,1,1,1

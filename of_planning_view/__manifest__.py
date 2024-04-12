@@ -14,10 +14,8 @@
         'base_geolocalize',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'views/of_planning_intervention_views.xml',
         'views/of_planning_intervention_template_views.xml',
-        'wizards/of_move_intervention_to_next_week_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
