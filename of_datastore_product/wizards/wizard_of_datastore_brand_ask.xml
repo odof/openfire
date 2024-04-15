@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_datastore_brand_ask_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.datastore.brand.ask.wizard.view.form</field>
+        <field name="model">of.datastore.brand.ask.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="action" invisible="1" />
+                <div name="connect" attrs="{'invisible': [('action', '!=', 'connect')]}">
+                    <span>Your request to connect to the next brand will be transmitted.</span>
+                    <br />
+                    <span>An additional cost of <field name="fee" nolabel="1" class="oe_inline" />€ sera
+                        applied to your subscription.</span>
+                </div>
+                <div name="connect" attrs="{'invisible': [('action', '!=', 'disconnect')]}">
+                    <span>Your request to disconnect the next brand will be transmitted.</span>
+                    <br />
+                    <span>After processing the request,<field name="fee2" nolabel="1"
+                            class="oe_inline" />€ will be deducted from your subscription.</span>
+                </div>
+                <div attrs="{'invisible': [('action', '!=', 'cancel')]}">
+                    <span>Your pending request for the next brand will be cancelled.</span>
+                </div>
+                <group>
+                    <field name="datastore_brand_id" readonly="1" />
+                    <field name="brand_id"
+                        attrs="{'invisible': [('action', '!=', 'connect')], 'required': [('action', '=', 'connect')]}" />
+                </group>
+                <footer>
+                    <button name="action_button_process" string="Envoyer la demande" type="object"
+                        class="oe_highlight" />
+                    <button string="Cancel" special="cancel" class="btn-default" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_datastore_brand_ask_wizard_action" model="ir.actions.act_window">
+        <field name="name">Product Datastore connection request</field>
+        <field name="res_model">of.datastore.brand.ask.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_datastore_brand_ask_wizard_view_form" />
+        <field name="target">new</field>
+    </record>
+
+</odoo>
