@@ -8,7 +8,8 @@ from odoo.exceptions import UserError, ValidationError
 
 
 class CalendarEvent(models.Model):
-    _inherit = 'calendar.event'
+    _name = 'calendar.event'
+    _inherit = ['calendar.event', 'of.readgroup']
 
     @api.model
     def _domain_employee_ids(self):
@@ -742,6 +743,24 @@ class CalendarEvent(models.Model):
                 continue
             res[field]['searchable'] = False
         return res
+
+    @api.model
+    def _read_group_process_groupby(self, gb, query):
+        # Ajout de la possibilité de regrouper par employé
+        if gb != 'of_gb_employee_id':
+            return super()._read_group_process_groupby(gb, query)
+
+        alias = query.left_join(self._table, 'id', 'of_employee_intervention_rel', 'intervention_id', 'of_employee_ids')
+
+        return {
+            'field': gb,
+            'groupby': gb,
+            'type': 'many2one',
+            'display_format': None,
+            'interval': None,
+            'tz_convert': False,
+            'qualified_field': f'"{alias}".employee_id',
+        }
 
     # --------------------------------------------------------------------------
     # Actions methods
