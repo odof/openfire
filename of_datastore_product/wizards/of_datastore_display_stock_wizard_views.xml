@@ -8,12 +8,12 @@
         <field name="arch" type="xml">
             <form string="Supplier stock">
                 <group>
-                    <field name="qty_available" readonly="1"/>
+                    <field name="qty_available" readonly="1" />
                 </group>
-                <separator string="Informations de stock"/>
-                <field name="of_stock_informations" readonly="1"/>
+                <separator string="Stock Informations" />
+                <field name="stock_informations" readonly="1" />
                 <footer>
-                    <button string="Ok" class="btn-primary" special="cancel"/>
+                    <button string="Ok" class="btn-primary" special="cancel" />
                 </footer>
             </form>
         </field>
@@ -23,7 +23,6 @@
         <field name="name">Supplier stock</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">of.datastore.display.stock</field>
-        <field name="view_type">form</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
@@ -31,12 +30,13 @@
     <record id="of_datastore_display_stock_product_template_form_view" model="ir.ui.view">
         <field name="name">of.datastore.display.stock.product.template.form.view</field>
         <field name="model">product.template</field>
-        <field name="inherit_id" ref="of_datastore_product.of_datastore_product_template_form_view"/>
+        <field name="inherit_id" ref="product.product_template_form_view" />
         <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <field name="of_display_supplier_stock_button" invisible="1" />
+            </xpath>
             <xpath expr="//header/button[last()]" position="after">
-                <button string="Voir stock fournisseur" type="action"
-                        name="of_datastore_product.action_of_datastore_display_stock"
-                        attrs="{'invisible': [('of_datastore_stock', '=', False)]}"/>
+                <button string="View supplier stock" type="action" name="of_datastore_product.action_of_datastore_display_stock" attrs="{'invisible': [('of_display_supplier_stock_button', '=', False)]}" />
             </xpath>
         </field>
     </record>
