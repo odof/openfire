@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!-- Vue formulaire -->
+    <record id="of_datastore_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.kit.product.template.common.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view" />
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <div>
+                    <label for="of_datastore_res_id" string="Connected" />
+                    <field name="of_datastore_res_id" widget="boolean" readonly="1" />
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_datastore_product_template_form_view2" model="ir.ui.view">
+        <field name="name">of.datastore.product.of.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_purchase_stock.of_purchase_stock_product_template_form_view" />
+        <field name="active">True</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_seller_discount']" position="after">
+                <field name="of_next_price_list" widget="monetary" options="{'currency_field': 'currency_id'}" />
+                <field name="of_next_price_list_date" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_of_datastore_product_template_tree" model="ir.ui.view">
+        <field name="name">product.datastore.stock.tree.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="stock.view_stock_product_template_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='virtual_available']" position="replace">
+                <field name="virtual_available" attrs="{'invisible':[('type', '!=', 'product')]}" string="Forecasted Quantity" optional="show"
+                    decoration-danger="virtual_available &lt; 0 and not of_datastore_has_link" decoration-warning="virtual_available == 0" groups="stock.group_stock_user"/>
+            </xpath>
+            <xpath expr="//tree" position="inside">
+                <field name="of_datastore_has_link" invisible="1" />
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Recherche d'articles sur base centralisée -->
+    <!-- FIXME : Format de domaine invalide ['of_datastore_product_search'] dans domain of <filter name="of_datastore_search">-->
+    <!-- <record id="of_datastore_product_template_search_view" model="ir.ui.view">
+        <field name="name">product.template.search</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Search on centralized database" name="of_datastore_search" domain="['of_datastore_product_search']"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record> -->
+
+</odoo>

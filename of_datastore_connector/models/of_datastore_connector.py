@@ -11,7 +11,7 @@ from odoo import _, api, fields, models
 _logger = logging.getLogger(__name__)
 
 try:
-    import openerplib  # sudo easy_install openerp-client-lib
+    import openerplib  # NOTE: Still using a "2013 library", consider updating to odoorpc ?
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
@@ -91,6 +91,7 @@ class OFDatastoreConnector(models.AbstractModel):
             def run(self):
                 try:
                     server_address = url
+                    # TODO: OF 10 legacy, check if still needed, remove if not
                     # ========== Code à recommenter après la résolution du bug OVH ==========
                     # Retrait du prefixe http:// et extraction du port (optionnel)
                     # address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
