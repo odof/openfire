@@ -66,12 +66,7 @@ class OFPlanningInterventionTemplate(models.Model):
         comodel_name='account.fiscal.position', string="Fiscal position", company_dependent=True
     )
     line_ids = fields.One2many(
-        comodel_name='of.planning.intervention.template.line',
-        inverse_name='template_id',
-        string="Template lines",
-        compute='_compute_template_line',
-        store=True,
-        readonly=False,
+        comodel_name='of.planning.intervention.template.line', inverse_name='template_id', string="Template lines"
     )
     legal = fields.Text(string="Legal notice")
     send_reports = fields.Selection(
@@ -258,26 +253,6 @@ class OFPlanningInterventionTemplate(models.Model):
                 'padding': 4,
             }
             template.sequence_id = self.env['ir.sequence'].sudo().create(sequence_data)
-
-    @api.depends('task_id')
-    def _compute_fiscal_position(self):
-        for template in self:
-            if template.task_id and template.task_id.fiscal_position_id and not template.fiscal_position_id:
-                template.fiscal_position_id = template.task_id.fiscal_position_id
-
-    @api.depends('task_id')
-    def _compute_template_line(self):
-        for template in self:
-            if template.task_id and template.task_id.product_id:
-                template.line_ids |= self.env['of.planning.intervention.template.line'].new(
-                    {
-                        'template_id': template.id,
-                        'product_id': template.task_id.product_id.id,
-                        'qty': 1,
-                        'price_unit': template.task_id.product_id.lst_price,
-                        'name': template.task_id.product_id.name,  # FIXME: not the same as _compute_name in line model
-                    }
-                )
 
     # --------------------------------------------------------------------------
     # Onchange methods

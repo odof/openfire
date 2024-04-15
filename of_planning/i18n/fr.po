@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-11 07:05+0000\n"
-"PO-Revision-Date: 2024-04-11 07:05+0000\n"
+"POT-Creation-Date: 2024-04-15 15:21+0000\n"
+"PO-Revision-Date: 2024-04-15 15:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -101,11 +101,6 @@ msgstr "(OF) Bloquer l'accès à la configuration des RDVs"
 #: model:ir.model.fields,field_description:of_planning.field_res_config_settings__of_company_choice
 msgid "(OF) Company choice for interventions"
 msgstr "(OF) Choix de la société pour les interventions"
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_res_company__of_intervention_use_deliveries
-msgid "(OF) Delivery notes management in Interventions"
-msgstr "(OF) Gestion des BL dans les interventions"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_connector_config_settings__of_hide_remaining_balance
@@ -591,11 +586,17 @@ msgid "Archived"
 msgstr ""
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__partner_ids
+msgid "Attendees"
+msgstr "Participants"
+
+#. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_intervention_template__send_reports__auto_done
 msgid "Automatic dispatch when the intervention is done"
 msgstr "Envoi automatique à la clôture de l'intervention"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_attach_report
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__attach_report
 msgid "Automatic report storage"
 msgstr "Stockage automatique des rapports"
@@ -821,6 +822,7 @@ msgstr "Signature client"
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_res_partner
 #: model:ir.ui.menu,name:of_planning.menu_res_partner
+#: model:ir.ui.menu,name:of_planning.menu_res_partner_main
 msgid "Customers"
 msgstr "Clients"
 
@@ -942,12 +944,7 @@ msgstr "Remise (%)"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__display_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__display_name
 msgid "Display Name"
-msgstr ""
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_task__display
-msgid "Display description"
-msgstr "Afficher la description"
+msgstr "Nom affiché"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_team__sequence
@@ -958,16 +955,6 @@ msgstr "Ordre d'affichage (le plus petit affiché en premier)"
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Displayed fields"
 msgstr "Champs affichés"
-
-#. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__res_company__of_intervention_use_deliveries__no
-msgid "Do not use delivery notes in Interventions"
-msgstr "Ne pas utiliser les BL dans les interventions"
-
-#. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__of_planning_task__display__hide
-msgid "Don't display"
-msgstr "Ne pas afficher"
 
 #. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__calendar_event__of_state__done
@@ -1074,7 +1061,6 @@ msgstr "Clôturée"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_fiscal_position_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__fiscal_position_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_task__fiscal_position_id
 msgid "Fiscal position"
 msgstr "Position fiscale"
 
@@ -1254,16 +1240,6 @@ msgid "In break"
 msgstr "En pause"
 
 #. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__of_planning_task__display__external_description
-msgid "In the external description"
-msgstr "Dans la description externe"
-
-#. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__of_planning_task__display__internal_description
-msgid "In the internal description"
-msgstr "Dans la description interne"
-
-#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_alert_wrong_company
 msgid "Incoherent company"
 msgstr "Société incohérente"
@@ -1330,7 +1306,10 @@ msgid "Intervention Planning - Week %s from %s to %s"
 msgstr ""
 
 #. module: of_planning
+#. odoo-python
+#: code:addons/of_planning/models/calendar_event.py:0
 #: model:ir.actions.report,name:of_planning.action_report_intervention_report
+#, python-format
 msgid "Intervention Report"
 msgstr "Rapport d'intervention"
 
@@ -2038,7 +2017,6 @@ msgstr "Groupe d'approvisionnement"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__product_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__product_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_task__product_id
 msgid "Product"
 msgstr "Produit"
 
@@ -2467,6 +2445,7 @@ msgid "The contact's company"
 msgstr "Société du contact"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_attach_report
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__attach_report
 msgid ""
 "The intervention report will be automatically attached to the intervention."
@@ -2667,11 +2646,6 @@ msgstr "Mettre à jour les taxes"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_use_default
 msgid "Use default report"
 msgstr "Utiliser le rapport par défaut"
-
-#. module: of_planning
-#: model:ir.model.fields.selection,name:of_planning.selection__res_company__of_intervention_use_deliveries__use
-msgid "Use delivery notes in Interventions"
-msgstr "Utiliser les bons de livraison dans les interventions"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__report_use_default

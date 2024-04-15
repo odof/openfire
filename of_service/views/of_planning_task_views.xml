@@ -11,7 +11,7 @@
                     <field string="Service Requests" name="request_count" widget="statinfo"/>
                 </button>
             </xpath>
-            <xpath expr="//field[@name='display']" position="after">
+            <xpath expr="//field[@name='duration']" position="after">
                 <field name="is_recurring"/>
                 <label for="recurring_interval" attrs="{'invisible': [('is_recurring', '=', False)]}"/>
                 <div attrs="{'invisible': [('is_recurring', '=', False)]}" col="2">

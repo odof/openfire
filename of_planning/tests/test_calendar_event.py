@@ -83,7 +83,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
         Test case to verify the behavior of the 'action_generate_stock_picking' method
         when multiple events are selected.
 
-        It creates two calendar events with the same company and type, and then tries
+        It creates two calendar events with the same company, partner and type, and then tries
         to generate stock picking for both events. It expects a UserError to be raised
         with the message "Aucun produit à livrer dans les interventions sélectionnées."
         """

@@ -173,12 +173,7 @@ class OFServiceRequest(models.Model):
         comodel_name='ir.attachment', string="Last report", compute='_compute_last_attachment_id'
     )
     line_ids = fields.One2many(
-        comodel_name='of.service.request.line',
-        inverse_name='request_id',
-        string="Invoice Lines",
-        compute='_compute_line_ids',
-        store=True,
-        readonly=False,
+        comodel_name='of.service.request.line', inverse_name='request_id', string="Invoice Lines"
     )
 
     # ===== Customer and address fields =====
@@ -291,9 +286,6 @@ class OFServiceRequest(models.Model):
         comodel_name='account.fiscal.position',
         string="Fiscal Position",
         domain="[('tax_ids.tax_src_id.type_tax_use','=','sale')]",
-        compute='_compute_fiscal_position_id',
-        store=True,
-        readonly=False,
     )
     currency_id = fields.Many2one(
         comodel_name='res.currency', string="Currency", readonly=True, related='company_id.currency_id'
@@ -450,36 +442,6 @@ class OFServiceRequest(models.Model):
                 request.recurring_interval = request.task_id.recurring_interval
 
     @api.depends('task_id')
-    def _compute_fiscal_position_id(self):
-        for request in self:
-            if request.task_id and request.task_id.fiscal_position_id and not request.fiscal_position_id:
-                request.fiscal_position_id = request.task_id.fiscal_position_id
-            if request.fiscal_position_id:
-                request._recompute_taxes()
-
-    @api.depends('task_id')
-    def _compute_line_ids(self):
-        for request in self:
-            if (
-                request.task_id
-                and request.task_id.product_id
-                and (not request.template_id or request.template_id.task_id != request.task_id)
-            ):
-                request.line_ids = [
-                    Command.create(
-                        {
-                            'request_id': request.id,
-                            'product_id': request.task_id.product_id.id,
-                            'qty': 1,
-                            'price_unit': request.task_id.product_id.lst_price,
-                            'name': request.task_id.product_id.name,
-                        }
-                    )
-                ]
-
-            request._recompute_taxes()
-
-    @api.depends('task_id')
     def _compute_duration(self):
         for request in self:
             if request.task_id and not request.duration:
@@ -540,19 +502,6 @@ class OFServiceRequest(models.Model):
         for request in self.filtered(lambda r: r.base_state == 'draft' and r.template_id):
             lines_to_create = []
             request.task_id = request.template_id.task_id
-            if request.template_id.task_id.product_id:
-                lines_to_create.append(
-                    Command.create(
-                        {
-                            'request_id': request.id,
-                            'product_id': request.template_id.task_id.product_id.id,
-                            'qty': 1,
-                            'price_unit': request.template_id.task_id.product_id.lst_price,
-                            'name': request.template_id.task_id.product_id.name,
-                        }
-                    )
-                )
-
             request.type_id = request.template_id.type_id
             request.fiscal_position_id = request.template_id.fiscal_position_id or request.fiscal_position_id
             lines_to_create.extend(

@@ -57,7 +57,6 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                 'name': 'Ramonage',
                 'duration': 1.5,
                 'description': 'Tâche de ramonage',
-                'fiscal_position_id': cls.fiscal_pos_5_5.id,
             }
         )
 
@@ -66,8 +65,6 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                 'name': 'Installation poêle à bois',
                 'duration': 8,
                 'description': 'Tâche d\'installation de poêle à bois',
-                'product_id': cls.product_wood_stove.id,
-                'fiscal_position_id': cls.fiscal_pos_20.id,
             }
         )
 

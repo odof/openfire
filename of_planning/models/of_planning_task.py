@@ -12,20 +12,7 @@ class OFPlanningTask(models.Model):
     description = fields.Text()
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=1, help="Used to order tasks. Lower is better.")
-    display = fields.Selection(
-        selection=[
-            ('hide', "Don't display"),
-            ('internal_description', "In the internal description"),
-            ('external_description', "In the external description"),
-        ],
-        string="Display description",
-        default='internal_description',
-    )
     is_locked = fields.Boolean(string="Locked")
-    product_id = fields.Many2one(comodel_name='product.product', string="Product")
-    fiscal_position_id = fields.Many2one(
-        comodel_name='account.fiscal.position', string="Fiscal position", company_dependent=True
-    )
     duration = fields.Float(string="Default duration", default=1.0)
     team_ids = fields.Many2many(
         comodel_name='of.planning.team',

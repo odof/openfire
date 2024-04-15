@@ -8,7 +8,6 @@
             <tree string="Tasks list">
                 <field name="sequence" widget="handle" />
                 <field name="name" />
-                <field name="product_id" />
                 <field name="duration" widget="float_time" />
                 <field name="description" />
             </tree>
@@ -38,9 +37,6 @@
                         <group>
                             <field name="duration" widget="float_time" />
                             <field name="is_locked" invisible="1" />
-                            <field name="product_id" attrs="{'readonly':[('is_locked', '=', True)]}" />
-                            <field name="fiscal_position_id" />
-                            <field name="display" />
                         </group>
                         <field name="description" nolabel="1" attrs="{'readonly':[('is_locked', '=', True)]}" placeholder="Add a description..."/>
                     </group>
