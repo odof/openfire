@@ -27,13 +27,6 @@ class OFServiceRequest(models.Model):
     _inherit = 'mail.thread'
     _description = "Service Request"
 
-    @api.model
-    def _default_company(self):
-        """For planning objects, the choice of company is made by settings in the company."""
-        if self.company_id.of_company_choice == 'user':
-            return self.env['res.company']._company_default_get('of.service.request')
-        return False
-
     def _default_days(self):
         """Returns the days of the week from Monday to Friday as default"""
         days = self.env['of.days'].search([('number', 'in', (1, 2, 3, 4, 5))], order="number")
@@ -155,7 +148,14 @@ class OFServiceRequest(models.Model):
         readonly=False,
         required=True,
     )
-    company_id = fields.Many2one(comodel_name='res.company', string="Company", required=True)
+    company_id = fields.Many2one(
+        comodel_name='res.company',
+        string="Company",
+        required=True,
+        compute='_compute_company_id',
+        store=True,
+        readonly=False,
+    )
     user_id = fields.Many2one(comodel_name='res.users', string="User", default=lambda r: r.env.user)
     stage_id = fields.Many2one(
         comodel_name='of.service.request.stage',
@@ -686,6 +686,17 @@ class OFServiceRequest(models.Model):
         for request in self:
             if request.type_id and request.type_id.stage_ids:
                 request.stage_id = request.type_id.stage_ids[0]
+
+    @api.depends('partner_id', 'user_id')
+    def _compute_company_id(self):
+        for request in self:
+            company_choice = self.env.user.company_id.of_company_choice or 'contact'
+            company = (
+                self.env.user.company_id
+                if company_choice == 'user'
+                else request.partner_id.company_id or self.user_id.company_id
+            )
+            request.company_id = company or False
 
     # --------------------------------------------------------------------------
     # Onchange methods
