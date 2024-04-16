@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-16 13:18+0000\n"
-"PO-Revision-Date: 2023-11-16 13:18+0000\n"
+"POT-Creation-Date: 2024-04-19 10:11+0000\n"
+"PO-Revision-Date: 2024-04-19 10:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,56 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_mobile
+#. odoo-python
+#: code:addons/of_mobile/models/of_service_request.py:0
+#, python-format
+msgid "%s SR were published on mobile"
+msgstr "%s DI ont été publiées sur le mobile"
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
+msgid ""
+"<span class=\"text-success\" attrs=\"{'invisible': [('mobile', '=', False)]}\">Mobile</span>\n"
+"                            <span class=\"text-danger\" attrs=\"{'invisible': [('mobile', '=', True)]}\">Mobile</span>"
+msgstr ""
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_task_view_form
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_service_request_view_form
+msgid ""
+"<span class=\"text-success\" attrs=\"{'invisible': [('mobile', '=', False)]}\">Mobile</span>\n"
+"                        <span class=\"text-danger\" attrs=\"{'invisible': [('mobile', '=', True)]}\">Mobile</span>"
+msgstr ""
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_product_brand_view_form
+#: model_terms:ir.ui.view,arch_db:of_mobile.product_template_view_form
+msgid ""
+"<span class=\"text-success\" attrs=\"{'invisible': [('of_mobile', '=', False)]}\">Mobile</span>\n"
+"                        <span class=\"text-danger\" attrs=\"{'invisible': [('of_mobile', '=', True)]}\">Mobile</span>"
+msgstr ""
+
+#. module: of_mobile
+#: model:ir.actions.server,name:of_mobile.action_mass_toggle_mobile
+msgid "Activate SR on mobile"
+msgstr "Activer les DI sur le mobile"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_connector_config_settings__of_mobile_auto_publish_service
+#: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_auto_publish_service
+msgid "Automatic SR publication"
+msgstr "Publication automatique des DI"
+
+#. module: of_mobile
 #: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__auto
 #: model:ir.model.fields.selection,name:of_mobile.selection__res_config_settings__of_mobile_meeting_timesheet__auto
 msgid "Automatic tracking"
 msgstr ""
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
 
 #. module: of_mobile
 #: model:ir.model,name:of_mobile.model_res_config_settings
@@ -28,12 +74,17 @@ msgstr "Paramètres de configuration"
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
+msgid "Define if SR are automatically or manually published."
+msgstr "Définit si les DI sont publiées automatiquement ou manuellement."
+
+#. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid ""
 "Define the maximum number of attachments which can be synchronized for an "
 "intervention."
 msgstr ""
-"Définir le nombre maximum de pièces jointes qui peuvent être "
-"synchronisées par intervention."
+"Définir le nombre maximum de pièces jointes qui peuvent être synchronisées "
+"par intervention."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
@@ -79,6 +130,21 @@ msgid "Define the time tracking mode."
 msgstr "Définir le mode de suivi du temps."
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_hr_employee
+msgid "Employee"
+msgstr "Employé"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_equipment
+msgid "Equipment"
+msgstr "Équipement"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_account_fiscal_position
+msgid "Fiscal Position"
+msgstr "Position fiscale"
+
+#. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Images size"
 msgstr "Taille des images"
@@ -89,9 +155,19 @@ msgid "Intervention modification"
 msgstr "Modification d'intervention"
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Interventions synchronization"
 msgstr "Synchronization des interventions"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
 
 #. module: of_mobile
 #: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__manual
@@ -132,12 +208,43 @@ msgstr "Largeur maximale"
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Mobile"
-msgstr "Mobile"
+msgstr ""
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_product_brand__of_mobile
+msgid "Mobile Brand"
+msgstr "Marque mobile"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__mobile
+msgid "Mobile Intervention Template"
+msgstr "Modèle d'intervention mobile"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_product_product__of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_product_template__of_mobile
+msgid "Mobile Product"
+msgstr "Produit mobile"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_service_request__mobile
+msgid "Mobile Service Request"
+msgstr "Demande d'intervention mobile"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_task__mobile
+msgid "Mobile Task"
+msgstr "Tâche mobile"
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Modification period"
 msgstr "Période de modification"
+
+#. module: of_mobile
+#: model:ir.model.fields,help:of_mobile.field_calendar_event__of_update_date
+msgid "Most recent update date of every elements in the intervention"
+msgstr ""
 
 #. module: of_mobile
 #: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__no
@@ -182,6 +289,43 @@ msgid "Planning period"
 msgstr "Période du planning"
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_product_brand
+msgid "Product brand"
+msgstr "Marque"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_service_request
+msgid "Service Request"
+msgstr "Demande d'intervention"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_survey_survey
+msgid "Survey"
+msgstr "Questionnaire"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_planning_task
+msgid "Task"
+msgstr "Tâche"
+
+#. module: of_mobile
+#. odoo-python
+#: code:addons/of_mobile/models/of_planning_intervention_template.py:0
+#, python-format
+msgid "The default template cannot be unpublished."
+msgstr "Le modèle d'intervention par défaut ne peut être dépublié"
+
+#. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Time tracking"
 msgstr "Suivi du temps"
@@ -197,3 +341,29 @@ msgstr "Suivi du temps obligatoire"
 #: model:ir.model.fields,field_description:of_mobile.field_res_config_settings__of_mobile_meeting_timesheet
 msgid "Time tracking mode"
 msgstr "Mode de suivi du temps"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_calendar_event__of_update_date
+msgid "Update date"
+msgstr ""
+
+#. module: of_mobile
+#. odoo-python
+#: code:addons/of_mobile/models/of_planning_task.py:0
+#, python-format
+msgid ""
+"You cannot unpublish this task, as the associated intervention templates are"
+" published."
+msgstr ""
+"Vous ne pouvez pas dépublié cette tâche car les modèle d'intervention "
+"associés sont publiés."
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_graphql
+msgid "of.graphql"
+msgstr ""

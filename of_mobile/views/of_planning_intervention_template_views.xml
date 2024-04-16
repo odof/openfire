@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view" >
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//widget[@name='web_ribbon']" position="after">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_button_toggle_mobile" type="object" class="oe_stat_button" icon="fa-android">
+                        <field name="mobile" invisible="1"/>
+                        <div class="o_stat_info o_field_widget">
+                            <span class="text-success" attrs="{'invisible': [('mobile', '=', False)]}">Mobile</span>
+                            <span class="text-danger" attrs="{'invisible': [('mobile', '=', True)]}">Mobile</span>
+                        </div>
+                    </button>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

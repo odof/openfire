@@ -36,7 +36,6 @@ class ControllersOfMobile(http.Controller):
         registry = odoo.modules.registry.Registry(request.db)
         with registry.cursor() as cr:
             env = odoo.api.Environment(cr, request.session.uid, request.session.context)
-            print(request.session.sid)
             # request._save_session would not update the session_token
             # as it lacks an environment, rotating the session myself
             http.root.session_store.rotate(request.session, env)
