@@ -13,7 +13,7 @@ class OFPlanningInterventionLine(models.Model):
     _description = "Intervention line"
 
     sequence = fields.Integer(default=10)
-    name = fields.Text(string="Description")
+    name = fields.Text(string="Description", compute='_compute_name', store=True, readonly=False)
 
     # Intervention Related fields
     intervention_id = fields.Many2one(
@@ -168,6 +168,17 @@ class OFPlanningInterventionLine(models.Model):
             fiscal_position = line.intervention_id.of_fiscal_position_id
             taxes = line.company_id._of_filter_taxes(line.product_id.taxes_id)
             line.tax_ids = fiscal_position and fiscal_position.map_tax(taxes) or taxes
+
+    @api.depends('product_id')
+    def _compute_name(self):
+        for line in self:
+            if product := line.product_id:
+                name = product.name_get()[0][1]
+                if product.description_sale:
+                    name += '\n' + product.description_sale
+                line.name = name
+            else:
+                line.name = ''
 
     # ------------------------------------------------------------------------------
     # Business methods
