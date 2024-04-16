@@ -1,4 +1,4 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from . import models
-from .hooks import _uninstall_hook
+from .hooks import _post_init_hook, _uninstall_hook
