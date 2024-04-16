@@ -65,6 +65,10 @@
         + .o_planning_cell {
             border-left-color: $planning-highlight-today-border;
         }
+
+        &.o_planning_now {
+            border-left: 2px solid red !important;
+        }
     }
 }
 

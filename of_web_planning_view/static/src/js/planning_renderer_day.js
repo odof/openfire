@@ -54,10 +54,14 @@ export class PlanningDayRenderer extends PlanningRenderer {
                 stop,
             };
             const isToday = date.hasSame(now, "day");
+            const isNow = date.hasSame(now, "day") && date.hasSame(now, "hour") && date.c.minute <= now.c.minute && now.c.minute < (date.c.minute + 5);
             const dayChanged = previousDate && previousDate.c.day != date.c.day;
 
             if (isToday) {
                 column.isToday = true;
+            }
+            if (isNow) {
+                column.isNow = true;
             }
             if (dayChanged) {
                 column.dayChanged = true;
@@ -71,7 +75,7 @@ export class PlanningDayRenderer extends PlanningRenderer {
                     [time]: (i + 1) * cellTime,
                     seconds: -1,
                 });
-                this.subColumns.push({ start: subCellStart, stop: subCellStop, isToday, dayChanged, columnId });
+                this.subColumns.push({ start: subCellStart, stop: subCellStop, isToday, isNow, dayChanged, columnId });
                 this.dateGridColumns.push(subCellStart);
             }
 

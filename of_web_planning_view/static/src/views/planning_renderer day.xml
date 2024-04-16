@@ -100,6 +100,7 @@
                 t-att-class="{
                     o_sample_data_disabled: isDisabled(row),
                     o_planning_today: column.isToday,
+                    o_planning_now: column.isNow,
                     o_planning_group: row.isGroup,
                     o_planning_hoverable: isHoverable(row),
                     o_group_open: !model.isClosed(row.id),
