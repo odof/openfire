@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_reorganization_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.planning.reorganization.wizard.view.form</field>
+        <field name="model">of.tour.planning.reorganization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reorganization of the tour">
+                <script>
+                    $(document).ready(function(){
+                        // élargir le pop-up
+                        $(".modal-dialog").width('80%');
+                    });
+                </script>
+                <sheet>
+                    <field name="tour_id" invisible="1"/>
+                    <group>
+                        <field name="line_ids" mode="tree" nolabel="1">
+                            <tree string="Tour lines" editable="top" create="false" edit="false" delete="false">
+                                <field name="sequence" widget="handle"/>
+                                <field name="intervention_id" readonly="1"/>
+                                <field name="date_start"/>
+                                <field name="address_city"/>
+                                <field name="employee_ids"/>
+                                <field name="duration" widget="float_time"/>
+                                <field name="duration_one_way" widget="float_time" readonly="1"/>
+                                <field name="distance_one_way" readonly="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight" />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
