@@ -1,11 +1,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import models
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 
 class OFPlanningTask(models.Model):
     _inherit = 'of.planning.task'
+
+    mobile = fields.Boolean(string="Mobile Task")
 
     def write(self, vals):
         res = super().write(vals)
@@ -15,3 +18,13 @@ class OFPlanningTask(models.Model):
     def unlink(self):
         self.env['calendar.event'].action_update_date([('of_task_id', '=', self.id)])
         return super().unlink()
+
+    def action_button_toggle_mobile(self):
+        self.ensure_one()
+        intervention_template_obj = self.env['of.planning.intervention.template']
+        if self.mobile and intervention_template_obj.search([('task_id', '=', self.id), ('mobile', '=', True)]):
+            raise UserError(
+                _("You cannot unpublish this task, as the associated intervention templates are published.")
+            )
+
+        self.mobile = not self.mobile

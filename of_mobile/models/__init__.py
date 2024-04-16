@@ -4,6 +4,8 @@ from . import res_config_settings
 from . import of_graphql
 from . import calendar_event
 from . import hr_employee
+from . import of_product_brand
+from . import product_template
 from . import sale_order
 from . import account_fiscal_position
 from . import account_move
@@ -12,3 +14,4 @@ from . import of_planning_task
 from . import of_planning_intervention_template
 from . import of_equipment
 from . import of_survey
+from . import of_service_request

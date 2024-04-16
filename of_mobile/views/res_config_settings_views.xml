@@ -28,13 +28,25 @@
                             </div>
                         </div>
                     </div>
+
                     <h2>Interventions synchronization</h2>
                     <div class="row mt16 o_settings_container">
+                        <div class="col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="of_mobile_auto_publish_service"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_mobile_auto_publish_service"/>
+                                <div class="text-muted">
+                                    Define if SR are automatically or manually published.
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-lg-6 o_setting_box">
                             <div class="o_setting_right_pane">
                                 <label for="of_mobile_history_limit"/>
                                 <div class="text-muted">
-                                Define the number of month of synchronized history. Maximum 24 months.   
+                                Define the number of month of synchronized history. Maximum 24 months.
                                 </div>
                                 <field name="of_mobile_history_limit" />
                             </div>
@@ -56,9 +68,9 @@
                                 </div>
                             </div>
                         </div>
- 
+
                     </div>
- 
+
                     <div class="row mt16 o_settings_container">
                         <div class="col-lg-6 o_setting_box">
                             <div class="o_setting_right_pane">
@@ -101,7 +113,6 @@
                         </div>
                     </div>
 
-
                     <h2>Time tracking</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-lg-6 o_setting_box">
@@ -118,7 +129,7 @@
                             </div>
                         </div>
                     </div>
- 
+
                 </div>
             </xpath>
         </field>
