@@ -186,6 +186,11 @@ class StockInventoryLine(models.Model):
     _inherit = ['stock.inventory.line', 'of.datastore.product.reference']
 
 
+class StockMove(models.Model):
+    _name = 'stock.move'
+    _inherit = ['stock.move', 'of.datastore.product.reference']
+
+
 class OFParcInstalle(models.Model):
     _name = 'of.parc.installe'
     _inherit = ['of.parc.installe', 'of.datastore.product.reference']
