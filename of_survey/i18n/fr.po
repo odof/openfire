@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-19 14:22+0000\n"
-"PO-Revision-Date: 2024-04-19 14:22+0000\n"
+"POT-Creation-Date: 2024-04-19 14:36+0000\n"
+"PO-Revision-Date: 2024-04-19 14:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -134,6 +134,17 @@ msgid ""
 "<span class=\"o_survey_session_answer_count\">0</span>\n"
 "                                     /"
 msgstr ""
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
+msgid ""
+"<span col=\"4\" attrs=\"{'invisible': "
+"[('has_conditional_questions','=',False)]}\">It's not possible to show "
+"progression because there is conditional question(s)</span>"
+msgstr ""
+"<span attrs=\"{'invisible': [('has_conditional_questions','=',False)]}\">La "
+"progression ne peut-être affichée car il existe une ou plusieurs questions "
+"conditionnelles</span>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -1565,8 +1576,8 @@ msgid "See file(s) for the answer"
 msgstr "Voir fichier(s) pour la réponse"
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/models/of_survey_user_input_line.py:0
 #: code:addons/of_survey/static/src/js/survey_form.js:0
@@ -1929,8 +1940,8 @@ msgid "This is a Test Survey."
 msgstr "Ceci est un Questionnaire test."
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/static/src/js/survey_form.js:0
 #: code:addons/of_survey/tests/test_survey.py:0
