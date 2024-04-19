@@ -3,6 +3,7 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
+from odoo.addons.of_account_tax_graphql.graphql.account_fiscal_position_type import AccountFiscalPosition
 from odoo.addons.of_base_graphql.graphql.attachment_type import Attachment
 from odoo.addons.of_base_graphql.graphql.company_type import Company
 from odoo.addons.of_base_graphql.graphql.employee_type import Employee
@@ -11,6 +12,7 @@ from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
 from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder
 from odoo.addons.of_stock_graphql.graphql.picking_type import Picking
 
+from .planning_intervention_line_type import PlanningInterventionLine
 from .planning_intervention_tag_type import PlanningInterventionTag
 from .planning_intervention_task_type import PlanningInterventionTask
 from .planning_intervention_template_type import PlanningInterventionTemplate
@@ -34,6 +36,7 @@ class PlanningIntervention(OdooObjectType):
         description="Liste des intervenants sur l'intervention",
         name='employees',
     )
+    of_is_closed = graphene.NonNull(graphene.Boolean, name='isClosed')
     company = graphene.Field(Company, required=True)
     of_state = graphene.String(required=True, name='state')
     of_picking_ids = graphene.List(graphene.NonNull(Picking), name='pickings')
@@ -48,7 +51,9 @@ class PlanningIntervention(OdooObjectType):
     description = graphene.String()
     of_customer_signature = OdooImage(name='customerSignature')
     of_operator_signature = OdooImage(name='operatorSignature')
-    of_tag_ids = graphene.List(graphene.NonNull(PlanningInterventionTag), name="tags", required=True)
+    of_tag_ids = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTag)), name='tags')
+    of_line_ids = graphene.List(graphene.NonNull(PlanningInterventionLine), name='invoiceLines')
+    fiscal_position = graphene.Field(AccountFiscalPosition)
 
     @staticmethod
     def resolve_attachments(root, info):
@@ -85,6 +90,10 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_template(root, info):
         return root.of_template_id or None
+
+    @staticmethod
+    def resolve_fiscal_position(root, info):
+        return root.of_fiscal_position_id or None
 
 
 class PlanningInterventionInput(graphene.InputObjectType):

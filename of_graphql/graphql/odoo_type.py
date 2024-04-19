@@ -13,12 +13,10 @@ class OdooImage(graphene.Scalar):
 
     @staticmethod
     def parse_literal(ast):
-        logger.info("parse_literal")
         return ast.value
 
     @staticmethod
     def parse_value(value):
-        logger.info("parse_value")
         return value
 
 

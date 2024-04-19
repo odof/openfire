@@ -7,6 +7,7 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 from ..graphql.equipment_mutation import EquipmentMutation
 from ..graphql.equipment_query import EquipmentQuery
 from ..graphql.equipment_type import Equipment, EquipmentCreateInput, EquipmentFilterInput, EquipmentUpdateInput
+from ..graphql.planning_intervention_type import PlanningIntervention
 
 
 class OFGraphql(models.AbstractModel):
@@ -23,5 +24,6 @@ class OFGraphql(models.AbstractModel):
                 EquipmentUpdateInput,
                 EquipmentQuery,
                 EquipmentMutation,
+                PlanningIntervention,
             ],
         )

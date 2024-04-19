@@ -6,6 +6,7 @@ from odoo.addons.graphql_base import OdooObjectType
 from odoo.addons.of_base_graphql.graphql.partner_type import Partner
 from odoo.addons.of_base_graphql.graphql.product_category_type import ProductCategory
 from odoo.addons.of_base_graphql.graphql.product_type import Product
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningIntervention
 from odoo.addons.of_product_brand_graphql.graphql.product_brand_type import ProductBrand
 from odoo.addons.of_stock_graphql.graphql.stock_lot_type import StockLot
 
@@ -33,7 +34,9 @@ class Equipment(OdooObjectType):
     lot = graphene.Field(StockLot)
     reseller = graphene.Field(Partner)
     installer = graphene.Field(Partner)
-    site_address_id = graphene.Field(Partner, name="siteAddress")
+    site_address = graphene.Field(Partner)
+    customer = graphene.Field(Partner, required=True)
+    interventions = graphene.List(graphene.NonNull(PlanningIntervention))
 
     @staticmethod
     def resolve_product(root, info):
@@ -58,6 +61,20 @@ class Equipment(OdooObjectType):
     @staticmethod
     def resolve_installer(root, info):
         return root.installer_id or None
+
+    @staticmethod
+    def resolve_site_address(root, info):
+        return root.site_address_id or None
+
+    @staticmethod
+    def resolve_customer(root, info):
+        return root.customer_id or None
+
+    @staticmethod
+    def resolve_interventions(root, info):
+        env = info.context["env"]
+        interventions = env['calendar.event'].search([('of_equipment_ids', 'in', root.id)])
+        return interventions
 
 
 class EquipmentInput(graphene.InputObjectType):

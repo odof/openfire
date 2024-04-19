@@ -11,7 +11,9 @@ class PlanningIntervention(OdooObjectType):
     _type = 'types'
 
     update_date = graphene.DateTime()
-    equipments = graphene.List(graphene.NonNull(Equipment))
+    equipments = graphene.NonNull(graphene.List(graphene.NonNull(Equipment)))
+    historical = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
+    comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
 
     @staticmethod
     def resolve_update_date(root, info):
@@ -20,6 +22,14 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_equipments(root, info):
         return root.of_equipment_ids or []
+
+    @staticmethod
+    def resolve_historical(root, info):
+        return root.of_historical_ids or []
+
+    @staticmethod
+    def resolve_comings(root, info):
+        return root.of_coming_ids or []
 
 
 class PlanningInterventionsOffline(graphene.ObjectType):
