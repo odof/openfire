@@ -74,17 +74,13 @@ class ResConfigSettings(models.TransientModel):
 
     @api.onchange('of_mobile_display_planning_days_before')
     def _onchange_of_mobile_display_planning_days_before(self):
-        if self.of_mobile_display_planning_days_before > 30:
-            self.of_mobile_display_planning_days_before = 30
-        if self.of_mobile_display_planning_days_before < 0:
-            self.of_mobile_display_planning_days_before = 0
+        self.of_mobile_display_planning_days_before = min(self.of_mobile_display_planning_days_before, 30)
+        self.of_mobile_display_planning_days_before = max(self.of_mobile_display_planning_days_before, 0)
 
     @api.onchange('of_mobile_display_planning_days_after')
     def _onchange_of_mobile_display_planning_days_after(self):
-        if self.of_mobile_display_planning_days_after > 60:
-            self.of_mobile_display_planning_days_after = 60
-        if self.of_mobile_display_planning_days_after < 0:
-            self.of_mobile_display_planning_days_after = 0
+        self.of_mobile_display_planning_days_after = min(self.of_mobile_display_planning_days_after, 60)
+        self.of_mobile_display_planning_days_after = max(self.of_mobile_display_planning_days_after, 0)
 
     @api.onchange('of_mobile_meeting_timesheet')
     def _onchange_of_mobile_meeting_timesheet(self):
@@ -93,39 +89,36 @@ class ResConfigSettings(models.TransientModel):
 
     @api.onchange('of_mobile_history_limit')
     def _onchange_of_mobile_history_limit(self):
-        if self.of_mobile_history_limit > 24:
-            self.of_mobile_history_limit = 24
+        self.of_mobile_history_limit = min(self.of_mobile_history_limit, 24)
 
     @api.onchange('of_mobile_can_edit_days_before')
     def _onchange_of_mobile_can_edit_days_before(self):
-        if self.of_mobile_can_edit_days_before > self.of_mobile_display_planning_days_before:
-            self.of_mobile_can_edit_days_before = self.of_mobile_display_planning_days_before
-        if self.of_mobile_can_edit_days_before < 0:
-            self.of_mobile_can_edit_days_before = 0
+        self.of_mobile_can_edit_days_before = min(
+            self.of_mobile_can_edit_days_before,
+            self.of_mobile_display_planning_days_before,
+        )
+        self.of_mobile_can_edit_days_before = max(self.of_mobile_can_edit_days_before, 0)
 
     @api.onchange('of_mobile_can_edit_days_after')
     def _onchange_of_mobile_can_edit_days_after(self):
-        if self.of_mobile_can_edit_days_after > self.of_mobile_display_planning_days_after:
-            self.of_mobile_can_edit_days_after = self.of_mobile_display_planning_days_after
-        if self.of_mobile_can_edit_days_after < 0:
-            self.of_mobile_can_edit_days_after = 0
+        self.of_mobile_can_edit_days_after = min(
+            self.of_mobile_can_edit_days_after,
+            self.of_mobile_display_planning_days_after,
+        )
+        self.of_mobile_can_edit_days_after = max(self.of_mobile_can_edit_days_after, 0)
 
     @api.onchange('of_mobile_max_size_attachment')
     def _onchange_of_mobile_max_size_attachment(self):
-        if self.of_mobile_max_size_attachment > 10:
-            self.of_mobile_max_size_attachment = 10
+        self.of_mobile_max_size_attachment = min(self.of_mobile_max_size_attachment, 10)
 
     @api.onchange('of_mobile_max_nb_attachment')
     def _onchange_of_mobile_max_nb_attachment(self):
-        if self.of_mobile_max_nb_attachment > 10:
-            self.of_mobile_max_nb_attachment = 10
+        self.of_mobile_max_nb_attachment = min(self.of_mobile_max_nb_attachment, 10)
 
     @api.onchange('of_mobile_image_resolution_width')
     def _onchange_of_mobile_image_resolution_width(self):
-        if self.of_mobile_image_resolution_width > 1920:
-            self.of_mobile_image_resolution_width = 1920
+        self.of_mobile_image_resolution_width = min(self.of_mobile_image_resolution_width, 1920)
 
     @api.onchange('of_mobile_image_resolution_height')
     def _onchange_of_mobile_image_resolution_height(self):
-        if self.of_mobile_image_resolution_height > 1920:
-            self.of_mobile_image_resolution_height = 1920
+        self.of_mobile_image_resolution_height = min(self.of_mobile_image_resolution_height, 1920)

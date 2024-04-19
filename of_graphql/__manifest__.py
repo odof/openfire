@@ -7,7 +7,7 @@
     "author": "",
     "website": "",
     "depends": ["graphql_base"],
-    "external_dependencies": {"python": ["graphene"]},
+    "external_dependencies": {"python": ["graphene", "graphdoc", "graphql-server"]},
     "development_status": "",
     "maintainers": [""],
     "installable": True,

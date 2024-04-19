@@ -17,8 +17,7 @@ class CalendarEvent(models.Model):
 
     def write(self, vals):
         vals['of_update_date'] = fields.Datetime.now()
-        res = super().write(vals)
-        return res
+        return super().write(vals)
 
     @api.model
     def action_update_date(self, domain_obj):
@@ -42,6 +41,5 @@ class CalendarEvent(models.Model):
 
         domain = expression.AND([domain, domain_obj])
 
-        interventions = self.env['calendar.event'].sudo().search(domain)
-        if interventions:
+        if interventions := self.env['calendar.event'].sudo().search(domain):
             interventions.write({'of_update_date': now})

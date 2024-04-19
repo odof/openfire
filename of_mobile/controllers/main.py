@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
 import odoo
 from odoo import http
 from odoo.http import request
@@ -20,8 +19,8 @@ class ControllersOfMobile(http.Controller):
         """
         body = request.get_json_data()
 
-        username = body.get("username", False)
-        password = body.get("password", False)
+        username = body.get('username', False)
+        password = body.get('password', False)
         if not password or not username:
             return {'code': 400, 'message': 'Missing username or password', 'session_id': None}
         user_id = request.session.authenticate(request.db, username, password)
