@@ -2501,7 +2501,6 @@ msgstr "Société"
 #. module: of_crm
 #: model:ir.ui.view,arch_db:of_crm.of_crm_case_form_view_oppor
 #: model:ir.ui.view,arch_db:of_crm.of_crm_view_create_opportunity_simplified
-#: model:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
 msgid "Source"
 msgstr "Origine"
 

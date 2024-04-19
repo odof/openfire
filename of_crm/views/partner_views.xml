@@ -22,15 +22,18 @@
             <xpath expr="//notebook" position="inside">
                 <page name="marketing" string="Marketing">
                     <group>
-                        <group string="Source" name="utm">
-                            <field name="of_lead_campaign_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
-                            <field name="of_lead_medium_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
-                            <field name="of_lead_source_id" attrs="{'invisible': [('opportunity_ids', '=', [])]}"/>
-                            <field name="campaign_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
-                            <field name="medium_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
-                            <field name="source_id" attrs="{'invisible': [('opportunity_ids', '!=', [])]}"/>
-                            <!-- /!\ Champ en readonly pour éviter des problèmes de on_change /!\ -->
-                            <field name="opportunity_ids" readonly="1" invisible="1"/>
+                        <!-- /!\ Champ en readonly pour éviter des problèmes de on_change /!\ -->
+                        <field name="opportunity_ids" readonly="1" invisible="1"/>
+                        <group string="Origine du contact" name="utm">
+                            <field name="campaign_id"/>
+                            <field name="medium_id"/>
+                            <field name="source_id"/>
+                        </group>
+                        <group string="Origine de la dernière opportunité" name="lead_utm"
+                            attrs="{'invisible': [('opportunity_ids', '=', [])]}">
+                            <field name="of_lead_campaign_id"/>
+                            <field name="of_lead_medium_id"/>
+                            <field name="of_lead_source_id"/>
                         </group>
                     </group>
                 </page>

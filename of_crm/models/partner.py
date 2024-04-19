@@ -112,9 +112,10 @@ Ce champ se met à jour automatiquement sur confirmation de commande et sur vali
     def _compute_of_lead_utm(self):
         for partner in self:
             if partner.opportunity_ids:
-                partner.of_lead_campaign_id = partner.opportunity_ids[0].campaign_id.id
-                partner.of_lead_source_id = partner.opportunity_ids[0].source_id.id
-                partner.of_lead_medium_id = partner.opportunity_ids[0].medium_id.id
+                opportunity = partner.opportunity_ids.sorted(key='id', reverse=True)[0]
+                partner.of_lead_campaign_id = opportunity.campaign_id.id
+                partner.of_lead_source_id = opportunity.source_id.id
+                partner.of_lead_medium_id = opportunity.medium_id.id
             else:
                 partner.of_lead_campaign_id = False
                 partner.of_lead_source_id = False
