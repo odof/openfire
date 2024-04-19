@@ -25,11 +25,6 @@
         'views/of_planning_task_views.xml',
         'views/of_planning_intervention_template_views.xml',
     ],
-    'external_dependencies': {
-        'python': [
-            'graphene',
-        ]
-    },
     'installable': True,
     'application': False,
     'auto_install': False,

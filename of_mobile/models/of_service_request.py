@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
 from odoo import _, api, fields, models
 
 
@@ -9,7 +8,7 @@ class OFServiceRequest(models.Model):
 
     @api.model
     def _default_mobile(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of_mobile.auto_publish_service') or False
+        return self.env['ir.config_parameter'].sudo().get_param('of_mobile.auto_publish_service')
 
     mobile = fields.Boolean(string="Mobile Service Request", default=lambda s: s._default_mobile())
 

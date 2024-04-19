@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
 from odoo import models
 
 
@@ -13,9 +12,9 @@ class HrEmployee(models.Model):
         domain_employee = [
             '|',
             '|',
-            ('of_employee_ids', 'in', self.id),
-            ('of_employee_id', '=', self.id),
-            ('of_gb_employee_id', '=', self.id),
+            ('of_employee_ids', 'in', self.ids),
+            ('of_employee_id', 'in', self.ids),
+            ('of_gb_employee_id', 'in', self.ids),
         ]
         self.env['calendar.event'].action_update_date(domain_employee)
 
@@ -25,9 +24,9 @@ class HrEmployee(models.Model):
         domain_employee = [
             '|',
             '|',
-            ('of_employee_ids', 'in', self.id),
-            ('of_employee_id', '=', self.id),
-            ('of_gb_employee_id', '=', self.id),
+            ('of_employee_ids', 'in', self.ids),
+            ('of_employee_id', 'in', self.ids),
+            ('of_gb_employee_id', 'in', self.ids),
         ]
         self.env['calendar.event'].action_update_date(domain_employee)
 

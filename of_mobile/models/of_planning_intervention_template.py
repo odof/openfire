@@ -12,11 +12,11 @@ class OFPlanningInterventionTemplate(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        self.env['calendar.event'].action_update_date([('of_template_id', '=', self.id)])
+        self.env['calendar.event'].action_update_date([('of_template_id', 'in', self.ids)])
         return res
 
     def unlink(self):
-        self.env['calendar.event'].action_update_date([('of_template_id', '=', self.id)])
+        self.env['calendar.event'].action_update_date([('of_template_id', 'in', self.ids)])
         return super().unlink()
 
     def action_button_toggle_mobile(self):
