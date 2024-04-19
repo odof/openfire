@@ -15,6 +15,16 @@ class CalendarEvent(models.Model):
         default=fields.Datetime.now(),
     )
 
+    of_historical_ids = fields.One2many(
+        comodel_name='calendar.event',
+        compute="_compute_historical_ids",
+    )
+
+    of_coming_ids = fields.One2many(
+        comodel_name='calendar.event',
+        compute="_compute_coming_ids",
+    )
+
     def write(self, vals):
         vals['of_update_date'] = fields.Datetime.now()
         return super().write(vals)
@@ -43,3 +53,40 @@ class CalendarEvent(models.Model):
 
         if interventions := self.env['calendar.event'].sudo().search(domain):
             interventions.write({'of_update_date': now})
+
+    @api.depends('of_partner_id', 'of_address_id')
+    def _compute_historical_ids(self):
+        limit = self.env['ir.config_parameter'].sudo().get_param('of_mobile.history_limit')
+        today = fields.Datetime.from_string(fields.Date.today())
+        limit_date = today - relativedelta(months=int(limit))
+        for interv in self:
+            if interv.of_address_id:
+                interventions = interv.of_address_id.of_intervention_address_ids
+            elif interv.of_partner_id:
+                interventions = interv.of_partner_id.of_intervention_partner_ids
+            else:
+                continue
+
+            interv.of_historical_ids = interventions.filtered(
+                lambda i: self._filterHistoricalIntervention(i, interv.start, limit_date)
+            )
+
+    def _filterHistoricalIntervention(self, historical_intervention, intervention_date, limit_date):
+        return intervention_date > historical_intervention.start > limit_date
+
+    @api.depends('of_partner_id', 'of_address_id')
+    def _compute_coming_ids(self):
+        for interv in self:
+            if interv.of_address_id:
+                interventions = interv.of_address_id.of_intervention_address_ids
+            elif interv.of_partner_id:
+                interventions = interv.of_partner_id.of_intervention_partner_ids
+            else:
+                continue
+
+            interv.of_coming_ids = interventions.filtered(
+                lambda i: self._filterComingIntervention(i, interv.start)
+            ).sorted(key=lambda x: x.start)
+
+    def _filterComingIntervention(self, coming_intervention, intervention_date):
+        return intervention_date < coming_intervention.start

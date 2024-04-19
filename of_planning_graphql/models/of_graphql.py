@@ -5,6 +5,7 @@ from odoo import models
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.employee_type import Employee, EmployeeFilterInput
+from ..graphql.planning_intervention_line_type import PlanningInterventionLine
 from ..graphql.planning_intervention_mutation import PlanningInterventionMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery
 from ..graphql.planning_intervention_tag_mutation import PlanningInterventionTagMutation
@@ -73,5 +74,6 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTagUpdateInput,
                 PlanningInterventionTagCreateInput,
                 PlanningInterventionTagMutation,
+                PlanningInterventionLine,
             ],
         )

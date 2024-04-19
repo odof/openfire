@@ -1,23 +1,36 @@
+import logging
+
 import graphene
 
 from odoo.exceptions import AccessError
 
+logger = logging.getLogger(__name__)
+
 
 def lazy_create(env, model, input):
     value_object = {}
-    for field in input.__dict__:
-        if field in input:
-            value_object[field] = input[field]
-
+    if type(input) is dict:
+        for field in input.keys():
+            if field in input:
+                value_object[field] = input[field]
+    else:
+        for field in input.__dict__:
+            if field in input:
+                value_object[field] = input[field]
     object = env[model].create(value_object)
     return object
 
 
 def lazy_update(env, model, id, input):
     value_object = {}
-    for field in input.__dict__:
-        if field in input:
-            value_object[field] = input[field]
+    if type(input) is dict:
+        for field in input.keys():
+            if field in input:
+                value_object[field] = input[field]
+    else:
+        for field in input.__dict__:
+            if field in input:
+                value_object[field] = input[field]
 
     object = env[model].search([('id', '=', id)], limit=1)
     if not object:
@@ -65,6 +78,27 @@ class OdooGraphql:
         cls.pool[dbname] = {'query': [], 'mutation': [], 'types': {}, 'subscription': [], 'schema': False}
 
     @classmethod
+    def group_class(cls, classes):
+        # ici on regroupe les classes ayant le même _name pour retourner une seule classe par _name
+        res = {}
+        for cl in classes:
+            if cl._name in res:
+                res[cl._name].append(cl)
+            else:
+                res[cl._name] = [cl]
+        classes_list = list(res.values())
+        pool_classes = []
+
+        for cl in classes_list:
+            if len(cl) > 1:
+                cl.reverse()
+                cl = type(cl[0]._name, tuple(cl), {})
+            else:
+                cl = cl[0]
+            pool_classes.append(cl)
+        return pool_classes
+
+    @classmethod
     def add(cls, dbname, objs):
         if dbname not in cls.pool:
             cls.pool[dbname] = {
@@ -96,10 +130,16 @@ class OdooGraphql:
             return cls.pool[dbname]['schema']
 
         if len(cls.pool[dbname]['query']) > 0:
-            class_query = type("Query", tuple(cls.pool[dbname]["query"]), {})
+            # on peut avoir des variables dans les classes query qui sont identiques
+            # il faut donc alors regrouper ces classes en gérant le bon ordre de surcharge
+            class_queries = cls.group_class(cls.pool[dbname]["query"])
+            class_query = type("Query", tuple(class_queries), {})
 
         if len(cls.pool[dbname]['mutation']) > 0:
-            class_mutation = type("Mutation", tuple(cls.pool[dbname]["mutation"]), {})
+            # on peut avoir des variables dans les classes mutations qui sont identiques
+            # il faut donc alors regrouper ces classes en gérant le bon ordre de surcharge
+            class_mutations = cls.group_class(cls.pool[dbname]["mutation"])
+            class_mutation = type("Mutation", tuple(class_mutations), {})
 
         types = []
 
@@ -119,5 +159,4 @@ class OdooGraphql:
             else:
                 schema = graphene.Schema(mutation=class_mutation, types=types)
         cls.pool[dbname]['schema'] = schema
-
         return schema

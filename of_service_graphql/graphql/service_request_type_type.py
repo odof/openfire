@@ -10,7 +10,7 @@ class ServiceRequestType(OdooObjectType):
     _type = 'types'
 
     id = graphene.Int(required=True)
-    name = graphene.String()
+    name = graphene.NonNull(graphene.String)
 
 
 class ServiceRequestTypeInput(graphene.InputObjectType):

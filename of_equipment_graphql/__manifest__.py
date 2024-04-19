@@ -8,7 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Ajoute les données de of_equipment dans le schéma Graphql",
-    "depends": ["of_graphql", "graphql_base", "of_equipment", "of_base_graphql"],
+    "depends": ["of_graphql", "graphql_base", "of_equipment", "of_base_graphql", "of_planning_graphql", "of_planning"],
     "installable": True,
     'application': False,
     'auto_install': True,

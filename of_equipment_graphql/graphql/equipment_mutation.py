@@ -1,3 +1,5 @@
+import logging
+
 import graphene
 
 from odoo.addons.of_base_graphql.graphql.partner_mutation import PartnerCreate, PartnerUpdate
@@ -7,6 +9,11 @@ from odoo.addons.of_base_graphql.graphql.product_category_type import ProductCat
 from odoo.addons.of_base_graphql.graphql.product_mutation import ProductCreate, ProductUpdate
 from odoo.addons.of_base_graphql.graphql.product_type import ProductInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_mutation import (
+    PlanningInterventionCreate,
+    PlanningInterventionUpdate,
+)
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningInterventionInput
 from odoo.addons.of_product_brand_graphql.graphql.product_brand_mutation import ProductBrandCreate, ProductBrandUpdate
 from odoo.addons.of_product_brand_graphql.graphql.product_brand_type import ProductBrandInput
 from odoo.addons.of_stock_graphql.graphql.stock_lot_mutation import StockLotCreate, StockLotUpdate
@@ -14,31 +21,56 @@ from odoo.addons.of_stock_graphql.graphql.stock_lot_type import StockLotInput
 
 from .equipment_type import Equipment, EquipmentCreateInput, EquipmentUpdateInput
 
+logger = logging.getLogger(__name__)
+
 
 class EquipmentCreate(graphene.Mutation):
     _name = 'EquipmentCreate'
 
     class Arguments:
         input = EquipmentCreateInput(required=True)
-        product = ProductInput()
+        product = ProductInput(required=True)
         brand = ProductBrandInput()
         product_category = ProductCategoryInput()
         lot = StockLotInput()
         reseller = PartnerInput()
         installer = PartnerInput()
+        customer = PartnerInput(required=True)
+        intervention = PlanningInterventionInput()
+        site_address = PartnerInput()
 
     Output = Equipment
 
     def mutate(
-        self, info, input, product=None, brand=None, product_category=None, lot=None, reseller=None, installer=None
+        self,
+        info,
+        input,
+        product,
+        customer,
+        brand=None,
+        product_category=None,
+        lot=None,
+        reseller=None,
+        installer=None,
+        intervention=None,
+        site_address=None,
     ):
         env = info.context["env"]
+        my_input = input.copy()
 
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
+        if product.id:
+            product = ProductUpdate().mutate(info, id=product.id, input=product)
+        else:
+            product = ProductCreate().mutate(info, input=product)
+
+        my_input['product_id'] = product.id
+
+        if customer.id:
+            customer = PartnerUpdate().mutate(info, id=customer.id, input=customer)
+        else:
+            customer = PartnerCreate().mutate(info, input=customer)
+
+        my_input['customer_id'] = customer.id
 
         if product_category:
             if product_category.id:
@@ -70,25 +102,41 @@ class EquipmentCreate(graphene.Mutation):
             else:
                 installer = PartnerCreate().mutate(info, input=installer)
 
-        equipment = lazy_create(env, 'of.equipment', input)
+        if intervention:
+            if intervention.id:
+                intervention = PlanningInterventionUpdate().mutate(info, id=intervention.id, input=intervention)
+            else:
+                intervention = PlanningInterventionCreate().mutate(info, input=intervention)
+            intervention.of_use_equipment = True
 
-        if product:
-            equipment.product_id = product
+        if site_address:
+            if site_address.id:
+                site_address = PartnerUpdate().mutate(info, id=site_address.id, input=site_address)
+            else:
+                site_address = PartnerCreate().mutate(info, input=site_address)
+
+        equipment = lazy_create(env, 'of.equipment', my_input)
 
         if brand:
-            equipment.brand_id = brand
+            equipment.brand_id = brand.id
 
         if product_category:
-            equipment.product_category_id = product_category
+            equipment.product_category_id = product_category.id
 
         if lot:
-            equipment.lot_id = lot
+            equipment.lot_id = lot.id
 
         if reseller:
-            equipment.reseller_id = reseller
+            equipment.reseller_id = reseller.id
 
         if installer:
-            equipment.installer_id = installer
+            equipment.installer_id = installer.id
+
+        if intervention:
+            equipment.intervention_ids += intervention
+
+        if site_address:
+            equipment.site_address_id = site_address.id
 
         return equipment
 
@@ -105,11 +153,26 @@ class EquipmentUpdate(graphene.Mutation):
         lot = StockLotInput()
         reseller = PartnerInput()
         installer = PartnerInput()
+        customer = PartnerInput()
+        intervention = PlanningInterventionInput()
+        site_address = PartnerInput()
 
     Output = Equipment
 
     def mutate(
-        self, info, id, input, product=None, brand=None, product_category=None, lot=None, reseller=None, installer=None
+        self,
+        info,
+        id,
+        input,
+        product=None,
+        customer=None,
+        brand=None,
+        product_category=None,
+        lot=None,
+        reseller=None,
+        installer=None,
+        intervention=None,
+        site_address=None,
     ):
         env = info.context["env"]
 
@@ -118,6 +181,12 @@ class EquipmentUpdate(graphene.Mutation):
                 product = ProductUpdate().mutate(info, id=product.id, input=product)
             else:
                 product = ProductCreate().mutate(info, input=product)
+
+        if customer:
+            if customer.id:
+                customer = PartnerUpdate().mutate(info, id=customer.id, input=customer)
+            else:
+                customer = PartnerCreate().mutate(info, input=customer)
 
         if product_category:
             if product_category.id:
@@ -149,25 +218,47 @@ class EquipmentUpdate(graphene.Mutation):
             else:
                 installer = PartnerCreate().mutate(info, input=installer)
 
+        if intervention:
+            if intervention.id:
+                intervention = PlanningInterventionUpdate().mutate(info, id=intervention.id, input=intervention)
+            else:
+                intervention = PlanningInterventionCreate().mutate(info, input=intervention)
+            intervention.of_use_equipment = True
+
+        if site_address:
+            if site_address.id:
+                site_address = PartnerUpdate().mutate(info, id=site_address.id, input=site_address)
+            else:
+                site_address = PartnerCreate().mutate(info, input=site_address)
+
         equipment = lazy_update(env, 'of.equipment', id, input)
 
         if product:
-            equipment.product_id = product
+            equipment.product_id = product.id
+
+        if customer:
+            equipment.customer_id = customer.id
 
         if brand:
-            equipment.brand_id = brand
+            equipment.brand_id = brand.id
 
         if product_category:
-            equipment.product_category_id = product_category
+            equipment.product_category_id = product_category.id
 
         if lot:
-            equipment.lot_id = lot
+            equipment.lot_id = lot.id
 
         if reseller:
-            equipment.reseller_id = reseller
+            equipment.reseller_id = reseller.id
 
         if installer:
-            equipment.installer_id = installer
+            equipment.installer_id = installer.id
+
+        if intervention:
+            equipment.intervention_ids += intervention
+
+        if site_address:
+            equipment.site_address_id = site_address.id
 
         return equipment
 
@@ -182,6 +273,15 @@ class EquipmentDelete(graphene.Mutation):
 
     def mutate(self, info, id):
         env = info.context['env']
+
+        equipment = env['calendar.event'].browse(id)
+        # On va vérifier dans chaque intervention sur cet équipement, s'il n'y a pas d'autres équipements
+        # alors on passe le champ use_equipment à False
+        if equipment:
+            for intervention in equipment.intervention_ids:
+                if len(intervention.of_equipment_ids.filtered(lambda r: r.id != equipment.id)) == 0:
+                    intervention.of_use_equipment = False
+
         return lazy_delete(env, 'of.equipment', id)
 
 

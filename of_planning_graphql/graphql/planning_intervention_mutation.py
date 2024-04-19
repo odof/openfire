@@ -101,10 +101,10 @@ class PlanningInterventionCreate(graphene.Mutation):
 
         if pickings:
             for picking in pickings:
-                if pickings.id:
+                if picking.id:
                     picking = PickingUpdate().mutate(info, id=picking.id, input=picking)
                 else:
-                    invoice = PickingCreate().mutate(info, input=picking)
+                    picking = PickingCreate().mutate(info, input=picking)
                 create_pickings += picking
 
         if pictures:
@@ -112,7 +112,7 @@ class PlanningInterventionCreate(graphene.Mutation):
                 if picture.id:
                     picture = AttachmentUpdate().mutate(info, id=picture.id, input=picture)
                 else:
-                    invoice = AttachmentCreate().mutate(info, input=picture)
+                    picture = AttachmentCreate().mutate(info, input=picture)
                 create_pictures += picture
 
         if order:
