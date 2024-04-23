@@ -71,10 +71,10 @@ class OfPeriodePlanifiee(models.Model):
     cust_done_time_perc = fields.Float(string=u"Temps produit client (%)", compute='_compute_time')
 
     gb_user_id = fields.Many2one(
-        'res.users', compute='lambda *a, **k:{}', search='_search_gb_user_id', string="Utilisateur",
+        'res.users', compute=lambda s: None, search='_search_gb_user_id', string="Utilisateur",
         of_custom_groupby=True)
     gb_category_id = fields.Many2one(
-        'project.category', compute='lambda *a, **k:{}', search='_search_gb_category_id', string=u"Catégorie",
+        'project.category', compute=lambda s: None, search='_search_gb_category_id', string=u"Catégorie",
         of_custom_groupby=True)
 
     planification_alert = fields.Boolean(string=u"Alerte de planification", compute='_compute_planification')

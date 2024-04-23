@@ -108,7 +108,7 @@ class ProjectTask(models.Model):
     of_done_dev_hours = fields.Float(string=u"Dev passé", compute='_compute_of_done')
     of_done_validation_hours = fields.Float(string=u"Validation passée", compute='_compute_of_done')
     of_gb_period_id = fields.Many2one(
-        comodel_name='of.periode.planifiee', compute='lambda *a, **k:{}', search='_search_of_gb_period_id',
+        comodel_name='of.periode.planifiee', compute=lambda s: None, search='_search_of_gb_period_id',
         string=u"Période", of_custom_groupby=True)
     of_analytic_line_ids = fields.One2many(
         comodel_name='account.analytic.line', inverse_name='task_id', string=u"Feuilles de temps")
