@@ -278,9 +278,9 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         help=u"Date du dernier RDV en date. Ne prend pas en compte les RDVs annulés ni reportés")  # Vue liste
 
     # Champs de recherche
-    date_fin_min = fields.Date(string=u"Date échéance min", compute='lambda *a, **k:{}')
-    date_fin_max = fields.Date(string=u"Date échéance max", compute='lambda *a, **k:{}')
-    date_controle = fields.Date(string=u"Date de contrôle", compute='lambda *a, **k:{}')
+    date_fin_min = fields.Date(string=u"Date échéance min", compute=lambda s: None)
+    date_fin_max = fields.Date(string=u"Date échéance max", compute=lambda s: None)
+    date_controle = fields.Date(string=u"Date de contrôle", compute=lambda s: None)
 
     # Nouveaux champs DI
 
