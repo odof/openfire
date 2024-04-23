@@ -337,6 +337,12 @@ class File(dms_base.DMSModel):
 
             # Sort result according to the original sort ordering
             result = [id for id in orig_ids if id in ids]
+            if len(orig_ids) == limit and len(result) < self._context.get('need', limit):
+                need = self._context.get('need', limit) - len(result)
+                more_ids = self.with_context(need=need)._search(
+                    args, offset=offset + len(orig_ids), limit=limit, order=order, access_rights_uid=access_rights_uid,
+                )
+                result.extend(list(more_ids)[:limit - len(result)])
             return len(result) if count else list(result)
 
         return len(orig_ids) if count else orig_ids
