@@ -37,8 +37,4 @@
         </field>
     </record>
 
-    <record id="contacts.action_contacts" model="ir.actions.act_window">
-        <field name="view_mode">kanban,tree,form,activity,map</field>
-    </record>
-
 </odoo>

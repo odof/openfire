@@ -43,8 +43,4 @@
         </field>
     </record>
 
-    <record id="of_equipment.action_view_of_equipment" model="ir.actions.act_window">
-        <field name="view_mode">tree,form,map</field>
-    </record>
-
 </odoo>

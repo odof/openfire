@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-
-    <record id="of_planning.action_res_partner" model="ir.actions.act_window">
-        <field name="view_mode">kanban,tree,form,map</field>
-    </record>
-
-</odoo>

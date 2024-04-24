@@ -38,8 +38,4 @@
         </field>
     </record>
 
-    <record id="crm.crm_lead_action_pipeline" model="ir.actions.act_window">
-        <field name="view_mode">tree,form,map</field>
-    </record>
-
 </odoo>

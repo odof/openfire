@@ -12,10 +12,11 @@
         'account',
         'of_map_view_partner',
     ],
-    'data': ['views/res_partner_views.xml'],
+    'data': [],
     'assets': {},
     'installable': True,
     'application': False,
     'auto_install': True,
+    'post_init_hook': '_post_init_hook',
     'uninstall_hook': '_uninstall_hook',
 }
