@@ -9,7 +9,6 @@
     'summary': "Gestion des équipements",
     'website': "https://www.openfire.fr",
     'depends': [
-        'of_map_view',
         'of_planning',
     ],
     'data': [
