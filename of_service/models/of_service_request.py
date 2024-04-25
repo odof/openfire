@@ -1161,16 +1161,13 @@ class OFServiceRequest(models.Model):
         if action_context is None:
             action_context = {}
 
-        next_date = self.next_date or fields.Date.today()
-        default_start = fields.Datetime.now().replace(day=next_date.day, month=next_date.month, year=next_date.year)
-        default_stop = default_start + relativedelta(hours=self.duration)
         action_context.update(
             {
                 'default_of_partner_id': self.partner_id.id,
                 'default_of_address_id': self.address_id and self.address_id.id or self.partner_id.id,
                 'default_of_task_id': self.task_id and self.task_id.id or False,
-                'default_start': default_start,
-                'default_stop': default_stop,
+                'default_start': False,
+                'default_stop': False,
                 'default_duration': self.duration,
                 'default_of_tag_ids': [Command.set([tag.id for tag in self.tag_ids])],
                 'default_of_internal_description': self.note,

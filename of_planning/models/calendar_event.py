@@ -681,6 +681,12 @@ class CalendarEvent(models.Model):
         ):
             self.of_show_update_fpos = True
 
+    @api.onchange('of_type')
+    def _onchange_date(self):
+        """Override to not update the start_date and stop_date fields"""
+        events = self.filtered(lambda e: e.of_type == 'intervention')
+        return super(CalendarEvent, self - events)._onchange_date()
+
     # --------------------------------------------------------------------------
     # ORM methods
     # --------------------------------------------------------------------------
