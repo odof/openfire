@@ -393,3 +393,26 @@ class CalendarEvent(models.Model):
         start_utc, stop_utc = string_to_datetime(date_start_str), string_to_datetime(date_stop_str)
 
         return {field: self._planning_progress_bar(field, res_ids[field], start_utc, stop_utc) for field in fields}
+
+    def _get_real_start_recursive(self, employee, start, stop):
+        """Recursive function to get the first, if any, available slot for the employee between start and stop"""
+        interventions = self.env['calendar.event'].search(
+            [
+                ('of_employee_ids', 'in', [employee.id]),
+                ('start', '<=', start),
+                ('stop', '>', start),
+                ('stop', '<', stop),
+            ]
+        )
+        real_start = start
+        if interventions:
+            real_start = max(interventions.mapped('stop'))
+            real_start = self._get_real_start_recursive(employee, real_start, stop)
+        return real_start
+
+    @api.model
+    def get_real_start(self, resource_id, start, stop):
+        resource = self.env['resource.resource'].browse(resource_id)
+        employee = resource.employee_id
+
+        return self._get_real_start_recursive(employee, start, stop)
