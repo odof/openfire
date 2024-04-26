@@ -3,19 +3,23 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_account_tax_graphql.graphql.account_fiscal_position_type import AccountFiscalPosition
-from odoo.addons.of_base_graphql.graphql.attachment_type import Attachment
-from odoo.addons.of_base_graphql.graphql.company_type import Company
-from odoo.addons.of_base_graphql.graphql.employee_type import Employee
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
+from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import (
+    AccountFiscalPosition,
+    AccountFiscalPositionInput,
+)
+from odoo.addons.of_base_graphql.graphql.attachment_type import Attachment, AttachmentInput
+from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
+from odoo.addons.of_base_graphql.graphql.employee_type import Employee, EmployeeInput
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
+from odoo.addons.of_graphql.graphql.company_type import Company
 from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
-from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder
-from odoo.addons.of_stock_graphql.graphql.picking_type import Picking
+from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder, SaleOrderInput
+from odoo.addons.of_stock_graphql.graphql.picking_type import Picking, PickingInput
 
-from .planning_intervention_line_type import PlanningInterventionLine
-from .planning_intervention_tag_type import PlanningInterventionTag
-from .planning_intervention_task_type import PlanningInterventionTask
-from .planning_intervention_template_type import PlanningInterventionTemplate
+from .planning_intervention_line_type import PlanningInterventionLine, PlanningInterventionLineInput
+from .planning_intervention_tag_type import PlanningInterventionTag, PlanningInterventionTagInput
+from .planning_intervention_task_type import PlanningInterventionTask, PlanningInterventionTaskInput
+from .planning_intervention_template_type import PlanningInterventionTemplate, PlanningInterventionTemplateInput
 
 
 class PlanningIntervention(OdooObjectType):
@@ -107,25 +111,35 @@ class PlanningInterventionInput(graphene.InputObjectType):
     stop = graphene.DateTime()
     days_before_today = graphene.Int()
     days_after_today = graphene.Int()
-    of_total_duration = graphene.Float(name='totalDuration')
-    of_break_duration = graphene.Float(name='breakDuration')
-    of_travel_duration = graphene.Float(name='travelDuration')
-    of_state = graphene.String(name='task')
-    of_type = graphene.String(name='type')
-    of_internal_description = graphene.String(name='internalDescription')
-    of_intervention_notes = graphene.String(name='interventionNotes')
-    of_customer_notes = graphene.String(name='customerNotes')
-    of_customer_signature = OdooImage(name='customerSignature')
-    of_operator_signature = OdooImage(name='operatorSignature')
+    total_duration = graphene.Float()
+    break_duration = graphene.Float()
+    travel_duration = graphene.Float()
+    task = graphene.String()
+    type = graphene.String()
+    internal_description = graphene.String()
+    intervention_notes = graphene.String()
+    customer_notes = graphene.String()
+    customer_signature = OdooImage()
+    operator_signature = OdooImage()
+
+    employees = graphene.List(
+        graphene.NonNull(EmployeeInput),
+        required=True,
+        description="Liste des intervenants sur l'intervention",
+    )
+
+    company = graphene.Field(CompanyInput, required=True)
+    pickings = graphene.List(graphene.NonNull(PickingInput))
+    order = graphene.List(graphene.NonNull(SaleOrderInput))
+    task = graphene.Field(PlanningInterventionTaskInput, required=True)
+    partner = graphene.Field(PartnerInput, description="Client de l'intervention")
+    address = graphene.Field(PartnerInput, description="Adresse de l'intervention")
+    attachments = graphene.List(graphene.NonNull(AttachmentInput))
+    template = graphene.Field(PlanningInterventionTemplateInput)
+    tags = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTagInput)))
+    invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
+    fiscal_position = graphene.Field(AccountFiscalPositionInput)
 
 
 class PlanningInterventionFilterInput(PlanningInterventionInput):
     _name = "PlanningInterventionFilterInput"
-
-
-class PlanningInterventionCreateInput(PlanningInterventionInput):
-    _name = "PlanningInterventionCreateInput"
-
-
-class PlanningInterventionUpdateInput(PlanningInterventionInput):
-    _name = "PlanningInterventionUpdateInput"

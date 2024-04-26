@@ -2,8 +2,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 from odoo.addons.of_base_graphql.graphql.partner_type import Partner
-from odoo.addons.of_base_graphql.graphql.product_template_type import ProductTemplate
-from odoo.addons.of_base_graphql.graphql.product_type import Product
+from odoo.addons.of_base_graphql.graphql.product_template_type import ProductTemplate, ProductTemplateInput
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
 
 
 class ProductBrand(OdooObjectType):
@@ -31,23 +31,9 @@ class ProductBrandInput(graphene.InputObjectType):
     code = graphene.String()
     use_prefix = graphene.Boolean()
     supplier_delay = graphene.Int()
+    product_templates = graphene.List(graphene.NonNull(ProductTemplateInput))
+    products = graphene.List(graphene.NonNull(ProductInput))
 
 
 class ProductBrandFilterInput(ProductBrandInput):
     _name = 'ProductBrandFilterInput'
-
-
-class ProductBrandCreateInput(ProductBrandInput):
-    _name = 'ProductBrandCreateInput'
-
-    name = graphene.String(required=True)
-    active = graphene.Boolean(default=True)
-    code = graphene.String(required=True)
-
-
-class ProductBrandUpdateInput(ProductBrandInput):
-    _name = 'ProductBrandUpdateInput'
-
-    name = graphene.String(required=True)
-    active = graphene.Boolean(default=True)
-    code = graphene.String(required=True)

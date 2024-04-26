@@ -8,7 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Ajoute les données de base odoo dans le schéma Graphql",
-    "depends": ["of_graphql", "graphql_base"],
+    "depends": ["of_graphql", "graphql_base", "of_base"],
     "installable": True,
     'application': False,
     'auto_install': True,

@@ -1,24 +1,26 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .account_payment_type import AccountPayment, AccountPaymentCreateInput, AccountPaymentUpdateInput
+from .account_payment_type import AccountPayment
 
 
 class AccountPaymentCreate(graphene.Mutation):
     _name = 'AccountPaymentCreate'
 
     class Arguments:
-        input = AccountPaymentCreateInput(required=True)
+        name = graphene.String()
+        amount_total = graphene.Float()
+        amount_residual = graphene.Float()
+        payment_state = graphene.String()
+        date = graphene.Date()
 
     Output = AccountPayment
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        account_payment = lazy_create(env, 'account.payment', input)
-
-        return account_payment
+        values = env['account.payment']._prepare_mutation_values(**args)
+        return env['account.payment'].create(values)
 
 
 class AccountPaymentUpdate(graphene.Mutation):
@@ -26,16 +28,19 @@ class AccountPaymentUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = AccountPaymentUpdateInput(required=True)
+        name = graphene.String()
+        amount_total = graphene.Float()
+        amount_residual = graphene.Float()
+        payment_state = graphene.String()
+        date = graphene.Date()
 
     Output = AccountPayment
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        account_payment = lazy_update(env, 'account.payment', id, input)
-
-        return account_payment
+        values = env['account.payment']._prepare_mutation_values(**args)
+        account_payment = env['account.payment'].search([('id', '=', id)])
+        return account_payment.write(values)
 
 
 class AccountPaymentDelete(graphene.Mutation):

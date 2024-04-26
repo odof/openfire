@@ -1,22 +1,22 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .product_category_type import ProductCategory, ProductCategoryCreateInput, ProductCategoryUpdateInput
+from .product_category_type import ProductCategory
 
 
 class ProductCategoryCreate(graphene.Mutation):
     _name = 'ProductCategoryCreate'
 
     class Arguments:
-        input = ProductCategoryCreateInput(required=True)
+        name = graphene.String()
 
     Output = ProductCategory
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        return lazy_create(env, 'product.category', input)
+        values = env['product.category']._prepare_mutation_values(**args)
+        return env['product.category'].create(values)
 
 
 class ProductCategoryUpdate(graphene.Mutation):
@@ -24,14 +24,15 @@ class ProductCategoryUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = ProductCategoryUpdateInput(required=True)
+        name = graphene.String()
 
     Output = ProductCategory
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        return lazy_update(env, 'product.category', id, input)
+        values = env['product.category']._prepare_mutation_values(**args)
+        category = env['product.category'].search([('id', '=', id)])
+        return category.write(values)
 
 
 class ProductCategoryDelete(graphene.Mutation):

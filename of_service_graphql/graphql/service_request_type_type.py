@@ -4,6 +4,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
+from .service_request_stage_type import ServiceRequestStage, ServiceRequestStageInput
+
 
 class ServiceRequestType(OdooObjectType):
     _name = 'ServiceRequestType'
@@ -11,6 +13,7 @@ class ServiceRequestType(OdooObjectType):
 
     id = graphene.Int(required=True)
     name = graphene.NonNull(graphene.String)
+    stage_ids = graphene.List(graphene.NonNull(ServiceRequestStage), name='stages')
 
 
 class ServiceRequestTypeInput(graphene.InputObjectType):
@@ -19,15 +22,8 @@ class ServiceRequestTypeInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
+    stages = graphene.List(ServiceRequestStageInput)
 
 
 class ServiceRequestTypeFilterInput(ServiceRequestTypeInput):
     _name = 'ServiceRequestTypeFilterInput'
-
-
-class ServiceRequestTypeCreateInput(ServiceRequestTypeInput):
-    _name = 'ServiceRequestTypeCreateInput'
-
-
-class ServiceRequestTypeUpdateInput(ServiceRequestTypeInput):
-    _name = 'ServiceRequestTypeUpdateInput'

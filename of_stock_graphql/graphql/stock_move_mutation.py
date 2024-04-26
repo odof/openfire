@@ -1,48 +1,26 @@
 import graphene
 
-from odoo.addons.of_base_graphql.graphql.partner_mutation import PartnerCreate, PartnerUpdate
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
-from odoo.addons.of_base_graphql.graphql.product_mutation import ProductCreate, ProductUpdate
 from odoo.addons.of_base_graphql.graphql.product_type import ProductInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .stock_move_type import StockMove, StockMoveCreateInput, StockMoveUpdateInput
+from .stock_move_type import StockMove
 
 
 class StockMoveCreate(graphene.Mutation):
     _name = 'StockMoveCreate'
 
     class Arguments:
-        input = StockMoveCreateInput(required=True)
-        partner = PartnerInput()
-        product = ProductInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
+        product = graphene.Argument(ProductInput)
 
     Output = StockMove
 
-    def mutate(self, info, input, partner=None, product=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        stock_move = lazy_create(env, "stock.move", input)
-
-        if partner:
-            stock_move.partner_id = partner
-
-        if product:
-            stock_move.product_id = product
-
-        return stock_move
+        values = env['stock.move']._prepare_mutation_values(**args)
+        return env['stock.move'].create(values)
 
 
 class StockMoveUpdate(graphene.Mutation):
@@ -50,36 +28,17 @@ class StockMoveUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = StockMoveUpdateInput(required=True)
-        partner = PartnerInput()
-        product = ProductInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
+        product = graphene.Argument(ProductInput)
 
     Output = StockMove
 
-    def mutate(self, info, id, input, partner=None, product=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        stock_move = lazy_update(env, "stock.move", id, input)
-
-        if partner:
-            stock_move.partner_id = partner
-
-        if product:
-            stock_move.product_id = product
-
-        return stock_move
+        values = env['stock.move']._prepare_mutation_values(**args)
+        move = env['stock.move'].search([('id', '=', id)])
+        return move.write(values)
 
 
 class StockMoveDelete(graphene.Mutation):

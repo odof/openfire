@@ -25,17 +25,3 @@ class PlanningInterventionTaskInput(graphene.InputObjectType):
 
 class PlanningInterventionTaskFilterInput(PlanningInterventionTaskInput):
     _name = "PlanningInterventionTaskFilterInput"
-
-
-class PlanningInterventionTaskCreateInput(PlanningInterventionTaskInput):
-    _name = "PlanningInterventionTaskCreateInput"
-
-    name = graphene.String(required=True)
-    duration = graphene.Float(required=True)
-
-
-class PlanningInterventionTaskUpdateInput(PlanningInterventionTaskInput):
-    _name = "PlanningInterventionTaskUpdateInput"
-
-    name = graphene.String(required=True)
-    duration = graphene.Float(required=True)

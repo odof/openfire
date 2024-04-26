@@ -4,8 +4,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .partner_phone_type import PartnerPhone
-from .partner_title_type import PartnerTitle
+from .partner_phone_type import PartnerPhone, PartnerPhoneInput
+from .partner_title_type import PartnerTitle, PartnerTitleInput
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,6 @@ class Partner(OdooObjectType):
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
-    customer = graphene.Boolean()
     title = graphene.Field(PartnerTitle)
     parent = graphene.Field(lambda: Partner)
     street = graphene.String()
@@ -52,28 +51,21 @@ class PartnerInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
-    city = graphene.String()
-    comment = graphene.String()
-    email = graphene.String()
+    title = graphene.Field(PartnerTitleInput)
+    parent = graphene.Field(lambda: PartnerInput)
     street = graphene.String()
     street2 = graphene.String()
+    city = graphene.String()
     zip = graphene.String()
-    customer = graphene.Boolean()
+    email = graphene.String()
+    of_phone_number_ids = graphene.List(graphene.NonNull(PartnerPhoneInput), required=True, name="phoneNumbers")
     write_date = graphene.DateTime()
     create_date = graphene.DateTime()
-    company_type = graphene.Field(CompanyType)
+    company_type = graphene.Field(CompanyType, required=True)
     partner_latitude = graphene.Float()
     partner_longitude = graphene.Float()
-
-
-class PartnerCreateInput(PartnerInput):
-    _name = 'PartnerCreateInput'
-
-    name = graphene.String(required=True)
-
-
-class PartnerUpdateInput(PartnerInput):
-    _name = 'PartnerUpdateInput'
+    comment = graphene.String()
+    ref = graphene.String()
 
 
 class PartnerFilterInput(PartnerInput):

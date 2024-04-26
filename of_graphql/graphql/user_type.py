@@ -1,8 +1,9 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
+from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
 
-from .company_type import Company
+from ..graphql.company_type import Company
 
 
 class User(OdooObjectType):
@@ -39,16 +40,14 @@ class UserInput(graphene.InputObjectType):
     mobile = graphene.String()
     phone = graphene.String()
     email = graphene.String()
-
-
-class UserCreateInput(UserInput):
-    _name = 'UserCreateInput'
-
-    name = graphene.String(required=True)
-
-
-class UserUpdateInput(UserInput):
-    _name = 'UserUpdateInput'
+    company = graphene.Field(
+        CompanyInput, required=True, description="Company courante de l'utilisateur", name="company"
+    )
+    companies = graphene.List(
+        graphene.NonNull(CompanyInput),
+        required=True,
+        description="Liste des companys auquel à accès l'utilisateur",
+    )
 
 
 class UserFilterInput(UserInput):

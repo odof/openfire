@@ -29,11 +29,3 @@ class SurveyQuestionAnswerInput(graphene.InputObjectType):
 
 class SurveyQuestionAnswerFilterInput(SurveyQuestionAnswerInput):
     _name = 'SurveyQuestionAnswerFilterInput'
-
-
-class SurveyQuestionAnswerCreateInput(SurveyQuestionAnswerInput):
-    _name = 'SurveyQuestionAnswerCreateInput'
-
-
-class SurveyQuestionAnswerUpdateInput(SurveyQuestionAnswerInput):
-    _name = 'SurveyQuestionAnswerUpdateInput'

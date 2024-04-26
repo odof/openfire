@@ -1,8 +1,8 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_account_graphql.graphql.account_tax_type import AccountTax
-from odoo.addons.of_base_graphql.graphql.product_type import Product
+from odoo.addons.of_account_graphql.graphql.account_tax_type import AccountTax, AccountTaxInput
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
 
 
 class SaleOrderLine(OdooObjectType):
@@ -31,15 +31,9 @@ class SaleOrderLineInput(graphene.InputObjectType):
     product_uom_qty = graphene.Float()
     price_unit = graphene.Float()
     price_subtotal = graphene.Float()
+    product = graphene.Field(ProductInput)
+    taxes = graphene.List(graphene.NonNull(AccountTaxInput))
 
 
 class SaleOrderLineFilterInput(SaleOrderLineInput):
     _name = "SaleOrderLineFilterInput"
-
-
-class SaleOrderLineCreateInput(SaleOrderLineInput):
-    _name = "SaleOrderLineCreateInput"
-
-
-class SaleOrderLineUpdateInput(SaleOrderLineInput):
-    _name = "SaleOrderLineUpdateInput"

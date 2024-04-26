@@ -1,48 +1,27 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_mutation import (
-    PlanningInterventionCreate,
-    PlanningInterventionUpdate,
-)
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningInterventionInput
 
-from .planning_intervention_tag_type import (
-    PlanningInterventionTag,
-    PlanningInterventionTagCreateInput,
-    PlanningInterventionTagUpdateInput,
-)
+from .planning_intervention_tag_type import PlanningInterventionTag
 
 
 class PlanningInterventionTagCreate(graphene.Mutation):
     _name = 'PlanningInterventionTagCreate'
 
     class Arguments:
-        input = PlanningInterventionTagCreateInput(required=True)
+        name = graphene.String()
+        sequence = graphene.Int()
+        active = graphene.Boolean()
+        color = graphene.Int()
         interventions = graphene.List(graphene.NonNull(PlanningInterventionInput))
 
     Output = PlanningInterventionTag
 
-    def mutate(self, info, input, interventions=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        create_interventions = env['of.planning.intervention']
-
-        if interventions:
-            for intervention in interventions:
-                if intervention.id:
-                    # on est sur une mise à jour
-                    intervention = PlanningInterventionUpdate().mutate(info, id=intervention.id, input=intervention)
-                else:
-                    intervention = PlanningInterventionCreate().mutate(info, input=intervention)
-                create_interventions += intervention
-
-        planning_intervention_tag = lazy_create(env, 'of.planning.tag', input)
-
-        if create_interventions:
-            planning_intervention_tag.intervention_ids = [(6, 0, create_interventions.ids)]
-
-        return planning_intervention_tag
+        values = env['of.planning.tag']._prepare_mutation_values(**args)
+        return env['of.planning.tag'].create(values)
 
 
 class PlanningInterventionTagUpdate(graphene.Mutation):
@@ -50,31 +29,19 @@ class PlanningInterventionTagUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = PlanningInterventionTagUpdateInput(required=True)
+        name = graphene.String()
+        sequence = graphene.Int()
+        active = graphene.Boolean()
+        color = graphene.Int()
         interventions = graphene.List(graphene.NonNull(PlanningInterventionInput))
 
     Output = PlanningInterventionTag
 
-    def mutate(self, info, id, input, interventions=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        update_interventions = env['of.planning.intervention']
-
-        if interventions:
-            for intervention in interventions:
-                if intervention.id:
-                    # on est sur une mise à jour
-                    intervention = PlanningInterventionUpdate().mutate(info, id=intervention.id, input=intervention)
-                else:
-                    intervention = PlanningInterventionCreate().mutate(info, input=intervention)
-                update_interventions += intervention
-
-        planning_intervention_tag = lazy_update(env, 'of.planning.tag', id, input)
-
-        if update_interventions:
-            planning_intervention_tag.intervention_ids = [(6, 0, update_interventions.ids)]
-
-        return planning_intervention_tag
+        values = env['of.planning.tag']._prepare_mutation_values(**args)
+        planning_tag = env['of.planning.tag'].search([('id', '=', id)])
+        return planning_tag.write(values)
 
 
 class PlanningInterventionTagDelete(graphene.Mutation):

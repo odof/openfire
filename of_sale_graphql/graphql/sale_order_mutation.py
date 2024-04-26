@@ -1,51 +1,28 @@
 import graphene
 
-from odoo.addons.of_base_graphql.graphql.partner_mutation import PartnerCreate, PartnerUpdate
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .sale_order_line_mutation import SaleOrderLineCreate, SaleOrderLineUpdate
 from .sale_order_line_type import SaleOrderLineInput
-from .sale_order_type import SaleOrder, SaleOrderCreateInput, SaleOrderUpdateInput
+from .sale_order_type import SaleOrder
 
 
 class SaleOrderCreate(graphene.Mutation):
     _name = 'SaleOrderCreate'
 
     class Arguments:
-        input = SaleOrderCreateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        date_order = graphene.DateTime()
+        validity_date = graphene.Date()
+        partner = graphene.Argument(PartnerInput)
         lines = graphene.List(graphene.NonNull(SaleOrderLineInput))
 
     Output = SaleOrder
 
-    def mutate(self, info, input, partner=None, lines=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-        create_lines = env['sale.order.line']
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if lines:
-            for line in lines:
-                if line.id:
-                    line = SaleOrderLineUpdate().mutate(info, id=line.id, input=line)
-                else:
-                    line = SaleOrderLineCreate().mutate(info, input=line)
-                create_lines += line
-
-        sale_order = lazy_create(env, "sale.order", input)
-
-        if partner:
-            sale_order.partner_id = partner
-
-        if lines:
-            sale_order.order_line = [(6, 0, create_lines.ids)]
-
-        return sale_order
+        values = env['sale.order']._prepare_mutation_values(**args)
+        return env['sale.order'].create(values)
 
 
 class SaleOrderUpdate(graphene.Mutation):
@@ -53,39 +30,19 @@ class SaleOrderUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = SaleOrderUpdateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        date_order = graphene.DateTime()
+        validity_date = graphene.Date()
+        partner = graphene.Argument(PartnerInput)
         lines = graphene.List(graphene.NonNull(SaleOrderLineInput))
 
     Output = SaleOrder
 
-    def mutate(self, info, id, input, partner=None, lines=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-        update_lines = env['sale.order.line']
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if lines:
-            for line in lines:
-                if line.id:
-                    line = SaleOrderLineUpdate().mutate(info, id=line.id, input=line)
-                else:
-                    line = SaleOrderLineCreate().mutate(info, input=line)
-                update_lines += line
-
-        sale_order = lazy_update(env, "sale.order", id, input)
-
-        if partner:
-            sale_order.partner_id = partner
-
-        if lines:
-            sale_order.order_line = [(6, 0, update_lines.ids)]
-
-        return sale_order
+        values = env['sale.order']._prepare_mutation_values(**args)
+        order = env['sale.order'].search([('id', '=', id)])
+        return order.write(values)
 
 
 class SaleOrderDelete(graphene.Mutation):

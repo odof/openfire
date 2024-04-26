@@ -27,17 +27,3 @@ class PartnerTitleInput(graphene.InputObjectType):
 
 class PartnerTitleFilterInput(PartnerTitleInput):
     _name = 'PartnerTitleFilterInput'
-
-    name = graphene.String(required=True)
-
-
-class PartnerTitleCreateInput(PartnerTitleInput):
-    _name = 'PartnerTitleCreateInput'
-
-    name = graphene.String(required=True)
-
-
-class PartnerTitleUpdateInput(PartnerTitleInput):
-    _name = 'PartnerTitleUpdateInput'
-
-    name = graphene.String(required=True)

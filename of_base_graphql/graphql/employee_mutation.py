@@ -1,24 +1,25 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .employee_type import Employee, EmployeeCreateInput, EmployeeUpdateInput
+from .employee_type import Employee
 
 
 class EmployeeCreate(graphene.Mutation):
     _name = 'EmployeeCreate'
 
     class Arguments:
-        input = EmployeeCreateInput(required=True)
+        name = graphene.String()
+        mobile_phone = graphene.String()
+        work_phone = graphene.String()
+        work_email = graphene.String()
 
     Output = Employee
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        employee = lazy_create(env, 'hr.employee', input)
-
-        return employee
+        values = env['hr.employee']._prepare_mutation_values(**args)
+        return env['hr.employee'].create(values)
 
 
 class EmployeeUpdate(graphene.Mutation):
@@ -26,16 +27,18 @@ class EmployeeUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = EmployeeUpdateInput(required=True)
+        name = graphene.String()
+        mobile_phone = graphene.String()
+        work_phone = graphene.String()
+        work_email = graphene.String()
 
     Output = Employee
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        employee = lazy_update(env, 'hr.employee', id, input)
-
-        return employee
+        values = env['hr.employee']._prepare_mutation_values(**args)
+        employee = env['hr.employee'].search([('id', '=', id)])
+        return employee.write(values)
 
 
 class EmployeeDelete(graphene.Mutation):

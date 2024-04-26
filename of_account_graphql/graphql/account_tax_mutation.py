@@ -1,24 +1,25 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .account_tax_type import AccountTax, AccountTaxCreateInput, AccountTaxUpdateInput
+from .account_tax_type import AccountTax, AccountTaxType
 
 
 class AccountTaxCreate(graphene.Mutation):
     _name = 'AccountTaxCreate'
 
     class Arguments:
-        input = AccountTaxCreateInput(required=True)
+        name = graphene.String(required=True)
+        amount = graphene.Float(required=True)
+        price_include = graphene.Boolean(required=True)
+        type_tax_use = graphene.Argument(AccountTaxType, required=True)
 
     Output = AccountTax
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        account_tax = lazy_create(env, 'account.tax', input)
-
-        return account_tax
+        values = env['account.tax']._prepare_mutation_values(**args)
+        return env['account.tax'].create(values)
 
 
 class AccountTaxUpdate(graphene.Mutation):
@@ -26,16 +27,17 @@ class AccountTaxUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = AccountTaxUpdateInput(required=True)
+        amount = graphene.Float(required=True)
+        price_include = graphene.Boolean(required=True)
+        type_tax_use = graphene.Argument(AccountTaxType, required=True)
 
     Output = AccountTax
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        account_tax = lazy_update(env, 'account.tax', id, input)
-
-        return account_tax
+        values = env['account.tax']._prepare_mutation_values(**args)
+        account_tax = env['account.tax'].search([('id', '=', id)])
+        return account_tax.write(values)
 
 
 class AccountTaxDelete(graphene.Mutation):

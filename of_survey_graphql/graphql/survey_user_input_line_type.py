@@ -18,6 +18,7 @@ class SurveyUserInputLine(OdooObjectType):
     value_date = graphene.Date()
     value_text_box = graphene.String()
     suggested_answer = graphene.Field(survey_question_answer_type.SurveyQuestionAnswer)
+    question_id = graphene.NonNull(graphene.Int, description="Identifiant de la question à laquelle cette ligne répond")
 
     @staticmethod
     def resolve_suggested_answer(root, info):
@@ -34,15 +35,8 @@ class SurveyUserInputLineInput(graphene.InputObjectType):
     value_char_box = graphene.String()
     value_date = graphene.Date()
     value_text_box = graphene.String()
+    suggested_answer = graphene.Field(survey_question_answer_type.SurveyQuestionAnswerInput)
 
 
 class SurveyUserInputLineFilterInput(SurveyUserInputLineInput):
     _name = 'SurveyUserInputLineFilterInput'
-
-
-class SurveyUserInputLineCreateInput(SurveyUserInputLineInput):
-    _name = 'SurveyUserInputLineCreateInput'
-
-
-class SurveyUserInputLineUpdateInput(SurveyUserInputLineInput):
-    _name = 'SurveyUserInputLineUpdateInput'

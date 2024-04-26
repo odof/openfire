@@ -3,9 +3,12 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import AccountFiscalPosition
+from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import (
+    AccountFiscalPosition,
+    AccountFiscalPositionInput,
+)
 
-from .planning_intervention_task_type import PlanningInterventionTask
+from .planning_intervention_task_type import PlanningInterventionTask, PlanningInterventionTaskInput
 
 
 class PlanningInterventionTemplate(OdooObjectType):
@@ -26,15 +29,9 @@ class PlanningInterventionTemplateInput(graphene.InputObjectType):
     id = graphene.Int()
     name = graphene.String()
     is_default_template = graphene.Boolean()
+    task = graphene.Field(PlanningInterventionTaskInput)
+    fiscal_position = graphene.Field(AccountFiscalPositionInput)
 
 
 class PlanningInterventionTemplateFilterInput(PlanningInterventionTemplateInput):
     _name = "PlanningInterventionTemplateFilterInput"
-
-
-class PlanningInterventionTemplateCreateInput(PlanningInterventionTemplateInput):
-    _name = "PlanningInterventionTemplateCreateInput"
-
-
-class PlanningInterventionTemplateUpdateInput(PlanningInterventionTemplateInput):
-    _name = "PlanningInterventionTemplateUpdateInput"

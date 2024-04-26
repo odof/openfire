@@ -12,7 +12,7 @@ class Survey(OdooObjectType):
     _type = 'types'
 
     id = graphene.Int(required=True)
-    title = graphene.String()
+    title = graphene.NonNull(graphene.String)
     active = graphene.Boolean()
     question_and_pages = graphene.List(graphene.NonNull(survey_question_page_type.SurveyQuestionPage))
     user_inputs = graphene.List(graphene.NonNull(survey_user_input_type.SurveyUserInput))
@@ -32,15 +32,15 @@ class SurveyInput(graphene.InputObjectType):
 
     id = graphene.Int()
     title = graphene.String()
+    active = graphene.Boolean()
+    question_and_pages = graphene.List(graphene.NonNull(survey_question_page_type.SurveyQuestionPageInput))
+    user_inputs = graphene.List(graphene.NonNull(survey_user_input_type.SurveyUserInputInput))
 
 
-class SurveyFilterInput(SurveyInput):
+class SurveyFilterInput(graphene.InputObjectType):
     _name = 'SurveyFilterInput'
+    _type = 'types'
 
-
-class SurveyCreateInput(SurveyInput):
-    _name = 'SurveyCreateInput'
-
-
-class SurveyUpdateInput(SurveyInput):
-    _name = 'SurveyUpdateInput'
+    id = graphene.Int()
+    title = graphene.String()
+    active = graphene.Boolean()

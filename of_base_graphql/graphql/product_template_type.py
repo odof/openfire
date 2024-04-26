@@ -15,7 +15,7 @@ class ProductTemplate(OdooObjectType):
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
-    ref = graphene.String()
+    list_price = graphene.Float()
 
 
 class ProductTemplateInput(graphene.InputObjectType):
@@ -24,17 +24,8 @@ class ProductTemplateInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
-    ref = graphene.String()
     list_price = graphene.Float()
 
 
 class ProductTemplateFilterInput(ProductTemplateInput):
     _name = 'ProductTemplateFilterInput'
-
-
-class ProductTemplateUpdateInput(ProductTemplateInput):
-    _name = 'ProductTemplateUpdateInput'
-
-
-class ProductTemplateCreateInput(ProductTemplateInput):
-    _name = 'ProductTemplateCreateInput'

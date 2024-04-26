@@ -1,7 +1,7 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.product_type import Product
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
 
 
 class AccountMoveLine(OdooObjectType):
@@ -27,14 +27,7 @@ class AccountMoveLineInput(graphene.InputObjectType):
     name = graphene.String()
     quantity = graphene.Int()
     price_unit = graphene.Float()
-
-
-class AccountMoveLineUpdateInput(AccountMoveLineInput):
-    _name = "AccountMoveLineUpdateInput"
-
-
-class AccountMoveLineCreateInput(AccountMoveLineInput):
-    _name = "AccountMoveLineCreateInput"
+    product = graphene.Field(ProductInput)
 
 
 class AccountMoveLineFilterInput(AccountMoveLineInput):

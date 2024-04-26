@@ -5,38 +5,25 @@ from odoo import models
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.employee_type import Employee, EmployeeFilterInput
-from ..graphql.planning_intervention_line_type import PlanningInterventionLine
+from ..graphql.planning_intervention_line_type import PlanningInterventionLine, PlanningInterventionLineInput
 from ..graphql.planning_intervention_mutation import PlanningInterventionMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery
 from ..graphql.planning_intervention_tag_mutation import PlanningInterventionTagMutation
 from ..graphql.planning_intervention_tag_query import PlanningInterventionTagQuery
-from ..graphql.planning_intervention_tag_type import (
-    PlanningInterventionTag,
-    PlanningInterventionTagCreateInput,
-    PlanningInterventionTagFilterInput,
-    PlanningInterventionTagUpdateInput,
-)
+from ..graphql.planning_intervention_tag_type import PlanningInterventionTag, PlanningInterventionTagFilterInput
 from ..graphql.planning_intervention_task_mutation import PlanningInterventionTaskMutation
 from ..graphql.planning_intervention_task_query import PlanningInterventionTaskQuery
-from ..graphql.planning_intervention_task_type import (
-    PlanningInterventionTask,
-    PlanningInterventionTaskCreateInput,
-    PlanningInterventionTaskFilterInput,
-    PlanningInterventionTaskUpdateInput,
-)
+from ..graphql.planning_intervention_task_type import PlanningInterventionTask, PlanningInterventionTaskFilterInput
 from ..graphql.planning_intervention_template_mutation import PlanningInterventionTemplateMutation
 from ..graphql.planning_intervention_template_query import PlanningInterventionTemplateQuery
 from ..graphql.planning_intervention_template_type import (
     PlanningInterventionTemplate,
-    PlanningInterventionTemplateCreateInput,
     PlanningInterventionTemplateFilterInput,
-    PlanningInterventionTemplateUpdateInput,
 )
 from ..graphql.planning_intervention_type import (
     PlanningIntervention,
-    PlanningInterventionCreateInput,
     PlanningInterventionFilterInput,
-    PlanningInterventionUpdateInput,
+    PlanningInterventionInput,
 )
 
 
@@ -53,27 +40,21 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTaskQuery,
                 PlanningInterventionTask,
                 PlanningInterventionTaskFilterInput,
-                PlanningInterventionTaskCreateInput,
-                PlanningInterventionTaskUpdateInput,
                 PlanningInterventionTaskMutation,
                 PlanningInterventionTemplateQuery,
                 PlanningInterventionTemplate,
-                PlanningInterventionTemplateCreateInput,
-                PlanningInterventionTemplateUpdateInput,
                 PlanningInterventionTemplateMutation,
                 PlanningInterventionTemplateFilterInput,
                 PlanningInterventionQuery,
-                PlanningInterventionCreateInput,
                 PlanningIntervention,
+                PlanningInterventionInput,
                 PlanningInterventionFilterInput,
-                PlanningInterventionUpdateInput,
                 PlanningInterventionMutation,
                 PlanningInterventionTagQuery,
                 PlanningInterventionTag,
                 PlanningInterventionTagFilterInput,
-                PlanningInterventionTagUpdateInput,
-                PlanningInterventionTagCreateInput,
                 PlanningInterventionTagMutation,
                 PlanningInterventionLine,
+                PlanningInterventionLineInput,
             ],
         )

@@ -3,18 +3,28 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.company_type import Company
-from odoo.addons.of_base_graphql.graphql.employee_type import Employee
-from odoo.addons.of_graphql.graphql.user_type import User
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_task_type import PlanningInterventionTask
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_template_type import PlanningInterventionTemplate
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningIntervention
+from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
+from odoo.addons.of_base_graphql.graphql.employee_type import Employee, EmployeeInput
+from odoo.addons.of_graphql.graphql.company_type import Company
+from odoo.addons.of_graphql.graphql.user_type import User, UserInput
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_task_type import (
+    PlanningInterventionTask,
+    PlanningInterventionTaskInput,
+)
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_template_type import (
+    PlanningInterventionTemplate,
+    PlanningInterventionTemplateInput,
+)
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import (
+    PlanningIntervention,
+    PlanningInterventionInput,
+)
 
-from ..graphql.attachment_type import Attachment
-from ..graphql.partner_type import Partner
-from ..graphql.service_request_line_type import ServiceRequestLine
-from ..graphql.service_request_stage_type import ServiceRequestStage
-from ..graphql.service_request_type_type import ServiceRequestType
+from ..graphql.attachment_type import Attachment, AttachmentInput
+from ..graphql.partner_type import Partner, PartnerInput
+from ..graphql.service_request_line_type import ServiceRequestLine, ServiceRequestLineInput
+from ..graphql.service_request_stage_type import ServiceRequestStage, ServiceRequestStageInput
+from ..graphql.service_request_type_type import ServiceRequestType, ServiceRequestTypeInput
 
 
 class ServiceRequest(OdooObjectType):
@@ -29,19 +39,19 @@ class ServiceRequest(OdooObjectType):
     title = graphene.String()
     priority = graphene.String()
     request_label_date = graphene.String(name="date")
-    state = graphene.String(name="planning_status")
-    base_state = graphene.String(name="calculation_status")
+    state = graphene.String(name="planningStatus")
+    base_state = graphene.String(name="calculationStatus")
     state_punctual = graphene.String(name="state")
-    intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention))
+    intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='interventions')
     intervention_count = graphene.Int()
     template = graphene.Field(PlanningInterventionTemplate)
     type = graphene.Field(ServiceRequestType)
-    history_intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='history_interventions')
+    history_intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='historyInterventions')
     task = graphene.Field(PlanningInterventionTask)
     company = graphene.Field(Company)
     user = graphene.Field(User)
     stage = graphene.Field(ServiceRequestStage)
-    employee_ids = graphene.List(graphene.NonNull(Employee))
+    employee_ids = graphene.List(graphene.NonNull(Employee), name='employees')
     last_attachment = graphene.Field(Attachment)
     line_ids = graphene.List(graphene.NonNull(ServiceRequestLine), name='lines')
     partner = graphene.Field(Partner)
@@ -101,10 +111,24 @@ class ServiceRequestInput(graphene.InputObjectType):
     number = graphene.String()
     title = graphene.String()
     priority = graphene.String()
-    request_label_date = graphene.String(name="date")
-    state = graphene.String(name="planning_status")
-    base_state = graphene.String(name="calculation_status")
-    state_punctual = graphene.String(name="state")
+    date = graphene.String()
+    planning_status = graphene.String()
+    calculation_status = graphene.String()
+    state = graphene.String()
+    interventions = graphene.List(graphene.NonNull(PlanningInterventionInput))
+    intervention_count = graphene.Int()
+    template = graphene.Field(PlanningInterventionTemplateInput)
+    type = graphene.Field(ServiceRequestTypeInput)
+    history_interventions = graphene.List(graphene.NonNull(PlanningInterventionInput))
+    task = graphene.Field(PlanningInterventionTaskInput)
+    company = graphene.Field(CompanyInput)
+    user = graphene.Field(UserInput)
+    stage = graphene.Field(ServiceRequestStageInput)
+    employees = graphene.List(graphene.NonNull(EmployeeInput))
+    last_attachment = graphene.Field(AttachmentInput)
+    lines = graphene.List(graphene.NonNull(ServiceRequestLineInput))
+    partner = graphene.Field(PartnerInput)
+    address = graphene.Field(PartnerInput)
     next_date = graphene.Date()
     end_date = graphene.Date()
     contract_end_date = graphene.Date()
@@ -115,11 +139,3 @@ class ServiceRequestInput(graphene.InputObjectType):
 
 class ServiceRequestFilterInput(ServiceRequestInput):
     _name = "ServiceRequestFilterInput"
-
-
-class ServiceRequestCreateInput(ServiceRequestInput):
-    _name = "ServiceRequestCreateInput"
-
-
-class ServiceRequestUpdateInput(ServiceRequestInput):
-    _name = "ServiceRequestUpdateInput"

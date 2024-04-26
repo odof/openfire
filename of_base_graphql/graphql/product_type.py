@@ -1,14 +1,11 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-import logging
 
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .product_category_type import ProductCategory
-
-logger = logging.getLogger(__name__)
+from .product_category_type import ProductCategory, ProductCategoryInput
 
 
 class Product(OdooObjectType):
@@ -27,17 +24,9 @@ class ProductInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
-    ref = graphene.String()
     list_price = graphene.Float()
+    categ_id = graphene.Field(ProductCategoryInput, name="category")
 
 
 class ProductFilterInput(ProductInput):
     _name = 'ProductFilterInput'
-
-
-class ProductUpdateInput(ProductInput):
-    _name = 'ProductUpdateInput'
-
-
-class ProductCreateInput(ProductInput):
-    _name = 'ProductCreateInput'

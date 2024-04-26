@@ -1,10 +1,10 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
 
-from .stock_location_type import StockLocation
-from .stock_move_type import StockMove
+from .stock_location_type import StockLocation, StockLocationInput
+from .stock_move_type import StockMove, StockMoveInput
 
 
 class Picking(OdooObjectType):
@@ -32,14 +32,9 @@ class PickingInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
-
-
-class PickingUpdateInput(PickingInput):
-    _name = "PickingUpdateInput"
-
-
-class PickingCreateInput(PickingInput):
-    _name = "PickingCreateInput"
+    partner = graphene.Field(PartnerInput)
+    lines = graphene.List(StockMoveInput)
+    location = graphene.Field(StockLocationInput)
 
 
 class PickingFilterInput(PickingInput):

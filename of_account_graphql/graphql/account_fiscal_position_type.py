@@ -36,11 +36,3 @@ class AccountFiscalPositionFilterInput(AccountFiscalPositionInput):
     _name = "AccountFiscalPositionFilterInput"
 
     tax_type_use = graphene.Field(AccountTaxType)
-
-
-class AccountFiscalPositionCreateInput(AccountFiscalPositionInput):
-    _name = "AccountFiscalPositionCreateInput"
-
-
-class AccountFiscalPositionUpdateInput(AccountFiscalPositionInput):
-    _name = "AccountFiscalPositionUpdateInput"

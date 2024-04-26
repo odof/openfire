@@ -25,16 +25,7 @@ class EmployeeInput(graphene.InputObjectType):
     mobile_phone = graphene.String()
     work_phone = graphene.String()
     work_email = graphene.String()
-    company_id = graphene.Int()
 
 
 class EmployeeFilterInput(EmployeeInput):
     _name = 'EmployeeFilterInput'
-
-
-class EmployeeCreateInput(EmployeeInput):
-    _name = 'EmployeeCreateInput'
-
-
-class EmployeeUpdateInput(EmployeeInput):
-    _name = 'EmployeeUpdateInput'

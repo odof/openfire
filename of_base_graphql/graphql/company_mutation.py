@@ -1,22 +1,20 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_update
-
-from .company_type import Company, CompanyCreateInput, CompanyUpdateInput
+from odoo.addons.of_graphql.graphql.company_type import Company
 
 
 class CompanyCreate(graphene.Mutation):
     _name = 'CompanyCreate'
 
     class Arguments:
-        input = CompanyCreateInput(required=True)
+        name = graphene.String()
 
     Output = Company
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        return lazy_create(env, "res.company", input)
+        values = env['res.company']._prepare_mutation_values(**args)
+        return env['res.company'].create(values)
 
 
 class CompanyUpdate(graphene.Mutation):
@@ -24,14 +22,15 @@ class CompanyUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = CompanyUpdateInput(required=True)
+        name = graphene.String()
 
     Output = Company
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        return lazy_update(env, "res.company", id, input)
+        values = env['res.company']._prepare_mutation_values(**args)
+        company = env['res.company'].search([('id', '=', id)])
+        return company.write(values)
 
 
 class CompanyMutation(graphene.ObjectType):

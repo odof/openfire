@@ -1,9 +1,10 @@
 import graphene
 
+from odoo.addons.of_graphql.graphql.company_type import Company
 from odoo.addons.of_graphql.graphql.odoo_domain import OdooDomainInput
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
-from .company_type import Company, CompanyFilterInput
+from .company_type import CompanyFilterInput
 
 
 class CompanyQuery(graphene.ObjectType):

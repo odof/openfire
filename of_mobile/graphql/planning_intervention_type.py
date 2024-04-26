@@ -4,6 +4,7 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 from odoo.addons.of_equipment_graphql.graphql.equipment_type import Equipment
+from odoo.addons.of_survey_graphql.graphql.survey_user_input_type import SurveyUserInput
 
 
 class PlanningIntervention(OdooObjectType):
@@ -14,6 +15,7 @@ class PlanningIntervention(OdooObjectType):
     equipments = graphene.NonNull(graphene.List(graphene.NonNull(Equipment)))
     historical = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
+    of_survey_user_input = graphene.Field(SurveyUserInput, name='surveyUserInput')
 
     @staticmethod
     def resolve_update_date(root, info):

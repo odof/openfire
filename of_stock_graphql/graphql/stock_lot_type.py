@@ -23,11 +23,3 @@ class StockLotInput(graphene.InputObjectType):
 
 class StockLotFilterInput(StockLotInput):
     _name = 'StockLotFilterInput'
-
-
-class StockLotCreateInput(StockLotInput):
-    _name = 'StockLotCreateInput'
-
-
-class StockLotUpdateInput(StockLotInput):
-    _name = 'StockLotUpdateInput'

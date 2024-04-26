@@ -9,41 +9,26 @@ from ..graphql.survey_mutation import SurveyMutation
 from ..graphql.survey_query import SurveyQuery
 from ..graphql.survey_question_answer_mutation import SurveyQuestionAnswerMutation
 from ..graphql.survey_question_answer_query import SurveyQuestionAnswerQuery
-from ..graphql.survey_question_answer_type import (
-    SurveyQuestionAnswer,
-    SurveyQuestionAnswerCreateInput,
-    SurveyQuestionAnswerFilterInput,
-    SurveyQuestionAnswerUpdateInput,
-)
+from ..graphql.survey_question_answer_type import SurveyQuestionAnswer, SurveyQuestionAnswerFilterInput
 from ..graphql.survey_question_page_mutation import SurveyConditionalQuestionMutation, SurveyQuestionPageMutation
 from ..graphql.survey_question_page_query import SurveyConditionalQuestionQuery, SurveyQuestionPageQuery
 from ..graphql.survey_question_page_type import (
     SurveyConditionalQuestion,
-    SurveyConditionalQuestionCreateInput,
     SurveyConditionalQuestionFilterInput,
-    SurveyConditionalQuestionUpdateInput,
     SurveyQuestionPage,
-    SurveyQuestionPageCreateInput,
     SurveyQuestionPageFilterInput,
-    SurveyQuestionPageUpdateInput,
 )
-from ..graphql.survey_type import Survey, SurveyCreateInput, SurveyFilterInput, SurveyUpdateInput
+from ..graphql.survey_type import Survey, SurveyFilterInput
 from ..graphql.survey_user_input_line_mutation import SurveyUserInputLineMutation
 from ..graphql.survey_user_input_line_query import SurveyUserInputLineQuery
 from ..graphql.survey_user_input_line_type import (
     SurveyUserInputLine,
-    SurveyUserInputLineCreateInput,
     SurveyUserInputLineFilterInput,
-    SurveyUserInputLineUpdateInput,
+    SurveyUserInputLineInput,
 )
 from ..graphql.survey_user_input_mutation import SurveyUserInputMutation
 from ..graphql.survey_user_input_query import SurveyUserInputQuery
-from ..graphql.survey_user_input_type import (
-    SurveyUserInput,
-    SurveyUserInputCreateInput,
-    SurveyUserInputFilterInput,
-    SurveyUserInputUpdateInput,
-)
+from ..graphql.survey_user_input_type import SurveyUserInput, SurveyUserInputFilterInput, SurveyUserInputInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -58,37 +43,27 @@ class OFGraphql(models.AbstractModel):
                 SurveyConditionalQuestionQuery,
                 SurveyConditionalQuestion,
                 SurveyConditionalQuestionFilterInput,
-                SurveyConditionalQuestionCreateInput,
-                SurveyConditionalQuestionUpdateInput,
                 SurveyMutation,
                 SurveyQuery,
                 Survey,
                 SurveyFilterInput,
-                SurveyCreateInput,
-                SurveyUpdateInput,
                 SurveyQuestionAnswerMutation,
                 SurveyQuestionAnswerQuery,
                 SurveyQuestionAnswer,
                 SurveyQuestionAnswerFilterInput,
-                SurveyQuestionAnswerCreateInput,
-                SurveyQuestionAnswerUpdateInput,
                 SurveyQuestionPageMutation,
                 SurveyQuestionPageQuery,
                 SurveyQuestionPage,
                 SurveyQuestionPageFilterInput,
-                SurveyQuestionPageCreateInput,
-                SurveyQuestionPageUpdateInput,
                 SurveyUserInputLineMutation,
                 SurveyUserInputLineQuery,
                 SurveyUserInputLine,
-                SurveyUserInputLineCreateInput,
+                SurveyUserInputLineInput,
                 SurveyUserInputLineFilterInput,
-                SurveyUserInputLineUpdateInput,
                 SurveyUserInputMutation,
                 SurveyUserInputQuery,
                 SurveyUserInput,
                 SurveyUserInputFilterInput,
-                SurveyUserInputCreateInput,
-                SurveyUserInputUpdateInput,
+                SurveyUserInputInput,
             ],
         )
