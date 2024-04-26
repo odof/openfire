@@ -19,17 +19,18 @@
                                         <td>
                                             <strong t-field="answer.question_id.title" />
                                             <span t-if="not answer.question_id.is_page"> : <span t-field="answer.answers" /></span>
-                                            <t t-if="answer.question_id.add_pictures">
-                                            <br/>
+                                            <div class="row mt-2">
                                                 <t t-foreach="answer.images" t-as="image">
                                                     <div class="col-3">
-                                                        <figure class="figure">
-                                                            <img t-attf-src="data:image/*;base64,{{image.datas}}" class="figure-img img img-fluid"/>
-                                                            <figcaption class="figure-caption"><span t-esc="image.description"/></figcaption>
-                                                        </figure>
+                                                        <div class="d-flex">
+                                                            <div class="mx-auto">
+                                                                <img t-attf-src="/web/image/of.image/#{image.id}/image_128" class="mr8" alt="Image"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-muted" t-esc="image.caption"/>
                                                     </div>
                                                 </t>
-                                            </t>
+                                            </div>
                                         </td>
                                     </tr>
                                 </t>
