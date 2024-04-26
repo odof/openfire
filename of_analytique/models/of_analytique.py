@@ -70,6 +70,11 @@ class OFSaleConfiguration(models.TransientModel):
         for wizard in self:
             wizard.group_of_group_analytique_obligatoire = wizard.of_compte_analytique
 
+    @api.onchange('of_compte_analytique')
+    def _onchange_of_compte_analytique(self):
+        if self.of_compte_analytique and not self.of_analytique_code:
+            self.of_analytique_code = u"(partner.name, partner.ref)"
+
     @api.multi
     def set_of_compte_analytique_setting(self):
         return self.env['ir.values'].sudo().set_default(
