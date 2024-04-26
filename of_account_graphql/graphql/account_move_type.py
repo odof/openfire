@@ -1,10 +1,13 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import AccountFiscalPosition
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
+from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import (
+    AccountFiscalPosition,
+    AccountFiscalPositionInput,
+)
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
 
-from .account_move_line_type import AccountMoveLine
+from .account_move_line_type import AccountMoveLine, AccountMoveLineInput
 
 
 class AccountMove(OdooObjectType):
@@ -32,15 +35,10 @@ class AccountMoveInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
+    partner = graphene.Field(PartnerInput)
+    invoice_line_ids = graphene.List(AccountMoveLineInput, name='lines')
+    fiscal_position = graphene.Field(AccountFiscalPositionInput)
 
 
 class AccountMoveFilterInput(AccountMoveInput):
     _name = 'AccountMoveUpdateFilterInput'
-
-
-class AccountMoveCreateInput(AccountMoveInput):
-    _name = 'AccountMoveCreateInput'
-
-
-class AccountMoveUpdateInput(AccountMoveInput):
-    _name = 'AccountMoveUpdateInput'

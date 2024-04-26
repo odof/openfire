@@ -1,24 +1,22 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .stock_lot_type import StockLot, StockLotCreateInput, StockLotUpdateInput
+from .stock_lot_type import StockLot
 
 
 class StockLotCreate(graphene.Mutation):
     _name = 'StockLotCreate'
 
     class Arguments:
-        input = StockLotCreateInput(required=True)
+        name = graphene.String()
 
     Output = StockLot
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        stock_lot_mutation = lazy_create(env, 'stock.lot', input)
-
-        return stock_lot_mutation
+        values = env['stock.lot']._prepare_mutation_values(**args)
+        return env['stock.lot'].create(values)
 
 
 class StockLotUpdate(graphene.Mutation):
@@ -26,16 +24,15 @@ class StockLotUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = StockLotUpdateInput(required=True)
+        name = graphene.String()
 
     Output = StockLot
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        stock_lot_mutation = lazy_update(env, 'stock.lot', id, input)
-
-        return stock_lot_mutation
+        values = env['stock.lot']._prepare_mutation_values(**args)
+        lot = env['stock.lot'].search([('id', '=', id)])
+        return lot.write(values)
 
 
 class StockLotDelete(graphene.Mutation):

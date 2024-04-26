@@ -2,42 +2,10 @@ import logging
 
 import graphene
 
+from odoo import Command
 from odoo.exceptions import AccessError
 
 logger = logging.getLogger(__name__)
-
-
-def lazy_create(env, model, input):
-    value_object = {}
-    if type(input) is dict:
-        for field in input.keys():
-            if field in input:
-                value_object[field] = input[field]
-    else:
-        for field in input.__dict__:
-            if field in input:
-                value_object[field] = input[field]
-    object = env[model].create(value_object)
-    return object
-
-
-def lazy_update(env, model, id, input):
-    value_object = {}
-    if type(input) is dict:
-        for field in input.keys():
-            if field in input:
-                value_object[field] = input[field]
-    else:
-        for field in input.__dict__:
-            if field in input:
-                value_object[field] = input[field]
-
-    object = env[model].search([('id', '=', id)], limit=1)
-    if not object:
-        raise AccessError(f"Unable to find object ({model}) with id: {id}")
-
-    object.write(value_object)
-    return object
 
 
 def lazy_delete(env, model, id):
@@ -47,6 +15,60 @@ def lazy_delete(env, model, id):
         return object
 
     return env[model]
+
+
+def convertImage(datas):
+    datas = datas.split(",")
+    if len(datas) > 1:
+        datas = datas[1]
+    else:
+        datas = datas[0]
+    return datas
+
+
+def many2one(self, model, input):
+    # cette méthode retourne l'id du many2one crée ou mis à jour selon la présence ou non
+    # d'un id dans input
+    obj = self.env[model]
+    obj_values = obj._prepare_mutation_values(**input)
+    if input.id:
+        record = obj.search([('id', '=', input.id)])
+        if record:
+            record.write(obj_values)
+            return record.id
+        else:
+            raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
+    else:
+        record = obj.create(obj_values)
+        return record.id
+
+
+def x2many(self, model, input, default={}, keep=False):
+    # cette méthode retourne une liste de Command pour les one2many/many2many
+    # default est un dict qui contient les valeurs par défaut que l'on souhaite ajouter à chaque ligne
+    # keep permet de préciser si les nouvelles lignes sont ajoutées aux lignes existantes du x2many
+    # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
+    obj = self.env[model]
+    res = []
+    if not keep:
+        res.append(Command.clear())
+    logger.info(input)
+    if type(input) is dict:
+        input = [input]
+
+    for record in input:
+        record_value = default
+        values = obj._prepare_mutation_values(**record)
+        record_value.update(values)
+
+        if record.id:
+            if not obj.search([('id', '=', record.id)]):
+                raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
+
+            res.append(Command.update(record.id, record_value))
+        else:
+            res.append(Command.create(record_value))
+    return res
 
 
 class OdooGraphql:
@@ -78,25 +100,8 @@ class OdooGraphql:
         cls.pool[dbname] = {'query': [], 'mutation': [], 'types': {}, 'subscription': [], 'schema': False}
 
     @classmethod
-    def group_class(cls, classes):
-        # ici on regroupe les classes ayant le même _name pour retourner une seule classe par _name
-        res = {}
-        for cl in classes:
-            if cl._name in res:
-                res[cl._name].append(cl)
-            else:
-                res[cl._name] = [cl]
-        classes_list = list(res.values())
-        pool_classes = []
-
-        for cl in classes_list:
-            if len(cl) > 1:
-                cl.reverse()
-                cl = type(cl[0]._name, tuple(cl), {})
-            else:
-                cl = cl[0]
-            pool_classes.append(cl)
-        return pool_classes
+    def get_pool(cls, dbname):
+        return cls.pool[dbname]
 
     @classmethod
     def add(cls, dbname, objs):
@@ -125,21 +130,15 @@ class OdooGraphql:
     @classmethod
     def schema(cls, dbname):
         class_query = False
-
+        logger.info(cls.pool[dbname])
         if cls.pool[dbname]['schema']:
             return cls.pool[dbname]['schema']
 
         if len(cls.pool[dbname]['query']) > 0:
-            # on peut avoir des variables dans les classes query qui sont identiques
-            # il faut donc alors regrouper ces classes en gérant le bon ordre de surcharge
-            class_queries = cls.group_class(cls.pool[dbname]["query"])
-            class_query = type("Query", tuple(class_queries), {})
+            class_query = type("Query", tuple(cls.pool[dbname]["query"]), {})
 
         if len(cls.pool[dbname]['mutation']) > 0:
-            # on peut avoir des variables dans les classes mutations qui sont identiques
-            # il faut donc alors regrouper ces classes en gérant le bon ordre de surcharge
-            class_mutations = cls.group_class(cls.pool[dbname]["mutation"])
-            class_mutation = type("Mutation", tuple(class_mutations), {})
+            class_mutation = type("Mutation", tuple(cls.pool[dbname]["mutation"]), {})
 
         types = []
 
@@ -160,3 +159,22 @@ class OdooGraphql:
                 schema = graphene.Schema(mutation=class_mutation, types=types)
         cls.pool[dbname]['schema'] = schema
         return schema
+
+    @classmethod
+    def debug(cls, dbname):
+        # Cette fonction va afficher en détail le contenu du pool
+        pool = cls.get_pool(dbname)
+        for mutation in pool['mutation']:
+            logger.info(f"mutation : {mutation._meta.class_type._name}")
+            fields = mutation._meta.fields
+            for field in fields.values():
+                logger.info(f"--> {field._type._name}")
+                for arg in field.args.values():
+                    if hasattr(arg._type, '_meta'):
+                        logger.info(f"---->{arg._type._meta.name}")
+                    else:
+                        if hasattr(arg._type._of_type, '_meta'):
+                            logger.info(f"---->{arg._type._of_type._meta}")
+                        else:
+                            logger.info(f"---->{arg._type.__dict__}")
+                            logger.info(f"---->{arg._type._of_type.__dict__}")

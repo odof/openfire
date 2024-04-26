@@ -6,37 +6,19 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.account_fiscal_position_mutation import AccountFiscalPositionMutation
 from ..graphql.account_fiscal_position_query import AccountFiscalPositionQuery
-from ..graphql.account_fiscal_position_tax_type import (
-    AccountFiscalPositionTax,
-    AccountFiscalPositionTaxCreateInput,
-    AccountFiscalPositionTaxUpdateInput,
-)
-from ..graphql.account_fiscal_position_type import (
-    AccountFiscalPosition,
-    AccountFiscalPositionCreateInput,
-    AccountFiscalPositionUpdateInput,
-)
+from ..graphql.account_fiscal_position_tax_type import AccountFiscalPositionTax
+from ..graphql.account_fiscal_position_type import AccountFiscalPosition
 from ..graphql.account_move_line_mutation import AccountMoveLineMutation
 from ..graphql.account_move_line_query import AccountMoveLineQuery
-from ..graphql.account_move_line_type import (
-    AccountMoveLine,
-    AccountMoveLineCreateInput,
-    AccountMoveLineFilterInput,
-    AccountMoveLineUpdateInput,
-)
+from ..graphql.account_move_line_type import AccountMoveLine, AccountMoveLineFilterInput
 from ..graphql.account_move_mutation import AccountMoveMutation
 from ..graphql.account_move_query import AccountMoveQuery
-from ..graphql.account_move_type import (
-    AccountMove,
-    AccountMoveCreateInput,
-    AccountMoveFilterInput,
-    AccountMoveUpdateInput,
-)
+from ..graphql.account_move_type import AccountMove, AccountMoveFilterInput
 from ..graphql.account_tax_mutation import AccountTaxMutation
 from ..graphql.account_tax_query import AccountTaxQuery
-from ..graphql.account_tax_type import AccountTax, AccountTaxCreateInput, AccountTaxFilterInput, AccountTaxUpdateInput
+from ..graphql.account_tax_type import AccountTax, AccountTaxFilterInput
 from ..graphql.company_type import Company
-from ..graphql.product_type import Product
+from ..graphql.product_type import Product, ProductInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -51,21 +33,14 @@ class OFGraphql(models.AbstractModel):
                 AccountFiscalPositionMutation,
                 AccountFiscalPositionQuery,
                 AccountFiscalPositionTax,
-                AccountFiscalPositionTaxCreateInput,
-                AccountFiscalPositionTaxUpdateInput,
                 AccountFiscalPosition,
-                AccountFiscalPositionCreateInput,
-                AccountFiscalPositionUpdateInput,
                 AccountMove,
-                AccountMoveUpdateInput,
-                AccountMoveCreateInput,
-                AccountMoveLineCreateInput,
                 AccountMoveLineFilterInput,
                 AccountMoveFilterInput,
                 AccountMoveLine,
-                AccountMoveLineUpdateInput,
                 AccountTax,
                 Product,
+                ProductInput,
                 AccountMoveQuery,
                 AccountMoveMutation,
                 AccountMoveLineQuery,
@@ -73,7 +48,5 @@ class OFGraphql(models.AbstractModel):
                 AccountTaxMutation,
                 AccountTaxQuery,
                 AccountTaxFilterInput,
-                AccountTaxCreateInput,
-                AccountTaxUpdateInput,
             ],
         )

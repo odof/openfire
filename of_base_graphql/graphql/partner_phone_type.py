@@ -2,7 +2,7 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .partner_title_type import PartnerTitle
+from .partner_title_type import PartnerTitle, PartnerTitleInput
 
 
 class PartnerPhone(OdooObjectType):
@@ -26,18 +26,4 @@ class PartnerPhoneInput(graphene.InputObjectType):
     id = graphene.Int()
     type = graphene.String()
     number_display = graphene.String()
-    title_id = graphene.Int()
-
-
-class PartnerPhoneCreateInput(PartnerPhoneInput):
-    _name = 'PartnerPhoneCreateInput'
-
-    type = graphene.String(required=True)
-    number_display = graphene.String(required=True)
-
-
-class PartnerPhoneUpdateInput(PartnerPhoneInput):
-    _name = 'PartnerPhoneUpdateInput'
-
-    type = graphene.String(required=True)
-    number_display = graphene.String(required=True)
+    title = graphene.Field(PartnerTitleInput)

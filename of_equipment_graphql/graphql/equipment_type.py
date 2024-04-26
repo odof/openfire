@@ -3,12 +3,15 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
-from odoo.addons.of_base_graphql.graphql.product_category_type import ProductCategory
-from odoo.addons.of_base_graphql.graphql.product_type import Product
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningIntervention
-from odoo.addons.of_product_brand_graphql.graphql.product_brand_type import ProductBrand
-from odoo.addons.of_stock_graphql.graphql.stock_lot_type import StockLot
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
+from odoo.addons.of_base_graphql.graphql.product_category_type import ProductCategory, ProductCategoryInput
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import (
+    PlanningIntervention,
+    PlanningInterventionInput,
+)
+from odoo.addons.of_product_brand_graphql.graphql.product_brand_type import ProductBrand, ProductBrandInput
+from odoo.addons.of_stock_graphql.graphql.stock_lot_type import StockLot, StockLotInput
 
 
 class Equipment(OdooObjectType):
@@ -93,15 +96,16 @@ class EquipmentInput(graphene.InputObjectType):
     service_date = graphene.Date()
     installation_date = graphene.Date()
     end_warranty_date = graphene.Date()
+    product = graphene.Field(ProductInput)
+    brand = graphene.Field(ProductBrandInput)
+    product_category = graphene.Field(ProductCategoryInput)
+    lot = graphene.Field(StockLotInput)
+    reseller = graphene.Field(PartnerInput)
+    installer = graphene.Field(PartnerInput)
+    site_address = graphene.Field(PartnerInput)
+    customer = graphene.Field(PartnerInput)
+    interventions = graphene.List(graphene.NonNull(PlanningInterventionInput))
 
 
 class EquipmentFilterInput(EquipmentInput):
     _name = "EquipmentFilterInput"
-
-
-class EquipmentCreateInput(EquipmentInput):
-    _name = "EquipmentCreateInput"
-
-
-class EquipmentUpdateInput(EquipmentInput):
-    _name = "EquipmentUpdateInput"

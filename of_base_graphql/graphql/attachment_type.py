@@ -29,6 +29,7 @@ class AttachmentInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
+    # type = graphene.Argument(AttachmentType)
     res_model = graphene.String()
     res_id = graphene.Int()
     datas = OdooImage()
@@ -36,11 +37,3 @@ class AttachmentInput(graphene.InputObjectType):
 
 class AttachmentFilterInput(AttachmentInput):
     _name = "AttachmentFilterInput"
-
-
-class AttachmentCreateInput(AttachmentInput):
-    _name = "AttachmentCreateInput"
-
-
-class AttachmentUpdateInput(AttachmentInput):
-    _name = "AttachmentUpdateInput"

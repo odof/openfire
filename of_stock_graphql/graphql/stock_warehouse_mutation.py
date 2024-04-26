@@ -1,36 +1,24 @@
 import graphene
 
-from odoo.addons.of_base_graphql.graphql.partner_mutation import PartnerCreate, PartnerUpdate
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .stock_warehouse_type import StockWarehouse, StockWarehouseCreateInput, StockWarehouseUpdateInput
+from .stock_warehouse_type import StockWarehouse
 
 
 class StockWarehouseCreate(graphene.Mutation):
     _name = 'StockWarehouseCreate'
 
     class Arguments:
-        input = StockWarehouseCreateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
 
     Output = StockWarehouse
 
-    def mutate(self, info, input, partner=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        stock_warehouse = lazy_create(env, 'stock.warehouse', input)
-
-        if partner:
-            stock_warehouse.partner_id = partner
-
-        return stock_warehouse
+        values = env['stock.warehouse']._prepare_mutation_values(**args)
+        return env['stock.warehouse'].create(values)
 
 
 class StockWarehouseUpdate(graphene.Mutation):
@@ -38,26 +26,16 @@ class StockWarehouseUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = StockWarehouseUpdateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
 
     Output = StockWarehouse
 
-    def mutate(self, info, id, input, partner=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        stock_warehouse = lazy_update(env, 'stock.warehouse', id, input)
-
-        if partner:
-            stock_warehouse.partner_id = partner
-
-        return stock_warehouse
+        values = env['stock.warehouse']._prepare_mutation_values(**args)
+        warehouse = env['stock.warehouse'].search([('id', '=', id)])
+        return warehouse.write(values)
 
 
 class StockWarehouseDelete(graphene.Mutation):

@@ -1,9 +1,9 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
 
-from .sale_order_line_type import SaleOrderLine
+from .sale_order_line_type import SaleOrderLine, SaleOrderLineInput
 
 
 class SaleOrder(OdooObjectType):
@@ -30,14 +30,8 @@ class SaleOrderInput(graphene.InputObjectType):
     name = graphene.String()
     date_order = graphene.DateTime()
     validity_date = graphene.Date()
-
-
-class SaleOrderUpdateInput(SaleOrderInput):
-    _name = "SaleOrderUpdateInput"
-
-
-class SaleOrderCreateInput(SaleOrderInput):
-    _name = "SaleOrderCreateInput"
+    partner = graphene.Field(PartnerInput)
+    lines = graphene.List(graphene.NonNull(SaleOrderLineInput))
 
 
 class SaleOrderFilterInput(SaleOrderInput):

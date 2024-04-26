@@ -23,11 +23,3 @@ class ServiceRequestStageInput(graphene.InputObjectType):
 
 class ServiceRequestStageFilterInput(ServiceRequestStageInput):
     _name = 'ServiceRequestStageFilterInput'
-
-
-class ServiceRequestStageCreateInput(ServiceRequestStageInput):
-    _name = 'ServiceRequestStageCreateInput'
-
-
-class ServiceRequestStageUpdateInput(ServiceRequestStageInput):
-    _name = 'ServiceRequestStageUpdateInput'

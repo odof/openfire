@@ -36,4 +36,4 @@ class SurveyQuery(graphene.ObjectType):
             if filter.title:
                 odoo_domain += [('title', 'like', filter.name)]
 
-        return env['of.survey'].search(odoo_domain, offset=offset, limit=limit)
+        return env['of.survey.survey'].search(odoo_domain, offset=offset, limit=limit)

@@ -6,29 +6,19 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.picking_mutation import PickingMutation
 from ..graphql.picking_query import PickingQuery
-from ..graphql.picking_type import Picking, PickingCreateInput, PickingFilterInput, PickingUpdateInput
+from ..graphql.picking_type import Picking, PickingFilterInput
 from ..graphql.stock_location_mutation import StockLocationMutation
 from ..graphql.stock_location_query import StockLocationQuery
-from ..graphql.stock_location_type import (
-    StockLocation,
-    StockLocationCreateInput,
-    StockLocationFilterInput,
-    StockLocationUpdateInput,
-)
+from ..graphql.stock_location_type import StockLocation, StockLocationFilterInput
 from ..graphql.stock_lot_mutation import StockLotMutation
 from ..graphql.stock_lot_query import StockLotQuery
-from ..graphql.stock_lot_type import StockLot, StockLotCreateInput, StockLotFilterInput, StockLotUpdateInput
+from ..graphql.stock_lot_type import StockLot, StockLotFilterInput
 from ..graphql.stock_move_mutation import StockMoveMutation
 from ..graphql.stock_move_query import StockMoveQuery
-from ..graphql.stock_move_type import StockMove, StockMoveCreateInput, StockMoveFilterInput, StockMoveUpdateInput
+from ..graphql.stock_move_type import StockMove, StockMoveFilterInput
 from ..graphql.stock_warehouse_mutation import StockWarehouseMutation
 from ..graphql.stock_warehouse_query import StockWarehouseQuery
-from ..graphql.stock_warehouse_type import (
-    StockWarehouse,
-    StockWarehouseCreateInput,
-    StockWarehouseFilterInput,
-    StockWarehouseUpdateInput,
-)
+from ..graphql.stock_warehouse_type import StockWarehouse, StockWarehouseFilterInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -40,34 +30,24 @@ class OFGraphql(models.AbstractModel):
             dbname,
             [
                 Picking,
-                PickingUpdateInput,
                 PickingMutation,
                 PickingQuery,
-                PickingCreateInput,
                 PickingFilterInput,
                 StockMove,
-                StockMoveUpdateInput,
                 StockMoveMutation,
                 StockMoveQuery,
                 StockMoveFilterInput,
-                StockMoveCreateInput,
                 StockLocationQuery,
                 StockLocation,
                 StockLocationFilterInput,
-                StockLocationUpdateInput,
-                StockLocationCreateInput,
                 StockLocationMutation,
                 StockLotQuery,
                 StockLot,
                 StockLotFilterInput,
-                StockLotUpdateInput,
-                StockLotCreateInput,
                 StockLotMutation,
                 StockWarehouseQuery,
                 StockWarehouse,
                 StockWarehouseFilterInput,
-                StockWarehouseUpdateInput,
-                StockWarehouseCreateInput,
                 StockWarehouseMutation,
             ],
         )

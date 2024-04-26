@@ -1,22 +1,23 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .product_template_type import ProductTemplate, ProductTemplateCreateInput, ProductTemplateUpdateInput
+from .product_template_type import ProductTemplate
 
 
 class ProductTemplateCreate(graphene.Mutation):
     _name = 'ProductTemplateCreate'
 
     class Arguments:
-        input = ProductTemplateCreateInput(required=True)
+        name = graphene.String()
+        list_price = graphene.Float()
 
     Output = ProductTemplate
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        return lazy_create(env, 'product.template', input)
+        values = env['product.template']._prepare_mutation_values(**args)
+        return env['product.template'].create(values)
 
 
 class ProductTemplateUpdate(graphene.Mutation):
@@ -24,14 +25,16 @@ class ProductTemplateUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = ProductTemplateUpdateInput(required=True)
+        name = graphene.String()
+        list_price = graphene.Float()
 
     Output = ProductTemplate
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        return lazy_update(env, 'product.template', id, input)
+        values = env['product.template']._prepare_mutation_values(**args)
+        product = env['product.template'].search([('id', '=', id)])
+        return product.write(values)
 
 
 class ProductTemplateDelete(graphene.Mutation):

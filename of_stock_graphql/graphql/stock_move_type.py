@@ -1,8 +1,8 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.partner_type import Partner
-from odoo.addons.of_base_graphql.graphql.product_type import Product
+from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
 
 
 class StockMove(OdooObjectType):
@@ -29,14 +29,8 @@ class StockMoveInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
-
-
-class StockMoveUpdateInput(StockMoveInput):
-    _name = "StockMoveUpdateInput"
-
-
-class StockMoveCreateInput(StockMoveInput):
-    _name = "StockMoveCreateInput"
+    partner = graphene.Field(PartnerInput)
+    product = graphene.Field(ProductInput)
 
 
 class StockMoveFilterInput(StockMoveInput):

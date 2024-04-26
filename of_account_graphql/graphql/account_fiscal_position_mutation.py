@@ -1,28 +1,22 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .account_fiscal_position_type import (
-    AccountFiscalPosition,
-    AccountFiscalPositionCreateInput,
-    AccountFiscalPositionUpdateInput,
-)
+from .account_fiscal_position_type import AccountFiscalPosition
 
 
 class AccountFiscalPositionCreate(graphene.Mutation):
     _name = 'AccountFiscalPositionCreate'
 
     class Arguments:
-        input = AccountFiscalPositionCreateInput(required=True)
+        name = graphene.String(required=True)
 
     Output = AccountFiscalPosition
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        account_fiscal_position = lazy_create(env, "account.fiscal.position", input)
-
-        return account_fiscal_position
+        value = env['account.fiscal.position']._prepare_mutation_values(**args)
+        return env['account.fiscal.position'].create(value)
 
 
 class AccountFiscalPositionUpdate(graphene.Mutation):
@@ -30,16 +24,15 @@ class AccountFiscalPositionUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = AccountFiscalPositionUpdateInput(required=True)
+        name = graphene.String()
 
     Output = AccountFiscalPosition
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        account_fiscal_position = lazy_update(env, "account.fiscal.position", id, input)
-
-        return account_fiscal_position
+        value = env['account.fiscal.position']._prepare_mutation_values(**args)
+        fiscal_position = env['account.fiscal.position'].search([('id', '=', id)])
+        return fiscal_position.write(value)
 
 
 class AccountFiscalPositionDelete(graphene.Mutation):

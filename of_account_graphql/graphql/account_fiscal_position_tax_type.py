@@ -12,6 +12,7 @@ class AccountFiscalPositionTax(OdooObjectType):
     _type = 'types'
 
     id = graphene.Int(required=True)
+    name = graphene.String()
     tax_src = graphene.Field(AccountTax, required=True)
     tax_dest = graphene.Field(AccountTax)
 
@@ -30,15 +31,9 @@ class AccountFiscalPositionTaxInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
+    tax_src = graphene.Field(AccountTax, required=True)
+    tax_dest = graphene.Field(AccountTax)
 
 
 class AccountFiscalPositionTaxFilterInput(AccountFiscalPositionTaxInput):
     _name = "AccountFiscalPositionTaxFilterInput"
-
-
-class AccountFiscalPositionTaxCreateInput(AccountFiscalPositionTaxInput):
-    _name = "AccountFiscalPositionTaxCreateInput"
-
-
-class AccountFiscalPositionTaxUpdateInput(AccountFiscalPositionTaxInput):
-    _name = "AccountFiscalPositionTaxUpdateInput"

@@ -1,12 +1,8 @@
-import logging
-
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
 
-from .attachment_type import Attachment, AttachmentCreateInput, AttachmentUpdateInput
-
-logger = logging.getLogger(__name__)
+from .attachment_type import Attachment, AttachmentType
 
 
 def convertImage(datas):
@@ -22,18 +18,18 @@ class AttachmentCreate(graphene.Mutation):
     _name = 'AttachmentCreate'
 
     class Arguments:
-        input = AttachmentCreateInput(required=True)
+        name = graphene.String(required=True)
+        type = graphene.Argument(AttachmentType)
+        res_model = graphene.String(name='model')
+        res_id = graphene.Int(name='model_id')
+        datas = OdooImage()
 
     Output = Attachment
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-        # Les données qui viennent de cet input (dans datas) doivent être modifiées avant d'être
-        # importé dans odoo, donc on convertit à la volée
-        if attachment := input.get("datas", False):
-            input.datas = convertImage(attachment)
-
-        return lazy_create(env, "ir.attachment", input)
+        values = env['ir.attachment']._prepare_mutation_values(**args)
+        return env['ir.attachment'].create(values)
 
 
 class AttachmentUpdate(graphene.Mutation):
@@ -41,17 +37,19 @@ class AttachmentUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = AttachmentUpdateInput(required=True)
+        name = graphene.String(required=True)
+        type = graphene.Argument(AttachmentType)
+        res_model = graphene.String(name='model')
+        res_id = graphene.Int(name='model_id')
+        datas = OdooImage()
 
     Output = Attachment
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-        # Les données qui viennent de cet input (dans datas) doivent être modifiées avant d'être
-        # importé dans odoo, donc on convertit à la volée
-        if attachment := input.get("datas", False):
-            input.datas = convertImage(attachment)
-        return lazy_update(env, "ir.attachment", id, input)
+        values = env['ir.attachment']._prepare_mutation_values(**args)
+        attachment = env['ir.attachment'].search([('id', '=', id)])
+        return attachment.write(values)
 
 
 class AttachmentMutation(graphene.ObjectType):

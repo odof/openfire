@@ -3,6 +3,7 @@
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
+from odoo.addons.of_survey_graphql.graphql.survey_type import SurveyInput
 
 from ..graphql.planning_intervention_template_type import PlanningInterventionTemplate
 from ..graphql.planning_intervention_type import PlanningIntervention
@@ -17,3 +18,20 @@ class OFGraphql(models.AbstractModel):
             dbname,
             [PlanningIntervention, PlanningInterventionTemplate],
         )
+
+    def _prepare_arguments(self):
+        arguments = super()._prepare_arguments()
+
+        new_arguments = {
+            "PlanningInterventionMutation": {
+                "planning_intervention_create": {
+                    "survey": SurveyInput,
+                },
+                "planning_intervention_update": {
+                    "survey": SurveyInput,
+                },
+            }
+        }
+        arguments = self._add_arguments(new_arguments, arguments)
+
+        return arguments

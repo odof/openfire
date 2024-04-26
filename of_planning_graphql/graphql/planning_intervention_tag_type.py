@@ -47,11 +47,3 @@ class PlanningInterventionTagInput(graphene.InputObjectType):
 
 class PlanningInterventionTagFilterInput(PlanningInterventionTagInput):
     _name = 'PlanningInterventionTagFilterInput'
-
-
-class PlanningInterventionTagCreateInput(PlanningInterventionTagInput):
-    _name = 'PlanningInterventionTagCreateInput'
-
-
-class PlanningInterventionTagUpdateInput(PlanningInterventionTagInput):
-    _name = 'PlanningInterventionTagUpdateInput'

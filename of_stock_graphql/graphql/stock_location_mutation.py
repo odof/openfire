@@ -1,9 +1,8 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
-from odoo.addons.of_stock_graphql.graphql.stock_warehouse_mutation import StockWarehouseCreate, StockWarehouseUpdate
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .stock_location_type import StockLocation, StockLocationCreateInput, StockLocationUpdateInput
+from .stock_location_type import StockLocation
 from .stock_warehouse_type import StockWarehouseInput
 
 
@@ -11,26 +10,15 @@ class StockLocationCreate(graphene.Mutation):
     _name = 'StockLocationCreate'
 
     class Arguments:
-        input = StockLocationCreateInput(required=True)
-        warehouse = StockWarehouseInput()
+        name = graphene.String()
+        warehouse = graphene.Argument(StockWarehouseInput)
 
     Output = StockLocation
 
-    def mutate(self, info, input, warehouse=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        if warehouse:
-            if warehouse.id:
-                warehouse = StockWarehouseUpdate().mutate(info, id=warehouse.id, input=warehouse)
-            else:
-                warehouse = StockWarehouseCreate().mutate(info, input=warehouse)
-
-        stock_location = lazy_create(env, 'stock.location', input)
-
-        if warehouse:
-            stock_location.warehouse_id = warehouse
-
-        return stock_location
+        values = env['stock.location']._prepare_mutation_values(**args)
+        return env['stock.location'].create(values)
 
 
 class StockLocationUpdate(graphene.Mutation):
@@ -38,26 +26,16 @@ class StockLocationUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = StockLocationUpdateInput(required=True)
-        warehouse = StockWarehouseInput()
+        name = graphene.String()
+        warehouse = graphene.Argument(StockWarehouseInput)
 
     Output = StockLocation
 
-    def mutate(self, info, id, input, warehouse=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        if warehouse:
-            if warehouse.id:
-                warehouse = StockWarehouseUpdate().mutate(info, id=warehouse.id, input=warehouse)
-            else:
-                warehouse = StockWarehouseCreate().mutate(info, input=warehouse)
-
-        stock_location = lazy_update(env, 'stock.location', id, input)
-
-        if warehouse:
-            stock_location.warehouse_id = warehouse
-
-        return stock_location
+        values = env['stock.location']._prepare_mutation_values(**args)
+        location = env['stock.location'].search([('id', '=', id)])
+        return location.write(values)
 
 
 class StockLocationDelete(graphene.Mutation):

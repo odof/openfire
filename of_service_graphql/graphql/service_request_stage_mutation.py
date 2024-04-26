@@ -1,28 +1,22 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .service_request_stage_type import (
-    ServiceRequestStage,
-    ServiceRequestStageCreateInput,
-    ServiceRequestStageUpdateInput,
-)
+from .service_request_stage_type import ServiceRequestStage
 
 
 class ServiceRequestStageCreate(graphene.Mutation):
     _name = 'ServiceRequestStageCreate'
 
     class Arguments:
-        input = ServiceRequestStageCreateInput(required=True)
+        name = graphene.String()
 
     Output = ServiceRequestStage
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        service_request_stage = lazy_create(env, 'of.service.request.stage', input)
-
-        return service_request_stage
+        values = env['of.service.request.stage']._prepare_mutation_values(**args)
+        return env['of.service.request.stage'].create(values)
 
 
 class ServiceRequestStageUpdate(graphene.Mutation):
@@ -30,16 +24,15 @@ class ServiceRequestStageUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = ServiceRequestStageUpdateInput(required=True)
+        name = graphene.String()
 
     Output = ServiceRequestStage
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        service_request_stage = lazy_update(env, 'of.service.request.stage', id, input)
-
-        return service_request_stage
+        values = env['of.service.request.stage']._prepare_mutation_values(**args)
+        request_stage = env['of.service.request.stage'].search([('id', '=', id)])
+        return request_stage.write(values)
 
 
 class ServiceRequestStageDelete(graphene.Mutation):

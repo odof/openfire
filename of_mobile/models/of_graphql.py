@@ -10,7 +10,6 @@ from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
 from ..graphql.partner_query import PartnerQuery
 from ..graphql.partner_type import PartnerCheckDuplications
-from ..graphql.planning_intervention_mutation import PlanningInterventionMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery, PlanningInterventionsOffline
 from ..graphql.planning_intervention_type import PlanningIntervention
 from ..graphql.product_query import ProductQuery
@@ -34,7 +33,6 @@ class OFGraphql(models.AbstractModel):
                 ProductQuery,
                 PlanningInterventionsOffline,
                 PlanningIntervention,
-                PlanningInterventionMutation,
                 EmployeeQuery,
                 Employee,
             ],

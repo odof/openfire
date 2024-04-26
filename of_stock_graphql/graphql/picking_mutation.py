@@ -1,13 +1,10 @@
 import graphene
 
-from odoo.addons.of_base_graphql.graphql.partner_mutation import PartnerCreate, PartnerUpdate
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
-from odoo.addons.of_stock_graphql.graphql.stock_location_mutation import StockLocationCreate, StockLocationUpdate
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .picking_type import Picking, PickingCreateInput, PickingUpdateInput
+from .picking_type import Picking
 from .stock_location_type import StockLocationInput
-from .stock_move_mutation import StockMoveCreate, StockMoveUpdate
 from .stock_move_type import StockMoveInput
 
 
@@ -15,49 +12,17 @@ class PickingCreate(graphene.Mutation):
     _name = 'PickingCreate'
 
     class Arguments:
-        input = PickingCreateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
         lines = graphene.List(graphene.NonNull(StockMoveInput))
-        location = StockLocationInput()
+        location = graphene.Argument(StockLocationInput)
 
     Output = Picking
 
-    def mutate(self, info, input, partner=None, lines=None, location=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-        create_lines = env['stock.move']
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if lines:
-            for line in lines:
-                if line.id:
-                    line = StockMoveUpdate().mutate(info, id=line.id, input=line)
-                else:
-                    line = StockMoveCreate().mutate(info, input=line)
-                create_lines += line
-
-        if location:
-            if location.id:
-                location = StockLocationUpdate().mutate(info, id=location.id, input=location)
-            else:
-                location = StockLocationCreate().mutate(info, input=location)
-
-        picking = lazy_create(env, "stock.picking", input)
-
-        if partner:
-            picking.partner_id = partner
-
-        if lines:
-            picking.move_ids_without_package = [(6, 0, create_lines.ids)]
-
-        if picking:
-            picking.location_id = location
-
-        return picking
+        values = env['stock.picking']._prepare_mutation_values(**args)
+        return env['stock.picking'].create(values)
 
 
 class PickingUpdate(graphene.Mutation):
@@ -65,49 +30,18 @@ class PickingUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = PickingUpdateInput(required=True)
-        partner = PartnerInput()
+        name = graphene.String()
+        partner = graphene.Argument(PartnerInput)
         lines = graphene.List(graphene.NonNull(StockMoveInput))
-        location = StockLocationInput()
+        location = graphene.Argument(StockLocationInput)
 
     Output = Picking
 
-    def mutate(self, info, id, input, partner=None, lines=None, location=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-        update_lines = env['stock.move']
-
-        if partner:
-            if partner.id:
-                partner = PartnerUpdate().mutate(info, id=partner.id, input=partner)
-            else:
-                partner = PartnerCreate().mutate(info, input=partner)
-
-        if lines:
-            for line in lines:
-                if line.id:
-                    line = StockMoveUpdate().mutate(info, id=line.id, input=line)
-                else:
-                    line = StockMoveCreate().mutate(info, input=line)
-                update_lines += line
-
-        if location:
-            if location.id:
-                location = StockLocationUpdate().mutate(info, id=location.id, input=location)
-            else:
-                location = StockLocationCreate().mutate(info, input=location)
-
-        picking = lazy_update(env, "stock.picking", id, input)
-
-        if partner:
-            picking.partner_id = partner
-
-        if lines:
-            picking.move_ids_without_package = [(6, 0, update_lines.ids)]
-
-        if location:
-            picking.location_id = location
-
-        return picking
+        values = env['stock.picking']._prepare_mutation_values(**args)
+        picking = env['stock.picking'].search([('id', '=', id)])
+        return picking.write(values)
 
 
 class PickingDelete(graphene.Mutation):

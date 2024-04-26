@@ -1,36 +1,26 @@
 import graphene
 
-from odoo.addons.of_base_graphql.graphql.product_mutation import ProductCreate, ProductUpdate
 from odoo.addons.of_base_graphql.graphql.product_type import ProductInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .account_move_line_type import AccountMoveLine, AccountMoveLineCreateInput, AccountMoveLineUpdateInput
+from .account_move_line_type import AccountMoveLine
 
 
 class AccountMoveLineCreate(graphene.Mutation):
     _name = 'AccountMoveLineCreate'
 
     class Arguments:
-        input = AccountMoveLineCreateInput(required=True)
-        product = ProductInput()
+        name = graphene.String()
+        quantity = graphene.Int()
+        price_unit = graphene.Float()
+        product = graphene.Argument(ProductInput)
 
     Output = AccountMoveLine
 
-    def mutate(self, info, input, product=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        account_move_line = lazy_create(env, "account.move.line", input)
-
-        if product:
-            account_move_line.product_id = product
-
-        return account_move_line
+        value = env['account.move.line']._prepare_mutation(**args)
+        return env['account.move.line'].create(value)
 
 
 class AccountMoveLineUpdate(graphene.Mutation):
@@ -38,26 +28,18 @@ class AccountMoveLineUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = AccountMoveLineUpdateInput(required=True)
-        product = ProductInput()
+        name = graphene.String()
+        quantity = graphene.Int()
+        price_unit = graphene.Float()
+        product = graphene.Argument(ProductInput)
 
     Output = AccountMoveLine
 
-    def mutate(self, info, id, input, product=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        account_move_line = lazy_update(env, "account.move.line", id, input)
-
-        if product:
-            account_move_line.product_id = product
-
-        return account_move_line
+        values = env['account.move.line']._prepare_mutation_values(**args)
+        move_lines = env['account.move.line'].search([('id', '=', id)])
+        return move_lines.write(values)
 
 
 class AccountMoveLineDelete(graphene.Mutation):

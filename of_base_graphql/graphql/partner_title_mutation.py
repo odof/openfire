@@ -1,22 +1,23 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .partner_title_type import PartnerTitle, PartnerTitleCreateInput, PartnerTitleUpdateInput
+from .partner_title_type import PartnerTitle
 
 
 class PartnerTitleCreate(graphene.Mutation):
     _name = 'PartnerTitleCreate'
 
     class Arguments:
-        input = PartnerTitleCreateInput(required=True)
+        name = graphene.String()
+        of_used_for_phone = graphene.Boolean(name='usedForPhone')
 
     Output = PartnerTitle
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        return lazy_create(env, "res.partner.title", input)
+        values = env['res.partner.title']._prepare_mutation_values(**args)
+        return env['res.partner.title'].create(values)
 
 
 class PartnerTitleUpdate(graphene.Mutation):
@@ -24,14 +25,16 @@ class PartnerTitleUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = PartnerTitleUpdateInput(required=True)
+        name = graphene.String()
+        of_used_for_phone = graphene.Boolean(name='usedForPhone')
 
     Output = PartnerTitle
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        return lazy_update(env, "res.partner.title", id, input)
+        values = env['res.partner.title']._prepare_mutation_values(**args)
+        title = env['res.partner.title'].search([('id', '=', id)])
+        return title.write(values)
 
 
 class PartnerTitleDelete(graphene.Mutation):

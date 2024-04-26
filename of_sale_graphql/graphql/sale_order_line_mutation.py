@@ -1,53 +1,29 @@
 import graphene
 
-from odoo.addons.of_account_graphql.graphql.account_tax_mutation import AccountTaxCreate, AccountTaxUpdate
 from odoo.addons.of_account_graphql.graphql.account_tax_type import AccountTaxInput
-from odoo.addons.of_base_graphql.graphql.product_mutation import ProductCreate, ProductUpdate
 from odoo.addons.of_base_graphql.graphql.product_type import ProductInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .sale_order_line_type import SaleOrderLine, SaleOrderLineCreateInput, SaleOrderLineUpdateInput
+from .sale_order_line_type import SaleOrderLine
 
 
 class SaleOrderLineCreate(graphene.Mutation):
     _name = 'SaleOrderLineCreate'
 
     class Arguments:
-        input = SaleOrderLineCreateInput(required=True)
-        product = ProductInput()
+        name = graphene.String()
+        product_uom_qty = graphene.Float()
+        price_unit = graphene.Float()
+        price_subtotal = graphene.Float()
+        product = graphene.Argument(ProductInput)
         taxes = graphene.List(graphene.NonNull(AccountTaxInput))
 
     Output = SaleOrderLine
 
-    def mutate(self, info, input, product=None, taxes=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        create_taxes = env['account.tax']
-
-        if taxes:
-            for taxe in taxes:
-                if taxe.id:
-                    # on est sur une mise à jour
-                    taxe = AccountTaxUpdate().mutate(info, id=taxe.id, input=taxe)
-                else:
-                    taxe = AccountTaxCreate().mutate(info, input=taxe)
-                create_taxes += taxe
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        sale_order_line = lazy_create(env, "sale.order.line", input)
-
-        if product:
-            sale_order_line.product_id = product
-
-        if taxes:
-            sale_order_line.tax_id = [(6, 0, taxes.ids)]
-
-        return sale_order_line
+        values = env['sale.order.line']._prepare_mutation_values(**args)
+        return env['sale.order.line'].create(values)
 
 
 class SaleOrderLineUpdate(graphene.Mutation):
@@ -55,41 +31,20 @@ class SaleOrderLineUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = SaleOrderLineUpdateInput(required=True)
-        product = ProductInput()
+        name = graphene.String()
+        product_uom_qty = graphene.Float()
+        price_unit = graphene.Float()
+        price_subtotal = graphene.Float()
+        product = graphene.Argument(ProductInput)
         taxes = graphene.List(graphene.NonNull(AccountTaxInput))
 
     Output = SaleOrderLine
 
-    def mutate(self, info, id, input, product=None, taxes=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        update_taxes = env['account.tax']
-
-        if taxes:
-            for taxe in taxes:
-                if taxe.id:
-                    # on est sur une mise à jour
-                    taxe = AccountTaxUpdate().mutate(info, id=taxe.id, input=taxe)
-                else:
-                    taxe = AccountTaxCreate().mutate(info, input=taxe)
-                update_taxes += taxe
-
-        if product:
-            if product.id:
-                product = ProductUpdate().mutate(info, id=product.id, input=product)
-            else:
-                product = ProductCreate().mutate(info, input=product)
-
-        sale_order_line = lazy_update(env, "sale.order.line", id, input)
-
-        if product:
-            sale_order_line.product_id = product
-
-        if taxes:
-            sale_order_line.tax_id = [(6, 0, taxes.ids)]
-
-        return sale_order_line
+        values = env['sale.order.line']._prepare_mutation_values(**args)
+        line = env['sale.order.line'].search([('id', '=', id)])
+        return line.write(values)
 
 
 class SaleOrderLineDelete(graphene.Mutation):

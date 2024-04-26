@@ -4,7 +4,7 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .stock_warehouse_type import StockWarehouse
+from .stock_warehouse_type import StockWarehouse, StockWarehouseInput
 
 
 class StockLocation(OdooObjectType):
@@ -26,15 +26,8 @@ class StockLocationInput(graphene.InputObjectType):
 
     id = graphene.Int()
     name = graphene.String()
+    warehouse = graphene.Field(StockWarehouseInput)
 
 
 class StockLocationFilterInput(StockLocationInput):
     _name = 'StockLocationFilterInput'
-
-
-class StockLocationCreateInput(StockLocationInput):
-    _name = 'StockLocationCreateInput'
-
-
-class StockLocationUpdateInput(StockLocationInput):
-    _name = 'StockLocationUpdateInput'

@@ -3,10 +3,11 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_account_graphql.graphql.account_move_line_type import AccountMoveLine
-from odoo.addons.of_base_graphql.graphql.company_type import Company
-from odoo.addons.of_base_graphql.graphql.product_type import Product
-from odoo.addons.of_sale_graphql.graphql.sale_order_line_type import SaleOrderLine
+from odoo.addons.of_account_graphql.graphql.account_move_line_type import AccountMoveLine, AccountMoveLineInput
+from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
+from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInput
+from odoo.addons.of_graphql.graphql.company_type import Company
+from odoo.addons.of_sale_graphql.graphql.sale_order_line_type import SaleOrderLine, SaleOrderLineInput
 
 
 class ServiceRequestLine(OdooObjectType):
@@ -26,7 +27,7 @@ class ServiceRequestLine(OdooObjectType):
     invoice_status = graphene.String()
     qty_invoiced = graphene.Float()
     qty_invoiceable = graphene.Float()
-    invoice_line_ids = graphene.List(graphene.NonNull(AccountMoveLine))
+    invoice_line_ids = graphene.List(graphene.NonNull(AccountMoveLine), name='invoiceLines')
 
     @staticmethod
     def resolve_product(root, info):
@@ -55,15 +56,11 @@ class ServiceRequestLineInput(graphene.InputObjectType):
     invoice_status = graphene.String()
     qty_invoiced = graphene.Float()
     qty_invoiceable = graphene.Float()
+    product = graphene.Field(ProductInput)
+    order_line = graphene.Field(SaleOrderLineInput)
+    company = graphene.Field(CompanyInput)
+    invoice_lines = graphene.List(graphene.NonNull(AccountMoveLineInput))
 
 
 class ServiceRequestLineFilterInput(ServiceRequestLineInput):
     _name = 'ServiceRequestLineFilterInput'
-
-
-class ServiceRequestLineCreateInput(ServiceRequestLineInput):
-    _name = 'ServiceRequestLineCreateInput'
-
-
-class ServiceRequestLineUpdateInput(ServiceRequestLineInput):
-    _name = 'ServiceRequestLineUpdateInput'

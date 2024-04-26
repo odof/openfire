@@ -1,57 +1,27 @@
 import graphene
 
-from odoo.addons.of_account_graphql.graphql.account_fiscal_position_mutation import (
-    AccountFiscalPositionCreate,
-    AccountFiscalPositionUpdate,
-)
 from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import AccountFiscalPositionInput
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .planning_intervention_task_mutation import PlanningInterventionTaskCreate, PlanningInterventionTaskUpdate
 from .planning_intervention_task_type import PlanningInterventionTaskInput
-from .planning_intervention_template_type import (
-    PlanningInterventionTemplate,
-    PlanningInterventionTemplateCreateInput,
-    PlanningInterventionTemplateUpdateInput,
-)
+from .planning_intervention_template_type import PlanningInterventionTemplate
 
 
 class PlanningInterventionTemplateCreate(graphene.Mutation):
     _name = 'PlanningInterventionTemplateCreate'
 
     class Arguments:
-        input = PlanningInterventionTemplateCreateInput(required=True)
-        task = PlanningInterventionTaskInput()
-        fiscal_position = AccountFiscalPositionInput()
+        name = graphene.String()
+        is_default_template = graphene.Boolean()
+        task = graphene.Argument(PlanningInterventionTaskInput)
+        fiscal_position = graphene.Argument(AccountFiscalPositionInput)
 
     Output = PlanningInterventionTemplate
 
-    def mutate(self, info, input, task=None, fiscal_position=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        if task:
-            if task.id:
-                task = PlanningInterventionTaskUpdate().mutate(env, id=task.id, input=task)
-            else:
-                task = PlanningInterventionTaskCreate().mutate(env, input=task)
-
-        if fiscal_position:
-            if fiscal_position.id:
-                fiscal_position = AccountFiscalPositionUpdate().mutate(
-                    env, id=fiscal_position.id, input=fiscal_position
-                )
-            else:
-                fiscal_position = AccountFiscalPositionCreate().mutate(env, input=fiscal_position)
-
-        template = lazy_create(env, "of.planning.intervention.template", input)
-
-        if task:
-            template.task_id = task
-
-        if fiscal_position:
-            template.fiscal_position_id = fiscal_position
-
-        return template
+        values = env['of.planning.intervention.template']._prepare_mutation_values(**args)
+        return env['of.planning.intervention.template'].create(values)
 
 
 class PlanningInterventionTemplateUpdate(graphene.Mutation):
@@ -59,38 +29,18 @@ class PlanningInterventionTemplateUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = PlanningInterventionTemplateUpdateInput(required=True)
-        task = PlanningInterventionTaskInput()
-        fiscal_position = AccountFiscalPositionInput()
+        name = graphene.String()
+        is_default_template = graphene.Boolean()
+        task = graphene.Argument(PlanningInterventionTaskInput)
+        fiscal_position = graphene.Argument(AccountFiscalPositionInput)
 
     Output = PlanningInterventionTemplate
 
-    def mutate(self, info, id, input, task=None, fiscal_position=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        if task:
-            if task.id:
-                task = PlanningInterventionTaskUpdate().mutate(env, id=task.id, input=task)
-            else:
-                task = PlanningInterventionTaskCreate().mutate(env, input=task)
-
-        if fiscal_position:
-            if fiscal_position.id:
-                fiscal_position = AccountFiscalPositionUpdate().mutate(
-                    env, id=fiscal_position.id, input=fiscal_position
-                )
-            else:
-                fiscal_position = AccountFiscalPositionCreate().mutate(env, input=fiscal_position)
-
-        template = lazy_update(env, "of.planning.intervention.template", id, input)
-
-        if task:
-            template.task_id = task
-
-        if fiscal_position:
-            template.fiscal_position_id = fiscal_position
-
-        return template
+        values = env['of.planning.intervention.template']._prepare_mutation_values(**args)
+        template = env['of.planning.intervention.template'].search([('id', '=', id)])
+        return template.write(values)
 
 
 class PlanningInterventionTemplateDelete(graphene.Mutation):

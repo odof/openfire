@@ -2,6 +2,8 @@
 
 import logging
 
+import graphene
+
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
@@ -46,3 +48,42 @@ class OFGraphql(models.AbstractModel):
                 UserMutation,
             ],
         )
+
+    def _add_arguments(self, new_arguments, arguments):
+        for mutation in new_arguments.keys():
+            if mutation in arguments.keys():
+                for prop in arguments[mutation].keys():
+                    for new_prop in new_arguments[mutation].keys():
+                        if prop == new_prop:
+                            for arg in new_arguments[mutation][new_prop].keys():
+                                arguments[mutation][prop][arg] = graphene.Argument(
+                                    new_arguments[mutation][new_prop][arg]
+                                )
+            else:
+                arguments[mutation] = {}
+                for new_prop in new_arguments[mutation].keys():
+                    arguments[mutation][new_prop] = {}
+                    for arg in new_arguments[mutation][new_prop].keys():
+                        arguments[mutation][new_prop][arg] = graphene.Argument(new_arguments[mutation][new_prop][arg])
+        return arguments
+
+    def _prepare_arguments(self):
+        # To be super by other module
+        return {}
+
+    def _prepare_mutations(self, pool):
+        # on va chercher tous les arguments des modules installés
+        arguments = self._prepare_arguments()
+
+        # on patch les classes mutations avec ces arguments
+        for mutation in pool['mutation']:
+            if mutation._name in arguments.keys():
+                patch_arguments = arguments[mutation._name]
+                for prop in patch_arguments.keys():
+                    if hasattr(mutation, prop):
+                        to_patch = getattr(mutation, prop)
+                        to_patch.args.update(patch_arguments[prop])
+                    else:
+                        logger.error(
+                            f"La mutation {mutation} n'a pas la prop {prop}, elle ne peut donc pas être patchée"
+                        )

@@ -1,22 +1,30 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_base_graphql.graphql.product_template_type import ProductTemplateInput
+from odoo.addons.of_base_graphql.graphql.product_type import ProductInput
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
-from .product_brand_type import ProductBrand, ProductBrandCreateInput, ProductBrandUpdateInput
+from .product_brand_type import ProductBrand
 
 
 class ProductBrandCreate(graphene.Mutation):
     _name = 'ProductBrandCreate'
 
     class Arguments:
-        input = ProductBrandCreateInput(required=True)
+        name = graphene.String()
+        active = graphene.Boolean()
+        code = graphene.String()
+        use_prefix = graphene.Boolean()
+        supplier_delay = graphene.Int()
+        product_templates = graphene.List(graphene.NonNull(ProductTemplateInput))
+        products = graphene.List(graphene.NonNull(ProductInput))
 
     Output = ProductBrand
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        return lazy_create(env, 'of.product.brand', input)
+        values = env['of.product.brand']._prepare_mutation_values(**args)
+        return env['of.product.brand'].create(values)
 
 
 class ProductBrandUpdate(graphene.Mutation):
@@ -24,14 +32,21 @@ class ProductBrandUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = ProductBrandUpdateInput(required=True)
+        name = graphene.String()
+        active = graphene.Boolean()
+        code = graphene.String()
+        use_prefix = graphene.Boolean()
+        supplier_delay = graphene.Int()
+        product_templates = graphene.List(graphene.NonNull(ProductTemplateInput))
+        products = graphene.List(graphene.NonNull(ProductInput))
 
     Output = ProductBrand
 
-    def mutate(self, info, id, input):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        return lazy_update(env, 'of.product.brand', id, input)
+        values = env['of.product.brand']._prepare_mutation_values(**args)
+        brand = env['of.product.brand'].search([('id', '=', id)])
+        return brand.write(values)
 
 
 class ProductBrandDelete(graphene.Mutation):

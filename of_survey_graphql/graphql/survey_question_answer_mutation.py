@@ -1,6 +1,6 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
 from . import survey_question_answer_type
 
@@ -9,16 +9,17 @@ class SurveyQuestionAnswerCreate(graphene.Mutation):
     _name = 'SurveyQuestionAnswerCreate'
 
     class Arguments:
-        input = survey_question_answer_type.SurveyQuestionAnswerCreateInput(required=True)
+        value = graphene.String()
+        sequence = graphene.Int()
+        is_correct = graphene.Boolean()
+        is_default = graphene.Boolean()
 
     Output = survey_question_answer_type.SurveyQuestionAnswer
 
-    def mutate(self, info, input):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        survey_question_answer = lazy_create(env, 'of.survey.question.answer', input)
-
-        return survey_question_answer
+        values = env['of.survey.question.answer']._prepare_mutation_values(**args)
+        return env['of.survey.question.answer'].create(values)
 
 
 class SurveyQuestionAnswerUpdate(graphene.Mutation):
@@ -26,16 +27,18 @@ class SurveyQuestionAnswerUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = survey_question_answer_type.SurveyQuestionAnswerUpdateInput(required=True)
+        value = graphene.String()
+        sequence = graphene.Int()
+        is_correct = graphene.Boolean()
+        is_default = graphene.Boolean()
 
     Output = survey_question_answer_type.SurveyQuestionAnswer
 
-    def mutate(self, info, id, input, question=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        survey_question_answer = lazy_update(env, 'of.survey.question.answer', id, input)
-
-        return survey_question_answer
+        values = env['of.survey.question.answer']._prepare_mutation_values(**args)
+        answer = env['of.survey.question.answer'].search([('id', '=', id)])
+        return answer.write(values)
 
 
 class SurveyQuestionAnswerDelete(graphene.Mutation):

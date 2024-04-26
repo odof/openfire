@@ -1,44 +1,24 @@
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_create, lazy_delete, lazy_update
-from odoo.addons.of_service_graphql.graphql.service_request_stage_mutation import (
-    ServiceRequestStageCreate,
-    ServiceRequestStageUpdate,
-)
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
 from .service_request_stage_type import ServiceRequestStageInput
-from .service_request_type_type import ServiceRequestType, ServiceRequestTypeCreateInput, ServiceRequestTypeUpdateInput
+from .service_request_type_type import ServiceRequestType
 
 
 class ServiceRequestTypeCreate(graphene.Mutation):
     _name = 'ServiceRequestTypeCreate'
 
     class Arguments:
-        input = ServiceRequestTypeCreateInput(required=True)
+        name = graphene.String()
         stages = graphene.List(graphene.NonNull(ServiceRequestStageInput))
 
     Output = ServiceRequestType
 
-    def mutate(self, info, input, stages=None):
+    def mutate(self, info, **args):
         env = info.context["env"]
-
-        create_stages = env['of.service.request.stage']
-
-        if stages:
-            for stage in stages:
-                if stage.id:
-                    # on est sur une mise à jour
-                    stage = ServiceRequestStageUpdate().mutate(info, id=stage.id, input=stage)
-                else:
-                    stage = ServiceRequestStageCreate().mutate(info, input=stage)
-                create_stages += stage
-
-        service_request_type = lazy_create(env, 'of.service.request.type', input)
-
-        if create_stages:
-            service_request_type.stage_ids = [(6, 0, create_stages.ids)]
-
-        return service_request_type
+        values = env['of.service.request.type']._prepare_mutation_values(**args)
+        return env['of.service.request.type'].create(values)
 
 
 class ServiceRequestTypeUpdate(graphene.Mutation):
@@ -46,31 +26,16 @@ class ServiceRequestTypeUpdate(graphene.Mutation):
 
     class Arguments:
         id = graphene.Int(required=True)
-        input = ServiceRequestTypeUpdateInput(required=True)
+        name = graphene.String()
         stages = graphene.List(graphene.NonNull(ServiceRequestStageInput))
 
     Output = ServiceRequestType
 
-    def mutate(self, info, id, input, stages=None):
+    def mutate(self, info, id, **args):
         env = info.context["env"]
-
-        create_stages = env['of.service.request.stage']
-
-        if stages:
-            for stage in stages:
-                if stage.id:
-                    # on est sur une mise à jour
-                    stage = ServiceRequestStageUpdate().mutate(info, id=stage.id, input=stage)
-                else:
-                    stage = ServiceRequestStageCreate().mutate(info, input=stage)
-                create_stages += stage
-
-        service_request_type = lazy_update(env, 'of.service.request.type', id, input)
-
-        if create_stages:
-            service_request_type.stage_ids = [(6, 0, create_stages.ids)]
-
-        return service_request_type
+        values = env['of.service.request.type']._prepare_mutation_values(**args)
+        request_type = env['of.service.request.type'].search([('id', '=', id)])
+        return request_type.write(values)
 
 
 class ServiceRequestTypeDelete(graphene.Mutation):

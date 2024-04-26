@@ -21,13 +21,5 @@ class ProductCategoryInput(graphene.InputObjectType):
     name = graphene.String()
 
 
-class ProductCategoryUpdateInput(ProductCategoryInput):
-    _name = 'ProductCategoryUpdateInput'
-
-
-class ProductCategoryCreateInput(ProductCategoryInput):
-    _name = 'ProductCategoryCreateInput'
-
-
 class ProductCategoryFilterInput(ProductCategoryInput):
     _name = 'ProductCategoryFilterInput'

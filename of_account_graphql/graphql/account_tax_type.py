@@ -32,11 +32,3 @@ class AccountTaxInput(graphene.InputObjectType):
 
 class AccountTaxFilterInput(AccountTaxInput):
     _name = 'AccountFilterInput'
-
-
-class AccountTaxCreateInput(AccountTaxInput):
-    _name = 'AccountCreateInput'
-
-
-class AccountTaxUpdateInput(AccountTaxInput):
-    _name = 'AccountUpdateInput'
