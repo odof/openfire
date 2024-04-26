@@ -14,6 +14,7 @@ Module OpenFire extension de UTM Odoo
  - Ajout du champ medium_id et sequence dans utm.source
 """,
     'depends' : [
+        'sales_team',
         'utm',
     ],
     'data' : [
