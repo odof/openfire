@@ -15,7 +15,7 @@
                     <span>Remplir le compte analytique de la commande avec celui du client, si il existe.</span>
                     <br/>
                     <span>Configurer un couple (nom, code) pour générer automatiquement un compte analytique selon ce modèle, laisser vide sinon.</span>
-                    <field name="of_analytique_code"/>
+                    <field name="of_analytique_code" attrs="{'required': [('of_compte_analytique', '=', True)]}"/>
                 </div>
             </xpath>
         </field>
