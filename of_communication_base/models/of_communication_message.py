@@ -1,10 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from odoo import api, exceptions, fields, models
 from odoo.exceptions import ValidationError
 
 
 class OfCommunication(models.Model):
-    _name = 'communication'
+    _name = 'of.communication'
     _inherit = 'mail.thread'
     _description = 'Message object, which contains all the variables'
     _order = 'date desc'
@@ -55,32 +56,32 @@ class OfCommunication(models.Model):
         required=True,
         help="Content of the message notification. The maximum number of characters is 280",
     )
-    message = fields.Html(string="Message", default="", help="Content of the message")
+    message = fields.Html(string="Message", help="Content of the message")
 
-    def action_publish(self):
+    def of_action_publish(self):
         for record in self:
             if record.state in ['published', 'edit', 'canceled']:
                 raise exceptions.UserError("You can only publish message in 'Draft' state.")
             record.state = 'published'
 
-    def action_all_publish(self):
+    def of_action_all_publish(self):
         for record in self:
             if record.state in ['draft', 'edit']:
                 record.state = 'published'
 
-    def action_edit(self):
+    def of_action_edit(self):
         for record in self:
             if record.state not in ['published']:
                 raise exceptions.UserError("You can only edit message in 'Published' state.")
             record.state = 'edit'
 
-    def action_publish_edit(self):
+    def of_action_publish_edit(self):
         for record in self:
             if record.state in ['published', 'canceled']:
                 raise exceptions.UserError("You can only publish message in 'Edit' state.")
             record.state = 'published'
 
-    def action_cancel(self):
+    def of_action_cancel(self):
         for record in self:
             if record.state in ['published']:
                 raise exceptions.UserError('You can only cancel message in \'Draft\' state.')

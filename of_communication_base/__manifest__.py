@@ -16,8 +16,8 @@
     'data': [
         'security/ir.model.access.csv',
 
-        'views/of_communication_menus.xml',
         'views/of_communication_views.xml',
+        'views/of_communication_menus.xml',
     ],
     'installable': True,
     'application': False,
