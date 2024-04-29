@@ -56,10 +56,10 @@ class CalendarEvent(models.Model):
 
         # Les données qui viennent de cet input (dans datas) doivent être modifiées avant d'être
         # importé dans odoo, donc on convertit à la volée
-        if attachment := input.get("customer_signature", False):
+        if attachment := args.get("customer_signature", False):
             mutation['of_customer_signature'] = convertImage(attachment)
 
-        if attachment := input.get("operator_signature", False):
+        if attachment := args.get("operator_signature", False):
             mutation['of_operator_signature'] = convertImage(attachment)
 
         if args.get('origin', False) == "MOBILE":

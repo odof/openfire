@@ -34,7 +34,8 @@ class PartnerTitleUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['res.partner.title']._prepare_mutation_values(**args)
         title = env['res.partner.title'].search([('id', '=', id)])
-        return title.write(values)
+        title.write(values)
+        return title
 
 
 class PartnerTitleDelete(graphene.Mutation):

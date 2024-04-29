@@ -40,7 +40,8 @@ class AccountPaymentUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['account.payment']._prepare_mutation_values(**args)
         account_payment = env['account.payment'].search([('id', '=', id)])
-        return account_payment.write(values)
+        account_payment.write(values)
+        return account_payment
 
 
 class AccountPaymentDelete(graphene.Mutation):

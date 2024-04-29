@@ -35,7 +35,8 @@ class StockWarehouseUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['stock.warehouse']._prepare_mutation_values(**args)
         warehouse = env['stock.warehouse'].search([('id', '=', id)])
-        return warehouse.write(values)
+        warehouse.write(values)
+        return warehouse
 
 
 class StockWarehouseDelete(graphene.Mutation):

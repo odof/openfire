@@ -38,7 +38,8 @@ class StockMoveUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['stock.move']._prepare_mutation_values(**args)
         move = env['stock.move'].search([('id', '=', id)])
-        return move.write(values)
+        move.write(values)
+        return move
 
 
 class StockMoveDelete(graphene.Mutation):

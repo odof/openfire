@@ -44,7 +44,8 @@ class SurveyUserInputLineUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.survey.user_input.line']._prepare_mutation_values(**args)
         user_input_line = env['of.survey.user_input.line'].search([('id', '=', id)])
-        return user_input_line.write(values)
+        user_input_line.write(values)
+        return user_input_line
 
 
 class SurveyUserInputLineDelete(graphene.Mutation):

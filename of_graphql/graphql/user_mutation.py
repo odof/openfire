@@ -30,7 +30,8 @@ class UserUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['res.users']._prepare_mutation_values(**args)
         user = env['res.users'].search([('id', '=', id)])
-        return user.write(values)
+        user.write(values)
+        return user
 
 
 class UserMutation(graphene.ObjectType):

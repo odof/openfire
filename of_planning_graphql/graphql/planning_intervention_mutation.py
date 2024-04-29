@@ -107,7 +107,8 @@ class PlanningInterventionUpdate(graphene.Mutation):
             args['origin'] = 'WEB'
         values = env['calendar.event']._prepare_mutation_values(**args)
         intervention = env['calendar.event'].search([('id', '=', id)])
-        return intervention.write(values)
+        intervention.write(values)
+        return intervention
 
 
 class PlanningInterventionDelete(graphene.Mutation):

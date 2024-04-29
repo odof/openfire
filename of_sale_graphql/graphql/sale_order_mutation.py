@@ -42,7 +42,8 @@ class SaleOrderUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['sale.order']._prepare_mutation_values(**args)
         order = env['sale.order'].search([('id', '=', id)])
-        return order.write(values)
+        order.write(values)
+        return order
 
 
 class SaleOrderDelete(graphene.Mutation):

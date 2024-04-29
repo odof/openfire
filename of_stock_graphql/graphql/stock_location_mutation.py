@@ -35,7 +35,8 @@ class StockLocationUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['stock.location']._prepare_mutation_values(**args)
         location = env['stock.location'].search([('id', '=', id)])
-        return location.write(values)
+        location.write(values)
+        return location
 
 
 class StockLocationDelete(graphene.Mutation):

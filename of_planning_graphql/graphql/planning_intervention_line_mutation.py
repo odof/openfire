@@ -48,7 +48,8 @@ class PlanningInterventionLineUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.planning.intervention.line']._prepare_mutation_values(**args)
         intervention = env['of.planning.intervention.line'].search([('id', '=', id)])
-        return intervention.write(values)
+        intervention.write(values)
+        return intervention
 
 
 class PlanningInterventionLineDelete(graphene.Mutation):

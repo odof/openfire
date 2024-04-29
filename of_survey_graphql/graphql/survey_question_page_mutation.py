@@ -40,7 +40,8 @@ class SurveyConditionalQuestionUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.survey.conditional.question']._prepare_mutation_values(**args)
         conditional_question = env['of.survey.conditional.question'].search([('id', '=', id)])
-        return conditional_question.write(values)
+        conditional_question.write(values)
+        return conditional_question
 
 
 class SurveyConditionalQuestionDelete(graphene.Mutation):

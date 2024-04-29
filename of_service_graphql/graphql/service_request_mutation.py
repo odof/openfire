@@ -104,7 +104,8 @@ class ServiceRequestUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.service.request']._prepare_mutation_values(**args)
         service_request = env['of.service.request'].search([('id', '=', id)])
-        return service_request.write(values)
+        service_request.write(values)
+        return service_request
 
 
 class ServiceRequestDelete(graphene.Mutation):

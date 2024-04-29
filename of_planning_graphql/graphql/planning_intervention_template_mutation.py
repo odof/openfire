@@ -40,7 +40,8 @@ class PlanningInterventionTemplateUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.planning.intervention.template']._prepare_mutation_values(**args)
         template = env['of.planning.intervention.template'].search([('id', '=', id)])
-        return template.write(values)
+        template.write(values)
+        return template
 
 
 class PlanningInterventionTemplateDelete(graphene.Mutation):

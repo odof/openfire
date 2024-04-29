@@ -80,7 +80,8 @@ class EquipmentUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.equipment']._prepare_mutation_values(**args)
         equipment = env['of.equipment'].search([('id', '=', id)])
-        return equipment.write(values)
+        equipment.write(values)
+        return equipment
 
 
 class EquipmentDelete(graphene.Mutation):

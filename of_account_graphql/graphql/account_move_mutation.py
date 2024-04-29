@@ -41,7 +41,8 @@ class AccountMoveUpdate(graphene.Mutation):
         env = info.context["env"]
         value = env['account.move']._prepare_mutation(**args)
         account_move = env['account.move'].search([('id', '=', id)])
-        return account_move.write(value)
+        account_move.write(value)
+        return account_move
 
 
 class AccountMoveDelete(graphene.Mutation):
