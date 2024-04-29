@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="of_communication_base.Notification" owl="1">
+        <div t-if="state.visible" t-att-class="props.style + '-notification ' + 'alert-' + props.type + ' ' + state.animationClass" t-att-message-id="props.message_id">
+            <div t-att-class="props.style + '-header'">
+                <div t-att-class="props.style + '-content'">
+                    <div>
+                        <t t-att-class="props.style + '-text'" t-raw="props.message_is_html ? props.message : _.escape(props.message)"/>
+                    </div>
+                </div>
+                <div t-if="props.is_preview" t-att-class="props.style + '-action'">
+                    <div t-att-class="'see_more ' + props.style + '-text'">
+                        <button t-if="props.message_content" t-att-class="'btn btn-info ' + 'btn-see_more-' + props.type" t-on-click="closePreviewNotification" t-esc="props.button_see_more_label"></button>
+                    </div>
+                    <div t-att-class="'see_later ' + props.style + '-text'">
+                        <button t-att-class="'btn btn-outline-info ' + 'btn-see_later-' + props.type" t-on-click="closePreviewNotification" t-esc="props.button_see_later_label"></button>
+                    </div>
+                </div>
+                <div t-else=""  t-att-class="props.style + '-action'">
+                    <div t-att-class="'see_more ' + props.style + '-text'">
+                        <button t-if="props.message_content" t-att-class="'btn btn-info ' + 'btn-see_more-' + props.type" t-on-click="closeNotificationSeeMore" t-esc="props.button_see_more_label"></button>
+                    </div>
+                    <div t-att-class="'see_later ' + props.style + '-text'">
+                        <button t-att-class="'btn btn-outline-info ' + 'btn-see_later-' + props.type" t-on-click="closeNotificationSeeLater" t-esc="props.button_see_later_label"></button>
+                    </div>
+                </div>
+            </div>
+            <div t-if="props.is_preview" t-att-class="props.style + '-close'">
+                <button t-att-class="'btn btn-link close ' + 'btn-close-' + props.type" t-on-click="closePreviewNotification">×</button>
+            </div>
+            <div t-else="" t-att-class="props.style + '-close'">
+                <button t-att-class="'btn btn-link close ' + 'btn-close-' + props.type" t-on-click="closeNotification">×</button>
+            </div>
+        </div>
+        <t t-if="!props.is_preview and state.show">
+            <div class="background-message-content">
+                <div class="message-content-box">
+                    <div class="header-message">
+                        <h1><t t-esc="props.title"></t></h1>
+                        <button t-on-click="hide">×</button>
+                    </div>
+                    <div class="info-message">
+                        <div class="date-message">
+                            <p>Creation date : <t t-esc="props.date"></t></p>
+                            <p t-if="props.end_message">Post end date : <t t-esc="props.end_message"></t></p>
+                        </div>
+                        <div class="type-message'">
+                            <p>Message Type : <t t-esc="props.message_type"></t></p>
+                        </div>
+                    </div>
+                    <div class="body-message">
+                        <div class="message">
+                            <p class="message-summary">Summary : <t t-esc="props.summary"></t></p>
+                            <p t-if="props.message_content" class="message-message">
+                                Message : <br/>
+                                <div class="message-content">
+                                    <p t-out="state.message_content"/>
+                                </div>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+</templates>

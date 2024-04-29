@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_communication_delay_end_scheduled" model="ir.config_parameter">
+        <field name="key">of_communication.of_communication_delay_end_scheduled</field>
+        <field name="value">10</field>
+    </record>
+
+    <record id="of_communication_delay_recall_notification" model="ir.config_parameter">
+        <field name="key">of_communication.of_communication_delay_recall_notification</field>
+        <field name="value">1</field>
+    </record>
+
+</odoo>

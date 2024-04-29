@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="group_of_internal_message" model="res.groups">
+        <field name="name">(OF) Display a view to see messages internally</field>
+        <field name="comment">Allows you to see a message from the company</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_of_sender_internal_message" model="res.groups">
+        <field name="name">(OF) Display a view to create messages and send them internally</field>
+        <field name="comment">Allows you to create a message and send it to other customers of the company</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

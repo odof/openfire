@@ -1,0 +1,236 @@
+/* Root Containers */
+.banner-notification-root,
+.pop-up-notification-root {
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+}
+
+.pop-up-notification-root {
+    position: fixed;
+    top: 90px;
+    right: 20px;
+    z-index: 1055; /* We base this on the z-index of the notification: Connection lost. Attempting to reconnect...*/
+}
+
+/* Banner Notifications */
+.banner-notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+    min-height: 45px;
+    font-size: 15px;
+    margin-bottom: 2px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.banner-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.banner-header div {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+.banner-content {
+    width: fit-content;
+    max-width: 75%;
+}
+
+.banner-content div {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.banner-action {
+    white-space: nowrap;
+}
+
+.banner-action div {
+    display: inline-block;
+}
+
+.banner-close .close {
+    font-size: 1.5em;
+}
+
+/* Pop-up Notifications */
+.pop-up-notification {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 380px;
+    padding: 15px;
+    font-size: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.pop-up-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.pop-up-action {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.pop-up-action div {
+    margin-right: 20px;
+}
+
+.pop-up-close .close {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+/* General Styles */
+strong {
+    font-weight: bold;
+}
+
+button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    cursor: pointer;
+    outline: none;
+    color: inherit;
+    font: inherit;
+}
+
+/* Button Info */
+
+.btn-see_more-info {
+    background-color: #0e616e;
+    border-color: #0e616e;
+}
+
+.btn-see_more-info:hover {
+    background-color: #0b4e58;
+    border-color: #0b4e58;
+}
+
+.btn-see_later-info {
+    color: #0e616e;
+    border-color: #0e616e;
+}
+
+.btn-see_later-info:hover {
+    background-color: #0e616e;
+    border-color: #0e616e;
+}
+
+.btn-close-info {
+    color: #0e616e;
+}
+
+.btn-close-info:hover {
+    color: #0b4e58;
+}
+
+/* Button Warning */
+
+.btn-see_more-warning {
+    background-color: #856404;
+    border-color: #856404;
+}
+
+.btn-see_more-warning:hover {
+    background-color: #6a5003;
+    border-color: #6a5003;
+}
+
+.btn-see_later-warning {
+    color: #856404;
+    border-color: #856404;
+}
+
+.btn-see_later-warning:hover {
+    background-color: #856404;
+    border-color: #856404;
+}
+
+.btn-close-warning {
+    color: #856404;
+}
+
+.btn-close-warning:hover {
+    color: #6a5003;
+}
+
+/* Button Danger */
+
+.btn-see_more-danger {
+    background-color: #721c24;
+    border-color: #721c24;
+}
+
+.btn-see_more-danger:hover {
+    background-color: #5b161d;
+    border-color: #5b161d;
+}
+
+.btn-see_later-danger {
+    color: #721c24;
+    border-color: #721c24;
+}
+
+.btn-see_later-danger:hover {
+    background-color: #721c24;
+    border-color: #721c24;
+}
+
+.btn-close-danger {
+    color: #721c24;
+}
+
+.btn-close-danger:hover {
+    color: #5b161d;
+}
+
+/* Animations */
+.slide-in {
+    animation: slideIn 0.5s forwards;
+}
+
+.slide-out {
+    animation: slideOut 0.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+

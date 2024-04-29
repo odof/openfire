@@ -1,0 +1,104 @@
+/* Grey Background */
+.banner-notification-root > .background-message-content,
+.pop-up-notification-root > .background-message-content {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.5);
+    z-index: 999;
+}
+
+/* Message */
+.banner-notification-root > .background-message-content .message-content-box,
+.pop-up-notification-root > .background-message-content .message-content-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 1200px;
+    max-height: 70%;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .header-message,
+.pop-up-notification-root > .background-message-content .message-content-box .header-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    background-color: #ffffff;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .header-message p,
+.pop-up-notification-root > .background-message-content .message-content-box .header-message p {
+    margin: 0;
+    font-weight: bold;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .header-message button,
+.pop-up-notification-root > .background-message-content .message-content-box .header-message button {
+    margin: 0;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .info-message,
+.pop-up-notification-root > .background-message-content .message-content-box .info-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 10px;
+    font-size: 1.5em;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .date-message,
+.pop-up-notification-root > .background-message-content .message-content-box .date-message {
+    flex: 1;
+    text-align: left;
+    margin-right: 50px;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .type-message,
+.pop-up-notification-root > .background-message-content .message-content-box .type-message {
+    flex: 1;
+    text-align: right;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .body-message,
+.pop-up-notification-root > .background-message-content .message-content-box .body-message {
+    margin-top: 10px;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .message,
+.pop-up-notification-root > .background-message-content .message-content-box .message {
+    line-height: 1.5;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .body-message .message-summary,
+.pop-up-notification-root > .background-message-content .message-content-box .body-message .message-summary{
+    font-size: 1.3em;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .body-message .message-message,
+.pop-up-notification-root > .background-message-content .message-content-box .body-message .message-message{
+    font-size: 1.3em;
+}
+
+.banner-notification-root > .background-message-content .message-content-box .body-message .message-content,
+.pop-up-notification-root > .background-message-content .message-content-box .body-message .message-content{
+    font-size: 0.9em;
+    margin-top: 10px;
+    overflow-y: auto;
+    max-height: calc(70vh - 200px);
+}

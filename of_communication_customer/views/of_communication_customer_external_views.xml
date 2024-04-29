@@ -1,0 +1,122 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_communication_customer_external_message_tree_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message Tree</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_external_message_tree_views"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='message_style']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="export_xlsx">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_external_message_form_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message form</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_external_message_form_views"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='start_scheduled_publication']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='is_sending_notification']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_publish']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_publish_edit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_edit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_cancel']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='message_style']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='message']" position="replace">
+                <field name="message" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')], 'invisible': [('message', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='end_message']" position="replace">
+                <field name="end_message" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')], 'invisible': [('end_message', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_external_message_search" model="ir.ui.view">
+        <field name="name">Communication Customer Message Search</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_external_message_search"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_draft']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_published']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_canceled']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_active']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_group_state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_group_massage_style']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_banner']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_pop_up']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_communication_external_action" model="ir.actions.act_window">
+        <field name="name">Communication Customer External</field>
+        <field name="res_model">of.communication</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_communication_customer_external_message_search"/>
+        <field name="domain">[('is_internal', '=', False)]</field>
+    </record>
+
+    <record id="of_communication_external_action_view_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_communication_customer_external_message_tree_views"/>
+        <field name="act_window_id" ref="of_communication_external_action"/>
+    </record>
+
+    <record id="of_communication_external_action_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_communication_customer_external_message_form_views"/>
+        <field name="act_window_id" ref="of_communication_external_action"/>
+    </record>
+
+</odoo>

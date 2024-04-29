@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_communication_internal_sender_message_tree_views" model="ir.ui.view">
+        <field name="name">Communication Internal Sender Message Tree</field>
+        <field name="model">of.communication</field>
+        <field name="groups_id" eval="[(4, ref('group_of_sender_internal_message'))]"/>
+        <field name="arch" type="xml">
+            <tree string="Tree Message">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="message_type" optional="show"/>
+                <field name="message_style" optional="show"/>
+                <field name="summary" optional="show"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_communication_internal_sender_message_form_views" model="ir.ui.view">
+        <field name="name">Communication Internal Sender Message Form</field>
+        <field name="model">of.communication</field>
+        <field name="groups_id" eval="[(4, ref('group_of_sender_internal_message'))]"/>
+        <field name="arch" type="xml">
+            <form string="Form Message">
+                <header>
+                    <button name="action_button_publish" string="Publish" class="btn-primary" type="object" states="draft"/>
+                    <button name="action_button_publish_edit" string="Publish the Edit" class="btn-primary" type="object" states="in_edition"/>
+                    <button name="action_button_preview" string="Preview" class="btn-secondary" type="object" states="draft,in_edition"/>
+                    <button name="action_button_edit" string="Edit" class="btn-secondary" type="object" states="published,canceled"/>
+                    <button name="action_button_cancel" string="Cancel" class="btn-secondary" type="object" states="draft,in_edition"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date" readonly="1"/>
+                            <field name="message_type"/>
+                            <field name="message_style"/>
+                        </group>
+                        <group>
+                            <field name="start_scheduled_publication"/>
+                            <field name="end_scheduled_publication"/>
+                            <field name="end_message"/>
+                            <field name="is_sending_notification" attrs="{'invisible': ['|', ('state', '=', 'draft'), ('state', '=', 'canceled')]}"/>
+                        </group>
+                        <notebook>
+                            <page string="Message">
+                                <group>
+                                    <field name="summary"/>
+                                    <field name="message"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_communication_internal_sender_message_search" model="ir.ui.view">
+        <field name="name">Communication Internal Sender Message Search</field>
+        <field name="model">of.communication</field>
+        <field name="groups_id" eval="[(4, ref('group_of_sender_internal_message'))]"/>
+        <field name="arch" type="xml">
+            <search string="Search Message">
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_published" string="Published" domain="['|',('state', '=', 'published'),('state','=','edit')]"/>
+                <filter name="filter_canceled" string="Canceled" domain="[('state', '=', 'canceled')]"/>
+                <filter name="filter_active" string="Archived" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter name="filter_informative_message" string="Informative Message" domain="[('message_type', '=', 'informative_message')]"/>
+                <filter name="filter_patch_note" string="Patch Note" domain="[('message_type', '=', 'patch_note')]"/>
+                <filter name="filter_non-critical_alert_message" string="Non-Critical Alert Message" domain="[('message_type', '=', 'non-critical_alert_message')]"/>
+                <filter name="filter_critical_alert_message" string="Critical Alert Message" domain="[('message_type', '=', 'critical_alert_message')]"/>
+                <separator/>
+                <filter name="filter_banner" string="Banner" domain="[('message_style', '=', 'banner')]"/>
+                <filter name="filter_pop_up" string="Pop Up" domain="[('message_style', '=', 'pop-up')]"/>
+                <group>
+                    <filter name="filter_group_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="filter_group_message_type" string="Type" context="{'group_by': 'message_type'}"/>
+                    <filter name="filter_group_massage_style" string="Style" context="{'group_by': 'message_style'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_communication_internal_sender_action" model="ir.actions.act_window">
+        <field name="name">Communication Internal Sender</field>
+        <field name="res_model">of.communication</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_communication_internal_sender_message_search"/>
+        <field name="groups_id" eval="[(4, ref('group_of_sender_internal_message'))]"/>
+        <field name="domain">[('is_internal', '=', True)]</field>
+        <field name="context">{'default_is_internal': True}</field>
+    </record>
+
+    <record id="of_communication_internal_sender_message_action_tree_views" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_communication_internal_sender_message_tree_views"/>
+        <field name="act_window_id" ref="of_communication_internal_sender_action"/>
+    </record>
+
+    <record id="of_communication_internal_sender_message_action_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_communication_internal_sender_message_form_views"/>
+        <field name="act_window_id" ref="of_communication_internal_sender_action"/>
+    </record>
+
+</odoo>
