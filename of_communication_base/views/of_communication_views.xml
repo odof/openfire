@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_communication_message_tree_views" model="ir.ui.view">
+        <field name="name">Communication Message Tree</field>
+        <field name="model">of.communication</field>
+        <field name="arch" type="xml">
+            <tree string="Tree Message">
+                <field name="id"/>
+                <field name="date"/>
+                <field name="name"/>
+                <field name="message_type"/>
+                <field name="summary" optional="show"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_communication_message_form_views" model="ir.ui.view">
+        <field name="name">Communication Message Form</field>
+        <field name="model">of.communication</field>
+        <field name="arch" type="xml">
+            <form string="Form Message">
+                <header>
+                    <button name="action_button_publish" string="Publish" class="btn-primary" type="object" states="draft"/>
+                    <button name="action_button_publish_edit" string="Publish the Edit" class="btn-primary" type="object" states="edit"/>
+                    <button name="action_button_edit" string="Edit" class="btn-secondary" type="object" states="published, canceled"/>
+                    <button name="action_button_cancel" string="Cancel" class="btn-secondary" type="object" states="draft"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="date" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="message_type" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                        </group>
+                        <group>
+                            <field name="start_scheduled_publication" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="end_scheduled_publication" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                        </group>
+                        <notebook>
+                            <page string="Message">
+                                <group>
+                                    <field name="summary" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                                    <field name="message" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_communication_message_search" model="ir.ui.view">
+        <field name="name">Communication Message Search</field>
+        <field name="model">of.communication</field>
+        <field name="arch" type="xml">
+            <search string="Search Message">
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_published" string="Published" domain="['|',('state', '=', 'published'),('state','=','edit')]"/>
+                <filter name="filter_canceled" string="Canceled" domain="[('state', '=', 'canceled')]"/>
+                <filter name="filter_active" string="Archived" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter name="filter_informative_message" string="Informative Message" domain="[('message_type', '=', 'informative_message')]"/>
+                <filter name="filter_patch_note" string="Patch Note" domain="[('message_type', '=', 'patch_note')]"/>
+                <filter name="filter_non-critical_alert_message" string="Non-Critical Alert Message" domain="[('message_type', '=', 'non-critical_alert_message')]"/>
+                <filter name="filter_critical_alert_message" string="Critical Alert Message" domain="[('message_type', '=', 'critical_alert_message')]"/>
+                <group>
+                    <filter name="filter_group_message_type" string="Type" context="{'group_by': 'message_type'}"/>
+                    <filter name="filter_group_state" string="State" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_communication_action" model="ir.actions.act_window">
+        <field name="name">Communication OpenFire</field>
+        <field name="res_model">of.communication</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="of_communication_action_publish_all" model="ir.actions.server">
+        <field name="name">Publish</field>
+        <field name="model_id" ref="model_of_communication"/>
+        <field name="binding_model_id" ref="of_communication_base.model_of_communication"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_all_publish()</field>
+    </record>
+
+</odoo>
