@@ -21,7 +21,7 @@ class Equipment(OdooObjectType):
     id = graphene.Int(required=True)
     name = graphene.String()
     warranty_type = graphene.String()
-    state = graphene.String()
+    state = graphene.NonNull(graphene.String)
     model_name = graphene.String()
     installation_type = graphene.String()
     is_compliant = graphene.Boolean()

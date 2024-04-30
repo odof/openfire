@@ -65,6 +65,7 @@ class CalendarEvent(models.Model):
             elif interv.of_partner_id:
                 interventions = interv.of_partner_id.of_intervention_partner_ids
             else:
+                interv.of_historical_ids = False
                 continue
 
             interv.of_historical_ids = interventions.filtered(
@@ -82,6 +83,7 @@ class CalendarEvent(models.Model):
             elif interv.of_partner_id:
                 interventions = interv.of_partner_id.of_intervention_partner_ids
             else:
+                interv.of_coming_ids = False
                 continue
 
             interv.of_coming_ids = interventions.filtered(
