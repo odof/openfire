@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_communication_customer_message_tree_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message Tree</field>
+        <field name="model">of.communication.customer</field>
+        <field name="arch" type="xml">
+            <tree string="Tree Message" create="false" delete="false" export_xlsx="false">
+                <field name="date"/>
+                <field name="name"/>
+                <field name="type"/>
+                <field name="summary" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_message_form_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message Form</field>
+        <field name="model">of.communication.customer</field>
+        <field name="arch" type="xml">
+            <form string="Form Message" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <!-- pk pas mettre la datte de début de publication plutôt -->
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="type"/>
+                            <field name="end_scheduled_publication"/>
+                        </group>
+                        <notebook>
+                            <page string="Message">
+                                <group>
+                                    <field name="summary"/>
+                                    <field name="message"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_message_search" model="ir.ui.view">
+        <field name="name">Communication Customer Message Search</field>
+        <field name="model">of.communication.customer</field>
+        <field name="arch" type="xml">
+            <search string="Search Message">
+                <filter name="communication_message_filter_group_type" string="Type" context="{'group_by': 'type'}"/>
+                <filter name="communication_message_filter_informative_message" string="Informative Message" domain="[('type', '=', 'informative_message')]"/>
+                <filter name="communication_message_filter_patch_note" string="Patch Note" domain="[('type', '=', 'patch_note')]"/>
+                <filter name="communication_message_filter_non-critical_alert_message" string="Non-Critical Alert Message" domain="[('type', '=', 'non-critical_alert_message')]"/>
+                <filter name="communication_message_filter_critical_alert_message" string="Critical Alert Message" domain="[('type', '=', 'critical_alert_message')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_action" model="ir.actions.act_window">
+        <field name="name">Communication Customer OpenFire</field>
+        <field name="res_model">of.communication.customer</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

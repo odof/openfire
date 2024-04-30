@@ -38,6 +38,7 @@ msgstr "Annuler"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__canceled
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__canceled
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Canceled"
 msgstr "Annulé"
@@ -46,7 +47,7 @@ msgstr "Annulé"
 #: model:ir.actions.act_window,name:of_communication_base.of_communication_action
 #: model:ir.ui.menu,name:of_communication_base.menu_of_communication
 msgid "Communication OpenFire"
-msgstr "Communication OpenFire"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__message
@@ -57,7 +58,9 @@ msgstr "Contenu du message"
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__summary
 msgid ""
 "Content of the message notification. The maximum number of characters is 280"
-msgstr "Contenu de la notification du message. Le nombre maximum de caractères est de 280"
+msgstr ""
+"Contenu de la notification du message. Le nombre maximum de caractères est "
+"de 280"
 
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__create_uid
@@ -78,7 +81,7 @@ msgstr "Message d'alerte critique"
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__date
 msgid "Date"
-msgstr "Date"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__display_name
@@ -87,12 +90,14 @@ msgstr "Afficher un nom"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__draft
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__draft
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Draft"
 msgstr "Brouillon"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__edit
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__edit
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_form_views
 msgid "Edit"
 msgstr "Modifier"
@@ -125,7 +130,7 @@ msgstr "A un message"
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__message_needaction
@@ -172,7 +177,7 @@ msgstr "Pièce jointe principale"
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_form_views
 msgid "Message"
-msgstr "Message"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_has_error
@@ -187,7 +192,7 @@ msgstr "Objet de message, qui contient toutes les variables"
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_ids
 msgid "Messages"
-msgstr "Messages"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_type__non-critical_alert_message
@@ -239,6 +244,7 @@ msgstr "Publier la modification"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__published
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__published
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Published"
 msgstr "Publié"

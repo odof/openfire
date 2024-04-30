@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <menuitem id="menu_of_communication_customer" name="Communication Customer OpenFire" action="of_communication_customer_action" sequence="12"/>
+
+</odoo>
