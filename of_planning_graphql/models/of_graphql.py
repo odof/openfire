@@ -1,10 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import graphene
+
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.employee_type import Employee, EmployeeFilterInput
+from ..graphql.image_type import Image
 from ..graphql.planning_intervention_line_type import PlanningInterventionLine, PlanningInterventionLineInput
 from ..graphql.planning_intervention_mutation import PlanningInterventionMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery
@@ -37,6 +40,7 @@ class OFGraphql(models.AbstractModel):
             [
                 Employee,
                 EmployeeFilterInput,
+                Image,
                 PlanningInterventionTaskQuery,
                 PlanningInterventionTask,
                 PlanningInterventionTaskFilterInput,
@@ -58,3 +62,24 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionLineInput,
             ],
         )
+
+    def _prepare_arguments(self):
+        arguments = super()._prepare_arguments()
+
+        new_arguments = {
+            "ImageMutation": {
+                "image_create": {
+                    "intervention": PlanningInterventionInput,
+                    "intervention_date": graphene.DateTime(),
+                    "intervention_status": graphene.String(),
+                },
+                "image_update": {
+                    "intervention": PlanningInterventionInput,
+                    "intervention_date": graphene.DateTime(),
+                    "intervention_status": graphene.String(),
+                },
+            }
+        }
+        arguments = self._add_arguments(new_arguments, arguments)
+
+        return arguments
