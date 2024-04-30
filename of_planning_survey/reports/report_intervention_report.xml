@@ -20,7 +20,7 @@
                                             <strong t-field="answer.question_id.title" />
                                             <span t-if="not answer.question_id.is_page"> : <span t-field="answer.answers" /></span>
                                             <div class="row mt-2">
-                                                <t t-foreach="answer.images" t-as="image">
+                                                <t t-foreach="answer.image_ids" t-as="image">
                                                     <div class="col-3">
                                                         <div class="d-flex">
                                                             <div class="mx-auto">

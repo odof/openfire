@@ -257,20 +257,15 @@ odoo.define("of_survey.form", function (require) {
                 );
 
                 this.$("a.delete").on("click", function () {
-                    var id = self.$("a.delete").attr("id");
-                    self.images[this.current_question_id].splice(id, 1);
-                    $(`.form_images_${this.current_question_id}`).html(
+                    var id = $(this).find("i").attr("id");
+                    self.images[self.current_question_id].splice(id, 1);
+                    $(`.form_images_${self.current_question_id}`).html(
                         qweb.render("of_survey.form_images", {
-                            images: self.images[this.current_question_id],
+                            images: self.images[self.current_question_id],
                         })
                     );
-                    var $input = this.$(
-                        `input[ref="attachment_${this.current_question_id}"]`
-                    );
-                    $input.attr(
-                        "data-oe-data",
-                        JSON.stringify(self.images[this.current_question_id])
-                    );
+                    var $input = $(`input[ref="attachment_${self.current_question_id}"]`);
+                    $input.attr("data-oe-data", JSON.stringify(self.images[self.current_question_id]));
                 });
 
                 this.$("a.edit").on("click", function () {

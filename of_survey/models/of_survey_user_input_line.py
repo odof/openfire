@@ -87,7 +87,7 @@ class OFSurveyUserInputLine(models.Model):
             else:  # skipped
                 field_name = False
 
-            if field_name and not line[field_name]:
+            if field_name and field_name not in line._fields:
                 raise ValidationError(_("The answer must be in the right type"))
 
     @api.model_create_multi
