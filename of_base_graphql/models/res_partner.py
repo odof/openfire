@@ -15,7 +15,6 @@ class ResPartner(models.Model):
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
-        logger.info(args)
         if name := args.get('name'):
             mutation['name'] = name
 

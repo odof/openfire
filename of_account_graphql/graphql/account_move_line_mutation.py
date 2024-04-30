@@ -39,7 +39,8 @@ class AccountMoveLineUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['account.move.line']._prepare_mutation_values(**args)
         move_lines = env['account.move.line'].search([('id', '=', id)])
-        return move_lines.write(values)
+        move_lines.write(values)
+        return move_lines
 
 
 class AccountMoveLineDelete(graphene.Mutation):

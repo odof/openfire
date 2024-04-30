@@ -32,7 +32,8 @@ class AccountFiscalPositionUpdate(graphene.Mutation):
         env = info.context["env"]
         value = env['account.fiscal.position']._prepare_mutation_values(**args)
         fiscal_position = env['account.fiscal.position'].search([('id', '=', id)])
-        return fiscal_position.write(value)
+        fiscal_position.write(value)
+        return fiscal_position
 
 
 class AccountFiscalPositionDelete(graphene.Mutation):

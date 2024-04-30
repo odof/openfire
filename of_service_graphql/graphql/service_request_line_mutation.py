@@ -59,8 +59,9 @@ class ServiceRequestLineUpdate(graphene.Mutation):
     def mutate(self, info, id, **args):
         env = info.context["env"]
         values = env['of.service.request.line']._prepare_mutation_values(**args)
-        service_request = env['of.service.request.line'].search([('id', '=', id)])
-        return service_request.write(values)
+        service_request_line = env['of.service.request.line'].search([('id', '=', id)])
+        service_request_line.write(values)
+        return service_request_line
 
 
 class ServiceRequestLineDelete(graphene.Mutation):

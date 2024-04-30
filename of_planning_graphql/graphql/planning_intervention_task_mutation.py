@@ -36,7 +36,8 @@ class PlanningInterventionTaskUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.planning.task']._prepare_mutation_values(**args)
         task = env['of.planning.task'].search([('id', '=', id)])
-        return task.write(values)
+        task.write(values)
+        return task
 
 
 class PlanningInterventionTaskDelete(graphene.Mutation):

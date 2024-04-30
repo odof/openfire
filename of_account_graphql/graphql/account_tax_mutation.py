@@ -37,7 +37,8 @@ class AccountTaxUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['account.tax']._prepare_mutation_values(**args)
         account_tax = env['account.tax'].search([('id', '=', id)])
-        return account_tax.write(values)
+        account_tax.write(values)
+        return account_tax
 
 
 class AccountTaxDelete(graphene.Mutation):

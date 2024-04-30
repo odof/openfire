@@ -41,7 +41,8 @@ class PlanningInterventionTagUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.planning.tag']._prepare_mutation_values(**args)
         planning_tag = env['of.planning.tag'].search([('id', '=', id)])
-        return planning_tag.write(values)
+        planning_tag.write(values)
+        return planning_tag
 
 
 class PlanningInterventionTagDelete(graphene.Mutation):

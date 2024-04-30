@@ -50,9 +50,7 @@ def x2many(self, model, input, default={}, keep=False):
     # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
     obj = self.env[model]
     res = []
-    if not keep:
-        res.append(Command.clear())
-    logger.info(input)
+
     if type(input) is dict:
         input = [input]
 
@@ -65,9 +63,16 @@ def x2many(self, model, input, default={}, keep=False):
             if not obj.search([('id', '=', record.id)]):
                 raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
 
-            res.append(Command.update(record.id, record_value))
+            record = obj.search([('id', '=', record.id)])
+            record.write(record_value)
+            if not keep:
+                res.append(Command.set([record.id]))
         else:
-            res.append(Command.create(record_value))
+            if keep:
+                res.append(Command.create(record_value))
+            else:
+                record = obj.create(record_value)
+                res.append(Command.set([record.id]))
     return res
 
 
@@ -130,7 +135,6 @@ class OdooGraphql:
     @classmethod
     def schema(cls, dbname):
         class_query = False
-        logger.info(cls.pool[dbname])
         if cls.pool[dbname]['schema']:
             return cls.pool[dbname]['schema']
 

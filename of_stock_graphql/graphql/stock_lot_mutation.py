@@ -32,7 +32,8 @@ class StockLotUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['stock.lot']._prepare_mutation_values(**args)
         lot = env['stock.lot'].search([('id', '=', id)])
-        return lot.write(values)
+        lot.write(values)
+        return lot
 
 
 class StockLotDelete(graphene.Mutation):

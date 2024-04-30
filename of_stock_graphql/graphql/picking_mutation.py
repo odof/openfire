@@ -41,7 +41,8 @@ class PickingUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['stock.picking']._prepare_mutation_values(**args)
         picking = env['stock.picking'].search([('id', '=', id)])
-        return picking.write(values)
+        picking.write(values)
+        return picking
 
 
 class PickingDelete(graphene.Mutation):
