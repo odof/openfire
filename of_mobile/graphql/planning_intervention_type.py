@@ -15,7 +15,7 @@ class PlanningIntervention(OdooObjectType):
     equipments = graphene.NonNull(graphene.List(graphene.NonNull(Equipment)))
     historical = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
-    of_survey_user_input = graphene.Field(SurveyUserInput, name='surveyUserInput')
+    survey_user_input = graphene.Field(SurveyUserInput)
 
     @staticmethod
     def resolve_update_date(root, info):
@@ -32,6 +32,10 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_comings(root, info):
         return root.of_coming_ids or []
+
+    @staticmethod
+    def resolve_survey_user_input(root, info):
+        return root.of_survey_user_input or None
 
 
 class PlanningInterventionsOffline(graphene.ObjectType):
