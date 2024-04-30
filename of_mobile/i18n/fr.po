@@ -10,10 +10,12 @@ msgstr ""
 "PO-Revision-Date: 2024-05-17 10:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
+"X-Generator: Poedit 3.0.1\n"
 
 #. module: of_mobile
 #. odoo-python
@@ -110,12 +112,8 @@ msgstr "Définit si les DI sont publiées automatiquement ou manuellement."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
-msgid ""
-"Define the maximum number of attachments which can be synchronized for an "
-"intervention."
-msgstr ""
-"Définir le nombre maximum de pièces jointes qui peuvent être synchronisées "
-"par intervention."
+msgid "Define the maximum number of attachments which can be synchronized for an intervention."
+msgstr "Définir le nombre maximum de pièces jointes qui peuvent être synchronisées par intervention."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
@@ -124,36 +122,25 @@ msgstr "Définir la résolution maximale des images synchronisées."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
-msgid ""
-"Define the maximum size of an attachment which can be synchronized in "
-"megabytes."
-msgstr ""
-"Définir la taille maximum d'une pièce jointe pour être synchronisée. (En "
-"mégaoctet)"
+msgid "Define the maximum size of an attachment which can be synchronized in megabytes."
+msgstr "Définir la taille maximum d'une pièce jointe pour être synchronisée. (En mégaoctet)"
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid ""
-"Define the number of days before and after the intervention date when the "
-"technician can modify the intervention."
-msgstr ""
-"Définir le nombre de jour avant et après la date de l'intervention où le "
-"technicien peut éditer l'intervention."
+"Define the number of days before and after the intervention date when the technician can modify the intervention."
+msgstr "Définir le nombre de jour avant et après la date de l'intervention où le technicien peut éditer l'intervention."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Define the number of month of synchronized history. Maximum 24 months."
-msgstr ""
-"Définir le nombre maximum d'historique qui seront remontés. Maximum 24 mois."
+msgstr "Définir le nombre maximum d'historique qui seront remontés. Maximum 24 mois."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
-msgid ""
-"Define the planning period available on mobile. 30 days max before and 60 "
-"days max after the current date."
+msgid "Define the planning period available on mobile. 30 days max before and 60 days max after the current date."
 msgstr ""
-"Définir la période de planning synchronisée sur le mobile. Maximum 30 jour "
-"avant la date courante et 60 jours après."
+"Définir la période de planning synchronisée sur le mobile. Maximum 30 jour avant la date courante et 60 jours après."
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
@@ -169,6 +156,11 @@ msgstr "Nom affiché"
 #: model:ir.model,name:of_mobile.model_hr_employee
 msgid "Employee"
 msgstr "Employé"
+
+#. module: of_mobile
+#: model:of.planning.intervention.section,name:of_mobile.of_planning_intervention_section_equipment
+msgid "Equipement"
+msgstr "Équipement"
 
 #. module: of_mobile
 #: model:ir.model,name:of_mobile.model_of_equipment
@@ -237,6 +229,7 @@ msgid "Manual dispatch from Mobile"
 msgstr "Envoi manuel depuis l'intervention mobile"
 
 #. module: of_mobile
+
 #: model:ir.model.fields.selection,name:of_mobile.selection__of_connector_config_settings__of_mobile_meeting_timesheet__manual
 #: model:ir.model.fields.selection,name:of_mobile.selection__res_config_settings__of_mobile_meeting_timesheet__manual
 msgid "Manual tracking"
@@ -427,6 +420,7 @@ msgid "Send report"
 msgstr "Envoyer rapport"
 
 #. module: of_mobile
+
 #: model:ir.model,name:of_mobile.model_of_service_request
 msgid "Service Request"
 msgstr "Demande d'intervention"
@@ -476,7 +470,11 @@ msgid "Transfer"
 msgstr "Transfert"
 
 #. module: of_mobile
+<<<<<<< HEAD
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__ttype
+=======
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__type
+>>>>>>> 0a2d9883 (of_mobile: T15621 - [IMP] Choix de l'affichage des sections sur le mobile)
 msgid "Type"
 msgstr ""
 
@@ -489,12 +487,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/of_mobile/models/of_planning_task.py:0
 #, python-format
-msgid ""
-"You cannot unpublish this task, as the associated intervention templates are"
-" published."
-msgstr ""
-"Vous ne pouvez pas dépublié cette tâche car les modèle d'intervention "
-"associés sont publiés."
+msgid "You cannot unpublish this task, as the associated intervention templates are published."
+msgstr "Vous ne pouvez pas dépublié cette tâche car les modèle d'intervention associés sont publiés."
 
 #. module: of_mobile
 #: model:ir.model,name:of_mobile.model_of_graphql

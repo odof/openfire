@@ -23,4 +23,5 @@ class PlanningInterventionSectionQuery(graphene.ObjectType):
     def resolve_planning_intervention_sections(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context["env"]
         odoo_domain = env['of.planning.intervention.section']._prepare_graphql_domain(select=select, domain=domain)
+
         return env['of.planning.intervention.section'].search(odoo_domain, offset=offset, limit=limit)
