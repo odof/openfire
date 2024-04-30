@@ -6,6 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 from odoo.addons.of_equipment_graphql.graphql.equipment_type import Equipment
 from odoo.addons.of_survey_graphql.graphql.survey_user_input_type import SurveyUserInput
 
+from .planning_intervention_section_type import PlanningInterventionSection
+
 
 class PlanningIntervention(OdooObjectType):
     _name = 'PlanningIntervention'
@@ -16,6 +18,9 @@ class PlanningIntervention(OdooObjectType):
     historical = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     of_survey_user_input = graphene.Field(SurveyUserInput, name='surveyUserInput')
+    of_section_to_display_ids = graphene.NonNull(
+        graphene.List(graphene.NonNull(lambda: PlanningInterventionSection)), name='sections'
+    )
 
     @staticmethod
     def resolve_update_date(root, info):
@@ -32,6 +37,10 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_comings(root, info):
         return root.of_coming_ids or []
+
+    @staticmethod
+    def resolve_sections(root, info):
+        return root.of_section_to_display_ids or []
 
 
 class PlanningInterventionsOffline(graphene.ObjectType):
