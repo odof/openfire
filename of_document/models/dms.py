@@ -2,11 +2,14 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import itertools
-import unidecode
 from collections import defaultdict
+from string import ascii_lowercase
 
-from odoo import models, fields, api, SUPERUSER_ID
+import unidecode
+
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import ValidationError
+
 from odoo.addons.muk_dms.models import dms_base
 
 
@@ -75,11 +78,14 @@ class Directory(dms_base.DMSModel):
         :return: Sous dossier du partenaire
         """
         default_settings = self.env.ref('of_document.default_settings')
-        data = default_settings.of_subdirectory_ids.search([('data_ids', 'in', categ.ids)], limit=1)
-        object_dir = self.search([
-            ('name', '=', data.name),
-            ('parent_directory', '=', partner_dir.id),
-        ], limit=1)
+        data = default_settings.of_subdirectory_ids.filtered(lambda d: categ in d.datas_ids)[:1]
+        object_dir = self.search(
+            [
+                ('name', '=', data.name),
+                ('parent_directory', '=', partner_dir.id),
+            ],
+            limit=1
+        )
         if not object_dir:
             # Create object directory
             object_dir = self.sudo().create({
@@ -95,74 +101,195 @@ class File(dms_base.DMSModel):
 
     @api.model
     def _init_files(self):
+        cr = self.env.cr
         default_settings = self.env.ref('of_document.default_settings')
         data_ids = default_settings.of_subdirectory_ids.mapped('data_ids')
         dms_dir_obj = self.env['muk_dms.directory']
-        ir_attachment_obj = self.env['ir.attachment']
-        for partner in self.env['res.partner'].search([]):
-            objects = [('of_document.res_partner_file_category', partner)]
-            for obj_name in ('sale.order', 'purchase.order', 'crm.lead', 'project.issue', 'of.service',
-                             'of.planning.intervention'):
-                objects.append((
-                    'of_document.%s_file_category' % obj_name.replace('.', '_'),
-                    self.env[obj_name].search([('partner_id', '=', partner.id)])))
-            objects.append(('of_document.account_invoice_out_file_category',
-                            self.env['account.invoice'].search([('partner_id', '=', partner.id),
-                                                                ('type', 'in', ('out_invoice', 'out_refund'))])))
-            objects.append(('of_document.account_invoice_in_file_category',
-                            self.env['account.invoice'].search([('partner_id', '=', partner.id),
-                                                                ('type', 'in', ('in_invoice', 'in_refund'))])))
-            objects.append(('of_document.stock_picking_out_file_category',
-                            self.env['stock.picking'].search([('partner_id', '=', partner.id),
-                                                              ('picking_type_id.code', '=', 'outgoing')])))
-            objects.append(('of_document.stock_picking_in_file_category',
-                            self.env['stock.picking'].search([('partner_id', '=', partner.id),
-                                                              ('picking_type_id.code', '=', 'incoming')])))
 
-            partner_dir = False
-            for categ, obj in objects:
-                attachments = ir_attachment_obj.search([('res_model', '=', obj._name), ('res_id', 'in', obj.ids)])
-                if not attachments:
-                    continue
+        def create_muk_directory(parent_dir_id, name, partner_id):
+            cr.execute(
+                """
+                INSERT INTO muk_dms_directory (
+                    create_uid,
+                    create_date,
+                    name,
+                    of_partner_id,
+                    parent_directory
+                )
+                VALUES (
+                    1,
+                    NOW(),
+                    %s,
+                    %s,
+                    %s
+                )
+                RETURNING id
+                """,
+                (name, partner_id, parent_dir_id)
+            )
+            return cr.fetchone()[0]
 
-                if not partner_dir:
-                    partner_dir = dms_dir_obj.of_get_partner_directory(partner)
+        partner_dir_dict = {
+            c: self.env.ref('of_document.' + c + '_partner_directory')
+            for c in ascii_lowercase
+        }
+        partner_default_dir = self.env.ref('of_document.other_partner_directory')
+        partner_query = """
+            SELECT p.id, cp.id, cp.name, p.id, a.id, a.name, a.file_size, a.mimetype
+            FROM ir_attachment AS a
+            INNER JOIN res_partner AS p ON p.id = a.res_id
+            INNER JOIN res_partner AS cp ON cp.id = p.commercial_partner_id
+            WHERE a.res_model = 'res.partner' AND a.res_field IS NULL AND p.name IS NOT NULL AND p.name != ''
+            ORDER BY cp.id, res_id
+        """
+        object_query = """
+            SELECT p.id, cp.id, cp.name, tab.id, a.id, a.name, a.file_size, a.mimetype
+            FROM ir_attachment AS a
+            INNER JOIN %s AS tab ON tab.id = a.res_id
+            INNER JOIN res_partner AS p ON p.id = tab.partner_id
+            INNER JOIN res_partner AS cp ON cp.id = p.commercial_partner_id
+            WHERE a.res_model = '%s' AND a.res_field IS NULL AND p.name IS NOT NULL AND p.name != '' %s
+            ORDER BY cp.id, p.id
+        """
+        picking_type_in_ids = self.env['stock.picking.type'].search([('code', '=', 'incoming')]).ids
+        picking_type_out_ids = self.env['stock.picking.type'].search([('code', '=', 'outgoing')]).ids
+        objects = [
+            ('of_document.res_partner_file_category', 'res.partner', ""),
+            (
+                'of_document.account_invoice_out_file_category',
+                'account.invoice',
+                "AND tab.type IN ('out_invoice', 'out_refund')",
+            ),
+            (
+                'of_document.account_invoice_in_file_category',
+                'account.invoice',
+                "AND tab.type IN ('in_invoice', 'in_refund')",
+            ),
+            (
+                'of_document.stock_picking_out_file_category',
+                'stock.picking',
+                "AND picking_type_id IN " + str(tuple(picking_type_out_ids)),
+            ),
+            (
+                'of_document.stock_picking_in_file_category',
+                'stock.picking',
+                "AND picking_type_id IN " + str(tuple(picking_type_in_ids)),
+            ),
+        ]
 
-                categ = self.env.ref(categ)
-                object_dir = False
-                if categ in data_ids:
-                    try:
-                        object_dir = dms_dir_obj.of_get_object_directory(partner_dir, categ)
-                    except Exception:
-                        continue
+        for obj_name in (
+            'sale.order', 'purchase.order', 'crm.lead', 'project.issue', 'of.service', 'of.planning.intervention'
+        ):
+            objects.append((
+                'of_document.%s_file_category' % obj_name.replace('.', '_'),
+                obj_name,
+                "",
+            ))
 
-                for attachment in attachments:
-                    att = self.search([
-                        ('of_related_model', '=', obj._name),
-                        ('of_related_id', '=', attachment.res_id),
-                        ('of_attachment_id', '=', attachment.id),
-                        ('of_attachment_partner_id', '=', partner.id),
-                    ], limit=1)
-                    if not att:
-                        self.create({
-                            'name': attachment.name,
-                            'directory': object_dir.id if object_dir else partner_dir.id,
-                            'of_file_type': 'related',
-                            'of_related_model': obj._name,
-                            'of_related_id': attachment.res_id,
-                            'of_attachment_id': attachment.id,
-                            'of_attachment_partner_id': partner.id,
-                            'size': attachment.file_size,
-                            'of_category_id': categ.id
-                        })
-                    else:
-                        att.write({
-                            'name': attachment.name,
-                            'directory': object_dir.id if object_dir else partner_dir.id,
-                            'of_file_type': 'related',
-                            'size': attachment.file_size,
-                            'of_category_id': categ.id
-                        })
+        for categ, obj_name, where_query in objects:
+            categ = self.env.ref(categ)
+            categ_dir_name = False
+            if categ in data_ids:
+                categ_dir_name = default_settings.of_subdirectory_ids.filtered(lambda d: categ in d.data_ids)[:1].name
+            if obj_name == 'res.partner':
+                query = partner_query
+            else:
+                query = object_query % (self.env[obj_name]._table, obj_name, where_query)
+            cr.execute(query)
+            prev_partner_id = False
+
+            for (
+                partner_id, top_partner_id, top_partner_name, res_id, attachment_id, attachment_name, file_size,
+                mimetype
+            ) in cr.fetchall():
+                if top_partner_id != prev_partner_id:
+                    # Récupération ou création du répertoire muk
+                    prev_partner_id = top_partner_id
+                    partner_dir_id = dms_dir_obj.search([('of_partner_id', '=', top_partner_id)], limit=1).id
+                    if not partner_dir_id:
+                        partner_first_char = top_partner_name and top_partner_name[0].lower()
+                        parent_dir = partner_dir_dict.get(partner_first_char, partner_default_dir)
+                        partner_dir_id = create_muk_directory(parent_dir.id, top_partner_name, top_partner_id)
+
+                    categ_dir_id = False
+                    if categ_dir_name:
+                        # Récupération ou création de sous-répertoire muk
+                        categ_dir_id = dms_dir_obj.search(
+                            [('name', '=', categ_dir_name), ('parent_directory', '=', partner_dir_id)],
+                            limit=1
+                        ).id
+                        if not categ_dir_id:
+                            categ_dir_id = create_muk_directory(partner_dir_id, categ_dir_name, None)
+
+                muk_file = self.search(
+                    [
+                        ('of_related_model', '=', obj_name),
+                        ('of_related_id', '=', res_id),
+                        ('of_attachment_id', '=', attachment_id),
+                        ('of_attachment_partner_id', '=', partner_id),
+                    ], limit=1
+                )
+                if not muk_file:
+                    cr.execute(
+                        """
+                        INSERT INTO muk_dms_file (
+                            create_uid,
+                            create_date,
+                            name,
+                            directory,
+                            of_file_type,
+                            of_related_model,
+                            of_related_id,
+                            of_attachment_id,
+                            of_attachment_partner_id,
+                            size,
+                            mimetype,
+                            of_category_id
+                        )
+                        VALUES (
+                            1,
+                            NOW(),
+                            %s,  -- name
+                            %s,  -- directory
+                            'related',
+                            %s,  -- of_related_model
+                            %s,  -- of_related_id
+                            %s,  -- of_attachment_id
+                            %s,  -- of_attachment_partner_id
+                            %s,  -- size
+                            %s,  -- mimetype
+                            %s   -- of_category_id
+                        )
+                        """, (
+                            attachment_name,
+                            categ_dir_id or partner_dir_id,
+                            obj_name,
+                            res_id,
+                            attachment_id,
+                            partner_id,
+                            file_size,
+                            mimetype,
+                            categ.id,
+                        ))
+                else:
+                    cr.execute(
+                        """
+                        UPDATE muk_dms_file SET
+                            name = %s,
+                            directory = %s,
+                            of_file_type = 'related',
+                            size = %s,
+                            of_cateogory_id = %s
+                        WHERE id = %s
+                        """, (
+                            attachment_name,
+                            categ_dir_id or partner_dir_id,
+                            file_size,
+                            categ.id,
+                            muk_file.id
+                        )
+                    )
+        dms_dir_obj._parent_store_compute()
 
     of_file_type = fields.Selection(
         selection=[('normal', u"Fichier normal"), ('related', u"Fichier lié")], string=u"Type de fichier",
