@@ -1,8 +1,9 @@
 ========================
 OF Company communication
-======================== 
+========================
 
 Module de gestion des message entre base 
+Module parent (pour les bases mère) 
 
 Information sur le module
 #########################

@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_communication_customer_message_tree_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message Tree</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_message_tree_views"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+                <attribute name="export_xlsx">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_message_form_views" model="ir.ui.view">
+        <field name="name">Communication Customer Message form</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_message_form_views"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='start_scheduled_publication']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_publish']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_publish_edit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_edit']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_button_cancel']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">false</attribute>
+                <attribute name="delete">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_communication_customer_message_search" model="ir.ui.view">
+        <field name="name">Communication Customer Message Search</field>
+        <field name="model">of.communication</field>
+        <field name="inherit_id" ref="of_communication_base.of_communication_message_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='filter_draft']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_published']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_canceled']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_active']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='filter_group_state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
