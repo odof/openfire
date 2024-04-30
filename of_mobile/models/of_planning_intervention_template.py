@@ -1,14 +1,25 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import _, fields, models
+from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 
 
 class OFPlanningInterventionTemplate(models.Model):
     _inherit = 'of.planning.intervention.template'
 
+    @api.model
+    def _default_section_to_display_ids(self):
+        section_to_display_ids = self.env['of.planning.intervention.section'].search([])
+        return [Command.link(section_to_display.id) for section_to_display in section_to_display_ids]
+
     mobile = fields.Boolean(string="Mobile Intervention Template")
+    section_to_display_ids = fields.Many2many(
+        comodel_name='of.planning.intervention.section',
+        relation='of_planning_intervention_template_section_rel',
+        string="Sections to display on the intervention",
+        default=lambda r: r._default_section_to_display_ids(),
+    )
 
     def write(self, vals):
         res = super().write(vals)
