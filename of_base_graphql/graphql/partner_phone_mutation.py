@@ -37,7 +37,8 @@ class PartnerPhoneUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.res.partner.phone']._prepare_mutation_values(**args)
         phone = env['of.res.partner.phone'].search([('id', '=', id)])
-        return phone.write(values)
+        phone.write(values)
+        return phone
 
 
 class PartnerPhoneDelete(graphene.Mutation):

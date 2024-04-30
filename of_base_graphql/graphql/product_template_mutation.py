@@ -34,7 +34,8 @@ class ProductTemplateUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['product.template']._prepare_mutation_values(**args)
         product = env['product.template'].search([('id', '=', id)])
-        return product.write(values)
+        product.write(values)
+        return product
 
 
 class ProductTemplateDelete(graphene.Mutation):

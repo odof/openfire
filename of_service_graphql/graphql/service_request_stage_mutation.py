@@ -32,7 +32,8 @@ class ServiceRequestStageUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.service.request.stage']._prepare_mutation_values(**args)
         request_stage = env['of.service.request.stage'].search([('id', '=', id)])
-        return request_stage.write(values)
+        request_stage.write(values)
+        return request_stage
 
 
 class ServiceRequestStageDelete(graphene.Mutation):

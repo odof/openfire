@@ -38,7 +38,8 @@ class EmployeeUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['hr.employee']._prepare_mutation_values(**args)
         employee = env['hr.employee'].search([('id', '=', id)])
-        return employee.write(values)
+        employee.write(values)
+        return employee
 
 
 class EmployeeDelete(graphene.Mutation):

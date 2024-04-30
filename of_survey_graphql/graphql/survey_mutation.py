@@ -38,7 +38,8 @@ class SurveyUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.survey.survey']._prepare_mutation_values(**args)
         survey = env['of.survey.survey'].search([('id', '=', id)])
-        return survey.write(values)
+        survey.write(values)
+        return survey
 
 
 class SurveyDelete(graphene.Mutation):

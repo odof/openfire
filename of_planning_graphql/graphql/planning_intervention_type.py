@@ -124,19 +124,18 @@ class PlanningInterventionInput(graphene.InputObjectType):
 
     employees = graphene.List(
         graphene.NonNull(EmployeeInput),
-        required=True,
         description="Liste des intervenants sur l'intervention",
     )
 
-    company = graphene.Field(CompanyInput, required=True)
+    company = graphene.Field(CompanyInput)
     pickings = graphene.List(graphene.NonNull(PickingInput))
     order = graphene.List(graphene.NonNull(SaleOrderInput))
-    task = graphene.Field(PlanningInterventionTaskInput, required=True)
+    task = graphene.Field(PlanningInterventionTaskInput)
     partner = graphene.Field(PartnerInput, description="Client de l'intervention")
     address = graphene.Field(PartnerInput, description="Adresse de l'intervention")
     attachments = graphene.List(graphene.NonNull(AttachmentInput))
     template = graphene.Field(PlanningInterventionTemplateInput)
-    tags = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTagInput)))
+    tags = graphene.List(graphene.NonNull(PlanningInterventionTagInput))
     invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
     fiscal_position = graphene.Field(AccountFiscalPositionInput)
 

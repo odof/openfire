@@ -46,7 +46,8 @@ class ProductBrandUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.product.brand']._prepare_mutation_values(**args)
         brand = env['of.product.brand'].search([('id', '=', id)])
-        return brand.write(values)
+        brand.write(values)
+        return brand
 
 
 class ProductBrandDelete(graphene.Mutation):

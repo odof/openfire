@@ -49,7 +49,8 @@ class AttachmentUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['ir.attachment']._prepare_mutation_values(**args)
         attachment = env['ir.attachment'].search([('id', '=', id)])
-        return attachment.write(values)
+        attachment.write(values)
+        return attachment
 
 
 class AttachmentMutation(graphene.ObjectType):

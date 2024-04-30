@@ -32,7 +32,8 @@ class ProductCategoryUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['product.category']._prepare_mutation_values(**args)
         category = env['product.category'].search([('id', '=', id)])
-        return category.write(values)
+        category.write(values)
+        return category
 
 
 class ProductCategoryDelete(graphene.Mutation):

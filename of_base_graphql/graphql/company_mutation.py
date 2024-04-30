@@ -30,7 +30,8 @@ class CompanyUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['res.company']._prepare_mutation_values(**args)
         company = env['res.company'].search([('id', '=', id)])
-        return company.write(values)
+        company.write(values)
+        return company
 
 
 class CompanyMutation(graphene.ObjectType):

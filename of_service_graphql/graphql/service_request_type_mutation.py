@@ -35,7 +35,8 @@ class ServiceRequestTypeUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['of.service.request.type']._prepare_mutation_values(**args)
         request_type = env['of.service.request.type'].search([('id', '=', id)])
-        return request_type.write(values)
+        request_type.write(values)
+        return request_type
 
 
 class ServiceRequestTypeDelete(graphene.Mutation):

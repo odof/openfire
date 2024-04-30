@@ -68,7 +68,8 @@ class PartnerUpdate(graphene.Mutation):
         env = info.context["env"]
         values = env['res.partner']._prepare_mutation_values(**args)
         partner = env['res.partner'].search([('id', '=', id)])
-        return partner.write(values)
+        partner.write(values)
+        return partner
 
 
 class PartnerDelete(graphene.Mutation):

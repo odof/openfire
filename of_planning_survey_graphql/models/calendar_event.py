@@ -2,7 +2,7 @@
 
 from odoo import api, models
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
+from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
 
 
 class CalendarEvent(models.Model):
@@ -14,5 +14,8 @@ class CalendarEvent(models.Model):
 
         if survey := args.get('survey'):
             mutation['of_survey_id'] = many2one(self=self, model='of.survey.survey', input=survey)
+
+        if user_inputs := args.get('user_inputs'):
+            mutation['of_survey_user_input'] = x2many(self=self, model='of.survey.user_input', input=user_inputs)
 
         return mutation
