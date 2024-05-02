@@ -10,6 +10,7 @@ from odoo.addons.of_account_graphql.graphql.account_fiscal_position_type import 
 from odoo.addons.of_base_graphql.graphql.attachment_type import Attachment, AttachmentInput
 from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
 from odoo.addons.of_base_graphql.graphql.employee_type import Employee, EmployeeInput
+from odoo.addons.of_base_graphql.graphql.image_type import Image
 from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInput
 from odoo.addons.of_graphql.graphql.company_type import Company
 from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
@@ -58,6 +59,7 @@ class PlanningIntervention(OdooObjectType):
     of_tag_ids = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTag)), name='tags')
     of_line_ids = graphene.List(graphene.NonNull(PlanningInterventionLine), name='invoiceLines')
     fiscal_position = graphene.Field(AccountFiscalPosition)
+    all_images = graphene.NonNull(graphene.List(graphene.NonNull(Image)))
 
     @staticmethod
     def resolve_attachments(root, info):
@@ -98,6 +100,10 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_fiscal_position(root, info):
         return root.of_fiscal_position_id or None
+
+    @staticmethod
+    def resolve_all_images(root, info):
+        return root.of_all_image_ids or []
 
 
 class PlanningInterventionInput(graphene.InputObjectType):
