@@ -851,7 +851,8 @@ class OFWebsitePlanningBooking(http.Controller):
         values['company'] = request.website.company_id.sudo()
         values['terms'] = values.get('terms', False)
         values['opt_in'] = values.get('opt_in', False)
-
+        values['display_price'] = request.env['ir.values'].get_default(
+            'of.intervention.settings', 'website_booking_tache_price') or False
         return request.render('of_website_planning_booking.new_booking_confirmation', values)
 
     @http.route(['/new_booking/thank_you'], type='http', auth='user', website=True)
