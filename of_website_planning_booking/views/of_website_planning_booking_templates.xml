@@ -781,11 +781,13 @@
                                     <span t-esc="tache.name"/>
                                 </b>
                                 <br/>
-                                <p style="line-height: 70%; margin-top: 5px; margin-bottom: 5px;">
-                                    <span t-esc="price" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
-                                    <br/>
-                                    <i style="font-size: 65%">Ce tarif est indicatif et pourra évoluer en fonction des spécificités de votre installation</i>
-                                </p>
+                                <t t-if="display_price">
+                                    <p style="line-height: 70%; margin-top: 5px; margin-bottom: 5px;">
+                                        <span t-esc="price" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
+                                        <br/>
+                                        <i style="font-size: 65%">Ce tarif est indicatif et pourra évoluer en fonction des spécificités de votre installation</i>
+                                    </p>
+                                </t>
                                 <span t-esc="creneau.name"/>
                                 <br/>
                                 <span t-esc="creneau.description"/>
