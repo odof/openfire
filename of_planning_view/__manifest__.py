@@ -16,6 +16,7 @@
     'data': [
         'views/of_planning_intervention_views.xml',
         'views/of_planning_intervention_template_views.xml',
+        'views/menuitems.xml',
     ],
     'assets': {
         'web.assets_backend': [
