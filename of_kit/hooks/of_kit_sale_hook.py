@@ -72,3 +72,13 @@ class OFKitSaleHook(models.AbstractModel):
                 AND     SOL2.id                 = SOL1.id
                 AND     SOL1.of_is_kit          = True
                 """)
+
+    @api.model
+    def _create_column_diff_comps_cost(self):
+        module_self = self.env['ir.module.module'].search(
+            [('name', '=', 'of_kit'), ('state', 'in', ['installed', 'to upgrade'])])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < '10.0.1.3.1'
+        if actions_todo:
+            # On crée la colonne of_diff_cost_comps manuellement pour éviter le calcul sur toutes les lignes
+            # existantes (trop long et inutile)
+            self.env.cr.execute("ALTER TABLE sale_order_line ADD COLUMN of_diff_cost_comps bool;")

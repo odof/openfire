@@ -3,7 +3,7 @@
 {
     'name': 'OpenFire / Kits',
     'author': 'OpenFire',
-    'version': '10.0.1.3.0',
+    'version': '10.0.1.3.1',
     'category': 'OpenFire modules',
     'summary': 'Kits',
     'description': """
