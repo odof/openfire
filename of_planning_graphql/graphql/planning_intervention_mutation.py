@@ -3,9 +3,9 @@ import logging
 import graphene
 
 from odoo.addons.of_account_graphql.graphql.account_move_type import AccountMoveInput
-from odoo.addons.of_base_graphql.graphql.attachment_type import AttachmentInput
 from odoo.addons.of_base_graphql.graphql.company_type import CompanyInput
 from odoo.addons.of_base_graphql.graphql.employee_type import EmployeeInput
+from odoo.addons.of_base_graphql.graphql.image_type import ImageInput
 from odoo.addons.of_base_graphql.graphql.origin_type import Origin
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
@@ -43,13 +43,13 @@ class PlanningInterventionCreate(graphene.Mutation):
         partner = graphene.Argument(PartnerInput)
         invoices = graphene.List(graphene.NonNull(AccountMoveInput))
         pickings = graphene.List(graphene.NonNull(PickingInput))
-        pictures = graphene.List(graphene.NonNull(AttachmentInput))
         order = graphene.Argument(SaleOrderInput)
         template = graphene.Argument(PlanningInterventionTemplateInput)
         employees = graphene.List(graphene.NonNull(EmployeeInput))
         company = graphene.Argument(CompanyInput)
         origin = graphene.Argument(Origin)
         invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
+        images = graphene.List(graphene.NonNull(ImageInput))
 
     Output = PlanningIntervention
 
@@ -90,7 +90,7 @@ class PlanningInterventionUpdate(graphene.Mutation):
         partner = graphene.Argument(PartnerInput)
         invoices = graphene.List(graphene.NonNull(AccountMoveInput))
         pickings = graphene.List(graphene.NonNull(PickingInput))
-        pictures = graphene.List(graphene.NonNull(AttachmentInput))
+        images = graphene.List(graphene.NonNull(ImageInput))
         order = graphene.Argument(SaleOrderInput)
         template = graphene.Argument(PlanningInterventionTemplateInput)
         employees = graphene.List(graphene.NonNull(EmployeeInput))
