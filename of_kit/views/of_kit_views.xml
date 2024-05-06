@@ -24,7 +24,7 @@
                 <field name="of_pricing" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
                 <field name="of_price_used" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
-                <field name="cost_comps" attrs="{'invisible': [('of_is_kit','=',False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit','=',False)]}" groups="of_sale.of_group_sale_marge_manager"/>
             </xpath>
             <xpath expr="//form//notebook//page[2]" position="before">
                 <page name="components" string="Components" attrs="{'invisible': [('of_is_kit', '=', False)]}">
@@ -301,6 +301,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']" position="before">
                 <field name="of_difference" invisible="1"/>
+                <field name="of_diff_cost_comps" invisible="1"/>
                 <div class="oe_grey" attrs="{'invisible': [('of_difference', '=', False)]}">
                     <i>
                         <p>
@@ -308,19 +309,28 @@
                         </p>
                     </i>
                 </div>
+                <div class="oe_grey" attrs="{'invisible': [('of_diff_cost_comps', '=', False)]}">
+                    <i>
+                        <p>
+                            Un des kits n'a pas correctement actualisé son coût.
+                        </p>
+                    </i>
+                </div>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="attributes">
                 <!-- Edition des lignes de commande par formulaire -->
                 <attribute name="editable"/>
-                <attribute name="colors">red:of_difference==True</attribute>
+                <attribute name="colors">red:of_difference==True or of_diff_cost_comps==True</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree" position="inside">
-                <!-- Permet de mettre de la couleur lors d'un problème de montant -->
+                <!-- Permet de mettre de la couleur lors d'un problème de montant/coût -->
                 <field name="of_difference" invisible="1"/>
+                <field name="of_diff_cost_comps" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form" position="inside">
-                <!-- Permet de mettre de la couleur lors d'un problème de montant -->
+                <!-- Permet de mettre de la couleur lors d'un problème de montant/coût -->
                 <field name="of_difference" invisible="1"/>
+                <field name="of_diff_cost_comps" invisible="1"/>
             </xpath>
             <xpath expr="//page[@name='print']/group" position="inside">
                 <group string="Kit" name='kit'>
@@ -354,7 +364,7 @@
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
-                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}" groups="of_sale.of_group_sale_marge_manager"/>
             </xpath>
             <xpath expr="//group[@name='sale_shipping']//field[@name='picking_policy']" position="replace">
                 <label for="picking_policy"/>
@@ -549,7 +559,7 @@
             </xpath>
             <xpath expr="//form//field[@name='price_unit']" position="after">
                 <field name="price_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
-                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}"/>
+                <field name="cost_comps" attrs="{'invisible': [('of_is_kit', '=', False)]}" groups="of_sale.of_group_sale_marge_manager"/>
             </xpath>
         </field>
     </record>

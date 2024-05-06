@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
 import math
+from datetime import datetime, timedelta
 
 from odoo import api, fields, models
-from odoo.tools import float_is_zero, float_compare, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_is_zero
 
 import odoo.addons.decimal_precision as dp
 
@@ -30,6 +30,9 @@ class SaleOrder(models.Model):
              "- Collapse: One line per kit, with minimal info\n"
              "- Expand: One line per kit, plus one line per component")
     of_difference = fields.Boolean(string="Price difference", compute='_compute_of_difference', readonly=True)
+    of_diff_cost_comps = fields.Boolean(
+        string=u"Cost compos/kit difference", compute='_compute_of_cost_compos_difference', readonly=True
+    )
 
     @api.depends('order_line', 'order_line.of_difference')
     def _compute_of_difference(self):
@@ -38,6 +41,14 @@ class SaleOrder(models.Model):
                 order.of_difference = True
             else:
                 order.of_difference = False
+
+    @api.depends('order_line', 'order_line.of_diff_cost_comps')
+    def _compute_of_cost_compos_difference(self):
+        for order in self:
+            if order.order_line.filtered('of_diff_cost_comps'):
+                order.of_diff_cost_comps = True
+            else:
+                order.of_diff_cost_comps = False
 
     @api.multi
     @api.depends('order_line.product_id')
@@ -98,6 +109,11 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    @api.model_cr_context
+    def _auto_init(self):
+        self.env['of.kit.sale.hook']._create_column_diff_comps_cost()
+        return super(SaleOrderLine, self)._auto_init()
+
     kit_id = fields.Many2one(comodel_name='of.saleorder.kit', string="Components", copy=True)
     of_is_kit = fields.Boolean(string="Is a kit")
 
@@ -116,7 +132,9 @@ class SaleOrderLine(models.Model):
              "if set to 'fixed', the price of it's components won't be taken into account and the price will be the one of the kit.\n"
              "if set to 'computed', the price will be computed according to the components of the kit.")
     of_difference = fields.Boolean(compute='_compute_of_difference', store=True)
-
+    of_diff_cost_comps = fields.Boolean(
+        string=u"Cost compos/kit difference", compute='_compute_of_cost_compos_difference', store=True
+    )
     sale_kits_to_unlink = fields.Boolean(
         string="sale kits to unlink?", default=False,
         help="True if at least 1 sale kit needs to be deleted from database")
@@ -551,6 +569,9 @@ class SaleOrderLine(models.Model):
             # l'utilisateur ne sauvegarde pas la ligne, le devis ou les deux
             self._refresh_price_unit()
             vals['of_difference'] = False
+        if len(vals.keys()) == 1 and vals.get('of_diff_cost_comps'):
+            self.refresh_cost_comps()
+            vals['of_diff_cost_comps'] = False
         res = super(SaleOrderLine, self)._write(vals)
         return res
 
@@ -583,6 +604,23 @@ class SaleOrderLine(models.Model):
                 line.of_difference = float_compare(computed_price, line.price_unit, 2)
             else:
                 line.of_difference = False
+
+    @api.depends(
+        'cost_comps',
+        'purchase_price',
+        'kit_id',
+        'kit_id.kit_line_ids',
+        'kit_id.kit_line_ids.cost_unit',
+        'kit_id.kit_line_ids.qty_per_kit',
+    )
+    def _compute_of_cost_compos_difference(self):
+        for line in self:
+            if line.kit_id:
+                if line.purchase_price != line.cost_comps:
+                    line.of_diff_cost_comps = True
+
+                else:
+                    line.of_diff_cost_comps = False
 
     @api.multi
     def refresh_cost_comps(self):
