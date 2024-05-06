@@ -31,10 +31,11 @@
         'of_survey_graphql',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/ir_config_parameter.xml',
         'data/of_planning_intervention_section.xml',
         'data/of_planning_intervention_template.xml',
+        'security/ir.model.access.csv',
+        'security/of_mobile_security.xml',
         'views/res_config_settings_views.xml',
         'views/product_template_views.xml',
         'views/of_service_request_views.xml',
