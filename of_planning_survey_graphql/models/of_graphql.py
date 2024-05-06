@@ -29,11 +29,11 @@ class OFGraphql(models.AbstractModel):
             "PlanningInterventionMutation": {
                 "planning_intervention_create": {
                     "survey": SurveyInput,
-                    "user_inputs": graphene.List(SurveyUserInputInput),
+                    "survey_user_inputs": graphene.List(SurveyUserInputInput),
                 },
                 "planning_intervention_update": {
                     "survey": SurveyInput,
-                    "user_inputs": graphene.List(SurveyUserInputInput),
+                    "survey_user_inputs": graphene.List(SurveyUserInputInput),
                 },
             }
         }

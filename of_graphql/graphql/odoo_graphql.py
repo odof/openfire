@@ -39,8 +39,11 @@ def many2one(self, model, input):
         else:
             raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
     else:
-        record = obj.create(obj_values)
-        return record.id
+        if len(obj_values.keys()) > 0:
+            record = obj.create(obj_values)
+            return record.id
+        else:
+            return False
 
 
 def x2many(self, model, input, default={}, keep=False):
@@ -50,29 +53,36 @@ def x2many(self, model, input, default={}, keep=False):
     # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
     obj = self.env[model]
     res = []
+    res_ids = []
 
     if type(input) is dict:
         input = [input]
+
+    if len(input) == 0:
+        return [Command.clear()]
 
     for record in input:
         record_value = default
         values = obj._prepare_mutation_values(**record)
         record_value.update(values)
-
         if record.id:
             if not obj.search([('id', '=', record.id)]):
                 raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
 
             record = obj.search([('id', '=', record.id)])
             record.write(record_value)
-            if not keep:
-                res.append(Command.set([record.id]))
+            res_ids.append(record.id)
+
         else:
-            if keep:
-                res.append(Command.create(record_value))
-            else:
-                record = obj.create(record_value)
-                res.append(Command.set([record.id]))
+            record = obj.create(record_value)
+            res_ids.append(record.id)
+
+    if keep:
+        for id in res_ids:
+            res.append(Command.link(id))
+    else:
+        res = [Command.set(res_ids)]
+
     return res
 
 

@@ -27,7 +27,7 @@ class OFPlanningInterventionLine(models.Model):
         if product := args.get('product'):
             mutation['product_id'] = many2one(self=self, model='product.product', input=product)
 
-        if taxes := args.get('taxes'):
-            mutation['taxes'] = x2many(self=self, model='account.tax', input=taxes)
+        if 'taxes' in args.keys():
+            mutation['taxes'] = x2many(self=self, model='account.tax', input=args.get('taxes'))
 
         return mutation

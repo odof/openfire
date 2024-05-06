@@ -18,8 +18,8 @@ class StockPicking(models.Model):
         if partner := args.get('partner'):
             mutation['partner_id'] = many2one(self=self, model="res.partner", input=partner)
 
-        if lines := args.get('lines'):
-            mutation['move_ids_without_package'] = x2many(self=self, model='stock.move', input=lines)
+        if 'lines' in args.keys():
+            mutation['move_ids_without_package'] = x2many(self=self, model='stock.move', input=args.get('lines'))
 
         if location := args.get('location'):
             mutation['location_id'] = many2one(self=self, model='stock.location', input=location)

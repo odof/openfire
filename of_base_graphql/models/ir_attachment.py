@@ -24,7 +24,7 @@ class IrAttachment(models.Model):
         if res_id := args.get('res_id'):
             mutation['res_id'] = res_id
 
-        if attachment := input.get("datas", False):
+        if attachment := args.get("datas", False):
             mutation['datas'] = convertImage(attachment)
 
         return mutation

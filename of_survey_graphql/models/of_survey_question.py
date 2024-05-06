@@ -23,19 +23,19 @@ class OFSurveyQuestion(models.Model):
         if 'is_conditional' in args.keys():
             mutation['is_conditional'] = args['is_conditional']
 
-        if suggested_answers := args.get('suggested_answers'):
+        if 'suggested_answers' in args.keys():
             mutation['suggested_answer_ids'] = x2many(
-                self=self, model='of.survey.question.answer', input=suggested_answers
+                self=self, model='of.survey.question.answer', input=args.get('suggested_answers')
             )
 
-        if user_input_lines := args.get('user_input_line'):
+        if 'user_input_lines' in args.keys():
             mutation['user_input_line_ids'] = x2many(
-                self=self, model='of.survey.user_input.line', input=user_input_lines
+                self=self, model='of.survey.user_input.line', input=args.get('user_input_lines')
             )
 
-        if conditional_questions := args.get('conditional_questions'):
+        if 'conditional_questions' in args.keys():
             mutation['conditional_questions'] = x2many(
-                self=self, model='of.survey.conditional.question', input=conditional_questions
+                self=self, model='of.survey.conditional.question', input=args.get('conditional_questions')
             )
 
         return mutation
