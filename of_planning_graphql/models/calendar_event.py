@@ -77,8 +77,8 @@ class CalendarEvent(models.Model):
         if pickings := args.get('pickings'):
             mutation['picking_ids'] = x2many(self=self, model="stock.picking", input=pickings)
 
-        if pictures := args.get('pictures'):
-            mutation['of_all_image_ids'] = x2many(self=self, model="ir.attachment", input=pictures)
+        if images := args.get('images'):
+            mutation['of_all_image_ids'] = x2many(self=self, model="ir.attachment", input=images)
 
         if order := args.get('order'):
             mutation['order_id'] = many2one(self=self, model='sale.order', input=order)
