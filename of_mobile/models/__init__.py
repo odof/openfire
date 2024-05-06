@@ -12,6 +12,7 @@ from . import account_move
 from . import stock_picking
 from . import of_planning_task
 from . import of_planning_intervention_template
+from . import of_planning_intervention_section
 from . import of_equipment
 from . import of_survey
 from . import of_service_request
