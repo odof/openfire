@@ -14,6 +14,7 @@ from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
 from odoo.addons.of_stock_graphql.graphql.picking_type import PickingInput
 
 from .planning_intervention_line_type import PlanningInterventionLineInput
+from .planning_intervention_tag_type import PlanningInterventionTagInput
 from .planning_intervention_template_type import PlanningInterventionTemplateInput
 from .planning_intervention_type import PlanningIntervention
 
@@ -50,6 +51,7 @@ class PlanningInterventionCreate(graphene.Mutation):
         origin = graphene.Argument(Origin)
         invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
         images = graphene.List(graphene.NonNull(ImageInput))
+        tags = graphene.List(graphene.NonNull(PlanningInterventionTagInput))
 
     Output = PlanningIntervention
 
@@ -97,6 +99,7 @@ class PlanningInterventionUpdate(graphene.Mutation):
         company = graphene.Argument(CompanyInput)
         origin = graphene.Argument(Origin)
         invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
+        tags = graphene.List(graphene.NonNull(PlanningInterventionTagInput))
 
     Output = PlanningIntervention
 

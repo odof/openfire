@@ -25,8 +25,8 @@ class SaleOrderLine(models.Model):
         if price_subtotal := args.get('price_subtotal'):
             mutation['price_subtotal'] = price_subtotal
 
-        if taxes := args.get('taxes'):
-            mutation['tax_id'] = x2many(self=self, model='account.tax', input=taxes)
+        if 'taxes' in args.keys():
+            mutation['tax_id'] = x2many(self=self, model='account.tax', input=args.get('taxes'))
 
         if product := args.get('product'):
             mutation['product_id'] = many2one(self=self, model='product.product', input=product)

@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
         if partner := args.get('partner'):
             mutation['partner_id'] = many2one(self=self, model='res.partner', input=partner)
 
-        if lines := args.get('lines'):
-            mutation['order_line'] = x2many(self=self, model='sale.order.line', input=lines)
+        if 'lines' in args.keys():
+            mutation['order_line'] = x2many(self=self, model='sale.order.line', input=args.get('lines'))
 
         return mutation

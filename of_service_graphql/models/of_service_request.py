@@ -42,8 +42,8 @@ class OFServiceRequest(models.Model):
         if state := args.get('state'):
             mutation['state_punctual'] = state
 
-        if interventions := args.get('interventions'):
-            mutation['intervention_ids'] = x2many(self=self, model='calendar.event', input=interventions)
+        if 'interventions' in args.keys():
+            mutation['intervention_ids'] = x2many(self=self, model='calendar.event', input=args.get('interventions'))
 
         if intervention_count := args.get('intervention_count'):
             mutation['intervention_count'] = intervention_count
@@ -54,9 +54,9 @@ class OFServiceRequest(models.Model):
         if type := args.get('type'):
             mutation['type'] = many2one(self=self, model='of.service.request.type', input=type)
 
-        if history_interventions := args.get('history_interventions'):
+        if 'history_interventions' in args.keys():
             mutation['history_intervention_ids'] = x2many(
-                self=self, model='calendar.event', input=history_interventions
+                self=self, model='calendar.event', input=args.get('history_interventions')
             )
 
         if task := args.get('task'):
@@ -68,14 +68,14 @@ class OFServiceRequest(models.Model):
         if stage := args.get('stage'):
             mutation['stage'] = many2one(self=self, model='of.service.request.stage', input=stage)
 
-        if employees := args.get('employees'):
-            mutation['employee_ids'] = x2many(self=self, model='hr.employee', input=employees)
+        if 'employees' in args.keys():
+            mutation['employee_ids'] = x2many(self=self, model='hr.employee', input=args.get('employees'))
 
         if last_attachment := args.get('last_attachment'):
             mutation['last_attachment'] = many2one(self=self, model='ir.attachment', input=last_attachment)
 
-        if lines := args.get('lines'):
-            mutation['line_ids'] = x2many(self=self, model='of.service.request.line', input=lines)
+        if 'lines' in args.keys():
+            mutation['line_ids'] = x2many(self=self, model='of.service.request.line', input=args.get('lines'))
 
         if partner := args.get('partner'):
             mutation['partner'] = many2one(self=self, model='res.partner', input=partner)

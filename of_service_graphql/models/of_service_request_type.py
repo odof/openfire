@@ -15,7 +15,7 @@ class OSServcieRequestType(models.Model):
         if name := args.get('name'):
             mutation['name'] = name
 
-        if stages := args.get('stages'):
-            mutation['stage_ids'] = x2many(self=self, model='of.service.request.type', input=stages)
+        if 'stages' in args.keys():
+            mutation['stage_ids'] = x2many(self=self, model='of.service.request.type', input=args.get('stages'))
 
         return mutation

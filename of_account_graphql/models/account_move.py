@@ -18,8 +18,8 @@ class AccountMove(models.Model):
         if partner := args.get('partner'):
             mutation['partner_id'] = many2one(self=self, model='res.partner', input=partner)
 
-        if lines := args.get('lines'):
-            mutation['invoice_line_ids'] = x2many(self=self, model='account.move.line', input=lines)
+        if 'lines' in args.keys():
+            mutation['invoice_line_ids'] = x2many(self=self, model='account.move.line', input=args.get('lines'))
 
         if fiscal_position := args.get('fiscal_position'):
             mutation['fiscal_position_id'] = many2one(self=self, model='account.fiscal.position', input=fiscal_position)

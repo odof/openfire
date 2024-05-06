@@ -48,7 +48,7 @@ class OFServiceRequestLine(models.Model):
         if company := args.get('company'):
             mutation['company_id'] = many2one(self=self, model='res.company', input=company)
 
-        if invoice_lines := args.get('invoice_lines'):
-            mutation['invoice_line_ids'] = x2many(self=self, model='account.move', input=invoice_lines)
+        if 'invoice_lines' in args.keys():
+            mutation['invoice_line_ids'] = x2many(self=self, model='account.move', input=args.get('invoice_lines'))
 
         return mutation

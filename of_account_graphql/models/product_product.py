@@ -12,7 +12,7 @@ class ProductProduct(models.Model):
     def _prepare_mutation_values(self, **args):
         mutation = super()._prepare_mutation_values(**args)
 
-        if taxes := args.get('taxes'):
-            mutation['taxes'] = x2many(self=self, model='account.tax', input=taxes)
+        if 'taxes' in args.keys():
+            mutation['taxes'] = x2many(self=self, model='account.tax', input=args.get('taxes'))
 
         return mutation

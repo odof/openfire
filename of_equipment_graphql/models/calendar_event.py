@@ -13,6 +13,6 @@ class CalendarEvent(models.Model):
     def _prepare_mutation_values(self, **args):
         mutation = super()._prepare_mutation_values(**args)
 
-        if equipments := args.get('equipments'):
-            mutation['of_equipment_ids'] = x2many(self=self, model='of.equipment', input=equipments)
+        if 'equipments' in args.keys():
+            mutation['of_equipment_ids'] = x2many(self=self, model='of.equipment', input=args.get('equipments'))
         return mutation
