@@ -23,13 +23,10 @@ class PlanningInterventionSectionQuery(graphene.ObjectType):
     @staticmethod
     def resolve_planning_intervention_sections(root, info, filter=None, domain=None, offset=0, limit=10):
         env = info.context["env"]
-        odoo_domain = []
         odoo_type = {
             'id': 'int',
         }
-        if domain:
-            odoo_domain = graphqlOdooDomain(odoo_type, domain)
-
+        odoo_domain = graphqlOdooDomain(odoo_type, domain) if domain else []
         if filter:
             if filter.id:
                 odoo_domain += [('id', '=', filter.id)]

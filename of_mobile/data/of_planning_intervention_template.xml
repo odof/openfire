@@ -4,13 +4,13 @@
     <record id="of_planning.of_planning_default_intervention_template" model="of.planning.intervention.template">
         <field name="mobile" eval="True" />
         <field name="section_to_display_ids" eval="[
-            (4, ref('of_mobile.of_planning_intervention_section_equipment')),
-            (4, ref('of_mobile.of_planning_intervention_section_photos')),
-            (4, ref('of_mobile.of_planning_intervention_section_invoice')),
-            (4, ref('of_mobile.of_planning_intervention_section_report')),
-            (4, ref('of_mobile.of_planning_intervention_section_signature')),
-            (4, ref('of_mobile.of_planning_intervention_section_payment')),
-            (4, ref('of_mobile.of_planning_intervention_section_sale_order')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_equipment')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_photos')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_invoice')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_report')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_signature')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_payment')),
+            Command.link(ref('of_mobile.of_planning_intervention_section_sale_order')),
         ]" />
     </record>
 
