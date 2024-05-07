@@ -104,6 +104,7 @@ class PlanningInterventionUpdate(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, id, **args):
+        logger.info(f"mutate : {args}")
         env = info.context["env"]
         # ici on met origin=WEB par défaut
         if not args.get('origin', False):

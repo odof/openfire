@@ -46,7 +46,7 @@ def many2one(self, model, input):
             return False
 
 
-def x2many(self, model, input, default={}, keep=False):
+def x2many(self, model, input, default=False, keep=False):
     # cette méthode retourne une liste de Command pour les one2many/many2many
     # default est un dict qui contient les valeurs par défaut que l'on souhaite ajouter à chaque ligne
     # keep permet de préciser si les nouvelles lignes sont ajoutées aux lignes existantes du x2many
@@ -54,6 +54,8 @@ def x2many(self, model, input, default={}, keep=False):
     obj = self.env[model]
     res = []
     res_ids = []
+    if type(default) is bool:
+        default = {}
 
     if type(input) is dict:
         input = [input]
@@ -62,7 +64,7 @@ def x2many(self, model, input, default={}, keep=False):
         return [Command.clear()]
 
     for record in input:
-        record_value = default
+        record_value = default.copy()
         values = obj._prepare_mutation_values(**record)
         record_value.update(values)
         if record.id:

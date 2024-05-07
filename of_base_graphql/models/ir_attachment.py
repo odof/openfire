@@ -15,8 +15,8 @@ class IrAttachment(models.Model):
         if name := args.get('name'):
             mutation['name'] = name
 
-        if type := args.get('type'):
-            mutation['type'] = type
+        if ttype := args.get('type'):
+            mutation['type'] = ttype
 
         if res_model := args.get('res_model'):
             mutation['res_model'] = res_model

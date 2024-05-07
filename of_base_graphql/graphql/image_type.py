@@ -20,7 +20,7 @@ class Image(OdooObjectType):
 
 class ImageInput(graphene.InputObjectType):
     _name = 'ImageInput'
-    _type = "types"
+    _type = 'types'
 
     id = graphene.Int()
     name = graphene.String()
