@@ -10,5 +10,3 @@ class OFSurveySurvey(models.Model):
         selection_add=[('intervention_survey', "Intervention Survey")],
         ondelete={'intervention_survey': 'set default'},
     )
-    show_start = fields.Boolean(string="Show start page")
-    show_end = fields.Boolean(string="Show end page")

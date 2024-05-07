@@ -6,7 +6,7 @@ from odoo import fields, models
 class OFSurveyAnswers(models.Model):
     _inherit = 'of.survey.answers'
 
-    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervenion")
+    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervention")
 
     def unlink(self):
         # if a line is deleted, we must also delete the answers to this question
