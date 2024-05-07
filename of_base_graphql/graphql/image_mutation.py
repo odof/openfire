@@ -1,3 +1,5 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import graphene
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
@@ -19,7 +21,7 @@ class ImageCreate(graphene.Mutation):
     Output = Image
 
     def mutate(self, info, **args):
-        env = info.context["env"]
+        env = info.context['env']
         values = env['of.image']._prepare_mutation_values(**args)
         return env['of.image'].create(values)
 
@@ -38,7 +40,7 @@ class ImageUpdate(graphene.Mutation):
     Output = Image
 
     def mutate(self, info, id, **args):
-        env = info.context["env"]
+        env = info.context['env']
         values = env['of.image']._prepare_mutation_values(**args)
         image = env['of.image'].search([('id', '=', id)])
         image.write(values)

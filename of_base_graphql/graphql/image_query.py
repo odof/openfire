@@ -23,13 +23,10 @@ class ImageQuery(graphene.ObjectType):
     @staticmethod
     def resolve_images(root, info, filter=None, domain=None, offset=0, limit=10):
         env = info.context['env']
-        odoo_domain = []
         odoo_type = {
             'id': 'int',
         }
-        if domain:
-            odoo_domain = graphqlOdooDomain(odoo_type, domain)
-
+        odoo_domain = graphqlOdooDomain(odoo_type, domain) if domain else []
         if filter:
             if filter.name:
                 odoo_domain += [('name', 'ilike', filter.name)]
