@@ -205,8 +205,7 @@ class CalendarEvent(models.Model):
         column2='picking_id',
     )
     of_warehouse_id = fields.Many2one(
-        comodel_name='stock.warehouse',
-        string="Warehouse",
+        comodel_name='stock.warehouse', string="Warehouse", default=lambda self: self._default_of_warehouse_id()
     )
     of_procurement_group_id = fields.Many2one(comodel_name='procurement.group', string="Procurement Group", copy=False)
 
@@ -347,6 +346,14 @@ class CalendarEvent(models.Model):
                             }
                             raise ValidationError(message)
                 raise ValidationError(_("Warning, this intervention is in conflict with another one."))
+
+    # --------------------------------------------------------------------------
+    # Default methods
+    # --------------------------------------------------------------------------
+
+    def _default_of_warehouse_id(self):
+        # On va récupérer le premier entrepôt de la liste
+        return self.env['stock.warehouse'].search([], limit=1)
 
     # --------------------------------------------------------------------------
     # Compute methods
