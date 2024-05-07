@@ -160,7 +160,7 @@ class OFSurveyUserInput(models.Model):
         old_answers = self.env['of.survey.user_input.line'].search(
             [('user_input_id', '=', self.id), ('question_id', '=', question.id)]
         )
-        if question.question_type in ['char_box', 'text_box', 'date']:
+        if question.question_type in ['char_box', 'text_box', 'date', 'numerical_box']:
             if answer in ("[]", "") and len(attachments) > 0:
                 answer = _("See file(s) for the answer")
             self._save_line_simple_answer(question, old_answers, answer, attachments)
@@ -250,6 +250,8 @@ class OFSurveyUserInput(models.Model):
                 vals['suggested_answer_id'] = False
             else:
                 vals['suggested_answer_id'] = int(answer)
+        elif answer_type == 'numerical_box':
+            vals['value_numerical_box'] = float(answer)
         else:
             if not answer or (isinstance(answer, str) and not answer.strip()):
                 if len(attachments) > 0:

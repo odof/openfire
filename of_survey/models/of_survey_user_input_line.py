@@ -8,6 +8,7 @@ import pypdfium2 as pdfium
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.tools import float_is_zero
 
 
 class OFSurveyUserInputLine(models.Model):
@@ -36,9 +37,11 @@ class OFSurveyUserInputLine(models.Model):
             ('suggestion', "Suggestion"),
             ('multi_image', "Upload Image"),
             ('form', "Form"),
+            ('numerical_box', 'Number'),
         ],
     )
     value_char_box = fields.Char(string="Text answer")
+    value_numerical_box = fields.Float('Numerical answer')
     value_date = fields.Date(string="Date answer")
     value_text_box = fields.Text(string="Free Text answer")
     value_image = fields.Binary(string="Image answer")
@@ -57,6 +60,8 @@ class OFSurveyUserInputLine(models.Model):
                 line.display_name = line.value_char_box
             elif line.answer_type == 'text_box' and line.value_text_box:
                 line.display_name = textwrap.shorten(line.value_text_box, width=50, placeholder=" [...]")
+            elif line.answer_type == 'numerical_box':
+                line.display_name = line.value_numerical_box
             elif line.answer_type == 'date':
                 line.display_name = line.value_date.strftime(
                     self.env['res.lang'].search([('code', '=', self.env.user.lang)], limit=1).date_format
@@ -78,6 +83,9 @@ class OFSurveyUserInputLine(models.Model):
         for line in self:
             if line.skipped == bool(line.answer_type):
                 raise ValidationError(_("A question can either be skipped or answered, not both."))
+            # allow 0 for numerical box
+            if line.answer_type == 'numerical_box' and float_is_zero(line['value_numerical_box'], precision_digits=6):
+                continue
             if line.answer_type == 'suggestion':
                 field_name = 'suggested_answer_id'
             elif line.answer_type == 'multi_image':

@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import base64
+import contextlib
 import io
 
 import pypdfium2 as pdfium
@@ -82,11 +83,14 @@ class OFSurveyQuestion(models.Model):
             ('date', "Date"),
             ('multi_image', "Upload Image"),
             ('form', 'Form'),
+            ('numerical_box', 'Numerical Value'),
         ],
         compute='_compute_question_type',
         readonly=False,
         store=True,
     )
+    answer_numerical_box = fields.Float('Correct numerical answer', help="Correct number answer for this question.")
+
     add_pictures = fields.Boolean(string="Add picture(s)")
     # -- char_box
     save_as_email = fields.Boolean(
@@ -278,6 +282,7 @@ class OFSurveyQuestion(models.Model):
             if not question.validation_required or question.question_type not in [
                 'char_box',
                 'date',
+                'numerical_box',
             ]:
                 question.validation_required = False
 
@@ -391,6 +396,8 @@ class OFSurveyQuestion(models.Model):
         if answer or self.question_type in ['simple_choice', 'multiple_choice']:
             if self.question_type == 'char_box':
                 return self._validate_char_box(answer)
+            elif self.question_type == 'numerical_box':
+                return self._validate_numerical_box(answer)
             elif self.question_type in ['date']:
                 return self._validate_date(answer)
             elif self.question_type in ['simple_choice', 'multiple_choice']:
@@ -403,6 +410,19 @@ class OFSurveyQuestion(models.Model):
 
         if not (self.validation_length_min <= len(answer) <= self.validation_length_max) and self.validation_required:
             return {self.id: self.validation_error_msg or _("The answer you entered is not valid.")}
+        return {}
+
+    def _validate_numerical_box(self, answer):
+        try:
+            floatanswer = float(answer)
+        except ValueError:
+            return {self.id: _('This is not a number')}
+
+        if self.validation_required:
+            # Answer is not in the right range
+            with contextlib.suppress(Exception):
+                if not (self.validation_min_float_value <= floatanswer <= self.validation_max_float_value):
+                    return {self.id: self.validation_error_msg or _('The answer you entered is not valid.')}
         return {}
 
     def _validate_date(self, answer):

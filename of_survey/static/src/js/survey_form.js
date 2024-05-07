@@ -1151,6 +1151,18 @@ odoo.define("of_survey.form", function (require) {
                                 errors[questionId] = constrErrorMsg;
                             }
                             break;
+                        case 'numerical_box':
+                            if (questionRequired && !data[questionId]) {
+                                errors[questionId] = constrErrorMsg;
+                            } else {
+                                var floatMin = $input.data('validationFloatMin');
+                                var floatMax = $input.data('validationFloatMax');
+                                var value = parseFloat($input.val());
+                                if (floatMin && (floatMin > value || value > floatMax)) {
+                                    errors[questionId] = validationErrorMsg;
+                                }
+                            }
+                            break;
                         case "date":
                             if (questionRequired && !data[questionId]) {
                                 errors[questionId] = constrErrorMsg;

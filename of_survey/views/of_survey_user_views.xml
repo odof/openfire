@@ -162,6 +162,7 @@
                     </group>
                     <group>
                         <field name="value_char_box" colspan='2' attrs="{'invisible': [('answer_type','!=','char_box')]}"/>
+                        <field name="value_numerical_box" colspan='2' attrs="{'invisible': [('answer_type','!=','numerical_box')]}"/>
                         <field name="value_date" colspan='2' attrs="{'invisible': [('answer_type','!=','date')]}"/>
                         <field name="value_text_box" colspan='2' attrs="{'invisible': [('answer_type','!=','text_box')]}"/>
                         <field name="value_image" filename="value_image_filename" colspan='2' attrs="{'invisible': [('answer_type','!=','image')]}"/>

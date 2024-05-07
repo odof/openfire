@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-26 12:53+0000\n"
-"PO-Revision-Date: 2024-04-26 12:53+0000\n"
+"POT-Creation-Date: 2024-05-07 11:46+0000\n"
+"PO-Revision-Date: 2024-05-07 11:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -159,6 +159,17 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 msgid "<span>Fill PDF</span><br/>"
 msgstr "<span>Remplir PDF</span><br/>"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid ""
+"<span>How many ...?</span><br/>\n"
+"                                    <i class=\"fa fa-2x\" role=\"img\" aria-label=\"Numeric\" title=\"Numeric\">123 </i>\n"
+"                                    <i class=\"fa fa-2x fa-sort\" role=\"img\" aria-label=\"Numeric\"/>"
+msgstr ""
+"<span>Combien de ... ?</span><br/>\n"
+"                                    <i class=\"fa fa-2x\" role=\"img\" aria-label=\"Numérique\" title=\"Numérique\">123 </i>\n"
+"                                    <i class=\"fa fa-2x fa-sort\" role=\"img\" aria-label=\"Numérique\"/>"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
@@ -505,6 +516,21 @@ msgstr "Copié !"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__is_correct
 msgid "Correct"
 msgstr "Bonne réponse"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
+msgid "Correct Answer"
+msgstr ""
+
+#. module: of_survey
+#: model:ir.model.fields,help:of_survey.field_of_survey_question__answer_numerical_box
+msgid "Correct number answer for this question."
+msgstr "Réponse numérique correcte pour cette question."
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question__answer_numerical_box
+msgid "Correct numerical answer"
+msgstr "Réponse numérique correcte"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__create_uid
@@ -1304,6 +1330,7 @@ msgstr "Maintenant, utilisez ce raccourci pour revenir au Questionnaire."
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_survey__progression_mode__number
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_user_input_line__answer_type__numerical_box
 msgid "Number"
 msgstr "Nombre"
 
@@ -1330,6 +1357,16 @@ msgstr "Nombre de messages nécessitant une action"
 #: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_has_error_counter
 msgid "Number of messages with delivery error"
 msgstr "Nombre de messages avec des erreurs d'envoi"
+
+#. module: of_survey
+#: model:ir.model.fields.selection,name:of_survey.selection__of_survey_question__question_type__numerical_box
+msgid "Numerical Value"
+msgstr "Valeur numérique"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_numerical_box
+msgid "Numerical answer"
+msgstr "Réponse numérique"
 
 #. module: of_survey
 #: model:ir.model.fields.selection,name:of_survey.selection__of_survey_conditional_question__operator__or
@@ -1618,8 +1655,8 @@ msgid "Sections and Questions"
 msgstr "Sections et Questions"
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/models/of_survey_user_input.py:0
 #: code:addons/of_survey/models/of_survey_user_input_line.py:0
@@ -1876,6 +1913,7 @@ msgstr ""
 #. odoo-python
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/models/of_survey_question.py:0
+#: code:addons/of_survey/models/of_survey_question.py:0
 #: model_terms:ir.ui.view,arch_db:of_survey.of_question_container
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_form
 #, python-format
@@ -1997,14 +2035,21 @@ msgid "This is a Test Survey."
 msgstr "Ceci est un Questionnaire test."
 
 #. module: of_survey
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_survey/models/of_survey_question.py:0
 #: code:addons/of_survey/static/src/js/survey_form.js:0
 #: code:addons/of_survey/tests/test_survey.py:0
 #, python-format
 msgid "This is not a date"
 msgstr "Ceci n'est pas une date"
+
+#. module: of_survey
+#. odoo-python
+#: code:addons/of_survey/models/of_survey_question.py:0
+#, python-format
+msgid "This is not a number"
+msgstr "Ceci n’est pas un nombre"
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__description_done
