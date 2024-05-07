@@ -92,11 +92,12 @@
         </field>
     </record>
 
-    <record id="of_survey_survey_view_search" model="ir.ui.view">
+    <!-- Base view used to allow primary inheritance in depending specifics modules -->
+    <record id="of_survey_survey_view_search_base" model="ir.ui.view">
         <field name="name">of.survey.survey.search</field>
         <field name="model">of.survey.survey</field>
         <field name="arch" type="xml">
-            <search string="Survey">
+            <search string="Base view">
                 <field string="Survey" name="title"/>
                 <field string="Question &amp; Pages" name="question_and_page_ids"/>
                 <separator/>
@@ -113,10 +114,24 @@
         </field>
     </record>
 
+    <!-- Search view used only from Survey config menu. We cannot create an empty view so we are at least changing the string attribute -->
+    <record id="of_survey_survey_view_search" model="ir.ui.view">
+        <field name="name">of.survey.survey.search</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey_survey_view_search_base"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Survey</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_action_survey_form" model="ir.actions.act_window">
         <field name="name">Surveys</field>
         <field name="res_model">of.survey.survey</field>
         <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_survey_survey_view_search"/>
         <field name="help" type="html">
             <p>
                 No Survey Found

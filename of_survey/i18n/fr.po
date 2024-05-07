@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 11:46+0000\n"
-"PO-Revision-Date: 2024-05-07 11:46+0000\n"
+"POT-Creation-Date: 2024-05-07 13:22+0000\n"
+"PO-Revision-Date: 2024-05-07 13:22+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -367,7 +367,7 @@ msgstr "Toute personne avec le lien"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Archived"
 msgstr "Archivé"
 
@@ -407,6 +407,11 @@ msgstr "Image de fond pour PDF"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__background_image_url
 msgid "Background Url"
 msgstr "URL de l'arrière-plan"
+
+#. module: of_survey
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
+msgid "Base view"
+msgstr "Vue de base"
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
@@ -1059,7 +1064,7 @@ msgid "Last displayed question/page"
 msgstr "Dernière question/page affichée"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Late Activities"
 msgstr ""
 
@@ -1515,7 +1520,7 @@ msgid "Question"
 msgstr ""
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Question & Pages"
 msgstr ""
 
@@ -1692,11 +1697,9 @@ msgid "Show Question if"
 msgstr "Afficher la question si"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Show all records which has next action date is before today"
 msgstr ""
-"Afficher tous les enregistrements dont la date de la prochaine action est "
-"antérieure à aujourd'hui"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__show_end
@@ -1790,6 +1793,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_tree
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_line_view_search
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_search
@@ -2108,7 +2112,7 @@ msgstr ""
 "sur <strong class=\"text-danger\"/>."
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Today Activities"
 msgstr ""
 
@@ -2134,7 +2138,7 @@ msgid "Types of answers"
 msgstr "Réponses"
 
 #. module: of_survey
-#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
+#: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search_base
 msgid "Upcoming Activities"
 msgstr ""
 

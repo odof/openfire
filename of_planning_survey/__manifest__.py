@@ -20,6 +20,8 @@
     'data': [
         'data/of_planning_intervention_template.xml',
         'views/calendar_event_views.xml',
+        'views/of_survey_survey_views.xml',
+        'views/menuitems.xml',
         'views/of_planning_intervention_template_views.xml',
         'reports/report_intervention_report.xml',
         'reports/report_intervention_sheet.xml',

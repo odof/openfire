@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-08 16:58+0000\n"
-"PO-Revision-Date: 2024-02-08 16:58+0000\n"
+"POT-Creation-Date: 2024-05-07 13:29+0000\n"
+"PO-Revision-Date: 2024-05-07 13:29+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -27,9 +27,10 @@ msgid "Calendar Event"
 msgstr "Calendrier de l'événement"
 
 #. module: of_planning_survey
-#: model_terms:ir.ui.view,arch_db:of_planning_survey.survey_fill_form_done
-msgid "Finish"
-msgstr "Terminer"
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.report_intervention_report_document
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.report_intervention_sheet_document
+msgid "Image"
+msgstr ""
 
 #. module: of_planning_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_survey_answers__intervention_id
@@ -45,6 +46,11 @@ msgstr "Questionnaire intervention"
 #: model:ir.model,name:of_planning_survey.model_of_planning_intervention_template
 msgid "Intervention template"
 msgstr "Modèle d'intervention"
+
+#. module: of_planning_survey
+#: model_terms:ir.actions.act_window,help:of_planning_survey.of_action_survey_form
+msgid "No Survey Found"
+msgstr ""
 
 #. module: of_planning_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_calendar_event__of_answers_ids
@@ -90,6 +96,7 @@ msgstr "Démarrer le questionnaire"
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template__survey_id
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.of_planning_intervention_template_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.of_survey_survey_view_search_intervention_menu
 msgid "Survey"
 msgstr "Questionnaire"
 
@@ -107,6 +114,18 @@ msgstr "Entrée utilisateur du Questionnaire"
 #: model:ir.model.fields,field_description:of_planning_survey.field_calendar_event__of_survey_user_input_line
 msgid "Survey User Input Line"
 msgstr "Ligne d'entrée utilisateur du Questionnaire"
+
+#. module: of_planning_survey
+#: model:ir.actions.act_window,name:of_planning_survey.of_action_survey_form
+#: model:ir.ui.menu,name:of_planning_survey.menu_of_survey_survey
+msgid "Surveys"
+msgstr "Questionnaires"
+
+#. module: of_planning_survey
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.of_survey_survey_view_search_intervention
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.of_survey_survey_view_search_intervention_menu
+msgid "Type Intervention"
+msgstr ""
 
 #. module: of_planning_survey
 #: model:ir.model,name:of_planning_survey.model_of_survey_answers

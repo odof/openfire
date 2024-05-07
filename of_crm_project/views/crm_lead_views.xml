@@ -74,6 +74,47 @@
         </field>
     </record>
 
-    <menuitem name="Surveys" id="menu_of_survey_survey_form_crm" action="of_survey.of_action_survey_form" parent="crm.crm_menu_config" sequence="11"/>
+    <record id="of_survey_survey_view_search_crm" model="ir.ui.view">
+        <field name="name">survey.view.survey.search.crm</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey.of_survey_survey_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Type Lead/Opportunity" name="opportunity" domain="[('survey_type', '=', 'lead_opportunity')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search view used only from CRM config menu -->
+    <record id="of_survey_survey_view_search_crm_project" model="ir.ui.view">
+        <field name="name">of.survey.survey.search.crm.project</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey.of_survey_survey_view_search_base"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Survey</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Type Lead/Opportunity" name="opportunity" domain="[('survey_type', '=', 'lead_opportunity')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_action_survey_form" model="ir.actions.act_window">
+        <field name="name">Surveys</field>
+        <field name="res_model">of.survey.survey</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('survey_type','=','lead_opportunity')]</field>
+        <field name="context">{'default_survey_type': 'lead_opportunity'}</field>
+        <field name="search_view_id" ref="of_survey_survey_view_search_crm_project"/>
+        <field name="help" type="html">
+            <p>
+                No Survey Found
+            </p>
+        </field>
+    </record>
+
+    <menuitem name="Surveys" id="menu_of_survey_survey_form_crm" action="of_crm_project.of_action_survey_form" parent="crm.crm_menu_config" sequence="11"/>
 
 </odoo>

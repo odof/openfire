@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_survey_survey_view_search_intervention" model="ir.ui.view">
+        <field name="name">of.survey.view.survey.search.intervention</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey.of_survey_survey_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Type Intervention" name="intervention" domain="[('survey_type', '=', 'intervention_survey')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search view used only from Intervention config menu -->
+    <record id="of_survey_survey_view_search_intervention_menu" model="ir.ui.view">
+        <field name="name">of.survey.survey.search.intervention.menu</field>
+        <field name="model">of.survey.survey</field>
+        <field name="inherit_id" ref="of_survey.of_survey_survey_view_search_base"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="attributes">
+                <attribute name="string">Survey</attribute>
+            </xpath>
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <filter string="Type Intervention" name="intervention" domain="[('survey_type', '=', 'intervention_survey')]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_action_survey_form" model="ir.actions.act_window">
+        <field name="name">Surveys</field>
+        <field name="res_model">of.survey.survey</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('survey_type','=','intervention_survey')]</field>
+        <field name="context">{'default_survey_type': 'intervention_survey'}</field>
+        <field name="search_view_id" ref="of_survey_survey_view_search_intervention_menu"/>
+        <field name="help" type="html">
+            <p>
+                No Survey Found
+            </p>
+        </field>
+    </record>
+
+</odoo>
