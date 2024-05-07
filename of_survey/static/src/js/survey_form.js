@@ -627,7 +627,7 @@ odoo.define("of_survey.form", function (require) {
              */
             _onChoiceImgClick: function (ev) {
                 ev.preventDefault();
-                this.imgZoomer = new SurveyImageZoomer({
+                this.imgZoomer = new OFSurveyImageZoomer({
                     sourceImage: $(ev.currentTarget).attr("src"),
                 });
                 this.imgZoomer.appendTo(document.body);

@@ -102,7 +102,8 @@
                                         <field name="id" invisible="1"/>
                                         <field name="sequence" widget="handle"/>
                                         <field name="value" string="Choices"/>
-
+                                        <field name="value_image_filename" invisible="1"/>
+                                        <field name="value_image" width="200px" filename="value_image_filename" options="{'accepted_file_extensions': 'image/*'}"/>
                                         <field name="is_default" invisible="1"/>
                                         <button class="btn" name="action_button_check_suggested_answer_ids" type="object" icon="fa-square-o" context="{'active_answer': id}" attrs="{'invisible': ['|', ('is_default','=',True), ('id','=',False)]}" string="(Tick to set as default)"/>
                                         <button class="btn" name="action_button_uncheck_suggested_answer_ids" type="object" icon="fa-check-square" context="{'active_answer': id}" attrs="{'invisible': ['|', ('is_default','=',False), ('id','=',False)]}" string="(Tick to set as default)"/>
