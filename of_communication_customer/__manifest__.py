@@ -8,7 +8,6 @@
     'website': "https://www.openfire.fr",
     'category': 'OpenFire',
     'summary': "Gestion de la communication",
-    'description': "",
     'depends': [
         'base',
         'mail',

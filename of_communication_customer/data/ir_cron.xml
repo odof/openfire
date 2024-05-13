@@ -5,7 +5,7 @@
         <field name="name">Message : Automatically retrieve messages from parent database to child database </field>
         <field name="active">True</field>
         <field name="user_id" ref="base.user_root"/>
-        <field name="model_id" ref="model_of_communication_customer"/>
+        <field name="model_id" ref="model_of_communication"/>
         <field name="interval_number">5</field>
         <field name="interval_type">minutes</field>
         <field name="numbercall">-1</field>

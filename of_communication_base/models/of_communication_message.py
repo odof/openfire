@@ -56,6 +56,8 @@ class OfCommunication(models.Model):
         help="Content of the message notification. The maximum number of characters is 280",
     )
     message = fields.Html(help="Content of the message")
+    edited = fields.Boolean(string="Edited", default=False)
+    canceled = fields.Boolean(string="Canceled", default=False)
 
     def action_button_publish(self):
         for record in self:
@@ -73,6 +75,7 @@ class OfCommunication(models.Model):
             if record.state not in ['published']:
                 raise exceptions.UserError(_("You can only edit message in 'Published' state."))
             record.state = 'edit'
+            record.edited = True
 
     def action_button_publish_edit(self):
         for record in self:
@@ -85,8 +88,10 @@ class OfCommunication(models.Model):
             if record.state in ['published']:
                 raise exceptions.UserError(_("You can only cancel message in \'Draft\' state."))
             record.state = 'canceled'
+            record.canceled = True
 
     def unlink(self):
+        print(self.env.context)
         for record in self:
             if not self.env.context.get('of_force_message_delete') and record.state != 'canceled':
                 raise exceptions.UserError(_("You can only delete messages that are in 'Canceled' state."))

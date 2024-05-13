@@ -38,7 +38,6 @@ msgstr "Annuler"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__canceled
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__canceled
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Canceled"
 msgstr "Annulé"
@@ -90,14 +89,12 @@ msgstr "Afficher un nom"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__draft
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__draft
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Draft"
 msgstr "Brouillon"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__edit
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__edit
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_form_views
 msgid "Edit"
 msgstr "Modifier"
@@ -244,7 +241,6 @@ msgstr "Publier la modification"
 
 #. module: of_communication_base
 #: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__state__published
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication_customer__state__published
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Published"
 msgstr "Publié"
