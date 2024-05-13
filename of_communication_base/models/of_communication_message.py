@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -11,10 +11,8 @@ class OfCommunication(models.Model):
     _order = 'date desc'
 
     name = fields.Text(string="Title", required=True, help="Title of message")
-    date = fields.Date(
-        string="Date", default=fields.Date.today, required=True, copy=False, help="Post publication date"
-    )
-    type = fields.Selection(
+    date = fields.Date(default=fields.Date.today, required=True, copy=False, help="Post publication date")
+    message_type = fields.Selection(
         string="Type",
         selection=[
             ('informative_message', "Informative Message"),
@@ -23,11 +21,14 @@ class OfCommunication(models.Model):
             ('critical_alert_message', "Critical Alert Message"),
         ],
         required=True,
-        help="Type of message",
+        help="Type of message."
+        "Depending on its type the notification will have a color which will define its urgency : "
+        "- Informative Message in blue "
+        "- Patch Note in blue "
+        "- Non-Critical Alert Message in orange "
+        "- Critical Alert Message in red ",
     )
     state = fields.Selection(
-        string="State",
-        readonly=True,
         selection=[
             ('draft', "Draft"),
             ('published', "Published"),
@@ -51,44 +52,48 @@ class OfCommunication(models.Model):
         help="The message's removed date and time. If not set, it stays visible until replaced by a new message.",
     )
     summary = fields.Text(
-        string="Summary",
-        default="",
         required=True,
         help="Content of the message notification. The maximum number of characters is 280",
     )
-    message = fields.Html(string="Message", help="Content of the message")
+    message = fields.Html(help="Content of the message")
 
-    def of_action_publish(self):
+    def action_button_publish(self):
         for record in self:
             if record.state in ['published', 'edit', 'canceled']:
-                raise exceptions.UserError("You can only publish message in 'Draft' state.")
+                raise exceptions.UserError(_("You can only publish message in 'Draft' state."))
             record.state = 'published'
 
-    def of_action_all_publish(self):
+    def action_all_publish(self):
         for record in self:
             if record.state in ['draft', 'edit']:
                 record.state = 'published'
 
-    def of_action_edit(self):
+    def action_button_edit(self):
         for record in self:
             if record.state not in ['published']:
-                raise exceptions.UserError("You can only edit message in 'Published' state.")
+                raise exceptions.UserError(_("You can only edit message in 'Published' state."))
             record.state = 'edit'
 
-    def of_action_publish_edit(self):
+    def action_button_publish_edit(self):
         for record in self:
             if record.state in ['published', 'canceled']:
-                raise exceptions.UserError("You can only publish message in 'Edit' state.")
+                raise exceptions.UserError(_("You can only publish message in 'Edit' state."))
             record.state = 'published'
 
-    def of_action_cancel(self):
+    def action_button_cancel(self):
         for record in self:
             if record.state in ['published']:
-                raise exceptions.UserError('You can only cancel message in \'Draft\' state.')
+                raise exceptions.UserError(_("You can only cancel message in \'Draft\' state."))
             record.state = 'canceled'
+
+    def unlink(self):
+        for record in self:
+            if not self.env.context.get('of_force_message_delete') and record.state != 'canceled':
+                raise exceptions.UserError(_("You can only delete messages that are in 'Canceled' state."))
+        return super().unlink()
 
     @api.constrains('summary')
     def _check_char_max_summary(self):
         for record in self:
             if len(record.summary) > 280:
-                raise ValidationError('You cannot have more than 280 characters in the summary')
+                raise ValidationError(_("You cannot have more than 280 characters in the summary"))

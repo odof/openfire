@@ -6,9 +6,10 @@
         <field name="model">of.communication</field>
         <field name="arch" type="xml">
             <tree string="Tree Message">
+                <field name="id"/>
                 <field name="date"/>
                 <field name="name"/>
-                <field name="type"/>
+                <field name="message_type"/>
                 <field name="summary" optional="show"/>
                 <field name="state"/>
             </tree>
@@ -21,28 +22,28 @@
         <field name="arch" type="xml">
             <form string="Form Message">
                 <header>
-                    <button name="of_action_publish" string="Publish" class="btn-primary" type="object" states="draft"/>
-                    <button name="of_action_publish_edit" string="Publish the Edit" class="btn-primary" type="object" states="edit"/>
-                    <button name="of_action_edit" string="Edit" class="btn-secondary" type="object" states="published"/>
-                    <button name="of_action_cancel" string="Cancel" class="btn-secondary" type="object" states="draft"/>
+                    <button name="action_button_publish" string="Publish" class="btn-primary" type="object" states="draft"/>
+                    <button name="action_button_publish_edit" string="Publish the Edit" class="btn-primary" type="object" states="edit"/>
+                    <button name="action_button_edit" string="Edit" class="btn-secondary" type="object" states="published, canceled"/>
+                    <button name="action_button_cancel" string="Cancel" class="btn-secondary" type="object" states="draft"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,published"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
-                            <field name="name" attrs="{'readonly': [('state', '=', 'published')]}"/>
-                            <field name="date" attrs="{'readonly': [('state', '=', 'published')]}"/>
-                            <field name="type" attrs="{'readonly': [('state', '=', 'published')]}"/>
+                            <field name="name" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="date" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="message_type" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                         </group>
                         <group>
-                            <field name="start_scheduled_publication" attrs="{'readonly': [('state', '=', 'published')]}"/>
-                            <field name="end_scheduled_publication" attrs="{'readonly': [('state', '=', 'published')]}"/>
+                            <field name="start_scheduled_publication" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="end_scheduled_publication" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                         </group>
                         <notebook>
                             <page string="Message">
                                 <group>
-                                    <field name="summary" attrs="{'readonly': [('state', '=', 'published')]}"/>
-                                    <field name="message" attrs="{'readonly': [('state', '=', 'published')]}"/>
+                                    <field name="summary" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                                    <field name="message" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                                 </group>
                             </page>
                         </notebook>
@@ -60,17 +61,19 @@
         <field name="model">of.communication</field>
         <field name="arch" type="xml">
             <search string="Search Message">
-                <filter name="communication_message_filter_group_type" string="Type" context="{'group_by': 'type'}"/>
-                <filter name="communication_message_filter_group_state" string="State" context="{'group_by': 'state'}"/>
-                <filter name="communication_message_filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
-                <filter name="communication_message_filter_published" string="Published" domain="['|',('state', '=', 'published'),('state','=','edit')]"/>
-                <filter name="communication_message_filter_canceled" string="Canceled" domain="[('state', '=', 'canceled')]"/>
-                <filter name="communication_message_filter_active" string="Archived" domain="[('active', '=', False)]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_published" string="Published" domain="['|',('state', '=', 'published'),('state','=','edit')]"/>
+                <filter name="filter_canceled" string="Canceled" domain="[('state', '=', 'canceled')]"/>
+                <filter name="filter_active" string="Archived" domain="[('active', '=', False)]"/>
                 <separator/>
-                <filter name="communication_message_filter_informative_message" string="Informative Message" domain="[('type', '=', 'informative_message')]"/>
-                <filter name="communication_message_filter_patch_note" string="Patch Note" domain="[('type', '=', 'patch_note')]"/>
-                <filter name="communication_message_filter_non-critical_alert_message" string="Non-Critical Alert Message" domain="[('type', '=', 'non-critical_alert_message')]"/>
-                <filter name="communication_message_filter_critical_alert_message" string="Critical Alert Message" domain="[('type', '=', 'critical_alert_message')]"/>
+                <filter name="filter_informative_message" string="Informative Message" domain="[('message_type', '=', 'informative_message')]"/>
+                <filter name="filter_patch_note" string="Patch Note" domain="[('message_type', '=', 'patch_note')]"/>
+                <filter name="filter_non-critical_alert_message" string="Non-Critical Alert Message" domain="[('message_type', '=', 'non-critical_alert_message')]"/>
+                <filter name="filter_critical_alert_message" string="Critical Alert Message" domain="[('message_type', '=', 'critical_alert_message')]"/>
+                <group>
+                    <filter name="filter_group_message_type" string="Type" context="{'group_by': 'message_type'}"/>
+                    <filter name="filter_group_state" string="State" context="{'group_by': 'state'}"/>
+                </group>
             </search>
         </field>
     </record>

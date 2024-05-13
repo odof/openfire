@@ -7,8 +7,7 @@
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
     'category': 'OpenFire',
-    'summary': "Gestion de la communication",
-    'description': "",
+    'summary': "Gestion de la communication entre base (message, alertes, etc.)",
     'depends': [
         'base',
         'mail',

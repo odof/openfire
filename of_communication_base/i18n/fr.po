@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-30 06:32+0000\n"
-"PO-Revision-Date: 2024-04-30 06:32+0000\n"
+"POT-Creation-Date: 2024-05-07 13:57+0000\n"
+"PO-Revision-Date: 2024-05-07 13:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -70,7 +70,7 @@ msgid "Created on"
 msgstr "Créé sur"
 
 #. module: of_communication_base
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__type__critical_alert_message
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_type__critical_alert_message
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Critical Alert Message"
 msgstr "Message d'alerte critique"
@@ -138,7 +138,7 @@ msgid "If checked, some messages have a delivery error."
 msgstr "Si coché, certains messages ont une erreur de livraison."
 
 #. module: of_communication_base
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__type__informative_message
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_type__informative_message
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Informative Message"
 msgstr "Message informatif"
@@ -190,7 +190,7 @@ msgid "Messages"
 msgstr "Messages"
 
 #. module: of_communication_base
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__type__non-critical_alert_message
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_type__non-critical_alert_message
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Non-Critical Alert Message"
 msgstr "Message d'alerte non critique"
@@ -216,7 +216,7 @@ msgid "Number of messages with delivery error"
 msgstr "Nombre de messages avec erreur de livraison"
 
 #. module: of_communication_base
-#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__type__patch_note
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_type__patch_note
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Patch Note"
 msgstr "Note de mise à jour"
@@ -299,12 +299,60 @@ msgid "Tree Message"
 msgstr "Liste de message"
 
 #. module: of_communication_base
-#: model:ir.model.fields,field_description:of_communication_base.field_of_communication__type
+#: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_type
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Type"
-msgstr "Type"
+msgstr ""
 
 #. module: of_communication_base
-#: model:ir.model.fields,help:of_communication_base.field_of_communication__type
-msgid "Type of message"
-msgstr "Type de message"
+#: model:ir.model.fields,help:of_communication_base.field_of_communication__message_type
+msgid ""
+"Type of message.Depending on its type the notification will have a color "
+"which will define its urgency :Informative Message in bluePatch Note in "
+"blueNon-Critical Alert Message in orangeCritical Alert Message in red"
+msgstr ""
+"Type de message.Selon son type la notification aura une couleur "
+"qui définira son urgence :Message informatif en bleuPatch Note en "
+"bleuMessage d'alerte non critique en orangeMessage d'alerte critique en rouge"
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You can only cancel message in 'Draft' state."
+msgstr "Vous ne pouvez annuler le message qu'à l'état « Brouillon »."
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You can only delete messages that are in 'Canceled' state."
+msgstr "Vous ne pouvez supprimer que les messages qui sont à l'état « Annulé »."
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You can only edit message in 'Published' state."
+msgstr "Vous ne pouvez modifier le message qu'à l'état « Publié »."
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You can only publish message in 'Draft' state."
+msgstr "Vous ne pouvez publier un message qu'à l'état « Brouillon »."
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You can only publish message in 'Edit' state."
+msgstr "Vous ne pouvez publier un message qu'à l'état « Modifier »."
+
+#. module: of_communication_base
+#. odoo-python
+#: code:addons/of_communication_base/models/of_communication_message.py:0
+#, python-format
+msgid "You cannot have more than 280 characters in the summary"
+msgstr "Vous ne pouvez pas avoir plus de 280 caractères dans le résumé"
