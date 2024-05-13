@@ -146,3 +146,17 @@ class IrAttachment(models.Model):
             dms_dirs.filtered(lambda directory: not directory.files and not directory.child_directories).unlink()
 
         return res
+
+    @api.model
+    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        # Special case for Muk preview widget in mail.compose.message pop-up
+        if len(args) == 1 and args[0][0] == 'id' and args[0][1] == '=':
+            id = args[0][2]
+            self._cr.execute("""SELECT id, res_model, res_id FROM ir_attachment WHERE id = %s""", [id])
+            row = self._cr.dictfetchone()
+            if row and row['res_model'] == 'mail.compose.message' and row['res_id'] == 0:
+                return super(IrAttachment, self.sudo())._search(
+                    args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
+
+        return super(IrAttachment, self)._search(
+            args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
