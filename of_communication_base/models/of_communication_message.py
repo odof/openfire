@@ -21,12 +21,13 @@ class OfCommunication(models.Model):
             ('critical_alert_message', "Critical Alert Message"),
         ],
         required=True,
+        tracking=True,
         help="Type of message."
-        "Depending on its type the notification will have a color which will define its urgency : "
-        "- Informative Message in blue "
-        "- Patch Note in blue "
-        "- Non-Critical Alert Message in orange "
-        "- Critical Alert Message in red ",
+        "Depending on its type the notification will have a color which will define its urgency : \n"
+        "  * Informative Message in blue \n"
+        "  * Patch Note in blue \n"
+        "  * Non-Critical Alert Message in orange \n"
+        "  * Critical Alert Message in red ",
     )
     state = fields.Selection(
         selection=[
@@ -37,6 +38,7 @@ class OfCommunication(models.Model):
         ],
         required=True,
         default="draft",
+        tracking=True,
         help="State of message",
     )
     active = fields.Boolean(string="Archived", default=True)
@@ -44,20 +46,22 @@ class OfCommunication(models.Model):
         string="Start of Scheduled Publication",
         readonly=False,
         required=True,
+        tracking=True,
         help="The message's display date and time.",
     )
     end_scheduled_publication = fields.Datetime(
         string="End of Scheduled Publication",
         readonly=False,
+        tracking=True,
         help="The message's removed date and time. If not set, it stays visible until replaced by a new message.",
     )
     summary = fields.Text(
         required=True,
+        tracking=True,
         help="Content of the message notification. The maximum number of characters is 280",
     )
     message = fields.Html(help="Content of the message")
     edited = fields.Boolean(string="Edited", default=False)
-    canceled = fields.Boolean(string="Canceled", default=False)
 
     def action_button_publish(self):
         for record in self:
@@ -88,7 +92,6 @@ class OfCommunication(models.Model):
             if record.state in ['published']:
                 raise exceptions.UserError(_("You can only cancel message in \'Draft\' state."))
             record.state = 'canceled'
-            record.canceled = True
 
     def unlink(self):
         print(self.env.context)

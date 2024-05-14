@@ -17,7 +17,6 @@
         'security/ir.model.access.csv',
 
         'views/of_communication_message_views.xml',
-        'views/of_communication_menus.xml',
 
         'data/ir_cron.xml',
     ],

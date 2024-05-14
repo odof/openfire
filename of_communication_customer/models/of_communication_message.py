@@ -125,38 +125,54 @@ class OfCommunicationCustomer(models.Model):
             ],
         )
 
-    def _unlink_old_message(self):
-        for record in self:
-            now = fields.Datetime.now()
-            models, db, uid, password = record._get_connection_to_openFire()
-            existing_messages = self.search(
+    def _unlink_edited_message(self):
+        now = fields.Datetime.now()
+        models, db, uid, password = self._get_connection_to_openFire()
+        existing_messages = self.search(
+            [
+                ('state', '=', 'published'),
+                ('start_scheduled_publication', '<=', now),
+                ('end_scheduled_publication', '>=', now),
+            ]
+        )
+        existing_msg_ids = existing_messages.mapped('source_message_id')
+
+        parent_messages = models.execute_kw(
+            db,
+            uid,
+            password,
+            'of.communication',
+            'search_read',
+            [
                 [
-                    ('start_scheduled_publication', '>=', now),
-                    ('end_scheduled_publication', '<=', now),
+                    ('id', 'in', existing_msg_ids),
+                    ('start_scheduled_publication', '<=', now),
+                    ('end_scheduled_publication', '>=', now),
+                    ('edited', '=', True),
                 ]
-            )
-            existing_msg_ids = existing_messages.mapped('source_message_id')
+            ],
+            {'fields': []},
+        )
 
-            parent_messages = models.execute_kw(
-                db,
-                uid,
-                password,
-                'of.communication',
-                'search_read',
-                [
-                    [
-                        ('id', 'in', existing_msg_ids),
-                        ('state', '!=', 'published'),
-                    ]
-                ],
-                {'fields': []},
-            )
+        for message in parent_messages:
+            child_message = existing_messages.filtered(lambda r: r.source_message_id == message['id'])
+            child_message.with_context(of_force_message_delete=True).unlink()
 
-            for message in parent_messages:
-                self.unlink()
+    def _unlink_old_message(self):
+        now = fields.Datetime.now()
+        existing_messages = self.search(
+            [
+                ('state', '=', 'published'),
+                ('end_scheduled_publication', '<=', now),
+            ]
+        )
+
+        for message in existing_messages:
+            message.with_context(of_force_message_delete=True).unlink()
 
     @api.model
     def _cron_communication_message_between_customer_and_base(self):
         self._create_new_message()
         self._update_existing_message()
-        # self._unlink_old_message()
+        self._unlink_edited_message()
+        self._unlink_old_message()

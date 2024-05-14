@@ -6,7 +6,6 @@
         <field name="model">of.communication</field>
         <field name="arch" type="xml">
             <tree string="Tree Message">
-                <field name="id"/>
                 <field name="date"/>
                 <field name="name"/>
                 <field name="message_type"/>
