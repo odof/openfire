@@ -95,35 +95,36 @@ class OfCommunicationCustomer(models.Model):
             ],
             {'fields': []},
         )
-        messages_to_update = []
+        parent_upd_msg_ids = []
 
         for message in parent_messages:
-            child_message = existing_messages.filtered(lambda r: r.source_message_id == message['id'])
-            child_message and child_message.write(
-                {
-                    'name': message['name'],
-                    'message_type': message['message_type'],
-                    'start_scheduled_publication': message['start_scheduled_publication'],
-                    'end_scheduled_publication': message['end_scheduled_publication'],
-                    'summary': message['summary'],
-                    'message': message['message'],
-                }
-            )
-            messages_to_update.append(message['id'])
+            if child_message := existing_messages.filtered(lambda r: r.source_message_id == message['id']):
+                child_message.write(
+                    {
+                        'name': message['name'],
+                        'message_type': message['message_type'],
+                        'start_scheduled_publication': message['start_scheduled_publication'],
+                        'end_scheduled_publication': message['end_scheduled_publication'],
+                        'summary': message['summary'],
+                        'message': message['message'],
+                    }
+                )
+                parent_upd_msg_ids.append(message['id'])
 
-        models.execute_kw(
-            db,
-            uid,
-            password,
-            'of.communication',
-            'write',
-            [
-                messages_to_update,
-                {
-                    'edited': False,
-                },
-            ],
-        )
+        if messages_to_update:
+            models.execute_kw(
+                db,
+                uid,
+                password,
+                'of.communication',
+                'write',
+                [
+                    messages_to_update,
+                    {
+                        'edited': False,
+                    },
+                ],
+            )
 
     def _unlink_edited_message(self):
         now = fields.Datetime.now()
