@@ -50,10 +50,10 @@
                             <field name="legal" nolabel="1" />
                         </page>
                         <page name="sheet" string="Intervention sheet">
-                            <group col="4" class="mb-4">
+                            <group col="1" class="mb-4">
                                 <group>
                                     <field name="sheet_use_default" attrs="{'invisible':[('is_default_template','=',True)]}" />
-                                    <separator string="Displayed fields" colspan="2" />
+                                    <separator string="Displayed fields" />
                                     <field name="sheet_title" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
                                     <field name="sheet_partner_id" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
                                     <field name="sheet_date" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
@@ -128,10 +128,10 @@
                             </group>
                         </page>
                         <page name="report" string="Intervention report">
-                            <group col="4" class="mb-4">
+                            <group col="1" class="mb-4">
                                 <group>
                                     <field name="report_use_default" attrs="{'invisible':[('is_default_template','=',True)]}" />
-                                    <separator string="Displayed fields" colspan="2" />
+                                    <separator string="Displayed fields" />
                                     <field name="report_title" attrs="{'readonly':[('report_use_default','=',True)]}" />
                                     <field name="report_partner_id" attrs="{'readonly':[('report_use_default','=',True)]}" />
                                     <field name="report_date" attrs="{'readonly':[('report_use_default','=',True)]}" />
