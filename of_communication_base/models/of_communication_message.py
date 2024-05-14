@@ -94,7 +94,6 @@ class OfCommunication(models.Model):
             record.state = 'canceled'
 
     def unlink(self):
-        print(self.env.context)
         for record in self:
             if not self.env.context.get('of_force_message_delete') and record.state != 'canceled':
                 raise exceptions.UserError(_("You can only delete messages that are in 'Canceled' state."))
