@@ -116,6 +116,8 @@ class OFSurveyUserInput(models.Model):
     def _mark_in_progress(self):
         """marks the state as 'in_progress' and updates the start_datetime accordingly."""
         self.write({'start_datetime': fields.Datetime.now(), 'state': 'in_progress'})
+        for user_input in self:
+            user_input.predefined_question_ids = user_input.survey_id._prepare_user_input_predefined_questions()
 
     def get_start_url(self):
         self.ensure_one()

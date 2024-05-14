@@ -99,3 +99,18 @@ class CrmLead(models.Model):
             'target': 'self',
             'url': url,
         }
+
+    def action_button_edit_survey(self):
+        # on passe le survey en cours
+        self.of_survey_user_input._mark_in_progress()
+
+        # on met sur la première question
+        self.of_survey_user_input.last_displayed_page_id = 0
+
+        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input.access_token}'
+        return {
+            'type': 'ir.actions.act_url',
+            'name': _("Edit Survey"),
+            'target': 'self',
+            'url': url,
+        }

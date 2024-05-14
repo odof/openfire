@@ -8,12 +8,14 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
                 <page name="survey" string="Survey">
+                    <field name="of_survey_user_input_line" invisible="1"/>
                     <group>
                         <group>
                             <field name="of_survey_id" context="{'default_survey_type': 'intervention_survey'}"/>
                         </group>
                         <group attrs="{'invisible': [('of_survey_id','=',False)]}">
                             <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>
+                            <button class="btn btn-secondary" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line','=',[])]}"/>
                         </group>
                         <field name="of_answers_ids">
                             <tree create="false" edit="false" delete="false" decoration-info="is_page">

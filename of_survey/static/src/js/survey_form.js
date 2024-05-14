@@ -125,6 +125,7 @@ odoo.define("of_survey.form", function (require) {
                                 .on("click", self._onSubmit.bind(self));
 
                             self.$('button[type="submit"]').removeClass("disabled");
+                            self._showConditionalQuestions();
                         }
                     })
                     .then(function () {
@@ -510,6 +511,32 @@ odoo.define("of_survey.form", function (require) {
                                             );
                                             dependingQuestion.removeClass("d-none");
                                         });
+                                        // Si jamais results est vide, il faut être sûr qu'on a bien caché toutes les
+                                        // questions conditionnelles (ce qui n'est pas forcément le cas quand on edit un questionnaire)
+                                        // on va donc demander à odoo, la liste des questions conditionnelles de la question en cours
+                                        // et toutes les cacher
+                                        if (results.length == 0) {
+                                            self._rpc({
+                                                model: "of.survey.conditional.question",
+                                                method: "search_read",
+                                                args: [
+                                                    [
+                                                        ['triggering_question_id', '=', parseInt($question_id)]
+                                                    ],
+                                                    ['question_id'],
+                                                ],
+                                            })
+                                            .then(function(res) {
+
+                                                res.map((question) => {
+                                                    if (question.question_id.length > 0) {
+                                                        var dependingQuestion = $('.js_question-wrapper#' + question.question_id[0]);
+                                                        dependingQuestion.addClass('d-none');
+                                                    }
+                                                })
+
+                                            });
+                                        }
                                     }
                                 );
                             });
@@ -609,6 +636,30 @@ odoo.define("of_survey.form", function (require) {
                                             );
                                             dependingQuestion.removeClass("d-none");
                                         });
+                                        // Si jamais results est vide, il faut être sûr qu'on a bien caché toutes les
+                                        // questions conditionnelles (ce qui n'est pas forcément le cas quand on edit un questionnaire)
+                                        // on va donc demander à odoo, la liste des questions conditionnelles de la question en cours
+                                        // et toutes les cacher
+                                        if (results.length == 0) {
+                                            self._rpc({
+                                                model: "of.survey.conditional.question",
+                                                method: "search_read",
+                                                args: [
+                                                    [
+                                                        ['triggering_question_id', '=', parseInt($question_id)]
+                                                    ],
+                                                    ['question_id'],
+                                                ],
+                                            })
+                                            .then(function(res) {
+                                                res.map((question) => {
+                                                    if (question.question_id.length > 0) {
+                                                        var dependingQuestion = $('.js_question-wrapper#' + question.question_id[0]);
+                                                        dependingQuestion.addClass('d-none');
+                                                    }
+                                                })
+                                            });
+                                        }
                                     }
                                 );
                             });
@@ -1054,6 +1105,14 @@ odoo.define("of_survey.form", function (require) {
                     this._scrollToError($errorTarget);
                 }
 
+                // Ici, on va vérifier chaque input pour voir s'il est déjà sélectionné ou pas quand on affiche plusieurs
+                // questions sur la même page
+                // Soit parce qu'il est une valeur par défaut, soit parce que nous sommes dans une modifications
+                // d'un questionnaire. Cela va permettre d'afficher les questions conditionnelles de ces réponses
+                if (self.options.questionsLayout != 'page_per_question') {
+                    self._showConditionalQuestions();
+                };
+
                 let show_end = $(".show_end").attr("data-show");
                 let record_id = $(".show_end").attr("res-id");
                 let model = $(".show_end").attr("res-model");
@@ -1079,7 +1138,19 @@ odoo.define("of_survey.form", function (require) {
                     }
                 }
             },
-
+            _showConditionalQuestions: function() {
+                var self = this;
+                this.$('.o_survey_form_choice_item').each(function() {
+                    if ($(this).is(':checked')) {
+                        $(this).addClass('o_survey_form_choice_item_selected');
+                        let target = {
+                            currentTarget: this,
+                        }
+                        self._onChangeChoiceItem(target);
+                        $($(this).parent()).addClass('o_survey_selected');
+                    }
+                })
+            },
             // VALIDATION TOOLS
             // -------------------------------------------------------------------------
             /**

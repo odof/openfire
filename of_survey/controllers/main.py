@@ -617,6 +617,10 @@ class OFSurvey(http.Controller):
         # on va créer une liste de question et réponses pour retourner la liste des questions qui sont à afficher
         for question in questions_answers:
             for answer_id in question["answers"]:
+                # si la question est déjà dans les réponses, on la supprime
+                lines = new_user_input.user_input_line_ids.filtered(lambda r: r.question_id.id == int(question["id"]))
+                lines.unlink()
+
                 new_user_input.user_input_line_ids = [
                     Command.create(
                         {
