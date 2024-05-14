@@ -18,7 +18,7 @@ class OFImage(models.Model):
     name = fields.Char()
     sequence = fields.Integer(default=10)
 
-    image_1920 = fields.Image()
+    image_1920 = fields.Image(required=True)
 
     can_image_1024_be_zoomed = fields.Boolean(
         string="Can Image 1024 be zoomed", compute='_compute_can_image_1024_be_zoomed', store=True
@@ -47,7 +47,7 @@ class OFImage(models.Model):
         image_data = base64.b64encode(buffered.getvalue())
 
         self.write({'image_1920': image_data})
-        return {'type': 'ir.actions.client', 'tag': 'soft_reload'}
+        return True
 
     @api.depends('image_1920', 'image_1024')
     def _compute_can_image_1024_be_zoomed(self):
