@@ -111,7 +111,7 @@ class OfCommunicationCustomer(models.Model):
                 )
                 parent_upd_msg_ids.append(message['id'])
 
-        if messages_to_update:
+        if parent_upd_msg_ids:
             models.execute_kw(
                 db,
                 uid,
@@ -119,7 +119,7 @@ class OfCommunicationCustomer(models.Model):
                 'of.communication',
                 'write',
                 [
-                    messages_to_update,
+                    parent_upd_msg_ids,
                     {
                         'edited': False,
                     },
