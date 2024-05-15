@@ -2,7 +2,7 @@
 
 from xmlrpc import client
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 
 class OfCommunicationCustomer(models.Model):
@@ -13,7 +13,7 @@ class OfCommunicationCustomer(models.Model):
 
     def _get_connection_to_openFire(self):
         url = "http://localhost:8069"
-        db = "openfire"
+        db = "openfire16-stage"
         username = "admin"
         password = "admin"
 
@@ -51,8 +51,9 @@ class OfCommunicationCustomer(models.Model):
             {'fields': []},
         )
 
+        created_messages = self.env['of.communication'].browse()
         for message in parent_messages:
-            self.create(
+            created_msg = self.create(
                 {
                     'name': message['name'],
                     'date': message['date'],
@@ -65,6 +66,8 @@ class OfCommunicationCustomer(models.Model):
                     'source_message_id': message['id'],
                 }
             )
+            created_messages |= created_msg
+        created_messages and created_messages._dispatch_notification()
 
     def _update_existing_message(self):
         now = fields.Datetime.now()
@@ -177,3 +180,25 @@ class OfCommunicationCustomer(models.Model):
         self._update_existing_message()
         self._unlink_edited_message()
         self._unlink_old_message()
+
+    def _dispatch_notification(self):
+        users = self.env['res.users'].search([])  # TODO: Filter users ?
+        for message in self:
+            href_action = (
+                f"<a href='/web#id={message.id}&view_type=form&model=of.communication&"
+                f"action={self.env.ref('of_communication_base.of_communication_action').id}'>View</a>"
+            )
+            message = f"<p>{message.summary}</p><p>{href_action}</p>"
+            for user in users:
+                if user.has_group('base.group_user'):  # NOTE: Check specific group ?
+                    self.env['bus.bus']._sendone(
+                        user.partner_id,
+                        'simple_notification',
+                        {
+                            'title': _("New message from OpenFire"),
+                            'message': message,
+                            'sticky': True,
+                            'warning': True,
+                            'message_is_html': True,
+                        },
+                    )
