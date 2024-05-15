@@ -26,6 +26,7 @@ class CalendarEvent(models.Model):
             return
 
         self.of_task_id = self.of_request_id.task_id
+        self.of_partner_id = self.of_request_id.partner_id
         self.of_address_id = self.of_request_id.address_id or self.of_request_id.partner_id
         self.of_tag_ids = self.of_request_id.tag_ids
         if self.of_request_id.order_id:
