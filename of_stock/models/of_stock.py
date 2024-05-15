@@ -1106,10 +1106,10 @@ class StockQuant(models.Model):
         return res
 
     of_brand_id = fields.Many2one(
-        comodel_name='of.product.brand', related='product_id.brand_id', string=u"Marque", store=True, readonly=True,
-        compute_sudo=True)
+        comodel_name='of.product.brand', related='product_id.product_tmpl_id.brand_id', string=u"Marque", store=True,
+        readonly=True, compute_sudo=True)
     of_categ_id = fields.Many2one(
-        comodel_name='product.category', related='product_id.categ_id',
+        comodel_name='product.category', related='product_id.product_tmpl_id.categ_id',
         string=u"Catégorie d'article", store=True, readonly=True, compute_sudo=True)
     of_partner_id = fields.Many2one(
         comodel_name='res.partner', related='reservation_id.picking_id.partner_id',
