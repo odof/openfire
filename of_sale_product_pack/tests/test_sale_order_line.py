@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import Command
+from odoo.tests import Form
 
 from odoo.addons.of_product_pack.tests.common import TestOFProdutPackCommon
 from odoo.addons.of_sale.tests.common import TestOFSaleCommon
@@ -13,6 +14,34 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
 
     def setUp(self):
         return super().setUp()
+
+    def test_00_sale_order_line_of_pack_ok(self):
+        """Test if pack_ok product are correctly passed to the sale order line"""
+        self.assertEqual(self.product_1.pack_ok, False)
+
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': self.product_1.id,
+                    'product_uom_qty': 1,
+                },
+            ),
+        ]
+        order_pack_not_ok = self.env['sale.order'].create(order_values)
+        self.assertEqual(order_pack_not_ok.order_line[0].of_pack_ok, False)
+
+        order_values = self._prepare_empty_sale_order_values()
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': self.product_pack_detailed.id,
+                    'product_uom_qty': 1,
+                },
+            ),
+        ]
+        order_pack_ok = self.env['sale.order'].create(order_values)
+        self.assertEqual(order_pack_ok.order_line[0].of_pack_ok, True)
 
     def test_01_sale_order_line_of_pack_type(self):
         """Test if sale order line are correctly created and removed when changing of_pack_type"""
@@ -208,3 +237,97 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         self.assertTrue(
             order.order_line.filtered(lambda line: line.product_id == new_product and not line.pack_parent_line_id)
         )
+
+    def test_04_sale_order_line_product_uom_qty_ignored(self):
+        """Test if the quantities (and the price unit) are correctly computed on the sale order lines
+        for an ignored component price on pack"""
+        order_values = self._prepare_empty_sale_order_values()
+
+        # On rajoute un pack
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': self.product_pack_detailed.id,
+                    'product_uom_qty': 1,
+                },
+            ),
+        ]
+        order = self.env['sale.order'].create(order_values)
+        self.assertEqual(order.order_line[0].product_uom_qty, 1)
+        self.assertEqual(order.order_line[1].product_uom_qty, 1)
+        self.assertEqual(order.order_line[2].product_uom_qty, 1)
+        self.assertEqual(order.order_line[0].price_unit, 40)
+        self.assertEqual(order.order_line[1].price_unit, 0)
+        self.assertEqual(order.order_line[2].price_unit, 0)
+
+        # On modifie les quantités des composants du pack
+        with Form(order.order_line[0], 'of_sale_product_pack.of_sale_order_line_view') as line_form:
+            with line_form.of_pack_line_ids.edit(0) as pack_line_form:
+                pack_line_form.quantity = 2
+                pack_line_form.save()
+            with line_form.of_pack_line_ids.edit(1) as pack_line_form:
+                pack_line_form.quantity = 3
+                pack_line_form.save()
+            line_form.save()
+
+        self.assertEqual(order.order_line[0].product_uom_qty, 1)
+        self.assertEqual(order.order_line[1].product_uom_qty, 2)
+        self.assertEqual(order.order_line[2].product_uom_qty, 3)
+        self.assertEqual(order.order_line[0].price_unit, 40)
+        self.assertEqual(order.order_line[1].price_unit, 0)
+        self.assertEqual(order.order_line[2].price_unit, 0)
+
+        # On modifie le nombre de pack
+        with Form(order) as order_form:
+            with order_form.order_line.edit(0) as line_form:
+                line_form.product_uom_qty = 2
+                line_form.save()
+            order = order_form.save()
+
+        self.assertEqual(order.order_line[0].product_uom_qty, 2)
+        self.assertEqual(order.order_line[1].product_uom_qty, 4)
+        self.assertEqual(order.order_line[2].product_uom_qty, 6)
+        self.assertEqual(order.order_line[0].price_unit, 40)
+        self.assertEqual(order.order_line[1].price_unit, 0)
+        self.assertEqual(order.order_line[2].price_unit, 0)
+
+    def test_05_sale_order_line_product_uom_qty_totalized(self):
+        """Test if the quantities (and the price unit) are correctly computed on the sale order lines
+        for an ignored component price on pack"""
+        order_values = self._prepare_empty_sale_order_values()
+
+        # On rajoute un pack
+        order_values['order_line'] = [
+            Command.create(
+                {
+                    'product_id': self.product_pack_non_detailed.id,
+                    'product_uom_qty': 1,
+                },
+            ),
+        ]
+        order = self.env['sale.order'].create(order_values)
+        self.assertEqual(order.order_line[0].product_uom_qty, 1)
+        self.assertEqual(order.order_line[0].price_unit, 32.0)
+
+        # On modifie les quantités des composants du pack
+        with Form(order.order_line[0], 'of_sale_product_pack.of_sale_order_line_view') as line_form:
+            with line_form.of_pack_line_ids.edit(0) as pack_line_form:
+                pack_line_form.quantity = 2
+                pack_line_form.save()
+            with line_form.of_pack_line_ids.edit(1) as pack_line_form:
+                pack_line_form.quantity = 3
+                pack_line_form.save()
+            line_form.save()
+
+        self.assertEqual(order.order_line[0].product_uom_qty, 1)
+        self.assertEqual(order.order_line[0].price_unit, 84.0)
+
+        # On modifie le nombre de pack
+        with Form(order) as order_form:
+            with order_form.order_line.edit(0) as line_form:
+                line_form.product_uom_qty = 2
+                line_form.save()
+            order = order_form.save()
+
+        self.assertEqual(order.order_line[0].product_uom_qty, 2)
+        self.assertEqual(order.order_line[0].price_unit, 84.0)

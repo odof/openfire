@@ -18,7 +18,7 @@ class TestOFProdutPackCommon(TestOFProductCommon):
                     'brand_id': cls.product_brand_a.id,
                     'categ_id': cls.env.ref('product.product_category_all').id,
                     'standard_price': 10,
-                    'list_price': 20,
+                    'list_price': 12,
                     'type': 'service',
                 },
                 {
@@ -36,7 +36,7 @@ class TestOFProdutPackCommon(TestOFProductCommon):
                     'brand_id': cls.product_brand_a.id,
                     'categ_id': cls.env.ref('product.product_category_all').id,
                     'standard_price': 10,
-                    'list_price': 20,
+                    'list_price': 27,
                     'type': 'service',
                 },
             ]

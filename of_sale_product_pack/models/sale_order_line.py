@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 from odoo import Command, api, fields, models
+from odoo.fields import first
 from odoo.tools import float_compare
 
 
@@ -48,13 +49,13 @@ class SaleOrderLine(models.Model):
     @api.depends('product_id')
     def _compute_of_pack_line_ids(self):
         for record in self:
-            if record.product_id and record.product_id.pack_ok:
+            if record.product_id.pack_ok:
                 pack_lines = record.product_id.pack_line_ids
                 pack_line_ids = [
                     Command.create(
                         {
                             'product_id': line.product_id.id,
-                            'quantity': line.quantity,
+                            'quantity': line.quantity * record.product_uom_qty,
                         },
                     )
                     for line in pack_lines
@@ -99,12 +100,16 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_id', 'product_id.pack_ok', 'of_pack_line_ids', 'of_pack_component_price')
     def _compute_price_unit(self):
+        super()._compute_price_unit()
         for line in self:
             if line.of_pack_component_price == 'totalized':
                 line.price_unit = sum(
                     pack_line.product_id.lst_price * pack_line.quantity for pack_line in line.of_pack_line_ids
                 )
-        super()._compute_price_unit()
+
+    # ---------------------------------------------------------------------
+    # ORM methods
+    # ---------------------------------------------------------------------
 
     def write(self, vals):
         if vals.get('of_pack_type') == 'detailed':
@@ -232,6 +237,33 @@ class SaleOrderLine(models.Model):
                 pickings_to_confirm.action_confirm()
         return True
 
+    def expand_pack_line(self, write=False):
+        """
+        Replacement of the OCA `expand_pack_line` function that was based on the components of a pack present
+        on the product form and not on the sales order line as desired.
+        """
+        self.ensure_one()
+        if self.of_pack_ok and self.pack_type == 'detailed':
+            # if we are using update_pricelist or checking out on ecommerce we
+            # only want to update prices
+            vals_list = []
+            for subline in self.of_pack_line_ids:
+                vals = subline.get_sale_order_line_vals(self, self.order_id)
+                if write:
+                    if existing_subline := first(
+                        self.pack_child_line_ids.filtered(lambda child: child.product_id == subline.product_id)
+                    ):
+                        if self.do_no_expand_pack_lines:
+                            vals.pop('product_uom_qty', None)
+                            vals.pop('discount', None)
+                        existing_subline.write(vals)
+                    elif not self.do_no_expand_pack_lines:
+                        vals_list.append(vals)
+                else:
+                    vals_list.append(vals)
+            if vals_list:
+                self.create(vals_list)
+
     def _expand_pack_line(self):
         for line in self:
             if vals_list := [line._get_pack_line_vals(line, sol_pack_line) for sol_pack_line in line.of_pack_line_ids]:
@@ -255,7 +287,7 @@ class SaleOrderLine(models.Model):
                 'order_id': order_line.order_id.id,
                 'sequence': order_line.sequence,
                 'product_id': pack_line.product_id.id,
-                'product_uom_qty': pack_line.quantity,
+                'product_uom_qty': pack_line.quantity * order_line.product_uom_qty,
                 'price_unit': pack_line.product_id.lst_price,
                 'pack_parent_line_id': order_line.id,
                 'pack_modifiable': order_line.product_id.pack_modifiable,
@@ -304,9 +336,11 @@ class SaleOrderLine(models.Model):
             for pack_line in updated_items:
                 product_by_id = values_before_write[line]['product_by_id'][pack_line]
                 li = line.pack_child_line_ids.filtered(
-                    lambda ol: ol.product_id.id == product_by_id and ol.product_uom_qty != pack_line.quantity
+                    lambda ol: ol.product_id.id == product_by_id
+                    and ol.product_uom_qty != (pack_line.quantity * line.product_uom_qty)
                 )
-                li.product_uom_qty = pack_line.quantity
+                li.product_uom_qty = pack_line.quantity * line.product_uom_qty
+                li.price_unit = 0.0
 
             # Remove pack lines from order lines if they don't exist in pack lines anymore
             order_lines_to_remove = self.browse()

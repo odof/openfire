@@ -15,17 +15,11 @@
             </field>
             <field name="name" position="after">
                 <label for="of_pack_line_ids"/>
-                <field name="of_pack_line_ids" mode="tree,form" attrs="{'invisible': [('of_pack_ok', '=', False)]}" required="1">
-                    <tree>
+                <field name="of_pack_line_ids" mode="tree" attrs="{'invisible': [('of_pack_ok', '=', False)]}" required="1">
+                    <tree editable="bottom">
                         <field name="product_id"/>
                         <field name="quantity"/>
                     </tree>
-                    <form>
-                        <group>
-                            <field name="product_id"/>
-                            <field name="quantity"/>
-                        </group>
-                    </form>
                 </field>
             </field>
         </field>
