@@ -2,7 +2,7 @@
 
 from xmlrpc import client
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 from odoo.tools import config
 
 
@@ -66,8 +66,9 @@ class OfCommunicationCustomer(models.Model):
             {'fields': []},
         )
 
+        created_message = self.env['of.communication'].browse()
         for message in parent_messages:
-            self.create(
+            created_msg = self.create(
                 {
                     'name': message['name'],
                     'date': message['date'],
@@ -80,6 +81,8 @@ class OfCommunicationCustomer(models.Model):
                     'source_message_id': message['id'],
                 }
             )
+            created_message |= created_msg
+        created_message and created_message._dispatch_notification()
 
     def _update_existing_message(self):
         """
@@ -119,19 +122,23 @@ class OfCommunicationCustomer(models.Model):
         )
         messages_to_update = []
 
+        update_message = self.env['of.communication'].browse()
         for message in parent_messages:
             child_message = existing_messages.filtered(lambda r: r.source_message_id == message['id'])
-            child_message and child_message.write(
-                {
-                    'name': message['name'],
-                    'message_type': message['message_type'],
-                    'start_scheduled_publication': message['start_scheduled_publication'],
-                    'end_scheduled_publication': message['end_scheduled_publication'],
-                    'summary': message['summary'],
-                    'message': message['message'],
-                }
-            )
+            if child_message:
+                update_msg = child_message.write(
+                    {
+                        'name': message['name'],
+                        'message_type': message['message_type'],
+                        'start_scheduled_publication': message['start_scheduled_publication'],
+                        'end_scheduled_publication': message['end_scheduled_publication'],
+                        'summary': message['summary'],
+                        'message': message['message'],
+                    }
+                )
+                update_message |= update_msg
             messages_to_update.append(message['id'])
+        update_message and update_message._dispatch_notification()
 
         models.execute_kw(
             db,
@@ -202,6 +209,39 @@ class OfCommunicationCustomer(models.Model):
 
         for message in existing_messages:
             message.with_context(of_force_message_delete=True).unlink()
+
+    def _dispatch_notification(self):
+        users = self.env['res.users'].search([])  # TODO: Filter users ?
+        for message in self:
+            button_label = _("View Message")
+            href_action = (
+                f"<a href='/web#id={message.id}&view_type=form&model=of.communication&"
+                f"action={self.env.ref('of_communication_base.of_communication_action').id}'>{button_label}</a>"
+            )
+
+            message_type = message.message_type
+            if message_type == 'critical_alert_message':
+                message_type = 'danger'
+            elif message_type == 'non-critical_alert_message':
+                message_type = 'warning'
+            else:
+                message_type = 'info'
+
+            message = f"<div>{message.summary}</div><div>{href_action}</div>"
+            for user in users:
+                if user.has_group('base.group_user'):  # NOTE: Check specific group ?
+                    self.env['bus.bus']._sendone(
+                        user.partner_id,
+                        'of_banner_notification',
+                        {
+                            'title': _("New message from OpenFire : "),
+                            'message': message,
+                            'sticky': True,
+                            'warning': False,
+                            'type': message_type,
+                            'message_is_html': True,
+                        },
+                    )
 
     @api.model
     def _cron_communication_message_between_customer_and_base(self):

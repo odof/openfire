@@ -18,6 +18,11 @@
 
         'data/ir_cron.xml',
     ],
+    "assets": {
+        'web.assets_backend': [
+            'of_communication_customer/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
