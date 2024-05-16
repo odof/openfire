@@ -451,7 +451,14 @@ export class OFSaleSectionOne2Many extends X2ManyField {
             context['default_of_position_node'] = this.list.records.filter((record) => record.data.of_parent_node_id == 0).length;
             context['default_of_level'] = 0;
         }
-
+        // Si on ajoute un produit et qu'il existe déjà au moins une section, on doit mettre
+        // le produit dans la section la plus profonde
+        if (!context.default_display_type) {
+            let sections = this.list.records.filter((record) => record.data.display_type == 'line_section');
+            if (sections.length > 0){
+                context['default_of_parent_node_id'] = sections.slice(-1)[0].data.of_node_id;
+            }
+        }
         return super.onAdd({ context, editable });
     }
 }

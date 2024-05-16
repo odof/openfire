@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
     <t t-name="of_sale_layout_category.popupover_info" owl="1">
@@ -16,25 +16,30 @@
                     <div class="form">
                         <legend> What do you want to delete ?</legend>
                         <div class="form-check">
-                          <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete1" value="all" checked="checked"/>
-                          <label class="form-check-label" for="radioDelete1">
-                            This section and all its content(s)
-                          </label>
+                            <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete1" value="all" checked="checked"/>
+                            <label class="form-check-label" for="radioDelete1">
+                                This section and all its content(s)
+                            </label>
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete2" value="one"/>
-                          <label class="form-check-label" for="radioDelete2">
-                            This section and move its content(s)
-                          </label>
+                            <input class="form-check-input" t-model="state.section" type="radio" name="radioDelete" id="radioDelete2" value="one"/>
+                            <label class="form-check-label" for="radioDelete2">
+                                This section and move its content(s)
+                            </label>
                         </div>
                         <t t-if="state.section=='one'">
                             <div class="form">
-                                <p>Move content(s) to this section :</p>
-                                <select name="section" class="form-select" t-model="state.sectionSelected">
-                                    <t t-foreach="sections" t-as="section" t-key="section_index">
-                                        <option t-att-value="section.id"><t t-esc="section.name"/></option>
-                                    </t>
-                                </select>
+                                <t t-if="sections[0]">
+                                    <p>Move content(s) to this section :</p>
+                                    <select name="section" class="form-select" t-model="state.sectionSelected">
+                                        <t t-foreach="sections" t-as="section" t-key="section_index">
+                                            <option t-att-value="section.id"><t t-esc="section.name"/></option>
+                                        </t>
+                                    </select>
+                                </t>
+                                <t t-else="">
+                                    <p>No section to move to. Content will be move to the no section category.</p>
+                                </t>
                             </div>
                         </t>
                     </div>
