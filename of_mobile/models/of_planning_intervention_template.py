@@ -20,6 +20,7 @@ class OFPlanningInterventionTemplate(models.Model):
         string="Sections to display on the intervention",
         default=lambda r: r._default_section_to_display_ids(),
     )
+    send_reports = fields.Selection(selection_add=[('mobile', "Manual dispatch from Mobile")])
 
     def write(self, vals):
         res = super().write(vals)
