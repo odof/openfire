@@ -56,7 +56,7 @@ class OFPlanningInterventionTemplate(models.Model):
                 defaults = default_template_values
         return defaults
 
-    name = fields.Char(required=True)
+    name = fields.Char(required=True, translate=True)
     sequence = fields.Integer(default=1, help="Used to order templates. Lower is better.")
     active = fields.Boolean(default=True)
     code = fields.Char(compute='_compute_code', inverse='_inverse_code', store=True, required=True)
@@ -84,7 +84,7 @@ class OFPlanningInterventionTemplate(models.Model):
     sheet_use_default = fields.Boolean(
         string="Use default report", default=True, help="Use values set in the default template for the report."
     )
-    sheet_title = fields.Char(string="Report title")
+    sheet_title = fields.Char(string="Report title", translate=True)
     sheet_partner_id = fields.Boolean(string="Customer")
     sheet_date = fields.Boolean(string="Date")
 
@@ -147,7 +147,7 @@ class OFPlanningInterventionTemplate(models.Model):
     report_use_default = fields.Boolean(
         string="Use default report", default=True, help="Use values set in the default template for the report."
     )
-    report_title = fields.Char(string="Report title")
+    report_title = fields.Char(string="Report title", translate=True)
     report_partner_id = fields.Boolean(string="Customer")
     report_date = fields.Boolean(string="Date")
 

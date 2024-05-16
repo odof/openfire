@@ -883,6 +883,11 @@ msgid "Default duration"
 msgstr "Durée par défaut"
 
 #. module: of_planning
+#: model:of.planning.intervention.template,name:of_planning.of_planning_default_intervention_template
+msgid "Default template"
+msgstr "Modèle par défaut"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
 msgid "Define the use delivery notes in Interventions"
 msgstr "Définir l'utilisation des BL dans les interventions"
@@ -1330,7 +1335,7 @@ msgstr "Fiche d'intervention"
 #: code:addons/of_planning/models/sale_order.py:0
 #, python-format
 msgid "Intervention Sheet - %s"
-msgstr ""
+msgstr "Fiche d’intervention - %s"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_image__intervention_date
@@ -1369,12 +1374,14 @@ msgid "Intervention notes"
 msgstr "Notes intervention"
 
 #. module: of_planning
+#: model:of.planning.intervention.template,report_title:of_planning.of_planning_default_intervention_template
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
 msgid "Intervention report"
 msgstr "Rapport d'intervention"
 
 #. module: of_planning
+#: model:of.planning.intervention.template,sheet_title:of_planning.of_planning_default_intervention_template
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Intervention sheet"
 msgstr "Fiche d'intervention"
@@ -1678,7 +1685,6 @@ msgid "Minutes of the previous intervention"
 msgstr "Compte-rendu de l'intervention précédente"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_mobile
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_mobile
 msgid "Mobile"
 msgstr ""
@@ -1885,10 +1891,14 @@ msgid "Payments"
 msgstr "Paiements"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_phone
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_phone
 msgid "Phone"
 msgstr "Téléphone"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_phone_number_ids
+msgid "Phone numbers"
+msgstr ""
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -2164,7 +2174,7 @@ msgstr "Numéro de commande"
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_sale_order
 msgid "Sales Order"
-msgstr "Commandes clients"
+msgstr "Bon de commande"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_sale_order_line
