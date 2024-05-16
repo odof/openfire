@@ -12,6 +12,11 @@
         'of_planning',
         'of_survey',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_planning_survey/static/src/scss/survey_survey_views.scss',
+        ],
+    },
     'data': [
         'data/of_planning_intervention_template.xml',
         'views/calendar_event_views.xml',
