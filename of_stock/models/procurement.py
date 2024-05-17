@@ -12,6 +12,11 @@ from psycopg2 import OperationalError
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
+    @api.model
+    def _procurement_from_orderpoint_get_grouping_key(self, orderpoint_ids):
+        orderpoint = self.env['stock.warehouse.orderpoint'].browse(orderpoint_ids)
+        return (orderpoint.location_id.id, orderpoint.of_forecast_limit and orderpoint.of_forecast_period)
+
     def _procurement_from_orderpoint_get_groups(self, orderpoint_ids):
         orderpoint = self.env['stock.warehouse.orderpoint'].browse(orderpoint_ids[0])
         if orderpoint.of_forecast_limit:
