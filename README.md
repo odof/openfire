@@ -49,7 +49,7 @@ Voici les linters utilisés dans ce projet :
   - [Prettier](https://prettier.io/) : formate le code javascript
 
 Les linters sont configurés dans les fichiers suivants :
-* [.sort.cfg](.sort.cfg) : configuration d'isort
+* [.isort.cfg](.isort.cfg) : configuration d'isort
 * [.flake8](.flake8) : configuration de flake8
 * [.pre-commit-config.yaml](.pre-commit-config.yaml) : configuration de pre-commit
 * [.eslintrc.yml](.eslintrc.yml) : configuration d'eslint
@@ -66,7 +66,7 @@ La plus part des IDE supportent ce fichier de configuration de façon native mai
 ## Gitlab-ci
 
 Gitlab lancera le pipeline de contrôle suivant :
-* Isort (configuration dans le fichier [.sort.cfg](.sort.cfg))
+* Isort (configuration dans le fichier [.isort.cfg](.isort.cfg))
 * Flake8 (configuration dans le fichier [.flake8](.flake8))
 * Black avec les paramètres suivants :
     - --skip-string-normalization
