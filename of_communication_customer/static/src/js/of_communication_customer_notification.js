@@ -11,6 +11,9 @@ registerPatch({
          * @override
          */
         async _handleNotification(message) {
+            /**
+             * Cette fonction récupère un message et le renvois dans la fonction qui traite ce type de message
+             */
             if (message.type === "of_banner_notification") {
                 return this._handleNotificationBannerNotificationOF(message.payload);
             }
@@ -21,6 +24,9 @@ registerPatch({
         },
 
         async _handleNotificationSimpleNotificationOF({ message, message_is_html, sticky, title, type }) {
+            /**
+             * Cette fonction récupère un message et crée une notification de type pop-up sur le haut droit de l'écran
+             */
             let notificationType = type
             notificationType = ["warning", "danger", "success", "info"].includes(type) ? type : 'info';
             this.messaging.notify({
@@ -32,6 +38,9 @@ registerPatch({
         },
 
         async _handleNotificationBannerNotificationOF(payload) {
+            /**
+             * Cette fonction récupère un message et crée une notification de type bannière sous la bare de navigation de odoo
+             */
             const container = document.querySelector("nav.o_main_navbar");
             if (!container) {
                 return;

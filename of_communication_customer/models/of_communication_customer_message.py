@@ -37,6 +37,7 @@ class OfCommunicationCustomer(models.Model):
         Elle sélectionne également ceux dont la date et l'heure de publication sont antérieures,
         mais dont la date et l'heure de fin de publication n'est pas encore passée,
         puis les transfère vers la base enfant pour y être créés.
+        Elle envoie ensuite ce message dans la fonction de création des notification
         """
         now = fields.Datetime.now()
         models, db, uid, password = self._get_connection_to_openFire()
@@ -122,11 +123,11 @@ class OfCommunicationCustomer(models.Model):
         )
         messages_to_update = []
 
-        update_message = self.env['of.communication'].browse()
+        # update_message = self.env['of.communication'].browse()
         for message in parent_messages:
             child_message = existing_messages.filtered(lambda r: r.source_message_id == message['id'])
             if child_message:
-                update_msg = child_message.write(
+                child_message.write(  # update_msg =
                     {
                         'name': message['name'],
                         'message_type': message['message_type'],
@@ -136,9 +137,9 @@ class OfCommunicationCustomer(models.Model):
                         'message': message['message'],
                     }
                 )
-                update_message |= update_msg
+                # update_message |= update_msg
             messages_to_update.append(message['id'])
-        update_message and update_message._dispatch_notification()
+        # update_message and update_message._dispatch_notification()
 
         models.execute_kw(
             db,
@@ -211,6 +212,12 @@ class OfCommunicationCustomer(models.Model):
             message.with_context(of_force_message_delete=True).unlink()
 
     def _dispatch_notification(self):
+        """
+        La fonction récupère les message crée, puis récupère tous les users.
+        Ensuit pour chaque message elle crée un lien pour aller le voir et donne un type (danger, warning, info),
+        en fonction du type (critical_alert_message, non-critical_alert_message, autre),
+        puis pour chaque user elle crée une notification à partire d'un fichier java script
+        """
         users = self.env['res.users'].search([])  # TODO: Filter users ?
         for message in self:
             button_label = _("View Message")
