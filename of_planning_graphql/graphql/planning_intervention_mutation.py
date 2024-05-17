@@ -112,7 +112,6 @@ class PlanningInterventionUpdate(graphene.Mutation):
         values = env['calendar.event']._prepare_mutation_values(**args)
         intervention = env['calendar.event'].search([('id', '=', id)])
         intervention.write(values)
-        logger.info(values)
         return intervention
 
 

@@ -62,6 +62,7 @@ class ServiceRequest(OdooObjectType):
     duration = graphene.Float()
     planned_duration = graphene.Float()
     remaining_duration = graphene.Float()
+    affectation = graphene.String()
 
     @staticmethod
     def resolve_template(root, info):
@@ -139,3 +140,9 @@ class ServiceRequestInput(graphene.InputObjectType):
 
 class ServiceRequestFilterInput(ServiceRequestInput):
     _name = "ServiceRequestFilterInput"
+    affectation = graphene.String()
+    period = graphene.String()
+    latitude = graphene.Float()
+    longitude = graphene.Float()
+    max_distance = graphene.Float()
+    sort = graphene.String()
