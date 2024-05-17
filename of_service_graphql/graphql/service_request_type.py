@@ -62,6 +62,7 @@ class ServiceRequest(OdooObjectType):
     duration = graphene.Float()
     planned_duration = graphene.Float()
     remaining_duration = graphene.Float()
+    affectation = graphene.String()
 
     @staticmethod
     def resolve_template(root, info):
