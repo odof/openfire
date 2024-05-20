@@ -3,6 +3,7 @@
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 
 class ResUsers(models.Model):
@@ -31,3 +32,24 @@ class ResUsers(models.Model):
             mutation['companies'] = x2many(self=self, model='res.company', input=companies)
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='res.users', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+            if select.email:
+                odoo_domain += [('email', 'ilike', select.email)]
+            if select.mobile:
+                odoo_domain += [('mobile', 'ilike', select.mobile)]
+            if select.phone:
+                odoo_domain += [('phone', 'ilike', select.phone)]
+
+        return odoo_domain

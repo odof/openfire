@@ -3,6 +3,7 @@
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import x2many
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 
 class OFSurveySurvey(models.Model):
@@ -27,3 +28,18 @@ class OFSurveySurvey(models.Model):
             mutation['user_input_ids'] = x2many(self=self, model='of.survey.user_input', input=args.get('user_inputs'))
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='of.survey.survey', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.title:
+                odoo_domain += [('title', 'like', select.name)]
+
+        return odoo_domain

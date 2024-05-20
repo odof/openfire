@@ -5,6 +5,7 @@ import logging
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import convertImage, many2one, x2many
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 logger = logging.getLogger(__name__)
 
@@ -105,3 +106,33 @@ class CalendarEvent(models.Model):
             mutation['of_tag_ids'] = x2many(self=self, model='of.planning.tag', input=args.get('tags'))
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='calendar.event', domain=domain)
+
+        if select:
+            today = fields.Date.from_string(fields.Date.today())
+
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+            if select.duration:
+                odoo_domain += [('duration', '=', select.duration)]
+            if select.start:
+                odoo_domain += [('start', '=', select.start)]
+            if select.stop:
+                odoo_domain += [('stop', '=', select.stop)]
+            if select.days_before_today:
+                before = today + relativedelta(days=-select.days_before_today)
+                odoo_domain += [('start', '>=', fields.Date.to_string(before))]
+            if select.days_after_today:
+                after = today + relativedelta(days=-select.days_after_today)
+                odoo_domain += [('start', '>=', fields.Date.to_string(after))]
+            odoo_domain += [('of_state', 'not in', ['cancel', 'postponed']), ('of_type', '=', 'intervention')]
+
+        return odoo_domain

@@ -3,6 +3,7 @@
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 
 class AccountMove(models.Model):
@@ -25,3 +26,18 @@ class AccountMove(models.Model):
             mutation['fiscal_position_id'] = many2one(self=self, model='account.fiscal.position', input=fiscal_position)
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='account.move.line', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+
+        return odoo_domain

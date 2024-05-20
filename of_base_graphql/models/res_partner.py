@@ -5,6 +5,7 @@ import logging
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +67,28 @@ class ResPartner(models.Model):
             mutation['title'] = many2one(self=self, model='res.partner.title', input=title)
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='res.company', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+            if select.street:
+                odoo_domain += [('street', 'ilike', select.street)]
+            if select.street2:
+                odoo_domain += [('street2', 'ilike', select.street2)]
+            if select.city:
+                odoo_domain += [('city', 'ilike', select.city)]
+            if select.zip:
+                odoo_domain += [('zip', 'ilike', select.zip)]
+            if select.email:
+                odoo_domain += [('email', 'ilike', select.email)]
+
+        return odoo_domain

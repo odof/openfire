@@ -2,6 +2,8 @@
 
 from odoo import api, models
 
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
+
 
 class ResCompany(models.Model):
     _inherit = 'res.company'
@@ -14,3 +16,18 @@ class ResCompany(models.Model):
             mutation['name'] = name
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='res.company', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+
+        return odoo_domain

@@ -2,6 +2,8 @@
 
 from odoo import api, models
 
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
+
 
 class OFImage(models.Model):
     _inherit = 'of.image'
@@ -26,3 +28,18 @@ class OFImage(models.Model):
             mutation['image_1920'] = image_1920
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='res.company', domain=domain)
+
+        if select:
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+
+        return odoo_domain

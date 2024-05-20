@@ -20,36 +20,36 @@ class OdooImage(graphene.Scalar):
         return value
 
 
-def graphqlOdooDomain(odoo_type, domain):
-    """Permet de transformer un domain graphql en domain odoo
-    Le champs odoo_type doit contenir un dictionnaire qui associe les champs qui ne sont pas des str
-    A leur type (int, float etc.)
-    Car la valeur qui est dans le domain graphql est forcément un str, donc on doit le convertir
-    avant de le passer à odoo
-    """
-
+def graphqlOdooDomain(self, model, domain):
+    """Permet de transformer un domain graphql en domain odoo"""
     odoo_domain = []
+    odoo_type = {}
+    odoo_model = self.env['ir.model'].search([('model', '=', model)])
     for d in domain:
         field = d.field
+
+        # on va chercher dans odoo le type du champs
+        odoo_field = self.env['ir.model.fields'].search([('model_id', '=', odoo_model.id), ('name', '=', field)])
+
         operator = d.operator.value
         value = d.value
 
         if field in odoo_type:
-            if odoo_type[field] == 'int':
+            if odoo_field.ttype == 'integer':
                 if operator in ["in", "not in"]:
                     value = d.value.replace("[", "").replace("]", "")
                     value = value.split(",")
                     value = [int(v) for v in value]
                 else:
                     value = int(d.value)
-            elif odoo_type[field] == 'float':
+            elif odoo_field.ttype == 'float':
                 if operator in ["in", "not in"]:
                     value = d.value.replace("[", "").replace("]", "")
                     value = value.split(",")
                     value = [float(v) for v in value]
                 else:
                     value = float(d.value)
-            elif odoo_type[field] == 'boolean':
+            elif odoo_field.ttype == 'boolean':
                 if operator in ["in", "not in"]:
                     value = d.value.replace("[", "").replace("]", "")
                     value = value.split(",")

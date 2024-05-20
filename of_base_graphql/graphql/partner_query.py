@@ -3,7 +3,6 @@ import logging
 import graphene
 
 from odoo.addons.of_graphql.graphql.odoo_domain import OdooDomainInput
-from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 from .partner_type import Partner, PartnerFilterInput
 
@@ -16,37 +15,15 @@ class PartnerQuery(graphene.ObjectType):
 
     partners = graphene.List(
         graphene.NonNull(Partner),
-        filter=graphene.Argument(PartnerFilterInput),
+        select=graphene.Argument(PartnerFilterInput),
         domain=graphene.List(graphene.NonNull(OdooDomainInput)),
         limit=graphene.Int(),
         offset=graphene.Int(),
     )
 
     @staticmethod
-    def resolve_partners(root, info, filter=None, domain=None, offset=0, limit=10):
+    def resolve_partners(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context["env"]
-        odoo_domain = []
-        odoo_type = {
-            'id': 'int',
-            'company_id': 'int',
-        }
-        if domain:
-            odoo_domain = graphqlOdooDomain(odoo_type, domain)
-
-        if filter:
-            if filter.id:
-                odoo_domain += [('id', '=', filter.id)]
-            if filter.name:
-                odoo_domain += [('name', 'ilike', filter.name)]
-            if filter.street:
-                odoo_domain += [('street', 'ilike', filter.street)]
-            if filter.street2:
-                odoo_domain += [('street2', 'ilike', filter.street2)]
-            if filter.city:
-                odoo_domain += [('city', 'ilike', filter.city)]
-            if filter.zip:
-                odoo_domain += [('zip', 'ilike', filter.zip)]
-            if filter.email:
-                odoo_domain += [('email', 'ilike', filter.email)]
+        odoo_domain = env['res.partner']._prepare_graphql_domain(select=select, domain=domain)
 
         return env['res.partner'].search(odoo_domain, offset=offset, limit=limit)
