@@ -48,12 +48,14 @@ def many2one(self, model, input):
 
 def x2many(self, model, input, default=False, keep=False):
     # cette méthode retourne une liste de Command pour les one2many/many2many
+    # parent_id est l'id de l'enregistrement parent
     # default est un dict qui contient les valeurs par défaut que l'on souhaite ajouter à chaque ligne
     # keep permet de préciser si les nouvelles lignes sont ajoutées aux lignes existantes du x2many
     # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
     obj = self.env[model]
     res = []
     res_ids = []
+    creates = []
     if type(default) is bool:
         default = {}
 
@@ -76,14 +78,18 @@ def x2many(self, model, input, default=False, keep=False):
             res_ids.append(record.id)
 
         else:
-            record = obj.create(record_value)
-            res_ids.append(record.id)
+            creates += [record_value]
+            # record = obj.create(record_value)
+            # res_ids.append(record.id)
 
     if keep:
         for id in res_ids:
             res.append(Command.link(id))
     else:
         res = [Command.set(res_ids)]
+
+    for create in creates:
+        res.append(Command.create(create))
 
     return res
 
