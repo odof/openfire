@@ -22,12 +22,12 @@ class OFPlanningInterventionLine(models.Model):
             mutation['discount'] = discount
 
         if quantity := args.get('quantity'):
-            mutation['quantity'] = quantity
+            mutation['qty'] = quantity
 
         if product := args.get('product'):
             mutation['product_id'] = many2one(self=self, model='product.product', input=product)
 
         if 'taxes' in args.keys():
-            mutation['taxes'] = x2many(self=self, model='account.tax', input=args.get('taxes'))
+            mutation['tax_ids'] = x2many(self=self, model='account.tax', input=args.get('taxes'))
 
         return mutation

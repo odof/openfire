@@ -40,7 +40,7 @@ class SurveyConditionalQuestion(OdooObjectType):
     name = graphene.String()
     operator = graphene.String()
     question_id = graphene.Field(SurveyQuestionPage, name="question")
-    triggering_question_id = graphene.Field(SurveyQuestionPage, name="triggeringQuestion")
+    triggering_question_id = graphene.Field(SurveyQuestionPage, name="triggeringQuestion", required=True)
     answer_ids = graphene.List(graphene.NonNull(survey_question_answer_type.SurveyQuestionAnswer), name="answers")
 
 

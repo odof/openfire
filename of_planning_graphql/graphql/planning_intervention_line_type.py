@@ -24,10 +24,10 @@ class PlanningInterventionLineInput(graphene.InputObjectType):
     _name = "PlanningInterventionLineInput"
     _type = "types"
 
-    id = graphene.Int(required=True)
+    id = graphene.Int()
     price_unit = graphene.NonNull(graphene.Float)
     name = graphene.String()
     discount = graphene.NonNull(graphene.Float)
-    product_id = graphene.NonNull(ProductInput, name='product')
-    qty = graphene.NonNull(graphene.Float, name='quantity')
-    tax_ids = graphene.NonNull(graphene.List(graphene.NonNull(AccountTaxInput)), name='taxes')
+    product = graphene.NonNull(ProductInput)
+    quantity = graphene.NonNull(graphene.Float)
+    taxes = graphene.NonNull(graphene.List(graphene.NonNull(AccountTaxInput)))
