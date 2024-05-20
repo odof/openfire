@@ -15,8 +15,8 @@ class IrAttachment(models.Model):
         if name := args.get('name'):
             mutation['name'] = name
 
-        if type := args.get('type'):
-            mutation['type'] = type
+        if ttype := args.get('type'):
+            mutation['type'] = ttype
 
         if res_model := args.get('res_model'):
             mutation['res_model'] = res_model
@@ -24,7 +24,7 @@ class IrAttachment(models.Model):
         if res_id := args.get('res_id'):
             mutation['res_id'] = res_id
 
-        if attachment := input.get("datas", False):
+        if attachment := args.get("datas", False):
             mutation['datas'] = convertImage(attachment)
 
         return mutation

@@ -1,17 +1,21 @@
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "GraphQL OpenFire",
-    "version": "16.0.1.0.1",
-    "license": "LGPL-3",
-    "author": "",
-    "website": "",
-    "depends": ["graphql_base"],
-    "external_dependencies": {"python": ["graphene", "graphdoc", "graphql-server"]},
-    "development_status": "",
-    "maintainers": [""],
-    "installable": True,
+    'name': "OpenFire / GraphQL",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'category': "OpenFire",
+    'summary': "GraphQL pour OpenFire",
+    'website': "https://www.openfire.fr",
+    'depends': [
+        'graphql_base',
+    ],
     'data': [
         'security/ir.model.access.csv',
     ],
+    'external_dependencies': {'python': ['graphene', 'graphdoc', 'graphql-server']},
+    'installable': True,
+    'application': False,
+    'auto_install': False,
 }

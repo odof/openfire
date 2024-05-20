@@ -27,10 +27,10 @@ class OFProductBrand(models.Model):
         if supplier_delay := args.get('supplier_delay'):
             mutation['supplier_delay'] = supplier_delay
 
-        if product_templates := args.get('product_templates'):
-            mutation['product_ids'] = x2many(self=self, model='product.template', input=product_templates)
+        if 'product_templates' in args.keys():
+            mutation['product_ids'] = x2many(self=self, model='product.template', input=args.get('product_templates'))
 
-        if products := args.get('products'):
-            mutation['product_variant_ids'] = x2many(self=self, model='product.product', input=products)
+        if 'products' in args.keys():
+            mutation['product_variant_ids'] = x2many(self=self, model='product.product', input=args.get('products'))
 
         return mutation

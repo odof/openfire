@@ -24,7 +24,7 @@ class OFPlanningTag(models.Model):
         if 'active' in args.keys():
             mutation['active'] = args['active']
 
-        if interventions := args.get('interventions'):
-            mutation['intervention_ids'] = x2many(self=self, model='calendar.event', input=interventions)
+        if 'interventions' in args.keys():
+            mutation['intervention_ids'] = x2many(self=self, model='calendar.event', input=args.get('interventions'))
 
         return mutation

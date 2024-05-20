@@ -1,3 +1,5 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
@@ -11,6 +13,7 @@ class User(OdooObjectType):
     sales_access_right = graphene.String(required=True)
     account_access_right = graphene.String(required=True)
     partner_manager_access_right = graphene.String(required=True)
+    price_change_access_right = graphene.String(required=True)
 
     @staticmethod
     def resolve_interventions_access_right(root, info):
@@ -51,5 +54,12 @@ class User(OdooObjectType):
     def resolve_partner_manager_access_right(root, info):
         if root.has_group('base.group_partner_manager'):
             return 'manager'
+        else:
+            return 'none'
+
+    @staticmethod
+    def resolve_price_change_access_right(root, info):
+        if root.has_group('of_mobile.group_price_change_mobile'):
+            return 'allowed'
         else:
             return 'none'

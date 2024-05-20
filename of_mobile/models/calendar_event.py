@@ -2,12 +2,17 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.models import expression
 
 
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
+
+    @api.model
+    def _default_of_section_to_display_ids(self):
+        section_to_display_ids = self.env['of.planning.intervention.section'].search([])
+        return [Command.link(section_to_display.id) for section_to_display in section_to_display_ids]
 
     of_update_date = fields.Datetime(
         string='Update date',
@@ -24,6 +29,26 @@ class CalendarEvent(models.Model):
         comodel_name='calendar.event',
         compute="_compute_coming_ids",
     )
+
+    of_section_to_display_ids = fields.Many2many(
+        comodel_name='of.planning.intervention.section',
+        relation='of_calendar_event_section_rel',
+        column1='intervention_id',
+        column2='section_id',
+        string="Sections to display on the intervention",
+        help="By adding or removing a section from this list, you can choose which sections will be displayed on the "
+        "mobile app for this intervention.",
+        default=lambda r: r._default_of_section_to_display_ids(),
+        compute='_compute_of_section_to_display_ids',
+        store=True,
+        readonly=False,
+    )
+
+    @api.depends('of_template_id')
+    def _compute_of_section_to_display_ids(self):
+        for event in self:
+            if event.of_template_id:
+                event.of_section_to_display_ids = event.of_template_id.section_to_display_ids
 
     def write(self, vals):
         vals['of_update_date'] = fields.Datetime.now()
@@ -65,6 +90,7 @@ class CalendarEvent(models.Model):
             elif interv.of_partner_id:
                 interventions = interv.of_partner_id.of_intervention_partner_ids
             else:
+                interv.of_historical_ids = False
                 continue
 
             interv.of_historical_ids = interventions.filtered(
@@ -82,6 +108,7 @@ class CalendarEvent(models.Model):
             elif interv.of_partner_id:
                 interventions = interv.of_partner_id.of_intervention_partner_ids
             else:
+                interv.of_coming_ids = False
                 continue
 
             interv.of_coming_ids = interventions.filtered(

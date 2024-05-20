@@ -18,7 +18,7 @@ class GraphQLController(http.Controller, GraphQLControllerMixin):
     @http.route("/graphiql/openfire", auth="user")
     def graphiql(self, **kwargs):
         request.env['of.graphql']._prepare_mutations(OdooGraphql.get_pool(request.env.cr.dbname))
-        OdooGraphql.debug(request.env.cr.dbname)
+        # OdooGraphql.debug(request.env.cr.dbname)
         schema = OdooGraphql.schema(request.env.cr.dbname)
         return self._handle_graphiql_request(schema.graphql_schema)
 

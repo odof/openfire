@@ -26,7 +26,7 @@ class OFSurveyConditionalQuestion(models.Model):
                 self=self, model='of.survey.question', input=triggering_question
             )
 
-        if answers := args.get('answers'):
-            mutation['answer_ids'] = x2many(self=self, model='of.survey.question.answer', input=answers)
+        if 'answers' in args.keys():
+            mutation['answer_ids'] = x2many(self=self, model='of.survey.question.answer', input=args.get('answers'))
 
         return mutation

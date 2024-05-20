@@ -15,6 +15,9 @@ from ..graphql.company_type import CompanyFilterInput, CompanyInput
 from ..graphql.employee_mutation import EmployeeMutation
 from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee, EmployeeFilterInput
+from ..graphql.image_mutation import ImageMutation
+from ..graphql.image_query import ImageQuery
+from ..graphql.image_type import Image, ImageFilterInput
 from ..graphql.partner_mutation import PartnerMutation
 from ..graphql.partner_phone_mutation import PartnerPhoneMutation
 from ..graphql.partner_phone_type import PartnerPhone
@@ -71,6 +74,10 @@ class OFGraphql(models.AbstractModel):
                 ProductTemplate,
                 ProductTemplateMutation,
                 ProductTemplateFilterInput,
+                Image,
+                ImageFilterInput,
+                ImageQuery,
+                ImageMutation,
                 Employee,
                 EmployeeFilterInput,
                 EmployeeQuery,

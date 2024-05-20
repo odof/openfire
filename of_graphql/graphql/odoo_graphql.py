@@ -39,35 +39,52 @@ def many2one(self, model, input):
         else:
             raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
     else:
-        record = obj.create(obj_values)
-        return record.id
+        if len(obj_values.keys()) > 0:
+            record = obj.create(obj_values)
+            return record.id
+        else:
+            return False
 
 
-def x2many(self, model, input, default={}, keep=False):
+def x2many(self, model, input, default=False, keep=False):
     # cette méthode retourne une liste de Command pour les one2many/many2many
     # default est un dict qui contient les valeurs par défaut que l'on souhaite ajouter à chaque ligne
     # keep permet de préciser si les nouvelles lignes sont ajoutées aux lignes existantes du x2many
     # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
     obj = self.env[model]
     res = []
-    if not keep:
-        res.append(Command.clear())
-    logger.info(input)
+    res_ids = []
+    if type(default) is bool:
+        default = {}
+
     if type(input) is dict:
         input = [input]
 
+    if len(input) == 0:
+        return [Command.clear()]
+
     for record in input:
-        record_value = default
+        record_value = default.copy()
         values = obj._prepare_mutation_values(**record)
         record_value.update(values)
-
         if record.id:
             if not obj.search([('id', '=', record.id)]):
                 raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
 
-            res.append(Command.update(record.id, record_value))
+            record = obj.search([('id', '=', record.id)])
+            record.write(record_value)
+            res_ids.append(record.id)
+
         else:
-            res.append(Command.create(record_value))
+            record = obj.create(record_value)
+            res_ids.append(record.id)
+
+    if keep:
+        for id in res_ids:
+            res.append(Command.link(id))
+    else:
+        res = [Command.set(res_ids)]
+
     return res
 
 
@@ -130,7 +147,6 @@ class OdooGraphql:
     @classmethod
     def schema(cls, dbname):
         class_query = False
-        logger.info(cls.pool[dbname])
         if cls.pool[dbname]['schema']:
             return cls.pool[dbname]['schema']
 

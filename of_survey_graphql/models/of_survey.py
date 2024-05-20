@@ -18,10 +18,12 @@ class OFSurveySurvey(models.Model):
         if 'active' in args.keys():
             mutation['active'] = args['active']
 
-        if question_pages := args.get('question_pages'):
-            mutation['question_and_page_ids'] = x2many(self=self, model='of.survey.question', input=question_pages)
+        if 'question_pages' in args.keys():
+            mutation['question_and_page_ids'] = x2many(
+                self=self, model='of.survey.question', input=args.get('question_pages')
+            )
 
-        if user_inputs := args.get('user_inputs'):
-            mutation['user_input_ids'] = x2many(self=self, model='of.survey.user_input', input=user_inputs)
+        if 'user_inputs' in args.keys():
+            mutation['user_input_ids'] = x2many(self=self, model='of.survey.user_input', input=args.get('user_inputs'))
 
         return mutation

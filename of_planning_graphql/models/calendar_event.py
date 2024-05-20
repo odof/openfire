@@ -1,8 +1,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
+
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import convertImage, many2one, x2many
+
+logger = logging.getLogger(__name__)
 
 
 class CalendarEvent(models.Model):
@@ -71,14 +75,19 @@ class CalendarEvent(models.Model):
         if partner := args.get('partner'):
             mutation['of_partner_id'] = many2one(self=self, model="res.partner", input=partner)
 
-        if invoices := args.get('invoices'):
-            mutation['of_invoice_ids'] = x2many(self=self, model="account.move", input=invoices)
+        if 'invoices' in args.keys():
+            mutation['of_invoice_ids'] = x2many(self=self, model="account.move", input=args.get('invoices'))
 
-        if pickings := args.get('pickings'):
-            mutation['picking_ids'] = x2many(self=self, model="stock.picking", input=pickings)
+        if 'invoice_lines' in args.keys():
+            mutation['of_line_ids'] = x2many(
+                self=self, model='of.planning.intervention.line', input=args.get('invoice_lines')
+            )
 
-        if pictures := args.get('pictures'):
-            mutation['of_all_image_ids'] = x2many(self=self, model="ir.attachment", input=pictures)
+        if 'pickings' in args.keys():
+            mutation['picking_ids'] = x2many(self=self, model="stock.picking", input=args.get('pickings'))
+
+        if 'images' in args.keys():
+            mutation['of_all_image_ids'] = x2many(self=self, model="of.image", input=args.get('images'))
 
         if order := args.get('order'):
             mutation['order_id'] = many2one(self=self, model='sale.order', input=order)
@@ -86,10 +95,13 @@ class CalendarEvent(models.Model):
         if template := args.get('template'):
             mutation['of_template_id'] = many2one(self=self, model='of.planning.intervention.template', input=template)
 
-        if employees := args.get('employees'):
-            mutation['of_employee_ids'] = x2many(self=self, model='hr.employee', input=employees)
+        if 'employees' in args.keys():
+            mutation['of_employee_ids'] = x2many(self=self, model='hr.employee', input=args.get('employees'))
 
         if company := args.get('company'):
             mutation['company_id'] = many2one(self=self, model='res.company', input=company)
+
+        if 'tags' in args.keys():
+            mutation['of_tag_ids'] = x2many(self=self, model='of.planning.tag', input=args.get('tags'))
 
         return mutation

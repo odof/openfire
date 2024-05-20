@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import x2many
@@ -12,11 +13,6 @@ class CalendarEvent(models.Model):
     def _prepare_mutation_values(self, **args):
         mutation = super()._prepare_mutation_values(**args)
 
-        if equipments := args.get('equipments'):
-            mutation['of_equipment_ids'] = x2many(
-                self=self,
-                model='of.equipment',
-                input=equipments,
-            )
-
+        if 'equipments' in args.keys():
+            mutation['of_equipment_ids'] = x2many(self=self, model='of.equipment', input=args.get('equipments'))
         return mutation

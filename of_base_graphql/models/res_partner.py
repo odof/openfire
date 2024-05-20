@@ -15,7 +15,6 @@ class ResPartner(models.Model):
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
-        logger.info(args)
         if name := args.get('name'):
             mutation['name'] = name
 
@@ -55,8 +54,10 @@ class ResPartner(models.Model):
         if ref := args.get('ref'):
             mutation['ref'] = ref
 
-        if phone_numbers := args.get('phone_numbers'):
-            mutation['of_phone_number_ids'] = x2many(self=self, model='of.res.partner.phone', input=phone_numbers)
+        if 'phone_numbers' in args.keys():
+            mutation['of_phone_number_ids'] = x2many(
+                self=self, model='of.res.partner.phone', input=args.get('phone_numbers')
+            )
 
         if parent := args.get('parent'):
             mutation['parent_id'] = many2one(self=self, model='res.partner', input=parent)
