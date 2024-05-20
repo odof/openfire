@@ -1,13 +1,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import logging
 
-from odoo import api, models
+from dateutil.relativedelta import relativedelta
+
+from odoo import api, fields, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import convertImage, many2one, x2many
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
-
-logger = logging.getLogger(__name__)
 
 
 class CalendarEvent(models.Model):
