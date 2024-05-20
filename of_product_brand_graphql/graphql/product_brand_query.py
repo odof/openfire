@@ -3,7 +3,6 @@
 import graphene
 
 from odoo.addons.of_graphql.graphql.odoo_domain import OdooDomainInput
-from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 from .product_brand_type import ProductBrand, ProductBrandFilterInput
 
@@ -14,24 +13,16 @@ class ProductBrandQuery(graphene.ObjectType):
 
     product_brands = graphene.List(
         graphene.NonNull(ProductBrand),
-        filter=graphene.Argument(ProductBrandFilterInput),
+        select=graphene.Argument(ProductBrandFilterInput),
         domain=graphene.List(graphene.NonNull(OdooDomainInput)),
         limit=graphene.Int(),
         offset=graphene.Int(),
     )
 
     @staticmethod
-    def resolve_product_brands(root, info, filter=None, domain=None, offset=0, limit=10):
+    def resolve_product_brands(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context['env']
-        odoo_domain = []
-        odoo_type = {'id': 'int', 'of_mobile': 'boolean'}
-        if domain:
-            odoo_domain = graphqlOdooDomain(odoo_type, domain)
 
-        if filter:
-            if filter.id:
-                odoo_domain += [('id', '=', filter.id)]
-            if filter.name:
-                odoo_domain += [('name', 'like', filter.name)]
+        odoo_domain = env['of.product.brand']._prepare_graphql_domain(select=select, domain=domain)
 
         return env['of.product.brand'].search(odoo_domain, offset=offset, limit=limit)

@@ -3,7 +3,6 @@
 import graphene
 
 from odoo.addons.of_graphql.graphql.odoo_domain import OdooDomainInput
-from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 from .image_type import Image, ImageFilterInput
 
@@ -14,14 +13,14 @@ class ImageQuery(graphene.ObjectType):
 
     images = graphene.List(
         graphene.NonNull(Image),
-        filter=graphene.Argument(ImageFilterInput),
+        select=graphene.Argument(ImageFilterInput),
         domain=graphene.List(graphene.NonNull(OdooDomainInput)),
         limit=graphene.Int(),
         offset=graphene.Int(),
     )
 
     @staticmethod
-    def resolve_images(root, info, filter=None, domain=None, offset=0, limit=10):
+    def resolve_images(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context['env']
         odoo_type = {
             'id': 'int',

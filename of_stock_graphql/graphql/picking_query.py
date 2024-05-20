@@ -3,7 +3,6 @@
 import graphene
 
 from odoo.addons.of_graphql.graphql.odoo_domain import OdooDomainInput
-from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 from .picking_type import Picking, PickingFilterInput
 
@@ -14,24 +13,15 @@ class PickingQuery(graphene.ObjectType):
 
     pickings = graphene.List(
         graphene.NonNull(Picking),
-        filter=graphene.Argument(PickingFilterInput),
+        select=graphene.Argument(PickingFilterInput),
         domain=graphene.List(graphene.NonNull(OdooDomainInput)),
         limit=graphene.Int(),
         offset=graphene.Int(),
     )
 
     @staticmethod
-    def resolve_pickings(root, info, filter=None, domain=None, offset=0, limit=10):
+    def resolve_pickings(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context['env']
-        odoo_domain = []
-        odoo_type = {'id': 'int'}
-        if domain:
-            odoo_domain = graphqlOdooDomain(odoo_type, domain)
-
-        if filter:
-            if filter.id:
-                odoo_domain += [('id', '=', filter.id)]
-            if filter.name:
-                odoo_domain += [('name', 'like', filter.name)]
+        odoo_domain = env['stock.picking']._prepare_graphql_domain(select=select, domain=domain)
 
         return env['stock.picking'].search(odoo_domain, offset=offset, limit=limit)

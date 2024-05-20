@@ -2,6 +2,8 @@
 
 from odoo import api, models
 
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
+
 
 class OFSurveyQuestionAnswer(models.Model):
     _inherit = 'of.survey.question.answer'
@@ -23,3 +25,18 @@ class OFSurveyQuestionAnswer(models.Model):
             mutation['is_default'] = is_default
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='of.survey.question.answer', domain=domain)
+
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.value:
+                odoo_domain += [('value', 'like', select.value)]
+
+        return odoo_domain

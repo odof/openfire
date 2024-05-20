@@ -2,6 +2,8 @@
 
 from odoo import api, models
 
+from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -17,3 +19,18 @@ class ProductTemplate(models.Model):
             mutation['list_price'] = list_price
 
         return mutation
+
+    @api.model
+    def _prepare_graphql_domain(self, select, domain):
+        odoo_domain = []
+
+        if domain:
+            odoo_domain = graphqlOdooDomain(self=self, model='product.template', domain=domain)
+
+        if select:
+            if select.name:
+                odoo_domain += [('name', 'ilike', select.name)]
+            if select.ref:
+                odoo_domain += [('ref', 'ilike', select.ref)]
+
+        return odoo_domain
