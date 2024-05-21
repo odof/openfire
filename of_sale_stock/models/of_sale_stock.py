@@ -386,8 +386,8 @@ class StockPicking(models.Model):
         return amount
 
     @api.multi
-    def write(self, vals):
-        res = super(StockPicking, self).write(vals)
+    def _write(self, vals):
+        res = super(StockPicking, self)._write(vals)
         inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
         if ('min_date' in vals or 'state' in vals) and not inclure_service:
             orders = self.mapped('move_lines.procurement_id.sale_line_id.order_id')
