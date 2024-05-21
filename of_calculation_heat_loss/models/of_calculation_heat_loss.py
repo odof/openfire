@@ -46,7 +46,7 @@ class OFCalculationHeatLoss(models.Model):
         column1='calculation_id', column2='altitude_id', string="Altitudes disponibles",
         compute='_compute_department_id')
     altitude_id = fields.Many2one(
-        comodel_name='of.calculation.altitude', string=u"Altitude", required=True)
+        comodel_name='of.calculation.altitude', string=u"Altitude")
     base_temperature_line_id = fields.Many2one(
         comodel_name='of.calculation.base.temperature.line', string=u"Ligne de température",
         compute='_compute_base_temperature_line_id')

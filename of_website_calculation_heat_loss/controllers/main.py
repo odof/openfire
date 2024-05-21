@@ -14,6 +14,8 @@ class OFCalculationController(http.Controller):
             del request.session['heat_loss_id']
         if 'mail_attempt' in request.session:
             del request.session['mail_attempt']
+        if 'display_altitude' in request.session:
+            del request.session['display_altitude']
 
     def send_email(self, heat_loss, **kwargs):
         try:
@@ -23,6 +25,9 @@ class OFCalculationController(http.Controller):
             heat_loss.write({'mailing_attempt': 'failed'})
         request.session['mail_attempt'] = True
 
+    def address_fields(self):
+        return ['zip_id', 'partner_zip', 'partner_city', 'partner_state_id', 'partner_street']
+
     def update_heat_loss(self, heat_loss, **kwargs):
         if heat_loss:
             heat_loss.write(kwargs)
@@ -30,18 +35,23 @@ class OFCalculationController(http.Controller):
             country = request.env['res.country'].search([('code', '=', 'FR')])
             kwargs['partner_country_id'] = country.id
             heat_loss = heat_loss.sudo().create(kwargs)
+            heat_loss.geolocalize()
+        if any(kwargs[key] != heat_loss[key] for key in self.address_fields()):
+            heat_loss.geolocalize()
         return heat_loss
 
     @http.route('/calcul_deperdition_chaleur', type='http', auth="public", methods=['GET', 'POST'], website=True)
     def heat_loss_calculation_form(self, **kwargs):
         heat_loss_obj = request.env['of.calculation.heat.loss']
         altitude_obj = request.env['of.calculation.altitude']
+        department_obj = request.env['of.calculation.department']
         construction_date_obj = request.env['of.calculation.construction.date']
         construction_type_obj = request.env['of.calculation.construction.type']
         surface_obj = request.env['of.calculation.surface']
         button_pressed = kwargs.pop('button_id', False)
         coef_obj = request.env['of.calculation.fuel.coef']
         better_zip_obj = request.env['res.better.zip']
+        display_altitude = request.session.get('display_altitude', False)
         env = request.env
 
         if button_pressed:
@@ -65,18 +75,26 @@ class OFCalculationController(http.Controller):
                 has_errors['zip_id'] = True
                 del kwargs['zip_id']
 
+        altitudes = altitude_obj.search([])
         if not has_errors:
             heat_loss = heat_loss_obj.sudo().browse(heat_loss_id).exists() if heat_loss_id else heat_loss_obj
             if button_pressed == 'mail':
                 self.send_email(heat_loss=heat_loss, **kwargs)
             if button_pressed == 'validate':
                 heat_loss = self.update_heat_loss(heat_loss=heat_loss, **kwargs)
-            if heat_loss:
+            if heat_loss and not heat_loss.altitude_id:
+                display_altitude = has_errors['altitude'] = True
+                request.session['display_altitude'] = True
+                department = department_obj.search([('code', '=', heat_loss.partner_id.zip[:2])], limit=1)
+                if department:
+                    altitudes = department.base_temperature_id.line_ids.mapped('altitude_id')
+        if heat_loss:
+            request.session['heat_loss_id'] = heat_loss.id
+            if not has_errors:
                 heat_loss.button_compute_estimated_power()
-                request.session['heat_loss_id'] = heat_loss.id
 
         values = {
-            'altitudes': altitude_obj.search([]),
+            'altitudes': altitudes,
             'construction_dates': construction_date_obj.search([]),
             'better_g_list': heat_loss_obj.get_construction_date_for_better_g(),
             'construction_types': construction_type_obj.search([]),
@@ -84,7 +102,8 @@ class OFCalculationController(http.Controller):
             'roof_surfaces': surface_obj.search([('surface_type', '=', 'roof')]),
             'floor_surfaces': surface_obj.search([('surface_type', '=', 'floor')]),
             'fuel_coefs': coef_obj.search([]),
-            'error_dict': has_errors
+            'error_dict': has_errors,
+            'display_altitude': display_altitude,
         }
         if has_errors:
             fields_dict = {}
@@ -120,7 +139,6 @@ class OFCalculationController(http.Controller):
                 message = u"Désolé, il semble que l'adresse que vous avez renseignée est introuvable ou incorrecte. " \
                           u"Veuillez réessayer avec une adresse mail valide."
             values['mailing_attempt_message'] = message
-
         return request.render('of_website_calculation_heat_loss.heat_loss_calculation_form', values)
 
     @http.route('/get_heat_loss_altitude_ids_from_zip', type='json', auth="public", methods=['POST'], website=True)
