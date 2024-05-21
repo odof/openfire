@@ -15,10 +15,9 @@ class UserUpdate(graphene.Mutation):
         mobile = graphene.String()
         phone = graphene.String()
         email = graphene.String()
-        company = graphene.Argument(CompanyInput, required=True, description="Company courante de l'utilisateur")
+        company = graphene.Argument(CompanyInput, description="Company courante de l'utilisateur")
         companies = graphene.List(
-            graphene.NonNull(CompanyInput),
-            required=True,
+            CompanyInput,
             description="Liste des companys auquel à accès l'utilisateur",
         )
 

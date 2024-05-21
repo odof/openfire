@@ -4,6 +4,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
+from .fcm_token_type import FCMToken, FCMTokenInput
+
 
 class User(OdooObjectType):
     _name = 'User'
@@ -14,6 +16,7 @@ class User(OdooObjectType):
     account_access_right = graphene.String(required=True)
     partner_manager_access_right = graphene.String(required=True)
     price_change_access_right = graphene.String(required=True)
+    of_fcm_token_ids = graphene.List(graphene.NonNull(FCMToken), name='FCMTokens')
 
     @staticmethod
     def resolve_interventions_access_right(root, info):
@@ -63,3 +66,10 @@ class User(OdooObjectType):
             return 'allowed'
         else:
             return 'none'
+
+
+class UserInput(graphene.InputObjectType):
+    _name = "UserInput"
+    _type = 'types'
+
+    fcm_tokens = graphene.List(graphene.NonNull(FCMTokenInput))

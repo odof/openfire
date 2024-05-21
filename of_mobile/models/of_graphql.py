@@ -8,6 +8,8 @@ from ..graphql.configuration_query import ConfigurationQuery
 from ..graphql.configuration_type import Configuration
 from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
+from ..graphql.fcm_token_mutation import FCMTokenMutation
+from ..graphql.fcm_token_type import FCMToken, FCMTokenInput
 from ..graphql.partner_query import PartnerQuery
 from ..graphql.partner_type import PartnerCheckDuplications
 from ..graphql.planning_intervention_mutation import PlanningInterventionSendReportMutation
@@ -31,7 +33,7 @@ from ..graphql.planning_intervention_template_type import (
 )
 from ..graphql.planning_intervention_type import PlanningIntervention
 from ..graphql.product_query import ProductQuery
-from ..graphql.user_type import User
+from ..graphql.user_type import User, UserInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -44,6 +46,7 @@ class OFGraphql(models.AbstractModel):
             [
                 Configuration,
                 User,
+                UserInput,
                 PartnerCheckDuplications,
                 PlanningInterventionQuery,
                 ConfigurationQuery,
@@ -59,6 +62,9 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionSectionMutation,
                 EmployeeQuery,
                 Employee,
+                FCMTokenMutation,
+                FCMToken,
+                FCMTokenInput,
                 PlanningInterventionTemplate,
                 PlanningInterventionTemplateInput,
                 PlanningInterventionTemplateFilterInput,
@@ -67,3 +73,17 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTemplateAdditionalLineInput,
             ],
         )
+
+    def _prepare_arguments(self):
+        arguments = super()._prepare_arguments()
+
+        new_arguments = {
+            "UserMutation": {
+                "user_update": {
+                    "fcm_tokens": FCMTokenInput,
+                },
+            }
+        }
+        arguments = self._add_arguments(new_arguments, arguments)
+
+        return arguments

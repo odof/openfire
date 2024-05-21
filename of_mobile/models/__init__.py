@@ -17,3 +17,7 @@ from . import of_equipment
 from . import of_survey
 from . import of_service_request
 from . import of_planning_intervention_template_additional_line
+from . import bus
+from . import of_fcm_device_token
+from . import res_users
+from . import res_partner

@@ -26,10 +26,10 @@ class ResUsers(models.Model):
             mutation['email'] = email
 
         if company := args.get('company'):
-            mutation['company'] = many2one(self=self, model='res.company', input=company)
+            mutation['company_id'] = many2one(self=self, model='res.company', input=company)
 
         if companies := args.get('companies'):
-            mutation['companies'] = x2many(self=self, model='res.company', input=companies)
+            mutation['company_ids'] = x2many(self=self, model='res.company', input=companies)
 
         return mutation
 

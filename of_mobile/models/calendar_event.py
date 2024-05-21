@@ -1,8 +1,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import pytz
 from dateutil.relativedelta import relativedelta
 
-from odoo import Command, api, fields, models
+from odoo import Command, _, api, fields, models
 from odoo.models import expression
 
 
@@ -52,9 +53,262 @@ class CalendarEvent(models.Model):
             if event.of_template_id:
                 event.of_section_to_display_ids = event.of_template_id.section_to_display_ids
 
+    @api.model_create_multi
+    def create(self, list_vals):
+        defer_push_notification = self._context.get('defer_push_notification', False)
+
+        results = super().create(list_vals)
+        for result in results:
+            if not defer_push_notification and self._is_intervention_today(result):
+                user_ids = result.mapped('of_employee_ids.user_id.id')
+                for user_id in user_ids:
+                    notification = {
+                        'backoffice': {
+                            'title': _("New intervention today"),
+                            'message': _(
+                                "Click <a href='/web#id={}&view_type=form&model={}'>here</a> to open it".format(
+                                    result.id, 'calendar.event'
+                                )
+                            ),
+                            'sticky': False,
+                            'warning': True,
+                            'message_is_html': True,
+                        },
+                        'firebase': {
+                            'user_id': user_id,
+                            'kind': 'message_with_data',
+                            'title': _("New intervention today"),
+                            'message': _('Click here to open it'),
+                            'payload': {'type': 'new_intervention', 'intervention_id': result.id},
+                        },
+                    }
+                    user = self.env['res.users'].browse(user_id)
+                    user.send_notif(notification)
+
+        return results
+
     def write(self, vals):
         vals['of_update_date'] = fields.Datetime.now()
-        return super().write(vals)
+
+        # Debrief des changements pour savoir si l'on doit notifier
+        # On ne notifie que pour les interventions du jour et dans les cas suivants :
+        # - changement d'intervenant
+        # - changement d'horaire (pas de notification visible)
+        # - changement de lieu (pas de notification visible)
+        # - changement d'état (pas de notification visible)
+        # Les 3 dernières n'ayant pas de changement de notification visible vont
+        # juste être considérées comme des maj de l'intervention
+        employee_notifications = []
+        intervention_updated_notifications = set()
+
+        defer_push_notification = self._context.get('defer_push_notification', False)
+
+        new_start_date = vals.get('start', False)
+        is_new_start_date_today = False
+
+        if new_start_date:
+            today = fields.Date.from_string(fields.Date.today())
+            new_start_date_parsed = fields.Date.from_string(new_start_date)
+            is_new_start_date_today = today == new_start_date_parsed
+
+        for intervention in self:
+            if defer_push_notification:
+                continue
+
+            if not self._is_intervention_today(intervention) and not is_new_start_date_today:
+                continue
+
+            address_id = vals.get('of_address_id', False)
+
+            previous_address_id = intervention.of_address_id.id if intervention.of_address_id else None
+            if address_id and previous_address_id != address_id:
+                intervention_updated_notifications.add(intervention)
+
+            if new_start_date and new_start_date != intervention.start:
+                intervention_updated_notifications.add(intervention)
+
+            state = vals.get('of_state')
+            if state and state != intervention.of_state:
+                intervention_updated_notifications.add(intervention)
+
+            if vals.get('employee_ids'):
+                previous_employee_ids = (
+                    set([employee.id for employee in intervention.of_employee_ids])
+                    if intervention.of_employee_ids
+                    else set()
+                )
+                new_employee_ids = set(vals.get('of_employee_ids')[0][2])
+
+                if previous_employee_ids != new_employee_ids:
+                    employee_notifications.append((intervention, previous_employee_ids, new_employee_ids))
+
+        result = super().write(vals)
+
+        if not defer_push_notification:
+            employee_obj = self.env['hr.employee']
+            for intervention in intervention_updated_notifications:
+                user_ids = intervention.mapped('of_employee_ids.user_id.id')
+                for user_id in user_ids:
+                    notification = {
+                        'firebase': {
+                            'kind': 'data',
+                            'user_id': user_id,
+                            'payload': {'type': 'updated_intervention', 'intervention_id': intervention.id},
+                        }
+                    }
+                    user = self.env['res.users'].browse(user_id)
+                    user.send_notif(notification)
+
+            for employee_notification in employee_notifications:
+                intervention, previous_employee_ids, new_employee_ids = employee_notification
+
+                employee_ids = intervention.of_employee_ids
+
+                employee_notify_new_intervention = new_employee_ids - previous_employee_ids
+                employee_notify_deleted_intervention = previous_employee_ids - new_employee_ids
+
+                user_ids = [
+                    employee_id.user_id.id
+                    for employee_id in employee_ids.filtered(
+                        lambda x: x.id in employee_notify_new_intervention and x.user_id
+                    )
+                ]
+
+                # Si l'intervention est aujourd'hui et que l'on a des utilisateurs à notifier
+                if user_ids:
+                    for user_id in user_ids:
+                        notification = {
+                            'backoffice': {
+                                'title': _("New intervention today"),
+                                'message': _(
+                                    "Click <a href='/web#id={}&view_type=form&model={}'>here</a> to open it".format(
+                                        intervention.id, 'calendar.event'
+                                    )
+                                ),
+                                'sticky': False,
+                                'warning': True,
+                                'message_is_html': True,
+                            },
+                            'firebase': {
+                                'user_id': user_id,
+                                'kind': 'message_with_data',
+                                'title': _("New intervention today"),
+                                'message': _('Click here to open it'),
+                                'payload': {'type': 'new_intervention', 'intervention_id': intervention.id},
+                            },
+                        }
+                        user = self.env['res.users'].browse(user_id)
+                        user.send_notif(notification)
+
+                tz = pytz.timezone(intervention.event_tz or self.env.context.get('tz'))
+
+                employee_ids_to_notify = employee_obj.search(
+                    [
+                        ('id', 'in', list(employee_notify_deleted_intervention)),
+                        ('user_id', '!=', False),
+                    ]
+                )
+
+                intervention_time = (
+                    pytz.utc.localize(fields.Datetime.from_string(intervention.start)).astimezone(tz).strftime('%H:%M')
+                )
+
+                if employee_ids_to_notify:
+                    user_ids = employee_ids_to_notify.mapped('user_id.id')
+
+                    for user_id in user_ids:
+                        notification = {
+                            'backoffice': {
+                                'title': _("Operator changement"),
+                                'message': _(
+                                    "You are no more the operator of the intervention {} plannified at {}".format(
+                                        intervention.name, intervention_time
+                                    )
+                                ),
+                                'sticky': False,
+                                'warning': True,
+                            },
+                            'firebase': {
+                                'title': _("Operator changement"),
+                                'message': _(
+                                    "You are no more the operator of the intervention {} plannified at {}".format(
+                                        intervention.name, intervention_time
+                                    )
+                                ),
+                                'kind': 'message_with_data',
+                                'user_id': user_id,
+                                'payload': {
+                                    'type': 'deleted_intervention',
+                                    'intervention_id': intervention.id,
+                                },
+                            },
+                        }
+                        user = self.env['res.users'].browse(user_id)
+                        user.send_notif(notification)
+
+        return result
+
+    def unlink(self):
+        delete_notifications = []
+
+        for intervention in self:
+            employee_ids = intervention.of_employee_ids.filtered('user_id')
+            if self._is_intervention_today(intervention):
+                delete_notifications.append(
+                    (intervention.name, intervention.start, intervention.event_tz, employee_ids, intervention.id)
+                )
+
+        result = super().unlink()
+
+        for notification in delete_notifications:
+            (
+                intervention_name,
+                intervention_start_date,
+                intervention_tz,
+                employee_ids,
+                intervention_id,
+            ) = notification
+
+            tz = pytz.timezone(intervention_tz or self.env.context.get('tz'))
+
+            intervention_time = (
+                pytz.utc.localize(fields.Datetime.from_string(intervention_start_date)).astimezone(tz).strftime('%H:%M')
+            )
+
+            user_ids = employee_ids.mapped('user_id.id')
+
+            for user_id in user_ids:
+                notification = {
+                    'backoffice': {
+                        'title': _("Intervention has been deleted"),
+                        'message': _(
+                            "The intervention {} plannified at {} has been deleted".format(
+                                intervention_name, intervention_time
+                            )
+                        ),
+                        'sticky': False,
+                        'warning': True,
+                    },
+                    'firebase': {
+                        'title': _("Intervention has been deleted"),
+                        'message': _(
+                            "The intervention {} plannified at {} has been deleted".format(
+                                intervention_name, intervention_time
+                            )
+                        ),
+                        'kind': 'message_with_data',
+                        'user_id': user_id,
+                        'payload': {
+                            'type': 'deleted_intervention',
+                            'intervention_id': intervention_id,
+                        },
+                    },
+                }
+
+                user = self.env['res.users'].browse(user_id)
+                user.send_notif(notification)
+
+        return result
 
     @api.model
     def action_update_date(self, domain_obj):
@@ -119,3 +373,12 @@ class CalendarEvent(models.Model):
 
     def _filterComingIntervention(self, coming_intervention, intervention_date):
         return intervention_date < coming_intervention.start
+
+    def _is_intervention_today(self, intervention):
+        # On considère qu'une intervention se déroule aujourd'hui
+        # si la date du jour est comprise entre la date de début ou de fin
+
+        today = fields.Date.from_string(fields.Date.today())
+        start_date = fields.Date.from_string(intervention.start)
+        end_date = fields.Date.from_string(intervention.stop)
+        return start_date <= today <= end_date
