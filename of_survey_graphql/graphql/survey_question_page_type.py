@@ -30,6 +30,13 @@ class SurveyQuestionPage(OdooObjectType):
     conditional_questions = graphene.List(
         graphene.NonNull(lambda: SurveyConditionalQuestion), name="conditionalQuestions"
     )
+    constr_mandatory = graphene.Boolean(name="mandatory")
+    default_text = graphene.String()
+    default_date = graphene.DateTime()
+    question_placeholder = graphene.String()
+    add_pictures = graphene.Boolean()
+    comments_allowed = graphene.Boolean()
+    comments_message = graphene.String()
 
 
 class SurveyConditionalQuestion(OdooObjectType):
