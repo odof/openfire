@@ -343,6 +343,20 @@ class StockPicking(models.Model):
         )
         return [('id', 'in', moves.mapped('picking_id').ids)]
 
+    @api.multi
+    def _write(self, vals):
+        res = super(StockPicking, self)._write(vals)
+        inclure_service = self.env['ir.values'].get_default('sale.config.settings', 'of_inclure_service_bl')
+        if ('min_date' in vals or 'state' in vals) and not inclure_service:
+            orders = self.mapped('move_lines.procurement_id.sale_line_id.order_id') + \
+                self.mapped('move_lines.procurement_id.of_sale_comp_id.kit_id.order_line_id.order_id')
+            lines = orders.mapped('order_line').filtered(
+                lambda ol: ol.of_invoice_policy == 'ordered_delivery' and ol.of_is_kit)
+            for line in lines:
+                if not line.kit_id.kit_line_ids.mapped('product_id').filtered(lambda p: p.type != 'service'):
+                    line._compute_of_invoice_date_prev()
+        return res
+
 
 class StockMove(models.Model):
     _inherit = 'stock.move'
