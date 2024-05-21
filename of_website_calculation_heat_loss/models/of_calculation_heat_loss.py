@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import re
+
+import requests
+
 from odoo import api, fields, models
 
 
@@ -75,3 +79,35 @@ class OFCalculationHeatLoss(models.Model):
             })
             partner = partner_obj.create(partner_vals)
         return new_vals, partner
+
+    @api.multi
+    def geolocalize(self):
+        self.ensure_one()
+        try:
+            self.partner_id.geo_code()
+        except Exception as e:
+            return False
+        elevation_api_url = 'https://api.open-elevation.com/api/v1/lookup'
+        try:
+            req = requests.get(
+                elevation_api_url, params={'locations': "%s,%s" % (self.partner_id.geo_lat, self.partner_id.geo_lng)}
+            )
+            result = req.json()
+            if result:
+                elevation = result['results'][0]['elevation']
+            else:
+                return
+        except:
+            return
+        department_obj = self.env['of.calculation.department']
+        department = department_obj.search([('code', '=', self.partner_id.zip[:2])], limit=1)
+        if department:
+            altitudes = department.base_temperature_id.line_ids.mapped('altitude_id')
+            if altitudes:
+                for altitude in altitudes:
+                    values = re.findall(r'\d+', altitude.name)
+                    if values and float(values[0]) <= elevation < float(values[-1]):
+                        break
+                else:
+                    return False
+                self.write({'altitude_id': altitude.id})

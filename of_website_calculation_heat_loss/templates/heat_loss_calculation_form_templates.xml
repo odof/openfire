@@ -148,17 +148,7 @@
                                    data-limit="10"
                                    data-model="res.better.zip"/>
                         </div>
-                        <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
-                            <label class="control-label" for="altitude_id">
-                                <span> Altitude </span>
-                            </label>
-                            <select class="form-control o_website_form_input" id="altitude_id" name="altitude_id" required="required">
-                                <option/>
-                                <t t-foreach="altitudes" t-as="altitude">
-                                    <option t-att-value="altitude.id" t-att-selected="altitude_id and altitude.id == altitude_id.id and 'selected'"><t t-esc="altitude.name"/></option>
-                                </t>
-                            </select>
-                        </div>
+
                         <h3 class="text-center mb8 mt32">Caractéristiques</h3>
                         <div class="form-group form-field o_required form-field-float" data-model-field="true" data-optional="false">
                             <label class="control-label" for="surface">
@@ -267,6 +257,22 @@
                                     <option t-att-value="floor_surface.id" t-att-selected="floor_surface_id and floor_surface.id == floor_surface_id.id and 'selected'"><t t-esc="floor_surface.name"/></option>
                                 </t>
                             </select>
+                        </div>
+                        <div t-attf-style="#{not display_altitude and 'display:none;' or ''}">
+                            <span>
+                                Nous n'avons pas pu récupérer l'altitude à partir de votre adresse, veuillez renseigner l'altitude manuellement.
+                            </span>
+                            <div class="form-group form-field o_required form-field-many2one" data-model-field="true" data-optional="false">
+                                <label class="control-label" for="altitude_id">
+                                    <span> Altitude </span>
+                                </label>
+                                <select class="form-control o_website_form_input" id="altitude_id" name="altitude_id">
+                                    <option/>
+                                    <t t-foreach="altitudes" t-as="altitude">
+                                        <option t-att-value="altitude.id" t-att-selected="altitude_id and altitude.id == altitude_id.id and 'selected'"><t t-esc="altitude.name"/></option>
+                                    </t>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
