@@ -24,4 +24,12 @@ class ServiceRequestQuery(graphene.ObjectType):
         env = info.context["env"]
         odoo_domain = env['of.service.request']._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.service.request'].search(odoo_domain, offset=offset, limit=limit)
+        service_requests_final = env['of.service.request'].search(odoo_domain, offset=offset, limit=limit)
+        # Trier les DI
+        if select.sort == 'nearest_end_date':
+            service_requests_final = sorted(service_requests_final, key=lambda x: x[0].end_date)
+        elif select.sort == 'nearest_distance':
+            service_requests_final = sorted(
+                service_requests_final, key=lambda x: float('inf') if len(x) < 2 or x[1] is None else x[1]
+            )
+        return service_requests_final
