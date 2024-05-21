@@ -27,6 +27,23 @@ from ..graphql.service_request_stage_type import ServiceRequestStage, ServiceReq
 from ..graphql.service_request_type_type import ServiceRequestType, ServiceRequestTypeInput
 
 
+class AffectationType(graphene.Enum):
+    MINE = "mine"
+    ALL = "all"
+    NOT_AFFECTED = "not_affected"
+
+
+class PeriodType(graphene.Enum):
+    CURRENT_WEEK = "current_week"
+    NEXT_WEEK = "next_week"
+    CURRENT_MONTH = "current_month"
+
+
+class SortType(graphene.Enum):
+    NEAREST_END_DATE = "nearest_end_date"
+    NEAREST_DISTANCE = "nearest_distance"
+
+
 class ServiceRequest(OdooObjectType):
     _name = "ServiceRequest"
     _type = "types"
@@ -140,9 +157,9 @@ class ServiceRequestInput(graphene.InputObjectType):
 
 class ServiceRequestFilterInput(ServiceRequestInput):
     _name = "ServiceRequestFilterInput"
-    affectation = graphene.String()
-    period = graphene.String()
+    affectation = graphene.Field(AffectationType)
+    period = graphene.Field(PeriodType)
     latitude = graphene.Float()
     longitude = graphene.Float()
     max_distance = graphene.Float()
-    sort = graphene.String()
+    sort = graphene.Field(SortType)
