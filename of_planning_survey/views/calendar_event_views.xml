@@ -12,6 +12,9 @@
                     <group>
                         <group>
                             <field name="of_survey_id" context="{'default_survey_type': 'intervention_survey'}"/>
+                            <!-- Le champs ci-dessous est mis en invisible pour qu'il soit bien pris par le onchange
+                            sur le of_survey_id -->
+                            <field name="of_survey_user_input" invisible="1"/>
                         </group>
                         <group attrs="{'invisible': [('of_survey_id','=',False)]}">
                             <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>

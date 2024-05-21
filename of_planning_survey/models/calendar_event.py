@@ -34,7 +34,7 @@ class CalendarEvent(models.Model):
 
     @api.depends('of_template_id')
     def _compute_of_survey_id(self):
-        for event in self.filtered(lambda i: i.of_template_id and not i.of_survey_id):
+        for event in self:
             event.of_survey_id = event.of_template_id.survey_id
 
     @api.depends('of_survey_user_input_line', 'of_question_ids')
