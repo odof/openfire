@@ -14,7 +14,7 @@ class ResGroups(models.Model):
         if group_root and group_root.id in self.ids and vals.get('users'):
             if not len(group_root.users):
                 raise UserError(_("The admin account cannot be removed from this group."))
-            admin_user_id = self.env.ref('base.user_admin').id
-            if len(group_root.users) > 1 or admin_user_id not in group_root.users.ids:
+            admins = self.env.ref('base.user_root') | self.env.ref('base.user_admin')
+            if any(user not in admins for user in group_root.users):
                 raise UserError(_("Only the admin account can belong to this group."))
         return res

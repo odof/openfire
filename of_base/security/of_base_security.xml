@@ -6,7 +6,7 @@
     <record id="of_base.of_group_root_only" model="res.groups">
         <field name="name">Admin only</field>
         <field name="comment">Group only for admin (root) user</field>
-        <field name="users" eval="[Command.link(ref('base.user_admin'))]"/>
+        <field name="users" eval="[Command.set([ref('base.user_admin'), ref('base.user_root')])]" />
     </record>
 
     <!-- Création groupe utilisateurs intranet -->

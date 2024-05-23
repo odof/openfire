@@ -57,19 +57,28 @@ class ResUsers(models.Model):
         # mark reactivated users as such
         if inactive_users and values.get('active'):
             inactive_users.write({'of_reactivated_user': True})
+
+        # check that we don't add the group of_group_root_only to a user that is not an admin
         group_root = self.env.ref('of_base.of_group_root_only').sudo()
-        admin_user_id = self.env.ref('base.user_admin').id
+        self._check_admin_only_group()
+
         if not len(group_root.users):
             raise UserError(_("The group \"%s\" cannot be removed from the administrator account.") % group_root.name)
-        if 'groups_id' in values and (len(group_root.users) > 2 or group_root.users.id != admin_user_id):
-            raise UserError(_("Group \"%s\" cannot be added to a user!") % group_root.name)
-
         return result
 
     @api.model_create_multi
     def create(self, vals_list):
-        users = super(ResUsers, self).create(vals_list)
+        users = super().create(vals_list)
+        users._check_admin_only_group()
         for user in users:
             if not user.email:
                 user.email = user._get_default_email()
         return user
+
+    def _check_admin_only_group(self):
+        for user in self:
+            group_root = self.env.ref('of_base.of_group_root_only').sudo()
+            if group_root in user.groups_id and user not in self.env.ref('base.user_root') | self.env.ref(
+                'base.user_admin'
+            ):
+                raise UserError(_("Only the admin account can belong to group \"%s\".") % group_root.name)
