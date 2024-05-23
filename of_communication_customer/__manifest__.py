@@ -14,6 +14,8 @@
         'of_communication_base',
     ],
     'data': [
+        'security/ir.model.access.csv',
+
         'views/of_communication_customer_views.xml',
 
         'data/ir_cron.xml',

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_communication_customer,access.of.communication.customer,model_of_communication,,1,0,0,0
+access_of_communication_notification_log,access.of.communication.notification.log,model_of_communication_notification_log,base.group_user,1,1,1,1

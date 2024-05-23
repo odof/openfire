@@ -1,3 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_communication,access.of.communication,model_of_communication,base.group_user,1,1,1,1
-access_of_communication_customer,access.of.communication.customer,model_of_communication,,1,0,0,0

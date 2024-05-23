@@ -17,6 +17,7 @@
 
         'views/of_communication_views.xml',
         'views/of_communication_menus.xml',
+        'data/ir_config_parameter.xml',
     ],
     'installable': True,
     'application': False,

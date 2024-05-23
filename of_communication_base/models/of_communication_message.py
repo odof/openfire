@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from datetime import timedelta
+
 from odoo import _, api, exceptions, fields, models
 from odoo.exceptions import ValidationError
 
@@ -11,7 +13,7 @@ class OfCommunication(models.Model):
 
     _name = 'of.communication'
     _inherit = 'mail.thread'
-    _description = 'Openfire communication message'
+    _description = 'Message created'
     _order = 'date desc'
 
     name = fields.Text(string="Title", required=True, help="Title of message")
@@ -50,6 +52,7 @@ class OfCommunication(models.Model):
         string="Start of Scheduled Publication",
         readonly=False,
         required=True,
+        default=fields.Datetime.now,
         tracking=True,
         help="The message's display date and time.",
     )
@@ -57,6 +60,8 @@ class OfCommunication(models.Model):
         string="End of Scheduled Publication",
         readonly=False,
         tracking=True,
+        compute='_compute_end_scheduled_publication',
+        store=True,
         help="The message's removed date and time. If not set, it stays visible until replaced by a new message.",
     )
     summary = fields.Text(
@@ -66,6 +71,19 @@ class OfCommunication(models.Model):
     )
     message = fields.Html(help="Content of the message")
     edited = fields.Boolean(string="Edited", default=False)
+    message_style = fields.Selection(
+        selection=[
+            ('banner', "Banner"),
+            ('pop-up', "Pop-up"),
+        ],
+        compute='_compute_style_of_message',
+        readonly=False,
+        store=True,
+        help="Style of message. \n"
+        "Depending on its style, the notification will have a different form : \n"
+        "  * Banner : a banner will appear at the top of the customer page \n"
+        "  * Pop-up : a pop-up will appear at the top right of the customer page \n",
+    )
 
     def action_button_publish(self):
         """
@@ -120,6 +138,30 @@ class OfCommunication(models.Model):
             if not self.env.context.get('of_force_message_delete') and record.state != 'canceled':
                 raise exceptions.UserError(_("You can only delete messages that are in 'Canceled' state."))
         return super().unlink()
+
+    @api.depends('message_type')
+    def _compute_style_of_message(self):
+        """
+        Fonction qui calcule si le message est une alerte non-critique/critique et lui donne un style
+        """
+        for message_type in self:
+            if message_type.message_type in ['non-critical_alert_message', 'critical_alert_message']:
+                message_type.message_style = 'banner'
+            else:
+                message_type.message_style = 'pop-up'
+
+    @api.depends('start_scheduled_publication')
+    def _compute_end_scheduled_publication(self):
+        """
+        Fonction qui calcule une fin de publication d'un message
+        en fonction du paramètre donner dans la configuration de odoo (10 jour de base)
+        """
+        cfg = self.env['ir.config_parameter'].sudo()
+        delay = int(cfg.get_param('of_communication.delay_end_scheduled', 10))
+        for message_end_scheduled in self:
+            message_end_scheduled.end_scheduled_publication = (
+                message_end_scheduled.start_scheduled_publication + timedelta(days=delay)
+            )
 
     @api.constrains('summary')
     def _check_char_max_summary(self):

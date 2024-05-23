@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 13:57+0000\n"
-"PO-Revision-Date: 2024-05-07 13:57+0000\n"
+"POT-Creation-Date: 2024-05-24 06:54+0000\n"
+"PO-Revision-Date: 2024-05-24 06:54+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,6 +30,11 @@ msgstr "Archivé"
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_attachment_count
 msgid "Attachment Count"
 msgstr "Nombre de pièces jointes"
+
+#. module: of_communication_base
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_style__banner
+msgid "Banner"
+msgstr "Bannière"
 
 #. module: of_communication_base
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_form_views
@@ -98,6 +103,11 @@ msgstr "Brouillon"
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_form_views
 msgid "Edit"
 msgstr "Modifier"
+
+#. module: of_communication_base
+#: model:ir.model.fields,field_description:of_communication_base.field_of_communication__edited
+msgid "Edited"
+msgstr "Édité"
 
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__end_scheduled_publication
@@ -177,14 +187,19 @@ msgid "Message"
 msgstr ""
 
 #. module: of_communication_base
+#: model:ir.model,name:of_communication_base.model_of_communication
+msgid "Message created"
+msgstr "Message Crée"
+
+#. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_has_error
 msgid "Message Delivery error"
 msgstr "Erreur de livraison du message"
 
 #. module: of_communication_base
-#: model:ir.model,name:of_communication_base.model_of_communication
-msgid "Message object, which contains all the variables"
-msgstr "Objet de message, qui contient toutes les variables"
+#: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_style
+msgid "Message Style"
+msgstr "Style du message"
 
 #. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__message_ids
@@ -222,6 +237,11 @@ msgstr "Nombre de messages avec erreur de livraison"
 #: model_terms:ir.ui.view,arch_db:of_communication_base.of_communication_message_search
 msgid "Patch Note"
 msgstr "Note de mise à jour"
+
+#. module: of_communication_base
+#: model:ir.model.fields.selection,name:of_communication_base.selection__of_communication__message_style__pop-up
+msgid "Pop-up"
+msgstr ""
 
 #. module: of_communication_base
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__date
@@ -267,9 +287,27 @@ msgid "State of message"
 msgstr "État du message"
 
 #. module: of_communication_base
+#: model:ir.model.fields,help:of_communication_base.field_of_communication__message_style
+msgid ""
+"Style of message. \n"
+"Depending on its style, the notification will have a different form : \n"
+"  * Banner : a banner will appear at the top of the customer page \n"
+"  * Pop-up : a pop-up will appear at the top right of the customer page \n"
+msgstr ""
+"Style du message. \n"
+"Selon son style, la notification aura une forme différente : \n"
+"  * Bannière : une bannière apparaîtra en haut de la page client \n"
+"  * Pop-up : une pop-up apparaîtra en haut à droite de la page client \n"
+
+#. module: of_communication_base
 #: model:ir.model.fields,field_description:of_communication_base.field_of_communication__summary
 msgid "Summary"
 msgstr "Résumé"
+
+#. module: of_communication_base
+#: model:ir.model,name:of_communication_base.model_ir_config_parameter
+msgid "System Parameter"
+msgstr "Paramètre System"
 
 #. module: of_communication_base
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__start_scheduled_publication
@@ -309,13 +347,19 @@ msgstr ""
 #. module: of_communication_base
 #: model:ir.model.fields,help:of_communication_base.field_of_communication__message_type
 msgid ""
-"Type of message.Depending on its type the notification will have a color "
-"which will define its urgency :Informative Message in bluePatch Note in "
-"blueNon-Critical Alert Message in orangeCritical Alert Message in red"
+"Type of message. \n"
+"Depending on its type the notification will have a color which will define its urgency : \n"
+"  * Informative Message in blue \n"
+"  * Patch Note in blue \n"
+"  * Non-Critical Alert Message in orange \n"
+"  * Critical Alert Message in red "
 msgstr ""
-"Type de message.Selon son type la notification aura une couleur "
-"qui définira son urgence :Message informatif en bleuPatch Note en "
-"bleuMessage d'alerte non critique en orangeMessage d'alerte critique en rouge"
+"Type de message. \n"
+"Selon son type la notification aura une couleur qui définira son urgence : \n"
+"  * Message informatif en bleu \n"
+"  * Patch Note en bleu \n"
+"  * Message d'alerte non critique en orange \n"
+"  * Message d'alerte critique en rouge \n"
 
 #. module: of_communication_base
 #. odoo-python
@@ -329,7 +373,8 @@ msgstr "Vous ne pouvez annuler le message qu'à l'état « Brouillon »."
 #: code:addons/of_communication_base/models/of_communication_message.py:0
 #, python-format
 msgid "You can only delete messages that are in 'Canceled' state."
-msgstr "Vous ne pouvez supprimer que les messages qui sont à l'état « Annulé »."
+msgstr ""
+"Vous ne pouvez supprimer que les messages qui sont à l'état « Annulé »."
 
 #. module: of_communication_base
 #. odoo-python

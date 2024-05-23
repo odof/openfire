@@ -1,0 +1,96 @@
+.banner-notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0px 20px;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    animation: fadeIn 0.5s ease-in-out;
+    overflow: hidden;
+    font-size: 15px;
+}
+
+.banner-header div {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 5px;
+}
+
+.banner-header .bold{
+    font-weight: bold;
+}
+
+.banner-notification .close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.see_later {
+    background-color: transparent;
+    color: #fff;
+    padding: 0px 20px;
+    border: none;
+    padding: 0px ;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.see_later:hover {
+    background-color: transparent;
+    transform: scale(1.05);
+}
+
+.see_later:focus {
+    outline: none;
+}
+
+.banner-notification.banner-danger {
+    background-color: #f44336;
+}
+
+.banner-notification.banner-warning {
+    background-color: #ff9800;
+
+}
+
+.banner-notification.banner-info {
+    background-color: #2196f3;
+
+}
+
+.banner-notification .close:hover {
+    color: #ccc;
+}
+
+.banner-notification.closing {
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+}

@@ -33,6 +33,7 @@
                             <field name="name" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                             <field name="date" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                             <field name="message_type" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
+                            <field name="message_style" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>
                         </group>
                         <group>
                             <field name="start_scheduled_publication" attrs="{'readonly': ['|', ('state', '=', 'published'), ('state', '=', 'canceled')]}"/>

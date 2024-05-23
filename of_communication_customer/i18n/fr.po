@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 12:39+0000\n"
-"PO-Revision-Date: 2024-05-17 12:39+0000\n"
+"POT-Creation-Date: 2024-05-24 06:55+0000\n"
+"PO-Revision-Date: 2024-05-24 06:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,9 +16,59 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__action_type
+msgid "Action Type"
+msgstr "Type de l'action"
+
+#. module: of_communication_customer
 #: model:ir.model.fields,field_description:of_communication_customer.field_of_communication__active
 msgid "Archived"
 msgstr "Archivé"
+
+#. module: of_communication_customer
+#: model:ir.model.fields.selection,name:of_communication_customer.selection__of_communication_notification_log__action_type__close
+msgid "Close"
+msgstr "Fermer"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__create_uid
+msgid "Created by"
+msgstr "Crée par"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__create_date
+msgid "Created on"
+msgstr "Crée sur"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__display_name
+msgid "Display Name"
+msgstr "Afficher un nom"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__id
+msgid "ID"
+msgstr ""
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__message_id
+msgid "Message"
+msgstr ""
 
 #. module: of_communication_customer
 #: model:ir.actions.server,name:of_communication_customer.model_name_cron_ir_actions_server
@@ -27,20 +77,31 @@ msgid ""
 "Message : Automatically retrieve messages from parent database to child "
 "database "
 msgstr ""
-"Message : Récupérer automatiquement les messages de la base de données parent vers la "
-"base de données enfant"
+"Message : Récupérer automatiquement les messages de la base de données "
+"parent vers la base de données enfant"
+
+#. module: of_communication_customer
+#: model:ir.model,name:of_communication_customer.model_of_communication
+msgid "Message Crée"
+msgstr "Message de communication d'OpenFire"
 
 #. module: of_communication_customer
 #. odoo-python
 #: code:addons/of_communication_customer/models/of_communication_customer_message.py:0
+#: code:addons/of_communication_customer/models/of_communication_customer_message.py:0
 #, python-format
-msgid "Nouveau message d'OpenFire :"
-msgstr ""
+msgid "New message from OpenFire : "
+msgstr "Nouveau message d'OpenFire : "
 
 #. module: of_communication_customer
-#: model:ir.model,name:of_communication_customer.model_of_communication
-msgid "Openfire communication message"
-msgstr "Message de communication d'OpenFire"
+#: model:ir.model,name:of_communication_customer.model_of_communication_notification_log
+msgid "Notification log"
+msgstr "Log des notifications"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__read
+msgid "Read"
+msgstr "Lire"
 
 #. module: of_communication_customer
 #: model:ir.model.fields,field_description:of_communication_customer.field_of_communication__source_message_id
@@ -48,7 +109,23 @@ msgid "Source Message ID"
 msgstr "ID du message source"
 
 #. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__timestamp
+msgid "Timestamp"
+msgstr "Horodatage"
+
+#. module: of_communication_customer
+#: model:ir.model.fields,field_description:of_communication_customer.field_of_communication_notification_log__user_id
+msgid "User"
+msgstr "Utilisateur/Utilisatrice"
+
+#. module: of_communication_customer
+#: model:ir.model.fields.selection,name:of_communication_customer.selection__of_communication_notification_log__action_type__view
+msgid "View"
+msgstr "Vue"
+
+#. module: of_communication_customer
 #. odoo-python
+#: code:addons/of_communication_customer/models/of_communication_customer_message.py:0
 #: code:addons/of_communication_customer/models/of_communication_customer_message.py:0
 #, python-format
 msgid "View Message"
