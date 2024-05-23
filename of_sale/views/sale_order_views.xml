@@ -104,10 +104,10 @@
 
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_template_id']" position="before">
                     <field name="id" invisible="1"/>
-                    <button name="action_button_open_sale_order_line" style="max-width: 39px;" type="object" icon="fa-folder-open" title="Open sale order line"
-                        attrs="{'invisible': ['|', ('id', '=', False), ('state', 'in', ('done','cancel'))]}"/>
+                    <button name="action_button_open_sale_order_line" type="object" icon="fa-folder-open" title="Open sale order line"
+                       attrs="{'invisible': ['|', ('id', '=', False), ('state', 'in', ('done','cancel'))]}"/>
                     <field name="of_obsolete" invisible="1"/>
-                    <button name="action_button_dummy" style="max-width: 39px;" class="btn-outline-danger disabled" aria-label="Obsolete"
+                    <button name="action_button_dummy" class="btn-outline-danger disabled" aria-label="Obsolete"
                             type="object" icon="fa-clock-o" title="Obsolete" attrs="{'column_invisible': [('of_obsolete', '=', False)], 'invisible': [('of_obsolete', '=', False)]}"/>
                 </xpath>
 

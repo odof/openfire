@@ -46,6 +46,11 @@
         'wizards/of_sale_order_confirmation_views.xml',
         'wizards/of_res_partner_check_duplications_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_sale/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
