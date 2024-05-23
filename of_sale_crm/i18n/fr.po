@@ -146,7 +146,7 @@ msgstr ""
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__draft
 msgid "Estimate"
-msgstr "Devis"
+msgstr "Estimation"
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_sale_order_search_view
@@ -342,7 +342,7 @@ msgstr ""
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__sent
 msgid "Quotation"
-msgstr "Envoyé"
+msgstr "Devis"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_sent_quotation
