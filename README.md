@@ -20,6 +20,8 @@ La branche Openfire 16 dépend de certains modules OCA
 | base_location_geonames_import | https://github.com/OCA/partner-contact | - |
 | base_location | https://github.com/OCA/partner-contact | - |
 | l10n_fr_fec | https://github.com/OCA/l10n-france/ | - |
+| sale_product_pack | https://github.com/OCA/product-pack | - |
+| sale_comment_template | https://github.com/OCA/sale-reporting | - |
 
 <br />
 
