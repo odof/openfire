@@ -173,13 +173,12 @@ export class OFSaleSectionLine extends Component {
         if (children.length > 0) {
             await this.duplicateRecursive(newRecord, children);
         }
-
         // A la fin on lance un resequence pour calculer la séquence et le nom des sections
         await this.resequence();
     }
 
     async duplicateRecursive(parentRecord, children) {
-        await Promise.all(children.map(async (child) => {
+        for (const child of children){
             // on va chercher les enfants (même of_node_parent_id dans les records)
             let childs = this.props.list.records.filter((record) => record.data.of_parent_node_id == child.data.of_node_id);
             // on duplique le child
@@ -191,7 +190,7 @@ export class OFSaleSectionLine extends Component {
             if (childs.length > 0) {
                 await this.duplicateRecursive(newRecord, childs);
             }
-        }));
+        };
     }
 
     deleteAsk(evt) {
