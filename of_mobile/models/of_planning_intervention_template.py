@@ -21,6 +21,11 @@ class OFPlanningInterventionTemplate(models.Model):
         default=lambda r: r._default_section_to_display_ids(),
     )
     send_reports = fields.Selection(selection_add=[('mobile', "Manual dispatch from Mobile")])
+    additional_line_ids = fields.One2many(
+        comodel_name='of.planning.intervention.template.additional.line',
+        inverse_name='additional_template_id',
+        string="Additional Invoice lines",
+    )
 
     def write(self, vals):
         res = super().write(vals)

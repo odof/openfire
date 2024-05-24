@@ -6,8 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-17 10:20+0000\n"
-"PO-Revision-Date: 2024-05-17 10:20+0000\n"
+
+"POT-Creation-Date: 2024-05-24 08:27+0000\n"
+"PO-Revision-Date: 2024-05-24 08:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -58,6 +59,22 @@ msgid "Activate SR on mobile"
 msgstr "Activer les DI sur le mobile"
 
 #. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__additional_line_ids
+msgid "Additional Invoice lines"
+msgstr "lignes de facture supplémentaires"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_planning_intervention_template_additional_line
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
+msgid "Additional Products"
+msgstr "Articles supplémentaires"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__additional_template_id
+msgid "Additional Template"
+msgstr ""
+
+#. module: of_mobile
 #: model:res.groups,comment:of_mobile.group_price_change_mobile
 msgid "Authorizes users to change product prices from cell phone"
 msgstr ""
@@ -97,11 +114,13 @@ msgstr "Paramètres de configuration"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__create_uid
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__create_uid
 msgid "Created by"
 msgstr ""
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__create_date
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__create_date
 msgid "Created on"
 msgstr ""
 
@@ -149,6 +168,7 @@ msgstr "Définir le mode de suivi du temps."
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__display_name
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__display_name
 msgid "Display Name"
 msgstr "Nom affiché"
 
@@ -175,6 +195,7 @@ msgstr "Position fiscale"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__id
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__id
 msgid "ID"
 msgstr ""
 
@@ -210,16 +231,19 @@ msgstr "Pièce comptable"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section____last_update
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__write_uid
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__write_date
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__write_date
 msgid "Last Updated on"
 msgstr ""
 
@@ -390,6 +414,7 @@ msgstr "Période du planning"
 
 #. module: of_mobile
 #: model:ir.model,name:of_mobile.model_product_template
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__product_id
 msgid "Product"
 msgstr "Produit"
 
@@ -470,13 +495,15 @@ msgid "Transfer"
 msgstr "Transfert"
 
 #. module: of_mobile
-<<<<<<< HEAD
-#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__ttype
-=======
+
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__type
->>>>>>> 0a2d9883 (of_mobile: T15621 - [IMP] Choix de l'affichage des sections sur le mobile)
 msgid "Type"
 msgstr ""
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__price_unit
+msgid "Unit price"
+msgstr "Prix unitaire"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_calendar_event__of_update_date

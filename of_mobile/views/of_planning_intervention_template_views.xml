@@ -20,6 +20,15 @@
             <xpath expr="//notebook/page[@name='configuration']/group" position="inside">
                 <field name="section_to_display_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
             </xpath>
+            <field name="line_ids" position="after">
+                <separator string="Additional Products" />
+                <field name="additional_line_ids" >
+                    <tree editable="bottom">
+                        <field name="product_id" context="{'default_of_mobile_available': True}"/>
+                        <field name="price_unit"/>
+                    </tree>
+                </field>
+            </field>
         </field>
     </record>
 

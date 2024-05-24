@@ -16,3 +16,4 @@ from . import of_planning_intervention_section
 from . import of_equipment
 from . import of_survey
 from . import of_service_request
+from . import of_planning_intervention_template_additional_line
