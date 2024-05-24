@@ -9,4 +9,4 @@ class OFMailTemplate(models.Model):
 
     @api.model
     def _get_allowed_models(self):
-        return super(OFMailTemplate, self)._get_allowed_models() + ['project.task']
+        return super(OFMailTemplate, self)._get_allowed_models() + ['project.task', 'project.project']
