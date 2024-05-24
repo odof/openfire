@@ -37,6 +37,10 @@ class SurveyQuestionPage(OdooObjectType):
     add_pictures = graphene.Boolean()
     comments_allowed = graphene.Boolean()
     comments_message = graphene.String()
+    validation_required = graphene.Boolean()
+    validation_min_float_value = graphene.Float()
+    validation_max_float_value = graphene.Float()
+    validation_error_msg = graphene.String()
 
 
 class SurveyConditionalQuestion(OdooObjectType):
@@ -72,6 +76,10 @@ class SurveyQuestionPageInput(graphene.InputObjectType):
     conditional_questions = graphene.List(
         graphene.NonNull(lambda: SurveyConditionalQuestionInput), name="conditionalQuestions"
     )
+    validation_required = graphene.Boolean()
+    validation_min_float_value = graphene.Float()
+    validation_max_float_value = graphene.Float()
+    validation_error_msg = graphene.String()
 
 
 class SurveyConditionalQuestionInput(graphene.InputObjectType):
