@@ -28,6 +28,9 @@ class OFSurveyUserInputLine(models.Model):
         if value_text_box := args.get('value_text_box'):
             mutation['value_text_box'] = value_text_box
 
+        if value_numerical_box := args.get('value_numerical_box'):
+            mutation['value_numerical_box'] = value_numerical_box
+
         if suggested_answer := args.get('suggested_answer'):
             mutation['suggested_answer_id'] = many2one(
                 self=self, model='of.survey.question.answer', input=suggested_answer

@@ -80,6 +80,10 @@ class SurveyQuestionPageCreate(graphene.Mutation):
         conditional_questions = graphene.List(
             graphene.NonNull(survey_question_page_type.SurveyConditionalQuestionInput)
         )
+        validation_required = graphene.Boolean()
+        validation_min_float_value = graphene.Float()
+        validation_max_float_value = graphene.Float()
+        validation_error_msg = graphene.String()
 
     Output = survey_question_page_type.SurveyQuestionPage
 
@@ -104,6 +108,10 @@ class SurveyQuestionPageUpdate(graphene.Mutation):
         conditional_questions = graphene.List(
             graphene.NonNull(survey_question_page_type.SurveyConditionalQuestionInput)
         )
+        validation_required = graphene.Boolean()
+        validation_min_float_value = graphene.Float()
+        validation_max_float_value = graphene.Float()
+        validation_error_msg = graphene.String()
 
     Output = survey_question_page_type.SurveyQuestionPage
 

@@ -39,6 +39,18 @@ class OFSurveyQuestion(models.Model):
                 self=self, model='of.survey.conditional.question', input=args.get('conditional_questions')
             )
 
+        if 'validation_required' in args.keys():
+            mutation['validation_required'] = args['validation_required']
+
+        if validation_min_float_value := args.get('validation_min_float_value'):
+            mutation['validation_min_float_value'] = validation_min_float_value
+
+        if validation_max_float_value := args.get('validation_max_float_value'):
+            mutation['validation_max_float_value'] = validation_max_float_value
+
+        if validation_error_msg := args.get('validation_error_msg'):
+            mutation['validation_error_msg'] = validation_error_msg
+
         return mutation
 
     @api.model

@@ -14,6 +14,7 @@ class SurveyUserInputLineCreate(graphene.Mutation):
         value_char_box = graphene.String()
         value_date = graphene.Date()
         value_text_box = graphene.String()
+        value_numerical_box = graphene.Float()
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
 
@@ -35,6 +36,7 @@ class SurveyUserInputLineUpdate(graphene.Mutation):
         value_char_box = graphene.String()
         value_date = graphene.Date()
         value_text_box = graphene.String()
+        value_numerical_box = graphene.Float()
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
 
