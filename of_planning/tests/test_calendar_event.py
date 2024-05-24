@@ -136,11 +136,11 @@ class TestCalendarEvent(TestOFPlanningCommon):
                 'qty': 1,
             }
         )
-        self.event.action_button_confirm()
 
         # La génération d'un BL nécessite le renseignement d'un entrepôt
+        self.event.of_warehouse_id = False
         with self.assertRaises(UserError) as error:
-            self.event.action_generate_stock_picking()
+            self.event.action_button_confirm()
         self.assertEqual(
             error.exception.args[0],
             f"Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention: {self.event.name}",
@@ -176,7 +176,7 @@ class TestCalendarEvent(TestOFPlanningCommon):
             self.event.action_generate_stock_picking()
         self.assertEqual(
             error.exception.args[0],
-            f"Aucun article à ajouter dans un bon de livraison: {[self.event.name]}",
+            "Aucun produit à livrer dans l'intervention.",
         )
 
         # On confirme le premier BL

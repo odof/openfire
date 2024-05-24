@@ -756,7 +756,9 @@ class CalendarEvent(models.Model):
         res = super().write(vals)
         if 'of_line_ids' in vals:
             for intervention in self.filtered(
-                lambda i: i.of_type == 'intervention' and i.of_state in ['confirmed', 'done']
+                lambda i: i.of_type == 'intervention'
+                and i.of_state in ['confirmed', 'done']
+                and i._need_for_new_picking()
             ):
                 intervention.action_generate_stock_picking()
         return res
@@ -805,8 +807,9 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
 
     def action_button_confirm(self):
+        if self._need_for_new_picking():
+            self.action_generate_stock_picking()
         self.write({'of_state': 'confirmed'})
-        self.action_generate_stock_picking()
 
     def action_button_ongoing(self):
         self.write({'of_state': 'ongoing'})
@@ -942,7 +945,7 @@ class CalendarEvent(models.Model):
         if not self.of_address_id:
             raise UserError(_("A customer address is required to generate a stock picking."))
         lines = self.mapped('of_line_ids')
-        if all(line.product_id.type == 'service' for line in lines):
+        if not self._need_for_new_picking():
             if len(self) == 1:
                 raise UserError(_("No product to deliver in the intervention."))
             raise UserError(_("No product to deliver in the selected interventions."))
@@ -1007,6 +1010,19 @@ class CalendarEvent(models.Model):
         else:
             html_message = self._format_invoice_messages_html(messages_by_events)
         return self.env['of.popup.wizard'].popup_return(message_html=html_message)
+
+    def _need_for_new_picking(self):
+        move_obj = self.env['stock.move']
+        for line in self.of_line_ids:
+            if line.product_id.type == 'service':
+                continue
+            move_lines = move_obj.search([('of_intervention_line_id', '=', line.id)])
+            if not move_lines:
+                return True
+            for move_line in move_lines:
+                if line.product_id != move_line.product_id or line.qty != move_line.product_uom_qty:
+                    return True
+        return False
 
     def _format_invoice_messages_html(self, messages_by_events):
         """
