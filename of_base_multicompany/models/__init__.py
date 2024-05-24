@@ -5,4 +5,4 @@ from . import account_config_setings
 from . import of_base_multicompany
 from . import product
 from . import stock_history
-from . import stock_picking
+from . import stock_move
