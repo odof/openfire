@@ -88,6 +88,12 @@ class OFCalculationHeatLoss(models.Model):
         except Exception as e:
             return False
         elevation_api_url = 'https://api.open-elevation.com/api/v1/lookup'
+        if (
+            self.partner_id.geocoding in ('not_tried', 'no_address', 'failure') or
+            self.partner_id.geocoding == 'need_verif' and
+            self.partner_id.precision in ('no_address', 'unknown', 'not_tried', 'low')
+        ):
+            return
         try:
             req = requests.get(
                 elevation_api_url, params={'locations': "%s,%s" % (self.partner_id.geo_lat, self.partner_id.geo_lng)}
