@@ -2,6 +2,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import itertools
+import json
+import os
 from collections import defaultdict
 from string import ascii_lowercase
 
@@ -106,7 +108,18 @@ class File(dms_base.DMSModel):
         data_ids = default_settings.of_subdirectory_ids.mapped('data_ids')
         dms_dir_obj = self.env['muk_dms.directory']
 
-        def create_muk_directory(parent_dir_id, name, partner_id):
+        def update_relational_path(model, record_id, record_name, directory):
+            path = json.loads(directory.relational_path)
+            path.append({
+                'model': model._name,
+                'id': record_id,
+                'name': record_name})
+            cr.execute(
+                "UPDATE " + model._table + " SET relational_path = %s WHERE id = %s",
+                (json.dumps(path), record_id)
+            )
+
+        def create_muk_directory(parent_dir, name, partner_id):
             cr.execute(
                 """
                 INSERT INTO muk_dms_directory (
@@ -114,20 +127,32 @@ class File(dms_base.DMSModel):
                     create_date,
                     name,
                     of_partner_id,
-                    parent_directory
+                    parent_directory,
+                    settings,
+                    path
                 )
                 VALUES (
                     1,
                     NOW(),
                     %s,
                     %s,
+                    %s,
+                    %s,
                     %s
                 )
                 RETURNING id
                 """,
-                (name, partner_id, parent_dir_id)
+                (
+                    name,
+                    partner_id,
+                    parent_dir.id,
+                    parent_dir.settings.id,
+                    "%s%s/" % (parent_dir.path, name),
+                )
             )
-            return cr.fetchone()[0]
+            directory_id = cr.fetchone()[0]
+            update_relational_path(dms_dir_obj, directory_id, name, parent_dir)
+            return dms_dir_obj.browse(directory_id)
 
         partner_dir_dict = {
             c: self.env.ref('of_document.' + c + '_partner_directory')
@@ -205,21 +230,21 @@ class File(dms_base.DMSModel):
                 if top_partner_id != prev_partner_id:
                     # Récupération ou création du répertoire muk
                     prev_partner_id = top_partner_id
-                    partner_dir_id = dms_dir_obj.search([('of_partner_id', '=', top_partner_id)], limit=1).id
-                    if not partner_dir_id:
+                    partner_dir = dms_dir_obj.search([('of_partner_id', '=', top_partner_id)], limit=1)
+                    if not partner_dir:
                         partner_first_char = top_partner_name and top_partner_name[0].lower()
                         parent_dir = partner_dir_dict.get(partner_first_char, partner_default_dir)
-                        partner_dir_id = create_muk_directory(parent_dir.id, top_partner_name, top_partner_id)
+                        partner_dir = create_muk_directory(parent_dir, top_partner_name, top_partner_id)
 
-                    categ_dir_id = False
+                    categ_dir = False
                     if categ_dir_name:
                         # Récupération ou création de sous-répertoire muk
-                        categ_dir_id = dms_dir_obj.search(
-                            [('name', '=', categ_dir_name), ('parent_directory', '=', partner_dir_id)],
+                        categ_dir = dms_dir_obj.search(
+                            [('name', '=', categ_dir_name), ('parent_directory', '=', partner_dir.id)],
                             limit=1
-                        ).id
-                        if not categ_dir_id:
-                            categ_dir_id = create_muk_directory(partner_dir_id, categ_dir_name, None)
+                        )
+                        if not categ_dir:
+                            categ_dir = create_muk_directory(partner_dir, categ_dir_name, None)
 
                 muk_file = self.search(
                     [
@@ -229,14 +254,20 @@ class File(dms_base.DMSModel):
                         ('of_attachment_partner_id', '=', partner_id),
                     ], limit=1
                 )
+                directory = categ_dir or partner_dir
                 if not muk_file:
+
                     cr.execute(
+                        # settings, extension, path
                         """
                         INSERT INTO muk_dms_file (
                             create_uid,
                             create_date,
                             name,
                             directory,
+                            settings,
+                            extension,
+                            path,
                             of_file_type,
                             of_related_model,
                             of_related_id,
@@ -251,6 +282,9 @@ class File(dms_base.DMSModel):
                             NOW(),
                             %s,  -- name
                             %s,  -- directory
+                            %s,  -- settings
+                            %s,  -- extension
+                            %s,  -- path
                             'related',
                             %s,  -- of_related_model
                             %s,  -- of_related_id
@@ -260,9 +294,13 @@ class File(dms_base.DMSModel):
                             %s,  -- mimetype
                             %s   -- of_category_id
                         )
+                        RETURNING id
                         """, (
                             attachment_name,
-                            categ_dir_id or partner_dir_id,
+                            directory.id,
+                            directory.settings.id,
+                            os.path.splitext(attachment_name)[1],
+                            "%s%s" % (directory.path, attachment_name),
                             obj_name,
                             res_id,
                             attachment_id,
@@ -270,25 +308,31 @@ class File(dms_base.DMSModel):
                             file_size,
                             mimetype,
                             categ.id,
-                        ))
+                        )
+                    )
+                    file_id = cr.fetchone()[0]
+                    update_relational_path(self, file_id, attachment_name, directory)
                 else:
                     cr.execute(
                         """
                         UPDATE muk_dms_file SET
                             name = %s,
                             directory = %s,
+                            path = %s,
                             of_file_type = 'related',
                             size = %s,
                             of_category_id = %s
                         WHERE id = %s
                         """, (
                             attachment_name,
-                            categ_dir_id or partner_dir_id,
+                            directory.id,
+                            "%s%s" % (directory.path, attachment_name),
                             file_size,
                             categ.id,
                             muk_file.id
                         )
                     )
+                    update_relational_path(self, muk_file.id, attachment_name, directory)
         dms_dir_obj._parent_store_compute()
 
     of_file_type = fields.Selection(
