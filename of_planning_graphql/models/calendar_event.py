@@ -18,6 +18,9 @@ class CalendarEvent(models.Model):
         if name := args.get('name'):
             mutation['name'] = name
 
+        if state := args.get('state'):
+            mutation['of_state'] = state
+
         if duration := args.get('duration'):
             mutation['duration'] = duration
 
@@ -43,10 +46,10 @@ class CalendarEvent(models.Model):
             mutation['of_travel_duration'] = travel_duration
 
         if task := args.get('task'):
-            mutation['of_state'] = task
+            mutation['of_task_id'] = many2one(self=self, model="of.planning.task", input=task)
 
         if type := args.get('type'):
-            mutation['of_type'] = type
+            mutation['of_type_id'] = many2one(self=self, model="of.service.request", input=type)
 
         if internal_description := args.get('internal_description'):
             mutation['of_internal_description'] = internal_description
@@ -74,6 +77,9 @@ class CalendarEvent(models.Model):
         if partner := args.get('partner'):
             mutation['of_partner_id'] = many2one(self=self, model="res.partner", input=partner)
 
+        if partner := args.get('address'):
+            mutation['of_address_id'] = many2one(self=self, model="res.partner", input=partner)
+
         if 'invoices' in args.keys():
             mutation['of_invoice_ids'] = x2many(self=self, model="account.move", input=args.get('invoices'))
 
@@ -89,7 +95,7 @@ class CalendarEvent(models.Model):
             mutation['of_all_image_ids'] = x2many(self=self, model="of.image", input=args.get('images'))
 
         if order := args.get('order'):
-            mutation['order_id'] = many2one(self=self, model='sale.order', input=order)
+            mutation['of_order_id'] = many2one(self=self, model='sale.order', input=order)
 
         if template := args.get('template'):
             mutation['of_template_id'] = many2one(self=self, model='of.planning.intervention.template', input=template)
@@ -98,7 +104,7 @@ class CalendarEvent(models.Model):
             mutation['of_employee_ids'] = x2many(self=self, model='hr.employee', input=args.get('employees'))
 
         if company := args.get('company'):
-            mutation['company_id'] = many2one(self=self, model='res.company', input=company)
+            mutation['of_company_id'] = many2one(self=self, model='res.company', input=company)
 
         if 'tags' in args.keys():
             mutation['of_tag_ids'] = x2many(self=self, model='of.planning.tag', input=args.get('tags'))

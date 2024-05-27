@@ -11,10 +11,12 @@ from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
 from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
+from odoo.addons.of_service_graphql.graphql.service_request_type_type import ServiceRequestTypeInput
 from odoo.addons.of_stock_graphql.graphql.picking_type import PickingInput
 
 from .planning_intervention_line_type import PlanningInterventionLineInput
 from .planning_intervention_tag_type import PlanningInterventionTagInput
+from .planning_intervention_task_type import PlanningInterventionTaskInput
 from .planning_intervention_template_type import PlanningInterventionTemplateInput
 from .planning_intervention_type import PlanningIntervention
 
@@ -26,6 +28,7 @@ class PlanningInterventionCreate(graphene.Mutation):
 
     class Arguments:
         name = graphene.String()
+        state = graphene.String()
         duration = graphene.Float()
         start = graphene.DateTime()
         stop = graphene.DateTime()
@@ -34,14 +37,15 @@ class PlanningInterventionCreate(graphene.Mutation):
         total_duration = graphene.Float()
         break_duration = graphene.Float()
         travel_duration = graphene.Float()
-        task = graphene.String()
-        type = graphene.String()
+        task = graphene.Argument(PlanningInterventionTaskInput)
+        type = graphene.Argument(ServiceRequestTypeInput)
         internal_description = graphene.String()
         intervention_notes = graphene.String()
         customer_notes = graphene.String()
         customer_signature = OdooImage()
         operator_signature = OdooImage()
         partner = graphene.Argument(PartnerInput)
+        address = graphene.Argument(PartnerInput)
         invoices = graphene.List(graphene.NonNull(AccountMoveInput))
         pickings = graphene.List(graphene.NonNull(PickingInput))
         order = graphene.Argument(SaleOrderInput)
@@ -74,6 +78,7 @@ class PlanningInterventionUpdate(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
         name = graphene.String()
+        state = graphene.String()
         duration = graphene.Float()
         start = graphene.DateTime()
         stop = graphene.DateTime()
@@ -82,14 +87,15 @@ class PlanningInterventionUpdate(graphene.Mutation):
         total_duration = graphene.Float()
         break_duration = graphene.Float()
         travel_duration = graphene.Float()
-        task = graphene.String()
-        type = graphene.String()
+        task = graphene.Argument(PlanningInterventionTaskInput)
+        type = graphene.Argument(ServiceRequestTypeInput)
         internal_description = graphene.String()
         intervention_notes = graphene.String()
         customer_notes = graphene.String()
         customer_signature = OdooImage()
         operator_signature = OdooImage()
         partner = graphene.Argument(PartnerInput)
+        address = graphene.Argument(PartnerInput)
         invoices = graphene.List(graphene.NonNull(AccountMoveInput))
         pickings = graphene.List(graphene.NonNull(PickingInput))
         images = graphene.List(graphene.NonNull(ImageInput))
