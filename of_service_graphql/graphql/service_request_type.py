@@ -48,7 +48,7 @@ class ServiceRequest(OdooObjectType):
     _name = "ServiceRequest"
     _type = "types"
 
-    id = graphene.Int()
+    id = graphene.Int(required=True)
     name = graphene.String()
     active = graphene.Boolean()
     origin = graphene.String()
@@ -64,14 +64,14 @@ class ServiceRequest(OdooObjectType):
     template = graphene.Field(PlanningInterventionTemplate)
     type = graphene.Field(ServiceRequestType)
     history_intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='historyInterventions')
-    task = graphene.Field(PlanningInterventionTask)
-    company = graphene.Field(Company)
+    task = graphene.Field(PlanningInterventionTask, required=True)
+    company = graphene.Field(Company, required=True)
     user = graphene.Field(User)
     stage = graphene.Field(ServiceRequestStage)
     employee_ids = graphene.List(graphene.NonNull(Employee), name='employees')
     last_attachment = graphene.Field(Attachment)
     line_ids = graphene.List(graphene.NonNull(ServiceRequestLine), name='lines')
-    partner = graphene.Field(Partner)
+    partner = graphene.Field(Partner, required=True)
     address = graphene.Field(Partner)
     next_date = graphene.Date()
     end_date = graphene.Date()
@@ -79,6 +79,7 @@ class ServiceRequest(OdooObjectType):
     duration = graphene.Float()
     planned_duration = graphene.Float()
     remaining_duration = graphene.Float()
+    note = graphene.String()
 
     @staticmethod
     def resolve_template(root, info):
@@ -86,7 +87,7 @@ class ServiceRequest(OdooObjectType):
 
     @staticmethod
     def resolve_type(root, info):
-        return root.of_type or None
+        return root.type_id or None
 
     @staticmethod
     def resolve_task(root, info):
