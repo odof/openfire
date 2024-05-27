@@ -135,9 +135,9 @@ class OFSmsCompose(models.TransientModel):
 
         for record in records:
             partner = self.partner_field and record[self.partner_field] or record
-            to_number = partner.get_mobile_numbers()
             # process content
             try:
+                to_number = partner.get_mobile_numbers()
                 # On passe le contenu du texto par l'interpréteur Mako.
                 content = self.env['mail.template'].render_template(
                     self.sms_content, self.model, record.id, post_process=False)
