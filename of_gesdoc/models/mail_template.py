@@ -77,6 +77,15 @@ class OfMailTemplate(models.Model):
 
             pages = resolve1(doc.catalog.get('Pages'))
             page_kids = [str(ref) for ref in pages.get('Kids')]
+            # permet de récupérer la liste des fields par page
+            # car dans certains cas les fields ne portent pas l'attribut P
+            pk_annots = {}
+            for str_ref, page in [(str(ref), resolve1(ref)) for ref in pages.get('Kids')]:
+                annots = page.get('Annots')
+                if isinstance(annots, list):
+                    pk_annots[str_ref] = [str(a) for a in annots]
+                else:
+                    pk_annots[str_ref] = [str(a) for a in resolve1(annots)]
 
             for i in fields:
                 field = resolve1(i)
@@ -85,6 +94,12 @@ class OfMailTemplate(models.Model):
                 page_number = None
                 if page_ref:
                     page_number = page_kids.index(str(page_ref))
+                if not page_number:
+                    str_i = str(i)
+                    for str_page_ref, page_annots in pk_annots.iteritems():
+                        if str_i in page_annots:
+                            page_number = page_kids.index(str_page_ref)
+                            break
 
                 rect = field.get('Rect')
                 x0 = None
