@@ -18,13 +18,23 @@
                                     <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
                                         <td>
                                             <strong t-field="answer.question_id.title" />
-                                            <span t-if="not answer.question_id.is_page"> : <span t-field="answer.answers" /></span>
+                                            <span t-if="not answer.question_id.is_page"> :
+                                                <div class="col-3">
+                                                    <t t-foreach="answer.answers_images_ids" t-as="answer_image">
+                                                        <span t-field="answer_image.answer" />
+                                                        <t t-if="answer_image.image">
+                                                            <img t-attf-src="data:image/png;base64,#{answer_image.image}" class="mr8 img-fluid" alt="Image"/>
+
+                                                        </t>
+                                                    </t>
+                                                </div>
+                                            </span>
                                             <div class="row mt-2">
                                                 <t t-foreach="answer.image_ids" t-as="image">
                                                     <div class="col-3">
                                                         <div class="d-flex">
                                                             <div class="mx-auto">
-                                                                <img t-attf-src="/web/image/of.image/#{image.id}/image_128" class="mr8" alt="Image"/>
+                                                                <img t-attf-src="/web/image/of.image/#{image.id}/image_256" class="mr8" alt="Image"/>
                                                             </div>
                                                         </div>
                                                         <div class="text-muted" t-esc="image.caption"/>

@@ -7,3 +7,4 @@ from . import of_survey_survey
 from . import of_survey_answers
 from . import of_survey_user_input
 from . import of_survey_user_input_line
+from . import of_survey_answers_images
