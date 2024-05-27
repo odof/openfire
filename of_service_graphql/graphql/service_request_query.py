@@ -26,10 +26,11 @@ class ServiceRequestQuery(graphene.ObjectType):
 
         service_requests_final = env['of.service.request'].search(odoo_domain, offset=offset, limit=limit)
         # Trier les DI
-        if select.sort == 'nearest_end_date':
-            service_requests_final = sorted(service_requests_final, key=lambda x: x[0].end_date)
-        elif select.sort == 'nearest_distance':
-            service_requests_final = sorted(
-                service_requests_final, key=lambda x: float('inf') if len(x) < 2 or x[1] is None else x[1]
-            )
+        if select:
+            if select.sort == 'nearest_end_date':
+                service_requests_final = sorted(service_requests_final, key=lambda x: x[0].end_date)
+            elif select.sort == 'nearest_distance':
+                service_requests_final = sorted(
+                    service_requests_final, key=lambda x: float('inf') if len(x) < 2 or x[1] is None else x[1]
+                )
         return service_requests_final
