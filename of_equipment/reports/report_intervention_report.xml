@@ -44,7 +44,7 @@
         <xpath expr="//div[@name='report_intervention']" position="after">
             <div t-if="template.report_equipment" class="row mb-4" name="report_equipment" style="page-break-inside: avoid;">
                 <t t-set="equipment" t-value="doc.of_equipment_ids and doc.of_equipment_ids[0]"/>
-                <div class="col">
+                <div t-if="doc.of_use_equipment" class="col">
                     <h5 name="title_equipment">
                         <strong>Equipment</strong>
                     </h5>
