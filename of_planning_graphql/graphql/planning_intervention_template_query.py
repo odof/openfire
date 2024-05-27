@@ -20,7 +20,7 @@ class PlanningInterventionTemplateQuery(graphene.ObjectType):
     )
 
     @staticmethod
-    def resolve_planning_intervention_templates(root, info, select=None, domain=None, offset=0, limit=1):
+    def resolve_planning_intervention_templates(root, info, select=None, domain=None, offset=0, limit=10):
         env = info.context['env']
         odoo_domain = env['of.planning.intervention.template']._prepare_graphql_domain(select=select, domain=domain)
 

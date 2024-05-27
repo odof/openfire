@@ -17,6 +17,16 @@ from ..graphql.planning_intervention_section_type import (
     PlanningInterventionSection,
     PlanningInterventionSectionFilterInput,
 )
+from ..graphql.planning_intervention_template_additional_line_type import (
+    PlanningInterventionTemplateAdditionalLine,
+    PlanningInterventionTemplateAdditionalLineFilterInput,
+    PlanningInterventionTemplateAdditionalLineInput,
+)
+from ..graphql.planning_intervention_template_type import (
+    PlanningInterventionTemplate,
+    PlanningInterventionTemplateFilterInput,
+    PlanningInterventionTemplateInput,
+)
 from ..graphql.planning_intervention_type import PlanningIntervention
 from ..graphql.product_query import ProductQuery
 from ..graphql.user_type import User
@@ -45,5 +55,11 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionSectionMutation,
                 EmployeeQuery,
                 Employee,
+                PlanningInterventionTemplate,
+                PlanningInterventionTemplateInput,
+                PlanningInterventionTemplateFilterInput,
+                PlanningInterventionTemplateAdditionalLine,
+                PlanningInterventionTemplateAdditionalLineFilterInput,
+                PlanningInterventionTemplateAdditionalLineInput,
             ],
         )
