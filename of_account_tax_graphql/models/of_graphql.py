@@ -4,7 +4,6 @@ from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
-from ..graphql.account_fiscal_position_query import AccountFiscalPositionQuery
 from ..graphql.account_fiscal_position_type import AccountFiscalPosition
 
 
@@ -15,5 +14,5 @@ class OFGraphql(models.AbstractModel):
         # ici on charge le graphql de ce module
         OdooGraphql.add(
             dbname,
-            [AccountFiscalPositionQuery, AccountFiscalPosition],
+            [AccountFiscalPosition],
         )

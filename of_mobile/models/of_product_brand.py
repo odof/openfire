@@ -6,8 +6,8 @@ from odoo import fields, models
 class OFProductBrand(models.Model):
     _inherit = 'of.product.brand'
 
-    of_mobile = fields.Boolean(string="Mobile Brand")
+    of_mobile_available = fields.Boolean(string="Mobile Brand")
 
     def action_button_toggle_mobile(self):
         self.ensure_one()
-        self.of_mobile = not self.of_mobile
+        self.of_mobile_available = not self.of_mobile_available

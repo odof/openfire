@@ -10,6 +10,7 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product
 class ProductQuery(graphene.ObjectType):
     _name = 'PartnerQuery'
     _type = 'query'
+
     additional_products = graphene.List(graphene.NonNull(Product))
 
     products_search = graphene.List(
@@ -22,7 +23,7 @@ class ProductQuery(graphene.ObjectType):
     @staticmethod
     def resolve_additional_products(root, info):
         env = info.context['env']
-        return env['product.product'].search([])
+        return env['product.product'].search([('of_mobile_available', '=', True)])
 
     @staticmethod
     def resolve_products_search(root, info, query, brand_ids=[], category_ids=[]):
