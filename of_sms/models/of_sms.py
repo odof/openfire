@@ -202,7 +202,7 @@ class ResPartner(models.Model):
     def get_mobile_numbers(self):
         mobile_numbers = []
         for partner in self:
-            for mobile in partner.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile'):
+            for mobile in partner.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile' and p.number):
                 phone_number = convert_phone_number(mobile.number, new_format='e164', strict=True)
                 if phone_number:
                     mobile_numbers.append(phone_number)
