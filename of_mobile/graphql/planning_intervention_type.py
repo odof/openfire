@@ -1,4 +1,5 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+#
 
 import graphene
 
@@ -17,10 +18,14 @@ class PlanningIntervention(OdooObjectType):
     equipments = graphene.NonNull(graphene.List(graphene.NonNull(Equipment)))
     historical = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
-    of_survey_user_input = graphene.Field(SurveyUserInput, name='surveyUserInput')
+    survey_user_input = graphene.Field(SurveyUserInput)
     of_section_to_display_ids = graphene.NonNull(
         graphene.List(graphene.NonNull(lambda: PlanningInterventionSection)), name='sections'
     )
+
+    @staticmethod
+    def resolve_survey_user_input(root, info):
+        return root.of_survey_user_input or None
 
     @staticmethod
     def resolve_update_date(root, info):
