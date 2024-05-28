@@ -26,7 +26,7 @@ class CalendarEvent(models.Model):
         string="History (Equipment)",
     )
 
-    @api.constrains('of_equipment_ids')
+    @api.constrains('of_equipment_ids', 'of_use_equipment')
     def _check_of_equipment_ids(self):
         if self._context.get('ignore_equipment_ids_check'):
             return

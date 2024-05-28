@@ -52,7 +52,7 @@ class OFServiceRequest(models.Model):
     # Constraints
     # --------------------------------------------------
 
-    @api.constrains('equipment_ids')
+    @api.constrains('equipment_ids', 'use_equipment')
     def _check_equipment_ids(self):
         if self._context.get('ignore_equipment_ids_check'):
             return
