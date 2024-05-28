@@ -496,49 +496,35 @@ odoo.define("of_survey.form", function (require) {
                                 params: { questions_answers: self.questions_answers },
                             }).then(function (results) {
                                 // on cache les questions inactives
-                                self._getInactiveConditionalQuestionIds().then(
-                                    function (inactiveQuestions) {
-                                        inactiveQuestions.forEach(function (question) {
-                                            var dependingQuestion = $(
-                                                ".js_question-wrapper#" + question
-                                            );
-                                            dependingQuestion.addClass("d-none");
-                                        });
-                                        // on affiche les actives
-                                        results.forEach(function (questionId) {
-                                            var dependingQuestion = $(
-                                                ".js_question-wrapper#" + questionId
-                                            );
-                                            dependingQuestion.removeClass("d-none");
-                                        });
-                                        // Si jamais results est vide, il faut être sûr qu'on a bien caché toutes les
-                                        // questions conditionnelles (ce qui n'est pas forcément le cas quand on edit un questionnaire)
-                                        // on va donc demander à odoo, la liste des questions conditionnelles de la question en cours
-                                        // et toutes les cacher
-                                        if (results.length == 0) {
-                                            self._rpc({
-                                                model: "of.survey.conditional.question",
-                                                method: "search_read",
-                                                args: [
-                                                    [
-                                                        ['triggering_question_id', '=', parseInt($question_id)]
-                                                    ],
-                                                    ['question_id'],
-                                                ],
-                                            })
-                                            .then(function(res) {
+                                // Lors de l'édition d'un questionnaire, il n'est pas aisé de savoir
+                                // quelle question est sélectionnée ou pas
+                                // Le plus simple (et plus bourrin) c'est de cacher d'abord toutes les questions conditionnelles et afficher uniquement la ou les bonnes
+                                self._rpc({
+                                    model: "of.survey.conditional.question",
+                                    method: "search_read",
+                                    args: [
+                                        [
+                                            ['triggering_question_id', '=', parseInt($question_id)]
+                                        ],
+                                        ['question_id'],
+                                    ],
+                                })
+                                .then(function(res) {
 
-                                                res.map((question) => {
-                                                    if (question.question_id.length > 0) {
-                                                        var dependingQuestion = $('.js_question-wrapper#' + question.question_id[0]);
-                                                        dependingQuestion.addClass('d-none');
-                                                    }
-                                                })
-
-                                            });
+                                    res.map((question) => {
+                                        if (question.question_id.length > 0) {
+                                            var dependingQuestion = $('.js_question-wrapper#' + question.question_id[0]);
+                                            dependingQuestion.addClass('d-none');
                                         }
-                                    }
-                                );
+                                    })
+
+                                    results.forEach(function (questionId) {
+                                        var dependingQuestion = $(
+                                            ".js_question-wrapper#" + questionId
+                                        );
+                                        dependingQuestion.removeClass("d-none");
+                                    });
+                                });
                             });
                         }
                     }
