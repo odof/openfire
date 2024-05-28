@@ -24,7 +24,6 @@ class TestCalendarEvent(TestOFPlanningCommon):
                 "of_partner_id": cls.customer_a.id,
             }
         )
-        cls.warehouse_1 = cls.env["stock.warehouse"].search([("company_id", "=", cls.company_fr.id)], limit=1)
 
     def test_01_employees_capabilities_nok(self):
         dt_now = fields.Datetime.now()
