@@ -126,6 +126,8 @@ odoo.define("of_survey.form", function (require) {
 
                             self.$('button[type="submit"]').removeClass("disabled");
                             self._showConditionalQuestions();
+                            self._showImages();
+
                         }
                     })
                     .then(function () {
@@ -307,7 +309,6 @@ odoo.define("of_survey.form", function (require) {
                         title: $("#title").val(),
                         legend: $("#legend").val(),
                     };
-
                     this._saveAttachment(data);
 
                     $("#addAttachment").modal("hide");
@@ -1058,6 +1059,7 @@ odoo.define("of_survey.form", function (require) {
                     }
                     self._initChoiceItems();
                     self._initTextArea();
+                    self._showImages();
 
                     if (
                         this.options.sessionInProgress &&
@@ -1136,6 +1138,59 @@ odoo.define("of_survey.form", function (require) {
                         $($(this).parent()).addClass('o_survey_selected');
                     }
                 })
+            },
+            _showImages: function(){
+                var self = this;
+                // on récupère l'id du user_input pour aller remplir les images qui ont déjà été
+                // sauvegardées dans odoo, puis on affiche les images
+                self._rpc({
+                    route: `/of_survey/images/${self.options.userInputId}`,
+                    params: { },
+                }).then(function (results) {
+                    self.images = results;
+                    for (const [question_id,value_image] of Object.entries(self.images)){
+                        self.$(`.form_images_${question_id}`).html(
+                            qweb.render("of_survey.form_images", {
+                                images: self.images[question_id],
+                            })
+                        );
+
+                        self.$("a.delete").on("click", function () {
+                            var id = $(this).find("i").attr("id");
+                            self.images[question_id].splice(id, 1);
+                            $(`.form_images_${question_id}`).html(
+                                qweb.render("of_survey.form_images", {
+                                    images: self.images[question_id],
+                                })
+                            );
+                            var $input = $(`input[ref="attachment_${question_id}"]`);
+                            $input.attr("data-oe-data", JSON.stringify(self.images[question_id]));
+                        });
+
+                        self.$("a.edit").on("click", function () {
+                            var id = $(this).find("i").attr("id");
+                            self.current_question_id = question_id;
+                            // on ouvre la modal avec les données pré-remplies
+                            $("#addAttachment #title").val(
+                                self.images[question_id][id]["title"]
+                            );
+                            $("#addAttachment #legend").val(
+                                self.images[question_id][id]["legend"]
+                            );
+                            $("#addAttachment .thumb").attr(
+                                "src",
+                                self.images[question_id][id]["src"]
+                            );
+                            $("#addAttachment .thumb").attr(
+                                "filename",
+                                self.images[question_id][id]["src"]
+                            );
+                            $("#addAttachment .thumb").attr("origin", id);
+                            $("#addAttachment").modal("show");
+                        });
+
+                    }
+                });
             },
             // VALIDATION TOOLS
             // -------------------------------------------------------------------------

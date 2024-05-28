@@ -45,6 +45,3 @@ access_of_sector_intervention_manager,access.of.sector.intervention.manager,of_b
 
 access_of_sector_zip_range_user_planning_responsible,of.sector.zip.range.planning.responsible,of_base_location.model_of_sector_zip_range,group_planning_intervention_responsible,1,1,1,0
 access_of_sector_zip_range_intervention_manager,access.of.sector.zip.range.intervention.manager,of_base_location.model_of_sector_zip_range,group_planning_intervention_manager,1,1,1,1
-
-access_of_image_user,of.image,model_of_image,base.group_user,1,1,1,1
-access_of_image_public,access.of.image.public,model_of_image,,1,0,0,0

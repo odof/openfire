@@ -7,3 +7,5 @@ access_of_connector_config_settings,access_of_connector_config_settings,model_of
 access_of_popup_wizard,access_of_popup_wizard,model_of_popup_wizard,base.group_user,1,1,1,1
 access_of_res_partner_check_duplications,access_of_res_partner_check_duplications,model_of_res_partner_check_duplications,base.group_user,1,1,1,1
 access_of_html_sanitize_wizard,access_of_html_sanitize_wizard,of_base.model_of_html_sanitize_wizard,base.group_user,1,1,1,0
+access_of_image_user,of.image,model_of_image,base.group_user,1,1,1,1
+access_of_image_public,access.of.image.public,model_of_image,,1,0,0,0

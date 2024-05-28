@@ -4,7 +4,7 @@
     <t t-name="of_survey.form_images">
         <div class="row mt-3">
             <t t-foreach="images" t-as="image">
-                <div class="col-4">
+                <div class="col-4 mb-3">
                     <div class="block-image row">
                         <div class="col-4">
                             <img t-att-src="image.src" class="img img-fluid"/>

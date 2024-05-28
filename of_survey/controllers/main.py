@@ -653,6 +653,28 @@ class OFSurvey(http.Controller):
         inactive_questions = user_input.sudo()._get_inactive_conditional_questions()
         return inactive_questions.ids if len(inactive_questions) > 0 else []
 
+    @http.route(
+        '/of_survey/images/<model("of.survey.user_input"):user_input>', type='json', auth='public', website=True
+    )
+    def survey_images(self, user_input, **post):
+        """
+        Retrieve survey images for each question in the user input.
+        """
+        images = {}
+        for line in user_input.user_input_line_ids:
+            if line.question_id not in images:
+                images[line.question_id.id] = []
+
+            for image in line.value_image_ids:
+                images[line.question_id.id].append(
+                    {
+                        'title': image.name,
+                        'legend': image.caption,
+                        'src': f"data:image/png;base64,{image.image_1920.decode('utf-8')}",  # noqa E231, E702
+                    }
+                )
+        return images
+
     # ------------------------------------------------------------
     # COMPLETED SURVEY ROUTES
     # ------------------------------------------------------------
