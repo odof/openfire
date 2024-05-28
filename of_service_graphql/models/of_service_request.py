@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import requests
 
 from odoo import api, models
+from odoo.tools import config
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
@@ -190,8 +191,7 @@ class OFServiceRequest(models.Model):
         return odoo_domain
 
     def calculate_distances(self, service_requests, latitude, longitude, max_distance):
-        config = self.env['ir.config_parameter'].sudo()
-        routing_base_url = config.get_param('of_routing_base_url', default='')
+        routing_base_url = config.get('of_routing_base_url', default='')
         services_index = {}
         destinations = ''
         for i, service in enumerate(service_requests):
