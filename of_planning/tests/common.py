@@ -13,6 +13,8 @@ class TestOFPlanningCommon(TestOFSaleCommon):
     def setUpClass(cls):
         super().setUpClass()
 
+        cls.warehouse_1 = cls.env["stock.warehouse"].search([("company_id", "=", cls.company_fr.id)], limit=1)
+
         # Supplier data
         cls.supplier_stove = cls.env["res.partner"].create(
             {

@@ -207,6 +207,18 @@ class OFPlanningInterventionLine(models.Model):
                 }
             )
 
+    def _get_delivered_moves(self):
+        """Helper method to get the delivered moves for the intervention line.
+        We can override this method to add custom logic for getting the delivered moves.
+
+        Returns:
+            recordset: A filtered recordset of move records that meet the criteria.
+        """
+        self.ensure_one()
+        return self.move_ids.filtered(
+            lambda m: m.state == "done" and not m.scrapped and m.product_id == self.product_id
+        )
+
     def _get_delivered_qty(self):
         """Computes the delivered quantity on planning intervention lines, based on done stock moves related to
         its procurements.
@@ -216,9 +228,7 @@ class OFPlanningInterventionLine(models.Model):
         """
         self.ensure_one()
         qty = 0.0
-        for move in self.move_ids.filtered(
-            lambda m: m.state == "done" and not m.scrapped and m.product_id == self.product_id
-        ):
+        for move in self._get_delivered_moves():
             if move.location_dest_id.usage == "customer":
                 if not move.origin_returned_move_id or move.to_refund:
                     qty += move.product_uom._compute_quantity(move.product_uom_qty, self.product_id.uom_id)
@@ -303,6 +313,73 @@ class OFPlanningInterventionLine(models.Model):
             "sequence": self.sequence,
         }
 
+    def _prepare_and_append_procurement(self, group_id, procurements, line, qty):
+        """
+        Prepares procurement values and appends a procurement to the procurements list.
+
+        This method calculates the product quantity, adjusts it according to the unit of measure,
+        and creates a procurement record which is then appended to the procurements list.
+
+        This method can be overridden to add custom logic for preparing and appending procurements.
+
+        Args:
+            group_id (int): The ID of the procurement group.
+            procurements (list): The list to which the procurement will be appended.
+            line (recordset): The recordset of the procurement line.
+            qty (float): The quantity to be subtracted from the line quantity (outgoing/incoming quantity).
+
+        Returns:
+            None
+        """
+        values = line._prepare_procurement_values(group_id=group_id)
+        product_qty = line.qty - qty
+
+        line_uom = line.uom_id
+        quant_uom = line.product_id.uom_id
+        product_qty, procurement_uom = line_uom._adjust_uom_quantities(product_qty, quant_uom)
+        procurements.append(
+            self.env["procurement.group"].Procurement(
+                line.product_id,
+                product_qty,
+                procurement_uom,
+                line.intervention_id.of_address_id.property_stock_customer,
+                line.product_id.display_name,
+                line.intervention_id.name,
+                line.intervention_id.of_company_id,
+                values,
+            )
+        )
+
+    def _process_procurement_line(self, procurements, line, qty):
+        """
+        Processes a procurement line by creating or updating a procurement group and appending procurement orders.
+
+        Args:
+            procurements (list): A list to which the procurement orders will be appended.
+            line (recordset): The procurement line to be processed.
+            qty (float): The quantity of the product to be procured.
+
+        Returns:
+            None
+        """
+        group_id = line._get_procurement_group()
+        if not group_id:
+            group_id = self.env["procurement.group"].create(line._prepare_procurement_group_vals())
+            line.intervention_id.of_procurement_group_id = group_id
+        else:
+            # In case the procurement group is already created and the order was
+            # cancelled, we need to update certain values of the group.
+            updated_vals = {}
+            if group_id.partner_id != line.intervention_id.of_address_id:
+                updated_vals["partner_id"] = line.intervention_id.of_address_id.id
+            if group_id.of_intervention_id != line.intervention_id:
+                updated_vals["of_intervention_id"] = line.intervention_id.id
+            if updated_vals:
+                group_id.write(updated_vals)
+
+        # Append create and append procurement to procurements list
+        self._prepare_and_append_procurement(group_id, procurements, line, qty)
+
     def _action_launch_stock_rule(self):
         """
         Copied from sale.order.line._action_launch_stock_rule (`odoo/addons/sale_stock/models/sale_order_line.py`) and
@@ -345,39 +422,10 @@ class OFPlanningInterventionLine(models.Model):
                 continue
 
             line_treated.append(line)
-            group_id = line._get_procurement_group()
-            if not group_id:
-                group_id = self.env["procurement.group"].create(line._prepare_procurement_group_vals())
-                line.intervention_id.of_procurement_group_id = group_id
-            else:
-                # In case the procurement group is already created and the order was
-                # cancelled, we need to update certain values of the group.
-                updated_vals = {}
-                if group_id.partner_id != line.intervention_id.of_address_id:
-                    updated_vals["partner_id"] = line.intervention_id.of_address_id.id
-                if group_id.of_intervention_id != line.intervention_id:
-                    updated_vals["of_intervention_id"] = line.intervention_id.id
-                if updated_vals:
-                    group_id.write(updated_vals)
 
-            values = line._prepare_procurement_values(group_id=group_id)
-            product_qty = line.qty - qty
+            # Process procurement line and append it to procurements list
+            self._process_procurement_line(procurements, line, qty)
 
-            line_uom = line.uom_id
-            quant_uom = line.product_id.uom_id
-            product_qty, procurement_uom = line_uom._adjust_uom_quantities(product_qty, quant_uom)
-            procurements.append(
-                self.env["procurement.group"].Procurement(
-                    line.product_id,
-                    product_qty,
-                    procurement_uom,
-                    line.intervention_id.of_address_id.property_stock_customer,
-                    line.product_id.display_name,
-                    line.intervention_id.name,
-                    line.intervention_id.of_company_id,
-                    values,
-                )
-            )
         if procurements:
             procurement_group = self.env["procurement.group"]
             if self.env.context.get("import_file"):
