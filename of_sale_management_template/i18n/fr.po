@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 13:17+0000\n"
-"PO-Revision-Date: 2023-11-22 13:17+0000\n"
+"POT-Creation-Date: 2024-05-28 14:07+0000\n"
+"PO-Revision-Date: 2024-05-28 14:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,11 +16,30 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_management_template
-#: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order__of_documents_ids
-#: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order_template__of_documents_ids
-#: model_terms:ir.ui.view,arch_db:of_sale_management_template.sale_order_template_inherit_view_form
+#: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order_template__of_custom_document_ids
+#: model_terms:ir.ui.view,arch_db:of_sale_management_template.of_sale_order_template_inherit_view_form
 msgid "Documents"
-msgstr "Documents joints"
+msgstr ""
+
+#. module: of_sale_management_template
+#: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order_template__of_fiscal_position_id
+msgid "Fiscal position"
+msgstr "Position fiscal"
+
+#. module: of_sale_management_template
+#: model:ir.model,name:of_sale_management_template.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_sale_management_template
+#: model:ir.model,name:of_sale_management_template.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_sale_management_template
+#: model:ir.model,name:of_sale_management_template.model_of_product_brand
+msgid "Product brand"
+msgstr "Marque"
 
 #. module: of_sale_management_template
 #: model:ir.model,name:of_sale_management_template.model_sale_order_template
@@ -28,14 +47,14 @@ msgid "Quotation Template"
 msgstr "Modèle de devis"
 
 #. module: of_sale_management_template
+#: model:ir.model,name:of_sale_management_template.model_sale_order_template_line
+msgid "Quotation Template Line"
+msgstr "Ligne du modèle de devis"
+
+#. module: of_sale_management_template
 #: model:ir.model,name:of_sale_management_template.model_sale_order
 msgid "Sales Order"
 msgstr "Bon de commande"
-
-#. module: of_sale_management_template
-#: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order_template__of_fiscal_position_id
-msgid "Tax position"
-msgstr "Position fiscal"
 
 #. module: of_sale_management_template
 #: model:ir.model.fields,field_description:of_sale_management_template.field_sale_order_template__of_payment_term_id

@@ -174,25 +174,25 @@
 
         <!-- Header block -->
         <xpath expr="//div[@id='informations']" position="replace">
-            <div class="col-12 mt-4 mb-4" id="informations">
-                <div t-if="doc.date_order" class="col-3 mw-100 mb-2 mr-3" name="informations_date" style="float: left; padding-right: 10px;">
+            <div class="row mt-4 mb-4" id="informations">
+                <div t-if="doc.date_order" class="col-auto col-3 mw-100 mb-2" name="informations_date">
                     <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
                     <strong t-else="">Order Date:</strong>
                     <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
                 </div>
-                <div t-if="pdf_order_ref_info and doc.client_order_ref" class="col-3 mw-100 mb-2 mr-3" name="informations_reference" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_order_ref_info and doc.client_order_ref" class="col-auto col-3 mw-100 mb-2" name="informations_reference">
                     <strong>Your Reference:</strong>
                     <p class="m-0" t-field="doc.client_order_ref"/>
                 </div>
-                <div t-if="pdf_customer_ref_info and doc.partner_id.ref" class="col-3 mw-100 mb-2 mr-3" name="informations_customer_reference" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_customer_ref_info and doc.partner_id.ref" class="col-auto col-3 mw-100 mb-2" name="informations_customer_reference">
                     <strong>Customer Reference:</strong>
                     <p class="m-0" t-field="doc.partner_id.ref"/>
                 </div>
-                <div t-if="pdf_validity_info and doc.validity_date and doc.state in ['draft', 'sent']" class="col-3 mw-100 mb-2 mr-3" name="expiration_date" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_validity_info and doc.validity_date and doc.state in ['draft', 'sent']" class="col-auto col-3 mw-100 mb-2" name="expiration_date">
                     <strong>Expiration:</strong>
                     <p class="m-0" t-field="doc.validity_date"/>
                 </div>
-                <div t-if="pdf_salesperson_info and doc.user_id" class="col-3 mw-100 mb-2 mr-3" name="salesperson_information" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_salesperson_info and doc.user_id" class="col-auto col-3 mw-100 mb-2" name="salesperson_information">
                     <strong>Salesperson:</strong>
                     <p class="m-0">
                         <t t-if="pdf_salesperson_name and doc.user_id.name">
@@ -219,7 +219,7 @@
                         </t>
                     </p>
                 </div>
-                <div t-if="pdf_customer_info" class="col-3 mw-100 mb-2 mr-3" name="customer_information" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_customer_info" class="col-auto col-3 mw-100 mb-2" name="customer_information">
                     <strong>Customer:</strong>
                     <p class="m-0">
                         <t t-if="pdf_customer_phone and doc.partner_id.phone">
@@ -242,7 +242,7 @@
                         </t>
                     </p>
                 </div>
-                <div t-if="pdf_payment_term_info and doc.payment_term_id" class="col-3 mw-100 mb-2 mr-3" name="payment_term_information" style="float: left; padding-right: 10px;">
+                <div t-if="pdf_payment_term_info and doc.payment_term_id" class="col-auto col-3 mw-100 mb-2" name="payment_term_information">
                     <strong>Payment Terms:</strong>
                     <p class="m-0" t-field="doc.payment_term_id"/>
                 </div>

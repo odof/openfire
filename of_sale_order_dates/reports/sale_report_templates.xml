@@ -10,13 +10,11 @@
 
         <!-- Header block -->
         <xpath expr="//div[@name='payment_term_information']" position="after">
-            <div t-if="pdf_requested_week and doc.of_requested_week" name="requested_week"
-                    style="float: left; padding-right: 10px;">
+            <div t-if="pdf_requested_week and doc.of_requested_week" class="col-auto col-3 mw-100 mb-2" name="requested_week">
                 <strong>Requested week:</strong>
                 <p class="m-0" t-field="doc.of_requested_week"/>
             </div>
-            <div t-if="pdf_requested_week and doc.of_requested_week" style="display: table-cell; width: 4px;"/>
-            <div t-if="pdf_technical_visit_info and doc.of_technical_visit_date" class="col-3 mw-100 mb-2 mr-3" name="technical_visit_information" style="float: left; padding-right: 10px;">
+            <div t-if="pdf_technical_visit_info and doc.of_technical_visit_date" class="col-auto col-3 mw-100 mb-2" name="technical_visit_information">
                 <strong>Technical Visit Date:</strong>
                 <p class="m-0" t-field="doc.of_technical_visit_date"/>
             </div>

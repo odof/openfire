@@ -1,0 +1,36 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sale_management_comment_template
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-28 14:08+0000\n"
+"PO-Revision-Date: 2024-05-28 14:08+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sale_management_comment_template
+#: model:ir.model.fields,field_description:of_sale_management_comment_template.field_sale_order_template__of_comment_template_ids
+msgid "Comment Template"
+msgstr "Modèle de commentaire"
+
+#. module: of_sale_management_comment_template
+#: model_terms:ir.ui.view,arch_db:of_sale_management_comment_template.sale_order_template_view_form
+msgid "Comments"
+msgstr "Commentaires"
+
+#. module: of_sale_management_comment_template
+#: model:ir.model,name:of_sale_management_comment_template.model_sale_order_template
+msgid "Quotation Template"
+msgstr "Modèle de devis"
+
+#. module: of_sale_management_comment_template
+#: model:ir.model,name:of_sale_management_comment_template.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"

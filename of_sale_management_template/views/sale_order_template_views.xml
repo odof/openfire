@@ -11,7 +11,7 @@
                 <field name="of_payment_term_id"/>
             </xpath>
             <xpath expr="//notebook//page[@name='terms_and_conditions']" position="after">
-                <page string="Documents">
+                <page string="Documents" name="documents">
                     <field name="of_custom_document_ids"/>
                 </page>
             </xpath>
