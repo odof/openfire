@@ -48,8 +48,8 @@ class CalendarEvent(models.Model):
         if task := args.get('task'):
             mutation['of_task_id'] = many2one(self=self, model="of.planning.task", input=task)
 
-        if type := args.get('type'):
-            mutation['of_type_id'] = many2one(self=self, model="of.service.request", input=type)
+        if ttype := args.get('type'):
+            mutation['of_type_id'] = many2one(self=self, model="of.service.request", input=ttype)
 
         if internal_description := args.get('internal_description'):
             mutation['of_internal_description'] = internal_description
@@ -77,8 +77,8 @@ class CalendarEvent(models.Model):
         if partner := args.get('partner'):
             mutation['of_partner_id'] = many2one(self=self, model="res.partner", input=partner)
 
-        if partner := args.get('address'):
-            mutation['of_address_id'] = many2one(self=self, model="res.partner", input=partner)
+        if address := args.get('address'):
+            mutation['of_address_id'] = many2one(self=self, model="res.partner", input=address)
 
         if 'invoices' in args.keys():
             mutation['of_invoice_ids'] = x2many(self=self, model="account.move", input=args.get('invoices'))
