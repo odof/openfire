@@ -45,10 +45,10 @@ class OFSurveyUserInputLine(models.Model):
         if domain:
             odoo_domain = graphqlOdooDomain(self=self, model='of.survey.user_input.line', domain=domain)
 
-        if filter:
-            if filter.id:
-                odoo_domain += [('id', '=', filter.id)]
-            if filter.name:
-                odoo_domain += [('name', 'like', filter.name)]
+        if select:
+            if select.id:
+                odoo_domain += [('id', '=', select.id)]
+            if select.name:
+                odoo_domain += [('name', 'like', select.name)]
 
         return odoo_domain
