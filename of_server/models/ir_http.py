@@ -60,7 +60,13 @@ def _dispatch(cls):
             of_params = request.params
             if len(str(of_params)) > 4096:
                 of_params = str(of_params)[:4096] + " [...]"
-            _logger.info(u"OF DEBOGUE DEBUT %s %s - appel %s", os.getpid(), of_compteur, of_base_url)
+            _logger.info(
+                u"OF DEBOGUE DEBUT %s %s - UID %s - appel %s",
+                os.getpid(),
+                of_compteur,
+                request.env.uid,
+                of_base_url,
+            )
         try:
             result = request.dispatch()
         finally:
@@ -72,11 +78,24 @@ def _dispatch(cls):
                     signe = int(of_temps / 10)
                 if signe == 0:
                     # Opération rapide, on ne met pas les paramètres pour alléger les logs.
-                    _logger.info(u"OF DEBOGUE FIN" + str(signe) + u" %s %s - Temps : %ss - appel %s", os.getpid(),
-                                 of_compteur, of_temps, of_base_url)
+                    _logger.info(
+                        u"OF DEBOGUE FIN" + str(signe) + u" %s %s - UID %s - Temps : %ss - appel %s",
+                        os.getpid(),
+                        of_compteur,
+                        request.env.uid,
+                        of_temps,
+                        of_base_url,
+                    )
                 else:
-                    _logger.info(u"OF DEBOGUE FIN" + str(signe) + u" %s %s - Temps : %ss - appel %s %s", os.getpid(),
-                                 of_compteur, of_temps, of_base_url, of_params)
+                    _logger.info(
+                        u"OF DEBOGUE FIN" + str(signe) + u" %s %s- UID %s - Temps : %ss  - appel %s %s",
+                        os.getpid(),
+                        of_compteur,
+                        request.env.uid,
+                        of_temps,
+                        of_base_url,
+                        of_params,
+                    )
         # FIN MODIFICATION OPENFIRE
         if isinstance(result, Exception):
             raise result
