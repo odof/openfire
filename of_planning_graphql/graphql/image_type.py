@@ -4,7 +4,7 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .planning_intervention_type import PlanningIntervention
+from .planning_intervention_type import PlanningIntervention, PlanningInterventionInput
 
 
 class Image(OdooObjectType):
@@ -18,3 +18,12 @@ class Image(OdooObjectType):
     @staticmethod
     def resolve_intervention(root, info):
         return root.intervention_id or None
+
+
+class ImageInput(graphene.InputObjectType):
+    _name = 'ImageInput'
+    _type = 'types'
+
+    intervention = graphene.Field(PlanningInterventionInput)
+    intervention_date = graphene.DateTime()
+    intervention_status = graphene.String()
