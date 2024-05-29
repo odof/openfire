@@ -68,11 +68,11 @@ class CalendarEvent(models.Model):
         if attachment := args.get("operator_signature", False):
             mutation['of_operator_signature'] = convertImage(attachment)
 
-        if args.get('origin', False) == "MOBILE":
+        if args.get('origin', False) == "mobile":
             mutation['of_force_dates'] = True
-            mutation['name'] = ''
             mutation['user_id'] = self.env.user.id
-            mutation['last_updated_mobile'] = True
+            # Par défaut le mobile ne créera que des interventions
+            mutation['of_type'] = 'intervention'
 
         if partner := args.get('partner'):
             mutation['of_partner_id'] = many2one(self=self, model="res.partner", input=partner)
@@ -108,6 +108,9 @@ class CalendarEvent(models.Model):
 
         if 'tags' in args.keys():
             mutation['of_tag_ids'] = x2many(self=self, model='of.planning.tag', input=args.get('tags'))
+
+        if service_request := args.get('service_request'):
+            mutation['of_request_id'] = many2one(self=self, model='of.service.request', input=service_request)
 
         return mutation
 

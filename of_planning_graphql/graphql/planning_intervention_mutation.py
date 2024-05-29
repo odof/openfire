@@ -11,6 +11,7 @@ from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
 from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
+from odoo.addons.of_service_graphql.graphql.service_request_type import ServiceRequestInput
 from odoo.addons.of_service_graphql.graphql.service_request_type_type import ServiceRequestTypeInput
 from odoo.addons.of_stock_graphql.graphql.picking_type import PickingInput
 
@@ -56,6 +57,7 @@ class PlanningInterventionCreate(graphene.Mutation):
         invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
         images = graphene.List(graphene.NonNull(ImageInput))
         tags = graphene.List(graphene.NonNull(PlanningInterventionTagInput))
+        service_request = graphene.Argument(ServiceRequestInput)
 
     Output = PlanningIntervention
 
@@ -106,6 +108,7 @@ class PlanningInterventionUpdate(graphene.Mutation):
         origin = graphene.Argument(Origin)
         invoice_lines = graphene.List(graphene.NonNull(PlanningInterventionLineInput))
         tags = graphene.List(graphene.NonNull(PlanningInterventionTagInput))
+        service_request = graphene.Argument(ServiceRequestInput)
 
     Output = PlanningIntervention
 
