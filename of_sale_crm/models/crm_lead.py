@@ -24,3 +24,8 @@ class CrmLead(models.Model):
             if partner.invoice_warn == 'block':
                 self.partner_id = False
             return {'warning': warning}
+
+    def _prepare_opportunity_quotation_context(self):
+        quotation_context = super()._prepare_opportunity_quotation_context()
+        quotation_context['default_of_referred_id'] = self.of_referred_id.id
+        return quotation_context
