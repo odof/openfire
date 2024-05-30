@@ -16,7 +16,7 @@ class CalendarEvent(models.Model):
             mutation['of_survey_id'] = many2one(self=self, model='of.survey.survey', input=survey)
 
         if 'survey_user_inputs' in args.keys():
-            mutation['of_survey_user_input'] = x2many(
+            mutation['of_survey_user_input_id'] = x2many(
                 self=self, model='of.survey.user_input', input=args.get('survey_user_inputs')
             )
 

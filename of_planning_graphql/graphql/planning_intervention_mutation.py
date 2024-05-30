@@ -1,3 +1,5 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import logging
 
 import graphene
@@ -61,11 +63,7 @@ class PlanningInterventionCreate(graphene.Mutation):
 
     Output = PlanningIntervention
 
-    def mutate(
-        self,
-        info,
-        **args,
-    ):
+    def mutate(self, info, **args):
         env = info.context["env"]
         # ici on met origin=WEB par défaut
         if not args.get('origin', False):

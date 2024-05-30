@@ -25,14 +25,14 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page name="project" string="Project">
-                    <field name="of_survey_user_input_line" invisible="1"/>
+                    <field name="of_survey_user_input_line_ids" invisible="1"/>
                     <group>
                         <group>
                             <field name="of_survey_id" domain="[('survey_type','=','lead_opportunity')]"/>
                         </group>
                         <group attrs="{'invisible': [('of_survey_id','=',False)]}">
                             <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>
-                            <button class="btn btn-secondary" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line','=',[])]}"/>
+                            <button class="btn btn-secondary" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line_ids','=',[])]}"/>
                         </group>
                     </group>
 
@@ -55,7 +55,7 @@
                     </field>
 
                     <group>
-                        <field name="of_survey_user_input" invisible="1"/>
+                        <field name="of_survey_user_input_id" invisible="1"/>
                     </group>
                 </page>
             </xpath>

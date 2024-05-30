@@ -26,7 +26,7 @@ class PlanningIntervention(OdooObjectType):
 
     @staticmethod
     def resolve_survey_user_input(root, info):
-        return root.of_survey_user_input or None
+        return root.of_survey_user_input_id or None
 
     @staticmethod
     def resolve_update_date(root, info):

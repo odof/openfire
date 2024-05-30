@@ -19,7 +19,10 @@ class OFGraphql(models.AbstractModel):
         # ici on charge le graphql de ce module
         OdooGraphql.add(
             dbname,
-            [PlanningIntervention, PlanningInterventionTemplate],
+            [
+                PlanningIntervention,
+                PlanningInterventionTemplate,
+            ],
         )
 
     def _prepare_arguments(self):

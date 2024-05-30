@@ -120,7 +120,6 @@ class PlanningInterventionInput(graphene.InputObjectType):
     total_duration = graphene.Float()
     break_duration = graphene.Float()
     travel_duration = graphene.Float()
-    task = graphene.Field(PlanningInterventionTaskInput)
     internal_description = graphene.String()
     intervention_notes = graphene.String()
     customer_notes = graphene.String()
