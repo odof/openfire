@@ -139,8 +139,8 @@
                 </xpath>
 
                 <!-- Notebook -->
-                <!-- Page printings -->
-                <xpath expr="//notebook//page[@name='other_information']" position="after">
+                <xpath expr="//notebook//page[@name='customer_signature']" position="after">
+                    <!-- Page printings -->
                     <page string="Printing" name="printing_settings">
                         <group>
                             <group string="Printing settings">
@@ -149,11 +149,8 @@
                             </group>
                         </group>
                     </page>
-                </xpath>
-                <!-- /Page printings -->
-
-                <!-- Page notes-->
-                <xpath expr="//notebook/page[@name='other_information']" position="after">
+                    <!-- /Page printings -->
+                    <!-- Page notes -->
                     <page string="Notes" name="notes">
                         <group string="Customer notes" name="customer_notes" attrs="{'invisible':[('of_customer_notes','=',False)]}">
                             <field name="of_customer_notes" colspan="2" nolabel="1"/>
@@ -162,8 +159,8 @@
                             </div>
                         </group>
                     </page>
+                    <!-- /Page notes-->
                 </xpath>
-                <!-- /Page notes-->
                 <!-- /Notebook -->
 
             </field>

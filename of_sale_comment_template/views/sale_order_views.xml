@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="sale_comment_template.action_sale_order_comment_template" model="ir.actions.act_window">
+        <field name="context">{}</field>
+    </record>
+
     <record id="sale_order_form_add_comment" model="ir.ui.view">
         <field name="name">comment_template.sale.order.form</field>
         <field name="model">sale.order</field>
@@ -12,6 +16,29 @@
                         "tree_view_ref": "of_sale_comment_template.base_comment_template_view_o2m_tree",
                     }
                 </attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Replaces `comments` on OCA view to move it after an OF page -->
+    <record id="sale_order_form_add_comment" model="ir.ui.view" >
+        <field name="name">comment_template.sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_comment_template.sale_order_form_add_comment" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='comments']" position="replace"/>
+        </field>
+    </record>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">comment_template.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='notes']" position="after">
+                <page string="Comments" name="comments">
+                    <field name="comment_template_ids" />
+                </page>
             </xpath>
         </field>
     </record>

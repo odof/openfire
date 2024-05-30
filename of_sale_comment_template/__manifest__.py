@@ -9,6 +9,7 @@
     'summary': "Module d'extension pour les commentaires de vente",
     'depends': [
         'of_base_comment_template',
+        'of_sale',
         'sale_comment_template',
     ],
     'data': [

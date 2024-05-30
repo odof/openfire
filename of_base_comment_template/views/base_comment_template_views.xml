@@ -4,11 +4,26 @@
     <record id="view_base_comment_template_form" model="ir.ui.view">
         <field name="name">of.base.comment.template.view.form</field>
         <field name="model">base.comment.template</field>
-        <field name="inherit_id" ref="base_comment_template.view_base_comment_template_form"/>
+        <field name="inherit_id" ref="base_comment_template.view_base_comment_template_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='domain']" position="replace">
-                <field name="domain" groups="base.group_no_one"/>
+                <field name="domain" groups="base.group_no_one" />
             </xpath>
+            <field name="partner_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="engine" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="domain" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="models" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="models" position="after">
+                <field name="model_ids" widget="many2many_tags"/>
+            </field>
         </field>
     </record>
 
@@ -21,11 +36,46 @@
                 <field name="name" />
                 <field name="position" />
                 <field name="company_id" groups="base.group_multi_company" />
-                <field name="partner_ids" string="Partners" />
-                <field name="models" optional="hide"/>
-                <field name="model_ids" groups="base.group_erp_manager" optional="hide"/>
-                <field name="domain" string="Domain" optional="hide"/>
+                <field name="partner_ids" string="Partners" invisible="1" />
+                <field name="models" optional="hide" />
+                <field name="model_ids" groups="base.group_erp_manager" optional="hide" />
+                <field name="domain" string="Domain" optional="hide" />
             </tree>
+        </field>
+    </record>
+
+    <record id="view_base_comment_template_search" model="ir.ui.view">
+        <field name="name">of.base.comment.template.search</field>
+        <field name="model">base.comment.template</field>
+        <field name="inherit_id" ref="base_comment_template.view_base_comment_template_search" />
+        <field name="arch" type="xml">
+            <field name="partner_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="domain" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="models" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+
+        </field>
+    </record>
+
+    <record id="view_base_comment_template_tree" model="ir.ui.view">
+        <field name="name">of.base.comment.template.tree</field>
+        <field name="model">base.comment.template</field>
+        <field name="inherit_id" ref="base_comment_template.view_base_comment_template_tree" />
+        <field name="arch" type="xml">
+            <field name="partner_ids" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="domain" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="models" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
         </field>
     </record>
 

@@ -1,33 +1,3 @@
-#. module: of_base_comment_template
-#: model:ir.model.fields.selection,name:base_comment_template.selection__base_comment_template__position__after_lines
-msgid "Bottom"
-msgstr "Bas"
-
-#. module: of_base_comment_template
-#: model:ir.model.fields.selection,name:base_comment_template.selection__base_comment_template__position__before_lines
-msgid "Top"
-msgstr "Haut"
-
-#. module: of_base_comment_template
-#: model:ir.model.fields,field_description:base_comment_template.field_base_comment_template__domain
-msgid "Filter Domain"
-msgstr "Domaine"
-
-#. module: of_base_comment_template
-#: model:ir.model.fields,field_description:base_comment_template.field_base_comment_template__partner_ids
-msgid "Partner"
-msgstr "Client"
-
-#. module: of_base_comment_template
-#: model_terms:ir.ui.view,arch_db:base_comment_template.view_base_comment_template_form
-msgid "Preview"
-msgstr "Test"
-
-#. module: of_base_comment_template
-#: model_terms:ir.ui.view,arch_db:base_comment_template.base_comment_template_preview_form
-msgid "Preview of"
-msgstr "Test"
-
 #. module: base_comment_template
 #: model:ir.model.fields,field_description:base_comment_template.field_base_comment_template__engine
 msgid "Engine"
