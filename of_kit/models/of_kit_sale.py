@@ -608,6 +608,7 @@ class SaleOrderLine(models.Model):
     @api.depends(
         'cost_comps',
         'purchase_price',
+        'of_is_kit',
         'kit_id',
         'kit_id.kit_line_ids',
         'kit_id.kit_line_ids.cost_unit',
@@ -615,17 +616,16 @@ class SaleOrderLine(models.Model):
     )
     def _compute_of_cost_compos_difference(self):
         for line in self:
-            if line.kit_id:
+            if line.of_is_kit and line.kit_id:
                 if line.purchase_price != line.cost_comps:
                     line.of_diff_cost_comps = True
-
                 else:
                     line.of_diff_cost_comps = False
 
     @api.multi
     def refresh_cost_comps(self):
         for line in self:
-            if line.kit_id:
+            if line.of_is_kit and line.kit_id:
                 line.purchase_price = line.cost_comps
 
 
