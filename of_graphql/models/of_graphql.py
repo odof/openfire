@@ -11,7 +11,7 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 from ..graphql.company_type import Company
 from ..graphql.user_mutation import UserMutation
 from ..graphql.user_query import UserQuery
-from ..graphql.user_type import User, UserFilterInput
+from ..graphql.user_type import User, UserFilterInput, UserInput
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +42,7 @@ class OFGraphql(models.AbstractModel):
             dbname,
             [
                 User,
+                UserInput,
                 UserFilterInput,
                 Company,
                 UserQuery,

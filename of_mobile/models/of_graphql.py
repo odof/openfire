@@ -16,6 +16,7 @@ from ..graphql.planning_intervention_section_query import PlanningInterventionSe
 from ..graphql.planning_intervention_section_type import (
     PlanningInterventionSection,
     PlanningInterventionSectionFilterInput,
+    PlanningInterventionSectionInput,
 )
 from ..graphql.planning_intervention_template_additional_line_type import (
     PlanningInterventionTemplateAdditionalLine,
@@ -51,6 +52,7 @@ class OFGraphql(models.AbstractModel):
                 PlanningIntervention,
                 PlanningInterventionSectionQuery,
                 PlanningInterventionSection,
+                PlanningInterventionSectionInput,
                 PlanningInterventionSectionFilterInput,
                 PlanningInterventionSectionMutation,
                 EmployeeQuery,

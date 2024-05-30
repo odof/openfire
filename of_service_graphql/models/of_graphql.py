@@ -6,19 +6,31 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.attachment_type import Attachment, AttachmentInput
 from ..graphql.partner_type import Partner, PartnerInput
-from ..graphql.planning_intervention_type import PlanningIntervention
+from ..graphql.planning_intervention_type import PlanningIntervention, PlanningInterventionInput
 from ..graphql.service_request_line_mutation import ServiceRequestLineMutation
 from ..graphql.service_request_line_query import ServiceRequestLineQuery
-from ..graphql.service_request_line_type import ServiceRequestLine, ServiceRequestLineFilterInput
+from ..graphql.service_request_line_type import (
+    ServiceRequestLine,
+    ServiceRequestLineFilterInput,
+    ServiceRequestLineInput,
+)
 from ..graphql.service_request_mutation import ServiceRequestMutation
 from ..graphql.service_request_query import ServiceRequestQuery
 from ..graphql.service_request_stage_mutation import ServiceRequestStageMutation
 from ..graphql.service_request_stage_query import ServiceRequestStageQuery
-from ..graphql.service_request_stage_type import ServiceRequestStage, ServiceRequestStageFilterInput
-from ..graphql.service_request_type import ServiceRequest, ServiceRequestFilterInput
+from ..graphql.service_request_stage_type import (
+    ServiceRequestStage,
+    ServiceRequestStageFilterInput,
+    ServiceRequestStageInput,
+)
+from ..graphql.service_request_type import ServiceRequest, ServiceRequestFilterInput, ServiceRequestInput
 from ..graphql.service_request_type_mutation import ServiceRequestTypeMutation
 from ..graphql.service_request_type_query import ServiceRequestTypeQuery
-from ..graphql.service_request_type_type import ServiceRequestType, ServiceRequestTypeFilterInput
+from ..graphql.service_request_type_type import (
+    ServiceRequestType,
+    ServiceRequestTypeFilterInput,
+    ServiceRequestTypeInput,
+)
 
 
 class OFGraphql(models.AbstractModel):
@@ -30,19 +42,23 @@ class OFGraphql(models.AbstractModel):
             dbname,
             [
                 ServiceRequest,
+                ServiceRequestInput,
                 ServiceRequestFilterInput,
                 ServiceRequestQuery,
                 ServiceRequestMutation,
                 ServiceRequestLineQuery,
                 ServiceRequestLine,
+                ServiceRequestLineInput,
                 ServiceRequestLineFilterInput,
                 ServiceRequestLineMutation,
                 ServiceRequestStageQuery,
                 ServiceRequestStage,
+                ServiceRequestStageInput,
                 ServiceRequestStageFilterInput,
                 ServiceRequestStageMutation,
                 ServiceRequestTypeQuery,
                 ServiceRequestType,
+                ServiceRequestTypeInput,
                 ServiceRequestTypeFilterInput,
                 ServiceRequestTypeMutation,
                 Attachment,
@@ -50,5 +66,6 @@ class OFGraphql(models.AbstractModel):
                 Partner,
                 PartnerInput,
                 PlanningIntervention,
+                PlanningInterventionInput,
             ],
         )

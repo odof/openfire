@@ -6,7 +6,7 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.product_brand_mutation import ProductBrandMutation
 from ..graphql.product_brand_query import ProductBrandQuery
-from ..graphql.product_brand_type import ProductBrand, ProductBrandFilterInput
+from ..graphql.product_brand_type import ProductBrand, ProductBrandFilterInput, ProductBrandInput
 from ..graphql.product_type import Product
 
 
@@ -20,6 +20,7 @@ class OFGraphql(models.AbstractModel):
             [
                 ProductBrand,
                 Product,
+                ProductBrandInput,
                 ProductBrandFilterInput,
                 ProductBrandQuery,
                 ProductBrandMutation,

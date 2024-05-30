@@ -6,10 +6,10 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.sale_order_line_mutation import SaleOrderLineMutation
 from ..graphql.sale_order_line_query import SaleOrderLineQuery
-from ..graphql.sale_order_line_type import SaleOrderLine, SaleOrderLineFilterInput
+from ..graphql.sale_order_line_type import SaleOrderLine, SaleOrderLineFilterInput, SaleOrderLineInput
 from ..graphql.sale_order_mutation import SaleOrderMutation
 from ..graphql.sale_order_query import SaleOrderQuery
-from ..graphql.sale_order_type import SaleOrder, SaleOrderFilterInput
+from ..graphql.sale_order_type import SaleOrder, SaleOrderFilterInput, SaleOrderInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -21,10 +21,12 @@ class OFGraphql(models.AbstractModel):
             dbname,
             [
                 SaleOrder,
+                SaleOrderInput,
                 SaleOrderLine,
                 SaleOrderQuery,
                 SaleOrderLineQuery,
                 SaleOrderLineFilterInput,
+                SaleOrderLineInput,
                 SaleOrderFilterInput,
                 SaleOrderMutation,
                 SaleOrderLineMutation,

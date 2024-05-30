@@ -9,16 +9,22 @@ from ..graphql.survey_mutation import SurveyMutation
 from ..graphql.survey_query import SurveyQuery
 from ..graphql.survey_question_answer_mutation import SurveyQuestionAnswerMutation
 from ..graphql.survey_question_answer_query import SurveyQuestionAnswerQuery
-from ..graphql.survey_question_answer_type import SurveyQuestionAnswer, SurveyQuestionAnswerFilterInput
+from ..graphql.survey_question_answer_type import (
+    SurveyQuestionAnswer,
+    SurveyQuestionAnswerFilterInput,
+    SurveyQuestionAnswerInput,
+)
 from ..graphql.survey_question_page_mutation import SurveyConditionalQuestionMutation, SurveyQuestionPageMutation
 from ..graphql.survey_question_page_query import SurveyConditionalQuestionQuery, SurveyQuestionPageQuery
 from ..graphql.survey_question_page_type import (
     SurveyConditionalQuestion,
     SurveyConditionalQuestionFilterInput,
+    SurveyConditionalQuestionInput,
     SurveyQuestionPage,
     SurveyQuestionPageFilterInput,
+    SurveyQuestionPageInput,
 )
-from ..graphql.survey_type import Survey, SurveyFilterInput
+from ..graphql.survey_type import Survey, SurveyFilterInput, SurveyInput
 from ..graphql.survey_user_input_line_mutation import SurveyUserInputLineMutation
 from ..graphql.survey_user_input_line_query import SurveyUserInputLineQuery
 from ..graphql.survey_user_input_line_type import (
@@ -42,18 +48,22 @@ class OFGraphql(models.AbstractModel):
                 SurveyConditionalQuestionMutation,
                 SurveyConditionalQuestionQuery,
                 SurveyConditionalQuestion,
+                SurveyConditionalQuestionInput,
                 SurveyConditionalQuestionFilterInput,
                 SurveyMutation,
                 SurveyQuery,
                 Survey,
+                SurveyInput,
                 SurveyFilterInput,
                 SurveyQuestionAnswerMutation,
                 SurveyQuestionAnswerQuery,
                 SurveyQuestionAnswer,
+                SurveyQuestionAnswerInput,
                 SurveyQuestionAnswerFilterInput,
                 SurveyQuestionPageMutation,
                 SurveyQuestionPageQuery,
                 SurveyQuestionPage,
+                SurveyQuestionPageInput,
                 SurveyQuestionPageFilterInput,
                 SurveyUserInputLineMutation,
                 SurveyUserInputLineQuery,

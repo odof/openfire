@@ -4,8 +4,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 
-from .service_request_type import ServiceRequest
-from .service_request_type_type import ServiceRequestType
+from .service_request_type import ServiceRequest, ServiceRequestInput
+from .service_request_type_type import ServiceRequestType, ServiceRequestTypeInput
 
 
 class PlanningIntervention(OdooObjectType):
@@ -22,3 +22,11 @@ class PlanningIntervention(OdooObjectType):
     @staticmethod
     def resolve_request(root, info):
         return root.of_request_id or None
+
+
+class PlanningInterventionInput(graphene.InputObjectType):
+    _name = 'PlanningInterventionInput'
+    _type = 'types'
+
+    type = graphene.Field(ServiceRequestTypeInput)
+    request = graphene.Field(ServiceRequestInput)
