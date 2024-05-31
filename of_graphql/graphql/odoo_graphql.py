@@ -34,7 +34,8 @@ def many2one(self, model, input):
     if input.id:
         record = obj.search([('id', '=', input.id)])
         if record:
-            record.write(obj_values)
+            if len(obj_values.keys()) > 0:
+                record.write(obj_values)
             return record.id
         else:
             raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
@@ -72,9 +73,9 @@ def x2many(self, model, input, default=False, keep=False):
         if record.id:
             if not obj.search([('id', '=', record.id)]):
                 raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
-
             record = obj.search([('id', '=', record.id)])
-            record.write(record_value)
+            if len(record_value.keys()) > 0:
+                record.write(record_value)
             res_ids.append(record.id)
 
         else:
