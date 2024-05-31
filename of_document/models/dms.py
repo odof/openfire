@@ -279,7 +279,7 @@ class File(dms_base.DMSModel):
                             directory = %s,
                             of_file_type = 'related',
                             size = %s,
-                            of_cateogory_id = %s
+                            of_category_id = %s
                         WHERE id = %s
                         """, (
                             attachment_name,
