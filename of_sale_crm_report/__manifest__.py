@@ -14,7 +14,8 @@
     'data': [
         'data/ir_config_parameter.xml',
         'security/res_groups.xml',
-        'views/res_config_settings_views.xml',
+        # NOTE: Disabled for now as it is not used. Waiting for full SQL view migration.
+        # 'views/res_config_settings_views.xml',
     ],
     'qweb': [],
     'installable': True,
