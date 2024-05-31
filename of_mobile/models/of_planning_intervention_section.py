@@ -10,7 +10,7 @@ class OFPlanningInterventionSection(models.Model):
     _description = "Sections to display on mobile"
     _order = 'name'
 
-    name = fields.Char(string="Name", required=True, translate=True)
+    name = fields.Char(required=True, translate=True)
     ttype = fields.Char(string="Type", required=True)
 
     @api.model
