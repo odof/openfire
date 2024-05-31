@@ -227,7 +227,7 @@ class OFServiceCreateInterventionLineWizard(models.TransientModel):
 
     wizard_id = fields.Many2one(comodel_name='of.service.create.intervention.wizard', string=u"Wizard")
     sequence = fields.Integer(string=u"Séquence", default=10)
-    service_id = fields.Many2one(comodel_name='of.service', string=u"DI", required=True)
+    service_id = fields.Many2one(comodel_name='of.service', string=u"DI", required=True, ondelete="cascade")
     service_number = fields.Char(string=u"Numéro", related='service_id.number')
     service_titre = fields.Char(string=u"Titre", related='service_id.titre')
     service_partner_id = fields.Many2one(
