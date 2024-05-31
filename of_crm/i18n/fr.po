@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-18 06:13+0000\n"
-"PO-Revision-Date: 2024-04-18 06:13+0000\n"
+"POT-Creation-Date: 2024-06-13 13:46+0000\n"
+"PO-Revision-Date: 2024-06-13 13:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -101,6 +101,11 @@ msgstr "Étapes CRM"
 #: model:ir.model.fields,field_description:of_crm.field_res_users__of_lead_campaign_id
 msgid "Campaign"
 msgstr "Campagne"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.menu_utm_campaign_act
+msgid "Campaigns"
+msgstr "Campagnes"
 
 #. module: of_crm
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
@@ -258,6 +263,11 @@ msgid "Lead/Opportunity"
 msgstr "Piste/Opportunité"
 
 #. module: of_crm
+#: model:ir.ui.menu,name:of_crm.menu_crm_configuration_links
+msgid "Link Tracker"
+msgstr "Tracker de liens"
+
+#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_partner_longitude
 msgid "Longitude"
 msgstr ""
@@ -286,7 +296,12 @@ msgstr ""
 #. module: of_crm
 #: model:ir.model.fields.selection,name:of_crm.selection__crm_lead__of_precision__medium
 msgid "Medium"
-msgstr ""
+msgstr "Canal"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.menu_utm_medium
+msgid "Mediums"
+msgstr "Canaux"
 
 #. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__meeting_ids
@@ -434,6 +449,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_crm.field_res_users__of_lead_source_id
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
 msgid "Source"
+msgstr "Origin"
+
+#. module: of_crm
+#: model:ir.ui.menu,name:of_crm.menu_utm_source
+msgid "Sources"
 msgstr ""
 
 #. module: of_crm

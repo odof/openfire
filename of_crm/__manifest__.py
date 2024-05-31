@@ -22,6 +22,7 @@
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
         'views/mail_activity_type_views.xml',
+        'views/utm_menus.xml',
     ],
     'installable': True,
     'application': False,

@@ -15,7 +15,6 @@
         'views/utm_campaign_views.xml',
         'views/utm_medium_views.xml',
         'views/utm_source_views.xml',
-        'views/utm_menus.xml',
     ],
     'installable': True,
     'application': False,
