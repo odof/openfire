@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_base.DisplayCodeVersion" owl="1">
+        <Dropdown>
+            <t t-set-slot="toggler">
+                <i class="fa fa-code-fork mr4"/>
+            </t>
+            <DropdownItem onSelected="selectItem1">
+                <span t-esc="state.code_version"/>
+            </DropdownItem>
+        </Dropdown>
+    </t>
+
+</templates>

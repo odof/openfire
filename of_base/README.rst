@@ -61,6 +61,20 @@ Fonctionnalités
 
 * Surchage du code standard Odoo pour gérer l'addition de groupes dans les attributs champs de la vue XML.
 
+* Ajout d'un composant pour afficher la version actuelle de l'application.
+    - cette version sera visible dans le "Systray" (zone de notification) d'Odoo à côté de l’icône des notifications/activités.
+    - pour se faire **la version** doit être définie dans le **fichier `.openfire-version`** dans le répertoire racine **contenant `odoo`et le repo `openfire`**.
+        - exemple :
+
+          .. code-block:: bash
+
+            $ ls
+            $ odoo oca openfire .openfire-version
+            $ cat .openfire-version
+            16.0.1.0
+      - si le fichier n'existe pas, le composant affichera "?!".
+
+
 Droits utilisateurs
 ###################
 

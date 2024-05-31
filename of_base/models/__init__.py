@@ -27,3 +27,4 @@ from . import res_groups
 from . import res_partner_bank
 from . import res_partner_title
 from . import res_users
+from . import version_registery
