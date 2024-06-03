@@ -152,9 +152,6 @@ class CalendarEvent(models.Model):
         copy=False,
         domain="['|', ('partner_id', '=', of_partner_id), ('partner_id', '=', of_address_id)]",
     )
-    of_order_user_id = fields.Many2one(
-        comodel_name='res.users', string="Vendor", related='of_order_id.user_id', readonly=True
-    )
     of_order_amount_total = fields.Monetary(
         string="Order amount", currency_field='of_currency_id', readonly=True, compute='_compute_order_amounts'
     )
