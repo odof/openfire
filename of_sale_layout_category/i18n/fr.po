@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-22 15:48+0000\n"
-"PO-Revision-Date: 2024-05-22 15:48+0000\n"
+"POT-Creation-Date: 2024-06-13 18:44+0000\n"
+"PO-Revision-Date: 2024-06-13 18:44+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,8 +17,8 @@ msgstr ""
 
 #. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
-msgid "<strong>Sans section</strong>"
-msgstr ""
+msgid "% Sale Price"
+msgstr "% Prix de vente"
 
 #. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
@@ -139,7 +139,8 @@ msgstr "Déplacer le contenu vers cette section :"
 msgid ""
 "No section to move to. Content will be move to the no section category."
 msgstr ""
-"Pas de section vers laquelle déplacer. Le contenu sera déplacer vers le niveau sans section."
+"Pas de section vers laquelle déplacer. Le contenu sera déplacer vers le "
+"niveau sans section."
 
 #. module: of_sale_layout_category
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_node_id
@@ -250,8 +251,22 @@ msgid "This section and move its content(s)"
 msgstr "Cette section et déplacer son contenu"
 
 #. module: of_sale_layout_category
+#. odoo-python
+#: code:addons/of_sale_layout_category/models/sale_order.py:0
+#, python-format
+msgid "Total"
+msgstr ""
+
+#. module: of_sale_layout_category
 #. odoo-javascript
 #: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
 #, python-format
 msgid "What do you want to delete ?"
 msgstr "Que voulez-vous supprimer ?"
+
+#. module: of_sale_layout_category
+#. odoo-python
+#: code:addons/of_sale_layout_category/models/sale_order.py:0
+#, python-format
+msgid "Without sections"
+msgstr "Sans section"

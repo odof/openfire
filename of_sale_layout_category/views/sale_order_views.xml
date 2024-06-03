@@ -26,7 +26,7 @@
                         <field name="of_show_products" widget="boolean_toggle"/>
                     </div>
                     <div class="col-2 offset-4" attrs="{'invisible': [('of_layout_category_active','=',False)]}">
-                        <button class="btn btn-md btn-primary float-right" name="show_summary" type="object" string="Show Summary"/>
+                        <button class="btn btn-md btn-primary float-right" name="action_button_show_summary" type="object" string="Show Summary"/>
                     </div>
                 </div>
             </xpath>

@@ -4,59 +4,48 @@
     <template id="report_sale_summary">
         <div class="container">
             <h2>Sale Summary</h2>
-
+            <t t-set="datas" t-value="sale_id.get_sale_layout_summary_report()"/>
             <table class="table mt-3">
                 <thead>
                     <tr>
                         <th>Section</th>
                         <th class="text-end">Cost</th>
                         <th class="text-end">Sale Price</th>
+                        <th class="text-end">% Sale Price</th>
                         <th class="text-end">Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <t t-foreach="sale_id.order_line.filtered(lambda r: r.display_type == 'line_section')" t-as="section" t-key="section.id">
-                        <t t-set="section_lines" t-value="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == section.of_node_id)" />
-                        <tr>
-                            <td><t t-esc="section.of_section_name" /> - <t t-esc="section.name" /></td>
+                    <t t-foreach="datas['sections']" t-as="section" t-key="section_index">
+                        <tr t-att-class="section['highlight'] and 'highlight' or ''">
+                            <td><t t-esc="section['name']"/></td>
                             <td class="text-end">
-                                <span t-esc="sum(section_lines.mapped('purchase_price'))" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
+                                <span t-esc="section['cost']" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
                             </td>
                             <td class="text-end">
-                                <span t-esc="sum(section_lines.mapped('price_subtotal'))" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
+                                <span t-esc="section['price']" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
                             </td>
                             <td class="text-end">
-                                <span t-esc="float(sum(section_lines.mapped('product_uom_qty')))" />
+                                <span t-esc="section['percent_price']" />
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="section['qty']" />
                             </td>
                         </tr>
                     </t>
-                    <t t-set="lines_without_section" t-value="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == 0)" />
-                    <tr t-if="sale_id.order_line.filtered(lambda l: l.of_parent_node_id == 0)">
-                        <td>
-                            <strong>Sans section</strong>
-                        </td>
-                        <td class="text-end">
-                            <span t-esc="sum(lines_without_section.mapped('purchase_price'))" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
-                        </td>
-                        <td class="text-end">
-                            <span t-esc="sum(lines_without_section.mapped('price_subtotal'))" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
-                        </td>
-                        <td class="text-end">
-                            <span t-esc="float(sum(lines_without_section.mapped('product_uom_qty')))" />
-                        </td>
-                    </tr>
-                    <tr>
+                    <tr class="highlight">
                         <td>
                             <strong>Total</strong>
                         </td>
                         <td class="text-end">
-                            <span t-esc="sum(sale_id.order_line.mapped('purchase_price'))" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
+                            <span t-esc="datas['total']['cost']" t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
                         </td>
                         <td class="text-end">
-                            <span t-esc="sum(sale_id.order_line.mapped('price_subtotal'))"  t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
+                            <span t-esc="datas['total']['price']"  t-options="{'widget': 'monetary', 'display_currency': sale_id.currency_id}"/>
                         </td>
+                        <td></td>
                         <td class="text-end">
-                            <span t-esc="float(sum(sale_id.order_line.mapped('product_uom_qty')))" />
+                            <span t-esc="datas['total']['qty']" />
                         </td>
                     </tr>
                 </tbody>
