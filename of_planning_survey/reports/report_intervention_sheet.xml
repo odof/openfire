@@ -5,8 +5,8 @@
         <xpath expr="//div[@name='sheet_invoicing']" position="after">
             <!-- Survey -->
             <div t-if="template.sheet_survey and doc.of_answers_ids"
-                name="sheet_survey"
-                class="row mb-4" style="page-break-inside: avoid;">
+                 name="sheet_survey"
+                 class="row mb-4" style="page-break-inside: avoid;">
                 <div class="col">
                     <h5 name="title_survey">
                         <strong>Survey</strong>
@@ -15,34 +15,36 @@
                         <table class="table table-condensed mb-0">
                             <tbody>
                                 <t t-foreach="doc.of_answers_ids" t-as="answer">
-                                    <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
-                                        <td>
-                                            <strong t-field="answer.question_id.title" />
-                                            <span t-if="not answer.question_id.is_page"> :
-                                                <div class="col-3">
-                                                    <t t-foreach="answer.answers_images_ids" t-as="answer_image">
-                                                        <span t-field="answer_image.answer" />
-                                                        <t t-if="answer_image.image">
-                                                            <img t-attf-src="data:image/png;base64,#{answer_image.image}" class="mr8 img-fluid" alt="Image"/>
-
+                                    <t t-if="answer.question_id.is_page or answer.answers_images_ids or answer.image_ids">
+                                        <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
+                                            <td>
+                                                <strong t-field="answer.question_id.title"/>
+                                                <t t-if="not answer.question_id.is_page and (answer.answers_images_ids or answer.image_ids)">
+                                                    :
+                                                    <div t-if="answer.answers_images_ids" class="w-100">
+                                                        <t t-foreach="answer.answers_images_ids" t-as="answer_image">
+                                                            <span t-field="answer_image.answer" class="d-block"/>
+                                                            <t t-if="answer_image.image">
+                                                                <img t-attf-src="data:image/png;base64,#{answer_image.image}" class="mr8 img-fluid" alt="Image"/>
+                                                            </t>
                                                         </t>
-                                                    </t>
-                                                </div>
-                                            </span>
-                                            <div class="row mt-2">
-                                                <t t-foreach="answer.image_ids" t-as="image">
-                                                    <div class="col-3">
-                                                        <div class="d-flex">
-                                                            <div class="mx-auto">
-                                                                <img t-attf-src="/web/image/of.image/#{image.id}/image_256" class="mr8" alt="Image"/>
+                                                    </div>
+                                                    <div t-if="answer.image_ids" class="row mt-2">
+                                                        <t t-foreach="answer.image_ids" t-as="image">
+                                                            <div class="col-3">
+                                                                <div class="d-flex">
+                                                                    <div class="mx-auto">
+                                                                        <img t-attf-src="/web/image/of.image/#{image.id}/image_256" class="mr8" alt="Image"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="text-muted" t-esc="image.caption"/>
                                                             </div>
-                                                        </div>
-                                                        <div class="text-muted" t-esc="image.caption"/>
+                                                        </t>
                                                     </div>
                                                 </t>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    </t>
                                 </t>
                             </tbody>
                         </table>
