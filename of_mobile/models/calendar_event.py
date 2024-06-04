@@ -44,6 +44,8 @@ class CalendarEvent(models.Model):
         readonly=False,
     )
 
+    of_mobile_report_send_date = fields.Datetime(string="Send date report from Mobile")
+
     @api.depends('of_template_id')
     def _compute_of_section_to_display_ids(self):
         for event in self:

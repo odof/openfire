@@ -21,6 +21,7 @@
         'data/report_paperformat.xml',
         'data/cron_planning.xml',
         'data/email_planning.xml',
+        'data/email_intervention.xml',
         'security/res_groups.xml',
         'security/ir.model.access.csv',
         'views/of_sector_views.xml',

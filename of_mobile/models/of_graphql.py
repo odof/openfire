@@ -10,6 +10,7 @@ from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
 from ..graphql.partner_query import PartnerQuery
 from ..graphql.partner_type import PartnerCheckDuplications
+from ..graphql.planning_intervention_mutation import PlanningInterventionSendReportMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery, PlanningInterventionsOffline
 from ..graphql.planning_intervention_section_mutation import PlanningInterventionSectionMutation
 from ..graphql.planning_intervention_section_query import PlanningInterventionSectionQuery
@@ -50,6 +51,7 @@ class OFGraphql(models.AbstractModel):
                 ProductQuery,
                 PlanningInterventionsOffline,
                 PlanningIntervention,
+                PlanningInterventionSendReportMutation,
                 PlanningInterventionSectionQuery,
                 PlanningInterventionSection,
                 PlanningInterventionSectionInput,

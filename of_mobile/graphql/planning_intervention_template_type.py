@@ -15,6 +15,7 @@ class PlanningInterventionTemplate(OdooObjectType):
     _type = 'types'
 
     additional_line_ids = graphene.List(graphene.NonNull(PlanningInterventionTemplateAdditionalLine))
+    send_reports = graphene.Boolean()
 
 
 class PlanningInterventionTemplateInput(graphene.InputObjectType):
@@ -22,6 +23,7 @@ class PlanningInterventionTemplateInput(graphene.InputObjectType):
     _type = 'types'
 
     additional_lines = graphene.List(graphene.NonNull(PlanningInterventionTemplateAdditionalLineInput))
+    send_reports = graphene.Boolean()
 
 
 class PlanningInterventionTemplateFilterInput(PlanningInterventionTemplateInput):
