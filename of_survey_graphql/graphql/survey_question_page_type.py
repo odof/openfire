@@ -37,6 +37,7 @@ class SurveyQuestionPage(OdooObjectType):
     add_pictures = graphene.Boolean()
     comments_allowed = graphene.Boolean()
     comments_message = graphene.String()
+    comment_count_as_answer = graphene.Boolean()
     validation_required = graphene.Boolean()
     validation_min_float_value = graphene.Float()
     validation_max_float_value = graphene.Float()
