@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <record id="product_template_view_form_product_pack" model="ir.ui.view">
@@ -9,6 +9,29 @@
             <xpath expr="//field[@name='pack_component_price']" position="attributes">
                 <attribute name="attrs">{}</attribute>
             </xpath>
+            <field name="list_price" position="replace">
+                <field name="list_price" class="oe_inline" widget='monetary' nolabel="1"
+                    options="{'currency_field': 'currency_id', 'field_digits': True}" attrs="{'readonly':['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" force_save="1" />
+            </field>
+            <field name="standard_price" position="replace">
+                <field name="standard_price" class="oe_inline" widget='monetary' nolabel="1"
+                    options="{'currency_field': 'cost_currency_id', 'field_digits': True}"
+                    force_save="1" attrs="{'readonly':['&amp;', ('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
+
+            </field>
+            <xpath expr="//label[@for='list_price']" position="replace">
+                <label for="list_price" string="Kit Price"
+                    attrs="{'invisible': ['|',('pack_component_price','=','ignored'),('pack_ok','=',False)]}" />
+                <label for="list_price" string="Sales Price"
+                    attrs="{'invisible': ['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
+            </xpath>
+            <xpath expr="//label[@for='standard_price']" position="replace">
+                <label for="standard_price" string="Kit Cost"
+                    attrs="{'invisible': ['|',('pack_component_price','=','ignored'),('pack_ok','=',False)]}" />
+                <label for="standard_price" string="Cost"
+                    attrs="{'invisible': ['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
+            </xpath>
+
         </field>
     </record>
 

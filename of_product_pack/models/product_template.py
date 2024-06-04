@@ -17,7 +17,24 @@ class ProductTemplate(models.Model):
         for product in self:
             product.pack_modifiable_invisible = product.pack_type != "detailed"
 
-    @api.model
+    @api.onchange('pack_ok', 'pack_component_price', 'pack_line_ids')
+    def _onchange_list_price(self):
+        if self.pack_ok and self.pack_component_price == 'totalized' and self.pack_line_ids:
+            self.list_price = sum(
+                pack_line.product_id.list_price * pack_line.quantity for pack_line in self.pack_line_ids
+            )
+        else:
+            self.list_price = 1.0
+
+    @api.onchange('pack_ok', 'pack_component_price', 'pack_line_ids')
+    def _onchange_standard_price(self):
+        if self.pack_ok and self.pack_component_price == 'totalized' and self.pack_line_ids:
+            self.standard_price = sum(
+                pack_line.product_id.standard_price * pack_line.quantity for pack_line in self.pack_line_ids
+            )
+        else:
+            self.standard_price = 0.0
+
     def _get_pack_component_price(self):
         """Method for getting the selection for the pack component price."""
         return [

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 15:47+0000\n"
-"PO-Revision-Date: 2024-01-30 15:47+0000\n"
+"POT-Creation-Date: 2024-06-14 09:26+0000\n"
+"PO-Revision-Date: 2024-06-14 09:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -23,11 +23,61 @@ msgid "Calculated"
 msgstr "Calculé"
 
 #. module: of_product_pack
+#: model_terms:ir.ui.view,arch_db:of_product_pack.product_template_view_form_product_pack
+msgid "Cost"
+msgstr "Coût"
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_product_pack
 #. odoo-python
 #: code:addons/of_product_pack/models/product_template.py:0
 #, python-format
 msgid "Fixed"
 msgstr "Fixé"
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__id
+msgid "ID"
+msgstr ""
+
+#. module: of_product_pack
+#: model_terms:ir.ui.view,arch_db:of_product_pack.product_template_view_form_product_pack
+msgid "Kit Cost"
+msgstr "Coût de kit"
+
+#. module: of_product_pack
+#: model_terms:ir.ui.view,arch_db:of_product_pack.product_template_view_form_product_pack
+msgid "Kit Price"
+msgstr "Prix de kit"
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__write_date
+msgid "Last Updated on"
+msgstr ""
 
 #. module: of_product_pack
 #: model:ir.model.fields,help:of_product_pack.field_product_product__pack_component_price
@@ -69,5 +119,21 @@ msgstr "Type de kit"
 
 #. module: of_product_pack
 #: model:ir.model,name:of_product_pack.model_product_template
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__product_id
 msgid "Product"
 msgstr "Produit"
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__quantity
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: of_product_pack
+#: model_terms:ir.ui.view,arch_db:of_product_pack.product_template_view_form_product_pack
+msgid "Sales Price"
+msgstr "Prix de vente"
+
+#. module: of_product_pack
+#: model:ir.model,name:of_product_pack.model_of_product_pack_lines
+msgid "of.product.pack.lines"
+msgstr ""
