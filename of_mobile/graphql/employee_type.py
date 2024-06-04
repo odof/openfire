@@ -20,7 +20,7 @@ class Employee(OdooObjectType):
 
     @staticmethod
     def resolve_company_id(root, info):
-        return root.user_id.sudo().company_id.id
+        return root.sudo().company_id.id
 
     @staticmethod
     def resolve_authorized_company_ids(root, info):

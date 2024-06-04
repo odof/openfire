@@ -23,7 +23,10 @@ class ControllersOfMobile(http.Controller):
         password = body.get('password', False)
         if not password or not username:
             return {'code': 400, 'message': 'Missing username or password', 'session_id': None}
-        user_id = request.session.authenticate(request.db, username, password)
+        try:
+            user_id = request.session.authenticate(request.db, username, password)
+        except odoo.exceptions.AccessDenied:
+            return {'code': 401, 'message': 'Impossible to login.', 'session_id': None}
 
         if not user_id:
             return {'code': 401, 'message': 'Impossible to login.', 'session_id': None}
