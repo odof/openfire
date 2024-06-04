@@ -2,9 +2,9 @@
 
 import logging
 
-from odoo import api, models
+from odoo import Command, api, models
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
+from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 logger = logging.getLogger(__name__)
@@ -72,12 +72,13 @@ class OFEquipment(models.Model):
             mutation['installer_id'] = many2one(self=self, model='res.partner', input=installer)
 
         if intervention := args.get('intervention'):
-            mutation['intervention_ids'] = x2many(
-                self=self, model='calendar.event', input=intervention, default={'of_use_equipment': True}, keep=True
-            )
+            # on va d'abord chercher l'intervention
+            intervention_id = many2one(self=self, model='calendar.event', input=intervention)
+            # puis on l'ajoute à la liste des interventions de cet équipement
+            mutation['intervention_ids'] = [Command.link(intervention_id)]
 
         if site_address := args.get('site_address'):
-            mutation['site_address_id'] = many2one(self=self, mode='res.partner', input=site_address)
+            mutation['site_address_id'] = many2one(self=self, model='res.partner', input=site_address)
 
         return mutation
 

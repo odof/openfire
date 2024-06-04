@@ -60,7 +60,7 @@ def x2many(self, model, input, default=False, keep=False):
     if type(default) is bool:
         default = {}
 
-    if type(input) is dict:
+    if type(input) is not list:
         input = [input]
 
     if len(input) == 0:
