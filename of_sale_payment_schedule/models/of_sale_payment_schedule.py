@@ -25,6 +25,7 @@ class OFSalePaymenSchedule(models.Model):
     sequence = fields.Integer(string="Sequence")
     date = fields.Date(string="Date")
 
+    @api.depends('order_id.of_payment_schedule_ids')
     def _compute_is_last(self):
         for order in self.mapped('order_id'):
             for payment in order.of_payment_schedule_ids:
