@@ -435,11 +435,7 @@ class CalendarEvent(models.Model):
                 )
                 if comp_accounting_company != fiscal_accounting_company:
                     change_fiscal_pos = True
-            if (
-                template_accounting.fiscal_position_id
-                and not event.of_link_order
-                and (not event.of_fiscal_position_id or change_fiscal_pos)
-            ):
+            if (template_accounting.fiscal_position_id and not event.of_link_order) or change_fiscal_pos:
                 event.of_fiscal_position_id = template_accounting.fiscal_position_id
 
             event._recompute_taxes()
@@ -459,11 +455,13 @@ class CalendarEvent(models.Model):
     @api.depends('of_template_id')
     def _compute_of_line_ids(self):
         for event in self.filtered(lambda e: e.of_template_id):
-            if lines_to_create := [
-                Command.create(line._prepare_intervention_line_vals(event)) for line in event.of_template_id.line_ids
-            ]:
-                event.of_line_ids = lines_to_create
-
+            if (
+                lines_to_create := [
+                    Command.create(line._prepare_intervention_line_vals(event))
+                    for line in event.of_template_id.line_ids
+                ]
+            ) and event.of_state == 'draft':
+                event.of_line_ids = [Command.clear()] + lines_to_create[:]
         for event in self:
             event._recompute_taxes()
 
@@ -1071,7 +1069,7 @@ class CalendarEvent(models.Model):
                 result += f"<li>{event.name}"
                 if message_type == 'error':
                     msg_details = "<ul>" + "".join([f"<li>{msg}</li>" for msg in messages[message_type]]) + "</ul>"
-                    result += f":<br/>{msg_details}</li>"
+                    result += f":<br/>{msg_details}</li>"  # noqa
         result += "</ul>"
         return result
 
