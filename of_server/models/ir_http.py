@@ -88,7 +88,7 @@ def _dispatch(cls):
                     )
                 else:
                     _logger.info(
-                        u"OF DEBOGUE FIN" + str(signe) + u" %s %s- UID %s - Temps : %ss  - appel %s %s",
+                        u"OF DEBOGUE FIN" + str(signe) + u" %s %s - UID %s - Temps : %ss - appel %s %s",
                         os.getpid(),
                         of_compteur,
                         request.env.uid,
