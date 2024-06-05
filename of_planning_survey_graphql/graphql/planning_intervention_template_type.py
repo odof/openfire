@@ -10,7 +10,10 @@ class PlanningInterventionTemplate(OdooObjectType):
     _name = 'PlanningInterventionTemplate'
     _type = 'types'
 
-    survey_id = graphene.Field(Survey, name='survey')
+    survey = graphene.Field(Survey)
+
+    def resolve_survey(root, info):
+        return root.survey_id or None
 
 
 class PlanningInterventionTemplateInput(graphene.InputObjectType):

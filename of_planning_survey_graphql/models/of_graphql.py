@@ -1,7 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import graphene
-
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
@@ -32,11 +30,11 @@ class OFGraphql(models.AbstractModel):
             "PlanningInterventionMutation": {
                 "planning_intervention_create": {
                     "survey": SurveyInput,
-                    "survey_user_inputs": graphene.List(SurveyUserInputInput),
+                    "survey_user_input": SurveyUserInputInput,
                 },
                 "planning_intervention_update": {
                     "survey": SurveyInput,
-                    "survey_user_inputs": graphene.List(SurveyUserInputInput),
+                    "survey_user_input": SurveyUserInputInput,
                 },
             }
         }
