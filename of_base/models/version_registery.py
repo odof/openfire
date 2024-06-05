@@ -12,4 +12,4 @@ class VersionRegistry(models.AbstractModel):
     @api.model
     def _register_hook(self):
         version_loader.load_version(self.env.cr, self.env.registry)
-        return super(VersionRegistry, self)._register_hook()
+        return super()._register_hook()
