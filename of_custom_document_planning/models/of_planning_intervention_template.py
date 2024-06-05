@@ -10,7 +10,6 @@ class OFPlanningInterventionTemplate(models.Model):
     sheet_order_pdf = fields.Boolean(string="Order")
     sheet_picking_pdf = fields.Boolean(string="Delivery notes")
     sheet_invoice_pdf = fields.Boolean(string="Invoices")
-    sheet_purchase_pdf = fields.Boolean(string="Purchases")
     sheet_custom_document_ids = fields.Many2many(
         comodel_name='of.custom.document', relation='sheet_intervention_custom_document', string="Joined documents"
     )
@@ -19,7 +18,6 @@ class OFPlanningInterventionTemplate(models.Model):
     report_order_pdf = fields.Boolean(string="Order")
     report_picking_pdf = fields.Boolean(string="Delivery notes")
     report_invoice_pdf = fields.Boolean(string="Invoices")
-    report_purchase_pdf = fields.Boolean(string="Purchases")
     report_custom_document_ids = fields.Many2many(
         comodel_name='of.custom.document', relation='report_intervention_custom_document', string="Joined documents"
     )

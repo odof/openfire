@@ -7,13 +7,11 @@
         <field name="sheet_order_pdf" eval="True" />
         <field name="sheet_picking_pdf" eval="False" />
         <field name="sheet_invoice_pdf" eval="False" />
-        <field name="sheet_purchase_pdf" eval="True" />
 
         <!-- Intervention report-->
         <field name="report_order_pdf" eval="False" />
         <field name="report_picking_pdf" eval="False" />
         <field name="report_invoice_pdf" eval="False" />
-        <field name="report_purchase_pdf" eval="True" />
     </record>
 
 </odoo>

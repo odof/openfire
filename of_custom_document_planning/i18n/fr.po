@@ -71,12 +71,6 @@ msgid "Order"
 msgstr "Commandes"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_purchase_pdf
-msgid "Purchases"
-msgstr "Achats"
-
-#. module: of_custom_document_planning
 #: model:ir.model,name:of_custom_document_planning.model_ir_actions_report
 msgid "Report Action"
 msgstr "Action d'impression"
