@@ -22,7 +22,7 @@ class PlanningIntervention(OdooObjectType):
     of_section_to_display_ids = graphene.NonNull(
         graphene.List(graphene.NonNull(lambda: PlanningInterventionSection)), name='sections'
     )
-    of_mobile_report_send_date = graphene.DateTime(name='mobile_report_send_date')
+    of_mobile_report_send_date = graphene.DateTime(name='mobileReportSendDate')
 
     @staticmethod
     def resolve_survey_user_input(root, info):
