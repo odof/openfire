@@ -44,6 +44,7 @@ class SurveyUserInputLineInput(graphene.InputObjectType):
     value_text_box = graphene.String()
     value_numerical_box = graphene.Float()
     suggested_answer = graphene.Field(survey_question_answer_type.SurveyQuestionAnswerInput)
+    question = graphene.Int(description="Identifiant de la question à laquelle cette ligne répond")
 
 
 class SurveyUserInputLineFilterInput(SurveyUserInputLineInput):

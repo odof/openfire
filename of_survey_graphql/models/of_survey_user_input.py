@@ -33,6 +33,9 @@ class OFSurveyUserInput(models.Model):
                 self=self, model='of.survey.question', input=args.get('predefined_questions')
             )
 
+        if survey_id := args.get('survey'):
+            mutation['survey_id'] = survey_id
+
         return mutation
 
     @api.model

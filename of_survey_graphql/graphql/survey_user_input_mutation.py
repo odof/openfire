@@ -15,6 +15,7 @@ class SurveyUserInputCreate(graphene.Mutation):
         partner = graphene.Argument(PartnerInput)
         user_input_lines = graphene.List(graphene.NonNull(survey_user_input_line_type.SurveyUserInputLineInput))
         predefined_questions = graphene.List(graphene.NonNull(survey_question_page_type.SurveyQuestionPageInput))
+        survey = graphene.Int(description="Id du survey")
 
     Output = survey_user_input_type.SurveyUserInput
 
@@ -34,6 +35,7 @@ class SurveyUserInputUpdate(graphene.Mutation):
         partner = graphene.Argument(PartnerInput)
         user_input_lines = graphene.List(graphene.NonNull(survey_user_input_line_type.SurveyUserInputLineInput))
         predefined_questions = graphene.List(graphene.NonNull(survey_question_page_type.SurveyQuestionPageInput))
+        survey = graphene.Int(description="Id du survey")
 
     Output = survey_user_input_type.SurveyUserInput
 

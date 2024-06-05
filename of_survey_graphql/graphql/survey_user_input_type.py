@@ -22,10 +22,15 @@ class SurveyUserInput(OdooObjectType):
     predefined_question_ids = graphene.List(
         graphene.NonNull(survey_question_page_type.SurveyQuestionPage), name="predefinedQuestions"
     )
+    survey = graphene.Int(description="Id du survey")
 
     @staticmethod
     def resolve_partner(root, info):
         return root.partner_id or None
+
+    @staticmethod
+    def resolve_survey(root, info):
+        return root.survey_id or None
 
 
 class SurveyUserInputInput(graphene.InputObjectType):
@@ -42,6 +47,7 @@ class SurveyUserInputInput(graphene.InputObjectType):
     predefined_question_ids = graphene.List(
         graphene.NonNull(survey_question_page_type.SurveyQuestionPageInput), name="predefinedQuestions"
     )
+    survey = graphene.Int(description="Id du survey")
 
 
 class SurveyUserInputFilterInput(SurveyUserInputInput):

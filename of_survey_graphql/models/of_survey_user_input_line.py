@@ -18,6 +18,12 @@ class OFSurveyUserInputLine(models.Model):
 
         if answer_type := args.get('answer_type'):
             mutation['answer_type'] = answer_type
+        else:
+            if question_id := args.get('question'):
+                if question_id:
+                    # on va chercher le type sur la question
+                    odoo_question = self.env['of.survey.question'].browse(question_id)
+                    mutation['answer_type'] = odoo_question.question_type
 
         if value_char_box := args.get('value_char_box'):
             mutation['value_char_box'] = value_char_box
@@ -36,8 +42,8 @@ class OFSurveyUserInputLine(models.Model):
                 self=self, model='of.survey.question.answer', input=suggested_answer
             )
 
-        if question := args.get('question'):
-            mutation['question_id'] = many2one(self=self, model='of.survey.question', input=question)
+        if question_id := args.get('question'):
+            mutation['question_id'] = question_id
 
         return mutation
 
