@@ -44,6 +44,13 @@ class SortType(graphene.Enum):
     NEAREST_DISTANCE = "nearest_distance"
 
 
+class TaskDurationType(graphene.Enum):
+    ONE_HOUR = "one_hour"
+    TWO_HOURS = "two_hours"
+    FOUR_HOURS = "four_hours"
+    FOUR_HOURS_MORE = "four_hours_more"
+
+
 class ServiceRequest(OdooObjectType):
     _name = "ServiceRequest"
     _type = "types"
@@ -80,6 +87,7 @@ class ServiceRequest(OdooObjectType):
     planned_duration = graphene.Float()
     remaining_duration = graphene.Float()
     note = graphene.String()
+    distance = graphene.Float()
 
     @staticmethod
     def resolve_template(root, info):
@@ -153,6 +161,7 @@ class ServiceRequestInput(graphene.InputObjectType):
     duration = graphene.Float()
     planned_duration = graphene.Float()
     remaining_duration = graphene.Float()
+    distance = graphene.Float()
 
 
 class ServiceRequestFilterInput(ServiceRequestInput):
@@ -163,3 +172,10 @@ class ServiceRequestFilterInput(ServiceRequestInput):
     longitude = graphene.Float()
     max_distance = graphene.Float()
     sort = graphene.Field(SortType)
+    query = graphene.String()
+    max_duration = graphene.Float()
+    min_duration = graphene.Float()
+    state = graphene.List(graphene.String)
+    task = graphene.List(PlanningInterventionTaskInput)
+    address = graphene.Field(PartnerInput)
+    task_duration = graphene.Field(TaskDurationType)

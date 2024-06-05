@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import requests
 
-from odoo import api, models
+from odoo import api, fields, models
 from odoo.tools import config
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
@@ -13,6 +13,8 @@ from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 class OFServiceRequest(models.Model):
     _inherit = 'of.service.request'
+
+    distance = fields.Float()
 
     @api.model
     def _prepare_mutation_values(self, **args):
@@ -122,11 +124,13 @@ class OFServiceRequest(models.Model):
             if select.name:
                 odoo_domain += [('name', 'like', select.name)]
             if select.state:
-                odoo_domain += [('state', '=', select.state)]
+                odoo_domain += [('state', 'in', select.state)]
             if select.duration:
                 odoo_domain += [('duration', '=', select.duration)]
             if select.task:
-                odoo_domain += [('task', '=', select.task)]
+                task_ids = [task.id for task in select.task if task.id]
+                if task_ids:
+                    odoo_domain += [('task_id', 'in', task_ids)]
             if select.affectation == 'mine':
                 # DI affectées au technicien courant
                 odoo_domain += [('employee_ids', 'in', [self.env.user.employee_id.id])]
@@ -154,6 +158,22 @@ class OFServiceRequest(models.Model):
                 end_of_month = datetime.now().replace(day=1).date() + timedelta(days=31)
                 odoo_domain.append(('next_date', '<=', end_of_month))
                 odoo_domain.append(('end_date', '>=', start_of_month))
+            if select.number:
+                odoo_domain += [('number', 'ilike', select.number)]
+            if select.title:
+                odoo_domain += [('title', 'ilike', select.title)]
+            if select.address.name:
+                odoo_domain += [('address_id.name', 'ilike', select.address.name)]
+            if select.address.city:
+                odoo_domain += [('address_id.city', 'ilike', select.address.city)]
+            if select.task_duration == "one_hour":
+                odoo_domain += [('duration', '<=', 1.0)]
+            if select.task_duration == "two_hours":
+                odoo_domain += [('duration', '<=', 2.0), ('duration', '>', 1.0)]
+            if select.task_duration == "four_hours":
+                odoo_domain += [('duration', '<=', 4.0), ('duration', '>', 2.0)]
+            if select.task_duration == "four_hours_more":
+                odoo_domain += [('duration', '>', 4.0)]
             if select.latitude is not None and select.longitude is not None and select.max_distance is not None:
                 max_distance_converted = select.max_distance / 1000 * 0.621371
                 # premier filtre
@@ -185,6 +205,10 @@ class OFServiceRequest(models.Model):
                 services_distance = self.calculate_distances(
                     service_requests, select.latitude, select.longitude, max_distance_converted
                 )
+                for s in services_distance:
+                    for service in service_requests:
+                        if s[0].id == service.id:
+                            service.distance = s[1]
                 distance_list = [s[0].id for s in services_distance]
                 odoo_domain.append(('id', 'in', distance_list))
 
