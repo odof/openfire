@@ -162,10 +162,11 @@ class OFServiceRequest(models.Model):
                 odoo_domain += [('number', 'ilike', select.number)]
             if select.title:
                 odoo_domain += [('title', 'ilike', select.title)]
-            if select.address.name:
-                odoo_domain += [('address_id.name', 'ilike', select.address.name)]
-            if select.address.city:
-                odoo_domain += [('address_id.city', 'ilike', select.address.city)]
+            if select.address:
+                if select.address.name:
+                    odoo_domain += [('address_id.name', 'ilike', select.address.name)]
+                if select.address.city:
+                    odoo_domain += [('address_id.city', 'ilike', select.address.city)]
             if select.task_duration == "one_hour":
                 odoo_domain += [('duration', '<=', 1.0)]
             if select.task_duration == "two_hours":
