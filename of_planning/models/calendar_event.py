@@ -4,7 +4,7 @@ import base64
 from datetime import timedelta
 
 from odoo import Command, _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import AccessError, UserError, ValidationError
 
 
 class CalendarEvent(models.Model):
@@ -845,6 +845,8 @@ class CalendarEvent(models.Model):
         self.write({'of_state': 'draft'})
 
     def action_button_close(self):
+        if self.of_template_id.send_reports == 'auto_done':
+            self.action_send_reports()
         self.write({'of_is_closed': True})
 
     def action_button_open(self):
@@ -1059,6 +1061,20 @@ class CalendarEvent(models.Model):
 
     def action_create_invoice_list(self):
         return self.action_create_invoice(view_mode='tree')
+
+    def action_send_reports(self):
+        for intervention in self:
+            try:
+                email_template = self.env.ref("of_planning.email_template_of_planning_intervention_report")
+            except Exception:
+                raise AccessError("Unable to find email template")
+
+            if self.env.user.email:
+                email_template = self.env.ref(
+                    "of_planning.email_template_of_planning_intervention_report"
+                ).with_context(default_email_from=self.env.user.email_formatted)
+                email_template.with_context(force_attachment=True).send_mail(intervention.id, force_send=True)
+                intervention.of_mobile_report_send_date = fields.Datetime.now()
 
     # --------------------------------------------------------------------------
     # Business methods
