@@ -18,6 +18,7 @@ Module permettant la réservation d'articles en stock depuis les commandes de ve
     'depends': [
         'stock_reserve',
         'of_kit',
+        'of_sale_stock',
     ],
     'category': "OpenFire",
     'data': [

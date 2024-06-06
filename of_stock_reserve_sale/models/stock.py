@@ -67,18 +67,19 @@ class StockMove(models.Model):
                 # On repasse également les mouvements de stock "disponibles" à "en attende de disponibilité"
                 pack_op.linked_move_operation_ids.mapped('move_id').write({'state': 'confirmed'})
 
+            rest_quant = False
             if quants_to_use:
                 quants = []
                 if move.picking_id:
                     pickings_to_recompute |= move.picking_id
                 for quant_id in move.reserved_quant_ids.ids:
                     move.write({'reserved_quant_ids': [[3, quant_id]]})
-                rest_quant = False
                 for quant in quants_to_use:
-                    if sum([q[1] for q in quants]) >= move.product_qty:
+                    quant_sum = sum([q[1] for q in quants])
+                    if quant_sum >= move.product_qty:
                         break
-                    if sum([q[1] for q in quants]) + quant.qty > move.product_qty:
-                        rest_quant = quant._quant_split(quant.qty - rest)
+                    if quant_sum + quant.qty > move.product_qty:
+                        rest_quant = quant._quant_split(quant.qty - (move.product_qty - quant_sum))
                     quants_used |= quant
                     quants.append((quant, quant.qty))
                 if quants:

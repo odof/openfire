@@ -45,11 +45,47 @@ class SaleOrder(models.Model):
         auto_reserve = self.env['ir.values'].get_default('stock.config.settings', 'of_auto_reserve')
         res = super(SaleOrder, self).action_confirm()
         if auto_reserve:
-            for line in self.mapped('order_line').filtered('of_reservation_ids'):
-                quants = line.mapped('of_reservation_ids.reserved_quant_ids')
-                line.release_stock_reservations()
-                moves = line.mapped('procurement_ids.move_ids')
-                moves.reservation_to_operation(quants)
+            lines_to_process = self.mapped('order_line').filtered('of_reservation_ids')
+            # Check locations to determine if division is necessary
+            default_picking = lines_to_process.mapped('procurement_ids.move_ids.picking_id')
+            if default_picking and len(default_picking) > 1:
+                default_picking = default_picking[0]
+            default_location = default_picking.picking_type_id.default_location_src_id
+            locations = lines_to_process.mapped('of_reservation_ids.reserved_quant_ids.location_id')
+            division_dict = {}
+            for location in locations.filtered(lambda loc: loc.id != default_location.id):
+                division_dict[location.id] = {}
+                for line in lines_to_process:
+                    qty_to_divide = 0
+                    for quant in line.of_reservation_ids.mapped('reserved_quant_ids'):
+                        if quant.location_id.id == location.id:
+                            qty_to_divide += quant.qty
+                    if qty_to_divide:
+                        division_dict[location.id][line] = qty_to_divide
+            # Picking division
+            picking_type_obj = self.env['stock.picking.type']
+            delivery_division_wizard_obj = self.env['of.delivery.division.wizard']
+            for location_id, lines_dict in division_dict.iteritems():
+                picking_type = picking_type_obj.search(
+                    [('code', '=', 'outgoing'), ('default_location_src_id', '=', location_id)], limit=1)
+                line_vals = []
+                for line, qty_to_divide in lines_dict.iteritems():
+                    move = line.mapped(
+                        'procurement_ids.move_ids').filtered(lambda move: move.picking_id.id == default_picking.id)
+                    line_vals.append((0, 0, {'move_id': move.id, 'qty_to_divide': qty_to_divide}))
+                wizard = delivery_division_wizard_obj.create({
+                    'picking_id': default_picking.id,
+                    'line_ids': line_vals,
+                    'picking_type_id': picking_type.id
+                })
+                wizard.action_delivery_division()
+            # Reservation
+            for line in lines_to_process:
+                for quant in line.mapped('of_reservation_ids.reserved_quant_ids'):
+                    move = line.procurement_ids.mapped('move_ids').filtered(
+                        lambda m: m.location_id.id == quant.location_id.id)
+                    quant.reservation_id.action_cancel()
+                    move.reservation_to_operation(quant)
         return res
 
 
