@@ -11,6 +11,9 @@
                     <field name="of_section_to_display_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
                 </group>
             </xpath>
+            <xpath expr="//field[@name='of_picking_amount_total']" position="after">
+                <field name="of_payment_intervention"/>
+            </xpath>
         </field>
     </record>
 

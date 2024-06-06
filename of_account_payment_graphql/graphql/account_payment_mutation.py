@@ -1,8 +1,14 @@
+import logging
+
 import graphene
 
+from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
 from .account_payment_type import AccountPayment
+from .of_payment_mode_type import PaymentModeInput
+
+logger = logging.getLogger(__name__)
 
 
 class AccountPaymentCreate(graphene.Mutation):
@@ -10,17 +16,22 @@ class AccountPaymentCreate(graphene.Mutation):
 
     class Arguments:
         name = graphene.String()
-        amount_total = graphene.Float()
-        amount_residual = graphene.Float()
+        amount = graphene.Float()
         payment_state = graphene.String()
         date = graphene.Date()
+        payment_mode = graphene.Argument(PaymentModeInput)
+        partner = graphene.Argument(PartnerInput)
 
     Output = AccountPayment
 
     def mutate(self, info, **args):
         env = info.context["env"]
         values = env['account.payment']._prepare_mutation_values(**args)
-        return env['account.payment'].create(values)
+        payment = env['account.payment'].create(values)
+        payment.action_post()
+        if invoice := payment.intervention_invoice_id:
+            invoice.payment_id = payment.id
+        return payment
 
 
 class AccountPaymentUpdate(graphene.Mutation):
@@ -29,10 +40,11 @@ class AccountPaymentUpdate(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
         name = graphene.String()
-        amount_total = graphene.Float()
-        amount_residual = graphene.Float()
+        amount = graphene.Float()
         payment_state = graphene.String()
         date = graphene.Date()
+        payment_mode = graphene.Argument(PaymentModeInput)
+        partner = graphene.Argument(PartnerInput)
 
     Output = AccountPayment
 

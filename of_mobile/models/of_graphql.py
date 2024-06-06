@@ -3,7 +3,9 @@
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningInterventionInput
 
+from ..graphql.account_payment_type import AccountPayment, AccountPaymentInput, PaymentType
 from ..graphql.configuration_query import ConfigurationQuery
 from ..graphql.configuration_type import Configuration
 from ..graphql.employee_query import EmployeeQuery
@@ -71,6 +73,8 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTemplateAdditionalLine,
                 PlanningInterventionTemplateAdditionalLineFilterInput,
                 PlanningInterventionTemplateAdditionalLineInput,
+                AccountPayment,
+                AccountPaymentInput,
             ],
         )
 
@@ -82,7 +86,17 @@ class OFGraphql(models.AbstractModel):
                 "user_update": {
                     "fcm_tokens": FCMTokenInput,
                 },
-            }
+            },
+            "AccountPaymentMutation": {
+                "account_payment_create": {
+                    "ttype": PaymentType,
+                    "intervention": PlanningInterventionInput,
+                },
+                "account_payment_update": {
+                    "ttype": PaymentType,
+                    "intervention": PlanningInterventionInput,
+                },
+            },
         }
         arguments = self._add_arguments(new_arguments, arguments)
 

@@ -1,9 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 import pytz
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command, _, api, fields, models
+from odoo.exceptions import UserError
 from odoo.models import expression
 
 
@@ -46,12 +48,20 @@ class CalendarEvent(models.Model):
     )
 
     of_mobile_report_send_date = fields.Datetime(string="Send date report from Mobile")
+    of_payment_intervention = fields.Many2one(
+        comodel_name='account.payment', string="Payment", compute='_compute_of_payment'
+    )
 
     @api.depends('of_template_id')
     def _compute_of_section_to_display_ids(self):
         for event in self:
             if event.of_template_id:
                 event.of_section_to_display_ids = event.of_template_id.section_to_display_ids
+
+    def _compute_of_payment(self):
+        for event in self:
+            payment = self.env['account.payment'].search([('intervention_id', '=', event.id)], limit=1)
+            event.of_payment_intervention = payment.id
 
     @api.model_create_multi
     def create(self, list_vals):
@@ -382,3 +392,34 @@ class CalendarEvent(models.Model):
         start_date = fields.Date.from_string(intervention.start)
         end_date = fields.Date.from_string(intervention.stop)
         return start_date <= today <= end_date
+
+    def action_mobile_create_invoice(self):
+        """
+        Create an invoice for the calendar event.
+        """
+        invoices = self.env['account.move']
+        for event in self:
+            if not event.of_fiscal_position_id:
+                raise UserError(_("Intervention is non billable, please select a fiscal position."))
+
+            # All lines are linked to order lines so they should be invoiced from the sale order
+            if event.of_link_order and not event.of_line_ids.filtered(lambda li: not li.order_line_id):
+                raise UserError(
+                    _("Invoiceable lines are linked to order lines. Please do the invoicing from the sale order.")
+                )
+
+            if event.of_state not in ['confirmed', 'ongoing', 'done', 'unfinished', 'postponed']:
+                raise UserError(_("Intervention is non billable because it must be confirmed."))
+
+            # Prepare the invoice data
+            invoice_data, messages = event._prepare_invoice()
+            if invoice_data:
+                move_obj = self.env['account.move']
+                move = move_obj.create(invoice_data)
+                move.message_post_with_view(
+                    'mail.message_origin_link',
+                    values={'self': move, 'origin': event},
+                    subtype_id=self.env.ref('mail.mt_note').id,
+                )
+                invoices += move
+        return invoices

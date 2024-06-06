@@ -7,6 +7,8 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 from ..graphql.account_payment_mutation import AccountPaymentMutation
 from ..graphql.account_payment_query import AccountPaymentQuery
 from ..graphql.account_payment_type import AccountPayment, AccountPaymentFilterInput
+from ..graphql.of_payment_mode_query import PaymentModeQuery
+from ..graphql.of_payment_mode_type import PaymentMode, PaymentModeInput
 
 
 class OFGraphql(models.AbstractModel):
@@ -21,5 +23,8 @@ class OFGraphql(models.AbstractModel):
                 AccountPayment,
                 AccountPaymentFilterInput,
                 AccountPaymentMutation,
+                PaymentMode,
+                PaymentModeInput,
+                PaymentModeQuery,
             ],
         )

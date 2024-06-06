@@ -29,6 +29,8 @@
         'of_service_graphql',
         'of_survey',
         'of_survey_graphql',
+        'of_account_payment',
+        'of_account_payment_graphql',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -46,6 +48,7 @@
         'views/of_planning_task_views.xml',
         'views/of_planning_intervention_template_views.xml',
         'views/res_users_views.xml',
+        'views/account_payment_views.xml',
     ],
     'installable': True,
     'application': False,

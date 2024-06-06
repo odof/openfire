@@ -14,9 +14,13 @@
         'of_account',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/account_payment_views.xml',
+        'views/of_payment_mode_views.xml',
+        'views/menu.xml',
     ],
     'installable': True,
     'application': False,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }

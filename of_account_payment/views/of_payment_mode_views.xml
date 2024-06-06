@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_payment_mode_form" model="ir.ui.view">
+        <field name="name">of.payment.mode.form</field>
+        <field name="model">of.payment.mode</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="shortname"/>
+                        <field name="journal_id"/>
+                        <field name="payment_method_line_id"/>
+                        <field name="payment_type"/>
+                        <field name="company_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_payment_mode_tree" model="ir.ui.view">
+        <field name="name">of.payment.mode.tree</field>
+        <field name="model">of.payment.mode</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="shortname"/>
+                <field name="journal_id"/>
+                <field name="payment_method_line_id"/>
+                <field name="payment_type"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_payment_mode" model="ir.actions.act_window">
+        <field name="name">Payment Mode</field>
+        <field name="res_model">of.payment.mode</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+    <record model="ir.actions.server" id="action_set_printed">
+           <field name="name">Update payment mode</field>
+           <field name="model_id" ref="of_account_payment.model_of_payment_mode"/>
+           <field name="binding_model_id" ref="of_account_payment.model_of_payment_mode"/>
+           <field name="state">code</field>
+           <field name="code">
+               action = model.action_update_mode_payment()
+           </field>
+       </record>
+
+</odoo>

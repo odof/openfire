@@ -26,6 +26,21 @@ class OFPlanningInterventionTemplate(models.Model):
         inverse_name='additional_template_id',
         string="Additional Invoice lines",
     )
+    mobile_payment = fields.Boolean(string="Mobile payment")
+    payment_mode_ids = fields.Many2many(
+        comodel_name='of.payment.mode', string="Payment Mode", default='_default_payment_mode_ids'
+    )
+    mobile_payment_fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string="Fiscal Position"
+    )
+    auto_confirm_invoice = fields.Boolean(String="Invoice Auto confirmation")
+
+    @api.onchange('mobile_payment_fiscal_position_id')
+    def onchange_mobile_payment_fiscal_position_id(self):
+        self.fiscal_position_id = self.mobile_payment_fiscal_position_id
+
+    def _default_payment_mode_ids(self):
+        return self.env['of.payment.mode'].search([('type', '=', 'inbound')])
 
     def write(self, vals):
         res = super().write(vals)

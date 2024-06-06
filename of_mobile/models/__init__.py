@@ -21,3 +21,4 @@ from . import bus
 from . import of_fcm_device_token
 from . import res_users
 from . import res_partner
+from . import account_payment
