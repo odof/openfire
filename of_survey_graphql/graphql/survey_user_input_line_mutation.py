@@ -1,5 +1,6 @@
 import graphene
 
+from odoo.addons.of_base_graphql.graphql.image_type import ImageInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
 
 from . import survey_question_answer_type, survey_question_page_type, survey_user_input_line_type
@@ -17,6 +18,7 @@ class SurveyUserInputLineCreate(graphene.Mutation):
         value_numerical_box = graphene.Float()
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
+        images = graphene.List(graphene.NonNull(ImageInput))
 
     Output = survey_user_input_line_type.SurveyUserInputLine
 
@@ -39,6 +41,7 @@ class SurveyUserInputLineUpdate(graphene.Mutation):
         value_numerical_box = graphene.Float()
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
+        images = graphene.List(graphene.NonNull(ImageInput))
 
     Output = survey_user_input_line_type.SurveyUserInputLine
 

@@ -66,8 +66,6 @@ def x2many(self, model, input, default=False, keep=False):
     if len(input) == 0:
         return [Command.clear()]
 
-    logger.info(input)
-
     for record in input:
         record_value = default.copy()
         values = obj._prepare_mutation_values(**record)

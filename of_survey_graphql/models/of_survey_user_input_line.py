@@ -2,7 +2,7 @@
 
 from odoo import api, models
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
+from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 convert_type_dict = {
@@ -56,6 +56,9 @@ class OFSurveyUserInputLine(models.Model):
 
         if question_id := args.get('question'):
             mutation['question_id'] = question_id
+
+        if 'images' in args.keys():
+            mutation['value_image_ids'] = x2many(self=self, model='of.image', input=args.get('images'))
 
         return mutation
 

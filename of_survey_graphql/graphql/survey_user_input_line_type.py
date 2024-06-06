@@ -3,7 +3,7 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
-from odoo.addons.of_base_graphql.graphql.image_type import Image
+from odoo.addons.of_base_graphql.graphql.image_type import Image, ImageInput
 
 from . import survey_question_answer_type
 
@@ -45,6 +45,7 @@ class SurveyUserInputLineInput(graphene.InputObjectType):
     value_numerical_box = graphene.Float()
     suggested_answer = graphene.Field(survey_question_answer_type.SurveyQuestionAnswerInput)
     question = graphene.Int(description="Identifiant de la question à laquelle cette ligne répond")
+    images = graphene.List(graphene.NonNull(ImageInput))
 
 
 class SurveyUserInputLineFilterInput(SurveyUserInputLineInput):
