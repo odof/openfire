@@ -5,6 +5,17 @@ from odoo import api, models
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
+convert_type_dict = {
+    'simple_choice': 'suggestion',
+    'multiple_choice': 'suggestion',
+    'text_box': 'text_box',
+    'char_box': 'char_box',
+    'date': 'date',
+    'multi_image': 'multi_image',
+    'form': 'form',
+    'numerical_box': 'numerical_box',
+}
+
 
 class OFSurveyUserInputLine(models.Model):
     _inherit = 'of.survey.user_input.line'
@@ -23,7 +34,8 @@ class OFSurveyUserInputLine(models.Model):
                 if question_id:
                     # on va chercher le type sur la question
                     odoo_question = self.env['of.survey.question'].browse(question_id)
-                    mutation['answer_type'] = odoo_question.question_type
+                    if odoo_question.question_type in convert_type_dict:
+                        mutation['answer_type'] = convert_type_dict(odoo_question.question_type)
 
         if value_char_box := args.get('value_char_box'):
             mutation['value_char_box'] = value_char_box
