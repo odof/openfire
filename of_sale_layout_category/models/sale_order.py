@@ -1,24 +1,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import _, api, fields, models
+from odoo import _, fields, models
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     of_layout_category_active = fields.Boolean(string="Active Layout Category", default=True)
-    of_show_products = fields.Boolean(string="Show Products", default=True)
-
-    @api.onchange('of_show_products')
-    def onchange_of_show_products(self):
-        for line in self.order_line.filtered(lambda r: r.display_type != 'line_section'):
-            line.of_show = self.of_show_products
-
-    @api.onchange('of_layout_category_active')
-    def onchange_of_layout_category_active(self):
-        # Si jamais on cache les sections avancées, il faut toujours afficher les produits
-        if not self.of_layout_category_active:
-            self.of_show_products = True
 
     def get_sale_layout_summary_report(self):
         """
@@ -33,6 +21,7 @@ class SaleOrder(models.Model):
             dict: A dictionary containing the summary report data, including sections and totals.
 
         """
+        self.ensure_one()
         lines = []
 
         # Retrieve the highest-level sections
@@ -81,7 +70,11 @@ class SaleOrder(models.Model):
         child_lines = []
         # si on a des sous-sections, on va récupérer les données des sous-sections
         child_sections = self.order_line.filtered(
-            lambda r: r.of_parent_node_id == section.of_node_id and r.display_type == 'line_section'
+            lambda r: (
+                r.of_parent_node_id == section.of_node_id
+                and r.of_parent_node_id != 0
+                and r.display_type == 'line_section'
+            )
         )
         for child in child_sections:
             child_lines += self._sale_layout_recursive_data_section(child)
@@ -111,6 +104,7 @@ class SaleOrder(models.Model):
         return [value_section] + child_lines
 
     def action_button_show_summary(self):
+        self.ensure_one()
         wz = self.env['of.sale.summary.wizard'].create({'sale_id': self.id})
 
         return {

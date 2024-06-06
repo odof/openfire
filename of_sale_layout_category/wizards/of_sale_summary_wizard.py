@@ -13,5 +13,5 @@ class OFSaleSummaryWizard(models.TransientModel):
     def _compute_doc(self):
         for record in self:
             record.doc = self.env['ir.qweb']._render(
-                template="of_sale_layout_category.report_sale_summary", values={'sale_id': self.sale_id}
+                template="of_sale_layout_category.report_sale_summary", values={'sale_id': record.sale_id}
             )

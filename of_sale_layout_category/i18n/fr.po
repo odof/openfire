@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-02 08:03+0000\n"
-"PO-Revision-Date: 2024-07-02 08:03+0000\n"
+"POT-Creation-Date: 2024-07-15 08:44+0000\n"
+"PO-Revision-Date: 2024-07-15 08:44+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,15 +47,43 @@ msgstr "Ajouter un produit"
 
 #. module: of_sale_layout_category
 #. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Add Section"
+msgstr "Ajouter une section"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
 #: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
 #, python-format
 msgid "Cancel"
 msgstr "Annuler"
 
 #. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Caret Left"
+msgstr "Caret Gauche"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Caret Right"
+msgstr "Caret Droit"
+
+#. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.of_sale_summary_wizard_view_form
 msgid "Close"
 msgstr "Fermer"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Copy"
+msgstr "Copier"
 
 #. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
@@ -88,6 +116,13 @@ msgid "Delete row"
 msgstr "Supprimer la ligne"
 
 #. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Delete this section"
+msgstr "Supprimer cette section"
+
+#. module: of_sale_layout_category
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__display_name
 msgid "Display Name"
 msgstr "Nom affiché"
@@ -96,6 +131,34 @@ msgstr "Nom affiché"
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__doc
 msgid "Doc"
 msgstr ""
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Duplicate this section"
+msgstr "Dupliquer cette section"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Eye"
+msgstr "Œil"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Eye Slash"
+msgstr "Œil barré"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Hide order line from this section"
+msgstr "Cacher les lignes de section de la section"
 
 #. module: of_sale_layout_category
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_of_sale_summary_wizard__id
@@ -154,19 +217,26 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_node_id
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_node_id
 msgid "Node ID"
-msgstr "Id du noeud"
+msgstr "Id du nœud"
 
 #. module: of_sale_layout_category
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_position_node
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_position_node
 msgid "Node's Position"
-msgstr "Position du noeud"
+msgstr "Position du nœud"
 
 #. module: of_sale_layout_category
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_account_move_line__of_parent_node_id
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_parent_node_id
 msgid "Parent Node ID"
-msgstr "Id du noeud parent"
+msgstr "Id du nœud parent"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Plus"
+msgstr ""
 
 #. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.report_sale_summary
@@ -219,12 +289,6 @@ msgid "Section name"
 msgstr "Nom de la section"
 
 #. module: of_sale_layout_category
-#: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order__of_show_products
-#: model_terms:ir.ui.view,arch_db:of_sale_layout_category.sale_order_view_form
-msgid "Show Products"
-msgstr "Afficher produits"
-
-#. module: of_sale_layout_category
 #: model_terms:ir.ui.view,arch_db:of_sale_layout_category.sale_order_view_form
 msgid "Show Summary"
 msgstr "Afficher résumé"
@@ -233,6 +297,13 @@ msgstr "Afficher résumé"
 #: model:ir.model.fields,field_description:of_sale_layout_category.field_sale_order_line__of_show
 msgid "Show line"
 msgstr "Afficher ligne"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Show order line from this section"
+msgstr "Afficher les lignes de commande de la section"
 
 #. module: of_sale_layout_category
 #: model:ir.model,name:of_sale_layout_category.model_stock_move
@@ -267,6 +338,14 @@ msgstr ""
 
 #. module: of_sale_layout_category
 #. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#: code:addons/of_sale_layout_category/static/src/xml/of_sale_section_one2many.xml:0
+#, python-format
+msgid "Trash"
+msgstr "Poubelle"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
 #: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
 #, python-format
 msgid "What do you want to delete ?"
@@ -278,3 +357,17 @@ msgstr "Que voulez-vous supprimer ?"
 #, python-format
 msgid "Without sections"
 msgstr "Sans section"
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "all"
+msgstr ""
+
+#. module: of_sale_layout_category
+#. odoo-javascript
+#: code:addons/of_sale_layout_category/static/src/xml/popupover.xml:0
+#, python-format
+msgid "one"
+msgstr ""

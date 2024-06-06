@@ -10,6 +10,8 @@ import { makeContext } from "@web/core/context";
 import { usePopover } from "@web/core/popover/popover_hook";
 const { Component, useEffect, useRef, onWillUpdateProps, EventBus, useState } = owl;
 import { _t } from 'web.core';
+import { useBus } from "@web/core/utils/hooks";
+
 export class OFSaleSectionLine extends Component {
     static template = "of_sale_layout_category.OFSaleSectionLine";
     static components = {
@@ -31,6 +33,7 @@ export class OFSaleSectionLine extends Component {
             'section_name': this.props.record.data.name,
             'active_layout_category': true,
             'nbColumns': this.props.columns.length,
+            'show_products': true,
         })
 
         useEffect(
@@ -51,6 +54,12 @@ export class OFSaleSectionLine extends Component {
                 r1.data.of_position_node - r2.data.of_position_node
             );
         })
+
+        useBus(this.env.bus, "toggle_section", async (ev) => {
+            if (ev.detail.datapointId == this.props.record.id){
+                this.state.show_products = ev.detail.show_products;
+            }
+        });
     }
 
     showPopup(ev, popover, options) {
@@ -227,6 +236,33 @@ export class OFSaleSectionLine extends Component {
         await this.resequence();
     }
 
+    async toggleSection(evt, show_products) {
+        let treeRecord = new TreeRecord(this.props.list);
+        let node = treeRecord.find(this.props.record.id);
+        for (let child of Object.entries(treeRecord.allChildren(node))) {
+            await this.toggleRecord(child[0], show_products);
+        }
+    }
+
+    async toggleRecord(datapointId, show_products){
+        let record = this.props.list.records.find((record) => record.id == datapointId);
+        // si on est sur une ligne de produit ou une note, on la cache
+        if (record.data.display_type != 'line_section'){
+            if (show_products){
+                $(`tr[data-id="${record.id}"]`).show();
+            }
+            else {
+                $(`tr[data-id="${record.id}"]`).hide();
+            }
+        } else {
+            // sinon, c'est une section, on change juste l'icône oeil
+            await this.env.bus.trigger("toggle_section", {
+                datapointId: datapointId,
+                show_products: show_products,
+            });
+        }
+    }
+
     /* Fin gestion des sections */
 
     /* Actions sur les sections */
@@ -382,7 +418,9 @@ export class OFSaleSectionListRenderer extends ListRenderer {
                 });
             })
         }
-        super.sortStart({ element });
+        else {
+            super.sortStart({ element });
+        }
     }
 
     sortStop({ element }) {
