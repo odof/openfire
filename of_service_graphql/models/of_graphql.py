@@ -23,7 +23,12 @@ from ..graphql.service_request_stage_type import (
     ServiceRequestStageFilterInput,
     ServiceRequestStageInput,
 )
-from ..graphql.service_request_type import ServiceRequest, ServiceRequestFilterInput, ServiceRequestInput
+from ..graphql.service_request_type import (
+    ServiceRequest,
+    ServiceRequestFilterInput,
+    ServiceRequestFilterPeriodInput,
+    ServiceRequestInput,
+)
 from ..graphql.service_request_type_mutation import ServiceRequestTypeMutation
 from ..graphql.service_request_type_query import ServiceRequestTypeQuery
 from ..graphql.service_request_type_type import (
@@ -67,5 +72,6 @@ class OFGraphql(models.AbstractModel):
                 PartnerInput,
                 PlanningIntervention,
                 PlanningInterventionInput,
+                ServiceRequestFilterPeriodInput,
             ],
         )

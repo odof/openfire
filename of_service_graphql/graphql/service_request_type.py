@@ -33,12 +33,6 @@ class AffectationType(graphene.Enum):
     NOT_AFFECTED = "not_affected"
 
 
-class PeriodType(graphene.Enum):
-    CURRENT_WEEK = "current_week"
-    NEXT_WEEK = "next_week"
-    CURRENT_MONTH = "current_month"
-
-
 class SortType(graphene.Enum):
     NEAREST_END_DATE = "nearest_end_date"
     NEAREST_DISTANCE = "nearest_distance"
@@ -164,10 +158,16 @@ class ServiceRequestInput(graphene.InputObjectType):
     distance = graphene.Float()
 
 
+class ServiceRequestFilterPeriodInput(ServiceRequestInput):
+    _name = "ServiceRequestFilterPeriodInput"
+    start = graphene.Date(required=True)
+    end = graphene.Date(required=True)
+
+
 class ServiceRequestFilterInput(ServiceRequestInput):
     _name = "ServiceRequestFilterInput"
     affectation = graphene.Field(AffectationType)
-    period = graphene.Field(PeriodType)
+    periods = graphene.List(graphene.NonNull(ServiceRequestFilterPeriodInput))
     latitude = graphene.Float()
     longitude = graphene.Float()
     max_distance = graphene.Float()

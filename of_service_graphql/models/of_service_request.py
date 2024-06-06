@@ -1,14 +1,18 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import datetime, timedelta
+
+import logging
 
 import requests
 
 from odoo import api, fields, models
+from odoo.models import expression
 from odoo.tools import config
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one, x2many
 from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
+
+logger = logging.getLogger(__name__)
 
 
 class OFServiceRequest(models.Model):
@@ -57,10 +61,10 @@ class OFServiceRequest(models.Model):
             mutation['intervention_count'] = intervention_count
 
         if template := args.get('template'):
-            mutation['template'] = many2one(self=self, model='of.planning.intervention.template', input=template)
+            mutation['template_id'] = many2one(self=self, model='of.planning.intervention.template', input=template)
 
         if type := args.get('type'):
-            mutation['type'] = many2one(self=self, model='of.service.request.type', input=type)
+            mutation['type_id'] = many2one(self=self, model='of.service.request.type', input=type)
 
         if 'history_interventions' in args.keys():
             mutation['history_intervention_ids'] = x2many(
@@ -68,28 +72,28 @@ class OFServiceRequest(models.Model):
             )
 
         if task := args.get('task'):
-            mutation['task'] = many2one(self=self, model='of.planning.task', input=task)
+            mutation['task_id'] = many2one(self=self, model='of.planning.task', input=task)
 
         if company := args.get('company'):
             mutation['company_id'] = many2one(self=self, model='res.company', input=company)
 
         if stage := args.get('stage'):
-            mutation['stage'] = many2one(self=self, model='of.service.request.stage', input=stage)
+            mutation['stage_id'] = many2one(self=self, model='of.service.request.stage', input=stage)
 
         if 'employees' in args.keys():
             mutation['employee_ids'] = x2many(self=self, model='hr.employee', input=args.get('employees'))
 
         if last_attachment := args.get('last_attachment'):
-            mutation['last_attachment'] = many2one(self=self, model='ir.attachment', input=last_attachment)
+            mutation['last_attachment_id'] = many2one(self=self, model='ir.attachment', input=last_attachment)
 
         if 'lines' in args.keys():
             mutation['line_ids'] = x2many(self=self, model='of.service.request.line', input=args.get('lines'))
 
         if partner := args.get('partner'):
-            mutation['partner'] = many2one(self=self, model='res.partner', input=partner)
+            mutation['partner_id'] = many2one(self=self, model='res.partner', input=partner)
 
         if address := args.get('address'):
-            mutation['address'] = many2one(self=self, model='res.partner', input=address)
+            mutation['address_id'] = many2one(self=self, model='res.partner', input=address)
 
         if next_date := args.get('next_date'):
             mutation['next_date'] = next_date
@@ -140,24 +144,20 @@ class OFServiceRequest(models.Model):
             elif select.affectation == 'all':
                 # Toutes les DI (affectées et non affectées)
                 pass
-            if select.period == "current_week":
-                # Semaine en cours : DI dont la période de planification comprend la semaine en cours
-                start_of_week = datetime.now().date() - timedelta(days=datetime.now().weekday())
-                end_of_week = start_of_week + timedelta(days=6)
-                odoo_domain.append(('next_date', '<=', end_of_week))
-                odoo_domain.append(('end_date', '>=', start_of_week))
-            elif select.period == "next_week":
-                # Semaine prochaine : DI dont la période est planifiée sur la semaine prochaine
-                start_of_next_week = datetime.now().date() + timedelta(days=(7 - datetime.now().weekday()))
-                end_of_next_week = start_of_next_week + timedelta(days=6)
-                odoo_domain.append(('next_date', '>=', start_of_next_week))
-                odoo_domain.append(('end_date', '<=', end_of_next_week))
-            elif select.period == "current_month":
-                # Mois en cours : DI dont la période de planification comprend le mois en cours
-                start_of_month = datetime.now().replace(day=1).date()
-                end_of_month = datetime.now().replace(day=1).date() + timedelta(days=31)
-                odoo_domain.append(('next_date', '<=', end_of_month))
-                odoo_domain.append(('end_date', '>=', start_of_month))
+            if select.periods:
+                periods_domain = []
+                for period in select.periods:
+                    periods_domain = expression.OR(
+                        [
+                            periods_domain,
+                            [
+                                '&',
+                                ('next_date', '>=', period.start),
+                                ('end_date', '<', period.end),
+                            ],
+                        ]
+                    )
+                odoo_domain += periods_domain
             if select.number:
                 odoo_domain += [('number', 'ilike', select.number)]
             if select.title:
@@ -167,6 +167,20 @@ class OFServiceRequest(models.Model):
                     odoo_domain += [('address_id.name', 'ilike', select.address.name)]
                 if select.address.city:
                     odoo_domain += [('address_id.city', 'ilike', select.address.city)]
+            if select.query:
+                odoo_domain += [
+                    '|',
+                    '|',
+                    '|',
+                    ['number', 'ilike', select.query],
+                    ['name', 'ilike', select.query],
+                    ['address_id.name', 'ilike', select.query],
+                    ['address_id.city', 'ilike', select.query],
+                ]
+            if select.min_duration:
+                odoo_domain += [('duration', '>=', select.min_duration)]
+            if select.max_duration:
+                odoo_domain += [('duration', '<=', select.max_duration)]
             if select.task_duration == "one_hour":
                 odoo_domain += [('duration', '<=', 1.0)]
             if select.task_duration == "two_hours":
