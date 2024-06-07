@@ -47,6 +47,19 @@
                         </group>
                     </page>
                 </xpath>
+                <xpath expr="//page[@name='other_information']/group/group[@name='sale_reporting']" position="before">
+                    <!--
+                        FIXME : This view should inherit `of_sale_report_view_order_form_inherit_sale_stock` in `of_sale_report`
+                        This module is not integrated in this working branch yet, so we are moving field after a standard field.
+                        Thoses field should be positionned after `of_installation_date` field.
+                    -->
+                    <group name="installation_dates" string="Installation dates">
+                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                        <field name="of_force_laying_date"/>
+                        <field name="of_laying_week"/>
+                    </group>
+                </xpath>
             </field>
         </record>
 
@@ -58,27 +71,6 @@
                 <!--  Display field  opportunity outside developer mode -->
                 <xpath expr="//field[@name='opportunity_id']" position="attributes">
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
-                </xpath>
-            </field>
-        </record>
-
-        <!--
-            FIXME : This view should inherit `of_sale_report_view_order_form_inherit_sale_stock` in `of_sale_report`
-            This module is not integrated in this working branch yet, so we are moving field after a standard field.
-            Thoses field should be positionned after `of_installation_date` field.
-        -->
-        <record id="of_crm_of_sale_report_view_order_form_inherit_sale_stock" model="ir.ui.view">
-            <field name="name">of.crm.of.sale.order.form.sale.stock</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='sale_shipping']" position="after">
-                    <group>
-                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
-                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
-                        <field name="of_force_laying_date"/>
-                        <field name="of_laying_week"/>
-                    </group>
                 </xpath>
             </field>
         </record>
