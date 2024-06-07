@@ -391,6 +391,8 @@ class CalendarEvent(models.Model):
         for event in self:
             if not event.of_employee_id:
                 event.of_employee_id = event.of_employee_ids[:1]
+            if event.of_employee_id and event.of_employee_id.id not in event.of_employee_ids.ids:
+                event.of_employee_id = False
 
     @api.depends('of_employee_ids')
     def _compute_partner_ids(self):

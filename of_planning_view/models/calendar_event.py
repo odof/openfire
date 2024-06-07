@@ -80,8 +80,14 @@ class CalendarEvent(models.Model):
         """Compute the employee_id based on the resource_id.
         In case of we are assigning an event to a resource or moving an event from one resource to another one from
         planning view, we need to update the employee_id based on the resource_id.
+
+        Note: This method can be called by `_compute_partner_ids` (in `of_planning/models/calendar_event.py`)
+            because of the `mapped('of_employee_ids.related_contact_ids')` in compute method.
+            Odoo need to compute `of_employee_ids`.
         """
         for event in self:
+            if event.of_employee_id and event.of_employee_id.id not in event.of_employee_ids.ids:
+                event.of_employee_id = False
             if event.of_employee_id:
                 event.of_employee_ids -= event.of_employee_id
             if event.of_resource_id:
