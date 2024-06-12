@@ -106,11 +106,7 @@ class OFCostRecomputeWizard(models.TransientModel):
                     cost = line.product_id[field_used]
                 if not purchase_price:
                     purchase_price = line.product_id.of_seller_price
-            if self.exclude_change_zero and not cost:
+            if not (self.exclude_change_zero and not cost):
                 line.of_unit_cost = cost
-            elif not self.exclude_change_zero:
-                line.of_unit_cost = cost
-            if self.exclude_change_zero and not purchase_price:
-                line.of_purchase_price = purchase_price
-            elif not self.exclude_change_zero:
+            if not (self.exclude_change_zero and not purchase_price):
                 line.of_purchase_price = purchase_price
