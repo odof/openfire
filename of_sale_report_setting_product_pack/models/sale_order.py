@@ -12,6 +12,7 @@ class SaleOrder(models.Model):
             ('pack_components', "Pack and Components"),
             ('pack_components_details', "Pack and Components with prices details"),
         ],
+        default='pack_components',
         string="Pack print configuration",
     )
 
