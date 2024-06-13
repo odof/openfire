@@ -1,27 +1,23 @@
-# -*- coding: utf-8 -*-
 
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': 'OpenFire / Comptes de tiers',
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': 'OpenFire',
-    'version': '10.0.1.0.0',
-    'summary': 'Utilisation de comptes de tiers pour les clients et fournisseurs',
-    'description': """
-OpenFire / Comptes de tiers
-===========================
-Utilisation de comptes de tiers
-""",
     'category': 'Accounting',
     'depends': [
         'of_account',
-        'of_utils'
+        'of_utils',
+        'partner_manual_rank'
     ],
     'data': [
-        'views/of_tiers_view.xml',
+        'views/res_config_settings_views.xml',
         'security/ir.model.access.csv',
     ],
-    'demo': [],
     'qweb': [],
     'installable': True,
     'application': False,
     'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }

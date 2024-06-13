@@ -1,0 +1,79 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_account_third_party
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-06-13 10:05+0000\n"
+"PO-Revision-Date: 2024-06-13 10:05+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_third_party
+#: model_terms:ir.ui.view,arch_db:of_account_third_party.of_account_third_party_res_config_settings_view_form
+msgid ""
+"<span class=\"o_form_label\">(OF) Partners code</span>\n"
+"                                <span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+"<span class=\"o_form_label\">(OF) Code des partenaires</span>\n"
+"                                <span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont spécifiques à la société.\" aria-label=\"Les valeurs définies ici sont spécifiques à la société.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+
+#. module: of_account_third_party
+#: model_terms:ir.ui.view,arch_db:of_account_third_party.of_account_third_party_res_config_settings_view_form
+msgid "Accounts"
+msgstr "Comptes"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_account_third_party
+#: model:ir.model.fields,field_description:of_account_third_party.field_of_connector_config_settings__of_customer_code
+#: model:ir.model.fields,field_description:of_account_third_party.field_res_company__of_customer_code
+#: model:ir.model.fields,field_description:of_account_third_party.field_res_config_settings__of_customer_code
+msgid "Customer code"
+msgstr "Code client"
+
+#. module: of_account_third_party
+#: model_terms:ir.ui.view,arch_db:of_account_third_party.of_account_third_party_res_config_settings_view_form
+msgid "Drafting the code \"template\" for partners"
+msgstr "Rédaction du code \"template\" pour les partenaires"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_account_move_line
+msgid "Journal Item"
+msgstr "Écriture comptable"
+
+#. module: of_account_third_party
+#: model:ir.model,name:of_account_third_party.model_account_payment
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: of_account_third_party
+#: model:ir.model.fields,field_description:of_account_third_party.field_of_connector_config_settings__of_supplier_code
+#: model:ir.model.fields,field_description:of_account_third_party.field_res_company__of_supplier_code
+#: model:ir.model.fields,field_description:of_account_third_party.field_res_config_settings__of_supplier_code
+msgid "Supplier code"
+msgstr "Code fournisseur"
