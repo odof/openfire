@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- Bulle d'aide des articles de lignes de commandes -->
-    <record id="of_product_vrand_view_order_form" model="ir.ui.view">
+    <record id="of_product_brand_view_order_form" model="ir.ui.view">
         <field name="name">of.product.brand.sale.order.form</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>

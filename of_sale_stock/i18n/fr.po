@@ -59,7 +59,7 @@ msgid "My store"
 msgstr "Mon magasin"
 
 #. module: of_sale_stock
-#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_product_vrand_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_stock.of_product_brand_view_order_form
 msgid ""
 "Note: When searching for a product, typing \"m:ABC\" will filter products "
 "for brand \"ABC\"."
