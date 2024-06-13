@@ -455,7 +455,9 @@ export class OFSaleSectionOne2Many extends X2ManyField {
         if (!context.default_display_type) {
             let sections = this.list.records.filter((record) => record.data.display_type == 'line_section');
             if (sections.length > 0){
-                context['default_of_parent_node_id'] = sections.slice(-1)[0].data.of_node_id;
+                let section = sections.slice(-1)[0];
+                context['default_of_parent_node_id'] = section.data.of_node_id;
+                context['default_of_node_id'] = this.list.records.length + 1;
             }
         }
         return super.onAdd({ context, editable });
