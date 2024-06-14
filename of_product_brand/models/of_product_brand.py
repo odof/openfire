@@ -126,7 +126,9 @@ class OfProductBrand(models.Model):
             default_code = product.default_code or ''
             if remove_previous_prefix:
                 if isinstance(remove_previous_prefix, str):
-                    if default_code.startswith(remove_previous_prefix):
+                    if not default_code:
+                        continue
+                    elif default_code.startswith(remove_previous_prefix):
                         default_code = default_code[len(remove_previous_prefix) :]
                 else:
                     # This part is dangerous as it may erase a part of the product default_code
