@@ -31,10 +31,7 @@ class OFSurveyAnswers(models.Model):
             user_input_lines = answer.user_input.user_input_line_ids.filtered(
                 lambda record: record.question_id == answer.question_id
             )
-            images = self.env['of.image']
-            for line in user_input_lines:
-                images += line.value_image_ids
-            answer.image_ids = images
+            answer.image_ids = user_input_lines.mapped('value_image_ids')
 
     def _compute_form(self):
         for answer in self:

@@ -264,6 +264,7 @@ class OFSurveyUserInput(models.Model):
         # si la question permet d'ajouter des images, il faut aussi les mettre
         if question.add_pictures:
             attachment_ids = []
+            image_obj = self.env['of.image']
             for attachment in attachments:
                 name = attachment.get('title')
                 if name == '':
@@ -277,14 +278,23 @@ class OFSurveyUserInput(models.Model):
                     datas = datas[0]
                 datas = bytes(datas, 'utf-8')
 
-                attachment = self.env['of.image'].create(
-                    {
-                        'name': name,
-                        'caption': attachment.get('legend', ''),
-                        'image_1920': datas,
-                    }
+                att = image_obj.search(
+                    [
+                        ('name', '=', name),
+                        ('caption', '=', attachment.get('legend', '')),
+                    ],
+                    limit=1,
                 )
-                attachment_ids.append(attachment.id)
+
+                if not att:
+                    att = image_obj.create(
+                        {
+                            'name': name,
+                            'caption': attachment.get('legend', ''),
+                            'image_1920': datas,
+                        }
+                    )
+                attachment_ids.append(att.id)
             vals['value_image_ids'] = attachment_ids
         return vals
 
