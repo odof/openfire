@@ -84,7 +84,7 @@ class OfMailTemplate(models.Model):
                 annots = page.get('Annots')
                 if isinstance(annots, list):
                     pk_annots[str_ref] = [str(a) for a in annots]
-                else:
+                elif isinstance(resolve1(annots), list):
                     pk_annots[str_ref] = [str(a) for a in resolve1(annots)]
 
             for i in fields:
