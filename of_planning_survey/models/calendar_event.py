@@ -91,7 +91,36 @@ class CalendarEvent(models.Model):
                     question_answers_ids.append(Command.create(question_answers_value))
             event.of_answers_ids = question_answers_ids
 
+    @api.onchange('of_survey_id')
+    def _onchange_of_survey_id(self):
+        """When the survey is changed we remove the answers and create a new user input.
+
+        We need to do that stuff in the onchange too because the survey can be changed in the view and never opened from
+        the button `action_button_open_survey`.
+
+        That case should happen when survey is called from GraphQL API. # TODO: move me in a graphql module ?
+        """
+        if self.of_survey_id:
+            self.of_answers_ids = False
+            self.of_survey_user_input_id = self.of_survey_id._create_answer(
+                user=self.env.user, email=self.env.user.email
+            )
+            self.of_survey_user_input_id.res_model = self._name
+            self.of_survey_user_input_id.res_id = self._origin.id
+            self.of_survey_user_input_id.redirect_action_id = self.env.ref('of_planning.action_calendar_event').id
+            self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+
     def action_button_open_survey(self):
+        """
+        Open the survey associated with the calendar event.
+
+        We have to create a new user input to allow the user to answer the survey.
+        We need to create a new user input each time we open the survey because we need to keep track of the answers
+        given by the user.
+
+        Returns:
+            dict: An action dictionary to open the survey URL.
+        """
         self.ensure_one()
         # cleaning up old data
         self.env['of.survey.user_input'].search(
@@ -103,7 +132,7 @@ class CalendarEvent(models.Model):
         self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
         self.of_survey_user_input_id.res_model = self._name
         self.of_survey_user_input_id.res_id = self._origin.id
-        self.of_survey_user_input_id.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
+        self.of_survey_user_input_id.redirect_action_id = self.env.ref('of_planning.action_calendar_event').id
         self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
 
         url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
