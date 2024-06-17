@@ -867,7 +867,10 @@ class OfTourneeRdv(models.TransientModel):
                         u"Aucun des intervenants sélectionnés n'a la compétence pour réaliser cette prestation.")
 
         # Jours du service, jours travaillés des équipes et horaires de travail
-        jours_service = sudo and range(1, 8) or [jour.numero for jour in self.day_ids] or range(1, 8)
+        days = self.day_ids
+        if sudo:
+            days = self.day_ids.sudo()
+        jours_service = web and range(1, 8) or [jour.numero for jour in days] or range(1, 8)
 
         jours_feries = self.company_id.get_jours_feries(self.date_recherche_debut, self.date_recherche_fin)
         passer_jours_feries = self.env['ir.values'].get_default('of.intervention.settings', 'ignorer_jours_feries')
@@ -1406,9 +1409,9 @@ class OfTourneeRdv(models.TransientModel):
                     '|', ('allday', '=', False), ('intervention_id', '!=', False)], order="debut_dt")
                 if len(creneaux) == 0:
                     continue
-                if not sudo:
-                    tournee = tournee_obj.search([
-                        ('date', '=', date_courante), ('employee_id', '=', employee.sudo().id)], limit=1)
+
+                tournee = tournee_obj.search([
+                    ('date', '=', date_courante), ('employee_id', '=', employee.sudo().id)], limit=1)
 
                 origine, arrivee = self._get_origin_arrival_addresses(sudo, employee, tournee)
                 # Pas d'origine ni pour la tournée ni pour l'employé
