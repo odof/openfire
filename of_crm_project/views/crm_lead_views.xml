@@ -26,15 +26,16 @@
             <xpath expr="//notebook" position="inside">
                 <page name="project" string="Project">
                     <field name="of_survey_user_input_line" invisible="1"/>
-                    <group>
-                        <group>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="of_survey_id"/>
                             <field name="of_survey_id" domain="[('survey_type','=','lead_opportunity')]"/>
-                        </group>
-                        <group attrs="{'invisible': [('of_survey_id','=',False)]}">
-                            <button class="btn btn-primary" name="action_button_open_survey" type="object" string="Reply"/>
-                            <button class="btn btn-secondary" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line','=',[])]}"/>
-                        </group>
-                    </group>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary oe_right ms-2" name="action_button_open_survey" type="object" string="Reply" attrs="{'invisible': [('of_survey_user_input_line_ids','!=',[])]}" />
+                            <button class="btn btn-primary oe_right" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line_ids','=',[])]}"/>
+                        </div>
+                    </div>
 
                     <field name="of_answers_ids">
                         <tree create="false" edit="false" delete="false" decoration-info="is_page">
