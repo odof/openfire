@@ -173,24 +173,7 @@ class OFServiceCreateInterventionWizard(models.TransientModel):
                             name.append(val)
                 name = name and " ".join(name) or "Intervention"
 
-                values = {
-                    'partner_id': service.partner_id.id,
-                    'address_id': service.address_id.id,
-                    'tache_id': service.tache_id.id,
-                    'template_id': service.template_id.id,
-                    'service_id': service.id,
-                    'employee_ids': [(4, self.employee_id.id)],
-                    'tag_ids': [(4, tag.id) for tag in service.tag_ids],
-                    'date': fields.Datetime.to_string(start_date_utc),
-                    'duree': service.duree,
-                    'name': name,
-                    'user_id': self._uid,
-                    'company_id': service.company_id.id,
-                    'description_interne': service.note,
-                    'order_id': service.order_id.id,
-                    'origin_interface': u"Générer RDV depuis DI",
-                    'flexible': service.tache_id.flexible,
-                }
+                values = self._get_service_data(service, name, start_date_utc)
 
                 intervention = intervention_obj.create(values)
                 if group_flex:
@@ -218,6 +201,27 @@ class OFServiceCreateInterventionWizard(models.TransientModel):
         action['context'] = str(context)
         action['domain'] = [('id', 'in', new_interventions.ids)]
         return action
+
+    @api.model
+    def _get_service_data(self, service, name, start_date_utc):
+        return {
+            'partner_id': service.partner_id.id,
+            'address_id': service.address_id.id,
+            'tache_id': service.tache_id.id,
+            'template_id': service.template_id.id,
+            'service_id': service.id,
+            'employee_ids': [(4, self.employee_id.id)],
+            'tag_ids': [(4, tag.id) for tag in service.tag_ids],
+            'date': fields.Datetime.to_string(start_date_utc),
+            'duree': service.duree,
+            'name': name,
+            'user_id': self._uid,
+            'company_id': service.company_id.id,
+            'description_interne': service.note,
+            'order_id': service.order_id.id,
+            'origin_interface': u"Générer RDV depuis DI",
+            'flexible': service.tache_id.flexible,
+        }
 
 
 class OFServiceCreateInterventionLineWizard(models.TransientModel):
