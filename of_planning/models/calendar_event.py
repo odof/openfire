@@ -1094,7 +1094,7 @@ class CalendarEvent(models.Model):
         for line in self.of_line_ids:
             if line.product_id.type == 'service':
                 continue
-            move_lines = move_obj.search([('of_intervention_line_id', '=', line.id)])
+            move_lines = move_obj.search([('of_intervention_line_id', '=', line.id), ('state', '!=', 'cancel')])
             if not move_lines:
                 return True
             for move_line in move_lines:
