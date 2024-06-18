@@ -169,11 +169,39 @@ class OfComposeMail(models.TransientModel):
                 content_base64 = content.data
 
             if content_base64 and (abs(field.x1 - field.x0) > 0) and (abs(field.y1 - field.y0) > 0):
-                page = doc[field.page_number]
-                page_height = page.rect[3]
-                rect = fitz.Rect(field.x0, page_height - field.y1, field.x1, page_height - field.y0)
+                # on récupère toutes les infos du cadre et de l'image pour faire nos calculs
+                start_x = field.x0
+                end_x = field.x1
+                start_y = field.y0
+                end_y = field.y1
+                width = abs(field.x1 - field.x0)
+                height = abs(field.y1 - field.y0)
                 img = base64.b64decode(content_base64)
                 pix = fitz.Pixmap(bytearray(img))
+                # si les valeurs du cadre sont supérieures ou égales a celles de l'images, pas de resize à faire
+                ratio_w = width / pix.width
+                ratio_h = height / pix.height
+                h_to_move = 0.0
+                w_to_move = 0.0
+                # un resize du cadre est a faire car au moins une des deux valeurs de l'image est plus grande que
+                # celle du cadre. On utilise que le ratio le plus petit car le insertImage rempli totalement le cadre
+                if ratio_w < 1 or ratio_h < 1:
+                    if ratio_w < ratio_h:
+                        h_to_move = (height - ratio_w * pix.height) / 2
+                    else:
+                        w_to_move = (width - ratio_h * pix.width) / 2
+                else:
+                    h_to_move = (height - pix.height) / 2
+                    w_to_move = (width - pix.width) / 2
+                # on bouge les points du cadre ce qui a pour effet de changer la taille de l'image
+                end_y -= h_to_move
+                start_y += h_to_move
+                end_x -= w_to_move
+                start_x += w_to_move
+                page = doc[field.page_number]
+                page_height = page.rect[3]
+                # on créer le cadre et on insère l'image
+                rect = fitz.Rect(start_x, page_height - end_y, end_x, page_height - start_y)
                 page.insertImage(rect, pixmap=pix)
 
         doc.saveIncr()
