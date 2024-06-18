@@ -99,7 +99,7 @@ class ProjectIssue(models.Model):
     of_canal_id = COALESCE ( os.of_canal_id, pi.of_canal_id ),
     parc_installe_id = COALESCE ( os.parc_installe_id, pi.of_produit_installe_id ),
     note = COALESCE ( os.note, pi.description
-        || (CASE WHEN pi.of_intervention IS NOT NULL 
+        || (CASE WHEN pi.of_intervention IS NOT NULL
             THEN '
 Nature de l''intervention: ' || pi.of_intervention ELSE '' END)
         || (CASE WHEN pi.of_piece_commande IS NOT NULL
@@ -111,10 +111,10 @@ nº SAV ancienne version: ' || pi.of_code
             THEN '
 Étape SAV ancienne version: '
             || (SELECT ptt.name FROM project_task_type ptt WHERE ptt.id = pi.stage_id) ELSE '' END)
-        || (CASE WHEN pi.product_name_id IS NOT NULL AND pi.of_produit_installe_id IS NULL 
+        || (CASE WHEN pi.product_name_id IS NOT NULL AND pi.of_produit_installe_id IS NULL
             THEN '
 Article associé ancienne version: ['
-                || (SELECT pp1.default_code FROM product_product pp1 WHERE pp1.id = pi.product_name_id) 
+                || (SELECT pp1.default_code FROM product_product pp1 WHERE pp1.id = pi.product_name_id)
                 || '] '
                 || (SELECT pt.name
                     FROM product_product pp2 JOIN product_template pt ON pt.id = pp2.product_tmpl_id
@@ -193,7 +193,7 @@ nº SAV ancienne version: ' || pi.of_code
             || (SELECT ptt.name FROM project_task_type ptt WHERE ptt.id = pi.stage_id) ELSE '' END)
         || (CASE WHEN pi.product_name_id IS NOT NULL AND pi.of_produit_installe_id IS NULL
             THEN '
-Article associé ancienne version: [' 
+Article associé ancienne version: ['
                 || (SELECT pp1.default_code FROM product_product pp1 WHERE pp1.id = pi.product_name_id)
                 || '] '
                 || (SELECT pt.name
@@ -287,6 +287,9 @@ WHERE opi.sav_id = pi.id""")
             group_user = self.env.ref('base.group_user')
             if group_not_migrated in group_user.implied_ids:
                 group_user.write({'implied_ids': [(3, group_not_migrated.id)]})
+            # des utilisateurs sont encore dans le groupe SAV non migrés, on le leur retire
+            if group_not_migrated.users:
+                group_not_migrated.users.write({'groups_id': [(3, group_not_migrated.id)]})
             _logger.info(u"OPENFIRE SUCCÈS : migration des SAV dans les DI (T2356)")
 
 
