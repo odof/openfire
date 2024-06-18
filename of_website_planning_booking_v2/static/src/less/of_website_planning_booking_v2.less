@@ -1,0 +1,49 @@
+.of-panel-slot {
+    min-height: 60px;
+    text-align: center;
+    padding-top: 5px;
+
+    &:hover {
+        background: lightgray;
+    }
+}
+
+.of-border-primary {
+    outline: 2px solid @odoo-main-text-color;
+}
+
+.spinner-popup {
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s ease;
+    text-align: center;
+}
+
+.show-popup .spinner-popup {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: white;
+    margin-top: -50px;
+    margin-left: -50px;
+}
+
+.popup-text {
+    position: absolute;
+    top: 50%;
+    color: white;
+    font-size: 16px;
+    transform: translate(-50%, -400%);
+}

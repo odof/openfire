@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_intervention_settings_form_view" model="ir.ui.view">
+        <field name="name">of.intervention.settings.form.view</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='main']/group[last()]" position="after">
+                <group name="booking" string="Prise de RDV en ligne" groups="base.group_system">
+                    <field name="booking_opened_day_ids" class="oe_inline" widget="many2many_tags"/>
+                    <field name="booking_employee_ids" class="oe_inline" widget="many2many_tags"/>
+                    <field name="booking_search_mode"  class="oe_inline"/>
+                    <label for="booking_search_type" string="Critère de recherche"/>
+                    <div name="booking_search_type">
+                        <field name="booking_search_type" class="oe_inline" style="margin-right: 10px"/>
+                        <field name="booking_search_max_criteria" class="oe_inline"/>
+                        <span attrs="{'invisible': [('booking_search_type', '!=', 'distance')]}">km max</span>
+                        <span attrs="{'invisible': [('booking_search_type', '!=', 'duration')]}">minutes max</span>
+                    </div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

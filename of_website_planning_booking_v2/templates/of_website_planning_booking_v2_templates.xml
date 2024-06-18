@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="RDV">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/of_website_planning_booking_v2/static/src/less/of_website_planning_booking_v2.less"/>
+            <script type="text/javascript" src="/of_website_planning_booking_v2/static/src/js/of_website_planning_booking_v2.js"/>
+        </xpath>
+    </template>
+
+    <template id="booking" name="Prise de RDV en ligne">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container of_booking">
+                    <div class="row" style="margin-top: 40px;">
+                        <h1 class="col-md-10 page-header theme-text">
+                            Prendre rendez-vous
+                        </h1>
+                        <div class="clearfix"/>
+                        <div class="panel panel-default" id="service_panel">
+                            <div class="panel-heading collapsed" role="tab" data-toggle="collapse" data-parent="#myCollapseBookingService" data-target="#myCollapseTabBookingService" aria-expanded="false">
+                                <h2>
+                                    Prestation...
+                                </h2>
+                            </div>
+                            <div class="panel-collapse collapse" role="tabpanel" id="myCollapseTabBookingService" aria-expanded="false" style="height: 0px;">
+                                <div class="panel-body">
+                                    <div class="form-group col-md-7">
+                                        <label class="control-label" for="service">
+                                            Prestation
+                                        </label>
+                                        <select id="service_id" name="service_id" class="form-control">
+                                            <option value="">Choix de la prestation...</option>
+                                            <t t-foreach="service_list" t-as="s">
+                                                <option t-att-value="s['id']">
+                                                    <t t-esc="s['name']"/>
+                                                </option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="panel panel-default" id="address_panel" style="display: none;">
+                            <div class="panel-heading collapsed" role="tab" data-toggle="collapse" data-parent="#myCollapseBookingAddress" data-target="#myCollapseTabBookingAddress" aria-expanded="false">
+                                <h2>
+                                    Adresse...
+                                </h2>
+                            </div>
+                            <div class="panel-collapse collapse" role="tabpanel" id="myCollapseTabBookingAddress" aria-expanded="false" style="height: 0px;">
+                                <div class="panel-body">
+                                    <div class="form-group col-md-5" id="div_name">
+                                        <label class="control-label" for="name">
+                                            NOM Prénom *
+                                        </label>
+                                        <input type="text" id="name" name="name" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div class="form-group col-md-5" id="div_email">
+                                        <label class="control-label" for="email">
+                                            E-mail *
+                                        </label>
+                                        <input type="email" id="email" name="email" class="form-control"/>
+                                    </div>
+                                    <div class="form-group col-md-5" id="div_phone">
+                                        <label class="control-label" for="phone">
+                                            Téléphone *
+                                        </label>
+                                        <input type="tel" id="phone" name="phone" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div class="form-group col-md-10" id="div_street">
+                                        <label class="control-label" for="street">
+                                            Rue (et numéro) *
+                                        </label>
+                                        <input type="text" id="street" name="street" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div class="form-group col-md-10" id="div_street2">
+                                        <label class="control-label" for="street2">
+                                            Complément
+                                        </label>
+                                        <input type="text" id="street2" name="street2" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix"/>
+                                    <div class="form-group col-sm-3" id="div_zip">
+                                        <label class="control-label" for="zip">
+                                            Code Postal *
+                                        </label>
+                                        <input type="text" id="zip" name="zip" class="form-control"/>
+                                    </div>
+                                    <div class="form-group col-sm-7" id="div_city">
+                                        <label class="control-label" for="city">
+                                            Ville *
+                                        </label>
+                                        <input type="text" id="city" name="city" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix" />
+                                    <div class="mt32 mb64" name="buttons">
+                                        <div class="pull-right">
+                                            <button class="btn btn-default" id="address_submit">
+                                                Valider
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"/>
+                        <div class="panel panel-default" id="slot_panel" style="display: none;">
+                            <div class="panel-heading collapsed" role="tab" data-toggle="collapse" data-parent="#myCollapseBookingSlot" data-target="#myCollapseTabBookingSlot" aria-expanded="false">
+                                <h2>
+                                    Date...
+                                </h2>
+                            </div>
+                            <div class="panel-collapse collapse" role="tabpanel" id="myCollapseTabBookingSlot" aria-expanded="false" style="height: 0px;">
+                                <div class="panel-body">
+                                    <div class="form-group col-md-7">
+                                        <label class="control-label" for="from_date">
+                                            À partir de
+                                        </label>
+                                        <input type="date" id="from_date" name="from_date" class="form-control"/>
+                                    </div>
+                                    <div class="clearfix" />
+                                    <div class="col-md-10" id="no_slot_div" style="margin-top: 40px; display: none;">
+                                        <p style='text-align: center;'>
+                                            <b>Aucun créneau libre ne correspond à votre recherche, veuillez contacter votre magasin.</b>
+                                        </p>
+                                    </div>
+                                    <div id="slots_div" style="margin-top: 40px; display: none;">
+                                        <div class="col-md-10">
+                                            <div class="col-md-6 text-center pull-left" style="margin-bottom: 15px;">
+                                                <h4 style="margin: 0;">Matin</h4>
+                                                <span><i>8h00 - 13h00</i></span>
+                                            </div>
+                                            <div class="col-md-6 text-center pull-right" style="margin-bottom: 15px;">
+                                                <h4 style="margin: 0;">Après-midi</h4>
+                                                <span><i>14h00 - 18h00</i></span>
+                                            </div>
+                                            <div class="clearfix" />
+                                            <div class="col-md-12" id="of_booking_slots"/>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div class="col-md-10 has-error" id="slot_error" name="slot_error" style="display: none;">
+                                            <label class="help-block">Vous devez sélectionner un créneau avant de valider.</label>
+                                        </div>
+                                        <div class="clearfix"/>
+                                        <div class="mt32 mb64" name="buttons">
+                                            <span name="buttons_right" class="pull-right">
+                                                <button class="btn" id="search_more_submit">
+                                                    Chercher plus...
+                                                </button>
+                                                <button class="btn btn-default" id="slot_submit">
+                                                    Valider
+                                                    <span class="fa fa-long-arrow-right"/>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spinner-popup" id="spinner-popup">
+                        <span class="popup-text" id="popup-text" name="popup-text"/>
+                        <span class="fa fa-5x fa-spin fa-spinner fa-pulse spinner"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="booking_confirmation" name="Prise de RDV en ligne - Confirmation">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container of_booking">
+                    <div class="row" style="margin-top: 40px;">
+                        <h1 class="col-md-10 page-header theme-text">
+                            Confirmez votre rendez-vous
+                        </h1>
+                        <div class="clearfix"/>
+                        <div class="col-md-6">
+                            <h2 class="col-md-10">Intervention</h2>
+                            <div class="col-md-8 one_kanban">
+                                <div class="panel of-border-primary">
+                                    <div class="panel-body">
+                                        <b>
+                                            <span t-esc="task.name"/>
+                                        </b>
+                                        <br/>
+                                        <p style="line-height: 70%; margin-top: 5px; margin-bottom: 5px;">
+                                            <span t-esc="price" t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/> TTC
+                                            <br/>
+                                            <i style="font-size: 65%">Ce tarif est indicatif et pourra évoluer en fonction des spécificités de votre installation</i>
+                                        </p>
+                                        <span t-esc="slot.name"/>
+                                        <br/>
+                                        <span t-esc="slot.description"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h2 class="col-md-10">Adresse</h2>
+                            <div class="col-md-8 one_kanban">
+                                <div class="panel panel-default of-border-primary">
+                                    <div class="panel-body" style="overflow: clip;">
+                                        <t t-esc="partner" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'phone'], no_marker=True)"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"/>
+                        <br/>
+                        <form action="/booking/confirm" method="post">
+                            <div class="form-group col-md-10">
+                                <label class="control-label label-optional" for="comment">Commentaires additionnels</label>
+                                <textarea name="comment" class="form-control"/>
+                            </div>
+                            <div class="clearfix"/>
+                            <div class="mt32 mb64" name="buttons">
+                                <a class="btn" href="/booking" style="color: #969696; background: gainsboro;">
+                                    <span class="fa fa-long-arrow-left"/>
+                                    Retour
+                                </a>
+                                <span name="buttons_right" class="pull-right">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="service_id" t-att-value="service_id"/>
+                                        <input type="hidden" name="partner_id" t-att-value="partner_id"/>
+                                        <input type="hidden" name="slot_id" t-att-value="slot_id"/>
+                                        <input type="hidden" name="submitted" value="1"/>
+                                        <button type="submit" class="btn btn-default">
+                                            Valider
+                                            <span class="fa fa-long-arrow-right"/>
+                                        </button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="booking_thank_you" name="Prise de RDV en ligne - Merci">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure"/>
+                <div class="container of_booking">
+                    <h1 class="col-md-10 page-header theme-text">Merci</h1>
+                    <div class="clearfix" />
+                    <br/>
+                    <b class="col-md-10">
+                        Votre demande de rendez-vous a bien été enregistrée et une confirmation vous a été envoyée par e-mail.
+                        <br/>
+                        Nous vous recontacterons pour valider avec vous les modalités de ce rendez-vous.
+                    </b>
+                    <div class="clearfix"/>
+                    <div class="mt32 mb64 pull-right" name="buttons">
+                        <a href="/" class="btn btn-default">
+                            Accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
