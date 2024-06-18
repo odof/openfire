@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-27 16:02+0000\n"
-"PO-Revision-Date: 2024-03-27 16:02+0000\n"
+"POT-Creation-Date: 2024-06-13 12:49+0000\n"
+"PO-Revision-Date: 2024-06-13 12:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr "Non détaillé"
 #. module: of_sale_product_pack
 #: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_component_price
 msgid "Of Pack Component Price"
-msgstr ""
+msgstr "Prix du kit"
 
 #. module: of_sale_product_pack
 #: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_ok
@@ -71,6 +71,11 @@ msgid "Products that are part of this pack."
 msgstr "Produits faisant partie de ce pack."
 
 #. module: of_sale_product_pack
+#: model:ir.model,name:of_sale_product_pack.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: of_sale_product_pack
 #: model:ir.model,name:of_sale_product_pack.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de commande"
@@ -79,3 +84,14 @@ msgstr "Ligne de commande"
 #: model:ir.model,name:of_sale_product_pack.model_of_product_pack_lines
 msgid "of.product.pack.lines"
 msgstr ""
+
+#. module: of_sale_product_pack
+#. odoo-python
+#: code:addons/of_sale_product_pack/models/sale_order.py:0
+#, python-format
+msgid ""
+"You cannot delete this line because is part of a pack in this sale order. In"
+" order to delete this line you need to delete the pack itself"
+msgstr ""
+"Vous ne pouvez pas supprimer cette ligne car elle fait partie d’un kit. Pour"
+" pouvoir le supprimer, veuillez éditer le kit ou le supprimer"

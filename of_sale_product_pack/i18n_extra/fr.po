@@ -1,0 +1,20 @@
+#. module: of_sale_product_pack
+#: model_terms:ir.ui.view,arch_db:sale_product_pack.view_order_form
+msgid "Parent Pack is not modifiable"
+msgstr "Les composants du kit ne sont pas éditables depuis les lignes de commande"
+
+#. module: of_sale_product_pack
+#: model:ir.model.fields,field_description:sale_product_pack.field_sale_order_line__pack_parent_line_id
+msgid "Pack"
+msgstr "Kit"
+
+#. module: sale_product_pack
+#. odoo-python
+#: code:addons/sale_product_pack/models/sale_order.py:0
+#, python-format
+msgid ""
+"You cannot delete this line because is part of a pack in this sale order. In"
+" order to delete this line you need to delete the pack itself"
+msgstr ""
+"Vous ne pouvez pas supprimer cette ligne car elle fait partie d’un kit. Pour"
+" pouvoir le supprimer, veuillez éditer le kit ou le supprimer"

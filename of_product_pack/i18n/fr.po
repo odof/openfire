@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-14 09:26+0000\n"
-"PO-Revision-Date: 2024-06-14 09:26+0000\n"
+"POT-Creation-Date: 2024-06-13 12:47+0000\n"
+"PO-Revision-Date: 2024-06-13 12:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,7 @@ msgid "Cost"
 msgstr "Coût"
 
 #. module: of_product_pack
+
 #: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__create_uid
 msgid "Created by"
 msgstr ""
@@ -65,6 +66,7 @@ msgid "Kit Price"
 msgstr "Prix de kit"
 
 #. module: of_product_pack
+
 #: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines____last_update
 msgid "Last Modified on"
 msgstr ""
@@ -134,6 +136,7 @@ msgid "Sales Price"
 msgstr "Prix de vente"
 
 #. module: of_product_pack
+
 #: model:ir.model,name:of_product_pack.model_of_product_pack_lines
 msgid "of.product.pack.lines"
 msgstr ""

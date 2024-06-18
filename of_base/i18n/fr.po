@@ -1075,7 +1075,7 @@ msgstr "Groupe spécial caché"
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "History"
-msgstr ""
+msgstr "Historique"
 
 #. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__of_res_partner_phone__type__01_domicile

@@ -1,0 +1,32 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
+
+from odoo import _, api, models
+from odoo.exceptions import UserError
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    @api.onchange('order_line')
+    def check_pack_line_unlink(self):
+        """
+        Override to change raised error message
+
+        At least on embeded tree editable view odoo returns a recordset on
+        _origin.order_line only when lines are unlinked and this is exactly
+        what we need
+        """
+        origin_line_ids = self._origin.order_line.ids
+        line_ids = self.order_line.ids
+        removed_line_ids = list(set(origin_line_ids) - set(line_ids))
+        removed_line = self.env['sale.order.line'].browse(removed_line_ids)
+        if removed_line.filtered(
+            lambda x: x.pack_parent_line_id and not x.pack_parent_line_id.product_id.pack_modifiable
+        ):
+            raise UserError(
+                _(
+                    "You cannot delete this line because is part of a pack in"
+                    " this sale order. In order to delete this line you need to"
+                    " delete the pack itself"
+                )
+            )

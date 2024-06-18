@@ -2,3 +2,4 @@
 
 from . import sale_order_line
 from . import of_product_pack_lines
+from . import sale_order

@@ -212,7 +212,7 @@ msgstr "Ajouter un devis complémentaire"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Add quotation"
-msgstr "Ajout devis"
+msgstr "Ajouter un devis"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__addable_quote_ids

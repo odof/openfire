@@ -3,13 +3,14 @@
 {
     'name': "OpenFire / Écritures récurrentes",
     'version': '16.0.1.0.0',
+    'license': 'LGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'summary': "Module d'extension de account_move_template",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
+        'of_base_comment_template',
         'account_move_template',
     ],
     'data': [
@@ -18,6 +19,5 @@
     ],
     'installable': True,
     'application': False,
-    'auto_install': False,
-    'license': 'LGPL-3',
+    'auto_install': True,
 }

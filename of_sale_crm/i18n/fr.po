@@ -76,7 +76,7 @@ msgstr "Campagne"
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__cancel

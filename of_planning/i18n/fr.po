@@ -10,14 +10,15 @@ msgstr ""
 "PO-Revision-Date: 2024-06-21 09:06+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: \n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #. module: of_planning
 #. odoo-python
-#: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #, python-format
 msgid " (copy)"
@@ -133,11 +134,11 @@ msgstr ""
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.sale_order_view_form
 msgid ""
-"* The data entered in this field will be visualized in the intervention "
-"planning and printed in the intervention form."
+"* The data entered in this field will be visualized in the intervention planning and printed in the "
+"intervention form."
 msgstr ""
-"* Les données saisies dans ce champ seront visualisées dans la planification"
-" des interventions et imprimées dans le formulaire d'intervention."
+"* Les données saisies dans ce champ seront visualisées dans la planification des interventions et imprimées "
+"dans le formulaire d'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_force_dates
@@ -198,38 +199,26 @@ msgstr ""
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "<i class=\"fa fa-warning of_ws\"/> No operator can perform this task"
-msgstr ""
-"<i class=\"fa fa-warning of_ws\"/> Aucun intervenant ne peut réaliser la "
-"tâche"
+msgstr "<i class=\"fa fa-warning of_ws\"/> Aucun intervenant ne peut réaliser la tâche"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
-msgid ""
-"<i class=\"fa fa-warning\"/> Warning, this intervention is in conflict with "
-"another one."
-msgstr ""
-"<i class=\"fa fa-warning\"/> Attention, cette intervention est en conflit "
-"avec une autre."
+msgid "<i class=\"fa fa-warning\"/> Warning, this intervention is in conflict with another one."
+msgstr "<i class=\"fa fa-warning\"/> Attention, cette intervention est en conflit avec une autre."
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
-msgid ""
-"<p><strong>Invoicing completed successfully for the following "
-"interventions:</strong><br/>%s</p>"
-msgstr ""
-"<p><strong>Facturation complétée avec succès pour les interventions "
-"suivantes :</strong><br/>%s</p>"
+msgid "<p><strong>Invoicing completed successfully for the following interventions:</strong><br/>%s</p>"
+msgstr "<p><strong>Facturation complétée avec succès pour les interventions suivantes :</strong><br/>%s</p>"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
-msgid ""
-"<p><strong>Invoicing could not be completed because:</strong><br/>%s<p>"
-msgstr ""
-"<p><strong>La facturation n'a pas pu être complétée car :</strong><br/>%s<p>"
+msgid "<p><strong>Invoicing could not be completed because:</strong><br/>%s<p>"
+msgstr "<p><strong>La facturation n'a pas pu être complétée car :</strong><br/>%s<p>"
 
 #. module: of_planning
 #. odoo-python
@@ -241,13 +230,11 @@ msgstr "<p>La facturation n'a pas pu être complétée car :<br/>%s<p>"
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
 msgid ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
-"specific.\" aria-label=\"Values set here are company-specific.\" "
-"groups=\"base.group_multi_company\" role=\"img\"/>"
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-specific.\" aria-label=\"Values set "
+"here are company-specific.\" groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont"
-" spécifiques à la société.\" aria-label=\"Les valeurs définies ici sont "
-"spécifiques à la société.\" groups=\"base.group_multi_company\" "
+"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont spécifiques à la société.\" aria-"
+"label=\"Les valeurs définies ici sont spécifiques à la société.\" groups=\"base.group_multi_company\" "
 "role=\"img\"/>"
 
 #. module: of_planning
@@ -270,12 +257,14 @@ msgstr ""
 msgid ""
 "<span groups=\"account.group_show_line_subtotals_tax_excluded\">\n"
 "                                                        Amount</span>\n"
-"                                                    <span groups=\"account.group_show_line_subtotals_tax_included\">Total\n"
+"                                                    <span groups=\"account."
+"group_show_line_subtotals_tax_included\">Total\n"
 "                                                        Price</span>"
 msgstr ""
 "<span groups=\"account.group_show_line_subtotals_tax_excluded\">\n"
 "                                                        Montant</span>\n"
-"                                                    <span groups=\"account.group_show_line_subtotals_tax_included\">Total\n"
+"                                                    <span groups=\"account."
+"group_show_line_subtotals_tax_included\">Total\n"
 "                                                        Prix</span>"
 
 #. module: of_planning
@@ -708,7 +697,7 @@ msgstr "Sociétés"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_company_id
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Company"
-msgstr ""
+msgstr "Société"
 
 #. module: of_planning
 #. odoo-python
@@ -831,8 +820,7 @@ msgstr "Signature client"
 
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_res_partner
-#: model:ir.ui.menu,name:of_planning.menu_res_partner
-#: model:ir.ui.menu,name:of_planning.menu_res_partner_main
+#: model:ir.ui.menu,name:of_planning.menu_res_partner model:ir.ui.menu,name:of_planning.menu_res_partner_main
 msgid "Customers"
 msgstr "Clients"
 
@@ -907,12 +895,11 @@ msgstr "Définit les droits d'accès au planning d'intervention OpenFire"
 #: model:ir.model.fields,help:of_planning.field_res_company__of_company_choice
 #: model:ir.model.fields,help:of_planning.field_res_config_settings__of_company_choice
 msgid ""
-"Defines the company in which the interventions, requests for interventions, "
-"after-sales services and installed parks will be created."
+"Defines the company in which the interventions, requests for interventions, after-sales services and installed "
+"parks will be created."
 msgstr ""
-"Définit la société dans laquelle les interventions, les demandes "
-"d'intervention, les services après-vente et les parcs installés seront "
-"créés."
+"Définit la société dans laquelle les interventions, les demandes d'intervention, les services après-vente et "
+"les parcs installés seront créés."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__qty_delivered
@@ -996,11 +983,11 @@ msgstr "Durée"
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
 msgid ""
-"During the creation of an intervention, the company of the intervention will"
-" be set to the company of the selected field."
+"During the creation of an intervention, the company of the intervention will be set to the company of the "
+"selected field."
 msgstr ""
-"Lors de la création d'une intervention, la société de l'intervention sera "
-"définie sur la société du champ sélectionné."
+"Lors de la création d'une intervention, la société de l'intervention sera définie sur la société du champ "
+"sélectionné."
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -1025,6 +1012,8 @@ msgid ""
 "Employee %(employee)s has at least another intervention on this time slot:\n"
 " %(start)s: %(partner)s %(zip)s"
 msgstr ""
+"L’employé %(employee)s a une autre intervention prévue sur ce créneau :\n"
+" %(start)s: %(partner)s %(zip)s"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_category_id
@@ -1207,20 +1196,14 @@ msgstr "FACTURATION"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
-msgid ""
-"If checked, the remaining balance will not be displayed in the intervention "
-"report."
-msgstr ""
-"Si coché, le solde restant ne sera pas affiché dans le rapport "
-"d'intervention."
+msgid "If checked, the remaining balance will not be displayed in the intervention report."
+msgstr "Si coché, le solde restant ne sera pas affiché dans le rapport d'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_connector_config_settings__of_hide_remaining_balance
 #: model:ir.model.fields,help:of_planning.field_res_company__of_hide_remaining_balance
 #: model:ir.model.fields,help:of_planning.field_res_config_settings__of_hide_remaining_balance
-msgid ""
-"If you check this box, the remaining balance will be hidden in the "
-"interventions."
+msgid "If you check this box, the remaining balance will be hidden in the interventions."
 msgstr ""
 
 #. module: of_planning
@@ -1228,21 +1211,13 @@ msgstr ""
 #: model:ir.model.fields,help:of_planning.field_res_company__of_automatic_sectors
 #: model:ir.model.fields,help:of_planning.field_res_config_settings__of_automatic_sectors
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
-msgid ""
-"If you check this box, the sectors will be assigned automatically when the "
-"contact is created."
-msgstr ""
-"Si vous cochez cette case, les secteurs seront affectés automatiquement "
-"lorsque le contact est créé."
+msgid "If you check this box, the sectors will be assigned automatically when the contact is created."
+msgstr "Si vous cochez cette case, les secteurs seront affectés automatiquement lorsque le contact est créé."
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
-msgid ""
-"If you remove a task from an employee, remember to review that employee's "
-"interventions."
-msgstr ""
-"Si vous retirez une tâche à un employé, pensez à repasser sur les "
-"interventions de cet employé"
+msgid "If you remove a task from an employee, remember to review that employee's interventions."
+msgstr "Si vous retirez une tâche à un employé, pensez à repasser sur les interventions de cet employé"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_of_image
@@ -1269,9 +1244,7 @@ msgstr "Société incohérente"
 #: code:addons/of_planning/models/of_planning_intervention_line.py:0
 #, python-format
 msgid "Income accounts must be configured for the product category \"%s\"."
-msgstr ""
-"Le compte de produit doit être configuré pour la catégorie de produit "
-"\"%s\"."
+msgstr "Le compte de produit doit être configuré pour la catégorie de produit \"%s\"."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_inspection_visit_date
@@ -1341,8 +1314,7 @@ msgstr "Fiche d'intervention"
 
 #. module: of_planning
 #. odoo-python
-#: code:addons/of_planning/models/calendar_event.py:0
-#: code:addons/of_planning/models/sale_order.py:0
+#: code:addons/of_planning/models/calendar_event.py:0 code:addons/of_planning/models/sale_order.py:0
 #, python-format
 msgid "Intervention Sheet - %s"
 msgstr "Fiche d’intervention - %s"
@@ -1364,9 +1336,7 @@ msgstr "L'intervention n'est pas facturable car elle doit être confirmée."
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Intervention is non billable, please select a fiscal position."
-msgstr ""
-"L'intervention n'est pas facturable, veuillez sélectionner une position "
-"fiscale."
+msgstr "L'intervention n'est pas facturable, veuillez sélectionner une position fiscale."
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_of_planning_intervention_line
@@ -1504,9 +1474,7 @@ msgstr "Statut de facturation"
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
-msgid ""
-"Invoiceable lines are linked to order lines. Please do the invoicing from "
-"the sale order."
+msgid "Invoiceable lines are linked to order lines. Please do the invoicing from the sale order."
 msgstr ""
 
 #. module: of_planning
@@ -1758,8 +1726,7 @@ msgstr "Aucun client défini."
 #. odoo-python
 #: code:addons/of_planning/models/of_planning_intervention_line.py:0
 #, python-format
-msgid ""
-"No product to add in a stock picking for the following intervention: %s"
+msgid "No product to add in a stock picking for the following intervention: %s"
 msgstr "Aucun article à ajouter dans un bon de livraison: %s"
 
 #. module: of_planning
@@ -1969,9 +1936,7 @@ msgstr "Merci de définir une position fiscale"
 #: code:addons/of_planning/models/of_planning_intervention_line.py:0
 #, python-format
 msgid "Please select a warehouse in the invoicing tab of the intervention: %s"
-msgstr ""
-"Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention:"
-" %s"
+msgstr "Veuillez renseigner un entrepôt dans l'onglet Facturation de l'intervention: %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
@@ -2235,11 +2200,11 @@ msgstr "Envoyer rapport"
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_hr_employee__of_daily_email
 msgid ""
-"Send the schedule to the employee's e-mail address each evening,when the "
-"employee has appointments for the following day."
+"Send the schedule to the employee's e-mail address each evening,when the employee has appointments for the "
+"following day."
 msgstr ""
-"Envoyer le planning à l'adresse e-mail de l'employé chaque soir, lorsque "
-"l'employé a des rendez-vous pour le lendemain."
+"Envoyer le planning à l'adresse e-mail de l'employé chaque soir, lorsque l'employé a des rendez-vous pour le "
+"lendemain."
 
 #. module: of_planning
 #: model:mail.template,description:of_planning.email_template_planning
@@ -2300,9 +2265,7 @@ msgstr "Date de début"
 #: model:ir.model.fields,help:of_planning.field_calendar_event__start
 #: model:ir.model.fields,help:of_planning.field_of_image__intervention_date
 msgid "Start date of an event, without time for full days events"
-msgstr ""
-"Date de début d'un événement, sans heure pour les événements durant toute la"
-" journée"
+msgstr "Date de début d'un événement, sans heure pour les événements durant toute la journée"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -2357,9 +2320,7 @@ msgstr "Date de fin"
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__stop
 msgid "Stop date of an event, without time for full days events"
-msgstr ""
-"Date de fin d'événement, sans heure pour les événements durant toute la "
-"journée"
+msgstr "Date de fin d'événement, sans heure pour les événements durant toute la journée"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_street
@@ -2519,38 +2480,31 @@ msgstr "Il n'y a pas de commande liée à l'intervention."
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_customer_notes
 msgid ""
-"These notes are taken from the customer master record under 'Internal "
-"notes'. They can only be modified in the customer record."
+"These notes are taken from the customer master record under 'Internal notes'. They can only be modified in the "
+"customer record."
 msgstr ""
-"Ces notes sont reprises du dossier client sous 'Notes internes'. Elles ne "
-"peuvent être modifiées que dans le dossier client."
+"Ces notes sont reprises du dossier client sous 'Notes internes'. Elles ne peuvent être modifiées que dans le "
+"dossier client."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_intervention_notes
 msgid ""
-"These notes are taken from the quote/order under the heading 'Intervention "
-"notes'. They can only be modified in the quote/order (see the associated "
-"order)."
+"These notes are taken from the quote/order under the heading 'Intervention notes'. They can only be modified in "
+"the quote/order (see the associated order)."
 msgstr ""
-"Ces notes sont reprises du devis/commande sous 'Notes d'intervention'. Elles"
-" ne peuvent être modifiées que dans le devis/commande (voir la commande "
-"associée)."
+"Ces notes sont reprises du devis/commande sous 'Notes d'intervention'. Elles ne peuvent être modifiées que dans "
+"le devis/commande (voir la commande associée)."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_sale_order__of_intervention_notes
-msgid ""
-"These notes are visualized in the intervention planning and printed in the "
-"intervention form."
+msgid "These notes are visualized in the intervention planning and printed in the intervention form."
 msgstr ""
-"Ces notes sont visualisées dans le planning des interventions et imprimées "
-"dans le formulaire d'intervention."
+"Ces notes sont visualisées dans le planning des interventions et imprimées dans le formulaire d'intervention."
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "This address is not geolocalized, click here to try to geolocalize it"
-msgstr ""
-"Cette adresse n'est pas géolocalisée, cliquez ici pour essayer de la "
-"géolocaliser"
+msgstr "Cette adresse n'est pas géolocalisée, cliquez ici pour essayer de la géolocaliser"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -2559,12 +2513,9 @@ msgstr "Mois en cours"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_partner_pricelist_id
-msgid ""
-"This pricelist will be used, instead of the default one, for sales to the "
-"current partner"
+msgid "This pricelist will be used, instead of the default one, for sales to the current partner"
 msgstr ""
-"Cette liste de prix sera utilisée, au lieu de la liste de prix par défaut, "
-"pour les ventes au partenaire actuel"
+"Cette liste de prix sera utilisée, au lieu de la liste de prix par défaut, pour les ventes au partenaire actuel"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -2573,11 +2524,8 @@ msgstr "Semaine en cours"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
-msgid ""
-"This will update all taxes based on the currently selected fiscal position."
-msgstr ""
-"Cela mettra à jour toutes les taxes en fonction de la position fiscale "
-"actuellement sélectionnée."
+msgid "This will update all taxes based on the currently selected fiscal position."
+msgstr "Cela mettra à jour toutes les taxes en fonction de la position fiscale actuellement sélectionnée."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__tz
@@ -2696,8 +2644,7 @@ msgstr "Utiliser le rapport par défaut"
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__report_use_default
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__sheet_use_default
 msgid "Use values set in the default template for the report."
-msgstr ""
-"Utiliser les valeurs définies dans le modèle par défaut pour le rapport."
+msgstr "Utiliser les valeurs définies dans le modèle par défaut pour le rapport."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_tag__sequence
