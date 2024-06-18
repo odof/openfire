@@ -45,14 +45,15 @@ class SaleOrder(models.Model):
         lines_without_section = self.order_line.filtered(
             lambda r: r.display_type not in ['line_section', 'line_note'] and r.of_parent_node_id == 0
         )
-        value = {
-            'name': _("Without sections"),
-            'cost': sum(lines_without_section.mapped('purchase_price')),
-            'price': sum(lines_without_section.mapped('price_subtotal')),
-            'qty': sum(lines_without_section.mapped('product_uom_qty')),
-            'highlight': True,
-        }
-        summary['sections'].append(value)
+        if len(lines_without_section) > 0:
+            value = {
+                'name': _("Without sections"),
+                'cost': sum(lines_without_section.mapped('purchase_price')),
+                'price': sum(lines_without_section.mapped('price_subtotal')),
+                'qty': sum(lines_without_section.mapped('product_uom_qty')),
+                'highlight': True,
+            }
+            summary['sections'].append(value)
 
         # Calculate the total
         total = {
