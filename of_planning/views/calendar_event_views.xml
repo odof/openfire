@@ -257,13 +257,15 @@
                 <field name="of_internal_description" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" />
             </xpath>
             <xpath expr="//page[@name='page_details']/group" position="after">
-                <group attrs="{'invisible':['|', ('of_customer_notes','=',False), ('of_type', '!=', 'intervention')]}">
-                    <separator string="Customer notes" colspan="2" />
-                    <field name="of_customer_notes" colspan="2" nolabel="1" readonly="1" />
-                </group>
                 <group attrs="{'invisible':['|', ('of_intervention_notes','=',False), ('of_type', '!=', 'intervention')]}">
                     <separator string="Intervention notes" colspan="2" />
                     <field name="of_intervention_notes" nolabel="1" />
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='description']/.." position="after">
+                <group attrs="{'invisible':['|', ('of_customer_notes','=',False), ('of_type', '!=', 'intervention')]}">
+                    <separator string="Customer notes" colspan="2" />
+                    <field name="of_customer_notes" colspan="2" nolabel="1" readonly="1" />
                 </group>
             </xpath>
             <xpath expr="//page[@name='page_details']/group" position="before">
