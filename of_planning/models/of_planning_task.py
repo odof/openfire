@@ -8,12 +8,17 @@ class OFPlanningTask(models.Model):
     _description = "Task"
     _order = 'sequence'
 
-    name = fields.Char(size=100, required=True)
+    name = fields.Char(size=100, required=True, help="Enter a task name")
     description = fields.Text()
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=1, help="Used to order tasks. Lower is better.")
     is_locked = fields.Boolean(string="Locked")
-    duration = fields.Float(string="Default duration", default=1.0)
+    duration = fields.Float(
+        string="Default duration",
+        default=1.0,
+        help="The task duration is the default time allocated to its execution. "
+        "It can be modified in the interventions",
+    )
     team_ids = fields.Many2many(
         comodel_name='of.planning.team',
         relation='of_team_task_rel',
