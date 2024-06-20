@@ -22,6 +22,8 @@ from odoo.addons.of_planning_tournee.models.of_planning_tournee import AM_LIMIT_
 
 _logger = logging.getLogger(__name__)
 
+def round_to_next_minute(dt):
+    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute + (dt.second >= 1))
 
 """
 bug description quand changement de tache ou service lié puis changé?
@@ -1111,8 +1113,8 @@ class OfTourneeRdv(models.TransientModel):
                         date_fin_dt = tz.localize(date_fin_dt, is_dst=None).astimezone(pytz.utc)
 
                         wizard_line_obj.create({
-                            'debut_dt': date_debut_dt,
-                            'fin_dt': date_fin_dt,
+                            'debut_dt': round_to_next_minute(date_debut_dt),
+                            'fin_dt': round_to_next_minute(date_fin_dt),
                             'date_flo': intervention_deb,
                             'date_flo_deadline': intervention_fin,
                             'date': date_recherche_str,
@@ -1192,7 +1194,7 @@ class OfTourneeRdv(models.TransientModel):
                 'date_display': first_res.date,
                 'name': name,
                 'employee_id': first_res.employee_id.id,
-                'date_propos': date_propos_dt,  # datetime utc
+                'date_propos': round_to_next_minute(date_propos_dt),  # datetime utc
                 'date_propos_hour': first_res.date_flo,
                 'res_line_id': first_res.id,
                 'map_line_id': first_res.id,
@@ -1639,7 +1641,7 @@ class OfTourneeRdvLineMixin(models.AbstractModel):
         date_propos_dt = datetime.combine(
             d, datetime.min.time()) + timedelta(hours=self.selected_hour)  # datetime local
         date_propos_dt = tz.localize(date_propos_dt, is_dst=None).astimezone(pytz.utc)  # datetime utc
-        self.wizard_id.date_propos = date_propos_dt
+        self.wizard_id.date_propos = round_to_next_minute(date_propos_dt)
         return self.wizard_id.button_confirm()
 
     @api.multi
@@ -1731,7 +1733,7 @@ class OfTourneeRdvLine(models.TransientModel):
     by_date_hidden = fields.Boolean(string="Hidden", default=True, index=True)
     allday = fields.Boolean('All Day', default=False, index=True)
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
-    selected_hour = fields.Float(string='Heure du RDV', digits=(2, 2))
+    selected_hour = fields.Float(string='Heure du RDV', digits=(12, 5))
     selected_description = fields.Text(string="Description", related="wizard_id.description")
 
     @api.multi
