@@ -81,10 +81,11 @@ class SaleOrder(models.Model):
     def create(self, vals_list):
         order_start_state = self.env['ir.config_parameter'].sudo().get_param('of.sale.crm.sale.order.start_state')
         for vals in vals_list:
-            if order_start_state == 'estimate':
-                vals['state'] = 'draft'
-            elif order_start_state == 'quotation' and vals.get('state', 'draft') == 'draft':
-                vals['state'] = 'sent'
+            if 'state' not in vals:
+                if order_start_state == 'estimate':
+                    vals['state'] = 'draft'
+                elif order_start_state == 'quotation' and vals.get('state', 'draft') == 'draft':
+                    vals['state'] = 'sent'
         return super().create(vals_list)
 
     def action_button_confirm_estimate(self):
