@@ -620,16 +620,16 @@ class OFSurvey(http.Controller):
                 # si la question est déjà dans les réponses, on la supprime
                 lines = new_user_input.user_input_line_ids.filtered(lambda r: r.question_id.id == int(question["id"]))
                 lines.unlink()
-
-                new_user_input.user_input_line_ids = [
-                    Command.create(
-                        {
-                            'question_id': int(question["id"]),
-                            'answer_type': 'suggestion',
-                            'suggested_answer_id': int(answer_id),
-                        },
-                    )
-                ]
+                if answer_id != '-1':  # si la réponse n'est pas un commentaire
+                    new_user_input.user_input_line_ids = [
+                        Command.create(
+                            {
+                                'question_id': int(question["id"]),
+                                'answer_type': 'suggestion',
+                                'suggested_answer_id': int(answer_id),
+                            },
+                        )
+                    ]
 
         # pour chaque question conditionnelle du formulaire, on regarde si cette nouvelle réponse active une question
         conditional_questions = request.env['of.survey.question']
