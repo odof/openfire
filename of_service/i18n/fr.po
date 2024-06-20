@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-12 14:07+0000\n"
-"PO-Revision-Date: 2024-07-12 14:07+0000\n"
+"POT-Creation-Date: 2024-07-24 16:23+0000\n"
+"PO-Revision-Date: 2024-07-24 16:23+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -87,6 +87,8 @@ msgid ""
 "<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
 "'done')]}\"> estimated, including </em>"
 msgstr ""
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
+"'done')]}\"> estimé, incluant </em>"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
@@ -94,6 +96,8 @@ msgid ""
 "<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
 "'done')]}\"> planned and </em>"
 msgstr ""
+"<em class=\"oe_grey oe_inline\" attrs=\"{'invisible': [('state', '=', "
+"'done')]}\"> planifié et </em>"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
@@ -112,7 +116,7 @@ msgstr ""
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "<i class=\"fa fa-phone pe-1\" title=\"Phone\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-phone pe-1\" title=\"Téléphone\"/>"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
@@ -162,7 +166,7 @@ msgstr "<span>Mois référent&amp;nbsp;:</span>"
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
 msgid "<span>Store&amp;nbsp;:</span>"
-msgstr ""
+msgstr "<span>Magasin&amp;nbsp;:</span>"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.report_service_request_document
@@ -375,7 +379,7 @@ msgstr "Terminé le %s"
 #: code:addons/of_service/models/of_service_request.py:0
 #, python-format
 msgid "Compose Email"
-msgstr ""
+msgstr "Composer un email"
 
 #. module: of_service
 #: model:ir.model,name:of_service.model_res_partner
@@ -524,7 +528,7 @@ msgstr "Brouillon"
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.res_partner_view_form
 msgid "Due date"
-msgstr ""
+msgstr "Date d'échéance"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
@@ -536,6 +540,13 @@ msgstr "Durées"
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Email"
 msgstr ""
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__recurrency
+msgid "Enable this option to configure the recurrence of the intervention."
+msgstr ""
+"Activez cette option pour pouvoir configurer la récurrence de "
+"l'intervention."
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
@@ -669,12 +680,12 @@ msgstr ""
 #. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
+msgstr "Si coché, de nouveaux messages demandent votre attention."
 
 #. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__message_has_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Si coché, certains messages ont une erreur de livraison."
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
@@ -874,6 +885,13 @@ msgid "Lines"
 msgstr "Lignes"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_calendar_event__of_request_id
+msgid "Link a service request to your service to link these two objects."
+msgstr ""
+"Associez une demande d'intervention à votre intervention afin de lier ces "
+"deux objets."
+
+#. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__order_id
 msgid ""
 "Link order to task allows you to display the order in the task. This field "
@@ -906,7 +924,6 @@ msgstr ""
 #: model:ir.actions.act_window,name:of_service.action_of_service_request_maintenance
 #: model:ir.ui.menu,name:of_service.menu_of_service_maintenance
 #: model:ir.ui.menu,name:of_service.menu_of_service_request_maintenance_maintenance_first
-#: model:of.service.request.type,name:of_service.of_service_request_type_maintenance
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
 msgid "Maintenance"
 msgstr "Entretien - Maintenance"
@@ -1664,6 +1681,23 @@ msgstr ""
 "* Visite technique"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_calendar_event__of_type_id
+msgid ""
+"The type of intervention allows you to categorize it:\n"
+"* Servicing\n"
+"* Maintenance\n"
+"* Installation\n"
+"* SAP\n"
+"* Technical visit\n"
+msgstr ""
+"Le type d'intervention permet de la catégoriser :\n"
+"* Entretien\n"
+"* Maintenance\n"
+"* Installation\n"
+"* SAP\n"
+"* Visite technique\n"
+
+#. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
 msgid "This Month"
 msgstr "Ce mois-ci"
@@ -1765,7 +1799,7 @@ msgstr "Valider"
 #. module: of_service
 #: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__3
 msgid "Very High"
-msgstr ""
+msgstr "Très haute"
 
 #. module: of_service
 #: model:ir.model.fields.selection,name:of_service.selection__of_service_request_line__invoice_status__to_invoice

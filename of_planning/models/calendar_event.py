@@ -17,7 +17,28 @@ class CalendarEvent(models.Model):
     def _domain_employee_ids(self):
         return ['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]
 
-    name = fields.Char(required=False)
+    name = fields.Char(
+        required=False,
+        help="Define a name for the intervention; by default, the name of the customer and the task will be used.",
+    )
+    end_type = fields.Selection(
+        help="* Number of repeats: define the end of the recurrence with a number of repeats\n"
+        "* End date: define the end of the recurrence with a date\n"
+        "* Forever: intervention will be repeated in a maximum number of 720"
+    )
+    recurrency = fields.Boolean(string="Recurrent", help="Activate this option to set intervention recurrency")
+    allday = fields.Boolean(
+        string="All Day",
+        default=False,
+        help="If you define an all-day intervention, its start and end times"
+        "will be the start and end times of the main technician's workday.",
+    )
+    description = fields.Html(
+        help="The external description allows you to provide information "
+        "that will be communicated to the customer. This description can be added to "
+        "the intervention form or report by configuring the intervention models",
+    )
+
     # ===== Intervention specifics fields =====
     of_state = fields.Selection(
         selection=[
@@ -54,6 +75,8 @@ class CalendarEvent(models.Model):
         compute='_compute_of_company_id',
         store=True,
         readonly=False,
+        help="Select the intervention company: in the intervention configurations,"
+        " you can define whether the intervention company will be the user's or the customer's company by default.",
     )
     of_fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position',
@@ -63,7 +86,11 @@ class CalendarEvent(models.Model):
         readonly=False,
     )
     of_tag_ids = fields.Many2many(
-        comodel_name='of.planning.tag', column1='intervention_id', column2='tag_id', string="Intervention Tags"
+        comodel_name='of.planning.tag',
+        column1='intervention_id',
+        column2='tag_id',
+        string="Tags",
+        help="Assign one or more labels to the intervention",
     )
     of_line_ids = fields.One2many(
         comodel_name='of.planning.intervention.line',
@@ -83,7 +110,9 @@ class CalendarEvent(models.Model):
         readonly=False,
         help="Resource linked to the intervention",
     )
-    of_team_id = fields.Many2one(comodel_name='of.planning.team', string="Team")
+    of_team_id = fields.Many2one(
+        comodel_name='of.planning.team', string="Team", help="Select a team to add all team members to the intervention"
+    )
     of_employee_ids = fields.Many2many(
         comodel_name='hr.employee',
         relation='of_employee_intervention_rel',
@@ -95,6 +124,7 @@ class CalendarEvent(models.Model):
         string="Operators",
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
+        help="Select a team to add all team members to the intervention",
     )
     partner_ids = fields.Many2many(compute='_compute_partner_ids', readonly=False, store=True)
     of_employee_id = fields.Many2one(
@@ -103,6 +133,8 @@ class CalendarEvent(models.Model):
         readonly=False,
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
+        help="Define the person responsible for the intervention from among the selected participants."
+        "By default, the first participant will be entered as the main technician.",
     )
     of_category_id = fields.Many2one(comodel_name='hr.employee.category', string="Employee category")
 
@@ -139,6 +171,7 @@ class CalendarEvent(models.Model):
         readonly=False,
         tracking=True,
         auto_join=True,
+        help="Define the address of the intervention site; by default, the customer's address will be used.",
     )
     of_geocoding_state = fields.Selection(string="Geocoding state", related='of_address_id.of_geocoding_state')
     of_address_street = fields.Char(related='of_address_id.street', string="Street", readonly=True)
@@ -162,15 +195,22 @@ class CalendarEvent(models.Model):
         string="Order",
         copy=False,
         domain="['|', ('partner_id', '=', of_partner_id), ('partner_id', '=', of_address_id)]",
+        help="Link order to task allows you to display the order in the task."
+        " This field is automatically filled in when the intervention is created from an order.",
     )
     of_order_amount_total = fields.Monetary(
-        string="Order amount", currency_field='of_currency_id', readonly=True, compute='_compute_order_amounts'
+        string="Order amount",
+        currency_field='of_currency_id',
+        readonly=True,
+        compute='_compute_order_amounts',
+        help="Total amount of associated order",
     )
     of_order_still_due = fields.Monetary(
         string="Order still due amount",
         currency_field='of_currency_id',
         readonly=True,
         compute='_compute_order_amounts',
+        help="Outstanding amount of associated order",
     )
     of_link_order = fields.Boolean(string="Invoicing on order", compute='_compute_of_link_order', store=True)
 
@@ -179,6 +219,8 @@ class CalendarEvent(models.Model):
         selection=[('delivery', "Delivered quantity"), ('intervention', "Planned quantity")],
         string="Invoice policy",
         default='intervention',
+        help="* Planned quantity: generates the invoice from the quantities planned in the invoice lines.\n"
+        "* Delivered quantity: generates invoice only when delivery has been made (delivery note has been validated).",
     )
     of_invoice_status = fields.Selection(
         selection=[
@@ -203,6 +245,7 @@ class CalendarEvent(models.Model):
         readonly=True,
         compute='_compute_picking_amounts',
         currency_field='of_currency_id',
+        help="Value of sum of associated delivery notes",
     )
     of_picking_domain = fields.Many2many(comodel_name='stock.picking', compute='_compute_of_picking_domain')
     of_picking_manual_ids = fields.Many2many(
@@ -211,23 +254,47 @@ class CalendarEvent(models.Model):
         relation='of_planning_intervention_picking_manual_rel',
         column1='intervention_id',
         column2='picking_id',
+        help="By associating a delivery note with the intervention, you can display them in the mobile intervention.\n"
+        "This field is automatically filled in when the intervention is created from an order for which one or more "
+        "delivery notes have been generated.",
     )
     of_warehouse_id = fields.Many2one(
-        comodel_name='stock.warehouse', string="Warehouse", default=lambda self: self._default_of_warehouse_id()
+        comodel_name='stock.warehouse',
+        string="Warehouse",
+        default=lambda self: self._default_of_warehouse_id(),
+        help="Warehouse from which the intervention's invoicing lines originate."
+        "This field is mandatory in order to generate a delivery note from an intervention.",
     )
     of_procurement_group_id = fields.Many2one(comodel_name='procurement.group', string="Procurement Group", copy=False)
 
     # ===== Planning fields =====
     of_task_id = fields.Many2one(
-        comodel_name='of.planning.task', string="Task", compute='_compute_of_task_id', store=True, readonly=False
+        comodel_name='of.planning.task',
+        string="Task",
+        compute='_compute_of_task_id',
+        store=True,
+        readonly=False,
+        help="Task to be carried out during the operation",
     )
     of_template_id = fields.Many2one(
-        comodel_name='of.planning.intervention.template', string="Intervention template", change_default=True
+        comodel_name='of.planning.intervention.template',
+        string="Intervention template",
+        change_default=True,
+        help="Prepare the intervention with a pre-configured intervention template",
     )
-    of_force_dates = fields.Boolean(string="Force dates", default=False, help="/!\\ overwrite operator's schedule")
+    of_force_dates = fields.Boolean(
+        string="Force dates",
+        default=False,
+        help="Forcing the date allows you to ignore other interventions that might conflict with it.",
+    )
 
     # ===== Description and notes fields =====
-    of_internal_description = fields.Text(string="Internal description")
+    of_internal_description = fields.Text(
+        string="Internal description",
+        help="The internal description allows you to enter information that does not need"
+        "to be communicated to the customer."
+        " This description can be added to the intervention form or report by configuring the intervention templates.",
+    )
     of_intervention_notes = fields.Html(
         string="Intervention notes",
         related='of_order_id.of_intervention_notes',
@@ -252,14 +319,39 @@ class CalendarEvent(models.Model):
     # ===== Duration & time fields =====
     start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0))
     stop = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1))
-    of_real_start = fields.Datetime(string="Real start", copy=False)
-    of_real_stop = fields.Datetime(string="Real stop", copy=False)
-    of_real_duration = fields.Float(string="Real duration", compute='_compute_of_real_duration', store=True, copy=False)
-    of_break_duration = fields.Float(string="Break duration", copy=False)
+    of_real_start = fields.Datetime(
+        string="Real start",
+        copy=False,
+        help="Actual start date of intervention. Entered automatically if time tracking is enabled"
+        "(intervention configuration).",
+    )
+    of_real_stop = fields.Datetime(
+        string="Real stop",
+        copy=False,
+        help="Actual end date of intervention. Entered automatically if time tracking is "
+        "enabled in intervention configuration.",
+    )
+    of_real_duration = fields.Float(
+        string="Real duration",
+        compute='_compute_of_real_duration',
+        store=True,
+        copy=False,
+        help="Calculation of actual time spent on the job minus break time. ",
+    )
+    of_break_duration = fields.Float(
+        string="Break duration",
+        copy=False,
+        help="Recorded installation time. Entered automatically if time tracking is enabled in job configuration.",
+    )
     of_break_start = fields.Datetime(string="Break start", store=True, copy=False)
     of_in_break = fields.Boolean(string="In break", compute='_compute_of_in_break', store=True)
     of_travel_duration = fields.Float(string="Travel duration", copy=False)
-    of_total_duration = fields.Float(string="Total duration", compute='_compute_of_total_duration', store=True)
+    of_total_duration = fields.Float(
+        string="Total duration",
+        compute='_compute_of_total_duration',
+        store=True,
+        help="Calculation of the time spent between the actual start and end dates of the intervention.",
+    )
 
     # ===== Signature fields =====
     of_customer_signature = fields.Image(string="Customer's signature", copy=False, max_width=256, max_height=256)
@@ -314,7 +406,11 @@ class CalendarEvent(models.Model):
     )
 
     # Helpers UX, UI fields
-    of_is_flexible = fields.Boolean(string="Flexible")
+    of_is_flexible = fields.Boolean(
+        string="Flexible",
+        help="A flexible intervention is one that allows a certain amount of "
+        "flexibility in planning and could be moved.",
+    )
     of_show_update_fpos = fields.Boolean(string="Has Fiscal Position Changed", store=False)
 
     # Reports fields

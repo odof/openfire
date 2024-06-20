@@ -7,7 +7,9 @@ from odoo.exceptions import ValidationError
 class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
-    of_use_equipment = fields.Boolean(string="Use Equipment")
+    of_use_equipment = fields.Boolean(
+        string="Use Equipment", help="Activate this field to add one or more items of equipment to be worked on."
+    )
     of_equipment_ids = fields.Many2many(
         comodel_name='of.equipment',
         relation='of_calendar_event_equipment_rel',

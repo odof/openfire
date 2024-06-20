@@ -13,6 +13,7 @@ class CalendarEvent(models.Model):
         compute='_compute_of_survey_id',
         store=True,
         readonly=False,
+        help="Select the survey to be answered as part of the intervention",
     )
     of_survey_user_input_id = fields.Many2one(
         comodel_name='of.survey.user_input',

@@ -10,9 +10,20 @@ class CalendarEvent(models.Model):
         comodel_name='of.service.request',
         string="Service Request",
         domain="of_address_id and ['|', ('address_id', '=', of_address_id), ('partner_id', '=', of_address_id)] or []",
+        help="Link a service request to your service to link these two objects.",
     )
     of_type_id = fields.Many2one(
-        comodel_name='of.service.request.type', string="Type", compute='_compute_of_type_id', store=True, readonly=False
+        comodel_name='of.service.request.type',
+        string="Type",
+        compute='_compute_of_type_id',
+        store=True,
+        readonly=False,
+        help="The type of intervention allows you to categorize it:\n"
+        "* Servicing\n"
+        "* Maintenance\n"
+        "* Installation\n"
+        "* SAP\n"
+        "* Technical visit\n",
     )
 
     @api.depends('of_state', 'of_template_id')

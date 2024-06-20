@@ -267,7 +267,11 @@ class OFServiceRequest(models.Model):
     remaining_duration = fields.Float(compute='_compute_durations', store=True)
 
     # Recurrency
-    recurrency = fields.Boolean(string="Recurring service request", default=False)
+    recurrency = fields.Boolean(
+        string="Recurring service request",
+        default=False,
+        help="Enable this option to configure the recurrence of the intervention.",
+    )
     recurring_rule_type = fields.Selection(
         selection=[('monthly', "Monthly"), ('yearly', "Yearly")],
         string="Recurrency",

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 06:39+0000\n"
-"PO-Revision-Date: 2024-07-11 06:39+0000\n"
+"POT-Creation-Date: 2024-07-15 12:19+0000\n"
+"PO-Revision-Date: 2024-07-15 12:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -89,9 +89,17 @@ msgid "<strong>Equipment</strong>"
 msgstr "<strong>Équipement</strong>"
 
 #. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_calendar_event__of_use_equipment
+msgid ""
+"Activate this field to add one or more items of equipment to be worked on."
+msgstr ""
+"Activez ce champ pour ajouter un ou plusieurs équipements sur lesquels va "
+"porter l'intervention."
+
+#. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_equipment__active
 msgid "Active"
-msgstr ""
+msgstr "Actif"
 
 #. module: of_equipment
 #: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_is_compliant

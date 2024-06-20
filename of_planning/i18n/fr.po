@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 06:46+0000\n"
-"PO-Revision-Date: 2024-07-11 06:46+0000\n"
+"POT-Creation-Date: 2024-07-24 16:20+0000\n"
+"PO-Revision-Date: 2024-07-24 16:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgstr ""
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #, python-format
 msgid " (copy)"
-msgstr ""
+msgstr " (copie)"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -80,14 +80,14 @@ msgstr "# Interventions liées"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "%s - Intervention Planning for %s"
-msgstr ""
+msgstr "%s - Planning intervention pour %s"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "%s<br/>from %s to %s"
-msgstr ""
+msgstr "%s<br/>de %s à %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
@@ -151,10 +151,31 @@ msgstr ""
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__send_reports
 msgid ""
 "* Manual dispatch: manually from the OpenFire web database.\n"
-"* Automatic dispatch at intervention closure: from the mobile app, as soon as the user clicks on 'Completed' in an intervention, the intervention becomes completed and the intervention report is automatically e-mailed to the customer."
+"* Automatic dispatch at intervention closure: from the mobile app, as soon as the user clicks on 'Completed' in an intervention, the intervention becomes completed and the intervention report is automatically e-mailed to the customer.\n"
 msgstr ""
 "* Envoi manuel : manuellement depuis la base de données web OpenFire.\n"
-"* Envoi automatique à la clôture de l'intervention : depuis l'application mobile, dès que l'utilisateur clique sur 'Terminé' dans une intervention, l'intervention devient terminée et le compte-rendu d'intervention est automatiquement envoyé par mail au client."
+"* Envoi automatique à la clôture de l'intervention : depuis l'application mobile, dès que l'utilisateur clique sur 'Terminé' dans une intervention, l'intervention devient terminée et le rapport d'intervention est automatiquement envoyé par e-mail au client.\n"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__end_type
+msgid ""
+"* Number of repeats: define the end of the recurrence with a number of repeats\n"
+"* End date: define the end of the recurrence with a date\n"
+"* Forever: intervention will be repeated in a maximum number of 720"
+msgstr ""
+"* Nombre de répétitions : définie la fin de la récurrence avec un nombre de répétitions\n"
+"* Date de fin : définie la fin de la récurrence avec une date\n"
+"* Pour toujours : l'intervention sera répétée dans un nombre maximum de 720"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_invoice_policy
+#: model:ir.model.fields,help:of_planning.field_of_planning_intervention_line__invoice_policy
+msgid ""
+"* Planned quantity: generates the invoice from the quantities planned in the invoice lines.\n"
+"* Delivered quantity: generates invoice only when delivery has been made (delivery note has been validated)."
+msgstr ""
+"* Quantité planifiée : permet la génération de la facture à partir des quantités planifiées dans les lignes de facturation\n"
+"* Quantité livrée : permet la génération de la facture uniquement lorsque la livraison est effectuée (bon de livraison est validé)"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.sale_order_view_form
@@ -164,11 +185,6 @@ msgid ""
 msgstr ""
 "* Les données saisies dans ce champ seront visualisées dans la planification"
 " des interventions et imprimées dans le formulaire d'intervention."
-
-#. module: of_planning
-#: model:ir.model.fields,help:of_planning.field_calendar_event__of_force_dates
-msgid "/!\\ overwrite operator's schedule"
-msgstr "/!\\ écrase le planning de l'opérateur"
 
 #. module: of_planning
 #: model:mail.template,body_html:of_planning.email_template_planning
@@ -282,6 +298,8 @@ msgid ""
 "<span class=\"fa fa-plus\"/>\n"
 "                                <span> Add Odoo meeting</span>"
 msgstr ""
+"<span class=\"fa fa-plus\"/>\n"
+"                                <span> Ajouter réunion Odoo</span>"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -544,6 +562,15 @@ msgid "A customer address is required to generate a stock picking."
 msgstr "Une adresse cliente est nécessaire pour générer un bon de livraison."
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_is_flexible
+msgid ""
+"A flexible intervention is one that allows a certain amount of flexibility "
+"in planning and could be moved."
+msgstr ""
+"Une intervention flexible est une intervention qui permet une certaine "
+"souplesse dans la planification et qui pourrait être déplacée."
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_hr_employee__of_all_tasks
 msgid "Able to handle all task"
 msgstr "Apte à réaliser toutes les taches"
@@ -552,6 +579,11 @@ msgstr "Apte à réaliser toutes les taches"
 #: model:res.groups,name:of_planning.group_planning_intervention_read_own_write_own
 msgid "Access my interventions"
 msgstr "Accéder à mes interventions"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__recurrency
+msgid "Activate this option to set intervention recurrency"
+msgstr "Activez cette option pour définir la périodicité de l'intervention"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__active
@@ -569,6 +601,24 @@ msgstr "Actif"
 #: model:ir.model,name:of_planning.model_mail_activity
 msgid "Activity"
 msgstr "Activité"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_real_stop
+msgid ""
+"Actual end date of intervention. Entered automatically if time tracking is "
+"enabled in intervention configuration."
+msgstr ""
+"Date réelle de fin de l'intervention. Renseigné automatiquement si le suivi "
+"des temps est activée dans les configuration des interventions."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_real_start
+msgid ""
+"Actual start date of intervention. Entered automatically if time tracking is"
+" enabled(intervention configuration)."
+msgstr ""
+"Date réelle de démarrage de l'intervention. Renseigné automatiquement si la "
+"suivi des temps est activée(Configuration des interventions)"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_task_view_form
@@ -836,6 +886,11 @@ msgid "After"
 msgstr "Après"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__allday
+msgid "All Day"
+msgstr "Toute la journée"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_all_image_ids
 msgid "All images"
 msgstr "Toutes les images"
@@ -849,6 +904,8 @@ msgstr "Permet de donner une ou plusieurs équipe(s) à l'employé."
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__report_minutes
 msgid "Allows you to select or deselect all elements of the procedure report"
 msgstr ""
+"Permet de sélectionner ou désélectionner tous les éléments du compte rendu "
+"de l'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__sheet_minutes
@@ -864,6 +921,8 @@ msgid ""
 "Allows you to select or deselect all the items to be displayed linked to the"
 " order associated with the intervention."
 msgstr ""
+"Permet de sélectionner ou de désélectionner tous les éléments à afficher "
+"liés à la commande associée à l'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_hr_employee__of_daily_email
@@ -880,7 +939,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_task_view_search
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_team_view_search
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_tag_ids
+msgid "Assign one or more labels to the intervention"
+msgstr "Attribuez une ou plusieurs étiquettes à l'intervention"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__partner_ids
@@ -919,9 +983,33 @@ msgid "Break start"
 msgstr "Début de pause"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_picking_manual_ids
+msgid ""
+"By associating a delivery note with the intervention, you can display them in the mobile intervention.\n"
+"This field is automatically filled in when the intervention is created from an order for which one or more delivery notes have been generated."
+msgstr ""
+"Associez un bon de livraison à l'intervention vous permet de les afficher dans l'intervention mobile.\n"
+"Ce champ est automatiquement renseigné lorsque l'interventionest créé depuis une commande dont le ou les bons de livraison ont été générés."
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "CO"
 msgstr "CC"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_real_duration
+msgid "Calculation of actual time spent on the job minus break time. "
+msgstr ""
+"Calcul du temps réel passé sur l'intervention soustrait du temps de pause. "
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_total_duration
+msgid ""
+"Calculation of the time spent between the actual start and end dates of the "
+"intervention."
+msgstr ""
+"Calcul du temps passé entre les dates réelles de début et de fin de "
+"l'intervention."
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_calendar_attendee
@@ -1021,7 +1109,7 @@ msgstr "Société"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Compose Email"
-msgstr ""
+msgstr "Composer un email"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_res_config_settings
@@ -1037,7 +1125,7 @@ msgstr ""
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmer"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
@@ -1261,6 +1349,15 @@ msgid "Default template"
 msgstr "Modèle par défaut"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__name
+msgid ""
+"Define a name for the intervention; by default, the name of the customer and"
+" the task will be used."
+msgstr ""
+"Définissez un nom pour l'intervention ; par défaut, le nom du client et de "
+"la tâche seront utilisés."
+
+#. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__report_title
 msgid "Define a title for the PDF document of the intervention report."
 msgstr "Définir un titre pour le document PDF de rapport d'intervention."
@@ -1269,6 +1366,26 @@ msgstr "Définir un titre pour le document PDF de rapport d'intervention."
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__sheet_title
 msgid "Define a title for the PDF document of the intervention sheet."
 msgstr "Définir un titre pour le document PDF de la fiche d'intervention."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_address_id
+msgid ""
+"Define the address of the intervention site; by default, the customer's "
+"address will be used."
+msgstr ""
+"Définissez l'adresse du lieu de l'intervention, par défaut, l'adresse du "
+"client sera reprise"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_employee_id
+msgid ""
+"Define the person responsible for the intervention from among the selected "
+"participants.By default, the first participant will be entered as the main "
+"technician."
+msgstr ""
+"Définissez un responsable de l'intervention parmi les intervenants "
+"sélectionnés, par défaut, le premier intervenant sera renseigné comme "
+"technicien principal"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
@@ -1327,6 +1444,7 @@ msgid "Department"
 msgstr "Département"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__description
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__description
@@ -1478,11 +1596,16 @@ msgid "Event"
 msgstr "Événement"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_type
+msgid "Event Type"
+msgstr "Type d'événement"
+
+#. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Event without name"
-msgstr ""
+msgstr "Événement sans nom"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
@@ -1536,15 +1659,24 @@ msgid "Force dates"
 msgstr "Forcer les dates"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_force_dates
+msgid ""
+"Forcing the date allows you to ignore other interventions that might "
+"conflict with it."
+msgstr ""
+"Le fait de forcer la date vous permet d'ignorer d'autres interventions qui "
+"pourraient entrer en conflit avec elle."
+
+#. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__calendar_event__of_invoice_status__invoiced
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_intervention_line__invoice_status__invoiced
 msgid "Fully Billed"
-msgstr ""
+msgstr "Entièrement facturé"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Fully Invoiced"
-msgstr ""
+msgstr "Entièrement facturé"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -1691,6 +1823,16 @@ msgstr ""
 "lorsque le contact est créé."
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__allday
+msgid ""
+"If you define an all-day intervention, its start and end timeswill be the "
+"start and end times of the main technician's workday."
+msgstr ""
+"Si vous définissez une intervention sur toute la journée, ses heures de "
+"début et de fin seront les horaires de début et de fin de la journée de "
+"travail du technicien principal."
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
 msgid ""
 "If you remove a task from an employee, remember to review that employee's "
@@ -1790,14 +1932,14 @@ msgstr "Planning des interventions"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "Intervention Planning - %s<br/>Week %s from %s to %s"
-msgstr ""
+msgstr "Planning intervention - %s<br/>Semaine %s du %s au %s"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "Intervention Planning - Week %s from %s to %s"
-msgstr ""
+msgstr "Planning intervention - %s<br/>Semaine %s du %s au %s"
 
 #. module: of_planning
 #. odoo-python
@@ -1826,11 +1968,6 @@ msgstr "Fiche d'intervention - %(name)s - %(date)s"
 #, python-format
 msgid "Intervention Sheet - %s"
 msgstr "Fiche d’intervention - %s"
-
-#. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_tag_ids
-msgid "Intervention Tags"
-msgstr "Étiquettes"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_image__intervention_date
@@ -2011,8 +2148,8 @@ msgid ""
 "Invoiceable lines are linked to order lines. Please do the invoicing from "
 "the sale order."
 msgstr ""
-"Les lignes facturables sont liées aux lignes de commande. Veuillez faire la "
-"facturation depuis la commande."
+"Les lignes facturables sont liées aux lignes de commande. Veuillez effectuer"
+" la facturation à partir l'ordre de vente"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__qty_invoiceable
@@ -2058,7 +2195,7 @@ msgstr "Est un intervenant"
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Join Video Call"
-msgstr ""
+msgstr "Participer à un appel vidéo"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_account_move_line
@@ -2145,6 +2282,16 @@ msgid "Line to invoice"
 msgstr "Ligne à facturer"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_order_id
+msgid ""
+"Link order to task allows you to display the order in the task. This field "
+"is automatically filled in when the intervention is created from an order."
+msgstr ""
+"Associez une commande à l'intervention vous permet d'affiche la commande "
+"dans l'intervention.Ce champ est automatiquement renseigné lorsque "
+"l'intervention est créée depuis une commande."
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__event_ids
 #: model:ir.model.fields,field_description:of_planning.field_stock_picking__of_intervention_ids
 msgid "Linked interventions"
@@ -2163,7 +2310,7 @@ msgstr "BL liés"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__is_locked
 msgid "Locked"
-msgstr ""
+msgstr "Verrouillé"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_internal_layout
@@ -2232,11 +2379,6 @@ msgid "Mobile"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_type
-msgid "Event Type"
-msgstr "Type d'événement"
-
-#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "My Interventions"
 msgstr "Mes interventions"
@@ -2261,21 +2403,21 @@ msgstr "Semaine prochaine"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_alert_unable
 msgid "No operator able"
-msgstr ""
+msgstr "Aucun opérateur capable"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No operator can perform this task."
-msgstr ""
+msgstr "Aucun opérateur capable de performer cette tâche."
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "No partner"
-msgstr ""
+msgstr "Aucun partenaire"
 
 #. module: of_planning
 #. odoo-python
@@ -2437,6 +2579,11 @@ msgid "Origin"
 msgstr "Origine"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_order_still_due
+msgid "Outstanding amount of associated order"
+msgstr "Montant restant dû de la commande associée"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "PHOTOS"
 msgstr ""
@@ -2484,7 +2631,7 @@ msgstr "Téléphone"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_phone_number_ids
 msgid "Phone numbers"
-msgstr ""
+msgstr "Numéros de téléphone"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -2560,6 +2707,12 @@ msgstr "Poste"
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Postponed"
 msgstr "Reporté"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_template_id
+msgid "Prepare the intervention with a pre-configured intervention template"
+msgstr ""
+"Préemplissez l'intervention avec un modèle d'intervention déjà configuré"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_previous_minutes
@@ -2638,6 +2791,8 @@ msgstr "Produit"
 #, python-format
 msgid "Product taxes have been recomputed according to fiscal position %s."
 msgstr ""
+"Les taxes sur les produits ont été recalculées en fonction de la position "
+"fiscale %s."
 
 #. module: of_planning
 #: model:ir.ui.menu,name:of_planning.menu_product_template
@@ -2726,6 +2881,25 @@ msgstr "Fin réelle"
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Recompute all taxes based on this fiscal position"
 msgstr "Recalculer toutes les taxes en fonction de cette position fiscale"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_break_duration
+msgid ""
+"Recorded installation time. Entered automatically if time tracking is "
+"enabled in job configuration."
+msgstr ""
+"Temps de pose enregistré. Renseigné automatiquement si le suivi des temps "
+"est activé dans les configuration des interventions."
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__end_type
+msgid "Recurrence Termination"
+msgstr "Fin de la récurrence"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__recurrency
+msgid "Recurrent"
+msgstr "Récurrent"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.sale_order_view_search
@@ -2835,9 +3009,28 @@ msgid "Sectors"
 msgstr "Secteurs"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_employee_ids
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_team_id
+msgid "Select a team to add all team members to the intervention"
+msgstr ""
+"Sélectionnez un ou plusieurs intervenants qui effectueront l'intervention"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Select attendees..."
 msgstr "Sélectionner les participants..."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_company_id
+#: model:ir.model.fields,help:of_planning.field_of_planning_intervention_line__company_id
+msgid ""
+"Select the intervention company: in the intervention configurations, you can"
+" define whether the intervention company will be the user's or the "
+"customer's company by default."
+msgstr ""
+"Sélectionnez la société de l'intervention, dans les configurations des "
+"interventions, vous pouvez définir si par défaut la société de "
+"l'intervention sera celle de l'utilsiateur ou bien celle du client"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__report_intervention
@@ -2851,7 +3044,7 @@ msgstr ""
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 msgid "Send Email to attendees"
-msgstr ""
+msgstr "Envoyer un email aux invités"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
@@ -3028,6 +3221,7 @@ msgid "Tag list"
 msgstr "Liste des étiquettes"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_tag_ids
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Tags"
@@ -3075,6 +3269,11 @@ msgstr "Description de la tâche"
 #: model:ir.model.fields,help:of_planning.field_of_planning_intervention_template__task_id
 msgid "Task to be carried out during the intervention."
 msgstr "Tâche à réaliser lors de l'intervention."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_task_id
+msgid "Task to be carried out during the operation"
+msgstr "Tâche à effectuer pendant l'opération"
 
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_task
@@ -3167,6 +3366,29 @@ msgstr ""
 #: model:ir.model.fields.selection,name:of_planning.selection__res_company__of_company_choice__contact
 msgid "The contact's company"
 msgstr "Société du contact"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__description
+msgid ""
+"The external description allows you to provide information that will be "
+"communicated to the customer. This description can be added to the "
+"intervention form or report by configuring the intervention models"
+msgstr ""
+"La description externe vous permet de fournir des informations qui seront "
+"communiquées au client. Cette description peut être ajoutée au "
+"d'intervention ou du rapport en configurant les modèles d'intervention"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_internal_description
+msgid ""
+"The internal description allows you to enter information that does not "
+"needto be communicated to the customer. This description can be added to the"
+" intervention form or report by configuring the intervention templates."
+msgstr ""
+"La description interne vous permet de renseigner des informations qui n'ont "
+"pas à être communiqués au client. Cette description peut être ajoutée à la "
+"fiche ou au rapport d'intervention par la configuration des modèles "
+"d'intervention."
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_attach_report
@@ -3270,7 +3492,7 @@ msgstr ""
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__tz
 msgid "Timezone"
-msgstr ""
+msgstr "Fuseau horaire"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_of_planning_team__tz
@@ -3280,7 +3502,7 @@ msgstr "Timezone de l'équipe d'intervention"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__tz_offset
 msgid "Timezone offset"
-msgstr ""
+msgstr "Décalage du fuseau horaire"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -3308,6 +3530,11 @@ msgstr "Demain"
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_sheet_document
 msgid "Total"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_order_amount_total
+msgid "Total amount of associated order"
+msgstr "Montant total de la commande associée"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_total_duration
@@ -3444,6 +3671,11 @@ msgid "VAT"
 msgstr "TVA"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_picking_amount_total
+msgid "Value of sum of associated delivery notes"
+msgstr "Valeur de la somme des bons de livraison associés"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Vendor"
 msgstr "Vendeur"
@@ -3467,7 +3699,7 @@ msgstr "URL d'appel vidéo"
 #: model:ir.model.fields.selection,name:of_planning.selection__calendar_event__of_invoice_status__to_invoice
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_intervention_line__invoice_status__to_invoice
 msgid "Waiting Bills"
-msgstr ""
+msgstr "Factures en attente"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
@@ -3478,6 +3710,16 @@ msgstr "Factures en attente"
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_warehouse_id
 msgid "Warehouse"
 msgstr "Entrepôt"
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_warehouse_id
+msgid ""
+"Warehouse from which the intervention's invoicing lines originate.This field"
+" is mandatory in order to generate a delivery note from an intervention."
+msgstr ""
+"Entrepôt de départ des lignes de facturation de l'intervention. Ce champ est"
+" obligatoire pour pouvoir générer un bon de livraison depuis une "
+"intervention."
 
 #. module: of_planning
 #. odoo-python
@@ -3491,7 +3733,7 @@ msgstr "Avertissement pour %s"
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "Warning, this intervention is in conflict with another one."
-msgstr ""
+msgstr "Attention, cette intervention est en conflit avec une autre."
 
 #. module: of_planning
 #: model:ir.model.fields.selection,name:of_planning.selection__of_planning_print_wizard__report_type__week
@@ -3538,14 +3780,14 @@ msgstr "Hier"
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #, python-format
 msgid "You cannot unlink the default template"
-msgstr ""
+msgstr "Vous ne pouvez pas dissocier le modèle par défaut"
 
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
 #, python-format
 msgid "You need to define a sales journal for this company (%s)."
-msgstr ""
+msgstr "Vous devez définir un journal des ventes pour cette société (%s)."
 
 #. module: of_planning
 #: model:mail.template,subject:of_planning.email_template_of_planning_intervention_report
@@ -3562,7 +3804,7 @@ msgstr "Code postal"
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
 msgid "from %s %s<br/>to %s %s"
-msgstr ""
+msgstr "de %s %s<br/>à %s %s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_view_partner_intervention_warn_form
