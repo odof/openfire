@@ -458,7 +458,7 @@ class OfPlanningInterventionTemplateLine(models.Model):
     def _onchange_product(self):
         product = self.product_id
         self.qty = 1
-        self.price_unit = product.lst_price
+        self.price_unit = product.of_price_used
         if product:
             name = product.name_get()[0][1]
             if product.description_sale:
