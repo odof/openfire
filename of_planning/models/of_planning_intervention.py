@@ -2147,8 +2147,8 @@ class OfPlanningInterventionLine(models.Model):
         """
         for line in self:
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.taxe_ids.compute_all(price, line.currency_id, line.qty,
-                                              product=line.product_id, partner=line.intervention_id.address_id)
+            taxes = line.taxe_ids.compute_all(
+                price, line.currency_id, line.qty, product=line.product_id, partner=line.intervention_id.address_id)
             line.update({
                 'price_tax': taxes['total_included'] - taxes['total_excluded'],
                 'price_total': taxes['total_included'],
@@ -2159,10 +2159,13 @@ class OfPlanningInterventionLine(models.Model):
     def _onchange_product(self):
         product = self.product_id
         self.qty = 1
-        if self.intervention_id.partner_id and self.intervention_id.partner_pricelist_id:
+        if self.product_id.of_is_kit and self.product_id.of_pricing == 'computed':
+            # On ne gère pas correctement les listes de prix pour les kits en prix calculé
+            self.price_unit = product.price_comps
+        elif self.intervention_id.partner_id and self.intervention_id.partner_pricelist_id:
             self.price_unit = self._get_display_price(product)
         else:
-            self.price_unit = product.lst_price
+            self.price_unit = product.list_price
         if product:
             name = product.name_get()[0][1]
             if product.description_sale:
