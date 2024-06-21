@@ -13,7 +13,9 @@
                 </button>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">
-                <field name="of_heat_loss_ids" widget="many2many_tags" domain="[('partner_id', '=', partner_id)]"/>
+                <field name="of_heat_loss_ids" widget="many2many_tags"
+                context="{'default_partner_id': partner_id}"
+                domain="[('partner_id', '=', partner_id)]"/>
             </xpath>
         </field>
     </record>

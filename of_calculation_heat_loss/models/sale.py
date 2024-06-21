@@ -61,3 +61,11 @@ class SaleOrder(models.Model):
         else:
             action = {'type': 'ir.actions.act_window_close'}
         return action
+
+    @api.multi
+    def write(self, vals):
+        if 'of_heat_loss_ids' in vals:
+            for param in vals['of_heat_loss_ids']:
+                if param[0] == 2:
+                    param[0] = 3
+        return super(SaleOrder, self).write(vals)
