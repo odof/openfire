@@ -24,3 +24,4 @@ from . import res_partner
 from . import account_payment
 from . import res_company
 from . import sale_order_template
+from . import product_product
