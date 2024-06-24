@@ -1,0 +1,72 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_esb_odoo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-20 09:51+0000\n"
+"PO-Revision-Date: 2024-11-20 09:51+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__odoo_company_id
+msgid "Company ID"
+msgstr "ID de la société"
+
+#. module: of_esb_odoo
+#: model:ir.model,name:of_esb_odoo.model_of_esb_connection
+msgid "ESB Connection"
+msgstr "Connexion ESB"
+
+#. module: of_esb_odoo
+#: model:ir.model,name:of_esb_odoo.model_of_esb_service
+msgid "ESB Service"
+msgstr "Service ESB"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields.selection,name:of_esb_odoo.selection__of_esb_connection__ttype__odoo
+#: model_terms:ir.ui.view,arch_db:of_esb_odoo.of_esb_connection_form
+msgid "Odoo"
+msgstr "Odoo"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__odoo_base
+msgid "Odoo Base"
+msgstr "Base Odoo"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__odoo_port
+msgid "Odoo Port"
+msgstr "Port Odoo"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__odoo_protocol
+msgid "Odoo Protocol"
+msgstr "Protocole Odoo"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__odoo_server
+msgid "Odoo Server"
+msgstr "Serveur Odoo"
+
+#. module: of_esb_odoo
+#: model:ir.model.fields,field_description:of_esb_odoo.field_of_esb_connection__ttype
+msgid "Type"
+msgstr ""
+
+#. module: of_esb_odoo
+#: model:ir.model.fields.selection,name:of_esb_odoo.selection__of_esb_connection__odoo_protocol__jsonrpc
+msgid "jsonrpc"
+msgstr ""
+
+#. module: of_esb_odoo
+#: model:ir.model.fields.selection,name:of_esb_odoo.selection__of_esb_connection__odoo_protocol__jsonrpc+ssl
+msgid "jsonrpc+ssl"
+msgstr ""

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="user_firebase" model="res.users">
+        <field name="login">firebase</field>
+        <field name="password">th3_P@SSW0RD</field>
+        <field name="partner_id" ref="of_esb_firebase.partner_firebase" />
+        <field name="company_id" ref="base.main_company" />
+        <field name="company_ids" eval="[Command.link(ref('base.main_company'))]" />
+        <field name="groups_id" eval="[Command.set([ref('of_esb.group_esb')])]" />
+    </record>
+
+</odoo>

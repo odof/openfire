@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="main_menu_esb_internal" name="ESB Internal Data" parent="of_esb.menu_of_esb_main" sequence="10"/>
+
+</odoo>
