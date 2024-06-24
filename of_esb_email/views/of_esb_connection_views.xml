@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+     <record id="of_esb_connection_form" model="ir.ui.view">
+        <field name="name">of.esb.connection.form</field>
+        <field name="model">of.esb.connection</field>
+        <field name="inherit_id" ref="of_esb.of_esb_connection_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Email" attrs="{'invisible': [('ttype','!=','email')]}">
+                    <field name="email_server"/>
+                    <field name="email_port"/>
+                    <field name="email_type"/>
+                </group>
+            </xpath>
+        </field>
+
+    </record>
+
+</odoo>

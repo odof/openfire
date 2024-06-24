@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_trigger_operating_data_form" model="ir.ui.view">
+        <field name="name">of.esb.trigger.operating.data.form</field>
+        <field name="model">of.esb.trigger</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="partner_id" required="1"/>
+                    <field name="uuid"/>
+                    <field name="slug_name"/>
+                    <field name="security"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_trigger_operating_data_tree" model="ir.ui.view">
+        <field name="name">of.esb.trigger.operating.data.tree</field>
+        <field name="model">of.esb.trigger</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id" required="1"/>
+                <field name="security"/>
+                <field name="uuid"/>
+                <field name="slug_name"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_trigger_operating_data" model="ir.actions.act_window">
+        <field name="name">Trigger</field>
+        <field name="res_model">of.esb.trigger</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_ttype': 'webhook', 'default_public': True, 'default_is_operating_data': True}</field>
+        <field name="domain">[('is_operating_data','=',True)]</field>
+        <field
+            name="view_ids"
+            eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('of_esb_trigger_operating_data_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('of_esb_trigger_operating_data_form')}
+        )]"
+        />
+    </record>
+
+
+
+</odoo>

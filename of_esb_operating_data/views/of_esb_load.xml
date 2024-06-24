@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_load_form" model="ir.ui.view">
+        <field name="name">of.esb.load.form</field>
+        <field name="model">of.esb.load</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="connection_id"/>
+                    <field name="uuid"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_load_tree" model="ir.ui.view">
+        <field name="name">of.esb.load.tree</field>
+        <field name="model">of.esb.load</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="connection_id"/>
+                <field name="uuid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_load" model="ir.actions.act_window">
+        <field name="name">Load</field>
+        <field name="res_model">of.esb.load</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+</odoo>
