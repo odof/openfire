@@ -1,0 +1,281 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_esb_operating_data
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-20 09:45+0000\n"
+"PO-Revision-Date: 2024-11-20 09:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_base
+msgid "Base"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_export_form
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_import_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__code
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__code
+#: model:ir.model.fields.selection,name:of_esb_operating_data.selection__of_esb_extract_line__type_data__code
+msgid "Code"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__connection_id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__connection_id
+msgid "Connection"
+msgstr "Connexion"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__create_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__create_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__create_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__create_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__create_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__create_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__create_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__create_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__create_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__create_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__data
+#: model:ir.model.fields.selection,name:of_esb_operating_data.selection__of_esb_extract_line__type_data__data
+msgid "Data"
+msgstr "données"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__display_name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__display_name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__display_name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__display_name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__display_name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_load
+msgid "ESB Load"
+msgstr "ESB Load"
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_trigger
+msgid "ESB Trigger"
+msgstr "Déclencheur ESB"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__example
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__example
+msgid "Example"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_export_wizard
+msgid "Export ESB Data"
+msgstr "Exporter les données ESB"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__export_file
+msgid "Export File"
+msgstr "Fichier d'export"
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.of_esb_export_wizard_action
+#: model:ir.ui.menu,name:of_esb_operating_data.of_esb_export_wizard_menu
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_export_form
+msgid "Export JSON"
+msgstr "Exporter JSON"
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.action_of_esb_extract
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_extract
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__extract_id
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data_extract
+msgid "Extract"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_extract_line
+msgid "Extract Line"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__filename
+msgid "Filename"
+msgstr "Nom de fichier"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__id
+msgid "ID"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_import_wizard
+msgid "Import ESB Data"
+msgstr "Importer les données ESB"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__import_file
+msgid "Import File"
+msgstr "Fichier d'import"
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.of_esb_import_wizard_action
+#: model:ir.ui.menu,name:of_esb_operating_data.of_esb_import_wizard_menu
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_import_form
+msgid "Import JSON"
+msgstr "Importer JSON"
+
+#. module: of_esb_operating_data
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data_import_export
+msgid "Import/Export"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_trigger__is_operating_data
+msgid "Is Operating Data"
+msgstr "Est une donnée opérationnelle"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard____last_update
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract____last_update
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line____last_update
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard____last_update
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load____last_update
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__write_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__write_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__write_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__write_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__write_uid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__write_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__write_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__write_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_import_wizard__write_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__write_date
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__lines
+msgid "Lines"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.action_of_esb_load
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__load_id
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data_load
+msgid "Load"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__name
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__name
+msgid "Name"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data
+msgid "Operating Data"
+msgstr "Données opérationnelles"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__partner_id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__partner_id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__partner_id
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_trigger__partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__preview
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.of_esb_transform_form
+msgid "Preview"
+msgstr "Prévisualiser"
+
+#. module: of_esb_operating_data
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.of_esb_transform_form
+msgid "Everything in the 'result' variable will be sent to the 'load' below"
+msgstr "Tout ce qui sera dans la variable 'result' sera envoyé au 'load' ci-dessous"
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.action_of_esb_transform
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__transform_id
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data_transform
+msgid "Transform"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.actions.act_window,name:of_esb_operating_data.action_of_esb_trigger_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_export_wizard__trigger_id
+#: model:ir.ui.menu,name:of_esb_operating_data.menu_operating_data_trigger
+msgid "Trigger"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract_line__type_data
+msgid "Type Data"
+msgstr "Type de données"
+
+#. module: of_esb_operating_data
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_extract__uuid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_load__uuid
+#: model:ir.model.fields,field_description:of_esb_operating_data.field_of_esb_transform__uuid
+msgid "Uuid"
+msgstr ""
+
+#. module: of_esb_operating_data
+#. odoo-python
+#: code:addons/of_esb_operating_data/models/of_esb_transform.py:0
+#, python-format
+msgid "You can not see preview with an extract line of type 'code'"
+msgstr "Vous ne pouvez pas voir l'aperçu avec une ligne d'extraction de type 'code'"
+
+#. module: of_esb_operating_data
+#: model:ir.model,name:of_esb_operating_data.model_of_esb_transform
+msgid "ESB Transform"
+msgstr ""
+
+#. module: of_esb_operating_data
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_export_form
+#: model_terms:ir.ui.view,arch_db:of_esb_operating_data.wizard_of_esb_import_form
+msgid "or"
+msgstr "ou"

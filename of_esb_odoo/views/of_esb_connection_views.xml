@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_connection_form" model="ir.ui.view">
+        <field name="name">of.esb.connection.form</field>
+        <field name="model">of.esb.connection</field>
+        <field name="inherit_id" ref="of_esb.of_esb_connection_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <group string="Odoo" attrs="{'invisible': [('ttype','!=','odoo')]}">
+                    <field name="odoo_server"/>
+                    <field name="odoo_port"/>
+                    <field name="odoo_base"/>
+                    <field name="odoo_company_id"/>
+                    <field name="odoo_protocol"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

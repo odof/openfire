@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_of_esb_main" name="OF ESB">
+        <menuitem id="menu_of_esb_history" name="History" action="action_of_esb_history"/>
+        <menuitem id="menu_of_esb_configuration" name="Configuration">
+            <menuitem id="menu_of_esb_rule" name="Rules" action="action_of_esb_rule"/>
+            <menuitem id="menu_of_esb_service" name="Services" action="action_of_esb_service"/>
+            <menuitem id="menu_of_esb_connection" name="Connections" action="action_of_esb_connection"/>
+            <menuitem id="menu_of_esb_security" name="Security" action="action_of_esb_security"/>
+            <menuitem id="menu_of_esb_trigger" name="Triggers" action="action_of_esb_trigger"/>
+        </menuitem>
+        <menuitem id="menu_of_esb_debug" name="Debug">
+            <menuitem id="menu_of_esb_bus" name="Buses" action="action_of_esb_bus"/>
+            <menuitem id="menu_of_esb_data" name="Data" action="action_of_esb_data"/>
+        </menuitem>
+    </menuitem>
+
+
+</odoo>

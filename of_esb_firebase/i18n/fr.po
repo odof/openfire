@@ -1,0 +1,57 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_esb_firebase
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-20 09:56+0000\n"
+"PO-Revision-Date: 2024-11-20 09:56+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_esb_firebase
+#: model:ir.model.fields.selection,name:of_esb_firebase.selection__of_esb_connection__firebase_environment__development
+msgid "Development"
+msgstr "Développement"
+
+#. module: of_esb_firebase
+#: model:ir.model,name:of_esb_firebase.model_of_esb_connection
+msgid "ESB Connection"
+msgstr "Connexion ESB"
+
+#. module: of_esb_firebase
+#: model:ir.model,name:of_esb_firebase.model_of_esb_service
+msgid "ESB Service"
+msgstr "Service ESB"
+
+#. module: of_esb_firebase
+#: model:ir.model.fields.selection,name:of_esb_firebase.selection__of_esb_connection__ttype__firebase
+#: model_terms:ir.ui.view,arch_db:of_esb_firebase.of_esb_connection_form
+msgid "Firebase"
+msgstr ""
+
+#. module: of_esb_firebase
+#: model:ir.model.fields,field_description:of_esb_firebase.field_of_esb_connection__firebase_environment
+msgid "Firebase Environment"
+msgstr "Environnement Firebase"
+
+#. module: of_esb_firebase
+#: model:ir.model.fields.selection,name:of_esb_firebase.selection__of_esb_connection__firebase_environment__production
+msgid "Production"
+msgstr ""
+
+#. module: of_esb_firebase
+#: model:ir.model.fields,field_description:of_esb_firebase.field_of_esb_connection__firebase_service_account_file
+msgid "Service Account File"
+msgstr "Fichier de compte de service"
+
+#. module: of_esb_firebase
+#: model:ir.model.fields,field_description:of_esb_firebase.field_of_esb_connection__ttype
+msgid "Type"
+msgstr ""
