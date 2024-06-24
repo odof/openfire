@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-15 15:24+0000\n"
-"PO-Revision-Date: 2024-04-15 15:24+0000\n"
+"POT-Creation-Date: 2024-06-28 12:47+0000\n"
+"PO-Revision-Date: 2024-06-28 12:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -267,6 +267,17 @@ msgid "Archived"
 msgstr "Archivé"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__tech_sector_id
+msgid ""
+"Assigns the customer's technical area according to their zip code. "
+"Automatically filled in if the \"Auto. sector assignment\" option is "
+"activated in the service configuration."
+msgstr ""
+"Attribut le secteur technique du client en fonction de son code postal. "
+"Automatiquement renseigné si l'option \"Affectation auto. des secteurs\" est"
+" activé dans la configuration des interventions."
+
+#. module: of_service
 #: model:ir.model,name:of_service.model_ir_attachment
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -420,25 +431,14 @@ msgid "Customer"
 msgstr "Client"
 
 #. module: of_service
-#: model:ir.model.fields,help:of_service.field_of_service_request__day_ids
-msgid "Customer availability days."
-msgstr "Disponibilité du client"
+#: model:ir.model.fields,help:of_service.field_of_service_request__partner_tag_ids
+msgid "Customer's tags"
+msgstr "Etiquettes du client"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__request_label_date
 msgid "Date"
 msgstr ""
-
-#. module: of_service
-#: model:ir.model.fields,help:of_service.field_of_service_request__end_date
-msgid "Date from which intervention becomes overdue"
-msgstr ""
-"Date à partir de laquelle l'intervention devient en retard de planification"
-
-#. module: of_service
-#: model:ir.model.fields,help:of_service.field_of_service_request__next_date
-msgid "Date from which to schedule the next intervention"
-msgstr "Date à partir de laquelle programmer le prochain RDV"
 
 #. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__last_intervention_date
@@ -453,6 +453,25 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__day_ids
 msgid "Days"
 msgstr "Jours"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__day_ids
+msgid ""
+"Days of the week on which to schedule service calls. These days are used by "
+"default in the service request planning tool."
+msgstr ""
+"Jours de la semaine sur lequel planifier les interventions de la demande "
+"d'intervention. Ces jours sont utilisés par défaut dans l'outil de "
+"planification de la demande d'intervention."
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__address_id
+msgid ""
+"Define the address of the intervention site; by default, the customer's "
+"address will be used."
+msgstr ""
+"Définissez l'adresse du lieu de l'intervention, par défaut, l'adresse du "
+"client sera reprise"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__department_id
@@ -522,6 +541,28 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
 msgid "End of contract"
 msgstr "Fin de contrat"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__task_name
+msgid "Enter a task name"
+msgstr "Entrez un nom de tâche"
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__duration
+msgid ""
+"Estimate of the duration of the intervention(s) to be carried out as part of the service request.\n"
+"The planned duration is the cumulative time of the interventions linked to this service request.\n"
+"The remaining time is the result of the estimated time and the planned time.\n"
+"It is used to define the status of the service request:\n"
+"* Partially planned if the remaining duration is greater than 0\n"
+"* Planned if remaining duration is equal to 0"
+msgstr ""
+"Estimation de la durée d'une ou plusieurs interventions à réaliser dans le cadre de la demande d'intervention.\n"
+"La durée planifiée est le temps cumulé des interventions liées à cette demande d'intervention.\n"
+"La durée restante est le résultat de la durée estimée et de la durée planifiée.\n"
+"Elle permet de définir l'état de la demande d'intervention : \n"
+"* Partiellement planifiée si la durée restante est supérieure à 0\n"
+"* Planifiée si la durée restante est égale à 0"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__duration
@@ -690,16 +731,14 @@ msgstr "Modèle d'intervention"
 #: model:ir.model.constraint,message:of_service.constraint_of_service_request_duration_not_null_constraint
 #, python-format
 msgid "Intervention duration must be greater than 0!"
-msgstr "La durée de l'intervention doit être supérieure à 0!"
+msgstr "La durée de l'intervention doit être supérieure à 0 !"
 
 #. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__history_intervention_ids
 msgid ""
 "Intervention history of the installed products. If no installed products, "
 "address history"
-msgstr ""
-"Historique des RDVs du parc installé. Si pas de parc installé, historique de"
-" l'adresse"
+msgstr "Historique des interventions planifiées de la demande d'intervention."
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_ir_attachment__of_intervention_report
@@ -835,6 +874,16 @@ msgid "Lines"
 msgstr "Lignes"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__order_id
+msgid ""
+"Link order to task allows you to display the order in the task. This field "
+"is automatically filled in when the intervention is created from an order."
+msgstr ""
+"Associez une commande à l'intervention vous permet d'affiche la commande "
+"dans l'intervention. Ce champ est automatiquement renseigné lorsque "
+"l'intervention est créée depuis une commande."
+
+#. module: of_service
 #: model:ir.model.fields.selection,name:of_service.selection__of_service_request__priority__0
 msgid "Low"
 msgstr "Bas"
@@ -857,6 +906,7 @@ msgstr ""
 #: model:ir.actions.act_window,name:of_service.action_of_service_request_maintenance
 #: model:ir.ui.menu,name:of_service.menu_of_service_maintenance
 #: model:ir.ui.menu,name:of_service.menu_of_service_request_maintenance_maintenance_first
+#: model:of.service.request.type,name:of_service.of_service_request_type_maintenance
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
 msgid "Maintenance"
 msgstr "Entretien - Maintenance"
@@ -1110,6 +1160,17 @@ msgid "Planning end date"
 msgstr "Date de fin de planification"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__end_date
+msgid ""
+"Planning end date of service request.\n"
+"After this date, the service request changes status to \"In planning delay\".\n"
+"This date is used as the default end date in the service request planning tool."
+msgstr ""
+"Date de fin de planification de la demande d'intervention.\n"
+"Après cette date la demande d'intervention passe en état \"En retard de planification\".\n"
+"Cette date est utilisée comme date de fin par défaut dans l'outil de planification de la demande d'intervention."
+
+#. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_planning_intervention_template__planning_granularity
 msgid "Planning granularity"
 msgstr "Granularité du planning"
@@ -1118,6 +1179,17 @@ msgstr "Granularité du planning"
 #: model:ir.model.fields,help:of_service.field_of_service_request__month_ids
 msgid "Planning reference months."
 msgstr "Mois de référence pour la planification."
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__next_date
+msgid ""
+"Planning start date of the service request.\n"
+"Date from which the service request becomes \"To be planned quickly\".\n"
+"This date is used as the default start date in the service request planning tool."
+msgstr ""
+"Date de début de planification de la demande d'intervention.\n"
+"Date à partir de laquelle la demande d'intervention passe en état \"A planifier rapidement\".\n"
+"Cette date est utilisée comme date de début par défaut dans l'outil de planification de la demande d'intervention."
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__state
@@ -1139,6 +1211,13 @@ msgid ""
 msgstr ""
 "Attention, l'intervenant sélectionné n'est pas totalement disponible à la "
 "date choisie, les dates des nouveaux RDV seront forcées."
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__template_id
+msgid "Pre-fill your intervention with a pre-configured intervention template."
+msgstr ""
+"Pré-remplissez votre intervention avec un modèle d'intervention déjà "
+"configuré."
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__precision
@@ -1315,6 +1394,27 @@ msgid "Scheduled for %s"
 msgstr "Planifié pour %s"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__company_id
+#: model:ir.model.fields,help:of_service.field_of_service_request_line__company_id
+msgid ""
+"Select the intervention company: in the intervention configurations, you can"
+" define whether the intervention company will be the user's or the "
+"customer's company by default."
+msgstr ""
+"Sélectionnez la société de l'intervention : dans les configurations des "
+"interventions, vous pouvez définir si par défaut la société de "
+"l'intervention sera celle de l'utilisateur ou bien celle du client."
+
+#. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__employee_ids
+msgid ""
+"Select the interventionists who will be defined by default in the "
+"interventions of the intervention request."
+msgstr ""
+"Sélectionnez les intervenants qui seront définis par défaut dans les "
+"interventions de la demande d'intervention"
+
+#. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Send Email"
 msgstr "Envoyer mail"
@@ -1483,6 +1583,12 @@ msgid "Task"
 msgstr "Tâche"
 
 #. module: of_service
+#: model:ir.model.fields,help:of_service.field_of_service_request__task_id
+#: model:ir.model.fields,help:of_service.field_of_service_request_create_intervention_line_wizard__request_task_id
+msgid "Task to be carried out during the operation."
+msgstr "Tâche à réaliser lors de l'intervention."
+
+#. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__price_tax
 #: model:ir.model.fields,field_description:of_service.field_of_service_request_line__price_tax
 msgid "Taxes"
@@ -1499,14 +1605,25 @@ msgid "Technical Sector"
 msgstr "Secteur technique"
 
 #. module: of_service
+#: model:of.service.request.type,name:of_service.of_service_request_type_technical
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
 msgid "Technical Visit"
 msgstr "Visite technique"
 
 #. module: of_service
-#: model:of.service.request.type,name:of_service.of_service_request_type_technical
-msgid "Technical visit"
-msgstr "Visite technique"
+#: model:ir.model.fields,help:of_service.field_of_service_request__type_id
+msgid ""
+"The type allows you to categorize the intervention:\n"
+"* Servicing - Maintenance\n"
+"* Installation\n"
+"* AFTER-SALES SERVICE\n"
+"* Technical visit"
+msgstr ""
+"Le type permet de catégoriser l'intervention :\n"
+"* Entretien - Maintenance\n"
+"* Installation\n"
+"* SERVICE APRÈS-VENTE\n"
+"* Visite technique"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search

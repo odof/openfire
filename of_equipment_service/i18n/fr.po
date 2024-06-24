@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 13:21+0000\n"
-"PO-Revision-Date: 2024-04-04 13:21+0000\n"
+"POT-Creation-Date: 2024-06-19 09:18+0000\n"
+"PO-Revision-Date: 2024-06-19 09:18+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -79,6 +79,13 @@ msgstr "<span>N° de série&amp;nbsp;:</span>"
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
 msgid "<strong>Equipment</strong>"
 msgstr "<strong>Équipement</strong>"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request__use_equipment
+msgid ""
+"Activate this field to add one or more items of equipment to be worked on."
+msgstr ""
+"Activez ce champ pour ajouter un ou plusieurs équipements sur lesquels va porter l'intervention."
 
 #. module: of_equipment_service
 #: model:ir.actions.act_window,name:of_equipment_service.action_of_service_request_after_sales
@@ -280,7 +287,8 @@ msgstr "Temps de prise en compte (heures)"
 msgid ""
 "See for which equipment of a Service Request an intervention is "
 "planned/done."
-msgstr "Voyez pour quel équipement d'une DI une intervention est planifiée/terminée"
+msgstr ""
+"Voyez pour quel équipement d'une DI une intervention est planifiée/terminée"
 
 #. module: of_equipment_service
 #: model:ir.model,name:of_equipment_service.model_of_service_request

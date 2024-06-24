@@ -97,7 +97,6 @@ class OFServiceRequest(models.Model):
             ('done', "Done"),
             ('cancel', "Cancelled"),
         ],
-        string="State Punctual",
         compute='_compute_state_punctual',
         store=True,
         help="State for non recurrent request. If the request is recurrent, the punctual state is null.",
@@ -108,7 +107,11 @@ class OFServiceRequest(models.Model):
         comodel_name='calendar.event', inverse_name='of_request_id', string="Interventions"
     )
     intervention_count = fields.Integer(string="# Interventions", compute='_compute_intervention_count')
-    template_id = fields.Many2one(comodel_name='of.planning.intervention.template', string="Intervention Template")
+    template_id = fields.Many2one(
+        comodel_name='of.planning.intervention.template',
+        string="Intervention Template",
+        help="Pre-fill your intervention with a pre-configured intervention template.",
+    )
 
     # Type, tags and stage
     type_id = fields.Many2one(
@@ -118,6 +121,11 @@ class OFServiceRequest(models.Model):
         store=True,
         readonly=False,
         required=True,
+        help="The type allows you to categorize the intervention:\n"
+        "* Servicing - Maintenance\n"
+        "* Installation\n"
+        "* AFTER-SALES SERVICE\n"
+        "* Technical visit",
     )
     tag_ids = fields.Many2many(
         string="Tags",
@@ -147,6 +155,7 @@ class OFServiceRequest(models.Model):
         store=True,
         readonly=False,
         required=True,
+        help="Task to be carried out during the operation.",
     )
     company_id = fields.Many2one(
         comodel_name='res.company',
@@ -155,6 +164,9 @@ class OFServiceRequest(models.Model):
         compute='_compute_company_id',
         store=True,
         readonly=False,
+        help="Select the intervention company: in the intervention configurations, "
+        "you can define whether the intervention company "
+        "will be the user's or the customer's company by default.",
     )
     user_id = fields.Many2one(comodel_name='res.users', string="User", default=lambda r: r.env.user)
     stage_id = fields.Many2one(
@@ -167,7 +179,11 @@ class OFServiceRequest(models.Model):
         group_expand='_read_group_stage_ids',
     )
     employee_ids = fields.Many2many(
-        comodel_name='hr.employee', string="Operators", domain=lambda self: self._domain_employee_ids()
+        comodel_name='hr.employee',
+        string="Operators",
+        domain=lambda self: self._domain_employee_ids(),
+        help="Select the interventionists who will be "
+        "defined by default in the interventions of the intervention request.",
     )
     last_attachment_id = fields.Many2one(
         comodel_name='ir.attachment', string="Last report", compute='_compute_last_attachment_id'
@@ -188,6 +204,7 @@ class OFServiceRequest(models.Model):
         compute='_compute_address_id',
         store=True,
         readonly=False,
+        help="Define the address of the intervention site; by default, the customer's address will be used.",
     )
     address_address = fields.Char(string="Address", related='address_id.contact_address', readonly=True)
     address_street = fields.Char(string="Street", related='address_id.street', readonly=True)
@@ -198,7 +215,12 @@ class OFServiceRequest(models.Model):
     address_mobile = fields.Char(string="Mobile", related='address_id.mobile', readonly=True)
     address_email = fields.Char(string="Email", related='address_id.email', readonly=True)
     tech_sector_id = fields.Many2one(
-        string="Tech Sector", related='address_id.of_tech_sector_id', readonly=True, store=True
+        string="Tech Sector",
+        related='address_id.of_tech_sector_id',
+        readonly=True,
+        store=True,
+        help="Assigns the customer's technical area according to their zip code. "
+        "Automatically filled in if the \"Auto. sector assignment\" option is activated in the service configuration.",
     )
     department_id = fields.Many2one(
         comodel_name='res.country.department',
@@ -211,18 +233,36 @@ class OFServiceRequest(models.Model):
 
     # ===== Planning fields =====
     # Dates
-    next_date = fields.Date(string="Next planning", help="Date from which to schedule the next intervention")
+    next_date = fields.Date(
+        string="Next planning",
+        help="Planning start date of the service request.\n"
+        "Date from which the service request becomes \"To be planned quickly\".\n"
+        "This date is used as the default start date in the service request planning tool.",
+    )
     last_next_date = fields.Date(help="Field to keep rollback capability")
     end_date = fields.Date(
         string="Planning end date",
-        help="Date from which intervention becomes overdue",
         compute='_compute_end_date',
         store=True,
         readonly=False,
+        help="Planning end date of service request.\n"
+        "After this date, the service request changes status to \"In planning delay\".\n"
+        "This date is used as the default end date in the service request planning tool.",
     )
     contract_end_date = fields.Date(string="Contract end date")
     # Duration
-    duration = fields.Float(string="Estimated Duration", compute='_compute_duration', store=True, readonly=False)
+    duration = fields.Float(
+        string="Estimated Duration",
+        compute='_compute_duration',
+        store=True,
+        readonly=False,
+        help="Estimate of the duration of the intervention(s) to be carried out as part of the service request.\n"
+        "The planned duration is the cumulative time of the interventions linked to this service request.\n"
+        "The remaining time is the result of the estimated time and the planned time.\n"
+        "It is used to define the status of the service request:\n"
+        "* Partially planned if the remaining duration is greater than 0\n"
+        "* Planned if remaining duration is equal to 0",
+    )
     planned_duration = fields.Float(compute='_compute_durations', store=True)
     remaining_duration = fields.Float(compute='_compute_durations', store=True)
 
@@ -254,7 +294,8 @@ class OFServiceRequest(models.Model):
         column2='day_id',
         string="Days",
         default=lambda self: self._default_days(),
-        help="Customer availability days.",
+        help="Days of the week on which to schedule service calls. "
+        "These days are used by default in the service request planning tool.",
     )
     month_ids = fields.Many2many(
         comodel_name='of.months',
@@ -266,13 +307,17 @@ class OFServiceRequest(models.Model):
     )
 
     # partner_id.category_id is a M2M field
-    partner_tag_ids = fields.Many2many(string="Partner Tags", related='partner_id.category_id', readonly=True)
+    partner_tag_ids = fields.Many2many(
+        string="Partner Tags", related='partner_id.category_id', readonly=True, help="Customer's tags"
+    )
 
     # ===== Order fields =====
     order_id = fields.Many2one(
         comodel_name='sale.order',
         string="Order",
         domain="['|', ('partner_id', 'child_of', partner_id), ('partner_id', 'parent_of', partner_id)]",
+        help="Link order to task allows you to display the order in the task. "
+        "This field is automatically filled in when the intervention is created from an order.",
     )
     order_ids = fields.Many2many(comodel_name='sale.order', compute='_compute_order_ids', string="Orders", store=True)
     order_count = fields.Integer(string="# Orders", compute='_compute_order_ids', compute_sudo=True)

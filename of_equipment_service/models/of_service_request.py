@@ -8,7 +8,10 @@ class OFServiceRequest(models.Model):
     _inherit = 'of.service.request'
 
     # Equipment
-    use_equipment = fields.Boolean(string="Use Equipments")
+    use_equipment = fields.Boolean(
+        string="Use Equipments",
+        help="Activate this field to add one or more items of equipment to be worked on.",
+    )
     equipment_ids = fields.Many2many(
         comodel_name='of.equipment',
         relation='of_service_request_equipment_rel',
