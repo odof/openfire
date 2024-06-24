@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="partner_esb" model="res.partner">
+        <field name="name">ESB</field>
+        <field name="company_id" ref="base.main_company" />
+    </record>
+
+</odoo>
