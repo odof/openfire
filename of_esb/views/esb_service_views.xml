@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="esb_service_form" model="ir.ui.view">
+        <field name="name">esb.service.form</field>
+        <field name="model">esb.service</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="execute" type="object" string="Execute"/>
+                    <button name="execute_with_delay" type="object" string="Execute with delay"/>
+
+                </header>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="exec_active"/>
+                    </group>
+
+                    <field name="code" widget="ace" options="{'mode': 'python'}"/>
+                </group>
+                    <span>
+                        Les arguments envoyés dans la fonction sont dans le dictionnaire args<br/>
+                        Pour retourner un résultat, il suffit de l'affecter à la variable args
+                        exemple : args['result'] = "mon resultat"
+                    </span>
+            </form>
+        </field>
+    </record>
+
+    <record id="esb_service_tree" model="ir.ui.view">
+        <field name="name">esb.service.tree</field>
+        <field name="model">esb.service</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="exec_active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_esb_service" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">esb.service</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+</odoo>

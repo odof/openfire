@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="esb_rule_form" model="ir.ui.view">
+        <field name="name">esb.rule.form</field>
+        <field name="model">esb.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="channel"/>
+                    <field name="ttype"/>
+                    <field name="service"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="esb_rule_tree" model="ir.ui.view">
+        <field name="name">esb.rule.tree</field>
+        <field name="model">esb.rule</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="channel"/>
+                <field name="ttype"/>
+                <field name="service"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_esb_rule" model="ir.actions.act_window">
+        <field name="name">Rules</field>
+        <field name="res_model">esb.rule</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+</odoo>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="esb_bus_form" model="ir.ui.view">
+        <field name="name">esb.bus.form</field>
+        <field name="model">esb.bus</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="channel"/>
+                    <field name="ttype"/>
+                    <field name="data"/>
+                    <field name="uuid"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="esb_bus_tree" model="ir.ui.view">
+        <field name="name">esb.bus.tree</field>
+        <field name="model">esb.bus</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="channel"/>
+                <field name="ttype"/>
+                <field name="uuid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_esb_bus" model="ir.actions.act_window">
+        <field name="name">Bus</field>
+        <field name="res_model">esb.bus</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+</odoo>
