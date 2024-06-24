@@ -567,6 +567,11 @@ msgid "All images"
 msgstr "Toutes les images"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_hr_employee__of_team_ids
+msgid "Allows you to assign one or more teams to the employee."
+msgstr "Permet de donner une ou plusieurs équipe(s) à l'employé."
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_search
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_tag_view_search
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_task_view_search
@@ -900,6 +905,25 @@ msgid ""
 msgstr ""
 "Définit la société dans laquelle les interventions, les demandes d'intervention, les services après-vente et "
 "les parcs installés seront créés."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_hr_employee__of_task_ids
+msgid ""
+"Defines the tasks for which the employee is qualified.Tasks can be set in "
+"the \"Tasks\" submenu of the intervention configuration."
+msgstr ""
+"Permet de définir les tâches pour lesquelles l'employé est apte.\n"
+"Les tâches sont paramétrables dans le sous-menu \"Tâches\" de la configuration des interventions."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_hr_employee__of_is_salesperson
+msgid "Defines whether the employee is a salesperson."
+msgstr "Permet de définir si l'employé est un commercial."
+
+#. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_hr_employee__of_is_operator
+msgid "Defines whether the employee is a technician."
+msgstr "Permet de définir si l'employé est un technicien."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__qty_delivered
@@ -2203,8 +2227,8 @@ msgid ""
 "Send the schedule to the employee's e-mail address each evening,when the employee has appointments for the "
 "following day."
 msgstr ""
-"Envoyer le planning à l'adresse e-mail de l'employé chaque soir, lorsque l'employé a des rendez-vous pour le "
-"lendemain."
+"Permet d'envoyer le planning de l'employé chaque soir "
+"par email lorsque l'employé à des interventions le lendemain."
 
 #. module: of_planning
 #: model:mail.template,description:of_planning.email_template_planning

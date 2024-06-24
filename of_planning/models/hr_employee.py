@@ -19,17 +19,27 @@ class HREmployee(models.Model):
         column1='employee_id',
         column2='task_id',
         string="Tasks",
+        help="Defines the tasks for which the employee is qualified.\n"
+        "Tasks can be set in the \"Tasks\" submenu of the intervention configuration.",
     )
-    of_all_tasks = fields.Boolean(string="Able to handle all task", default=True)
+    of_all_tasks = fields.Boolean(
+        string="Able to handle all task",
+        default=True,
+    )
     of_team_ids = fields.Many2many(
         comodel_name='of.planning.team',
         relation='of_team_employee_rel',
         column1='employee_id',
         column2='team_id',
         string="Teams",
+        help="Allows you to assign one or more teams to the employee.",
     )
-    of_is_operator = fields.Boolean(string="Is an operator", default=False)
-    of_is_salesperson = fields.Boolean(string="Is a salesperson", default=False)
+    of_is_operator = fields.Boolean(
+        string="Is an operator", default=False, help="Defines whether the employee is a technician."
+    )
+    of_is_salesperson = fields.Boolean(
+        string="Is a salesperson", default=False, help="Defines whether the employee is a salesperson."
+    )
     of_daily_email = fields.Boolean(
         string="Send email a day before the appointment",
         default=False,
