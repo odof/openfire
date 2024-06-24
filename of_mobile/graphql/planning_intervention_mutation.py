@@ -24,7 +24,7 @@ class PlanningInterventionSendReport(graphene.Mutation):
         if not intervention:
             raise AccessError(f"Unable to find intervention with id: {id}")
 
-        intervention.action_send_reports()
+        intervention.action_send_reports_by_email()
 
         return intervention
 

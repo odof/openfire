@@ -813,28 +813,11 @@ class CalendarEvent(models.Model):
         self.write({'of_state': 'ongoing'})
 
     def action_button_done(self):
-        # on lance l'impression du rapport si besoin
-        if self.of_attach_report:
-            pdf, extension = self.env['ir.actions.report']._render_qweb_pdf(
-                'of_planning.report_intervention_report', res_ids=self.ids
-            )
-
-            self.env['ir.attachment'].sudo().create(
-                {
-                    'name': _("Intervention Report"),
-                    'type': 'binary',
-                    'datas': base64.b64encode(pdf),
-                    'mimetype': 'application/pdf',
-                    'res_model': 'calendar.event',
-                    'res_id': self.id,
-                }
-            )
-
-        self.write({'of_state': 'done'})
-        if events_report_auto := self.filtered(
-            lambda e: e.of_template_id and e.of_template_id.send_reports == 'auto_done'
-        ):
-            events_report_auto.action_send_reports()
+        self.action_attach_reports()
+        # Avoid writing on records that are already done
+        if events_not_done := self.filtered(lambda e: e.of_state != 'done'):
+            events_not_done.with_context(of_from_button=True).write({'of_state': 'done'})
+        self.action_send_reports_auto_done()
 
     def action_button_unfinished(self):
         self.write({'of_state': 'unfinished'})
@@ -874,7 +857,47 @@ class CalendarEvent(models.Model):
             'context': ctx,
         }
 
-    def action_send_reports(self):
+    def action_attach_reports(self):
+        """
+        Attach reports to the intervention if needed.
+
+        This method generates a PDF report for each event in the current selection and attaches it to the intervention
+        as a binary attachment.
+
+        Returns:
+            None
+        """
+        for event in self:
+            if event.of_attach_report:
+                pdf, extension = self.env['ir.actions.report']._render_qweb_pdf(
+                    'of_planning.report_intervention_report', res_ids=event.ids
+                )
+
+                self.env['ir.attachment'].sudo().create(
+                    {
+                        'name': _("Intervention Report"),
+                        'type': 'binary',
+                        'datas': base64.b64encode(pdf),
+                        'mimetype': 'application/pdf',
+                        'res_model': 'calendar.event',
+                        'res_id': event.id,
+                    }
+                )
+
+    def action_send_reports_auto_done(self):
+        """
+        Sends reports for events with 'auto_done' send_reports option.
+        This method filters the events based on the 'send_reports' option of the associated template.
+
+        Returns:
+            None
+        """
+        if events_report_auto := self.filtered(
+            lambda e: e.of_template_id and e.of_template_id.send_reports == 'auto_done'
+        ):
+            events_report_auto.action_send_reports_by_email()
+
+    def action_send_reports_by_email(self):
         for event in self:
             try:
                 email_template = self.env.ref('of_planning.email_template_of_planning_intervention_report')
