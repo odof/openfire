@@ -6,8 +6,8 @@ from odoo import api, fields, models
 class OFSector(models.Model):
     _name = 'of.sector'
 
-    name = fields.Char(string="Title", required=True)
-    code = fields.Char()
+    name = fields.Char(string="Title", required=True, help="Define a sector name")
+    code = fields.Char(help="Define a sector code")
     type = fields.Selection(
         selection=[
             ('technical', "Technical"),
@@ -17,6 +17,8 @@ class OFSector(models.Model):
         string="Sector type",
         required=True,
         default='technical_commercial',
+        help="The sector can be differentiated between \"Technical sector\" and \"Commercial sector\", "
+        "and you can choose a single type or apply both types to the sector.",
     )
     zip_range_ids = fields.One2many(comodel_name='of.sector.zip.range', inverse_name='sector_id', string="Postal codes")
     active = fields.Boolean(default=True)
