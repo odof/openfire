@@ -617,6 +617,7 @@ CalendarView.include({
                                         if (_.contains(self.now_filter_ids, key) &&
                                             self.all_filters[self.res_ids_indexes[key]].is_checked) {
                                             // at least one of the attendees of this events is checked in the filters
+                                            e.attendee_index = self.res_ids_indexes[key];
                                             events_temp.push(e);
                                             // quand on montre les créneaux dispo,
                                             // on duplique les events pour conserver l'alignement des colonnes
@@ -633,6 +634,7 @@ CalendarView.include({
                                         ? e[self.color_field] : e[self.color_field][0];
                                     if (_.contains(self.now_filter_ids, key) &&
                                         self.all_filters[self.res_ids_indexes[key]].is_checked) {
+                                        e.attendee_index = self.res_ids_indexes[key];
                                         events_temp.push(e);
                                     }
                                 }
@@ -655,6 +657,7 @@ CalendarView.include({
                                     if (_.contains(self.now_filter_ids, key) &&
                                         self.all_filters[self.res_ids_indexes[key]].is_checked) {
                                         // at least one of the attendees of this events is checked in the filters
+                                        events[ie].attendee_index = self.res_ids_indexes[key];
                                         events_temp.push(events[ie]);
                                         added = true;
                                         // quand on montre les créneaux dispo,
@@ -669,9 +672,11 @@ CalendarView.include({
                                 // si aucun participant n'a son filtre coché
                                 // mais que le filtre "tout le monde" est coché, on ajoute l'event
                                 if (!added && self.all_filters[-1] && self.all_filters[-1].is_checked) {
+                                    events[ie].attendee_index = self.all_filters.length - 1;
                                     events_temp.push(events[ie]);
                                 }
                             }else{
+                                events[ie].attendee_index = 0;
                                 events_temp.push(events[ie])
                             }
                         }
@@ -1341,6 +1346,7 @@ CalendarView.include({
             'attendees':attendees,
             'is_attendee_col': evt.is_attendee_col,
             'is_holiday': evt.ferie,  // fonctionnement ajouté dans fullcalendar pour l'affichage en mode jour
+            'attendee_index': evt.attendee_index,
         };
         if (evt.employee_id != false) {
             r['attendee_avatars'] = the_title_avatar;

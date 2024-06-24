@@ -177,6 +177,14 @@ CalendarView.include({
                 var attendee_data, creneaux_dispo_jour, creneau_dispo, cmpt_id = -1;
                 for (var k in self.now_filter_ids) {
                     var now_filter_id = self.now_filter_ids[k]
+                    var attendee_index = 99;
+                    for (var l in self.all_filters) {
+                        if (self.all_filters[l].value == now_filter_id) {
+                            attendee_index = l;
+                            break;
+                        }
+                    }
+                    
                     attendee_data = self.res_horaires_info[now_filter_id];
                     if (!isNullOrUndef(attendee_data)) {
                         for (var i=0; i<attendee_data.creneaux_dispo.length; i++) {
@@ -192,6 +200,7 @@ CalendarView.include({
                                 creneau_dispo["state"] = "Dispo";
                                 creneau_dispo["state_int"] = 0;
                                 creneau_dispo["virtuel"] = true;
+                                creneau_dispo["attendee_index"] = attendee_index;
                                 self.events_dispo.push(creneau_dispo)
                                 cmpt_id--;
                             }
