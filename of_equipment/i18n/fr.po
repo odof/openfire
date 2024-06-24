@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-18 06:19+0000\n"
-"PO-Revision-Date: 2024-04-18 06:19+0000\n"
+"POT-Creation-Date: 2024-06-28 15:46+0000\n"
+"PO-Revision-Date: 2024-06-28 15:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -94,9 +94,97 @@ msgid "Active"
 msgstr ""
 
 #. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_is_compliant
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_is_compliant
+msgid ""
+"Adds equipment conformity to the \"Equipment\" section of the PDF document."
+msgstr ""
+"Ajoute la conformité de l'équipement dans la partie \"Équipement\" du "
+"document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_installation_type
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_installation_type
+msgid ""
+"Adds equipment installation type to the \"Equipment\" section of the PDF "
+"document."
+msgstr ""
+"Ajoute le type d'installation de l'équipement dans la partie \"Équipement\" "
+"du document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_product_category_id
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_product_category_id
+msgid ""
+"Adds the equipment category to the \"Equipment\" section of the PDF "
+"document."
+msgstr ""
+"Ajoute la catégorie de l'équipement dans la partie \"Équipement\" du "
+"document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_note
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_note
+msgid ""
+"Adds the equipment information note to the \"Equipment\" section of the PDF "
+"document."
+msgstr ""
+"Ajoute la note d'information de l'équipement dans la partie \"Équipement\" "
+"du document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_installation_date
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_installation_date
+msgid ""
+"Adds the equipment installation date to the \"Equipment\" section of the PDF"
+" document."
+msgstr ""
+"Ajoute la date d'installation de l'équipement dans la partie \"Équipement\" "
+"du document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_installer_id
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_installer_id
+msgid ""
+"Adds the equipment installer to the \"Equipment\" section of the PDF "
+"document."
+msgstr ""
+"Ajoute l'installateur de l'équipement dans la partie \"Équipement\" du "
+"document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_brand_id
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_brand_id
+msgid "Adds the equipment mark to the \"Equipment\" section of the PDF document."
+msgstr ""
+"Ajoute la marque de l'équipement dans la partie \"Équipement\" du document "
+"PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_model
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_model
+msgid "Adds the equipment model to the \"Equipment\" section of the PDF document."
+msgstr ""
+"Ajoute le modèle de l'équipement dans la partie \"Équipement\" du document "
+"PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_product_id
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_product_id
+msgid "Adds the equipment name to the \"Equipment\" section of the PDF document."
+msgstr ""
+"Ajoute le nom de l'équipement dans la partie \"Équipement\" du document PDF."
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment_name
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment_name
+msgid "Adds the serial number in the \"Equipment\" section of the PDF document."
+msgstr "Ajoute le n° de série dans la partie \"Équipement\" du document PDF."
+
+#. module: of_equipment
 #: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_view_form
 msgid "Archived"
-msgstr ""
+msgstr "Archivé"
 
 #. module: of_equipment
 #: model:ir.model.fields,help:of_equipment.field_of_connector_config_settings__of_equipment_auto_create
@@ -138,13 +226,13 @@ msgstr "Catégorie"
 #: model:ir.model.fields,help:of_equipment.field_res_partner__of_is_installer
 #: model:ir.model.fields,help:of_equipment.field_res_users__of_is_installer
 msgid "Check this box if this partner is a installer."
-msgstr "Coché cette case si le partenaire est un installateur"
+msgstr "Coché cette case si le partenaire est un installateur."
 
 #. module: of_equipment
 #: model:ir.model.fields,help:of_equipment.field_res_partner__of_is_reseller
 #: model:ir.model.fields,help:of_equipment.field_res_users__of_is_reseller
 msgid "Check this box if this partner is a reseller."
-msgstr "Coché cette case si le partenaire est un revendeur"
+msgstr "Coché cette case si le partenaire est un revendeur."
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_equipment__site_city
@@ -630,6 +718,20 @@ msgstr "Revendeur"
 #: model:ir.model,name:of_equipment.model_sale_order
 msgid "Sales Order"
 msgstr "Bon de commande"
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__report_equipment
+msgid "Select or deselect all equipment-related items to be displayed."
+msgstr ""
+"Permet de sélectionner ou désélectionner tous les éléments à afficher liés à"
+" l'équipement"
+
+#. module: of_equipment
+#: model:ir.model.fields,help:of_equipment.field_of_planning_intervention_template__sheet_equipment
+msgid "Selects or deselects all equipment-related items to be displayed."
+msgstr ""
+"Permet de sélectionner ou désélectionner tous les éléments à afficher liés à"
+" l'équipement"
 
 #. module: of_equipment
 #: model:ir.model.fields,field_description:of_equipment.field_of_create_equipment_wizard__name

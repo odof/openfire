@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-21 09:49+0000\n"
-"PO-Revision-Date: 2024-06-21 09:49+0000\n"
+"POT-Creation-Date: 2024-06-28 15:51+0000\n"
+"PO-Revision-Date: 2024-06-28 15:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -28,16 +28,23 @@ msgid "(OF) Change prices from cell phone"
 msgstr "(OF) Changer les prix depuis le mobile"
 
 #. module: of_mobile
+#: model:ir.model.fields,help:of_mobile.field_of_planning_intervention_template__send_reports
+msgid ""
+"* Manual dispatch: manually from the OpenFire web database.\n"
+"* Automatic dispatch at intervention closure: from the mobile app, as soon as the user clicks on 'Completed' in an intervention, the intervention becomes completed and the intervention report is automatically e-mailed to the customer.\n"
+"* Manual dispatch from mobile: from the mobile app, as soon as the user clicks on 'Completed' in an intervention, he can send the intervention report by e-mail to the customer."
+msgstr ""
+"* Envoi manuel : manuellement depuis la base de données web OpenFire.\n"
+"* Envoi automatique à la clôture de l'intervention : depuis l'application mobile, dès que l'utilisateur clique sur 'Terminé' dans une intervention, l'intervention devient terminée et le rapport d'intervention est automatiquement envoyé par e-mail au client.\n"
+"* Envoi manuel depuis le mobile : depuis l'application mobile, dès que l'utilisateur clique sur 'Terminé' dans une intervention, il peut envoyer le rapport d'intervention par e-mail au client."
+
+#. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid ""
 "<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
 "specific.\" aria-label=\"Values set here are company-specific.\" "
 "groups=\"base.group_multi_company\" role=\"img\"/>"
 msgstr ""
-"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont"
-" spécifiques à la société.\" aria-label=\"Les valeurs définies ici sont "
-"spécifiques à la société.\" groups=\"base.group_multi_company\" "
-"role=\"img\"/>"
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
@@ -91,7 +98,7 @@ msgid "Additional Template"
 msgstr "Modèle supplémentaire"
 
 #. module: of_mobile
-#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__ttype__all
+#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__of_type__all
 msgid "All"
 msgstr "Tous"
 
@@ -302,13 +309,13 @@ msgid "Images size"
 msgstr "Taille des images"
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__intervention_id
-#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__ttype__intervention
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_intervention_id
+#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__of_type__intervention
 msgid "Intervention"
 msgstr ""
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__intervention_invoice_id
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_intervention_invoice_id
 msgid "Intervention Invoice"
 msgstr "Facture d'intervention"
 
@@ -460,6 +467,12 @@ msgid "Mobile"
 msgstr ""
 
 #. module: of_mobile
+#: model:ir.actions.server,name:of_mobile.cron_send_external_notif_ir_actions_server
+#: model:ir.cron,cron_name:of_mobile.cron_send_external_notif
+msgid "Mobile : Send External Notif"
+msgstr "Mobile : Envoi notification externe"
+
+#. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_product_brand__of_mobile_available
 msgid "Mobile Brand"
 msgstr ""
@@ -523,7 +536,7 @@ msgid "No tracking"
 msgstr "Aucun suivi"
 
 #. module: of_mobile
-#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__ttype__none
+#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__of_type__none
 msgid "None"
 msgstr "Aucun"
 
@@ -628,6 +641,11 @@ msgid "Product"
 msgstr "Produit"
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_product_product
+msgid "Product Variant"
+msgstr "Variante de produit"
+
+#. module: of_mobile
 #: model:ir.model,name:of_mobile.model_of_product_brand
 msgid "Product brand"
 msgstr "Marque"
@@ -638,17 +656,17 @@ msgid "Quotation Template"
 msgstr "Modèle de devis"
 
 #. module: of_mobile
-#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__ttype__sale
+#: model:ir.model.fields.selection,name:of_mobile.selection__account_payment__of_type__sale
 msgid "Sale"
 msgstr "Vente"
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__sale_invoice_id
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_sale_invoice_id
 msgid "Sale Invoice"
 msgstr "Facture de vente"
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__sale_id
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_sale_id
 msgid "Sale Order"
 msgstr "Commande"
 
@@ -672,12 +690,6 @@ msgstr "Sections à afficher sur le mobile"
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__section_to_display_ids
 msgid "Sections to display on the intervention"
 msgstr "Sections à afficher dans l'intervention"
-
-#. module: of_mobile
-#: model:ir.actions.server,name:of_mobile.cron_send_external_notif_ir_actions_server
-#: model:ir.cron,cron_name:of_mobile.cron_send_external_notif
-msgid "Send External Notif"
-msgstr "Mobile : Envoi notification externe"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__send_reports
@@ -747,7 +759,7 @@ msgid "Transfer"
 msgstr "Transfert"
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__ttype
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_type
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__ttype
 msgid "Type"
 msgstr ""

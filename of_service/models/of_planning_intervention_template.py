@@ -6,7 +6,16 @@ from odoo import api, fields, models
 class OFPlanningInterventionTemplate(models.Model):
     _inherit = 'of.planning.intervention.template'
 
-    type_id = fields.Many2one(comodel_name='of.service.request.type', string="Type", required=True)
+    type_id = fields.Many2one(
+        comodel_name='of.service.request.type',
+        string="Type",
+        required=True,
+        help="The type allows you to categorize the intervention:\n"
+        "* Servicing - Maintenance\n"
+        "* Installation\n"
+        "* AFTER-SALES SERVICE\n"
+        "* Technical visit",
+    )
     planning_granularity = fields.Selection(
         selection=[
             ('weekly', "Weekly"),

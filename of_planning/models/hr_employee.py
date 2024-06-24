@@ -43,8 +43,8 @@ class HREmployee(models.Model):
     of_daily_email = fields.Boolean(
         string="Send email a day before the appointment",
         default=False,
-        help="Send the schedule to the employee's e-mail address each evening,"
-        "when the employee has appointments for the following day.",
+        help="Allows you to send the employee's schedule each evening by email when the employee has work "
+        "to do the next day.",
     )
 
     def is_able(self, task, all_required=False):

@@ -24,7 +24,15 @@ class OFPlanningInterventionTemplate(models.Model):
         string="Sections to display on the intervention",
         default=lambda r: r._default_section_to_display_ids(),
     )
-    send_reports = fields.Selection(selection_add=[('mobile', "Manual dispatch from Mobile")])
+    send_reports = fields.Selection(
+        selection_add=[('mobile', "Manual dispatch from Mobile")],
+        help="* Manual dispatch: manually from the OpenFire web database.\n"
+        "* Automatic dispatch at intervention closure: from the mobile app, as soon as the user"
+        " clicks on 'Completed' in an intervention, the intervention becomes completed and the intervention"
+        " report is automatically e-mailed to the customer.\n"
+        "* Manual dispatch from mobile: from the mobile app, as soon as the user clicks on 'Completed'"
+        " in an intervention, he can send the intervention report by e-mail to the customer.",
+    )
     additional_line_ids = fields.One2many(
         comodel_name='of.planning.intervention.template.additional.line',
         inverse_name='additional_template_id',
