@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="get_data" model="of.esb.service">
+        <field name="name">Get DATA</field>
+        <field name="exec_active" eval="True"/>
+        <field name="ttype">system</field>
+        <field name="code"># Cette méthode permet d'appeler les méthodes sur esb.service qui commencent par
+# get_data_* en remplaçant * par la valeur de la clef 'type' de args.in_data
+self.get_data(args)</field>
+    </record>
+
+    <record id="set_data" model="of.esb.service">
+        <field name="name">Set DATA</field>
+        <field name="exec_active" eval="True"/>
+        <field name="ttype">system</field>
+        <field name="code"># Cette méthode permet d'appeler les méthodes sur esb.service qui commencent par
+# set_data_* en remplaçant * par la valeur de la clef 'type' de args.in_data
+self.set_data(args)</field>
+    </record>
+
+</odoo>

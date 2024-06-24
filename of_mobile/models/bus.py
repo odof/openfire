@@ -4,7 +4,7 @@ import datetime
 import json
 import logging
 
-from pyfcm import FCMNotification
+import requests
 
 from odoo import api, fields, models
 from odoo.tools import config
@@ -58,31 +58,51 @@ class BusBus(models.Model):
                         record.of_keep = False
 
     def send_firebase_notif(self, payload):
-        of_token_fcm = config.get("of_token_fcm", "")
-        if not of_token_fcm:
-            logger.info("No FCM token configured")
+        esb_url = config.get("of_esb_url", "")
+        esb_webhook_firebase_user = config.get("of_esb_webhook_firebase_user", "")
+        esb_webhook_firebase_password = config.get("of_esb_webhook_firebase_password", "")
+        if not esb_url or not esb_webhook_firebase_user or not esb_webhook_firebase_password:
+            logger.warning("ESB URL or Webhook Firebase User or Webhook Firebase Password is not set.")
             return False
 
-        push_service = FCMNotification(api_key=of_token_fcm)
         user = self.env["res.users"].browse(payload.get("user_id"))
         kind = payload.get("kind")
 
         if registration_ids := user.mapped("of_fcm_token_ids.token"):
-            try:
-                if kind == "message_with_data":
-                    result = push_service.notify_multiple_devices(
-                        registration_ids=registration_ids,
-                        message_title=payload.get("title"),
-                        message_body=payload.get("message"),
-                        data_message=payload.get("payload"),
-                    )
-                else:
-                    result = push_service.multiple_devices_data_message(
-                        registration_ids=registration_ids, data_message=payload.get("payload")
-                    )
+            headers = {
+                "Content-Type": "application/json",
+            }
 
-                logger.info(result)
+            try:
+                body = {}
+
+                if kind == "message_with_data":
+                    body = {
+                        "user": esb_webhook_firebase_user,
+                        "password": esb_webhook_firebase_password,
+                        "notifications": [
+                            {
+                                "type": "message",
+                                "registrations": registration_ids,
+                                "title": payload.get("title"),
+                                "message": payload.get("message"),
+                                "data": payload.get("payload", {}),
+                            }
+                        ],
+                    }
+                else:
+                    body = {
+                        "user": esb_webhook_firebase_user,
+                        "password": esb_webhook_firebase_password,
+                        "notifications": [
+                            {
+                                "type": "data",
+                                "registrations": registration_ids,
+                                "data": payload.get("payload", {}),
+                            }
+                        ],
+                    }
+                requests.post(f"{esb_url}/webhook/firebase", headers=headers, data=json.dumps(body), timeout=10)
             except Exception as e:
                 logger.info(f"Error while generating FCM Notification. {e}")
-                return False
         return True

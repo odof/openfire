@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_connection_form" model="ir.ui.view">
+        <field name="name">of.esb.connection.form</field>
+        <field name="model">of.esb.connection</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_button_test_connection" string="Test connection" type="object"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="ttype"/>
+                        <field name="security"/>
+                        <field name="is_valid" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_connection_tree" model="ir.ui.view">
+        <field name="name">of.esb.connection.tree</field>
+        <field name="model">of.esb.connection</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="ttype"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_connection" model="ir.actions.act_window">
+        <field name="name">Connections</field>
+        <field name="res_model">of.esb.connection</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
