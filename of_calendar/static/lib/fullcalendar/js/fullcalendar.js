@@ -4563,7 +4563,7 @@ function AgendaEventRenderer() {
 -----------------------------------------------------------------------------*/
 
 function orderSegByAttendee(segs) {
-    return _.sortBy(segs, function(seg){return seg.event.attendees[0]});
+    return _.sortBy(segs, function(seg){return seg.event.attendee_index});
 }
 
 // Sets the seg.backwardCoord and seg.forwardCoord on each segment and returns a new
