@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="trigger_firebase" model="of.esb.trigger">
+        <field name="name">firebase</field>
+        <field name="ttype">webhook</field>
+        <field name="security" ref="of_esb_firebase.security_firebase"/>
+        <field name="exec_active">true</field>
+        <field name="public">true</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="security_firebase" model="of.esb.security">
+        <field name="name">Trigger Firebase</field>
+        <field name="ttype">password</field>
+        <field name="user_id" ref="of_esb_firebase.user_firebase" />
+        <field name="user">firebase</field>
+        <field name="password">th3_P@SSW0RD</field>
+    </record>
+
+</odoo>

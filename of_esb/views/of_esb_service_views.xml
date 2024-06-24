@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_service_form" model="ir.ui.view">
+        <field name="name">of.esb.service.form</field>
+        <field name="model">of.esb.service</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="exec_active"/>
+                        <field name="ttype"/>
+                        <field name="uuid"/>
+                    </group>
+
+                    <field name="code" widget="ace" options="{'mode': 'python'}"/>
+                </group>
+                    <span>
+                        Args sent to the function are in the args dictionary<br/>
+                        The args variable is a dictionary containing three keys:<br/>
+                        <ul>
+                        <li>in_data : "contains the data that is sent in the bus",</li>
+                        <li>out_data : "contains the return data of the service",</li>
+                        <li>properties : "dictionary containing properties of the message, like the UUID of the trigger that launched the execution"</li>
+                        </ul>
+                    </span>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_service_tree" model="ir.ui.view">
+        <field name="name">of.esb.service.tree</field>
+        <field name="model">of.esb.service</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="exec_active"/>
+                <field name="ttype"/>
+                <field name="uuid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_service" model="ir.actions.act_window">
+        <field name="name">Services</field>
+        <field name="res_model">of.esb.service</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
