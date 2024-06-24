@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="partner_firebase" model="res.partner">
+        <field name="name">Firebase</field>
+        <field name="company_id" ref="base.main_company" />
+    </record>
+
+</odoo>

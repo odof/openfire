@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_data_form" model="ir.ui.view">
+        <field name="name">of.esb.data.form</field>
+        <field name="model">of.esb.data</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="in_data"/>
+                    <field name="out_data"/>
+                    <field name="properties"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_data_tree" model="ir.ui.view">
+        <field name="name">of.esb.data.tree</field>
+        <field name="model">of.esb.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="in_data"/>
+                <field name="out_data"/>
+                <field name="properties"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_data" model="ir.actions.act_window">
+        <field name="name">Data</field>
+        <field name="res_model">of.esb.data</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

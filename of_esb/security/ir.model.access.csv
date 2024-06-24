@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+of_esb.access_of_esb_bus,access_of_esb_bus,of_esb.model_of_esb_bus,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_connection,access_of_esb_connection,of_esb.model_of_esb_connection,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_security,access_of_esb_security,of_esb.model_of_esb_security,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_service,access_of_esb_service,of_esb.model_of_esb_service,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_trigger,access_of_esb_trigger,of_esb.model_of_esb_trigger,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_service_all,access_of_esb_service,of_esb.model_of_esb_service,,1,0,0,0
+of_esb.access_of_esb_security_all,access_of_esb_security,of_esb.model_of_esb_security,,1,0,0,0
+of_esb.access_of_esb_data,access_of_esb_data,of_esb.model_of_esb_data,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_rule,access_of_esb_rule,of_esb.model_of_esb_rule,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_history,access_of_esb_history,of_esb.model_of_esb_history,of_esb.group_esb,1,1,1,1
+of_esb.access_of_esb_type_bus,access_of_esb_type_bus,of_esb.model_of_esb_type_bus,of_esb.group_esb,1,0,0,0
