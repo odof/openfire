@@ -34,6 +34,9 @@ class SaleOrder(models.Model):
         if payment_term := args.get('payment_term'):
             mutation['payment_term_id'] = many2one(self=self, model='account.payment.term', input=payment_term)
 
+        if vendor := args.get('vendor'):
+            mutation['user_id'] = many2one(self=self, model='res.users', input=vendor)
+
         return mutation
 
     @api.model

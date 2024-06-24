@@ -5,6 +5,7 @@ import graphene
 from odoo.addons.of_account_graphql.graphql.account_payment_term_type import AccountPaymentTermInput
 from odoo.addons.of_base_graphql.graphql.partner_type import PartnerInput
 from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
+from odoo.addons.of_graphql.graphql.user_type import UserInput
 
 from .sale_order_line_type import SaleOrderLineInput
 from .sale_order_type import SaleOrder
@@ -21,6 +22,7 @@ class SaleOrderCreate(graphene.Mutation):
         lines = graphene.List(graphene.NonNull(SaleOrderLineInput))
         state = graphene.String()
         payment_term = graphene.Argument(AccountPaymentTermInput)
+        vendor = graphene.Argument(UserInput)
 
     Output = SaleOrder
 
@@ -42,6 +44,7 @@ class SaleOrderUpdate(graphene.Mutation):
         lines = graphene.List(graphene.NonNull(SaleOrderLineInput))
         state = graphene.String()
         payment_term = graphene.Argument(AccountPaymentTermInput)
+        vendor = graphene.Argument(UserInput)
 
     Output = SaleOrder
 
