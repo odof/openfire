@@ -14,3 +14,4 @@ pstats_print2list
 openpyxl==3.1.2
 pypdfium2
 pyfcm==2.0.4
+odoorpc==0.10.1

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="type_logs" model="of.esb.type.bus">
+        <field name="name">Logs</field>
+    </record>
+
+    <record id="type_webhook" model="of.esb.type.bus">
+        <field name="name">Webhook</field>
+    </record>
+
+    <record id="type_scheduler" model="of.esb.type.bus">
+        <field name="name">Scheduler</field>
+    </record>
+
+    <record id="type_internal" model="of.esb.type.bus">
+        <field name="name">Internal</field>
+    </record>
+
+    <record id="type_system" model="of.esb.type.bus">
+        <field name="name">System</field>
+    </record>
+
+    <record id="type_error" model="of.esb.type.bus">
+        <field name="name">Error</field>
+    </record>
+
+</odoo>

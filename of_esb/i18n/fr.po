@@ -1,0 +1,488 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_esb
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-20 07:45+0000\n"
+"PO-Revision-Date: 2024-11-20 07:45+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_esb
+#: model:res.groups,name:of_esb.group_esb
+msgid "(OF) Can create ESB Bus / Data"
+msgstr "(OF) Peut créer des Bus / Données ESB"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__exec_active
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__exec_active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__user_id
+msgid "Associated User"
+msgstr "Utilisateur associé"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_bus
+msgid "Bus"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_bus
+msgid "Buses"
+msgstr "Bus"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__channel
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__channel_bus
+msgid "Channel"
+msgstr "Canal"
+
+#. module: of_esb
+#: model:ir.model.fields,help:of_esb.field_of_esb_trigger__public
+msgid "Check this to make this trigger accessible with the url /webhook/"
+msgstr "Cochez cette case pour rendre ce déclencheur accessible avec l'URL /webhook/"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__code
+msgid "Code"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_configuration
+msgid "Configuration"
+msgstr ""
+
+#. module: of_esb
+#. odoo-python
+#: code:addons/of_esb/models/of_esb_connection.py:0
+#, python-format
+msgid "Connection Test Successful!"
+msgstr "Test de connexion réussi !"
+
+#. module: of_esb
+#. odoo-python
+#: code:addons/of_esb/models/of_esb_connection.py:0
+#, python-format
+msgid "Connection Test Unsuccessful!"
+msgstr "Test de connexion échoué !"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_connection
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_connection
+msgid "Connections"
+msgstr "Connexions"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__create_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__create_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__data
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__data
+msgid "Data"
+msgstr "Données"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__data_channel
+msgid "Data Channel"
+msgstr "Canal de données"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_data
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_data
+msgid "Data"
+msgstr "Données"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__date
+msgid "Date"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__date_exec
+msgid "Date of execution"
+msgstr "Date d'exécution"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__interval_type__days
+msgid "Days"
+msgstr "Jours"
+
+#. module: of_esb
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_debug
+msgid "Debug"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__display_name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__display_name
+msgid "Display Name"
+msgstr "Nom d'affichage"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_bus
+msgid "ESB Bus"
+msgstr "Bus ESB"
+
+#. module: of_esb
+#: model:ir.actions.server,name:of_esb.of_esb_cron_clean_bus_ir_actions_server
+#: model:ir.cron,cron_name:of_esb.of_esb_cron_clean_bus
+msgid "ESB: Clean Bus"
+msgstr "ESB : Nettoyer les bus"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_connection
+msgid "ESB Connection"
+msgstr "Connexion ESB"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_data
+msgid "ESB Data"
+msgstr "Données ESB"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_history
+msgid "ESB History"
+msgstr "Historique ESB"
+
+#. module: of_esb
+#: model:ir.actions.server,name:of_esb.of_esb_cron_esb_history_build_ir_actions_server
+#: model:ir.cron,cron_name:of_esb.of_esb_cron_esb_history_build
+msgid "ESB: History Build"
+msgstr "ESB : Construire l'historique"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_rule
+msgid "ESB Rule"
+msgstr "Règle ESB"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_service
+msgid "ESB Service"
+msgstr "Service ESB"
+
+#. module: of_esb
+#: model:ir.actions.server,name:of_esb.of_esb_cron_service_execute_ir_actions_server
+#: model:ir.cron,cron_name:of_esb.of_esb_cron_service_execute
+msgid "ESB: Service Execute"
+msgstr "ESB : Exécution du service"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_trigger
+msgid "ESB Trigger"
+msgstr "Déclencheur ESB"
+
+#. module: of_esb
+#: model:ir.model,name:of_esb.model_of_esb_type_bus
+msgid "ESB Type Bus"
+msgstr "Type de bus ESB"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_history
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__history
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_history
+msgid "History"
+msgstr "Historique"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__interval_type__hours
+msgid "Hours"
+msgstr "Heures"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__id
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__id
+msgid "ID"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__in_data
+msgid "In Data"
+msgstr "Données d'entrée"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__interval_number
+msgid "Interval Number"
+msgstr "Intervalle"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__interval_type
+msgid "Interval Unit"
+msgstr "Unité d'intervalle"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__is_valid
+msgid "Is Valid"
+msgstr "Est valide"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger____last_update
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__write_uid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__write_date
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_esb
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_service_form
+msgid ""
+"Args sent to the function are in the args dictionary<br/>\n"
+"                        The args variable is a dictionary containing three keys:<br/>"
+msgstr ""
+"Les arguments envoyés dans la fonction sont dans le dictionnaire args<br/>\n"
+"                        La variable args est un dictionnaire contenant trois clefs :<br/>"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__mermaid
+msgid "Mermaid"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__interval_type__minutes
+msgid "Minutes"
+msgstr "Minutes"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__interval_type__months
+msgid "Months"
+msgstr "Mois"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__name
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_type_bus__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_security__ttype__none
+msgid "None"
+msgstr "Aucun"
+
+#. module: of_esb
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_main
+msgid "OF ESB"
+msgstr "OF ESB"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__out_data
+msgid "Out Data"
+msgstr "Données de sortie"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__password
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_security__ttype__password
+msgid "Password"
+msgstr "Mot de passe"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_data__properties
+msgid "Properties"
+msgstr "Propriétés"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__public
+msgid "Public"
+msgstr "Public"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_rule
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_rule
+msgid "Rules"
+msgstr "Règles"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__ttype__scheduler
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_trigger_form
+msgid "Scheduler"
+msgstr "Planificateur"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_security
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__security
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__security
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_security
+msgid "Security"
+msgstr "Sécurité"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__service
+msgid "Service"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_service
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_service
+msgid "Services"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__slug_name
+msgid "Slug Name"
+msgstr "Nom du slug"
+
+#. module: of_esb
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_connection_form
+msgid "Test connection"
+msgstr "Tester la connexion"
+
+#. module: of_esb
+#: model:ir.actions.act_window,name:of_esb.action_of_esb_trigger
+#: model:ir.ui.menu,name:of_esb.menu_of_esb_trigger
+msgid "Triggers"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_connection__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__ttype
+msgid "Type"
+msgstr ""
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__ttype
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__type_bus
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__data_type
+msgid "Type of bus"
+msgstr "Type de bus"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__user
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_security__user
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_esb
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_bus__uuid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_history__uuid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_rule__uuid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_service__uuid
+#: model:ir.model.fields,field_description:of_esb.field_of_esb_trigger__uuid
+msgid "Uuid"
+msgstr "Uuid"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__ttype__webhook
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_trigger_form
+msgid "Webhook"
+msgstr "Webhook"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_trigger__interval_type__weeks
+msgid "Weeks"
+msgstr "Semaines"
+
+#. module: of_esb
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_service_form
+msgid "in_data : \"contains the data that is sent in the bus\","
+msgstr "in_data : \"contient les données qui sont envoyées dans le bus\","
+
+#. module: of_esb
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_service_form
+msgid "out_data : \"contains the return data of the service\","
+msgstr "out_data : \"contient les données de retour du service\","
+
+#. module: of_esb
+#: model_terms:ir.ui.view,arch_db:of_esb.of_esb_service_form
+msgid ""
+"properties : \"dictionary containing properties of the message, like "
+"the UUID of the trigger that launched the execution\""
+msgstr ""
+"properties : \"dictionnaire contenant des propriétés du message, comme "
+"l'UUID du trigger qui a lancé l'exécution\""
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_rule__ttype__system
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_service__ttype__system
+msgid "system"
+msgstr "système"
+
+#. module: of_esb
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_rule__ttype__user
+#: model:ir.model.fields.selection,name:of_esb.selection__of_esb_service__ttype__user
+msgid "user"
+msgstr "utilisateur"

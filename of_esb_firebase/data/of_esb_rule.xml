@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="rule_set_data" model="of.esb.rule">
+        <field name="name">Rule set data firebase</field>
+        <field name="ttype">user</field>
+        <field name="channel_bus">firebase</field>
+        <field name="type_bus" ref="of_esb.type_webhook"/>
+        <field name="service" ref="of_esb_firebase.service_set_data_firebase"/>
+    </record>
+
+</odoo>
