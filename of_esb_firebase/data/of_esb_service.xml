@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="service_set_data_firebase" model="of.esb.service">
+        <field name="name">Set data firebase</field>
+        <field name="exec_active" eval="True"/>
+        <field name="ttype">user</field>
+        <field name="code">self.set_data_firebase(args)</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="connection_firebase" model="of.esb.connection">
+        <field name="name">Firebase</field>
+        <field name="ttype">firebase</field>
+        <field name="security" ref="of_esb.authenticate_none"/>
+        <field name="firebase_environment">production</field>
+    </record>
+
+</odoo>

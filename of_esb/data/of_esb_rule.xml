@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="rule_get_data" model="of.esb.rule">
+        <field name="name">Rule Get DATA</field>
+        <field name="ttype">system</field>
+        <field name="channel_bus">get_data</field>
+        <field name="type_bus" ref="of_esb.type_internal"/>
+        <field name="service" ref="of_esb.get_data"/>
+    </record>
+
+    <record id="rule_set_data" model="of.esb.rule">
+        <field name="name">Rule Set DATA</field>
+        <field name="ttype">system</field>
+        <field name="channel_bus">set_data</field>
+        <field name="type_bus" ref="of_esb.type_internal"/>
+        <field name="service" ref="of_esb.set_data"/>
+    </record>
+
+</odoo>
