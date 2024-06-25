@@ -122,6 +122,8 @@ class CalendarEvent(models.Model):
 
         if 'employees' in args:
             mutation['of_employee_ids'] = x2many(self=self, model='hr.employee', input=args.get('employees'))
+            # on ajoute aussi le fait que l'employée principal est le premier de la liste donnée
+            mutation['of_employee_id'] = mutation['of_employee_ids'][0][2][0]
 
         if company := args.get('company'):
             mutation['of_company_id'] = many2one(self=self, model='res.company', input=company)
