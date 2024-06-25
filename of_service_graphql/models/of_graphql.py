@@ -81,3 +81,22 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTemplateInput,
             ],
         )
+
+    def _prepare_arguments(self):
+        arguments = super()._prepare_arguments()
+
+        new_arguments = {
+            'PlanningInterventionMutation': {
+                'planning_intervention_create': {
+                    'ttype': ServiceRequestTypeInput,
+                    'serviceRequest': ServiceRequestInput,
+                },
+                'planning_intervention_update': {
+                    'ttype': ServiceRequestTypeInput,
+                    'serviceRequest': ServiceRequestInput,
+                },
+            },
+        }
+        arguments = self._add_arguments(new_arguments, arguments)
+
+        return arguments

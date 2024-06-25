@@ -12,11 +12,11 @@ class PlanningIntervention(OdooObjectType):
     _name = 'PlanningIntervention'
     _type = 'types'
 
-    type = graphene.Field(ServiceRequestType)
+    ttype = graphene.Field(ServiceRequestType)
     request = graphene.Field(ServiceRequest)
 
     @staticmethod
-    def resolve_type(root, info):
+    def resolve_ttype(root, info):
         return root.of_type_id or None
 
     @staticmethod
@@ -28,5 +28,5 @@ class PlanningInterventionInput(graphene.InputObjectType):
     _name = 'PlanningInterventionInput'
     _type = 'types'
 
-    type = graphene.Field(ServiceRequestTypeInput)
+    ttype = graphene.Field(ServiceRequestTypeInput)
     request = graphene.Field(ServiceRequestInput)
