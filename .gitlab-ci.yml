@@ -9,7 +9,41 @@ before_script:
   - pip install flake8 flake8-print isort pylint black
 
 stages:
+  - check_commit_message
   - linting
+
+check_commit_message:
+  stage: check_commit_message
+  script:
+    - |
+      #!/bin/bash
+      # Get the last commit message
+      commit_message=$(git log -1 --pretty=%B)
+
+      # Get the first line of the commit message
+      first_line=$(echo "$commit_message" | head -n 1)
+
+      # Check if the first line is within the 72 character limit
+      if [ ${#first_line} -le 72 ]; then
+        echo "First line is within 72 characters."
+      else
+        echo "First line exceeds 72 characters."
+        exit 1
+      fi
+
+      # Get the number of lines in the commit message
+      commit_lines=$(echo "$commit_message" | wc -l)
+
+      # If there are more than one line, check for a blank line after the first line
+      if [ $commit_lines -gt 1 ]; then
+        second_line=$(echo "$commit_message" | sed -n '2p')
+        if [ -z "$second_line" ]; then
+          echo "There is a blank line after the first line."
+        else
+          echo "There is no blank line after the first line."
+          exit 1
+        fi
+      fi
 
 linting:
   stage: linting

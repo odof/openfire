@@ -6,6 +6,7 @@ Branche publique du produit Openfire 16.
 La version de python requise est **>= Python 3.9**
 <br />
 
+
 ## Modules
 
 La branche Openfire 16 dépend de certains modules OCA
