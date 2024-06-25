@@ -42,12 +42,9 @@ class UserInput(graphene.InputObjectType):
     mobile = graphene.String()
     phone = graphene.String()
     email = graphene.String()
-    company = graphene.Field(
-        CompanyInput, required=True, description="Société courante de l'utilisateur", name="company"
-    )
+    company = graphene.Field(CompanyInput, description="Société courante de l'utilisateur", name="company")
     companies = graphene.List(
         graphene.NonNull(CompanyInput),
-        required=True,
         description="Liste des sociétés auxquelles à accès l'utilisateur",
     )
 
