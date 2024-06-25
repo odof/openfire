@@ -37,7 +37,7 @@ from ..graphql.planning_intervention_type import (
     PlanningInterventionFilterInput,
     PlanningInterventionInput,
 )
-from ..graphql.sale_order_type import SaleOrder, SaleOrderInput
+from ..graphql.sale_order_type import SaleOrder
 
 
 class OFGraphql(models.AbstractModel):
@@ -75,7 +75,6 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionLine,
                 PlanningInterventionLineInput,
                 SaleOrder,
-                SaleOrderInput,
             ],
         )
 
@@ -93,14 +92,6 @@ class OFGraphql(models.AbstractModel):
                     "intervention": PlanningInterventionInput,
                     "intervention_date": graphene.DateTime(),
                     "intervention_status": graphene.String(),
-                },
-            },
-            "SaleOrderMutation": {
-                "sale_order_create": {
-                    "intervention_notes": graphene.String(),
-                },
-                "sale_order_update": {
-                    "intervention_notes": graphene.String(),
                 },
             },
         }

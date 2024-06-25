@@ -21,6 +21,8 @@
         'of_sale_graphql',
         'of_crm',
         'of_crm_graphql',
+        'of_sale_crm',
+        'of_sale_crm_graphql',
         'of_planning_survey',
         'of_planning_survey_graphql',
         'of_product_brand',

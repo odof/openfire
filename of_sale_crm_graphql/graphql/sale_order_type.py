@@ -9,4 +9,11 @@ class SaleOrder(OdooObjectType):
     _name = 'SaleOrder'
     _type = 'types'
 
-    of_intervention_notes = graphene.String(name='interventionNotes')
+    of_notes = graphene.String(name='notes')
+
+
+class SaleOrderInput(graphene.InputObjectType):
+    _name = 'SaleOrderInput'
+    _type = 'types'
+
+    notes = graphene.String(name='notes')

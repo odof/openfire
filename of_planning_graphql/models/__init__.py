@@ -7,4 +7,3 @@ from . import of_planning_intervention_template
 from . import of_planning_tag
 from . import of_planning_task
 from . import of_planning_intervention_line
-from . import sale_order
