@@ -104,12 +104,16 @@ class CalendarEvent(models.Model):
 
     def _compute_of_payment(self):
         for event in self:
-            payment = self.env['account.payment'].search([('of_intervention_id', '=', event.id)], limit=1)
-            event.of_payment_intervention = payment.id
-            payment = self.env['account.payment'].search(
-                [('of_sale_id', '=', event.of_additional_sale_order_id.id)], limit=1
-            )
-            event.of_payment_sale = payment.id
+            payment_intervention = self.env['account.payment'].search([('of_intervention_id', '=', event.id)], limit=1)
+            event.of_payment_intervention = payment_intervention.id
+
+            if event.of_additional_sale_order_id:
+                payment_sale = self.env['account.payment'].search(
+                    [('of_sale_id', '=', event.of_additional_sale_order_id.id)], limit=1
+                )
+                event.of_payment_sale = payment_sale.id
+            else:
+                event.of_payment_sale = False
 
     # --------------------------------------------------------------------------
     # ORM methods
