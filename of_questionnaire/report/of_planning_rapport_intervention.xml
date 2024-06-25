@@ -23,9 +23,9 @@
                         </div>
                         <t t-set="first" t-value="True"/>
                         <t t-foreach="q[1][1]" t-as="question">
-                            <div class="col-xs-12" style="display: table; padding: 0px; page-break-inside:avoid;">
+                            <div class="col-xs-12" style="display: table; padding: 0px;">
                                 <div style="display: table-cell;" t-attf-style="#{'' if first else 'border-top: 1px solid lightgray;'}">
-                                    <div class="h5" style="padding: 0px 16px;">
+                                    <div style="margin-top: 10px; margin-bottom: 10px; padding: 0px 16px; page-break-inside:avoid;">
                                         <strong><span t-esc="question[0]"/><span>&amp;nbsp;:</span></strong>
                                         <span t-esc="question[1]"/>
                                     </div>
