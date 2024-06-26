@@ -4,11 +4,8 @@ import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
 from odoo.addons.of_account_graphql.graphql.account_move_type import AccountMove
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import (
-    PlanningIntervention,
-    PlanningInterventionInput,
-)
-from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder, SaleOrderInput
+from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningIntervention
+from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder
 
 
 class PaymentType(graphene.Enum):
@@ -54,12 +51,3 @@ class AccountPayment(OdooObjectType):
     @staticmethod
     def resolve_invoice_sale(root, info):
         return root.of_sale_invoice_id or None
-
-
-class AccountPaymentInput(graphene.InputObjectType):
-    _name = "AccountPaymentInput"
-    _type = 'types'
-
-    intervention = graphene.Field(PlanningInterventionInput)
-    sale = graphene.Field(SaleOrderInput)
-    ttype = graphene.Field(PaymentType)

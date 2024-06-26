@@ -3,10 +3,9 @@
 from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
-from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import PlanningInterventionInput
 from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
 
-from ..graphql.account_payment_type import AccountPayment, AccountPaymentInput, PaymentType
+from ..graphql.account_payment_type import AccountPayment
 from ..graphql.configuration_query import ConfigurationQuery
 from ..graphql.configuration_type import Configuration
 from ..graphql.employee_query import EmployeeQuery
@@ -15,6 +14,7 @@ from ..graphql.fcm_token_mutation import FCMTokenMutation
 from ..graphql.fcm_token_type import FCMToken, FCMTokenInput
 from ..graphql.partner_query import PartnerQuery
 from ..graphql.partner_type import PartnerCheckDuplications
+from ..graphql.payment_intervention_mutation import PaymentInterventionCreateMutation
 from ..graphql.planning_intervention_mutation import PlanningInterventionSendReportMutation
 from ..graphql.planning_intervention_query import PlanningInterventionQuery, PlanningInterventionsOffline
 from ..graphql.planning_intervention_section_mutation import PlanningInterventionSectionMutation
@@ -82,7 +82,6 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionTemplateAdditionalLineFilterInput,
                 PlanningInterventionTemplateAdditionalLineInput,
                 AccountPayment,
-                AccountPaymentInput,
                 SaleOrder,
                 PlanningInterventionTask,
                 PlanningInterventionTaskInput,
@@ -90,6 +89,7 @@ class OFGraphql(models.AbstractModel):
                 SaleOrderTemplate,
                 SaleOrderTemplateInput,
                 SaleOrderTemplateFilterInput,
+                PaymentInterventionCreateMutation,
             ],
         )
 
@@ -100,18 +100,6 @@ class OFGraphql(models.AbstractModel):
             'UserMutation': {
                 'user_update': {
                     'fcm_tokens': FCMTokenInput,
-                },
-            },
-            'AccountPaymentMutation': {
-                'account_payment_create': {
-                    'ttype': PaymentType,
-                    'intervention': PlanningInterventionInput,
-                    'sale': SaleOrderInput,
-                },
-                'account_payment_update': {
-                    'ttype': PaymentType,
-                    'intervention': PlanningInterventionInput,
-                    'sale': SaleOrderInput,
                 },
             },
             'PlanningInterventionMutation': {
