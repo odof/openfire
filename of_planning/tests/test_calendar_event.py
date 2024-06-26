@@ -4,11 +4,12 @@ from datetime import timedelta
 
 from odoo import Command, fields
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests import Form
+from odoo.tests import Form, tagged
 
 from odoo.addons.of_planning.tests.common import TestOFPlanningCommon
 
 
+@tagged('openfire_planning')
 class TestCalendarEvent(TestOFPlanningCommon):
     @classmethod
     def setUpClass(cls):
@@ -326,3 +327,19 @@ class TestCalendarEvent(TestOFPlanningCommon):
         self.assertIsInstance(result, dict)
         self.assertEqual(result['res_model'], 'of.popup.wizard')
         self.assertEqual(result['context']['default_message_html'], message)
+
+    def test_08_set_employee_ids(self):
+        dt_now = fields.Datetime.now()
+        with Form(
+            self.env['calendar.event'].with_context(
+                default_of_type='intervention',
+                default_start=dt_now,
+                default_of_company_id=self.company_fr.id,
+            )
+        ) as event_form:
+            event_form.name = 'Test Event'
+            event_form.of_template_id = self.template_installation
+            event_form.of_employee_ids.add(self.employee_tech_bruce)
+            event_form.save()
+
+        self.assertEqual(event_form.of_employee_id, self.employee_tech_bruce)

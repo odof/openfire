@@ -16,7 +16,6 @@ class CalendarEvent(models.Model):
         return ['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]
 
     name = fields.Char(required=False)
-
     # ===== Intervention specifics fields =====
     of_state = fields.Selection(
         selection=[
@@ -72,13 +71,24 @@ class CalendarEvent(models.Model):
         readonly=False,
     )
 
-    # ===== Team, Operators, Employees fields =====
+    # ===== Team, Operators, Employees, Resource fields =====
+    of_resource_id = fields.Many2one(
+        comodel_name='resource.resource',
+        string="Resource",
+        compute='_compute_of_resource_id',
+        store=True,
+        readonly=False,
+        help="Resource linked to the intervention",
+    )
     of_team_id = fields.Many2one(comodel_name='of.planning.team', string="Team")
     of_employee_ids = fields.Many2many(
         comodel_name='hr.employee',
         relation='of_employee_intervention_rel',
         column1='intervention_id',
         column2='employee_id',
+        compute='_compute_of_employee_ids',
+        store=True,
+        readonly=False,
         string="Operators",
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
@@ -87,8 +97,6 @@ class CalendarEvent(models.Model):
     of_employee_id = fields.Many2one(
         comodel_name='hr.employee',
         string="Main operator",
-        compute='_compute_of_employee_id',
-        store=True,
         readonly=False,
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
@@ -356,6 +364,33 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Compute methods
     # --------------------------------------------------------------------------
+    @api.depends('of_resource_id')
+    def _compute_of_employee_ids(self):
+        """Compute the employee_id based on the resource_id.
+        In case of we are assigning an event to a resource or moving an event from one resource to another one from
+        planning view, we need to update the employee_id based on the resource_id.
+
+        Note: This method can be called by `_compute_partner_ids` (in `of_planning/models/calendar_event.py`)
+            because of the `mapped('of_employee_ids.related_contact_ids')` in compute method.
+            Odoo need to compute `of_employee_ids`.
+        """
+        for event in self:
+            if event.of_employee_id:
+                event.of_employee_ids -= event.of_employee_id
+            if event.of_resource_id:
+                event.of_employee_ids |= event.of_resource_id.employee_id
+                event.of_employee_id = event.of_resource_id.employee_id
+            if not event.of_employee_id:
+                event.of_employee_id = event.of_employee_ids[:1]
+
+    @api.depends('of_employee_ids', 'of_employee_id')
+    def _compute_of_resource_id(self):
+        for event in self:
+            event.of_resource_id = (
+                event.of_employee_id.resource_id
+                if event.of_employee_id
+                else (event.of_employee_ids and event.of_employee_ids[:1].resource_id or False)
+            )
 
     @api.depends('allday', 'start', 'stop')
     def _compute_dates(self):
@@ -383,14 +418,6 @@ class CalendarEvent(models.Model):
     def _compute_of_address_id(self):
         for event in self:
             event.of_address_id = event.of_partner_id
-
-    @api.depends('of_employee_ids')
-    def _compute_of_employee_id(self):
-        for event in self:
-            if not event.of_employee_id:
-                event.of_employee_id = event.of_employee_ids[:1]
-            if event.of_employee_id and event.of_employee_id.id not in event.of_employee_ids.ids:
-                event.of_employee_id = False
 
     @api.depends('of_employee_ids')
     def _compute_partner_ids(self):
@@ -660,6 +687,14 @@ class CalendarEvent(models.Model):
     # Onchange methods
     # --------------------------------------------------------------------------
 
+    @api.onchange('of_employee_ids')
+    def _onchange_of_employee_ids(self):
+        for event in self:
+            if event.of_employee_id and event.of_employee_id.id not in event.of_employee_ids.ids:
+                event.of_employee_id = False
+            else:
+                self._compute_of_employee_ids()
+
     @api.onchange('of_task_id')
     def _onchange_of_task_id(self):
         self.duration = self.of_task_id.duration
@@ -667,7 +702,7 @@ class CalendarEvent(models.Model):
     @api.onchange('of_team_id')
     def onchange_of_team_id(self):
         self.of_employee_ids = self.of_team_id.employee_ids
-        self._compute_of_employee_id()
+        self._compute_of_employee_ids()
 
     @api.onchange('of_order_id')
     def _onchange_of_order_id(self):

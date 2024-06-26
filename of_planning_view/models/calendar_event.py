@@ -14,15 +14,6 @@ class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
     # Planning fields
-    of_resource_id = fields.Many2one(
-        comodel_name='resource.resource',
-        string="Resource",
-        compute='_compute_of_resource_id',
-        store=True,
-        readonly=False,
-        help="Resource linked to the intervention",
-    )
-    of_employee_ids = fields.Many2many(compute='_compute_of_employee_id', store=True, readonly=False)
     of_planning_color = fields.Integer(
         related='of_template_id.planning_color',
         string="Planning color",
@@ -73,36 +64,7 @@ class CalendarEvent(models.Model):
 
     # --------------------------------------------------------------------------
     # Compute methods
-    # --------------------------------------------------------------------------
-
-    @api.depends('of_resource_id')
-    def _compute_of_employee_id(self):
-        """Compute the employee_id based on the resource_id.
-        In case of we are assigning an event to a resource or moving an event from one resource to another one from
-        planning view, we need to update the employee_id based on the resource_id.
-
-        Note: This method can be called by `_compute_partner_ids` (in `of_planning/models/calendar_event.py`)
-            because of the `mapped('of_employee_ids.related_contact_ids')` in compute method.
-            Odoo need to compute `of_employee_ids`.
-        """
-        for event in self:
-            if event.of_employee_id and event.of_employee_id.id not in event.of_employee_ids.ids:
-                event.of_employee_id = False
-            if event.of_employee_id:
-                event.of_employee_ids -= event.of_employee_id
-            if event.of_resource_id:
-                event.of_employee_ids |= event.of_resource_id.employee_id
-                event.of_employee_id = event.of_resource_id and event.of_resource_id.employee_id or False
-        super()._compute_of_employee_id()
-
-    @api.depends('of_employee_ids', 'of_employee_id')
-    def _compute_of_resource_id(self):
-        for event in self:
-            event.of_resource_id = (
-                event.of_employee_id.resource_id
-                if event.of_employee_id
-                else (event.of_employee_ids and event.of_employee_ids[:1].resource_id or False)
-            )
+    # -------------------------------------------------------------------------
 
     def _compute_popover_of_partner_address(self):
         for event in self:
