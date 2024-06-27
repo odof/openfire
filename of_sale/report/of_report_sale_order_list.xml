@@ -60,15 +60,15 @@
         </t>
     </template>
 
-    <report
-        id="of_report_sale_order_list"
-        string="Orders List"
-        model="sale.order"
-        report_type="qweb-pdf"
-        file="of_sale.of_report_saleorder_list"
-        name="of_sale.of_report_saleorder_list"
-        multi="True"
-        paperformat="of_base.paperformat_euro_internal"
-    />
+    <record id="of_report_sale_order_list" model="ir.actions.report">
+        <field name="name">Orders List</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_sale.of_report_saleorder_list</field>
+        <field name="report_file">of_sale.of_report_saleorder_list</field>
+        <field name="binding_model_id" ref="sale.model_sale_order" />
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="of_base.paperformat_euro_internal" />
+    </record>
 
 </odoo>
