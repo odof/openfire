@@ -75,7 +75,7 @@
                             </group>
                         </page>
                         <page string="Intervention History" name="intervention_history">
-                            <field name="intervention_ids" nolabel="1" context="{'default_of_address_id': site_address_id, 'default_of_use_equipment': True, 'default_of_equipment_ids': active_id}">
+                            <field name="intervention_ids" nolabel="1" context="{'default_of_address_id': site_address_id, 'default_of_use_equipment': True, 'default_of_partner_id': customer_id, 'default_of_equipment_ids': [(6, 0, [active_id])]}" domain="[('of_equipment_ids', 'in', [id])]">
                                 <tree
                                     string="Interventions"
                                     decoration-success="of_state == 'confirmed'"
@@ -85,7 +85,7 @@
                                     decoration-info="of_state == 'unfinished'"
                                 >
                                     <field name="of_state" invisible="1"/>
-                                    <field name="start"/>
+                                    <field name="start" string="Intervention Date"/>
                                     <field name="of_employee_ids" widget="many2many_tags"/>
                                     <field name="of_task_id"/>
                                     <field name="duration" widget="float_time"/>
