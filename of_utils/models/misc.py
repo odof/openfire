@@ -106,16 +106,18 @@ def compare_date(date1, date2, compare="==", isdatetime=False):
 
 
 def sanitize_text(text, allowed=''):
+    """This function cleans a text by replacing non-ascii characters.
+
+    Characters will be replaced by an equivalent if possible (e.g. accented letters) or removed otherwise.
+    Only digits, letters, and characters from allowed will be kept, others removed.
+
+    Args:
+        text: Text to clean.
+        allowed: Allowed ASCII special characters (punctuation, whitespace, etc.).
+
+    Returns:
+        Cleaned text.
     """
-    Cette fonction nettoie un texte en remplaçant les caractères non-ascii.
-    Les caractères seront remplacés par un équivalent si possible (e.g. lettres accentuées) ou supprimés sinon.
-    Seuls les chiffres, lettres, et caractères de allowed seront conservés, les autres supprimés.
-    :param text: Texte à nettoyer.
-    :param allowed: Caractères spéciaux ASCII autorisés (ponctuation, espaces blancs, etc.).
-    :return: texte nettoyé.
-    """
-    # Retrait de tous les caractères spéciaux.
-    # Les caractères accentués sont remplacés par leur version sans accent.
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii')
     allowed = re.escape(allowed)
     return re.sub(f'[^0-9A-Za-z{allowed}]', '', text)

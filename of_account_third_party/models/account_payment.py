@@ -8,6 +8,7 @@ class AccountPayment(models.Model):
 
     @api.depends('reconciled_invoice_ids', 'payment_type', 'partner_type', 'partner_id')
     def _compute_destination_account_id(self):
-        if len(self) == 1 and not self.reconciled_invoice_ids and self.payment_type != 'transfer' and self.partner_id:
-            self.partner_id.update_account()
+        for payment in self:
+            if payment.partner_id and not payment.reconciled_invoice_ids and not payment.is_internal_transfer:
+                payment.partner_id.update_account(update_customer_account=True, update_supplier_account=True)
         return super()._compute_destination_account_id()

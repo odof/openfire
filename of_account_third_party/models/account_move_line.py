@@ -9,4 +9,4 @@ class AccountMoveLine(models.Model):
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         if self.partner_id:
-            self.partner_id.update_account()
+            self.partner_id.update_account(update_customer_account=True, update_supplier_account=True)
