@@ -316,7 +316,7 @@ class CalendarEvent(models.Model):
 
     # Reports fields
     of_attach_report = fields.Boolean(related='of_template_id.attach_report')
-    of_report_send_date = fields.Datetime(string="Send date report")
+    of_report_send_date = fields.Datetime(string="Report dispatch date")
 
     @api.constrains('of_alert_unable')
     def _check_of_alert_unable(self):
@@ -881,6 +881,10 @@ class CalendarEvent(models.Model):
             default_res_id=self.id,
             default_composition_mode='comment',
         )
+        if template_id := self.env.ref(
+            'of_planning.email_template_of_planning_intervention_report', raise_if_not_found=False
+        ):
+            ctx['default_template_id'] = template_id.id
         return {
             'name': _('Compose Email'),
             'type': 'ir.actions.act_window',
