@@ -80,7 +80,7 @@ class Directory(dms_base.DMSModel):
         :return: Sous dossier du partenaire
         """
         default_settings = self.env.ref('of_document.default_settings')
-        data = default_settings.of_subdirectory_ids.filtered(lambda d: categ in d.datas_ids)[:1]
+        data = default_settings.of_subdirectory_ids.filtered(lambda d: categ in d.data_ids)[:1]
         object_dir = self.search(
             [
                 ('name', '=', data.name),
