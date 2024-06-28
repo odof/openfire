@@ -24,6 +24,7 @@ class SaleOrder(models.Model):
             - le nouveau champ 'Devis envoyé' est passé à vrai pour les commandes avec l'ancien état 'Devis envoyé'
         """
         cr = self._cr
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
         new_workflow = False
         new_canvasser_field = False
         if self._auto:
@@ -40,6 +41,44 @@ class SaleOrder(models.Model):
                 "WHERE table_name = '%s' "
                 "AND column_name = 'of_canvasser_id'" % self._table)
             new_canvasser_field = not bool(cr.fetchall())
+            # les colonnes reste à facturer n'existent pas, on veut calculer manuellement
+            cr.execute(
+                "SELECT * "
+                "FROM information_schema.columns "
+                "WHERE table_name = '%s' "
+                "AND column_name = 'of_amount_to_invoice'" % self._table)
+            if not bool(cr.fetchall()):
+                cr.execute(
+                    "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice numeric; "
+                    "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice_no_deposit numeric;"
+                )
+                # Reste à facturer
+                cr.execute(
+                    "WITH sub AS ( "
+                    "    SELECT sol.order_id, SUM(sol.of_amount_to_invoice) AS of_amount_to_invoice "
+                    "    FROM sale_order_line AS sol "
+                    "    GROUP BY sol.order_id "
+                    ") "
+                    "UPDATE sale_order AS so "
+                    "SET of_amount_to_invoice = sub.of_amount_to_invoice "
+                    "FROM sub "
+                    "WHERE sub.order_id=so.id"
+                )
+                # Reste à facturer hors acompte
+                cr.execute(
+                    "WITH sub AS ("
+                    "    SELECT sol.order_id, SUM(sol.of_amount_to_invoice) AS of_amount_to_invoice "
+                    "    FROM sale_order_line AS sol "
+                    "      LEFT JOIN product_product AS pp ON pp.id=sol.product_id "
+                    "      LEFT JOIN product_template AS pt ON pt.id=pp.product_tmpl_id "
+                    "    WHERE pt.categ_id != %s "
+                    "    GROUP BY sol.order_id "
+                    ") "
+                    "UPDATE sale_order AS so "
+                    "SET of_amount_to_invoice_no_deposit = sub.of_amount_to_invoice "
+                    "FROM sub "
+                    "WHERE sub.order_id=so.id", (categ_id,)
+                )
 
         res = super(SaleOrder, self)._auto_init()
 
@@ -117,6 +156,10 @@ class SaleOrder(models.Model):
     of_main_product_brand_id = fields.Many2one(
         comodel_name='of.product.brand', compute='_of_compute_main_product_brand_id',
         string="Brand of the main product", store=True)
+    of_amount_to_invoice = fields.Float(
+        string=u"Reste à facturer", compute="_compute_of_amount_to_invoice", store=True)
+    of_amount_to_invoice_no_deposit = fields.Float(
+        string=u"Reste à facturer hors acompte", compute="_compute_of_amount_to_invoice", store=True)
 
     @api.multi
     @api.depends('of_force_laying_date', 'of_manual_laying_date', 'intervention_ids',
@@ -172,6 +215,17 @@ class SaleOrder(models.Model):
             main_product_lines = rec.order_line.filtered(lambda l: l.of_article_principal)
             if main_product_lines:
                 rec.of_main_product_brand_id = main_product_lines[0].product_id.brand_id
+
+    @api.depends('order_line.of_amount_to_invoice')
+    def _compute_of_amount_to_invoice(self):
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+        for record in self:
+            record.of_amount_to_invoice = sum(record.order_line.mapped('of_amount_to_invoice'))
+            record.of_amount_to_invoice_no_deposit = sum(
+                record.order_line.filtered(
+                    lambda l: l.product_id.categ_id.id != categ_id
+                ).mapped('of_amount_to_invoice')
+            )
 
     @api.multi
     def _of_update_deadline_date_activities(self, activity_fields=None):
