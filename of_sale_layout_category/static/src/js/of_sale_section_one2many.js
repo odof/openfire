@@ -175,7 +175,6 @@ export class OFSaleSectionLine extends Component {
         recordValue['name'] = recordValue['name'] + _t(" (copy)");
         let newRecord = await this.add(recordValue);
 
-
         if (children.length > 0) {
             await this.duplicateRecursive(newRecord, children);
         }
@@ -189,12 +188,16 @@ export class OFSaleSectionLine extends Component {
             let childs = this.props.list.records.filter((record) => record.data.of_parent_node_id == child.data.of_node_id);
             // on duplique le child
             let recordValue = child.data;
+            let taxes = child.data.tax_id.records;
             recordValue['of_node_id'] = this.props.list.records.length + 1;
             recordValue['of_parent_node_id'] = parentRecord.data.of_node_id;
             if (recordValue.display_type == 'line_section'){
                 recordValue['name'] = recordValue['name'] + _t(" (copy)");
             }
             let newRecord = await this.add(recordValue);
+            for (const tax of taxes){
+                newRecord.data.tax_id.add(tax);
+            }
             // on les duplique récursivement s'il y en a
             if (childs.length > 0) {
                 await this.duplicateRecursive(newRecord, childs);
