@@ -4,4 +4,4 @@ from . import of_planning_intervention
 from . import purchase
 from . import sale
 from . import stock
-
+from . import stock_inventory
