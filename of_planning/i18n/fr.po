@@ -1816,6 +1816,12 @@ msgstr "Fiche d'intervention"
 #. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/calendar_event.py:0
+#, python-format
+msgid "Intervention Sheet - %(name)s - %(date)s"
+msgstr "Fiche d'intervention - %(name)s - %(date)s"
+
+#. module: of_planning
+#. odoo-python
 #: code:addons/of_planning/models/sale_order.py:0
 #, python-format
 msgid "Intervention Sheet - %s"

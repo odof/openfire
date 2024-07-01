@@ -1396,12 +1396,15 @@ class CalendarEvent(models.Model):
 
     def _get_report_base_filename(self, what='report'):
         """Helper method to get the base filename for the intervention report."""
+        self.ensure_one()
+
+        start_date = self.start.date() if self.start else ''
         if what == 'sheet':
-            return _("Intervention Sheet - %s") % self.name
+            return _("Intervention Sheet - %(name)s - %(date)s", name=self.name, date=f'{start_date}'.replace('/', '-'))
 
         task_name = self.of_task_id.name if self.of_task_id else ''
         partner_name = self.of_partner_id.display_name if self.of_partner_id else 'report'
-        start_date = self.start.date() if self.start else ''
+
         return (
             task_name + (task_name and partner_name and ' - ' or '') + f'{partner_name} {start_date}'.replace('/', '-')
         ) or "report"
