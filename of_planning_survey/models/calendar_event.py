@@ -38,6 +38,10 @@ class CalendarEvent(models.Model):
         readonly=False,
     )
 
+    # --------------------------------------------------------------------------
+    # Compute methods
+    # --------------------------------------------------------------------------
+
     @api.depends('of_template_id')
     def _compute_of_survey_id(self):
         for event in self:
@@ -91,6 +95,10 @@ class CalendarEvent(models.Model):
                     question_answers_ids.append(Command.create(question_answers_value))
             event.of_answers_ids = question_answers_ids
 
+    # --------------------------------------------------------------------------
+    # Onchange methods
+    # --------------------------------------------------------------------------
+
     @api.onchange('of_survey_id')
     def _onchange_of_survey_id(self):
         """When the survey is changed we remove the answers and create a new user input.
@@ -109,6 +117,23 @@ class CalendarEvent(models.Model):
             self.of_survey_user_input_id.res_id = self._origin.id
             self.of_survey_user_input_id.redirect_action_id = self.env.ref('of_planning.action_calendar_event').id
             self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+
+    # --------------------------------------------------------------------------
+    # ORM methods
+    # --------------------------------------------------------------------------
+
+    def copy(self, default=None):
+        self.ensure_one()
+        default = dict(default or {}, name=_("%s (copy)") % self.name)
+        new_record = super().copy(default)
+        # by doing this we keep we are resetting questions and user input to avoid having the same answers
+        # on the new record
+        new_record.of_survey_id = self.of_survey_id
+        return new_record
+
+    # --------------------------------------------------------------------------
+    # Actions methods
+    # --------------------------------------------------------------------------
 
     def action_button_open_survey(self):
         """
