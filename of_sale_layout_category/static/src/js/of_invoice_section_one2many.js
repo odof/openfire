@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { registry } from "@web/core/registry";
-const { Component, useEffect, useRef, EventBus } = owl;
+const { Component, useEffect, useState, useRef, EventBus } = owl;
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { X2ManyField } from "@web/views/fields/x2many/x2many_field";
 import { usePopover } from "@web/core/popover/popover_hook";
@@ -18,13 +18,20 @@ export class OFInvoiceSectionLine extends Component {
     }
 
     setup() {
-        this.nbColumns = this.props.columns.length;
+        this.state = useState({
+            nbColumns: this.props.columns.length,
+        });
         this.section_column = this.props.columns.find((c) => c.name === "name");
-        this.section_class = this.section_column.rawAttrs && this.section_column.rawAttrs.class;
+        this.section_class = this.section_column && this.section_column.rawAttrs && this.section_column.rawAttrs.class;
         this.handle_column = this.props.columns.find((c) => c.name === "sequence");
         this.input_section_ref = useRef('inputSection');
         this.popover = usePopover();
         this.bus = new EventBus();
+
+        useEffect(
+            () => {this.state.nbColumns = this.props.columns.length;},
+            () => [this.props.columns]
+        )
     }
 
     showPopup(ev, popover, options) {

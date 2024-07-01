@@ -18,7 +18,7 @@
                <Field name="handle_column.name" record="props.record" type="handle_column.widget" setDirty="(isDirty) => this.setDirty(isDirty)"/>
            </div>
         </td>
-        <td t-att-colspan="nbColumns-1">
+        <td t-att-colspan="state.nbColumns">
             <t t-if="state.active_layout_category">
                 <div class="row">
                     <div class="col-1">

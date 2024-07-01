@@ -8,7 +8,7 @@
     </t>
 
     <t t-name="of_sale_layout_category.OFInvoiceSectionLine" owl="1">
-        <td t-att-colspan="nbColumns">
+        <td t-att-colspan="state.nbColumns">
             <div class="row">
                 <div class="col-1">
                     <t t-esc="props.record.data.of_section_name"/>

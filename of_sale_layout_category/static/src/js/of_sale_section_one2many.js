@@ -30,8 +30,13 @@ export class OFSaleSectionLine extends Component {
         this.state = useState({
             'section_name': this.props.record.data.name,
             'active_layout_category': true,
+            'nbColumns': this.props.columns.length,
         })
 
+        useEffect(
+            () => {this.state.nbColumns = this.props.columns.length;},
+            () => [this.props.columns]
+        )
         useEffect(
             () => {
                 this.state.active_layout_category = this.props.record.model.root.data.of_layout_category_active
