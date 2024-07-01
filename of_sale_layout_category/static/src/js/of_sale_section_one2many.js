@@ -9,7 +9,7 @@ import { PopupoverInfo, PopupoverDelete } from "./popupover";
 import { makeContext } from "@web/core/context";
 import { usePopover } from "@web/core/popover/popover_hook";
 const { Component, useEffect, useRef, onWillUpdateProps, EventBus, useState } = owl;
-
+import { _t } from 'web.core';
 export class OFSaleSectionLine extends Component {
     static template = "of_sale_layout_category.OFSaleSectionLine";
     static components = {
@@ -172,6 +172,7 @@ export class OFSaleSectionLine extends Component {
         let recordValue = this.props.record.data;
         recordValue['of_node_id'] = this.props.list.records.length + 1;
         recordValue['of_parent_node_id'] = this.props.record.data.of_parent_node_id;
+        recordValue['name'] = recordValue['name'] + _t(" (copy)");
         let newRecord = await this.add(recordValue);
 
 
@@ -190,6 +191,9 @@ export class OFSaleSectionLine extends Component {
             let recordValue = child.data;
             recordValue['of_node_id'] = this.props.list.records.length + 1;
             recordValue['of_parent_node_id'] = parentRecord.data.of_node_id;
+            if (recordValue.display_type == 'line_section'){
+                recordValue['name'] = recordValue['name'] + _t(" (copy)");
+            }
             let newRecord = await this.add(recordValue);
             // on les duplique récursivement s'il y en a
             if (childs.length > 0) {
