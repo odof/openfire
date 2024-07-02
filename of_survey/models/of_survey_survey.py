@@ -223,6 +223,11 @@ class OFSurveySurvey(models.Model):
         default = dict(new_defaults, **(default or {}))
         return super().copy_data(default)
 
+    def write(self, vals):
+        res = super().write(vals)
+        self._check_conditional_questions()  # FIXME see docstring of this method
+        return res
+
     # ------------------------------------------------------------
     # ANSWER MANAGEMENT
     # ------------------------------------------------------------
@@ -634,3 +639,19 @@ class OFSurveySurvey(models.Model):
 
     def get_print_url(self):
         return f'/of_survey/print/{self.access_token}'
+
+    def _check_conditional_questions(self):
+        """
+        Checks if there are any conditional questions in the survey and updates the 'is_conditional' field accordingly.
+
+        This method is a hack to avoid an error when opening a survey with conditional questions.
+        The error is due to the fact that a question can be deleted and still be part of a condition.
+        This method should be improved in the future.
+
+        Returns:
+            None
+        """
+        for survey in self:
+            for question in survey.question_ids:
+                if len(question.conditional_questions) == 0:
+                    question.is_conditional = False
