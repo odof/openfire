@@ -756,7 +756,11 @@ class OFPlanningIntervention(models.Model):
     @api.multi
     def export_data(self, fields_to_export, raw_data=False):
         u""" Override to convert virtual ids to ids """
-        records = self.browse(set(get_real_ids(self.ids)))
+        real_ids = get_real_ids(self.ids)
+        seen = set()
+        # On retire les doublons en préservant l'ordre des éléments
+        real_ids_unique = [x for x in real_ids if not (x in seen or seen.add(x))]
+        records = self.browse(real_ids_unique)
         return super(OFPlanningIntervention, records).export_data(fields_to_export, raw_data)
 
     @api.model
