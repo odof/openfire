@@ -27,6 +27,7 @@ Il faut également créer un article de situation.
         'report/of_situation_report.xml',
         'security/ir.model.access.csv',
         'views/of_sale_prorata_views.xml',
+        'views/sale_order_views.xml',
         'wizards/wizard_situation_view.xml',
     ],
     'installable': True,

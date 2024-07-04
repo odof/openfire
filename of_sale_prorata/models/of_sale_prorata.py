@@ -7,6 +7,43 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.model
+    def _auto_init(self):
+        cr = self._cr
+        if self._auto:
+            cr.execute(
+                "SELECT * "
+                "FROM information_schema.columns "
+                "WHERE table_name = '%s' "
+                "AND column_name = 'of_amount_to_invoice_no_prorata'" % self._table)
+            if not bool(cr.fetchall()):
+                cr.execute(
+                    "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice_no_prorata numeric"
+                )
+                # Reste à facturer
+                categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+                product_ids = (
+                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting'),
+                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting'),
+                )
+                self.env.cr.execute(
+                    "WITH sub AS ("
+                    "    SELECT sol.order_id, SUM(sol.of_amount_to_invoice) AS of_amount_to_invoice "
+                    "    FROM sale_order_line AS sol "
+                    "      LEFT JOIN product_product AS pp ON pp.id=sol.product_id "
+                    "      LEFT JOIN product_template AS pt ON pt.id=pp.product_tmpl_id "
+                    "    WHERE pt.categ_id != %s "
+                    "      AND sol.product_id NOT IN %s "
+                    "    GROUP BY sol.order_id "
+                    ") "
+                    "UPDATE sale_order AS so "
+                    "SET of_amount_to_invoice_no_prorata = sub.of_amount_to_invoice "
+                    "FROM sub "
+                    "WHERE sub.order_id=so.id", (categ_id, product_ids)
+                )
+        res = super(SaleOrder, self)._auto_init()
+        return res
+
     of_prorata_percent = fields.Float(string=u"Compte prorata(%)", digits=(4, 5))
     of_retenue_garantie_pct = fields.Float(
         string=u"Ret. garantie(%)", digits=(4, 5),
@@ -16,6 +53,10 @@ class SaleOrder(models.Model):
         help=u"Situation pour laquelle la prochaine facture sera générée")
     of_last_situation = fields.Boolean(compute='_compute_of_last_situation', string=u"Dernière situation ?")
     of_nb_situations = fields.Integer(string=u"Nb. situations")
+    of_amount_to_invoice_no_prorata = fields.Float(
+        string=u"Reste à facturer hors acompte, RG et prorata",
+        compute="_compute_of_amount_to_invoice_no_prorata", store=True
+    )
 
     @api.depends()
     def _compute_of_prochaine_situation(self):
@@ -37,6 +78,20 @@ class SaleOrder(models.Model):
     def _compute_of_last_situation(self):
         for order in self:
             order.of_last_situation = order.of_prochaine_situation == order.of_nb_situations
+
+    @api.depends('order_line.of_amount_to_invoice')
+    def _compute_of_amount_to_invoice_no_prorata(self):
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting'),
+        product_ids = [
+            self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting'),
+            self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting'),
+        ]
+        for record in self:
+            record.of_amount_to_invoice_no_prorata = sum(
+                record.order_line.filtered(
+                    lambda l: l.product_id.categ_id.id != categ_id and l.product_id.id not in product_ids
+                ).mapped('of_amount_to_invoice')
+            )
 
     @api.multi
     def action_invoice_create(self, grouped=False, final=False):
