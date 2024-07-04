@@ -242,14 +242,15 @@ class OFCalculationHeatLoss(models.Model):
 
             annual_consumption = estimated_power * rec.department_id.unified_day_degree \
                                  * rec.construction_type_id.intermittency_coefficient / 1000
-            rec.write({
-                'estimated_power': estimated_power,
-                'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt"),
-                'line_ids': [(0, 0, dict({'product_id': p.id}))
-                             for p in products],
-                'annual_consumption': annual_consumption,
-                'annual_consumption_text': "%.2f %s" % (annual_consumption, "kWatt/an"),
-            })
+            rec.write(
+                {
+                    'estimated_power': estimated_power,
+                    'estimated_power_text': "%s %s" % (estimated_power / 1000, "kWatt"),
+                    'line_ids': [(5,)] + [(0, 0, {'product_id': p.id}) for p in products],
+                    'annual_consumption': annual_consumption,
+                    'annual_consumption_text': "%.2f %s" % (annual_consumption, "kWatt/an"),
+                }
+            )
             self.get_fuel_consumption_data()
         if errors:
             return self.env['of.popup.wizard'].popup_return(message=u"\n".join(errors), titre="Erreur(s)")
