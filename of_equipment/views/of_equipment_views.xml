@@ -107,6 +107,7 @@
                 <field name="name"/>
                 <field name="product_id"/>
                 <field name="customer_id"/>
+                <field name="site_address_id"/>
                 <field name="site_phone_number_ids"/>
                 <field name="service_date"/>
                 <field name="reseller_id"/>
