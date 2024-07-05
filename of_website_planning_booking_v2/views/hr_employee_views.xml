@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- HR Employee Form View -->
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="of_calendar.view_of_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='horaires']/group[1]/div[1]" position="inside">
+                <div class="clearfix"/>
+                <br/>
+                <separator string="Web"/>
+                <field name="of_website_hours_summary"/>
+                <button name="%(of_calendar.action_of_horaire_segment_create_form_view)d" string="Créer un horaire web"
+                        context="{
+                            'default_employee_id': id,
+                            'default_mode': 'create',
+                            'default_mode_horaires': of_mode_horaires,
+                            'default_type': 'website',
+                        }" type="action"/>
+                <button name="%(of_calendar.action_of_horaire_segment_edit_form_view)d" string="Modifier un horaire web"
+                        context="{
+                            'default_employee_id': id,
+                            'default_mode': 'edit',
+                            'default_mode_horaires': of_mode_horaires,
+                            'default_type': 'website',
+                        }" type="action"/>
+                <button name="%(of_calendar.action_of_horaire_segment_unlink_form_view)d" string="Supprimer un horaire web"
+                        context="{
+                            'default_employee_id': id,
+                            'default_mode': 'unlink',
+                            'default_mode_horaires': 'advanced',
+                            'default_type': 'website',
+                        }" type="action"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
