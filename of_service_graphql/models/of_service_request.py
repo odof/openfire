@@ -209,7 +209,7 @@ class OFServiceRequest(models.Model):
                 odoo_domain.append(('id', 'in', service_localized_ids))
                 service_requests = self.env['of.service.request'].search(odoo_domain, limit=100)
                 services_distance = self.calculate_distances(
-                    service_requests, select.latitude, select.longitude, max_distance_converted
+                    service_requests, select.latitude, select.longitude, select.max_distance
                 )
                 for s in services_distance:
                     for service in service_requests:
@@ -241,6 +241,6 @@ class OFServiceRequest(models.Model):
             distance_index = services_index.get(service.id)
             if distance_index is not None:
                 distance = distances[distance_index]
-                if max_distance is not None and distance > max_distance:
+                if max_distance is not None and distance < max_distance:
                     services_distance.append((service, distance))
         return services_distance
