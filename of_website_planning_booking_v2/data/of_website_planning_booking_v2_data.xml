@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Website menu -->
+    <record id="booking_menu" model="website.menu">
+        <field name="name">Prendre rendez-vous</field>
+        <field name="url">/booking</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">60</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+    <!-- Modèle de mail -->
+    <record id="booking_confirmation_mail_template" model="mail.template">
+        <field name="name">Prise de RDV en ligne - Confirmation</field>
+        <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+        <field name="subject">Confirmation de votre prise de rendez-vous</field>
+        <field name="partner_to">${object.address_id.commercial_partner_id.id}</field>
+        <field name="model_id" ref="of_planning.model_of_planning_intervention"/>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">${object.address_id.commercial_partner_id.lang}</field>
+        <field name="body_html"><![CDATA[
+<p>Bonjour ${object.address_id.commercial_partner_id.title and object.address_id.commercial_partner_id.title.shortcut or ''} ${object.address_id.commercial_partner_id.name},</p>
+<p>
+Votre demande de rendez-vous pour le ${format_date(object.date)} a bien été enregistrée.
+</p>
+<p>
+Vous en souhaitant bonne réception.<br/>
+</p>
+]]>
+        </field>
+    </record>
+
+</odoo>

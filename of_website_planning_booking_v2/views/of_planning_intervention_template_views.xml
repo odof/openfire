@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.view.form</field>
+        <field name="model">of.planning.intervention.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box_custom']" position="inside">
+                <button name="toggle_web" type="object" class="oe_stat_button" icon="fa-globe">
+                    <field name="website_published" widget="boolean_button"
+                        options="{'terminology': {
+                            'string_true': 'Web',
+                            'string_false': 'Web'
+                        }}"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="website_name" attrs="{'invisible': [('website_published', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

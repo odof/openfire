@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_planning_intervention_template_portal,access.of.planning.intervention.template.portal,model_of_planning_intervention_template,base.group_portal,1,0,0,0
+access_of_planning_intervention_template_public,access.of.planning.intervention.template.public,model_of_planning_intervention_template,base.group_public,1,0,0,0
+access_res_better_zip_portal,access.res.better.zip.portal,base_location.model_res_better_zip,base.group_portal,1,0,0,0
+access_res_better_zip_public,access.res.better.zip.public,base_location.model_res_better_zip,base.group_public,1,0,0,0

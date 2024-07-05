@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Planning Intervention Form View -->
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.view.form</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h1" position="after">
+                <field name="website_create" invisible="1"/>
+                <h3 style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: #337ab7; padding-left: 5px; padding-right: 5px;"
+                    attrs="{'invisible': [('website_create', '=', False)]}">
+                    Web
+                </h3>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Planning Intervention Search View -->
+    <record id="of_planning_intervention_view_search" model="ir.ui.view">
+        <field name="name">of.planning.intervention.view.search</field>
+        <field name="model">of.planning.intervention</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='filter']" position="inside">
+                <separator/>
+                <filter name="website_create" string="RDV web" domain="[('website_create', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
