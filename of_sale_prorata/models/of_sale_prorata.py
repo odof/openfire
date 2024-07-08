@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -21,10 +21,11 @@ class SaleOrder(models.Model):
                     "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice_no_prorata numeric"
                 )
                 # Reste à facturer
-                categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+                categ_id = self.env['ir.values'].get_default(
+                    'sale.config.settings', 'of_deposit_product_categ_id_setting') or 0
                 product_ids = (
-                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting'),
-                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting'),
+                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting') or 0,
+                    self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting') or 0,
                 )
                 self.env.cr.execute(
                     "WITH sub AS ("

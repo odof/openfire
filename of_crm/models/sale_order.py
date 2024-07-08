@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
             - le nouveau champ 'Devis envoyé' est passé à vrai pour les commandes avec l'ancien état 'Devis envoyé'
         """
         cr = self._cr
-        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting') or 0
         new_workflow = False
         new_canvasser_field = False
         if self._auto:
