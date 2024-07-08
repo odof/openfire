@@ -564,8 +564,13 @@ input.images {
     padding: 10px;
     border: 1px solid #35979c;
     height: 100px;
-    .title {
-        font-weight: bold;
+    .block-text {
+        max-height: 80px;
+        overflow: hidden;
+
+        .title {
+            font-weight: bold;
+        }
     }
     i {
         font-size: x-large;
@@ -578,11 +583,6 @@ input.images {
     .button {
         padding: 0px;
         margin-top: 30px;
-    }
-    .legend {
-        overflow: scroll;
-        display: block;
-        max-height: 70px;
     }
 }
 

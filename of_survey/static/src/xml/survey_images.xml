@@ -9,9 +9,9 @@
                         <div class="col-4">
                             <img t-att-src="image.src" class="img img-fluid"/>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6 block-text">
                             <span t-esc="image.title" class="title"/><br/>
-                            <span t-esc="image.legend" class="legend"/>
+                            <span t-esc="image.legend"/>
                         </div>
                         <div class="col-2 button" >
                             <div class="col-12">
