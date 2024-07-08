@@ -1,0 +1,137 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_user_profile
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-10 13:23+0000\n"
+"PO-Revision-Date: 2024-10-10 13:23+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_user_profile
+#: model:ir.model,name:of_user_profile.model_res_groups
+msgid "Access Groups"
+msgstr "Groupes d'accès"
+
+#. module: of_user_profile
+#: model_terms:ir.ui.view,arch_db:of_user_profile.of_user_profile_res_users_profile_form_view
+msgid "Configuration"
+msgstr ""
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_field_ids
+msgid "Fields to update"
+msgstr "Champs à mettre à jour"
+
+#. module: of_user_profile
+#: model_terms:ir.ui.view,arch_db:of_user_profile.of_user_profile_res_users_profile_form_view
+msgid "Fields to update for linked users"
+msgstr "Champs à mettre à jour pour les utilisateurs liés"
+
+#. module: of_user_profile
+#: model:ir.model.fields,help:of_user_profile.field_res_users__of_is_update_users
+msgid ""
+"If non checked, users associated to this profile will not be updated after "
+"creation"
+msgstr ""
+" Si non coché, les utilisateurs associés à ce profil ne seront pas mis à "
+"jour après création "
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_is_user_profile
+msgid "Is User Profile"
+msgstr "Est un profil d'utilisateur"
+
+#. module: of_user_profile
+#: model_terms:ir.ui.view,arch_db:of_user_profile.of_user_profile_res_users_profile_form_view
+msgid "Linked Users"
+msgstr "Utilisateurs liés"
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_user_ids
+msgid "Linked users"
+msgstr "Utilisateurs"
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_superuser_id
+msgid "Of Superuser"
+msgstr "Super-utilisateur"
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_users_count
+msgid "Of Users Count"
+msgstr "Nombre d'utilisateurs"
+
+#. module: of_user_profile
+#: model:ir.model.constraint,message:of_user_profile.constraint_res_users_profile_without_profile_id
+msgid "Profile users cannot be linked to a profile!"
+msgstr "Les utilisateurs d'un profil ne peuvent pas être liés à un profil !"
+
+#. module: of_user_profile
+#: model_terms:ir.ui.view,arch_db:of_user_profile.of_user_profile_res_users_profile_form_view
+msgid "Profile..."
+msgstr "Profil..."
+
+#. module: of_user_profile
+#: model:ir.model.constraint,message:of_user_profile.constraint_res_users_active_admin_check
+msgid "The user with id = 2 must always be active!"
+msgstr "L'utilisateur avec l'id = 2 doit toujours être actif !"
+
+#. module: of_user_profile
+#: model:ir.model,name:of_user_profile.model_of_user_profile_hooks_installed
+msgid ""
+"This model is used to test if the module is installed and avoid monkey "
+"patching side-effects."
+msgstr ""
+"Ce modèle est utilisé pour tester si le module est installé et éviter les "
+"effets secondaires du monkeypatching."
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_is_update_users
+msgid "Update users after creation"
+msgstr "Mise à jour des utilisateurs après la création"
+
+#. module: of_user_profile
+#: model:ir.model,name:of_user_profile.model_res_users
+msgid "User"
+msgstr "Utilisateur"
+
+#. module: of_user_profile
+#: model:ir.model.fields,field_description:of_user_profile.field_res_users__of_user_profile_id
+msgid "User Profile"
+msgstr "Profil de l'utilisateur"
+
+#. module: of_user_profile
+#: model:ir.actions.act_window,name:of_user_profile.of_user_profile_res_users_profile_action
+#: model:ir.ui.menu,name:of_user_profile.of_user_profile_res_users_profile_menu
+msgid "Users Profiles"
+msgstr "Profils des utilisateurs"
+
+#. module: of_user_profile
+#. odoo-python
+#: code:addons/of_user_profile/models/res_users.py:0
+#, python-format
+msgid "You can't use %s as user profile !"
+msgstr "Vous ne pouvez pas utiliser %s comme profil d'utilisateur !"
+
+#. module: of_user_profile
+#. odoo-python
+#: code:addons/of_user_profile/models/res_users.py:0
+#, python-format
+msgid "_update_from_profile accepts only users linked to a same profile"
+msgstr ""
+"_update_from_profile n'accepte que les utilisateurs liés à un même profil."
+
+#. module: of_user_profile
+#. odoo-python
+#: code:addons/of_user_profile/models/res_users.py:0
+#, python-format
+msgid "_update_from_profile doesn't manage fields.One2many"
+msgstr "_update_from_profile ne gère pas les champs.One2many"
