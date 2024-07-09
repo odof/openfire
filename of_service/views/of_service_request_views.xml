@@ -58,7 +58,6 @@
                             <field name="base_state" invisible="1" />
                             <field name="type_id" />
                             <field name="template_id" context="{'of_search_by_type_id': type_id}" attrs="{'readonly': [('number', '!=', False), ('base_state', 'not in', ('draft', 'cancel'))]}" />
-                            <field name="order_id" context="{'extended_display': 1}" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}" />
                         </group>
                         <group>
                             <field name="user_id" />
@@ -145,6 +144,12 @@
                         <page name="description" string="Description">
                             <group>
                                 <field name="note" placeholder="Description..." colspan="2" nolabel="1"/>
+                            </group>
+                            <!-- Attribut invisible à supprimer une fois que d'autres champs que Commande sera dans cette partie Origine -->
+                            <group name="origin" string="Origin" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}">
+                                <group>
+                                    <field name="order_id" context="{'extended_display': 1}" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}"/>
+                                </group>
                             </group>
                         </page>
                         <page name="history" string="History">

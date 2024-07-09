@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:38+0000\n"
-"PO-Revision-Date: 2024-07-11 07:38+0000\n"
+"POT-Creation-Date: 2024-07-12 14:07+0000\n"
+"PO-Revision-Date: 2024-07-12 14:07+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1093,6 +1093,7 @@ msgstr "Commandes"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__origin
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Origin"
 msgstr "Origine"
 
