@@ -1201,8 +1201,7 @@ class CalendarEvent(models.Model):
         invoice_data = {}
 
         # Get the partner
-        partner = self.partner_id
-        partner = False
+        partner = self.of_partner_id
         if not partner:
             if not self.of_address_id:
                 messages.append(_("No partner defined."))
