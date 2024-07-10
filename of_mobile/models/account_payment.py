@@ -14,7 +14,7 @@ class AccountPayment(models.Model):
     of_type = fields.Selection(
         [('all', "All"), ('intervention', "Intervention"), ('sale', "Sale"), ('none', "None")],
         default='none',
-        string="Type",
+        string="Type (OF)",
     )
 
     @api.model

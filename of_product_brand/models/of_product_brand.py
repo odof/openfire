@@ -9,9 +9,9 @@ class OfProductBrand(models.Model):
 
     _description = "Product brand"
 
-    active = fields.Boolean(string="Active", default=True)
-    name = fields.Char(string="Name", required=True)
-    code = fields.Char(string="Code", required=True)
+    active = fields.Boolean(default=True)
+    name = fields.Char(required=True)
+    code = fields.Char(required=True)
     use_prefix = fields.Boolean(
         string="Use code as prefix",
         default=True,
@@ -30,7 +30,7 @@ class OfProductBrand(models.Model):
     product_variant_ids = fields.One2many(
         comodel_name='product.product', inverse_name='brand_id', string="Product variants", readonly=True
     )
-    logo = fields.Binary(string="Logo")
+    logo = fields.Binary()
     product_count = fields.Integer(
         string="# Products", compute='_compute_product_count', help="The number of products of this brand"
     )

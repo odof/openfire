@@ -28,7 +28,7 @@ except ImportError:
     pypdftk = None
 
 
-class OfCustomDocument(models.Model):
+class OFCustomDocument(models.Model):
     """Printable PDF document templates"""
 
     _name = 'of.custom.document'
@@ -41,9 +41,9 @@ class OfCustomDocument(models.Model):
     print_header = fields.Boolean(string="Print header", help="Print the header of the company")
     body_html = fields.Html(string='Body', render_engine='qweb', translate=True, prefetch=True, sanitize=False)
     file_name = fields.Char(string="Filename")
-    file = fields.Binary(string="File")
+    file = fields.Binary()
     fillable = fields.Boolean(string="Keep fillable", help="The pdf document will be fillable")
-    sequence = fields.Integer(string="Sequence", default=10)
+    sequence = fields.Integer(default=10)
     model_id = fields.Many2one(comodel_name='ir.model', string="Applies to")
     model = fields.Char(
         string='Related Document Model', related='model_id.model', index=True, store=True, readonly=True

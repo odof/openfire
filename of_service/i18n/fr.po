@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 15:41+0000\n"
-"PO-Revision-Date: 2024-06-28 15:41+0000\n"
+"POT-Creation-Date: 2024-07-11 07:38+0000\n"
+"PO-Revision-Date: 2024-07-11 07:38+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -533,7 +533,7 @@ msgstr "Durées"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__address_email
-#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_email
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Email"
 msgstr ""
 
@@ -938,7 +938,7 @@ msgstr "Date d'échéance min"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__address_mobile
-#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_mobile
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Mobile"
 msgstr ""
 
@@ -956,8 +956,6 @@ msgstr "Mois"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__name
-#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_name
-#: model:ir.model.fields,field_description:of_service.field_of_service_request__task_name
 #: model:ir.model.fields,field_description:of_service.field_of_service_request_stage__name
 #: model:ir.model.fields,field_description:of_service.field_of_service_request_tag__name
 #: model:ir.model.fields,field_description:of_service.field_of_service_request_type__name
@@ -1117,6 +1115,26 @@ msgid "Partner"
 msgstr "Partenaire"
 
 #. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_email
+msgid "Partner Email"
+msgstr "Email"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_mobile
+msgid "Partner Mobile"
+msgstr "Mobile"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_name
+msgid "Partner Name"
+msgstr "Nom"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_phone
+msgid "Partner Phone"
+msgstr "Téléphone"
+
+#. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_res_partner__request_partner_ids
 #: model:ir.model.fields,field_description:of_service.field_res_users__request_partner_ids
 msgid "Partner Service Request"
@@ -1129,7 +1147,7 @@ msgstr "Étiquettes partenaire"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__address_phone
-#: model:ir.model.fields,field_description:of_service.field_of_service_request__partner_phone
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Phone"
 msgstr "Téléphone"
 
@@ -1345,11 +1363,15 @@ msgid "SR to Schedule"
 msgstr "DI à planifier"
 
 #. module: of_service
-#: model:ir.model.fields,field_description:of_service.field_res_partner__request_to_schedule_count
 #: model:ir.model.fields,field_description:of_service.field_res_partner__request_to_schedule_ids
-#: model:ir.model.fields,field_description:of_service.field_res_users__request_to_schedule_count
 #: model:ir.model.fields,field_description:of_service.field_res_users__request_to_schedule_ids
 msgid "SR to schedule"
+msgstr "DI à planifier"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_res_partner__request_to_schedule_count
+#: model:ir.model.fields,field_description:of_service.field_res_users__request_to_schedule_count
+msgid "SR to schedule count"
 msgstr "DI à planifier"
 
 #. module: of_service
@@ -1460,11 +1482,15 @@ msgid "Service Request: Send by mail"
 msgstr "Demande d'intervention: Envoyer par mail"
 
 #. module: of_service
-#: model:ir.model.fields,field_description:of_service.field_sale_order__of_request_count
 #: model:ir.model.fields,field_description:of_service.field_sale_order__of_request_ids
 #: model_terms:ir.ui.view,arch_db:of_service.of_planning_task_view_form
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
 msgid "Service Requests"
+msgstr "Demandes d'intervention"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_sale_order__of_request_count
+msgid "Service Requests count"
 msgstr "Demandes d'intervention"
 
 #. module: of_service
@@ -1584,6 +1610,11 @@ msgid "Task"
 msgstr "Tâche"
 
 #. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__task_name
+msgid "Task Name"
+msgstr "Nom"
+
+#. module: of_service
 #: model:ir.model.fields,help:of_service.field_of_service_request__task_id
 #: model:ir.model.fields,help:of_service.field_of_service_request_create_intervention_line_wizard__request_task_id
 msgid "Task to be carried out during the operation."
@@ -1606,9 +1637,13 @@ msgid "Technical Sector"
 msgstr "Secteur technique"
 
 #. module: of_service
-#: model:of.service.request.type,name:of_service.of_service_request_type_technical
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
 msgid "Technical Visit"
+msgstr "Visite technique"
+
+#. module: of_service
+#: model:of.service.request.type,name:of_service.of_service_request_type_technical
+msgid "Technical visit"
 msgstr "Visite technique"
 
 #. module: of_service

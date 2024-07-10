@@ -3,7 +3,7 @@
 from odoo import api, fields, models
 
 
-class OfCustomDocumentField(models.Model):
+class OFCustomDocumentField(models.Model):
     _name = 'of.custom.document.field'
     _description = "PDF field"
     _inherit = 'mail.render.mixin'

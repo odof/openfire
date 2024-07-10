@@ -6,6 +6,7 @@ from odoo.tools import float_compare
 
 class OFSalePaymenSchedule(models.Model):
     _name = 'of.sale.payment.schedule'
+    _description = "Sale Payment Schedule"
     _order = 'order_id, sequence, id'
 
     def _default_payment_schedule_name(self):
@@ -14,16 +15,14 @@ class OFSalePaymenSchedule(models.Model):
     name = fields.Char(required=True, default=lambda self: self._default_payment_schedule_name())
     order_id = fields.Many2one(comodel_name='sale.order', string="Sale order")
     currency_id = fields.Many2one(related='order_id.currency_id', readonly=True)
-    amount = fields.Monetary(
-        currency_field='currency_id', string="Amount", compute='_compute_amount', readonly=False, store=True
-    )
+    amount = fields.Monetary(currency_field='currency_id', compute='_compute_amount', readonly=False, store=True)
     percent = fields.Float(
         string="Percentage", digits='Product Price', compute='_compute_percent', readonly=False, store=True
     )
     # TODO: rename depuis l'ancien nom : last
     is_last = fields.Boolean(string="Last payment", compute='_compute_is_last')
-    sequence = fields.Integer(string="Sequence")
-    date = fields.Date(string="Date")
+    sequence = fields.Integer()
+    date = fields.Date()
 
     def _compute_is_last(self):
         for order in self.mapped('order_id'):

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-18 07:53+0000\n"
-"PO-Revision-Date: 2024-06-18 07:53+0000\n"
+"POT-Creation-Date: 2024-07-11 06:36+0000\n"
+"PO-Revision-Date: 2024-07-11 06:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -22,8 +22,8 @@ msgid ""
 "Adds PDFs of delivery notes associated with the intervention as an appendix "
 "to the PDF document."
 msgstr ""
-"Ajoute les PDF des bons de livraison associés à "
-"l'intervention en annexe du document PDF."
+"Ajoute les PDF des bons de livraison associés à l'intervention en annexe du "
+"document PDF."
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,help:of_custom_document_planning.field_of_planning_intervention_template__report_custom_document_ids
@@ -32,14 +32,15 @@ msgid ""
 "Adds customized documents selected in the intervention as an appendix to the"
 " PDF document."
 msgstr ""
-"Ajoute les documents personnalisés sélectionné dans"
-" l'intervention en annexe du document PDF."
+"Ajoute les documents personnalisés sélectionné dans l'intervention en annexe"
+" du document PDF."
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,help:of_custom_document_planning.field_of_planning_intervention_template__report_invoice_pdf
 #: model:ir.model.fields,help:of_custom_document_planning.field_of_planning_intervention_template__sheet_invoice_pdf
 msgid ""
-"Adds the PDF invoice for the intervention as an appendix to the PDF document."
+"Adds the PDF invoice for the intervention as an appendix to the PDF "
+"document."
 msgstr ""
 "Ajoute le PDF de la facture de l'intervention en annexe du document PDF."
 
@@ -50,8 +51,8 @@ msgid ""
 "Adds the PDF of the order associated with the intervention as an appendix to"
 " the PDF document."
 msgstr ""
-"Ajoute le PDF de la commande associée à "
-"l'intervention en annexe du document PDF."
+"Ajoute le PDF de la commande associée à l'intervention en annexe du document"
+" PDF."
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,help:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
@@ -60,8 +61,8 @@ msgid ""
 "Adds the PDF of the purchase order associated with the intervention as an "
 "appendix to the PDF document."
 msgstr ""
-"Ajoute le PDF de la commande d'achat associée à l'intervention "
-"en annexe du document PDF."
+"Ajoute le PDF de la commande d'achat associée à l'intervention en annexe du "
+"document PDF."
 
 #. module: of_custom_document_planning
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
@@ -79,9 +80,18 @@ msgid "Custom documents"
 msgstr "Documents personnalisés"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_picking_pdf
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_picking_pdf
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Delivery notes"
+msgstr "Bons de livraison"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_picking_pdf
+msgid "Delivery notes (IR)"
+msgstr "Bons de livraison"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_picking_pdf
+msgid "Delivery notes (IS)"
 msgstr "Bons de livraison"
 
 #. module: of_custom_document_planning
@@ -100,28 +110,63 @@ msgid "Intervention template"
 msgstr "Modèle d'intervention"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_invoice_pdf
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_invoice_pdf
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Invoices"
 msgstr "Factures"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_custom_document_ids
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_custom_document_ids
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_invoice_pdf
+msgid "Invoices (IR)"
+msgstr "Factures"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_invoice_pdf
+msgid "Invoices (IS)"
+msgstr "Factures"
+
+#. module: of_custom_document_planning
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Joined documents"
 msgstr "Documents joints"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_order_pdf
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_order_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_custom_document_ids
+msgid "Joined documents (IR)"
+msgstr "Documents joints"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_custom_document_ids
+msgid "Joined documents (IS)"
+msgstr "Documents joints"
+
+#. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Order"
 msgstr "Commandes"
 
 #. module: of_custom_document_planning
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
-#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_purchase_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_order_pdf
+msgid "Order (IR)"
+msgstr "Commandes"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_order_pdf
+msgid "Order (IS)"
+msgstr "Commandes"
+
+#. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Purchases"
+msgstr "Achats"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
+msgid "Purchases (IR)"
+msgstr "Achats"
+
+#. module: of_custom_document_planning
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__sheet_purchase_pdf
+msgid "Purchases (IS)"
 msgstr "Achats"
 
 #. module: of_custom_document_planning

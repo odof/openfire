@@ -9,13 +9,14 @@ from odoo import api, fields, models
 
 class OfLogMessage(models.Model):
     _name = 'of.log.message'
+    _description = "Log Message"
     _order = 'create_date DESC'
 
     name = fields.Char(string="Title")
-    model = fields.Char(string="Model")
+    model = fields.Char()
     type = fields.Char(string="Error type", default="error")
-    message = fields.Text(string="Message", required=True)
-    function = fields.Char(string="Function")
+    message = fields.Text(required=True)
+    function = fields.Char()
     log_level = fields.Selection(
         selection=[
             ('info', "Info"),
@@ -36,13 +37,13 @@ class OfLogMessage(models.Model):
         self.search([('create_date', '<=', st)]).unlink()
 
     @api.model
-    def new_log(self, obj, name, type, message, function, log_level='warning'):
+    def new_log(self, obj, name, ttype, message, function, log_level='warning'):
         model = hasattr(obj, "_name") and obj._name or ""
         self.env['of.log.message'].create(
             {
                 'name': name,
                 'model': model,
-                'type': type,
+                'type': ttype,
                 'message': message,
                 'function': function,
                 'log_level': log_level,

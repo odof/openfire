@@ -36,7 +36,6 @@
         'of_sale_management_template',
     ],
     'data': [
-        'security/ir.model.access.csv',
         'data/ir_config_parameter.xml',
         'data/of_planning_intervention_section.xml',
         'data/of_planning_intervention_template.xml',

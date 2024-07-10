@@ -7,7 +7,7 @@ import pytz
 from odoo.addons.of_planning.tests.common import TestOFPlanningCommon
 
 
-class TestOfPlanningTeam(TestOFPlanningCommon):
+class TestOFPlanningTeam(TestOFPlanningCommon):
     def test_compute_tz_offset(self):
         """Test that the tz_offset is correctly computed"""
         team = self.env['of.planning.team'].create({'name': 'Team 1', 'tz': 'Europe/Paris'})

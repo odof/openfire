@@ -359,11 +359,11 @@ class OFServiceRequest(models.Model):
     partner_latitude = fields.Float(related='address_id.partner_latitude')
     partner_longitude = fields.Float(related='address_id.partner_longitude')
     precision = fields.Selection(related='address_id.of_precision')
-    partner_name = fields.Char(related='partner_id.name')
-    partner_mobile = fields.Char(related='partner_id.mobile')
-    partner_phone = fields.Char(related='partner_id.phone')
-    partner_email = fields.Char(related='partner_id.email')
-    task_name = fields.Char(related='task_id.name', readonly=True)
+    partner_name = fields.Char(related='partner_id.name', string="Partner Name")
+    partner_mobile = fields.Char(related='partner_id.mobile', string="Partner Mobile")
+    partner_phone = fields.Char(related='partner_id.phone', string="Partner Phone")
+    partner_email = fields.Char(related='partner_id.email', string="Partner Email")
+    task_name = fields.Char(related='task_id.name', readonly=True, string="Task Name")
     color = fields.Char(compute='_compute_color', help="Color of the request in the views")
     last_intervention_date = fields.Date(
         string="Last intervention Date",

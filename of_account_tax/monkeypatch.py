@@ -18,7 +18,7 @@ class OfAccountTaxHooks(models.AbstractModel):
     '''
 
     _name = 'of.account.tax.hooks.installed'
-    __doc__ = "This model is used to test if the module is installed and avoid monkey patching side-effects."
+    _description = "This model is used to test if the module is installed and avoid monkey patching side-effects."
 
 
 _load_template_origin = AccountChartTemplate._load_template

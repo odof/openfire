@@ -3,11 +3,11 @@
 {
     'name': "OpenFire / Date de naissance",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'partner_contact_birthdate',
     ],
@@ -17,5 +17,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

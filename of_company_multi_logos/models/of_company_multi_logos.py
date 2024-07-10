@@ -24,7 +24,7 @@ class OfCompanyMultiLogos(models.Model):
     logo = fields.Binary(related='image_1920', string="Company Logo", readonly=False, required=True)
     name = fields.Char(string="Label", required=True)
     color = fields.Integer(string="Color Index")
-    description = fields.Text(string="Description", translate=True)
+    description = fields.Text(translate=True)
     logo_position = fields.Selection(
         selection=[
             ('footer', 'Footer'),

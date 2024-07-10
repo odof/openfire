@@ -3,11 +3,11 @@
 {
     'name': "OpenFire / UTM",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'utm',
     ],
@@ -19,5 +19,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

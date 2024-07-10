@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 17:22+0000\n"
-"PO-Revision-Date: 2024-06-28 17:22+0000\n"
+"POT-Creation-Date: 2024-07-11 06:46+0000\n"
+"PO-Revision-Date: 2024-07-11 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -583,9 +583,18 @@ msgstr "Ajoute le compte rendu de l'intervention"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_address_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_address
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_address
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Address"
+msgstr "Adresse"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_address
+msgid "Address (IR)"
+msgstr "Adresse"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_address
+msgid "Address (IS)"
 msgstr "Adresse"
 
 #. module: of_planning
@@ -992,10 +1001,19 @@ msgstr "Sociétés"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_company_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__company_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_company_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_company_id
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Company"
+msgstr "Société"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_company_id
+msgid "Company (IR)"
+msgstr "Société"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_company_id
+msgid "Company (IS)"
 msgstr "Société"
 
 #. module: of_planning
@@ -1022,9 +1040,18 @@ msgid "Confirm"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_confirmation_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_confirmation_date
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Confirmation date"
+msgstr "Date de confirmation"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_confirmation_date
+msgid "Confirmation date (IR)"
+msgstr "Date de confirmation"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_confirmation_date
+msgid "Confirmation date (IS)"
 msgstr "Date de confirmation"
 
 #. module: of_planning
@@ -1040,10 +1067,19 @@ msgstr "Avertissement de conflit"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_res_partner
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_contact
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_contact
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Contact"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_contact
+msgid "Contact (IR)"
+msgstr "Contact"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_contact
+msgid "Contact (IS)"
+msgstr "Contact"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__create_uid
@@ -1075,13 +1111,20 @@ msgstr "Monnaie"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_partner_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_partner_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_partner_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_partner_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_partner_id
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_day_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_week_document
 msgid "Customer"
+msgstr "Client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_partner_id
+msgid "Customer (IR)"
+msgstr "Client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_partner_id
+msgid "Customer (IS)"
 msgstr "Client"
 
 #. module: of_planning
@@ -1090,10 +1133,29 @@ msgid "Customer category"
 msgstr "Catégorie client"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_partner_code
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_partner_code
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Customer code"
 msgstr "Code client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_partner_code
+msgid "Customer code (IR)"
+msgstr "Code client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_partner_code
+msgid "Customer code (IS)"
+msgstr "Code client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_partner_id
+msgid "Customer in title (IR)"
+msgstr "Client"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_partner_id
+msgid "Customer in title (IS)"
+msgstr "Client"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_customer_notes
@@ -1125,19 +1187,37 @@ msgid "Customers"
 msgstr "Clients"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_pickings
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_pickings
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "DELIVERIES"
 msgstr "LIVRAISONS"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_date
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_pickings
+msgid "DELIVERIES (IR)"
+msgstr "LIVRAISONS"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_pickings
+msgid "DELIVERIES (IS)"
+msgstr "LIVRAISONS"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_sheet_document
 #: model_terms:ir.ui.view,arch_db:of_planning.view_partner_form
 msgid "Date"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_date
+msgid "Date (IR)"
+msgstr "Date"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_date
+msgid "Date (IS)"
+msgstr "Date"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_signature_date
@@ -1248,19 +1328,28 @@ msgstr "Département"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__name
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_description
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_description
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__description
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__note
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_line_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_sheet_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_day_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_week_document
 msgid "Description"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_description
+msgid "Description (IR)"
+msgstr "Description"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_description
+msgid "Description (IS)"
+msgstr "Description"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__discount
@@ -1304,10 +1393,19 @@ msgid "Draft"
 msgstr "Brouillon"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_duration
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_duration
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Duration"
+msgstr "Durée"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_duration
+msgid "Duration (IR)"
+msgstr "Durée"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_duration
+msgid "Duration (IS)"
 msgstr "Durée"
 
 #. module: of_planning
@@ -1387,9 +1485,18 @@ msgid "Event without name"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_description
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_description
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "External description"
+msgstr "Description externe"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_description
+msgid "External description (IR)"
+msgstr "Description externe"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_description
+msgid "External description (IS)"
 msgstr "Description externe"
 
 #. module: of_planning
@@ -1476,9 +1583,18 @@ msgid "Group By"
 msgstr "Grouper par"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_history
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_history
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "HISTORY"
+msgstr "HISTORIQUE"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_history
+msgid "HISTORY (IR)"
+msgstr "HISTORIQUE"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_history
+msgid "HISTORY (IS)"
 msgstr "HISTORIQUE"
 
 #. module: of_planning
@@ -1513,15 +1629,33 @@ msgid "ID"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "INTERVENTION"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_invoicing
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_invoicing
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention
+msgid "INTERVENTION (IR)"
+msgstr "INTERVENTION"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention
+msgid "INTERVENTION (IS)"
+msgstr "INTERVENTION"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "INVOICING"
+msgstr "FACTURATION"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_invoicing
+msgid "INVOICING (IR)"
+msgstr "FACTURATION"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_invoicing
+msgid "INVOICING (IS)"
 msgstr "FACTURATION"
 
 #. module: of_planning
@@ -1595,16 +1729,34 @@ msgstr ""
 "\"%s\"."
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_inspection_visit_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_inspection_visit_date
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Inspection visit date"
 msgstr "Date VT"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_inspection_visit_date
+msgid "Inspection visit date (IR)"
+msgstr "Date VT"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_inspection_visit_date
+msgid "Inspection visit date (IS)"
+msgstr "Date VT"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_internal_description
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_internal_description
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_internal_description
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Internal description"
+msgstr "Description interne"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_internal_description
+msgid "Internal description (IR)"
+msgstr "Description interne"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_internal_description
+msgid "Internal description (IS)"
 msgstr "Description interne"
 
 #. module: of_planning
@@ -1670,6 +1822,11 @@ msgid "Intervention Sheet - %s"
 msgstr "Fiche d’intervention - %s"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_tag_ids
+msgid "Intervention Tags"
+msgstr "Étiquettes"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_image__intervention_date
 msgid "Intervention date"
 msgstr "Date d'intervention"
@@ -1697,21 +1854,32 @@ msgstr "Ligne d'intervention"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_intervention_notes
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_intervention_notes
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_intervention_notes
 #: model:ir.model.fields,field_description:of_planning.field_sale_order__of_intervention_notes
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.sale_order_view_form
 msgid "Intervention notes"
 msgstr "Notes intervention"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_intervention_notes
+msgid "Intervention notes (IR)"
+msgstr "Notes intervention"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_intervention_notes
+msgid "Intervention notes (IS)"
+msgstr "Notes intervention"
+
+#. module: of_planning
+#: model:of.planning.intervention.template,report_title:of_planning.of_planning_default_intervention_template
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.res_config_settings_view_form
 msgid "Intervention report"
 msgstr "Rapport d'intervention"
 
 #. module: of_planning
+#: model:of.planning.intervention.template,sheet_title:of_planning.of_planning_default_intervention_template
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Intervention sheet"
 msgstr "Fiche d'intervention"
@@ -1757,9 +1925,18 @@ msgid "Intervention title"
 msgstr "Titre de l'intervention"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_type
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_type
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Intervention type"
+msgstr "Type d'intervention"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_type
+msgid "Intervention type (IR)"
+msgstr "Type d'intervention"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_type
+msgid "Intervention type (IS)"
 msgstr "Type d'intervention"
 
 #. module: of_planning
@@ -1883,15 +2060,33 @@ msgid "Journal Item"
 msgstr "Écriture comptable"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_legal
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_legal
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "LEGAL NOTICE"
 msgstr "MENTIONS LÉGALES"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_label
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_label
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_legal
+msgid "LEGAL NOTICE (IR)"
+msgstr "MENTIONS LÉGALES"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_legal
+msgid "LEGAL NOTICE (IS)"
+msgstr "MENTIONS LÉGALES"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Label"
+msgstr "Titre"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_label
+msgid "Label (IR)"
+msgstr "Titre"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_label
+msgid "Label (IS)"
 msgstr "Titre"
 
 #. module: of_planning
@@ -1970,9 +2165,18 @@ msgid "Logo"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "MINUTES"
+msgstr "COMPTE-RENDU"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes
+msgid "MINUTES (IR)"
+msgstr "COMPTE-RENDU"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes
+msgid "MINUTES (IS)"
 msgstr "COMPTE-RENDU"
 
 #. module: of_planning
@@ -2022,14 +2226,17 @@ msgid "Mobile"
 msgstr ""
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_type
+msgid "Event Type"
+msgstr "Type d'événement"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "My Interventions"
 msgstr "Mes interventions"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__name
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_name
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_tag__name
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__name
 msgid "Name"
@@ -2111,8 +2318,9 @@ msgstr "Rien à facturer"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_number
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Number"
-msgstr "Numero"
+msgstr "Numéro"
 
 #. module: of_planning
 #: model:ir.module.category,name:of_planning.of_planning_intervention_category
@@ -2120,9 +2328,18 @@ msgid "OF Interventions"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "ORDER"
+msgstr "COMMANDE"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order
+msgid "ORDER (IR)"
+msgstr "COMMANDE"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order
+msgid "ORDER (IS)"
 msgstr "COMMANDE"
 
 #. module: of_planning
@@ -2158,9 +2375,18 @@ msgid "Operator's signature"
 msgstr "Signature technicien"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_employee_ids
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_employee_ids
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Operator(s)"
+msgstr "Technicien(s)"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_employee_ids
+msgid "Operator(s) (IR)"
+msgstr "Technicien(s)"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_employee_ids
+msgid "Operator(s) (IS)"
 msgstr "Technicien(s)"
 
 #. module: of_planning
@@ -2185,6 +2411,16 @@ msgid "Order line"
 msgstr "Ligne de commande"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_name
+msgid "Order number (IR)"
+msgstr "Number"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_name
+msgid "Order number (IS)"
+msgstr "Number"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_order_still_due
 msgid "Order still due amount"
 msgstr "Montant restant dû"
@@ -2195,15 +2431,33 @@ msgid "Origin"
 msgstr "Origine"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_photos
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_photos
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "PHOTOS"
 msgstr ""
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_products
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_products
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_photos
+msgid "PHOTOS (IR)"
+msgstr "PHOTOS"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_photos
+msgid "PHOTOS (IS)"
+msgstr "PHOTOS"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "PRODUCTS AND WORKS"
+msgstr "PRODUITS ET TRAVAUX"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_products
+msgid "PRODUCTS AND WORKS (IR)"
+msgstr "PRODUITS ET TRAVAUX"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_products
+msgid "PRODUCTS AND WORKS (IS)"
 msgstr "PRODUITS ET TRAVAUX"
 
 #. module: of_planning
@@ -2422,16 +2676,34 @@ msgid "Quantity"
 msgstr "Quantité"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_real_dates
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_real_dates
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Real dates"
 msgstr "Dates réelles"
 
 #. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_real_dates
+msgid "Real dates (IR)"
+msgstr "Dates réelles"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_real_dates
+msgid "Real dates (IS)"
+msgstr "Dates réelles"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_real_duration
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_real_duration
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_real_duration
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Real duration"
+msgstr "Durée réelle"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_minutes_real_duration
+msgid "Real duration (IR)"
+msgstr "Durée réelle"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_minutes_real_duration
+msgid "Real duration (IS)"
 msgstr "Durée réelle"
 
 #. module: of_planning
@@ -2465,9 +2737,18 @@ msgid "Report dispatch date"
 msgstr "Date d'envoi du rapport"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_title
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_title
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Report title"
+msgstr "Titre du rapport"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_title
+msgid "Report title (IR)"
+msgstr "Titre du rapport"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_title
+msgid "Report title (IS)"
 msgstr "Titre du rapport"
 
 #. module: of_planning
@@ -2502,10 +2783,19 @@ msgid "Restrict access to intervention settings"
 msgstr "Restreindre l'accès à la configuration des RDVs"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_signature
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_signature
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "SIGNATURES"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_signature
+msgid "SIGNATURES (IR)"
+msgstr "SIGNATURES"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_signature
+msgid "SIGNATURES (IS)"
+msgstr "SIGNATURES"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__so_number
@@ -2580,10 +2870,10 @@ msgstr "Envoyé aux employés qui souhaitent recevoir le planning du lendemain"
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_line__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sequence
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sequence_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_tag__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_task__sequence
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__sequence
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Sequence"
 msgstr "Séquence"
 
@@ -2595,9 +2885,18 @@ msgstr "Paramètres"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_signature_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_signature_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_signature_date
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Signature date"
+msgstr "Date de signature"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_signature_date
+msgid "Signature date (IR)"
+msgstr "Date de signature"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_signature_date
+msgid "Signature date (IS)"
 msgstr "Date de signature"
 
 #. module: of_planning
@@ -2621,10 +2920,19 @@ msgid "Start Date"
 msgstr "Date de début"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_date
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_date
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.view_calendar_event_intervention_tree
 msgid "Start date"
+msgstr "Date de début"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_date
+msgid "Start date (IR)"
+msgstr "Date de début"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_date
+msgid "Start date (IS)"
 msgstr "Date de début"
 
 #. module: of_planning
@@ -2714,17 +3022,17 @@ msgid "Tag list"
 msgstr "Liste des étiquettes"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_tag_ids
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Tags"
 msgstr "Étiquettes"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_of_planning_task
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_task_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_task_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_task_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__task_id
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_sheet_document
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_day_document
@@ -2733,9 +3041,28 @@ msgid "Task"
 msgstr "Tâche"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_task_description
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_task_description
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_task_id
+msgid "Task (IR)"
+msgstr "Tâche"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_task_id
+msgid "Task (IS)"
+msgstr "Tâche"
+
+#. module: of_planning
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Task description"
+msgstr "Description de la tâche"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_task_description
+msgid "Task description (IR)"
+msgstr "Description de la tâche"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_task_description
+msgid "Task description (IS)"
 msgstr "Description de la tâche"
 
 #. module: of_planning
@@ -2766,12 +3093,21 @@ msgstr ""
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_team_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_team_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_team_id
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__name
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_team_view_form
 msgid "Team"
+msgstr "Équipe"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_intervention_team_id
+msgid "Team (IR)"
+msgstr "Équipe"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_team_id
+msgid "Team (IS)"
 msgstr "Équipe"
 
 #. module: of_planning
@@ -2787,9 +3123,19 @@ msgid "Teams list"
 msgstr "Liste des équipes"
 
 #. module: of_planning
+#: model:ir.model.fields,help:of_planning.field_calendar_event__of_type
+msgid "Technical field to differentiate between interventions and events"
+msgstr "Champ technique pour différencier les interventions des événements"
+
+#. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template_line__template_id
 msgid "Template"
 msgstr "Modèle"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sequence_id
+msgid "Template Sequence"
+msgstr "Séquence"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__line_ids
@@ -2963,10 +3309,19 @@ msgid "Total duration"
 msgstr "Durée totale"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_totals
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_totals
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Totals"
 msgstr ""
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_totals
+msgid "Totals (IR)"
+msgstr "Totals"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_totals
+msgid "Totals (IS)"
+msgstr "Totals"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_stock_picking
@@ -2979,7 +3334,6 @@ msgid "Travel duration"
 msgstr "Durée du trajet"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_type
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_print_wizard__report_type
 msgid "Type"
 msgstr ""
@@ -3030,9 +3384,18 @@ msgid "Update Taxes"
 msgstr "Mettre à jour les taxes"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_use_default
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_use_default
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Use default report"
+msgstr "Utiliser le rapport par défaut"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_use_default
+msgid "Use default report (IR)"
+msgstr "Utiliser le rapport par défaut"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_use_default
+msgid "Use default report (IS)"
 msgstr "Utiliser le rapport par défaut"
 
 #. module: of_planning
@@ -3075,9 +3438,18 @@ msgid "VAT"
 msgstr "TVA"
 
 #. module: of_planning
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_user_id
-#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_user_id
+#: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Vendor"
+msgstr "Vendeur"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_user_id
+msgid "Vendor (IR)"
+msgstr "Vendeur"
+
+#. module: of_planning
+#: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_user_id
+msgid "Vendor (IS)"
 msgstr "Vendeur"
 
 #. module: of_planning

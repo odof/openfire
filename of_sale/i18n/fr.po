@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-27 11:29+0000\n"
-"PO-Revision-Date: 2024-03-27 11:29+0000\n"
+"POT-Creation-Date: 2024-07-11 07:14+0000\n"
+"PO-Revision-Date: 2024-07-11 07:14+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -348,11 +348,6 @@ msgid "Companies"
 msgstr "Sociétés"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_company_id
-msgid "Company"
-msgstr ""
-
-#. module: of_sale
 #: model:ir.model,name:of_sale.model_res_config_settings
 msgid "Config Settings"
 msgstr "Paramètres de configuration"
@@ -402,7 +397,6 @@ msgid ""
 msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_partner_id
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
 msgid "Customer"
 msgstr "Client"
@@ -938,6 +932,16 @@ msgid "Order"
 msgstr "Commande"
 
 #. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_company_id
+msgid "Order Company"
+msgstr "Company"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_partner_id
+msgid "Order Customer"
+msgstr "Client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__date_order
 msgid "Order Date"
 msgstr ""
@@ -1067,6 +1071,11 @@ msgstr "Résidu égal"
 #: model:res.groups,name:of_sale.of_group_sale_responsible
 msgid "Responsible"
 msgstr "Responsable"
+
+#. module: of_sale
+#: model:ir.model,name:of_sale.model_of_sale_order_confirmation
+msgid "Sale Order Confirmation"
+msgstr "Confirmation de commande"
 
 #. module: of_sale
 #. odoo-python
@@ -1250,6 +1259,15 @@ msgid "This line is the main product of the order"
 msgstr "Cette ligne est le produit principal de la commande"
 
 #. module: of_sale
+#: model:ir.model,name:of_sale.model_of_sale_hooks_installed
+msgid ""
+"This model is used to test if the module is installed and avoid monkey "
+"patching side-effects."
+msgstr ""
+"Ce modèle est utilisé pour tester si le module est installé et éviter les "
+"effets secondaires du monkey patching."
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_total_cost
 msgid "Total cost price"
 msgstr "Prix de revient"
@@ -1377,16 +1395,6 @@ msgstr "Vous devez d'abord configurer un article d'acompte"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
 msgid "days"
-msgstr ""
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_hooks_installed
-msgid "of.sale.hooks.installed"
-msgstr ""
-
-#. module: of_sale
-#: model:ir.model,name:of_sale.model_of_sale_order_confirmation
-msgid "of.sale.order.confirmation"
 msgstr ""
 
 #. module: of_sale

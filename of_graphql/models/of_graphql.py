@@ -17,17 +17,23 @@ logger = logging.getLogger(__name__)
 
 
 class OFGraphql(models.AbstractModel):
+    """
+    This model is used to register all the graphql modules installed on the database.
+    It allow us to use GraphQL with a similar inheritance system as Odoo models.
+    """
+
     _name = 'of.graphql'
+    _description = "OF Graphql Abstract Model"
 
     def _register_hook(self):
-        """Ici, on va lancer tous les register des modules graphql odoo pour construire le schéma général"""
-        # D'abord on vide le pool graphql sur cette base là
+        """Registers all the graphql modules installed on the database and builds the general schema."""
+        # First, clear the graphql pool for this database
         OdooGraphql.clear_pool(self.env.cr.dbname)
 
-        # on va chercher les modules installés et on crée le schéma graphql
-        # chaque module qui veut ajouter du graphql, doit faire un héritage de of.graphql
-        # et avoir une méthode dont le nom est _{nom du module}_register qui va ajouter dans OdooGraphql
-        # ce que l'on veut en Query, Mutation, Types et Subscription
+        # Fetch the installed modules and create the graphql schema
+        # Each module that wants to add graphql should inherit from of.graphql
+        # and have a method named _{module_name}_register that adds to OdooGraphql
+        # what we want in Query, Mutation, Types, and Subscription
         sql = """Select name from ir_module_module where state in ('installed','to_upgrade')"""
         self.env.cr.execute(sql)
         module_list = [name for (name,) in self.env.cr.fetchall()]
@@ -37,7 +43,7 @@ class OFGraphql(models.AbstractModel):
                 register(self.env.cr.dbname)
 
     def _of_graphql_register(self, dbname):
-        # ici on charge le graphql de ce module
+        """Loads the graphql for this module and adds it to OdooGraphql."""
         OdooGraphql.add(
             dbname,
             [
@@ -51,6 +57,7 @@ class OFGraphql(models.AbstractModel):
         )
 
     def _add_arguments(self, new_arguments, arguments):
+        """Adds new arguments to the existing arguments dictionary."""
         for mutation in new_arguments.keys():
             if mutation in arguments.keys():
                 for prop in arguments[mutation].keys():
@@ -69,14 +76,14 @@ class OFGraphql(models.AbstractModel):
         return arguments
 
     def _prepare_arguments(self):
-        # To be super by other module
+        """To be overridden by other modules. Prepares the arguments for mutations."""
         return {}
 
     def _prepare_mutations(self, pool):
-        # on va chercher tous les arguments des modules installés
+        """Fetches the arguments of installed modules and patches the mutation classes with these arguments."""
         arguments = self._prepare_arguments()
 
-        # on patch les classes mutations avec ces arguments
+        # Patch the mutation classes with the arguments
         for mutation in pool['mutation']:
             if mutation._name in arguments.keys():
                 patch_arguments = arguments[mutation._name]
@@ -85,6 +92,4 @@ class OFGraphql(models.AbstractModel):
                         to_patch = getattr(mutation, prop)
                         to_patch.args.update(patch_arguments[prop])
                     else:
-                        logger.error(
-                            f"La mutation {mutation} n'a pas la prop {prop}, elle ne peut donc pas être patchée"
-                        )
+                        logger.error(f"Mutation {mutation} doesn't have the prop {prop}, so it cannot be patched.")

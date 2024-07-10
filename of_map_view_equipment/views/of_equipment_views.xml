@@ -24,16 +24,25 @@
                         <div class="row g-0">
                             <div class="col">
                                 <ul class="ps-1 mb-0 list-unstyled">
-                                    <li t-if="record.site_address_id"><i class="fa fa-user pe-1"/><strong t-esc="record.site_address_id[1]"/></li>
+                                    <li t-if="record.site_address_id"><i class="fa fa-user pe-1" title="User" /><strong t-esc="record.site_address_id[1]"/></li>
                                     <li t-foreach="record.site_phone_number_ids.records" t-as="number" t-key="number_index">
-                                        <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                                        <i class="fa fa-phone pe-1" title="Phone" /><span t-esc="number.data.display_name"/>
                                     </li>
-                                    <li t-if="record.customer_mobile"><i class="fa fa-phone pe-1"/><span t-esc="record.customer_mobile"/></li>
-                                    <li t-if="record.site_zip or record.site_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.site_zip" t-esc="record.site_zip"/> <span t-if="record.site_city" t-esc="record.site_city"/></li>
+                                    <li t-if="record.customer_mobile"><i class="fa fa-phone pe-1" title="Phone" /><span t-esc="record.customer_mobile"/></li>
+                                    <li t-if="record.site_zip or record.site_city"><i class="fa fa-map-marker pe-1" title="Marker" /><span t-if="record.site_zip" t-esc="record.site_zip"/> <span t-if="record.site_city" t-esc="record.site_city"/></li>
                                     <li t-if="record.name"><span t-esc="record.name"/></li>
-                                    <li t-if="record.service_date">Sale: <span t-esc="props.record.service_date"/></li>
-                                    <li t-if="record.installation_date">Install: <span t-esc="props.record.installation_date"/></li>
-                                    <li t-if="record.end_warranty_date">Warranty: <span t-esc="props.record.end_warranty_date"/></li>
+                                    <li t-if="record.service_date">
+                                        Sale:
+                                        <t t-if="record.service_date.c.day &lt; 10">0</t><span t-esc="record.service_date.c.day"/>/<t t-if="record.service_date.c.month &lt; 10">0</t><span t-esc="record.service_date.c.month"/>/<span t-esc="record.service_date.c.year"/>
+                                    </li>
+                                    <li t-if="record.installation_date">
+                                        Install:
+                                        <t t-if="record.installation_date.c.day &lt; 10">0</t><span t-esc="record.installation_date.c.day"/>/<t t-if="record.installation_date.c.month &lt; 10">0</t><span t-esc="record.installation_date.c.month"/>/<span t-esc="record.installation_date.c.year"/>
+                                    </li>
+                                    <li t-if="record.end_warranty_date">
+                                        Warranty:
+                                        <t t-if="record.end_warranty_date.c.day &lt; 10">0</t><span t-esc="record.end_warranty_date.c.day"/>/<t t-if="record.end_warranty_date.c.month &lt; 10">0</t><span t-esc="record.end_warranty_date.c.month"/>/<span t-esc="record.end_warranty_date.c.year"/>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

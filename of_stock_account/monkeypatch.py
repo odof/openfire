@@ -22,7 +22,7 @@ class OFStockAccountHooks(models.AbstractModel):
     '''
 
     _name = 'of.stock.account.hooks.installed'
-    __doc__ = "This model is used to test if the module is installed and avoid monkey patching side-effects."
+    _description = "This model is used to test if the module is installed and avoid monkey patching side-effects."
 
 
 def product_price_update_before_done(self, forced_qty=None):

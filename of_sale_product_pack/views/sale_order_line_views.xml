@@ -7,10 +7,10 @@
         <field name="inherit_id" ref="of_sale.of_sale_order_line_view" />
         <field name="arch" type="xml">
             <field name="product_id" position="after">
-                <field name="of_pack_ok"/>
+                <field name="of_pack_ok" string="Pack"/>
             </field>
             <field name="of_main_product" position="after">
-                <field name="of_pack_type" attrs="{'invisible': [('of_pack_ok', '=', False)], 'required': [('of_pack_ok', '=', True)]}"/>
+                <field name="of_pack_type" string="Pack Display Type" attrs="{'invisible': [('of_pack_ok', '=', False)], 'required': [('of_pack_ok', '=', True)]}"/>
                 <field name="of_pack_component_price" attrs="{'invisible': [('of_pack_ok', '=', False)], 'required': [('of_pack_ok', '=', True)]}"/>
             </field>
             <field name="name" position="after">

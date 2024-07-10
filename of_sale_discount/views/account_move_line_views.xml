@@ -10,7 +10,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//notebook//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
-                <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line" optional="hide"/>
+                <field name="of_discount_formula" string="Discount (%)" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line" optional="hide"/>
             </xpath>
         </field>
     </record>
@@ -24,7 +24,7 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//field[@name='discount']" position="after">
-                <field name="of_discount_formula" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
+                <field name="of_discount_formula" string="Discount (%)" groups="base.group_no_one,of_sale_discount.of_group_discount_on_invoice_line"/>
             </xpath>
         </field>
     </record>

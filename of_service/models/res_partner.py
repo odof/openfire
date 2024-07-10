@@ -22,7 +22,7 @@ class ResPartner(models.Model):
     request_to_schedule_ids = fields.Many2many(
         comodel_name='of.service.request', string="SR to schedule", compute='_compute_requests'
     )
-    request_to_schedule_count = fields.Integer(string="SR to schedule", compute='_compute_requests')
+    request_to_schedule_count = fields.Integer(string="SR to schedule count", compute='_compute_requests')
     recurring_request_ids = fields.Many2many(
         comodel_name='of.service.request', string="Recurring SR", compute='_compute_requests'
     )

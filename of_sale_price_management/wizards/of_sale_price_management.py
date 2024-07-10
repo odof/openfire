@@ -42,7 +42,7 @@ class OFPriceManagementWizard(models.TransientModel):
     line_ids = fields.One2many(
         comodel_name='of.sale.price.management.wizard.line', inverse_name='wizard_id', string="Impacted lines"
     )
-    value = fields.Float(string="Value", digits='Sale Price')
+    value = fields.Float(digits='Sale Price')
     initial_margin = fields.Monetary(string="Initial margin", related='order_id.margin', related_sudo=False)
     initial_margin_percent = fields.Float(
         string="Initial margin %", related='order_id.margin_percent', related_sudo=False
@@ -364,11 +364,11 @@ class OFPriceManagementWizard(models.TransientModel):
             for line in lines:
                 total_purchase += line.purchase_price * line.product_uom_qty
             total_sale = sum(lines.mapped('price_subtotal'))
-            lines_dict['cost'] = f'{total_purchase:.2f} {currency_symbol}'
-            lines_dict['sale'] = f'{total_sale:.2f} {currency_symbol}'
-            lines_dict['margin'] = f'{total_sale:.2f} {currency_symbol}'
+            lines_dict['cost'] = f'{total_purchase:.2f} {currency_symbol}'  # noqa
+            lines_dict['sale'] = f'{total_sale:.2f} {currency_symbol}'  # noqa
+            lines_dict['margin'] = f'{total_sale:.2f} {currency_symbol}'  # noqa
             margin_percent = (100 * (1 - total_purchase / total_sale)) if total_sale else 0.0
-            lines_dict['margin_percent'] = f'{margin_percent:.2f}' if total_sale else '- %'
+            lines_dict['margin_percent'] = f'{margin_percent:.2f}' if total_sale else '- %'  # noqa
             res.append(lines_dict)
         return res
 
@@ -380,16 +380,17 @@ class OFPriceManagementWizardLine(models.TransientModel):
     # TODO: Déselectionner les lignes dont la quantité ou le prix valent 0
     state = fields.Selection(
         selection=[('excluded', "Excluded"), ('included', "Included"), ('forced', "Forced")],
-        string="State",
         required=True,
         default='included',
     )
     wizard_id = fields.Many2one(comodel_name='of.sale.price.management.wizard', required=True, ondelete='cascade')
-    order_line_id = fields.Many2one(comodel_name='sale.order.line', string="Product", readonly=True, ondelete='cascade')
+    order_line_id = fields.Many2one(
+        comodel_name='sale.order.line', string="Order Line", readonly=True, ondelete='cascade'
+    )
     product_id = fields.Many2one(comodel_name='product.product', string="Product", compute='_compute_product_id')
-    name = fields.Char(string="Name", compute='_compute_product_id')
+    name = fields.Char(compute='_compute_product_id')
     currency_id = fields.Many2one(compute='_compute_currency_id', comodel_name='res.currency', string="Currency")
-    quantity = fields.Float(string="Quantity", compute='_compute_quantity')
+    quantity = fields.Float(compute='_compute_quantity')
     tax_ids = fields.Many2many(
         comodel_name='account.tax',
         string="Taxes",
@@ -401,7 +402,7 @@ class OFPriceManagementWizardLine(models.TransientModel):
 
     total_cost_tax_excl = fields.Monetary(string="Total initial cost excl. VAT", compute='_compute_prices')
     price_unit_tax_excl = fields.Monetary(string="Initial unit price excl. VAT", compute='_compute_prices')
-    price_unit_tax_incl = fields.Monetary(string="Initial unit price excl. VAT", compute='_compute_prices')
+    price_unit_tax_incl = fields.Monetary(string="Initial unit price incl. VAT", compute='_compute_prices')
     total_price_tax_excl = fields.Monetary(string="Initial total price excl. VAT", compute='_compute_prices')
     total_price_tax_incl = fields.Monetary(string="Initial total price incl. VAT", compute='_compute_prices')
     discount = fields.Float(related='order_line_id.discount', readonly=True)
@@ -414,7 +415,7 @@ class OFPriceManagementWizardLine(models.TransientModel):
     customer_view = fields.Boolean(string="Customer/Vendor view", related="wizard_id.customer_view")
     discount_tax_ids = fields.Many2many(
         comodel_name='account.tax',
-        string="Taxes",
+        string="Taxes (M2M)",
         relation='of_sale_order_price_management_line_discount_tax_rel',
         column1='line_id',
         column2='tax_id',

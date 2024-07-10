@@ -21,14 +21,15 @@ from odoo.addons.base.models.res_users import GroupsView, name_boolean_group, na
 #    - res.group._update_user_groups_view()
 #    - res.partner.onchange_parent_id()
 class OfBaseHooks(models.AbstractModel):
-    '''When you use monkey patching, the code is executed when the module
+    """When you use monkey patching, the code is executed when the module
     is in the addons_path of the Odoo server, even is the module is not
     installed ! In order to avoid the side-effects it can create,
     we create an AbstractModel inside the module and we test the
     availability of this Model in the code of the monkey patching below.
-    '''
+    """
 
     _name = 'of.base.hooks.installed'
+    _description = "This model is used to test if the module is installed and avoid monkey patching side-effects."
 
 
 # Save the original methods

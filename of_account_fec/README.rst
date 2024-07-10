@@ -15,6 +15,7 @@ Module OpenFire extension du module OCA "France - FEC Export"
   Modifications effectuées pour les exports non officiels :
 
   * Ajout de la possibilité trier les lignes par "Date" ou par "Journal & Client"
+
   * Ajout d'un type d'export "Rapport FEC non officiel (entrées publiées uniquement)" qui s'affiche uniquement en mode
     test
   * Ajout du choix des journaux comptables à exporter

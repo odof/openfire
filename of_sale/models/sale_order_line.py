@@ -78,12 +78,12 @@ class SaleOrderLine(models.Model):
     )
     of_order_company_id = fields.Many2one(
         related='order_id.company_id',
-        string="Company",
+        string="Order Company",
         readonly=True,
     )
     of_order_partner_id = fields.Many2one(
         related='order_id.partner_id',
-        string="Customer",
+        string="Order Customer",
         readonly=True,
     )
     of_order_pricelist_id = fields.Many2one(

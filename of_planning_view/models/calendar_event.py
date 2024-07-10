@@ -24,7 +24,7 @@ class CalendarEvent(models.Model):
 
     # Popover fields
     of_partner_address = fields.Char(
-        string="Address",
+        string="Address (popover)",
         compute='_compute_popover_of_partner_address',
         help="Helper field, to display Address in the popover",
     )
@@ -48,7 +48,7 @@ class CalendarEvent(models.Model):
 
     # Time allocation
     of_allocated_hours = fields.Float(
-        string="Allocated Time", compute='_compute_of_allocated_hours', store=True, readonly=False
+        string="Allocated Hours", compute='_compute_of_allocated_hours', store=True, readonly=False
     )
     of_allocation_type = fields.Selection(
         selection=[('planning', 'Planning'), ('forecast', 'Forecast')], compute='_compute_of_allocation_type'

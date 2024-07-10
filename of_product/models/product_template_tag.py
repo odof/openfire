@@ -7,4 +7,4 @@ class ProductTemplateTag(models.Model):
     _inherit = 'product.tag'
 
     active = fields.Boolean(default=True)
-    description = fields.Text(string="Description")
+    description = fields.Text()

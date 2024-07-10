@@ -6,16 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-11 15:23+0000\n"
-"PO-Revision-Date: 2024-06-11 17:24+0200\n"
+"POT-Creation-Date: 2024-07-11 06:25+0000\n"
+"PO-Revision-Date: 2024-07-11 06:25+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
 
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__active
@@ -75,7 +73,8 @@ msgstr ""
 
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__name
-#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__shortname
+#: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_mode_form
+#: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_mode_tree
 msgid "Name"
 msgstr "Nom"
 
@@ -91,6 +90,7 @@ msgstr "Méthodes de paiements"
 
 #. module: of_account_payment
 #: model:ir.actions.act_window,name:of_account_payment.action_of_payment_mode
+#: model:ir.model,name:of_account_payment.model_of_payment_mode
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_payment_mode_id
 msgid "Payment Mode"
 msgstr "Mode de paiement"
@@ -116,11 +116,11 @@ msgid "Scheduled delivery date"
 msgstr ""
 
 #. module: of_account_payment
+#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__shortname
+msgid "Short Name"
+msgstr "Nom"
+
+#. module: of_account_payment
 #: model:ir.actions.server,name:of_account_payment.action_set_printed
 msgid "Update payment mode"
 msgstr "Mettre à jour les modes de paiements"
-
-#. module: of_account_payment
-#: model:ir.model,name:of_account_payment.model_of_payment_mode
-msgid "of.payment.mode"
-msgstr "Mode de paiements"

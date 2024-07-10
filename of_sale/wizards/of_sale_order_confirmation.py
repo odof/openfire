@@ -3,8 +3,11 @@
 from odoo import fields, models
 
 
-class OfSaleOrderConfirmation(models.TransientModel):
+class OFSaleOrderConfirmation(models.TransientModel):
+    """Transient model that allows to add a confirmation step before validating a sale order"""
+
     _name = 'of.sale.order.confirmation'
+    _description = "Sale Order Confirmation"
 
     order_id = fields.Many2one(comodel_name='sale.order')
     confirmation_date = fields.Datetime(string="Confirmation date", default=fields.Datetime.now())

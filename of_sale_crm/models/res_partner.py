@@ -8,7 +8,7 @@ class ResPartner(models.Model):
 
     of_customer_state = fields.Selection(
         selection=[('lead', "Prospect"), ('customer', "Signed customer"), ('other', "Other")],
-        string="State",
+        string="Customer State",
         default='lead',
         help="This field is only useful for customer partners."
         "A customer is considered a prospect as long as he/she has neither confirmed an order nor validated "

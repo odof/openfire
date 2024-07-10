@@ -8,7 +8,7 @@ class OFDays(models.Model):
     _description = "Week days"
 
     name = fields.Char(string="Day", size=16)
-    abbreviation = fields.Char(string="Abbreviation", size=16)
-    number = fields.Integer(string="Number", readonly=True)
+    abbreviation = fields.Char(size=16)
+    number = fields.Integer(readonly=True)
 
     _sql_constraints = [('days_number_uniq', 'unique(number)', "Two days cannot have the same number")]

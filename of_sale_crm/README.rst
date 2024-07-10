@@ -55,8 +55,8 @@ Droits utilisateurs
 Paramètres de configuration
 ###########################
 
-Ventes
-------
+Configuration des ventes
+------------------------
 
 * Ajout d'option pour activer ou non les étapes de départ "Estimation" et "Devis" sur les commandes
 

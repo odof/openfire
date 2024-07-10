@@ -304,16 +304,16 @@ class ResPartner(models.Model):
         cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = %s", (ref,))
         while True:
             ids = set()
-            for id, pid in cr.fetchall():
+            for iid, pid in cr.fetchall():
                 if pid:
                     ids.add(pid)
                 elif parent_id:
-                    if id != parent_id:
+                    if iid != parent_id:
                         raise ValidationError(
                             _("The customer account number is already in use and must be unique (%s).") % (ref,)
                         )
                 else:
-                    parent_id = id
+                    parent_id = iid
             if not ids:
                 break
             cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))

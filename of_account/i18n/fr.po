@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-07 18:41+0000\n"
-"PO-Revision-Date: 2023-12-07 18:41+0000\n"
+"POT-Creation-Date: 2024-07-10 12:36+0000\n"
+"PO-Revision-Date: 2024-07-10 12:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -282,6 +282,7 @@ msgstr "Verrouiller les écritures comptabilisées avec hash"
 
 #. module: of_account
 #: model:ir.actions.act_window,name:of_account.account_account_invoice_issued_act_window
+#: model:ir.model,name:of_account.model_of_mark_account_move_as_exported
 msgid "Mark Account Move as Exported"
 msgstr "Marquer comme exportée"
 
@@ -440,6 +441,15 @@ msgstr ""
 "La société du journal doit être la même que celle de l'écriture comptable."
 
 #. module: of_account
+#: model:ir.model,name:of_account.model_of_account_move_hooks_installed
+msgid ""
+"This model is used to test if the module is installed and avoid monkey "
+"patching side-effects."
+msgstr ""
+"Ce modèle est utilisé pour tester si le module est installé et éviter les "
+"effets secondaires du monkey patching."
+
+#. module: of_account
 #: model_terms:ir.ui.view,arch_db:of_account.of_account_move_line_form
 msgid "Total"
 msgstr ""
@@ -554,13 +564,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_account.of_res_partner_warnings_form_view
 msgid "invoices"
 msgstr "factures"
-
-#. module: of_account
-#: model:ir.model,name:of_account.model_of_account_move_hooks_installed
-msgid "of.account.move.hooks.installed"
-msgstr ""
-
-#. module: of_account
-#: model:ir.model,name:of_account.model_of_mark_account_move_as_exported
-msgid "of.mark.account.move.as.exported"
-msgstr ""

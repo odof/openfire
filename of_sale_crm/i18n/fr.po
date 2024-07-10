@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-07 13:39+0000\n"
-"PO-Revision-Date: 2024-06-07 13:39+0000\n"
+"POT-Creation-Date: 2024-07-11 07:16+0000\n"
+"PO-Revision-Date: 2024-07-11 07:16+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -132,6 +132,13 @@ msgstr "Créé le"
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_case_kanban_view_leads
 msgid "Customer"
 msgstr "Client"
+
+#. module: of_sale_crm
+#: model:ir.model.fields,field_description:of_sale_crm.field_crm_lead__of_customer_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_customer_state
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_customer_state
+msgid "Customer State"
+msgstr "État"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_of_sale_followup_tag__display_name
@@ -416,9 +423,9 @@ msgid "Source"
 msgstr ""
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_crm_lead__of_customer_state
-#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_customer_state
-#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_customer_state
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_view_partner_tree
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_res_partner_kanban_view
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_partner_form
 msgid "State"
 msgstr "État"
 

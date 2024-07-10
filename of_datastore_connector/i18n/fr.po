@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-06 15:46+0000\n"
-"PO-Revision-Date: 2023-01-06 15:46+0000\n"
+"POT-Creation-Date: 2024-07-10 13:34+0000\n"
+"PO-Revision-Date: 2024-07-10 13:34+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,11 @@ msgstr "Connexion réussie"
 #, python-format
 msgid "Connection timeout"
 msgstr "Délai de connexion expiré"
+
+#. module: of_datastore_connector
+#: model:ir.model,name:of_datastore_connector.model_of_datastore_connector
+msgid "Datastore Connector"
+msgstr "Connecteur Datastore"
 
 #. module: of_datastore_connector
 #: model:ir.model.fields,field_description:of_datastore_connector.field_of_datastore_connector__db_name
@@ -71,8 +76,3 @@ msgstr ""
 #, python-format
 msgid "You must fill the field \"%s\""
 msgstr "Vous devez remplir le champ \"%s\""
-
-#. module: of_datastore_connector
-#: model:ir.model,name:of_datastore_connector.model_of_datastore_connector
-msgid "of.datastore.connector"
-msgstr ""

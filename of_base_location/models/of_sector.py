@@ -5,6 +5,7 @@ from odoo import api, fields, models
 
 class OFSector(models.Model):
     _name = 'of.sector'
+    _description = "Geographical sector"
 
     name = fields.Char(string="Title", required=True, help="Define a sector name")
     code = fields.Char(help="Define a sector code")

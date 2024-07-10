@@ -5,6 +5,7 @@ from odoo import api, fields, models
 
 class OFResPartnerCheckDuplications(models.TransientModel):
     _name = 'of.res.partner.check.duplications'
+    _description = "Check Partner Duplications"
 
     @api.model
     def default_get(self, fields_list):

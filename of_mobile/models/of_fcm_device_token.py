@@ -5,9 +5,10 @@ from odoo import api, fields, models
 
 class OFFCMDeviceToken(models.Model):
     _name = 'of.fcm.device.token'
+    _description = "FCM Device Token"
     _rec_name = 'token'
 
-    token = fields.Char(string="Token", required=True)
+    token = fields.Char(required=True)
     user_id = fields.Many2one(comodel_name='res.users', string="User")
 
     @api.model

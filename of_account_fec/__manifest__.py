@@ -3,12 +3,12 @@
 {
     'name': "OpenFire / FEC",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'summary': "Module d'extension de l10n_fr_fec",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'l10n_fr_fec',
     ],
@@ -18,5 +18,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

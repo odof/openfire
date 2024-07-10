@@ -5,6 +5,7 @@ from odoo import fields, models
 
 class OfProductBrandAddProducts(models.TransientModel):
     _name = 'of.product.brand.add.products'
+    _description = "Add Products to Brand"
 
     brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", required=True)
     product_ids = fields.Many2many(comodel_name='product.template', string="Products")

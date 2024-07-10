@@ -3,12 +3,12 @@
 {
     'name': "OpenFire / Remise vente",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'summary': "Generic Modules/Sales & Purchases",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'of_sale',
     ],
@@ -24,6 +24,5 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
     'post_init_hook': 'post_init_hook',
 }

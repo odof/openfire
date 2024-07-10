@@ -8,14 +8,19 @@ from odoo import _, fields
 from odoo.tools.safe_eval import safe_eval
 
 
-def get_selection_label(self, object, field_name, field_value):
+def get_selection_label(self, res_model, field_name, field_value):
     """Get a translation of the displayed string value from a selection field for a given model
-    :param object: Model of the field selection
-    :param field_name: Name of the field in the model
-    :param field_value: Selection value of the field
-    :return: The translated string value of the selection field if the translation exist (else the original value)
+
+    Args:
+        self: Environment
+        res_model: Model of the field selection
+        field_name: Name of the field in the model
+        field_value: Selection value of the field
+
+    Returns:
+        The translated string value of the selection field if the translation exist (else the original value)
     """
-    return _(dict(self.env[object].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
+    return _(dict(self.env[res_model].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
 
 
 def ceil_to_multiple(val, mult):

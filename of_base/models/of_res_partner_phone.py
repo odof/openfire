@@ -7,12 +7,13 @@ from .res_partner import PHONE_TYPES, convert_phone_number
 
 class OFResPartnerPhone(models.Model):
     _name = 'of.res.partner.phone'
+    _description = "Partner Phone"
     _inherit = ['mail.thread']
     _order = 'type, id'
     _rec_name = 'number'
 
     partner_id = fields.Many2one(comodel_name='res.partner', string="Partner", index=True, ondelete='cascade')
-    number = fields.Char(string="Number")
+    number = fields.Char()
     number_display = fields.Char(
         string="Number in national format",
         compute='_compute_number_display',

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-28 15:51+0000\n"
-"PO-Revision-Date: 2024-06-28 15:51+0000\n"
+"POT-Creation-Date: 2024-07-11 06:44+0000\n"
+"PO-Revision-Date: 2024-07-11 06:44+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -272,6 +272,11 @@ msgstr "Employé"
 #: model:of.planning.intervention.section,name:of_mobile.of_planning_intervention_section_equipment
 msgid "Equipment"
 msgstr "Équipement"
+
+#. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_fcm_device_token
+msgid "FCM Device Token"
+msgstr ""
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_res_users__of_fcm_token_ids
@@ -567,6 +572,11 @@ msgid "Number of days before can edit"
 msgstr "Nombre de jours avant"
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_graphql
+msgid "OF Graphql Abstract Model"
+msgstr ""
+
+#. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_calendar_event__of_coming_ids
 msgid "Of Coming"
 msgstr ""
@@ -759,10 +769,15 @@ msgid "Transfer"
 msgstr "Transfert"
 
 #. module: of_mobile
-#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_type
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_section__ttype
+#: model_terms:ir.ui.view,arch_db:of_mobile.account_payment_form
 msgid "Type"
-msgstr ""
+msgstr "Type"
+
+#. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_account_payment__of_type
+msgid "Type (OF)"
+msgstr "Type"
 
 #. module: of_mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_additional_line__price_unit
@@ -822,13 +837,3 @@ msgstr "Vous devez ajouter une position fiscale pour publier ce modèle"
 #, python-format
 msgid "You must add a payment term to publish this template"
 msgstr "Vous devez ajouter une condition de paiement pour publier ce modèle"
-
-#. module: of_mobile
-#: model:ir.model,name:of_mobile.model_of_fcm_device_token
-msgid "of.fcm.device.token"
-msgstr ""
-
-#. module: of_mobile
-#: model:ir.model,name:of_mobile.model_of_graphql
-msgid "of.graphql"
-msgstr ""

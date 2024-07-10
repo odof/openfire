@@ -7,75 +7,75 @@ class OFPlanningInterventionTemplate(models.Model):
     _inherit = 'of.planning.intervention.template'
 
     sheet_equipment = fields.Boolean(
-        string="EQUIPMENT", help="Selects or deselects all equipment-related items to be displayed."
+        string="EQUIPMENT (IS)", help="Selects or deselects all equipment-related items to be displayed."
     )
     sheet_equipment_name = fields.Boolean(
-        string="Serial Number", help="Adds the serial number in the \"Equipment\" section of the PDF document."
+        string="Serial Number (IS)", help="Adds the serial number in the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_product_id = fields.Boolean(
-        string="Product", help="Adds the equipment name to the \"Equipment\" section of the PDF document."
+        string="Product (IS)", help="Adds the equipment name to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_model = fields.Boolean(
-        string="Model", help="Adds the equipment model to the \"Equipment\" section of the PDF document."
+        string="Model (IS)", help="Adds the equipment model to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_brand_id = fields.Boolean(
-        string="Brand", help="Adds the equipment mark to the \"Equipment\" section of the PDF document."
+        string="Brand (IS)", help="Adds the equipment mark to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_product_category_id = fields.Boolean(
-        string="Category", help="Adds the equipment category to the \"Equipment\" section of the PDF document."
+        string="Category (IS)", help="Adds the equipment category to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_installation_date = fields.Boolean(
-        string="Installation Date",
+        string="Installation Date (IS)",
         help="Adds the equipment installation date to the \"Equipment\" section of the PDF document.",
     )
     sheet_equipment_installation_type = fields.Boolean(
-        string="Installation Type",
+        string="Installation Type (IS)",
         help="Adds equipment installation type to the \"Equipment\" section of the PDF document.",
     )
     sheet_equipment_is_compliant = fields.Boolean(
-        string="Compliant", help="Adds equipment conformity to the \"Equipment\" section of the PDF document."
+        string="Compliant (IS)", help="Adds equipment conformity to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_installer_id = fields.Boolean(
-        string="Installer", help="Adds the equipment installer to the \"Equipment\" section of the PDF document."
+        string="Installer (IS)", help="Adds the equipment installer to the \"Equipment\" section of the PDF document."
     )
     sheet_equipment_note = fields.Boolean(
-        string="Note", help="Adds the equipment information note to the \"Equipment\" section of the PDF document."
+        string="Note (IS)", help="Adds the equipment information note to the \"Equipment\" section of the PDF document."
     )
 
     report_equipment = fields.Boolean(
-        string="EQUIPMENT", help="Select or deselect all equipment-related items to be displayed."
+        string="EQUIPMENT (IR)", help="Select or deselect all equipment-related items to be displayed."
     )
     report_equipment_name = fields.Boolean(
-        string="Serial Number", help="Adds the serial number in the \"Equipment\" section of the PDF document."
+        string="Serial Number (IR)", help="Adds the serial number in the \"Equipment\" section of the PDF document."
     )
     report_equipment_product_id = fields.Boolean(
-        string="Product", help="Adds the equipment name to the \"Equipment\" section of the PDF document."
+        string="Product (IR)", help="Adds the equipment name to the \"Equipment\" section of the PDF document."
     )
     report_equipment_model = fields.Boolean(
-        string="Model", help="Adds the equipment model to the \"Equipment\" section of the PDF document."
+        string="Model (IR)", help="Adds the equipment model to the \"Equipment\" section of the PDF document."
     )
     report_equipment_brand_id = fields.Boolean(
-        string="Brand", help="Adds the equipment mark to the \"Equipment\" section of the PDF document."
+        string="Brand (IR)", help="Adds the equipment mark to the \"Equipment\" section of the PDF document."
     )
     report_equipment_product_category_id = fields.Boolean(
-        string="Category", help="Adds the equipment category to the \"Equipment\" section of the PDF document."
+        string="Category (IR)", help="Adds the equipment category to the \"Equipment\" section of the PDF document."
     )
     report_equipment_installation_date = fields.Boolean(
-        string="Installation Date",
+        string="Installation Date (IR)",
         help="Adds the equipment installation date to the \"Equipment\" section of the PDF document.",
     )
     report_equipment_installation_type = fields.Boolean(
-        string="Installation Type",
+        string="Installation Type (IR)",
         help="Adds equipment installation type to the \"Equipment\" section of the PDF document.",
     )
     report_equipment_is_compliant = fields.Boolean(
-        string="Compliant", help="Adds equipment conformity to the \"Equipment\" section of the PDF document."
+        string="Compliant (IR)", help="Adds equipment conformity to the \"Equipment\" section of the PDF document."
     )
     report_equipment_installer_id = fields.Boolean(
-        string="Installer", help="Adds the equipment installer to the \"Equipment\" section of the PDF document."
+        string="Installer (IR)", help="Adds the equipment installer to the \"Equipment\" section of the PDF document."
     )
     report_equipment_note = fields.Boolean(
-        string="Note", help="Adds the equipment information note to the \"Equipment\" section of the PDF document."
+        string="Note (IR)", help="Adds the equipment information note to the \"Equipment\" section of the PDF document."
     )
 
     @api.onchange('sheet_equipment')

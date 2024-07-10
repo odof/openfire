@@ -4,6 +4,7 @@ from odoo import models
 
 class OFSectorUpdateDeleteWizard(models.TransientModel):
     _name = 'of.sector.update.delete.wizard'
+    _description = "Sector Update Delete Wizard"
 
     def action_button_validate(self):
         context = self._context.copy()

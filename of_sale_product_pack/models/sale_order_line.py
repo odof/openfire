@@ -10,7 +10,7 @@ class SaleOrderLine(models.Model):
 
     of_pack_type = fields.Selection(
         selection=[('detailed', "Detailed"), ('non_detailed', "Non Detailed")],
-        string="Pack Display Type",
+        string="Pack Display Type (OF)",
         compute='_compute_of_pack_type',
         store=True,
         readonly=False,
@@ -25,7 +25,7 @@ class SaleOrderLine(models.Model):
         readonly=False,
         precompute=True,
     )
-    of_pack_ok = fields.Boolean(string="Pack", compute='_compute_of_pack_ok', store=True, readonly=False)
+    of_pack_ok = fields.Boolean(string="Pack (OF)", compute='_compute_of_pack_ok', store=True, readonly=False)
     of_pack_line_ids = fields.One2many(
         comodel_name='of.product.pack.lines',
         inverse_name='parent_product_id',

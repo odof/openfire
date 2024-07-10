@@ -3,6 +3,7 @@
 {
     'name': "OpenFire / Connecteur CRM - Étape Kanban",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'website': 'http://www.openfire.fr',
     'category': 'Openfire',
@@ -16,5 +17,4 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

@@ -6,6 +6,7 @@ from odoo import Command, _, fields, models
 
 class OFSurveyAnswers(models.Model):
     _name = 'of.survey.answers'
+    _description = "Survey Answers"
     _rec_name = 'question_id'
     _order = 'sequence,id'
 

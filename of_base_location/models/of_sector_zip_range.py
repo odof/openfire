@@ -5,6 +5,7 @@ from odoo import api, fields, models
 
 class OFSectorZipRange(models.Model):
     _name = 'of.sector.zip.range'
+    _description = "Sector Zip Range"
     _order = 'zip_code_min, zip_code_max'
 
     name = fields.Char(string="Name displayed", compute='_compute_name', store=True)

@@ -38,10 +38,11 @@ class CalendarEvent(models.Model):
             ('intervention', "Intervention"),
             ('event', "Event"),
         ],
-        string="Type",
+        string="Event Type",
         index=True,
         default='intervention',
         required=True,
+        help="Technical field to differentiate between interventions and events",
     )
     of_is_closed = fields.Boolean(string="Closed", default=False, tracking=True)
     of_number = fields.Char(string="Number", copy=False)
@@ -60,7 +61,7 @@ class CalendarEvent(models.Model):
         readonly=False,
     )
     of_tag_ids = fields.Many2many(
-        comodel_name='of.planning.tag', column1='intervention_id', column2='tag_id', string="Tags"
+        comodel_name='of.planning.tag', column1='intervention_id', column2='tag_id', string="Intervention Tags"
     )
     of_line_ids = fields.One2many(
         comodel_name='of.planning.intervention.line',

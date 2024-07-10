@@ -7,7 +7,7 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     of_equipment_ids = fields.Many2many(comodel_name='of.equipment', string="Equipments", copy=False)
-    of_equipments_count = fields.Integer(string="Equipments", compute='_compute_of_equipments_data')
+    of_equipments_count = fields.Integer(string="Equipments count", compute='_compute_of_equipments_data')
     of_equipment_id = fields.Many2one(comodel_name='of.equipment', string="Name", compute='_compute_of_equipments_data')
     of_equipment_address_id = fields.Many2one(
         comodel_name='res.partner', string="Installation Address", compute='_compute_of_equipments_data'

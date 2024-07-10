@@ -3,7 +3,7 @@
 {
     'name': "OpenFire / Sale Stock",
     'version': '16.0.1.0.0',
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'summary': "Module de lien entre les ventes, les marques et les stocks",

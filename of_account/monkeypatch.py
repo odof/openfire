@@ -13,15 +13,15 @@ NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 # We are adding the following methods :
 #    - _onchange_partner_id_warning()
 class OfAccountMoveHooks(models.AbstractModel):
-    '''When you use monkey patching, the code is executed when the module
+    """When you use monkey patching, the code is executed when the module
     is in the addons_path of the Odoo server, even is the module is not
     installed ! In order to avoid the side-effects it can create,
     we create an AbstractModel inside the module and we test the
     availability of this Model in the code of the monkey patching below.
-    '''
+    """
 
     _name = 'of.account.move.hooks.installed'
-    __doc__ = "This model is used to test if the module is installed and avoid monkey patching side-effects."
+    _description = "This model is used to test if the module is installed and avoid monkey patching side-effects."
 
 
 _onchange_partner_id_original = AccountMove._onchange_partner_id

@@ -3,11 +3,11 @@
 {
     'name': "OpenFire / Remise interdite",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'summary': "Deactivate discount on sale orders and invoices depending on product category",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'of_product',
         'of_sale_discount',
@@ -20,6 +20,5 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
     'post_init_hook': 'post_init_hook',
 }

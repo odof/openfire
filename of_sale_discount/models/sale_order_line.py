@@ -9,7 +9,7 @@ class SaleOrderLine(models.Model):
 
     discount = fields.Float(compute='_compute_discount')
     of_discount_formula = fields.Char(
-        string="Discount (%)",
+        string="Discount formula (%)",
         compute='_compute_of_discount_formula',
         store=True,
         readonly=False,

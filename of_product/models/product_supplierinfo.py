@@ -13,7 +13,7 @@ class ProductSupplierInfo(models.Model):
         required=True,
         help="Public price excluding VAT recommended by the manufacturer",
     )
-    pp_currency_id = fields.Many2one(related='currency_id')
+    pp_currency_id = fields.Many2one(related='currency_id', string="Currency (Public Price)")
     of_discount = fields.Float(string="Discount", digits=(4, 2), compute='_compute_of_discount')
     of_product_category_name = fields.Char(string="Supplier Category")
 

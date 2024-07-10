@@ -65,7 +65,7 @@ class OFPlanningInterventionTemplate(models.Model):
         store=True,
         required=True,
     )
-    sequence_id = fields.Many2one(comodel_name='ir.sequence', string="Sequence", readonly=True)
+    sequence_id = fields.Many2one(comodel_name='ir.sequence', string="Template Sequence", readonly=True)
     task_id = fields.Many2one(
         comodel_name='of.planning.task', string="Task", help="Task to be carried out during the intervention."
     )
@@ -93,243 +93,259 @@ class OFPlanningInterventionTemplate(models.Model):
 
     # INTERVENTION SHEET
     sheet_use_default = fields.Boolean(
-        string="Use default report",
+        string="Use default report (IS)",
         default=True,
         help="Use the values defined in the default template for the intervention sheet.",
     )
     sheet_title = fields.Char(
-        string="Report title", translate=True, help="Define a title for the PDF document of the intervention sheet."
+        string="Report title (IS)",
+        translate=True,
+        help="Define a title for the PDF document of the intervention sheet.",
     )
-    sheet_partner_id = fields.Boolean(string="Customer", help="Adds address name to document title.")
-    sheet_date = fields.Boolean(string="Date", help="Adds intervention date to document title.")
+    sheet_partner_id = fields.Boolean(string="Customer in title (IS)", help="Adds address name to document title.")
+    sheet_date = fields.Boolean(string="Date (IS)", help="Adds intervention date to document title.")
 
     # Intervention
     sheet_intervention = fields.Boolean(
-        string="INTERVENTION", help="Selects or deselects all items to be displayed related to the intervention."
+        string="INTERVENTION (IS)", help="Selects or deselects all items to be displayed related to the intervention."
     )
     sheet_intervention_partner_id = fields.Boolean(
-        string="Customer", help="Adds the customer to the \"Intervention\" section of the PDF document."
+        string="Customer (IS)", help="Adds the customer to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_partner_code = fields.Boolean(
-        string="Customer code", help="Adds the customer code to the \"Intervention\" section of the PDF document."
+        string="Customer code (IS)", help="Adds the customer code to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_task_id = fields.Boolean(
-        string="Task", help="Adds the task to the \"Intervention\" section of the PDF document."
+        string="Task (IS)", help="Adds the task to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_task_description = fields.Boolean(
-        string="Task description", help="Adds the task description to the \"Intervention\" section of the PDF document."
+        string="Task description (IS)",
+        help="Adds the task description to the \"Intervention\" section of the PDF document.",
     )
     sheet_intervention_date = fields.Boolean(
-        string="Start date", help="Adds the intervention date to the \"Intervention\" section of the PDF document."
+        string="Start date (IS)", help="Adds the intervention date to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_duration = fields.Boolean(
-        string="Duration",
+        string="Duration (IS)",
         help="Adds the duration of the intervention in the \"Intervention\" section of the PDF document.",
     )
     sheet_intervention_team_id = fields.Boolean(
-        string="Team", help="Adds the selected team to the \"Intervention\" section of the PDF document."
+        string="Team (IS)", help="Adds the selected team to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_employee_ids = fields.Boolean(
-        string="Operator(s)", help="Adds technicians to the \"Intervention\" section of the PDF document."
+        string="Operator(s) (IS)", help="Adds technicians to the \"Intervention\" section of the PDF document."
     )
     sheet_intervention_company_id = fields.Boolean(
-        string="Company", help="Adds the company to the \"Intervention\" section of the PDF document."
+        string="Company (IS)", help="Adds the company to the \"Intervention\" section of the PDF document."
     )
-    sheet_intervention_label = fields.Boolean(string="Label")
-    sheet_intervention_address = fields.Boolean(string="Address")
-    sheet_intervention_contact = fields.Boolean(string="Contact")
-    sheet_intervention_type = fields.Boolean(string="Intervention type")
+    sheet_intervention_label = fields.Boolean(string="Label (IS)")
+    sheet_intervention_address = fields.Boolean(string="Address (IS)")
+    sheet_intervention_contact = fields.Boolean(string="Contact (IS)")
+    sheet_intervention_type = fields.Boolean(string="Intervention type (IS)")
     sheet_intervention_description = fields.Boolean(
-        string="External description",
+        string="External description (IS)",
         help="Adds the external description to the \"Intervention\" section of the PDF document.",
     )
     sheet_intervention_internal_description = fields.Boolean(
-        string="Internal description",
+        string="Internal description (IS)",
         help="Adds the internal description to the \"Intervention\" section of the PDF document.",
     )
 
     # History
-    sheet_history = fields.Boolean(string="HISTORY", help="Adds customer history to PDF document.")
+    sheet_history = fields.Boolean(string="HISTORY (IS)", help="Adds customer history to PDF document.")
 
     # Commande
     sheet_order = fields.Boolean(
-        string="ORDER",
+        string="ORDER (IS)",
         help="Allows you to select or deselect all the items to be displayed linked to"
         " the order associated with the intervention.",
     )
     sheet_order_name = fields.Boolean(
-        string="Name", help="Adds the associated order number to the \"Order\" section of the PDF document."
+        string="Order number (IS)",
+        help="Adds the associated order number to the \"Order\" section of the PDF document.",
     )
     sheet_order_confirmation_date = fields.Boolean(
-        string="Confirmation date",
+        string="Confirmation date (IS)",
         help="Adds the associated order confirmation date to the \"Order\" section of the PDF document.",
     )
     sheet_order_user_id = fields.Boolean(
-        string="Vendor", help="Adds the seller of the associated order to the \"Order\" section of the PDF document."
+        string="Vendor (IS)",
+        help="Adds the seller of the associated order to the \"Order\" section of the PDF document.",
     )
     sheet_order_inspection_visit_date = fields.Boolean(
-        string="Inspection visit date",
+        string="Inspection visit date (IS)",
         help="Adds the technical inspection date of the associated order in the \"Order\" section of the PDF document.",
     )
     sheet_order_totals = fields.Boolean(
-        string="Totals", help="Adds the associated order total to the \"Order\" section of the PDF document."
+        string="Totals (IS)", help="Adds the associated order total to the \"Order\" section of the PDF document."
     )
     sheet_order_intervention_notes = fields.Boolean(
-        string="Intervention notes",
+        string="Intervention notes (IS)",
         help="Adds the associated order notes to the \"Order\" section of the PDF document.",
     )
 
     # Produits et travaux (lignes de commande)
-    sheet_products = fields.Boolean(string="PRODUCTS AND WORKS")
+    sheet_products = fields.Boolean(string="PRODUCTS AND WORKS (IS)")
 
     # Livraisons
     sheet_pickings = fields.Boolean(
-        string="DELIVERIES", help="Adds delivery notes related to the intervention to the PDF document."
+        string="DELIVERIES (IS)", help="Adds delivery notes related to the intervention to the PDF document."
     )
 
     # Facturation
     sheet_invoicing = fields.Boolean(
-        string="INVOICING", help="Adds invoicing for the intervention to the PDF document."
+        string="INVOICING (IS)", help="Adds invoicing for the intervention to the PDF document."
     )
 
     # Mentions légales
-    sheet_legal = fields.Boolean(string="LEGAL NOTICE", help="Adds legal notices to the PDF document.")
+    sheet_legal = fields.Boolean(string="LEGAL NOTICE (IS)", help="Adds legal notices to the PDF document.")
 
     # Compte-Rendu
     sheet_minutes = fields.Boolean(
-        string="MINUTES", help="Allows you to select or deselect all elements of the procedure report."
+        string="MINUTES (IS)", help="Allows you to select or deselect all elements of the procedure report."
     )
-    sheet_minutes_real_dates = fields.Boolean(string="Real dates", help="Adds actual dates of intervention.")
-    sheet_minutes_real_duration = fields.Boolean(string="Real duration", help="Adds actual duration of intervention.")
-    sheet_minutes_description = fields.Boolean(string="Description", help="Add intervention report.")
+    sheet_minutes_real_dates = fields.Boolean(string="Real dates (IS)", help="Adds actual dates of intervention.")
+    sheet_minutes_real_duration = fields.Boolean(
+        string="Real duration (IS)", help="Adds actual duration of intervention."
+    )
+    sheet_minutes_description = fields.Boolean(string="Description (IS)", help="Add intervention report.")
 
     # Photos
-    sheet_photos = fields.Boolean(string="PHOTOS", help="Adds photos of the operation to the PDF document.")
+    sheet_photos = fields.Boolean(string="PHOTOS (IS)", help="Adds photos of the operation to the PDF document.")
 
     # Signatures
     sheet_signature = fields.Boolean(
-        string="SIGNATURES", help="Adds the technician's and customer's signatures to the PDF document."
+        string="SIGNATURES (IS)", help="Adds the technician's and customer's signatures to the PDF document."
     )
-    sheet_signature_date = fields.Boolean(string="Signature date", help="Adds signature date to PDF document.")
+    sheet_signature_date = fields.Boolean(string="Signature date (IS)", help="Adds signature date to PDF document.")
 
     # Intervention report
     report_use_default = fields.Boolean(
-        string="Use default report", default=True, help="Use values set in the default template for the report."
+        string="Use default report (IR)", default=True, help="Use values set in the default template for the report."
     )
     report_title = fields.Char(
-        string="Report title", translate=True, help="Define a title for the PDF document of the intervention report."
+        string="Report title (IR)",
+        translate=True,
+        help="Define a title for the PDF document of the intervention report.",
     )
-    report_partner_id = fields.Boolean(string="Customer", help="Adds the customer's name to the document title.")
-    report_date = fields.Boolean(string="Date", help="Adds intervention date to document title.")
+    report_partner_id = fields.Boolean(
+        string="Customer in title (IR)", help="Adds the customer's name to the document title."
+    )
+    report_date = fields.Boolean(string="Date (IR)", help="Adds intervention date to document title.")
 
     # Intervention
     report_intervention = fields.Boolean(
-        string="INTERVENTION", help="Selects or deselects all items to be displayed related to the intervention."
+        string="INTERVENTION (IR)", help="Selects or deselects all items to be displayed related to the intervention."
     )
     report_intervention_partner_id = fields.Boolean(
-        string="Customer", help="Adds the customer to the \"Intervention\" section of the PDF document."
+        string="Customer (IR)", help="Adds the customer to the \"Intervention\" section of the PDF document."
     )
     report_intervention_partner_code = fields.Boolean(
-        string="Customer code", help="Adds the customer code to the \"Intervention\" section of the PDF document."
+        string="Customer code (IR)", help="Adds the customer code to the \"Intervention\" section of the PDF document."
     )
     report_intervention_task_id = fields.Boolean(
-        string="Task", help="Adds the task to the \"Intervention\" section of the PDF document."
+        string="Task (IR)", help="Adds the task to the \"Intervention\" section of the PDF document."
     )
     report_intervention_task_description = fields.Boolean(
-        string="Task description", help="Adds the task description to the \"Intervention\" section of the PDF document."
+        string="Task description (IR)",
+        help="Adds the task description to the \"Intervention\" section of the PDF document.",
     )
     report_intervention_date = fields.Boolean(
-        string="Start date", help="Adds the intervention date to the \"Intervention\" section of the PDF document."
+        string="Start date (IR)", help="Adds the intervention date to the \"Intervention\" section of the PDF document."
     )
     report_intervention_duration = fields.Boolean(
-        string="Duration",
+        string="Duration (IR)",
         help="Adds the duration of the intervention in the \"Intervention\" section of the PDF document.",
     )
     report_intervention_team_id = fields.Boolean(
-        string="Team", help="Adds the selected team to the \"Intervention\" section of the PDF document."
+        string="Team (IR)", help="Adds the selected team to the \"Intervention\" section of the PDF document."
     )
     report_intervention_employee_ids = fields.Boolean(
-        string="Operator(s)", help="Adds technicians to the \"Intervention\" section of the PDF document."
+        string="Operator(s) (IR)", help="Adds technicians to the \"Intervention\" section of the PDF document."
     )
     report_intervention_company_id = fields.Boolean(
-        string="Company", help="Adds the company to the \"Intervention\" section of the PDF document."
+        string="Company (IR)", help="Adds the company to the \"Intervention\" section of the PDF document."
     )
-    report_intervention_label = fields.Boolean(string="Label")
-    report_intervention_address = fields.Boolean(string="Address")
-    report_intervention_contact = fields.Boolean(string="Contact")
-    report_intervention_type = fields.Boolean(string="Intervention type")
+    report_intervention_label = fields.Boolean(string="Label (IR)")
+    report_intervention_address = fields.Boolean(string="Address (IR)")
+    report_intervention_contact = fields.Boolean(string="Contact (IR)")
+    report_intervention_type = fields.Boolean(string="Intervention type (IR)")
     report_intervention_description = fields.Boolean(
-        string="External description",
+        string="External description (IR)",
         help="Adds the external description to the \"Intervention\" section of the PDF document.",
     )
     report_intervention_internal_description = fields.Boolean(
-        string="Internal description",
+        string="Internal description (IR)",
         help="Adds the internal description to the \"Intervention\" section of the PDF document.",
     )
 
     # History
-    report_history = fields.Boolean(string="HISTORY", help="Adds customer history to PDF document.")
+    report_history = fields.Boolean(string="HISTORY (IR)", help="Adds customer history to PDF document.")
 
     # Order
     report_order = fields.Boolean(
-        string="ORDER",
+        string="ORDER (IR)",
         help="Allows you to select or deselect all the items to be displayed "
         "linked to the order associated with the intervention.",
     )
     report_order_name = fields.Boolean(
-        string="Name", help="Adds the associated order number to the \"Order\" section of the PDF document."
+        string="Order number (IR)",
+        help="Adds the associated order number to the \"Order\" section of the PDF document.",
     )
     report_order_confirmation_date = fields.Boolean(
-        string="Confirmation date",
+        string="Confirmation date (IR)",
         help="Adds the associated order confirmation date to the \"Order\" section of the PDF document.",
     )
     report_order_user_id = fields.Boolean(
-        string="Vendor", help="Adds the seller of the associated order to the \"Order\" section of the PDF document."
+        string="Vendor (IR)",
+        help="Adds the seller of the associated order to the \"Order\" section of the PDF document.",
     )
     report_order_inspection_visit_date = fields.Boolean(
-        string="Inspection visit date",
+        string="Inspection visit date (IR)",
         help="Adds the technical inspection date of the associated order in the \"Order\" section of the PDF document.",
     )
     report_order_totals = fields.Boolean(
-        string="Totals", help="Adds the associated order total to the \"Order\" section of the PDF document."
+        string="Totals (IR)", help="Adds the associated order total to the \"Order\" section of the PDF document."
     )
     report_order_intervention_notes = fields.Boolean(
-        string="Intervention notes",
+        string="Intervention notes (IR)",
         help="Adds the associated order notes to the \"Order\" section of the PDF document.",
     )
 
     # Produits et travaux (lignes de commande)
-    report_products = fields.Boolean(string="PRODUCTS AND WORKS")
+    report_products = fields.Boolean(string="PRODUCTS AND WORKS (IR)")
 
     # Deliveries
     report_pickings = fields.Boolean(
-        string="DELIVERIES", help="Adds delivery notes related to the intervention to the PDF document."
+        string="DELIVERIES (IR)", help="Adds delivery notes related to the intervention to the PDF document."
     )
 
     # Invoicing
     report_invoicing = fields.Boolean(
-        string="INVOICING", help="Adds invoicing for the intervention to the PDF document."
+        string="INVOICING (IR)", help="Adds invoicing for the intervention to the PDF document."
     )
 
     # Legal notice
-    report_legal = fields.Boolean(string="LEGAL NOTICE", help="Adds legal notices to the PDF document.")
+    report_legal = fields.Boolean(string="LEGAL NOTICE (IR)", help="Adds legal notices to the PDF document.")
 
     # Intervention's minutes
     report_minutes = fields.Boolean(
-        string="MINUTES", help="Allows you to select or deselect all elements of the procedure report"
+        string="MINUTES (IR)", help="Allows you to select or deselect all elements of the procedure report"
     )
-    report_minutes_real_dates = fields.Boolean(string="Real dates", help="Adds actual dates of intervention.")
-    report_minutes_real_duration = fields.Boolean(string="Real duration", help="Adds actual duration of intervention.")
-    report_minutes_description = fields.Boolean(string="Description", help="Add intervention report.")
+    report_minutes_real_dates = fields.Boolean(string="Real dates (IR)", help="Adds actual dates of intervention.")
+    report_minutes_real_duration = fields.Boolean(
+        string="Real duration (IR)", help="Adds actual duration of intervention."
+    )
+    report_minutes_description = fields.Boolean(string="Description (IR)", help="Add intervention report.")
 
     # Photos
-    report_photos = fields.Boolean(string="PHOTOS", help="Adds photos of the operation to the PDF document.")
+    report_photos = fields.Boolean(string="PHOTOS (IR)", help="Adds photos of the operation to the PDF document.")
 
     # Signatures
     report_signature = fields.Boolean(
-        string="SIGNATURES", help="Adds the technician's and customer's signatures to the PDF document."
+        string="SIGNATURES (IR)", help="Adds the technician's and customer's signatures to the PDF document."
     )
-    report_signature_date = fields.Boolean(string="Signature date", help="Adds signature date to PDF document.")
+    report_signature_date = fields.Boolean(string="Signature date (IR)", help="Adds signature date to PDF document.")
 
     # --------------------------------------------------------------------------
     # Compute methods
@@ -467,18 +483,19 @@ class OFPlanningInterventionTemplate(models.Model):
     # ORM methods
     # --------------------------------------------------------------------------
 
-    @api.model
-    def create(self, vals):
-        if vals.get('sheet_use_default', False):
-            vals.update(self._get_default_template_values_sheet())
-        if vals.get('report_use_default', False):
-            vals.update(self._get_default_template_values_report())
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for val in vals_list:
+            if val.get('sheet_use_default'):
+                val.update(self._get_default_template_values_sheet())
+            if val.get('report_use_default'):
+                val.update(self._get_default_template_values_report())
+        return super().create(vals_list)
 
     def write(self, vals):
-        if vals.get('sheet_use_default', False):
+        if vals.get('sheet_use_default'):
             vals.update(self._get_default_template_values_sheet())
-        if vals.get('report_use_default', False):
+        if vals.get('report_use_default'):
             vals.update(self._get_default_template_values_report())
         res = super().write(vals)
         default_template = self.env.ref(

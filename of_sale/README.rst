@@ -18,8 +18,8 @@ Clients
     - facturation sur les quantités livrées.
 
 
-Produits:
----------
+Produits
+--------
 
 * Modification de **la vue des produits ouverte par défaut depuis le menu "Ventes > Produits > Produits""**, c'est la vue liste qui est ouverte par défaut et non plus la vue kanban
 
@@ -91,8 +91,8 @@ Droits utilisateurs
 Paramètres de configuration
 ###########################
 
-Ventes
-------
+Configuration des ventes
+------------------------
 
 * Ajout d'un paramètre pour choisir une catégorie d'articles d'acompte
     - cf. Paramètres > Ventes > Facturation > **(OF) Catégorie d'articles utilisés pour les acomptes**;
@@ -138,8 +138,8 @@ Ventes
     - si cette option est activée, l'opportunité liée à la commande sera copiée lors de la copie de la commande;
     - si cette option est désactivée, l'opportunité liée à la commande ne sera pas copiée lors de la copie de la commande;
 
-Facturation
------------
+Configuration de facturation
+----------------------------
 
 * Ajout d'un paramètre pour choisir la couleur de fond et la couleur de police des sections dans les rapports PDF
     - cf. Paramètres > Facturation > Impression PDF > **Titres de section**;

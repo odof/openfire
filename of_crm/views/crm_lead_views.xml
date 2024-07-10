@@ -20,15 +20,6 @@
             <xpath expr="//kanban/templates//field[@name='name']/parent::node()" position="after">
                 <span t-if="record.user_id"> - </span><field name="user_id"/>
             </xpath>
-
-            <!-- Kanban footer-->
-            <xpath expr="//div[hasclass('oe_kanban_footer')]//field[@name='priority']/.." position="after">
-                <div name="links" class="oe_kanban_bottom_left">
-                    <a name="action_button_view_activity" type="object" t-if="record.kanban_state.raw_value!='grey'">
-                        <span class="oe_kanban_status oe_kanban_status_grey"/>
-                    </a>
-                </div>
-            </xpath>
         </field>
     </record>
 
@@ -107,7 +98,7 @@
                 <field name="of_website" widget="url"/>
             </xpath>
             <xpath expr="//group[@name='opportunity_partner']//field[@name='partner_id']" position="before">
-                <field name="of_title" attrs="{'invisible': [('is_company','=',True)]}"/>
+                <field name="of_title" string="Title" attrs="{'invisible': [('is_company','=',True)]}"/>
             </xpath>
             <xpath expr="//page[@name='lead']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>

@@ -7,12 +7,12 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet" position="before">
                 <header attrs="{'invisible': [('of_state', '=', False)]}">
-                    <field name="of_state" widget="statusbar"/>
+                    <field name="of_state" string="Status" widget="statusbar"/>
                 </header>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Failure Reason" attrs="{'invisible': [('of_state', '!=', 'exception')]}">
-                    <field name="of_failure_reason"/>
+                    <field name="of_failure_reason" string="Failure Reason"/>
                 </page>
             </xpath>
         </field>

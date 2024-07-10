@@ -16,7 +16,7 @@ except (ImportError, IOError) as err:
     _logger.debug(err)
 
 
-class OfDatastoreConnector(models.AbstractModel):
+class OFDatastoreConnector(models.AbstractModel):
     """
     Fonctions de communication avec le serveur.
     Toute communication distante doit se faire par appel de ces fonctions.
@@ -25,11 +25,12 @@ class OfDatastoreConnector(models.AbstractModel):
     """
 
     _name = 'of.datastore.connector'
+    _description = "Datastore Connector"
 
     server_address = fields.Char(string="Server address", required=True)
     db_name = fields.Char(string="Database", required=True)
-    login = fields.Char(string="Login", required=True)
-    password = fields.Char(string="Password")
+    login = fields.Char(required=True)
+    password = fields.Char()
     new_password = fields.Char(
         string="Set Password",
         compute='_compute_new_password',

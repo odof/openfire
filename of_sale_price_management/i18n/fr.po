@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-20 13:36+0000\n"
-"PO-Revision-Date: 2023-06-20 13:36+0000\n"
+"POT-Creation-Date: 2024-07-11 07:20+0000\n"
+"PO-Revision-Date: 2024-07-11 07:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__margin_percent
 #, python-format
 msgid "% Margin"
@@ -25,7 +25,7 @@ msgstr "% Marge"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "% Overall discount"
 msgstr "% Remise globale"
@@ -72,14 +72,14 @@ msgstr "<strong>Nom du vendeur :</strong>"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Amount excl. VAT to be deducted"
 msgstr "Montant HT à déduire"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Amount incl. VAT to be deducted"
 msgstr "Montant TTC à déduire"
@@ -197,7 +197,7 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Exceptional discount deducted of %s.\n"
 msgstr "Remise exceptionnelle déduite de %s.\n"
@@ -270,9 +270,13 @@ msgstr "Prix total TTC initial"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__price_unit_tax_excl
-#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__price_unit_tax_incl
 msgid "Initial unit price excl. VAT"
 msgstr "Prix unit. HT initial"
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__price_unit_tax_incl
+msgid "Initial unit price incl. VAT"
+msgstr "Prix unit. TTC initial"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__is_discount
@@ -314,7 +318,7 @@ msgstr "Marge HT"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #: model:ir.actions.report,name:of_sale_price_management.of_action_report_sale_price_management
 #, python-format
 msgid "Margin sheet"
@@ -331,6 +335,11 @@ msgid "No rounding"
 msgstr "Pas d'arrondi"
 
 #. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__order_line_id
+msgid "Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_sale_price_management
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_view_sale_order_price_management
 msgid "Order lines"
 msgstr "Lignes de commande"
@@ -342,7 +351,7 @@ msgstr "Gestion prix"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Price management applied."
 msgstr "Gestion de prix appliquée."
@@ -368,7 +377,6 @@ msgid "Print"
 msgstr "Imprimer"
 
 #. module: of_sale_price_management
-#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__order_line_id
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__product_id
 #: model_terms:ir.ui.view,arch_db:of_sale_price_management.of_report_sale_price_management
 msgid "Product"
@@ -376,7 +384,7 @@ msgstr "Produit"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Products"
 msgstr "Produits"
@@ -403,7 +411,7 @@ msgstr "Référence"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Restore at store price"
 msgstr "Remettre au prix magasin"
@@ -470,7 +478,7 @@ msgstr "Sélection des produits d'un devis/bon de commande"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Services"
 msgstr ""
@@ -511,10 +519,14 @@ msgid "State"
 msgstr "État"
 
 #. module: of_sale_price_management
-#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__discount_tax_ids
 #: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__tax_ids
 msgid "Taxes"
 msgstr ""
+
+#. module: of_sale_price_management
+#: model:ir.model.fields,field_description:of_sale_price_management.field_of_sale_price_management_wizard_line__discount_tax_ids
+msgid "Taxes (M2M)"
+msgstr "Taxes"
 
 #. module: of_sale_price_management
 #: model:ir.model.fields,help:of_sale_price_management.field_of_sale_price_management_wizard_line__prix_unit_create
@@ -527,7 +539,7 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid ""
 "The amount excluding VAT to be deducted is greater than the total amount "
@@ -538,7 +550,7 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid ""
 "The amount including VAT to be deducted is greater than the total amount "
@@ -549,7 +561,7 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid ""
 "The discount percentage must be greater than 0 and less than or equal to "
@@ -559,14 +571,14 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "The margin percentage must be less than 100."
 msgstr "Le pourcentage de marge doit être inférieur à 100."
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Total"
 msgstr ""
@@ -608,14 +620,14 @@ msgstr "Total TTC simulé"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Total target amount excl. VAT"
 msgstr "Montant total HT cible"
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "Total target amount incl. VAT"
 msgstr "Montant total TTC cible"
@@ -652,35 +664,35 @@ msgstr ""
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "You must enter a target total amount excl. VAT."
 msgstr "Vous devez saisir un montant total HT cible."
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "You must enter a target total amount incl. VAT."
 msgstr "Vous devez saisir un montant total TTC cible."
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "You must enter an amount incl. VAT to deduct."
 msgstr "Vous devez saisir un montant TTC à déduire."
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "You must enter an amount to be deducted."
 msgstr "Vous devez saisir un montant HT à déduire."
 
 #. module: of_sale_price_management
 #. odoo-python
-#: code:addons/of_sale_price_management/wizard/of_sale_price_management.py:0
+#: code:addons/of_sale_price_management/wizards/of_sale_price_management.py:0
 #, python-format
 msgid "You must select the rounding precision"
 msgstr "Vous devez sélectionner la précision d'arrondi"

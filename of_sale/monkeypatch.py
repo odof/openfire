@@ -10,16 +10,16 @@ from odoo.addons.sale.wizard.mail_compose_message import MailComposeMessage
 _action_send_mail_original = MailComposeMessage._action_send_mail
 
 
-class OfSaleHooks(models.AbstractModel):
-    '''When you use monkey patching, the code is executed when the module
+class OFSaleHooks(models.AbstractModel):
+    """When you use monkey patching, the code is executed when the module
     is in the addons_path of the Odoo server, even is the module is not
     installed ! In order to avoid the side-effects it can create,
     we create an AbstractModel inside the module and we test the
     availability of this Model in the code of the monkey patching below.
-    '''
+    """
 
     _name = 'of.sale.hooks.installed'
-    __doc__ = "This model is used to test if the module is installed and avoid monkey patching side-effects."
+    _description = "This model is used to test if the module is installed and avoid monkey patching side-effects."
 
 
 def _action_send_mail(self, auto_commit=False):

@@ -3,12 +3,12 @@
 {
     'name': "OpenFire / Multi-logos",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
     'summary': "Gestion des multi-logos",
     'website': "https://www.openfire.fr",
-    'description': "",
     'depends': [
         'web',
         'of_base',
@@ -21,8 +21,9 @@
         'views/menuitems.xml',
         'report/report_templates.xml'
     ],
-    'installable': True,
+    # NOTE : Standard functionality should be enough now we are waiting for internal feedback.
+    # If its ok just delete this module, otherwise we will need keep it installable.
+    'installable': False,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
 }

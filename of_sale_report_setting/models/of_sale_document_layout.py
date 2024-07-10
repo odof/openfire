@@ -2,11 +2,15 @@
 
 from odoo import api, fields, models
 
-from odoo.addons.of_sale_report_setting.models.res_company import SELECTION_PRINT_IMAGE_LEVEL
-
 
 class OFSaleDocumentLayout(models.TransientModel):
+    """
+    Transient model to configure the layout of the sale document in a specific wizard that is not `res.config.settings`.
+    It mimics `res.config.settings`.
+    """
+
     _name = 'of.sale.document.layout'
+    _description = "Sale Document Layout"
 
     @api.model
     def default_get(self, fields):
@@ -151,7 +155,6 @@ class OFSaleDocumentLayout(models.TransientModel):
     pdf_price_taxexcl = fields.Boolean(string="Price Tax Excl.", related='company_id.pdf_price_taxexcl', readonly=False)
     pdf_price_taxinc = fields.Boolean(string="Price Tax Incl.", related='company_id.pdf_price_taxinc', readonly=False)
     pdf_print_image_level = fields.Selection(
-        selection=SELECTION_PRINT_IMAGE_LEVEL,
         string="Product images",
         related='company_id.pdf_print_image_level',
         readonly=False,

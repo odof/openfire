@@ -21,7 +21,7 @@ class BaseCommentTemplate(models.Model):
         comodel_name="ir.model",
         compute=False,
         compute_sudo=False,
-        string="Models",
+        string="Models (M2M)",
         help="This comment template will be available on this models. "
         "You can see here only models allowed to set the comment template.",
         search="_search_model_ids",

@@ -9,14 +9,14 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     discount = fields.Float(  # like sale.order.line => store=True, readonly=False, precompute=True
-        string="Discount (%)", compute='_of_compute_discount', store=True, readonly=False, precompute=True
+        string="Discount (%)", compute='_compute_discount', store=True, readonly=False, precompute=True
     )
     of_discount_formula = fields.Char(
-        string="Discount (%)", help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\""
+        string="Discount formula (%)", help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\""
     )
 
     @api.depends('of_discount_formula')
-    def _of_compute_discount(self):
+    def _compute_discount(self):
         for line in self:
             price_percent = 100.0
             if line.of_discount_formula:

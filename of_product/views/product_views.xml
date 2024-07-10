@@ -26,10 +26,10 @@
                     <group name="group_standard_price" string="Supplier information" colspan="2">
                         <field name="of_cost_date"/>
                         <div id="uom-display" col="3">
-                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" class="oe_inline"/></span>
+                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" string="Purchase UoM" class="oe_inline"/></span>
                         </div>
                         <div id="uom-display-2" col="5">
-                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" class="oe_inline"/></span>
+                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" string="Purchase UoM" class="oe_inline"/></span>
                         </div>
                     </group>
                     <group name="advanced_information" string="Advanced information" colspan="2">
@@ -100,7 +100,7 @@
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="product_tag_ids"/>
             </xpath>
-            <xpath expr="//div[@class='o_kanban_image me-1']" position="before">
+            <xpath expr="//div[hasclass('o_kanban_image')]" position="before">
                 <div>
                     <field name="product_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 </div>

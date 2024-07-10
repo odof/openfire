@@ -15,7 +15,7 @@ class SaleOrder(models.Model):
         copy=False,
         store=True,
     )
-    of_request_count = fields.Integer(string="Service Requests", compute='_compute_of_request_count')
+    of_request_count = fields.Integer(string="Service Requests count", compute='_compute_of_request_count')
 
     @api.depends('of_request_ids', 'order_line.of_request_line_id')
     def _compute_of_request_count(self):

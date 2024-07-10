@@ -8,9 +8,7 @@
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Personnalisation des ventes",
-    'description': "",
     'depends': [
-        # "of_account_invoice_report",  # TODO: uncomment when of_account is migrated
         'of_account',  # of_account > of_product_brand > of_product
         "of_account_tax",
         'of_base_location',

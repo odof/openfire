@@ -8,7 +8,7 @@ class OFSaleSummaryWizard(models.TransientModel):
     _description = "Sale Summary Wizard"
 
     sale_id = fields.Many2one(comodel_name='sale.order', string="Sale Order")
-    doc = fields.Html(string="Doc", compute='_compute_doc')
+    doc = fields.Html(compute='_compute_doc')
 
     def _compute_doc(self):
         for record in self:

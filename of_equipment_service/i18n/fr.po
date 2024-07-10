@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 09:18+0000\n"
-"PO-Revision-Date: 2024-06-19 09:18+0000\n"
+"POT-Creation-Date: 2024-07-11 06:43+0000\n"
+"PO-Revision-Date: 2024-07-11 06:43+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,8 @@ msgstr "<strong>Équipement</strong>"
 msgid ""
 "Activate this field to add one or more items of equipment to be worked on."
 msgstr ""
-"Activez ce champ pour ajouter un ou plusieurs équipements sur lesquels va porter l'intervention."
+"Activez ce champ pour ajouter un ou plusieurs équipements sur lesquels va "
+"porter l'intervention."
 
 #. module: of_equipment_service
 #: model:ir.actions.act_window,name:of_equipment_service.action_of_service_request_after_sales
@@ -175,7 +176,6 @@ msgstr "Équipements"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__event_id
-#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__request_id
 msgid "Event"
 msgstr "Intervention"
 
@@ -292,6 +292,7 @@ msgstr ""
 
 #. module: of_equipment_service
 #: model:ir.model,name:of_equipment_service.model_of_service_request
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__request_id
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
 msgid "Service Request"
 msgstr "Demande d'intervention"

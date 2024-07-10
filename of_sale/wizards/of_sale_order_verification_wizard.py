@@ -3,14 +3,14 @@
 from odoo import api, fields, models
 
 
-class OfSaleOrderVerification(models.TransientModel):
+class OFSaleOrderVerification(models.TransientModel):
     """Base Transient model to do specific verifications on Sale Order confirmation."""
 
     _name = 'of.sale.order.verification'
     _description = __doc__
 
-    message = fields.Text(string="Message")
-    type = fields.Selection(selection=[], string="Type")
+    message = fields.Text()
+    type = fields.Selection(selection=[])
     order_id = fields.Many2one(comodel_name='sale.order', string="Sale order")
 
     @api.model

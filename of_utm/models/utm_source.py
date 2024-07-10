@@ -8,6 +8,6 @@ class UtmSource(models.Model):
     _order = 'sequence'
 
     name = fields.Char(string="Origin Name")
-    active = fields.Boolean(string="Active", default=True)
-    sequence = fields.Integer(string="Sequence", default=10)
+    active = fields.Boolean(default=True)
+    sequence = fields.Integer(default=10)
     medium_id = fields.Many2one(comodel_name='utm.medium', string="Associated channel")

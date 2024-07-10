@@ -16,7 +16,7 @@
         <field name="model">account.move.template</field>
         <field name="inherit_id"  ref="account_move_template.account_move_template_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_title']" position="before">
+            <xpath expr="//div[hasclass('oe_title')]" position="before">
                 <div class="oe_button_box" name="button_box">
                     <button class="oe_stat_button" name="of_action_view_moves" type="object" icon="fa-bars">
                         <field string="Vouchers" name="of_moves_count" widget="statinfo"/>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-02 07:49+0000\n"
-"PO-Revision-Date: 2024-07-02 07:49+0000\n"
+"POT-Creation-Date: 2024-07-11 06:32+0000\n"
+"PO-Revision-Date: 2024-07-11 06:32+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -42,9 +42,15 @@ msgid ""
 msgstr "Le modèle de commentaire ne sera disponible que pour le client sélectionné"
 
 #. module: of_base_comment_template
-#: model:ir.model.fields,field_description:of_base_comment_template.field_base_comment_template__model_ids
 #: model:ir.model.fields,field_description:of_base_comment_template.field_base_comment_template__models
+#: model_terms:ir.ui.view,arch_db:of_base_comment_template.base_comment_template_view_o2m_tree
+#: model_terms:ir.ui.view,arch_db:of_base_comment_template.view_base_comment_template_form
 msgid "Models"
+msgstr "Modèles"
+
+#. module: of_base_comment_template
+#: model:ir.model.fields,field_description:of_base_comment_template.field_base_comment_template__model_ids
+msgid "Models (M2M)"
 msgstr "Modèles"
 
 #. module: of_base_comment_template

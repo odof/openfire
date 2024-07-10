@@ -3,11 +3,11 @@
 {
     'name': "OpenFire / Gestion prix & échéancier de paiement",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'summary': "Link module between Price management and Payment schedule",
     'website': 'https://www.openfire.fr',
-    'description': "",
     'depends': [
         'of_sale_price_management',
         'of_sale_payment_schedule'
@@ -17,5 +17,4 @@
     'installable': True,
     'application': False,
     'auto_install': True,
-    'license': 'LGPL-3',
 }

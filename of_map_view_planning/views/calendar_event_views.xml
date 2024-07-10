@@ -27,14 +27,14 @@
                         <div class="row g-0">
                             <div class="col">
                                 <ul class="ps-1 mb-0 list-unstyled">
-                                    <li t-if="record.display_name"><i class="fa fa-user pe-1"/><strong t-esc="record.display_name"/></li>
-                                    <li t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></li>
+                                    <li t-if="record.display_name"><i class="fa fa-user pe-1" title="User" /><strong t-esc="record.display_name"/></li>
+                                    <li t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1" title="Marker" /><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></li>
                                     <li t-foreach="record.of_address_phone_number_ids.records" t-as="number" t-key="number_index">
-                                        <i class="fa fa-phone pe-1"/><span t-esc="number.data.display_name"/>
+                                        <i class="fa fa-phone pe-1"  title="Phone" /><span t-esc="number.data.display_name"/>
                                     </li>
-                                    <li t-if="record.of_task_id"><i class="fa fa-cog pe-1"/><span t-esc="record.of_task_id[1]"/></li>
+                                    <li t-if="record.of_task_id"><i class="fa fa-cog pe-1" title="Gear" /><span t-esc="record.of_task_id[1]"/></li>
                                     <li t-if="record.start">
-                                        <i class="fa fa-truck pe-1"/>
+                                        <i class="fa fa-truck pe-1" title="Truck"/>
                                         <t t-if="record.start.c.day &lt; 10">0</t><span t-esc="record.start.c.day"/>/<t t-if="record.start.c.month &lt; 10">0</t><span t-esc="record.start.c.month"/>/<span t-esc="record.start.c.year" class="pe-1"/>
                                         <t t-if="record.start.c.hour &lt; 10">0</t><span t-esc="record.start.c.hour"/>:<t t-if="record.start.c.minute &lt; 10">0</t><span t-esc="record.start.c.minute"/>
                                     </li>

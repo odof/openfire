@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-11 07:03+0000\n"
-"PO-Revision-Date: 2024-04-11 07:03+0000\n"
+"POT-Creation-Date: 2024-07-11 06:27+0000\n"
+"PO-Revision-Date: 2024-07-11 06:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -450,6 +450,11 @@ msgid ""
 "a new contact should be created under that new company. You can use the "
 "\"Discard\" button to abandon this change."
 msgstr ""
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_res_partner_check_duplications
+msgid "Check Partner Duplications"
+msgstr "Vérifier les doublons de partenaires"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__city
@@ -903,11 +908,15 @@ msgid "Fail Mail"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_mail_mail__of_failure_reason
-#: model:ir.model.fields,field_description:of_base.field_mail_message__of_failure_reason
 #: model_terms:ir.ui.view,arch_db:of_base.of_mail_message_view_form
 msgid "Failure Reason"
-msgstr ""
+msgstr "Raison de l'échec"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_mail_mail__of_failure_reason
+#: model:ir.model.fields,field_description:of_base.field_mail_message__of_failure_reason
+msgid "Failure Reason (OF)"
+msgstr "Raison de l'échec"
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_mail_mail__of_failure_reason
@@ -1396,6 +1405,11 @@ msgid "Lock Confirmed Orders"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_log_message
+msgid "Log Message"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__log_level
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Log level"
@@ -1590,6 +1604,7 @@ msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_image__name
+#: model:ir.model.fields,field_description:of_base.field_of_log_message__name
 #: model:ir.model.fields,field_description:of_base.field_res_partner__name
 #: model:ir.model.fields,field_description:of_base.field_res_users__name
 msgid "Name"
@@ -1777,6 +1792,11 @@ msgid "Partner Autocomplete"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_res_partner_phone
+msgid "Partner Phone"
+msgstr "Téléphone du partenaire"
+
+#. module: of_base
 #: model:ir.model,name:of_base.model_res_partner_title
 msgid "Partner Title"
 msgstr "Titre du partenaire"
@@ -1807,6 +1827,11 @@ msgstr "Numéros de téléphone"
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Phones"
 msgstr "Téléphones"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_popup_wizard
+msgid "Popup Wizard"
+msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__of_potential_duplication
@@ -1968,6 +1993,11 @@ msgid "Reactivated user"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_readgroup
+msgid "Read Group Customization"
+msgstr "Customisation de Read Group"
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__geocoding_on_write
 msgid ""
 "Recalculate geocoding values automatically when a partner's address is "
@@ -2052,6 +2082,11 @@ msgid "Salesperson"
 msgstr "Commercial"
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_sanitize_query
+msgid "Sanitize Query"
+msgstr "Requête de nettoyage"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__use_po_lead
 msgid "Security Lead Time for Purchase"
 msgstr ""
@@ -2118,10 +2153,15 @@ msgid "Social capital"
 msgstr "Capital social"
 
 #. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_mail_message_view_form
+msgid "Status"
+msgstr "Statut"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_mail_mail__of_state
 #: model:ir.model.fields,field_description:of_base.field_mail_message__of_state
-msgid "Status"
-msgstr ""
+msgid "Status (OF)"
+msgstr "Statut"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__group_stock_storage_categories
@@ -2317,12 +2357,20 @@ msgid ""
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_of_base_hooks_installed
+msgid ""
+"This model is used to test if the module is installed and avoid monkey "
+"patching side-effects."
+msgstr ""
+"Ce modèle est utilisé pour tester si le module est installé et éviter les "
+"effets secondaires du monkey patching."
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__timeout
 msgid "Timeout"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_of_log_message__name
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Title"
@@ -2489,6 +2537,11 @@ msgid "Verify VAT Numbers"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model,name:of_base.model_version_registry
+msgid "Version Registry"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__geoloc_provider_googlemap_key
 msgid ""
 "Visit https://developers.google.com/maps/documentation/geocoding/get-api-key"
@@ -2592,43 +2645,8 @@ msgid "e.g. Sales Director"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model,name:of_base.model_of_base_hooks_installed
-msgid "of.base.hooks.installed"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_log_message
-msgid "of.log.message"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_popup_wizard
-msgid "of.popup.wizard"
-msgstr ""
-
-#. module: of_base
 #: model:ir.actions.act_window,name:of_base.action_of_popup_wizard
 msgid "of.popup.wizard.action"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_readgroup
-msgid "of.readgroup"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_res_partner_check_duplications
-msgid "of.res.partner.check.duplications"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_res_partner_phone
-msgid "of.res.partner.phone"
-msgstr ""
-
-#. module: of_base
-#: model:ir.model,name:of_base.model_of_sanitize_query
-msgid "of.sanitize.query"
 msgstr ""
 
 #. module: of_base

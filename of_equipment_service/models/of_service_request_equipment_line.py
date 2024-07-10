@@ -14,7 +14,7 @@ class OFServiceRequestEquipmentLine(models.Model):
 
     request_id = fields.Many2one(
         comodel_name='of.service.request',
-        string="Event",
+        string="Service Request",
         required=True,
         ondelete='cascade',
     )

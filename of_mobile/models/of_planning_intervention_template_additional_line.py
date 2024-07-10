@@ -14,7 +14,6 @@ class OFPlanningInterventionAdditionalLine(models.Model):
         string="Unit price",
         digits='Product Price',
         related="product_id.list_price",
-        default=0.0,
         readonly=True,
     )
     additional_template_id = fields.Many2one(

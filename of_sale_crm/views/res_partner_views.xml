@@ -25,7 +25,7 @@
             <xpath expr="//notebook//page[@name='sales_purchases']//group[@name='sale']//field[@name='user_id']" position="before">
                 <field name="customer_rank" invisible="1"/>
                 <field name="supplier_rank" invisible="1"/>
-                <field name="of_customer_state" required="1"
+                <field name="of_customer_state" string="State" required="1"
                         attrs="{'invisible': [('customer_rank', '&lt;=', 0), ('supplier_rank', '&gt;', 0)], 'readonly': [('parent_id', '!=', False), ('is_company', '=', False)]}"/>
             </xpath>
         </field>
@@ -37,7 +37,7 @@
         <field name="inherit_id" ref="base.res_partner_kanban_view"/>
         <field name="arch" type="xml">
             <xpath expr="//kanban//field[@name='type']" position="after">
-                <field name="of_customer_state"/>
+                <field name="of_customer_state" string="State"/>
             </xpath>
             <xpath expr="//kanban//templates//strong[hasclass('oe_partner_heading')]" position="after">
                 <div t-if="record.of_customer_state.raw_value == 'lead'" class="label label-success">prospect</div>
@@ -52,7 +52,7 @@
         <field eval="8" name="priority"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
-                <field name="of_customer_state" invisible="1"/>
+                <field name="of_customer_state" string="State" invisible="1"/>
             </xpath>
             <xpath expr="//tree" position="attributes">
                 <attribute name="decoration-info">of_customer_state=='lead'</attribute>

@@ -4,7 +4,10 @@ from odoo import fields, models
 
 
 class OFSanitizeQuery(models.Model):
+    """Query to sanitize database during restore"""
+
     _name = 'of.sanitize.query'
+    _description = "Sanitize Query"
 
     query_if = fields.Char()
     query = fields.Char(required=True)

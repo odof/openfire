@@ -6,7 +6,7 @@
         <field name="model">res.users</field>
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_title']/group//field[@name='partner_id']" position="after">
+            <xpath expr="//div[hasclass('oe_title')]/group//field[@name='partner_id']" position="after">
                 <field name="of_user_type"/>
             </xpath>
             <xpath expr="//notebook" position="inside">

@@ -4,7 +4,7 @@
     'name': "OpenFire / Web Widgets",
     'version': '16.0.1.0.0',
     'author': "OpenFire",
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'category': 'OpenFire',
     'sequence': 15,
     'summary': "Web Widgets for OpenFire",

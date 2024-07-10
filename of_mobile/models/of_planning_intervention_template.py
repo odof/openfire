@@ -47,7 +47,7 @@ class OFPlanningInterventionTemplate(models.Model):
     mobile_payment_fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string="Fiscal Position"
     )
-    auto_confirm_invoice = fields.Boolean(String="Invoice Auto confirmation")
+    auto_confirm_invoice = fields.Boolean(string="Invoice Auto confirmation")
 
     @api.onchange('mobile_payment_fiscal_position_id')
     def onchange_mobile_payment_fiscal_position_id(self):

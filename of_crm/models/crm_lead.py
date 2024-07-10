@@ -10,7 +10,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     # Partner related fields
-    of_title = fields.Many2one(related='partner_id.title', readonly=False)
+    of_title = fields.Many2one(related='partner_id.title', readonly=False, string="Partner Title")
     is_company = fields.Boolean(string="Is a company", tracking=True, related='partner_id.is_company', readonly=False)
     of_website = fields.Char(related='partner_id.website')
     tag_ids = fields.Many2many(
@@ -19,7 +19,9 @@ class CrmLead(models.Model):
         string='Tags',
         help="Classify and analyze your lead/opportunity categories like: Training, Service",
     )
-    meeting_ids = fields.Many2many(comodel_name='calendar.event', string="Meetings", related='partner_id.meeting_ids')
+    meeting_ids = fields.Many2many(
+        comodel_name='calendar.event', string="Meetings (Partner)", related='partner_id.meeting_ids'
+    )
 
     # Partner fields
     zip_id = fields.Many2one(comodel_name='res.city.zip', string="City/Location")
@@ -44,15 +46,15 @@ class CrmLead(models.Model):
         string="Date of next action"
     )
     of_date_action_filter = fields.Date(
-        string="Date of next action",
+        string="Date of next action (filter)",
         store=True,
         index=True,
         help="Technical field used in the search view to filter on the date of the next action",
     )
     of_title_action = fields.Char(string="Name of next action")
     of_partner_name = fields.Char(string="Name", compute='_compute_geocoding_data', store=True)
-    of_city = fields.Char(string="City", compute='_compute_geocoding_data', store=True)
-    of_zip = fields.Char(string="Zip", compute='_compute_geocoding_data', store=True)
+    of_city = fields.Char(string="City (map)", compute='_compute_geocoding_data', store=True)
+    of_zip = fields.Char(string="Zip (map)", compute='_compute_geocoding_data', store=True)
     of_precision = fields.Selection(
         OPENSTREETMAP_PRECISION, compute='_compute_geocoding_data', string="Precision", store=True
     )

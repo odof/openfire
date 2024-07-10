@@ -39,7 +39,7 @@ class OFPlanningTask(models.Model):
         copy=False,
         store=True,
     )
-    templates_count = fields.Integer(string="# Templates", compute='_compute_templates_ids')
+    templates_count = fields.Integer(string="# Templates", compute='_compute_templates_ids', compute_sudo=True)
 
     def _compute_templates_ids(self):
         intervention_template_obj = self.env['of.planning.intervention.template']

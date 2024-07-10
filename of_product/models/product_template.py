@@ -22,8 +22,8 @@ class ProductTemplate(models.Model):
     of_uom_category_id = fields.Many2one(related='uom_id.category_id', readonly=True)
     uom_po_id = fields.Many2one(domain="[('category_id', '=', of_uom_category_id)]")
     # Ajout de champs copiés de l'udm de vente pour affichage
-    of_uom_po_id_display = fields.Many2one(related='uom_po_id', readonly=True)
-    of_uom_po_id_display2 = fields.Many2one(related='uom_po_id', readonly=True)
+    of_uom_po_id_display = fields.Many2one(related='uom_po_id', string="Purchase UoM (display)", readonly=True)
+    of_uom_po_id_display2 = fields.Many2one(related='uom_po_id', string="Purchase UoM (display 2)", readonly=True)
 
     # Champs ajoutés pour openImport et affichage dans formulaire produit
     of_seller_pp_untaxed = fields.Float(related='seller_ids.of_public_price_untaxed', related_sudo=False)

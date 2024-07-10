@@ -22,7 +22,7 @@
                 <attribute name="invisible">1</attribute>
             </field>
             <field name="models" position="after">
-                <field name="model_ids" widget="many2many_tags"/>
+                <field name="model_ids" string="Models" widget="many2many_tags"/>
             </field>
         </field>
     </record>
@@ -38,7 +38,7 @@
                 <field name="company_id" groups="base.group_multi_company" />
                 <field name="partner_ids" string="Partners" invisible="1" />
                 <field name="models" optional="hide" />
-                <field name="model_ids" groups="base.group_erp_manager" optional="hide" />
+                <field name="model_ids" string="Models" groups="base.group_erp_manager" optional="hide" />
                 <field name="domain" string="Domain" optional="hide" />
             </tree>
         </field>

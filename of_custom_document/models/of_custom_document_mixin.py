@@ -10,7 +10,7 @@ except ImportError:
     pypdftk = None
 
 
-class OfCustomDocumentMixin(models.AbstractModel):
+class OFCustomDocumentMixin(models.AbstractModel):
     """Classe abstraite qui permet d'ajouter les documents joints.
     La fonction _allowed_reports doit être surchargée pour ajouter d'autres rapports et être en héritage pour la classe
     sur laquelle on veut ajouter la fonctionnalité.

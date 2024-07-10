@@ -5,6 +5,7 @@ from odoo import fields, models
 
 class OFProductPackLines(models.Model):
     _name = 'of.product.pack.lines'
+    _description = "Product Pack Lines"
     _rec_name = 'product_id'
 
     product_id = fields.Many2one(

@@ -3,6 +3,7 @@
 {
     'name': "OpenFire / Base",
     'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
     'sequence': 15,
@@ -65,7 +66,6 @@
     'installable': True,
     'application': False,
     'auto_install': False,
-    'license': 'LGPL-3',
     'post_init_hook': 'post_init_hook',
     'pre_init_hook': 'pre_init_hook',
 }

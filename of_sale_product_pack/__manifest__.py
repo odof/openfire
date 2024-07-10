@@ -3,7 +3,7 @@
 {
     'name': "OpenFire / Ventes & Kits produits",
     'version': '16.0.1.0.0',
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'author': "OpenFire",
     'summary': "Module de gestion de vente produits kits",
     'category': 'OpenFire',

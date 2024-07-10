@@ -107,9 +107,7 @@ class OFEquipment(models.Model):
     # Map view fields
     customer_name = fields.Char(related='customer_id.name')
     customer_mobile = fields.Char(related='customer_id.mobile')
-    precision = fields.Selection(
-        OPENSTREETMAP_PRECISION, compute='_compute_geocoding_data', string="Precision", store=True
-    )
+    precision = fields.Selection(OPENSTREETMAP_PRECISION, compute='_compute_geocoding_data', store=True)
     partner_latitude = fields.Float(string="Latitude", compute='_compute_geocoding_data', store=True)
     partner_longitude = fields.Float(string="Longitude", compute='_compute_geocoding_data', store=True)
     geocoding_state = fields.Selection(

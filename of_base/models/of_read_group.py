@@ -21,6 +21,7 @@ class OfReadGroup(models.AbstractModel):
     """
 
     _name = 'of.readgroup'
+    _description = "Read Group Customization"
 
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):

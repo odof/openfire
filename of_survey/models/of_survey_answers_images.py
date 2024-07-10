@@ -5,6 +5,7 @@ from odoo import fields, models
 
 class OFSurveyAnswersImages(models.Model):
     _name = 'of.survey.answers.images'
+    _description = "Survey Answers Images"
     _rec_name = 'answer'
 
     answer = fields.Char()
