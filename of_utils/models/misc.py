@@ -111,7 +111,7 @@ def sanitize_text(text, allowed=''):
     """
     # Retrait de tous les caractères spéciaux.
     # Les caractères accentués sont remplacés par leur version sans accent.
-    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii')
     allowed = re.escape(allowed)
     return re.sub(f'[^0-9A-Za-z{allowed}]', '', text)
 
