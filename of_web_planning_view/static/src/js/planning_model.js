@@ -13,10 +13,7 @@ import { Model } from "@web/views/model";
 import { formatFloat } from "@web/views/fields/formatters";
 import { session } from "@web/session";
 
-const GROUPBY_COMBINATIONS = [
-    "of_resource_id",
-];
-
+const GROUPBY_COMBINATIONS = ["of_resource_id"];
 
 const { DateTime } = luxon;
 
@@ -43,7 +40,7 @@ export function computeRange(scale, date) {
         const { weekStart } = localization;
         const weekday = start.weekday < weekStart ? weekStart - 7 : weekStart;
         start = start.set({ weekday }).startOf("day");
-        end = start.plus({ weeks: 1, days: -1 }).endOf("day")
+        end = start.plus({ weeks: 1, days: -1 }).endOf("day");
     } else {
         start = start.startOf(scale);
         end = end.endOf(scale);
@@ -85,7 +82,9 @@ function parseServerValues(fields, values) {
                 break;
             }
             case "many2one": {
-                parsedValues[fieldName] = value ? [value.id, value.display_name] : false;
+                parsedValues[fieldName] = value
+                    ? [value.id, value.display_name]
+                    : false;
                 break;
             }
             default: {
@@ -95,7 +94,6 @@ function parseServerValues(fields, values) {
     }
     return parsedValues;
 }
-
 
 export class PlanningModel extends Model {
     setup(params) {
@@ -132,20 +130,26 @@ export class PlanningModel extends Model {
             pagerOffset: 0,
         };
 
-        this.hideUnassignedRecords = false;
+        this.hideUnassignedRecords = true; // Hide unassigned records by default
         let displayUnassignedRecords = false;
+        console.log(domain);
         for (const node of domain) {
             if (
                 node.length === 3 &&
-                (node[0] === "of_resource_id" &&
+                node[0] === "of_resource_id" &&
                 node[1] !== "!=" &&
-                node[2] !== false) && (["of_resource_id"].includes(node[0]))
-            )  {
+                node[2] !== false &&
+                ["of_resource_id"].includes(node[0])
+            ) {
+                console.log("displayUnassignedRecords = true");
                 displayUnassignedRecords = true;
             }
         }
         if (displayUnassignedRecords) {
-            searchParams.domain = Domain.or([domain, "[('of_resource_id', '=', false)]"]).toList();
+            searchParams.domain = Domain.or([
+                domain,
+                "[('of_resource_id', '=', false)]",
+            ]).toList();
         }
 
         if (!metaData.scale) {
@@ -188,9 +192,9 @@ export class PlanningModel extends Model {
         const metaData = this._buildMetaData();
         let { focusDate, scale } = metaData;
         if (direction === "next") {
-            focusDate = focusDate.plus({ 'week': 1 });
+            focusDate = focusDate.plus({ week: 1 });
         } else if (direction === "previous") {
-            focusDate = focusDate.minus({ 'week': 1 });
+            focusDate = focusDate.minus({ week: 1 });
         } else {
             focusDate = DateTime.local();
         }
@@ -198,10 +202,14 @@ export class PlanningModel extends Model {
     }
 
     async getStartHour() {
-        return await this.orm.call('res.company', 'get_start_hour', [[session.company_id]]);
+        return await this.orm.call("res.company", "get_start_hour", [
+            [session.company_id],
+        ]);
     }
     async getEndHour() {
-        return await this.orm.call('res.company', 'get_end_hour', [[session.company_id]]);
+        return await this.orm.call("res.company", "get_end_hour", [
+            [session.company_id],
+        ]);
     }
 
     /**
@@ -222,7 +230,7 @@ export class PlanningModel extends Model {
         this.notify();
     }
 
-/**
+    /**
      * @param {Object} params
      * @param {RowId} [params.rowId]
      * @param {DateTime} [params.start]
@@ -236,8 +244,9 @@ export class PlanningModel extends Model {
         if (params.withDefault) {
             if (context.of_resource_id && !context.of_employee_ids) {
                 // get employee_id from resource_id if not already set
-                const employee_id = await this.orm.call(
-                    'hr.employee', 'search', [[['resource_id', '=', context.of_resource_id]]]);
+                const employee_id = await this.orm.call("hr.employee", "search", [
+                    [["resource_id", "=", context.of_resource_id]],
+                ]);
                 if (employee_id.length) {
                     context.of_employee_ids = [employee_id[0]];
                     context.of_employee_id = employee_id[0];
@@ -282,7 +291,8 @@ export class PlanningModel extends Model {
                     const value = group[fieldName];
                     if (Array.isArray(value)) {
                         const { type } = fields[fieldName];
-                        schedule[fieldName] = type === "many2many" ? [value[0]] : value[0];
+                        schedule[fieldName] =
+                            type === "many2many" ? [value[0]] : value[0];
                     } else {
                         schedule[fieldName] = value;
                     }
@@ -462,12 +472,18 @@ export class PlanningModel extends Model {
             if (row.groupedByField === fieldName) {
                 row.progressBar = progressBarInfo[row.resId];
                 if (row.progressBar) {
-                    row.progressBar.value_formatted = formatFloat(row.progressBar.value, {
-                        digits: [false, 0],
-                    });
-                    row.progressBar.max_value_formatted = formatFloat(row.progressBar.max_value, {
-                        digits: [false, 0],
-                    });
+                    row.progressBar.value_formatted = formatFloat(
+                        row.progressBar.value,
+                        {
+                            digits: [false, 0],
+                        }
+                    );
+                    row.progressBar.max_value_formatted = formatFloat(
+                        row.progressBar.max_value,
+                        {
+                            digits: [false, 0],
+                        }
+                    );
                     row.progressBar.ratio = row.progressBar.max_value
                         ? (row.progressBar.value / row.progressBar.max_value) * 100
                         : 0;
@@ -526,6 +542,17 @@ export class PlanningModel extends Model {
             group_by: groupedBy,
         };
         const domain = this._getDomain(metaData);
+        if (
+            domain.some(
+                ([fieldName, operator, value]) =>
+                    fieldName === "of_resource_id" &&
+                    operator === "=" &&
+                    value === false
+            )
+        ) {
+            this.hideUnassignedRecords = false;
+        }
+        console.log("_fetchData", domain);
         const fields = this._getFields(metaData);
         const specification = {};
         for (const fieldName of fields) {
@@ -565,7 +592,6 @@ export class PlanningModel extends Model {
         this.data = data;
         this.metaData = metaData;
         this._nextMetaData = null;
-
     }
 
     //--------------------------------------------------------------------------
@@ -587,7 +613,19 @@ export class PlanningModel extends Model {
                 [dateStopField, ">=", serializeDateTime(startDate)],
             ],
         ]);
-        if (this.hideUnassignedRecords) {
+        // AS we are hiding unassigned records by default, we need to check if user has explicitly asked to display them
+        // If not, we add a domain to hide them
+        if (
+            this.hideUnassignedRecords &&
+            !domain
+                .toList()
+                .some(
+                    ([fieldName, operator, value]) =>
+                        fieldName === "of_resource_id" &&
+                        operator === "=" &&
+                        value === false
+                )
+        ) {
             domain = Domain.and([domain, [["of_resource_id", "!=", false]]]);
         }
         return domain.toList();
@@ -673,7 +711,6 @@ export class PlanningModel extends Model {
 
     //--------------------------------------------------------------------------
 
-
     /**
      * Return a copy of this.metaData or of the last copy, extended with optional
      * params. This is useful for async methods that need to modify this.metaData,
@@ -743,7 +780,9 @@ export class PlanningModel extends Model {
         const scaleId = context.default_scale || metaData.defaultScale;
         /** @type {DateTime} */
         let focusDate =
-            "initialDate" in context ? deserializeDateTime(context.initialDate) : DateTime.local();
+            "initialDate" in context
+                ? deserializeDateTime(context.initialDate)
+                : DateTime.local();
         if (metaData.offset) {
             focusDate = focusDate.plus({ [scaleId]: metaData.offset });
         }
@@ -809,8 +848,14 @@ export class PlanningModel extends Model {
                 }
                 // Record could also be outside the displayed range since the
                 // sample server doesn't take the domain into account
-                parsedRecord[dateStopField] = Math.max(parsedRecord[dateStopField], modelStartDate)
-                parsedRecord[dateStartField] = Math.min(parsedRecord[dateStartField], modelStopDate);
+                parsedRecord[dateStopField] = Math.max(
+                    parsedRecord[dateStopField],
+                    modelStartDate
+                );
+                parsedRecord[dateStartField] = Math.min(
+                    parsedRecord[dateStartField],
+                    modelStopDate
+                );
                 parsedRecords.push(parsedRecord);
             } else if (dateStart <= dateStop) {
                 parsedRecords.push(parsedRecord);
@@ -835,7 +880,7 @@ export class PlanningModel extends Model {
      * @returns {Row[]}
      */
     _generateRows(metaData, params) {
-        const {groupedBy, groups, parentGroup} = params;
+        const { groupedBy, groups, parentGroup } = params;
         const groupLevel = metaData.groupedBy.length - groupedBy.length;
 
         if (!this.hideUnassignedRecords) {
@@ -959,7 +1004,6 @@ export class PlanningModel extends Model {
         return rows;
     }
 
-
     //--------------------------------------------------------------------------
 
     /**
@@ -978,7 +1022,9 @@ export class PlanningModel extends Model {
                 metaData.groupedBy.includes(f)
             );
             if (progressBarFields.length) {
-                proms.push(this._fetchProgressBarData(metaData, data, progressBarFields));
+                proms.push(
+                    this._fetchProgressBarData(metaData, data, progressBarFields)
+                );
             }
         }
         await Promise.all(proms);
@@ -1010,7 +1056,7 @@ export class PlanningModel extends Model {
             progressBarFields,
             resIds,
             serializeDateTime(startDate),
-            serializeDateTime(startDate.plus({ 'week': 1 })),
+            serializeDateTime(startDate.plus({ week: 1 })),
         ]);
 
         for (const fieldName in progressBarInfo) {
@@ -1081,7 +1127,7 @@ export class PlanningModel extends Model {
      * @returns {string}
      */
     _getRowName(metaData, groupedByField, value) {
-        // Rename 'Undefined Resource' to 'Unassigned Interventions'.
+        // Rename 'Undefined Resource' to ''.
         if (["of_resource_id"].includes(groupedByField)) {
             const resId = Array.isArray(value) ? value[0] : value;
             if (!resId) {

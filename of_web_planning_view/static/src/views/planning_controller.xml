@@ -69,7 +69,7 @@
                     </button>
                 </t>
             </span>
-            <div class="btn-group gap-1">
+            <div class="btn-group gap-1" style="display: none;">
                 <button t-if="!model.hideUnassignedRecords"
                     class="o_gantt_button_copy_previous_week btn btn-secondary"
                     title="Hide Unaffected Interventions"
