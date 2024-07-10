@@ -3,6 +3,8 @@
 import base64
 from datetime import timedelta
 
+import pytz
+
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 
@@ -365,6 +367,12 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Compute methods
     # --------------------------------------------------------------------------
+
+    def _inverse_dates(self):
+        for meeting in self:
+            if meeting.allday:
+                meeting._update_datetime_with_work_hours()
+
     @api.depends('of_resource_id')
     def _compute_of_employee_ids(self):
         """Compute the employee_id based on the resource_id.
@@ -686,6 +694,12 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Onchange methods
     # --------------------------------------------------------------------------
+
+    @api.onchange('allday')
+    def _onchange_allday(self):
+        self.ensure_one()
+        if self.allday:
+            self._update_datetime_with_work_hours()
 
     @api.onchange('of_employee_ids')
     def _onchange_of_employee_ids(self):
@@ -1157,6 +1171,46 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Business methods
     # --------------------------------------------------------------------------
+
+    def _retrieve_work_hours(self):
+        """Retrieve the work hours for the day of the intervention"""
+        self.ensure_one()
+        resource_calendar = self.of_employee_id.resource_calendar_id
+        week_day = self.start_date.weekday()
+        start_hour = None
+        end_hour = None
+
+        if not resource_calendar.two_weeks_calendar:
+            attendances = resource_calendar.attendance_ids.filtered(lambda a: int(a.dayofweek) == week_day)
+        else:
+            week_type = resource_calendar.attendance_ids.get_week_type(self.start_date)
+            attendances = resource_calendar.attendance_ids.filtered(
+                lambda a: int(a.dayofweek) == week_day and int(a.week_type) == week_type
+            )
+
+        if attendances:
+            start_hour = min(attendances.mapped('hour_from'))
+            end_hour = max(attendances.mapped('hour_to'))
+
+        return start_hour, end_hour
+
+    def _update_datetime_with_work_hours(self):
+        """Update the start and stop of the intervention with the work hours"""
+        self.ensure_one()
+        start_date, end_date = self._retrieve_work_hours()
+        tz = pytz.timezone(self.of_employee_id.tz or 'Europe/Paris')
+
+        if start_date is not None and end_date is not None:
+            startdate = self.start.replace(hour=int(start_date), minute=int(((start_date - int(start_date)) * 60)))
+            enddate = self.stop.replace(hour=int(end_date), minute=int(((end_date - int(end_date)) * 60)))
+        else:
+            startdate = self.start.replace(hour=9)
+            enddate = self.stop.replace(hour=18)
+
+        start = tz.localize(startdate).astimezone(pytz.UTC).replace(tzinfo=None)
+        stop = tz.localize(enddate).astimezone(pytz.UTC).replace(tzinfo=None)
+
+        self.write({'start': start, 'stop': stop})
 
     def _affect_intervention_number(self):
         events = self.filtered(
