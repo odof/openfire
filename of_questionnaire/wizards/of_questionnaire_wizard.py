@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+import re
+
+from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval
 
 
@@ -84,6 +86,7 @@ class RepondreQuestionnaireWizard(models.TransientModel):
         self.question_ids -= self.question_id
         # On teste s'il y a des conditions
         if self.question_id.condition:
+            re_strings = re.compile('(".*?[^\\\\]")')
             ctx = {}
             all_questions = self.env['of.planning.intervention.question'].search(
                 [('intervention_id', '=', self.question_id.intervention_id.id)])
@@ -93,6 +96,7 @@ class RepondreQuestionnaireWizard(models.TransientModel):
             condition_code = condition_code.replace(' = ', ' == ')
             condition_code = condition_code.replace(' et ', ' and ')
             condition_code = condition_code.replace(' ou ', ' or ')
+            condition_code = re_strings.sub('u\\1', condition_code)
             condition_res = safe_eval(condition_code, ctx)
             if not condition_res:
                 # Si la condition n'est pas respectée, on vide la réponse potentielle de la question

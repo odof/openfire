@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, SUPERUSER_ID
+import re
+
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools.safe_eval import safe_eval
 
@@ -234,6 +236,7 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def recompute_questions_condition_unmet(self):
+        re_strings = re.compile('(".*?[^\\\\]")')
         for intervention in self:
             ctx = {}
             for question in intervention.question_ids:
@@ -244,6 +247,8 @@ class OfPlanningIntervention(models.Model):
                     condition_code = condition_code.replace(' = ', ' == ')
                     condition_code = condition_code.replace(' et ', ' and ')
                     condition_code = condition_code.replace(' ou ', ' or ')
+                    # Remplacement de tous les textes par du unicode
+                    condition_code = re_strings.sub('u\\1', condition_code)
                     try:
                         condition_unmet = not safe_eval(condition_code, ctx)
                     except Exception:
