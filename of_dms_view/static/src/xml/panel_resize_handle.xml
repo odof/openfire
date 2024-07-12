@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.PanelResizeHandle" owl="1">
+        <div class="panel-resize-handle">
+            <hr />
+        </div>
+    </t>
+
+</templates>

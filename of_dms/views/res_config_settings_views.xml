@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_dms_res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.dms.res.config.settings.view.form.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="dms.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='dms_settings']" position="inside">
+                <div class="row mt16 o_settings_container" name="virtual_file">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_felt_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">
+                                Virtual File settings
+                            </span>
+                            <div class="text-muted">
+                                Define virtual file reports for documents tree
+                            </div>
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <field name="of_virtual_file_report_ids" nolabel="1" style="width: 100%">
+                                        <tree editable="top">
+                                            <field name="model_id"/>
+                                            <field name="model_name" invisible="1"/>
+                                            <field name="report_id" domain="[('model','=',model_name)]"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
