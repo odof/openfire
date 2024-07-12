@@ -1,0 +1,181 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_dms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-10 15:22+0000\n"
+"PO-Revision-Date: 2024-10-10 15:22+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_dms
+#: model_terms:ir.ui.view,arch_db:of_dms.of_dms_res_config_settings_view_form
+msgid ""
+"<span class=\"o_form_label\">\n"
+"                                Virtual File settings\n"
+"                            </span>"
+msgstr ""
+"<span class=\"o_form_label\">\n"
+"                                Paramètres des fichiers virtuels\n"
+"                            </span>"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_directory__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_ir_attachment
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__company_id
+msgid "Company"
+msgstr "Société"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_dms
+#: model:dms.access.group,name:of_dms.access_group_contacts_user
+msgid "Contacts user"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_file__content
+msgid "Content"
+msgstr "Contenu"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_file__of_content_url
+msgid "Content URL"
+msgstr "URL du contenu"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_dms
+#: model_terms:ir.ui.view,arch_db:of_dms.of_dms_res_config_settings_view_form
+msgid "Define virtual file reports for documents tree"
+msgstr "Définit les rapports de fichier virtuel pour l'arbre de documents"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_dms_directory
+msgid "Directory"
+msgstr "Dossier"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_res_partner__of_dms_directory_id
+#: model:ir.model.fields,field_description:of_dms.field_res_users__of_dms_directory_id
+msgid "Directory in DMS"
+msgstr "Dossier DMS"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_dms_file
+msgid "File"
+msgstr "Fichier"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__id
+#: model_terms:ir.ui.view,arch_db:of_dms.view_dms_file_form
+msgid "ID"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_file__of_virtual_res_model
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__model_id
+msgid "Model"
+msgstr "Modèle"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__model_name
+msgid "Model Name"
+msgstr "Nom du modèle"
+
+#. module: of_dms
+#: model:dms.access.group,name:of_dms.access_group_admin
+msgid "Only admin user"
+msgstr ""
+
+#. module: of_dms
+#: model:ir.model.fields.selection,name:of_dms.selection__dms_file__of_type__real
+msgid "Real"
+msgstr "Réel"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_of_dms_virtual_file_report__report_id
+msgid "Report"
+msgstr "Rapport"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_file__of_type
+msgid "Type of file"
+msgstr "Type de fichier"
+
+#. module: of_dms
+#: model:ir.model.fields.selection,name:of_dms.selection__dms_file__of_type__virtual
+msgid "Virtual"
+msgstr "Virtuel"
+
+#. module: of_dms
+#: model:ir.model,name:of_dms.model_of_dms_virtual_file_report
+msgid "Virtual File Report"
+msgstr "Rapport de fichier virtuel"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_dms_file__of_virtual_res_id
+msgid "Virtual ID"
+msgstr "ID virtuel"
+
+#. module: of_dms
+#: model:ir.model.fields,field_description:of_dms.field_res_company__of_virtual_file_report_ids
+#: model:ir.model.fields,field_description:of_dms.field_res_config_settings__of_virtual_file_report_ids
+msgid "Virtual file reports"
+msgstr "Rapports de fichier virtuel"

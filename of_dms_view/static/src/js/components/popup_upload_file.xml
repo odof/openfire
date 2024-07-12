@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.PopupUploadFile" owl="1">
+        <div class="container">
+            <form class="form_upload">
+                <div class="col-12 mt-3 mb-3">
+                    <div class="form">
+                        <legend>Upload File</legend>
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">The file will be uploaded into the contact <t t-esc="this.props.record.name" /> directory</label>
+                            <input class="form-control" type="file" id="input_file" name="input_file" t-ref="input_file"/>
+                        </div>
+                        <button class="btn btn-primary btn-sm" t-on-click.stop.prevent="click_upload" >Upload</button>
+                        <button class="btn btn-secondary btn-sm" t-on-click.stop="click_close">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </t>
+
+</templates>
