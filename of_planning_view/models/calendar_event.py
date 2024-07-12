@@ -124,22 +124,11 @@ class CalendarEvent(models.Model):
             planned_slots_with_calendar = slots_with_calendar - unplanned_slots_with_calendar
             if not planned_slots_with_calendar:
                 return
-            # if there are at least one slot having start or end date, call the _get_valid_work_intervals
-            start_utc = pytz.utc.localize(min(planned_slots_with_calendar.mapped('start')))
-            end_utc = pytz.utc.localize(max(planned_slots_with_calendar.mapped('stop')))
-            # work intervals per resource are retrieved with a batch
-            (
-                resource_work_intervals,
-                calendar_work_intervals,
-            ) = slots_with_calendar.of_resource_id._get_valid_work_intervals(
-                start_utc, end_utc, calendars=slots_with_calendar.of_company_id.resource_calendar_id
-            )
+
             for slot in planned_slots_with_calendar:
                 slot.of_allocated_hours = slot._get_duration_over_period(
                     pytz.utc.localize(slot.start),
                     pytz.utc.localize(slot.stop),
-                    resource_work_intervals,
-                    calendar_work_intervals,
                     has_allocated_hours=False,
                 )
 
@@ -170,19 +159,14 @@ class CalendarEvent(models.Model):
         )
         if not slots:
             return
-        # if there are at least one slot having start or end date, call the _get_valid_work_intervals
+
         start_utc = pytz.utc.localize(min(slots.mapped('start')))
         end_utc = pytz.utc.localize(max(slots.mapped('stop')))
-        resource_work_intervals, calendar_work_intervals = slots.of_resource_id.filtered(
-            'calendar_id'
-        )._get_valid_work_intervals(start_utc, end_utc, calendars=slots.of_company_id.resource_calendar_id)
         for slot in slots:
             if not slot.of_resource_id and slot.of_allocation_type == 'planning' or not slot.of_resource_id.calendar_id:
                 slot.of_allocated_percentage = 100 * slot.of_allocated_hours / slot._calculate_slot_duration()
             else:
-                work_hours = slot._get_working_hours_over_period(
-                    start_utc, end_utc, resource_work_intervals, calendar_work_intervals
-                )
+                work_hours = slot._get_working_hours_over_period(start_utc, end_utc)
                 slot.of_allocated_percentage = 100 * slot.of_allocated_hours / work_hours if work_hours else 100
 
     # --------------------------------------------------------------------------
@@ -200,30 +184,23 @@ class CalendarEvent(models.Model):
             return slot_duration
         return max_duration
 
-    def _get_duration_over_period(
-        self, start_utc, stop_utc, work_intervals, calendar_intervals, has_allocated_hours=True
-    ):
+    def _get_duration_over_period(self, start_utc, stop_utc, has_allocated_hours=True):
         assert start_utc.tzinfo and stop_utc.tzinfo
         self.ensure_one()
         start, stop = start_utc.replace(tzinfo=None), stop_utc.replace(tzinfo=None)
         if has_allocated_hours and self.start >= start and self.stop <= stop:
             return self.of_allocated_hours
-        # if the slot goes over the gantt period, compute the duration only within
-        # the gantt period
+        # if the slot goes over the planning period, compute the duration only within
+        # the planning period
         ratio = self.of_allocated_percentage / 100.0
-        working_hours = self._get_working_hours_over_period(start_utc, stop_utc, work_intervals, calendar_intervals)
+        working_hours = self._get_working_hours_over_period(start_utc, stop_utc)
         return working_hours * ratio
 
-    def _get_working_hours_over_period(self, start_utc, end_utc, work_intervals, calendar_intervals):
+    def _get_working_hours_over_period(self, start_utc, end_utc):
         start = max(start_utc, pytz.utc.localize(self.start))
         end = min(end_utc, pytz.utc.localize(self.stop))
         slot_interval = Intervals([(start, end, self.env['resource.calendar.attendance'])])
-        working_intervals = (
-            work_intervals[self.of_resource_id.id]
-            if self.of_resource_id
-            else calendar_intervals[self.of_company_id.resource_calendar_id.id]
-        )
-        return sum_intervals(slot_interval & working_intervals)
+        return sum_intervals(slot_interval)
 
     @api.model
     def planning_unavailability(self, start_date, end_date, scale, domain, group_bys=None, rows=None):
@@ -316,16 +293,16 @@ class CalendarEvent(models.Model):
             ]
         )
         planned_hours_mapped = defaultdict(float)
-        resource_work_intervals, calendar_work_intervals = resources.sudo()._get_valid_work_intervals(start, stop)
+
+        resource_work_intervals = resources._get_resource_work_intervals(start, stop)
+
         for slot in interventions_slots:
-            planned_hours_mapped[slot.of_resource_id.id] += slot._get_duration_over_period(
-                start, stop, resource_work_intervals, calendar_work_intervals
-            )
+            planned_hours_mapped[slot.of_resource_id.id] += slot._get_duration_over_period(start, stop)
             # We attribute that slot duration to the employees as well
             for employee in slot.of_employee_ids:
                 if employee.resource_id != slot.of_resource_id:
-                    test = slot._get_duration_over_period(start, stop, resource_work_intervals, calendar_work_intervals)
-                    planned_hours_mapped[employee.resource_id.id] += test
+                    planned_hours_mapped[employee.resource_id.id] += slot._get_duration_over_period(start, stop)
+
         # Compute employee work hours based on its work intervals.
         work_hours = {
             of_resource_id: sum_intervals(work_intervals)
