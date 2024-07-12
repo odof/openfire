@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.PopupDeleteFile" owl="1">
+        <div class="container">
+            <form class="form_delete">
+                <div class="col-12 mt-3 mb-3">
+                    <div class="form">
+                        <legend>Delete File</legend>
+                        <div class="mb-3">
+                          <label for="formFile" class="form-label">Do you really want to delete this file ?</label>
+                        </div>
+                        <button class="btn btn-primary btn-sm" t-on-click.stop.prevent="click_delete" >Delete</button>
+                        <button class="btn btn-secondary btn-sm" t-on-click.stop.prevent="click_close">Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_dms_file_form" model="ir.ui.view">
+        <field name="name">dms.file.form</field>
+        <field name="model">dms.file</field>
+        <field name="inherit_id" ref="dms.view_dms_file_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='content']" position="before">
+                <group name="type">
+                    <field name="of_type"/>
+                </group>
+                <group>
+                    <field name="of_content_url" widget="url"/>
+                </group>
+                <group name="virtual_file" attrs="{'invisible': [('of_type','!=','virtual')]}" string="ID">
+                    <group>
+                        <field name="of_virtual_res_id" attrs="{'required': [('of_type','=','virtual')]}"/>
+                        <field name="of_virtual_res_model" attrs="{'required': [('of_type','=','virtual')]}"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='content']" position="attributes">
+                <attribute name="attrs">{'invisible': [('of_type','!=','real')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='content']" position="attributes">
+                <attribute name="attrs">{'required': [('of_type','=','real')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_dms_file_tree" model="ir.ui.view">
+        <field name="name">dms.file.tree</field>
+        <field name="model">dms.file</field>
+        <field name="inherit_id" ref="dms.view_dms_file_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="of_type"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

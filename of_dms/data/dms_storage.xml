@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="storage_contacts" model="dms.storage">
+        <field name="name">Documents Contacts</field>
+        <field name="save_type">database</field>
+    </record>
+
+</odoo>

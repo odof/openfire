@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="directory_contacts" model="dms.directory">
+        <field name="name">Contacts</field>
+        <field name="is_root_directory" eval="True"/>
+        <field name="storage_id" ref="of_dms.storage_contacts" />
+        <field
+            name="group_ids"
+            eval="[(6, 0, [ref('of_dms.access_group_admin', ref('of_dms.access_group_contacts_user'))])]"
+        />
+    </record>
+
+</odoo>

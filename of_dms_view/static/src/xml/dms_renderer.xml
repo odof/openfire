@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.DmsRenderer" owl="1">
+        <div class="dms-renderer row g-0 bg-white" t-ref="root" t-on-mousemove="mousemove_resize_panel" >
+            <t t-call="of_dms_view.PanelDirectories">
+                <t t-set="records" t-value="props.records"/>
+            </t>
+            <div class="panel-resize-directories" t-ref="panel-resize-directories" t-on-mousedown="click_resize_directories" t-on-mouseup="mouseup_resize_directories">
+            </div>
+            <t t-call="of_dms_view.PanelDirectoriesFiles">
+                <t t-set="records" t-value="state.directories"/>
+                <t t-set="direct_files" t-value="state.directFiles"/>
+            </t>
+            <div class="panel-resize-directories-files" t-ref="panel-resize-directories-files" t-on-mousedown="click_resize_directories_files" t-on-mouseup="mouseup_resize_directories_files">
+            </div>
+            <t t-call="of_dms_view.PanelPreview">
+                <t t-set="preview" t-value="state.preview"/>
+            </t>
+        </div>
+    </t>
+
+</templates>

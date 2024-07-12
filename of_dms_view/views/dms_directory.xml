@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="dms_directory_dms_view" model="ir.ui.view">
+        <field name="name">dms.directory.dms</field>
+        <field name="model">dms.directory</field>
+        <field name="arch" type="xml">
+            <dms>
+                <field name="name"/>
+            </dms>
+        </field>
+    </record>
+
+    <record id="action_dms_directory_view" model="ir.actions.act_window">
+        <field name="name">DMS directory</field>
+        <field name="res_model">dms.directory</field>
+        <field name="view_mode">dms</field>
+    </record>
+
+    <menuitem id="menu_documents" name="Documents" parent="dms.main_menu_dms" action="action_dms_directory_view"/>
+
+</odoo>
