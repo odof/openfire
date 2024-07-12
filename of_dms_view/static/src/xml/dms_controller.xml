@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.DmsView" owl="1">
+        <Layout   className="'o_content_dms'">
+            <t t-component="props.Renderer" records="model.records"/>
+        </Layout>
+    </t>
+
+</templates>

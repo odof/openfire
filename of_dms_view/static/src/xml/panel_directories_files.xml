@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.LineDirectory" owl="1">
+        <li t-on-click.stop="() => this.click_expand(directory)" class="">
+            <header class="caret bg-light p-2 fw-bold">
+                <i t-attf-class="fa {{state.expanded[directory.id] and 'fa-caret-down' or 'fa-caret-right'}} me-2" title="Caret"/>
+                <t t-esc="directory.name"/>
+                <span t-if="directory.count_total_files" class="ms-2">
+                    (<t t-esc="directory.count_total_files"/>)
+                </span>
+            </header>
+            <t t-if="directory.files and state.expanded[directory.id]">
+                <ul class="list-group d-block ps-0">
+                    <t t-foreach="directory.files" t-as="file" t-key="file.id">
+                        <t t-if="state.files.map(f => f.id).includes(file.id)">
+                            <t t-call="of_dms_view.LineFile"/>
+                        </t>
+                    </t>
+                </ul>
+            </t>
+        </li>
+    </t>
+
+    <t t-name="of_dms_view.LineFile" owl="1">
+        <li t-on-click.stop="() => this.click_file(file)" t-attf-class="list-group-item-action {{this.currentFile.id == file.id and 'active' or ''}} p-2 ps-4 border-light border-bottom">
+            <i t-if="file.is_virtual" class="fa fa-file me-2" title="File"/>
+            <i t-elif="file.extension == 'pdf'" class="fa fa-file-pdf-o me-2" title="File PDF"/>
+            <i t-elif="file.extension == 'txt'" class="fa fa-file-text-o me-2" title="File TXT"/>
+            <i t-elif="file.extension == 'doc'" class="fa fa-file-text-o me-2" title="File DOC"/>
+            <i t-elif="file.extension == 'png'" class="fa fa-picture-o me-2" title="Picture"/>
+            <i t-elif="file.extension == 'jpg'" class="fa fa-picture-o me-2" title="Picture"/>
+            <i t-else="" class="fa fa-file-o me-2" title="File"/>
+            <t t-esc="file.name"/>
+        </li>
+    </t>
+
+    <t t-name="of_dms_view.PanelDirectoriesFiles" owl="1">
+        <div class="panel-directories-files col-4" t-ref="panel-directories-files">
+            <t t-if="records.length or direct_files.length">
+                <div class="panel-directories-files-header p-2">
+                    <form class="form-inline">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search_directories_files"/>
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" t-on-click="search_directories_files">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-directories-files-content me-1">
+                    <t t-set="parent" t-value="state.parentDirectory"/>
+                    <t t-if="parent.name">
+                        <button t-on-click.stop="() => this.click_directory(parent)" class="btn btn-link caret p-2 me-1">
+                            <i t-attf-class="fa fa-arrow-left me-2" title="Arrow Left"/><t t-esc="parent.name"/>
+                        </button>
+                    </t>
+                    <ul class="ps-0 pt-2">
+                        <t t-foreach="direct_files" t-as="file" t-key="file_index">
+                            <t t-if="state.files.map(f => f.id).includes(file.id)">
+                                <t t-call="of_dms_view.LineFile"/>
+                            </t>
+                        </t>
+                        <t t-foreach="records" t-as="record" t-key="record_index">
+                            <t t-if="record.is_directory">
+                                <t t-call="of_dms_view.LineDirectory">
+                                    <t t-set="directory" t-value="record"/>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <t t-if="state.files.map(f => f.id).includes(record.id)">
+                                    <t t-call="of_dms_view.LineFile">
+                                        <t t-set="file" t-value="record"/>
+                                    </t>
+                                </t>
+                            </t>
+                        </t>
+                    </ul>
+                </div>
+            </t>
+            <t t-else="">
+                <div class="panel-directories-files-header p-2">
+                    <form class="form-inline">
+                        <div class="input-group">
+
+                        </div>
+                    </form>
+                </div>
+                <div class="panel-directories-files-content p-2">
+                    <p class="text-center text-muted">You can use the menu on the left to browse the document management system.</p>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

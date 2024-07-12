@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_dms_view.PanelPreview" owl="1">
+        <div class="panel-preview col" t-attf-style="display: {{ preview and 'block' or 'none' }}">
+            <div class="panel-preview-header p-2">
+                <a t-att-href="this.currentFile.download_url" class="btn btn-primary" t-att-download="this.currentFile.name" >Download</a>
+                <t t-if="state.preview_real">
+                    <button class="btn btn-secondary btn-delete-file ms-2" t-on-click.stop.prevent="() => this.click_delete_file(this.currentFile)">Delete</button>
+                </t>
+                <button class="btn btn-secondary ms-2" t-on-click.stop.prevent="() => this.click_fullscreen()">
+                    <!-- Do not close this tag, it breaks the preview of document. Don't know why. -->
+                    <i class="fa fa-arrows-alt" title="Arrows Alt">
+                </button>
+            </div>
+        </div>
+        <div class="panel-preview-content bg-white"/>
+    </t>
+
+</templates>

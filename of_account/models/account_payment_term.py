@@ -38,6 +38,7 @@ class AccountPaymentTerm(models.Model):
         sign,
         untaxed_amount,
         untaxed_amount_currency,
+        cash_rounding=None,
     ):
         """Override of account.payment.term._compute_terms to add the call of `_get_compute_terms_line_vals` method to
         allow to override it in custom modules.
