@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='pack_component_price']" position="attributes">
                 <attribute name="attrs">{}</attribute>
             </xpath>
+            <xpath expr="//field[@name='pack_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <field name="list_price" position="replace">
                 <field name="list_price" class="oe_inline" widget='monetary' nolabel="1"
                     options="{'currency_field': 'currency_id', 'field_digits': True}" attrs="{'readonly':['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" force_save="1" />
@@ -17,7 +20,6 @@
                 <field name="standard_price" class="oe_inline" widget='monetary' nolabel="1"
                     options="{'currency_field': 'cost_currency_id', 'field_digits': True}"
                     force_save="1" attrs="{'readonly':['&amp;', ('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
-
             </field>
             <xpath expr="//label[@for='list_price']" position="replace">
                 <label for="list_price" string="Kit Price"
