@@ -43,6 +43,7 @@ from ..graphql.planning_intervention_type import PlanningIntervention
 from ..graphql.product_query import ProductQuery
 from ..graphql.sale_order_template_type import SaleOrderTemplate, SaleOrderTemplateFilterInput, SaleOrderTemplateInput
 from ..graphql.sale_order_type import SaleOrder
+from ..graphql.user_mutation import UserSubscribeNotificationMutation
 from ..graphql.user_type import User, UserInput
 
 
@@ -90,6 +91,7 @@ class OFGraphql(models.AbstractModel):
                 SaleOrderTemplateInput,
                 SaleOrderTemplateFilterInput,
                 PaymentInterventionCreateMutation,
+                UserSubscribeNotificationMutation,
             ],
         )
 
