@@ -8,6 +8,8 @@ from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
 from ..graphql.account_payment_type import AccountPayment
 from ..graphql.configuration_query import ConfigurationQuery
 from ..graphql.configuration_type import Configuration
+from ..graphql.driving_route_query import DrivingRouteQuery
+from ..graphql.driving_route_type import DrivingRoute, DrivingRouteCoordinates, DrivingRoutePath, DrivingRouteStop
 from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
 from ..graphql.fcm_token_mutation import FCMTokenMutation
@@ -92,6 +94,11 @@ class OFGraphql(models.AbstractModel):
                 SaleOrderTemplateFilterInput,
                 PaymentInterventionCreateMutation,
                 UserSubscribeNotificationMutation,
+                DrivingRouteQuery,
+                DrivingRouteCoordinates,
+                DrivingRoutePath,
+                DrivingRouteStop,
+                DrivingRoute,
             ],
         )
 
