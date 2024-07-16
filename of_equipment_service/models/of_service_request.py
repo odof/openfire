@@ -102,15 +102,19 @@ class OFServiceRequest(models.Model):
     @api.depends('use_equipment', 'address_id', 'partner_id')
     def _compute_equipment_ids(self):
         equipment_obj = self.env['of.equipment']
-        for request in self:
-            if request.address_id and request.use_equipment:
-                equipment = equipment_obj.search(
-                    [('site_address_id', '=', request.address_id.id)], limit=1
-                ) or equipment_obj.search([('customer_id', '=', request.address_id.id)], limit=1)
-                if not equipment and request.partner_id:
-                    equipment = equipment_obj.search([('customer_id', '=', request.partner_id.id)], limit=1)
-                if equipment:
-                    request.equipment_ids = equipment
+        requests_use_equipment = self.filtered('use_equipment')
+        for request in requests_use_equipment:
+            equipments = equipment_obj.search(
+                [('site_address_id', '=', request.address_id.id)]
+            ) or equipment_obj.search([('customer_id', '=', request.address_id.id)])
+            if not equipments and request.partner_id:
+                equipments = equipment_obj.search([('customer_id', '=', request.partner_id.id)])
+            if len(equipments) == 1:
+                request.equipment_ids = equipments
+            else:
+                request.equipment_ids = False
+        for request in self - requests_use_equipment:
+            request.equipment_ids = False
 
     # --------------------------------------------------
     # ORM methods

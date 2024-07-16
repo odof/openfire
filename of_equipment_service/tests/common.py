@@ -10,6 +10,38 @@ class TestOFEquipmentServiceCommon(TestOFEquipmentCommon):
     def setUpClass(cls):
         super().setUpClass()
 
+        # Create new customer Johnny Holiday
+        cls.customer_johnny_holiday_mansion = cls.env['res.partner'].create(
+            {
+                'name': "Mansion",
+                'street': "1 route du Rock",
+                'zip': "35000",
+                'city': "Rennes",
+                'country_id': cls.env.ref('base.fr').id,
+            }
+        )
+        cls.customer_johnny_holiday = cls.env['res.partner'].create(
+            {
+                'name': "Johnny Holiday",
+                'street': "1 rue du Mississippi",
+                'zip': "35000",
+                'city': "Rennes",
+                'is_company': True,
+                'country_id': cls.env.ref('base.fr').id,
+                'child_ids': [Command.set([cls.customer_johnny_holiday_mansion.id])],
+            }
+        )
+
+        # Create 1 Equipment for Johnny Holiday
+        cls.equipment_wood_stove_jh = cls.env['of.equipment'].create(
+            {
+                'name': "JH/WS00001",
+                'product_id': cls.product_wood_stove.id,
+                'customer_id': cls.customer_johnny_holiday.id,
+                'site_address_id': cls.customer_johnny_holiday.id,
+            }
+        )
+
         # Create new customer Johnny Crash
         cls.customer_johnny_crash_apartment = cls.env['res.partner'].create(
             {

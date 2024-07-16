@@ -13,8 +13,6 @@ class CalendarEvent(models.Model):
     )
     of_equipment_ids = fields.Many2many(
         domain="[('id', 'in', of_equipment_ids_domain and of_equipment_ids_domain or [])]",
-        compute=False,  # Disable compute, because now equipments are managed by the service request if
-        # the event is linked to one
     )
 
     # -------------------------------------------------------------------------
@@ -48,6 +46,18 @@ class CalendarEvent(models.Model):
                     )
                     .ids
                 )
+
+    @api.depends('of_request_id')
+    def _compute_of_equipment_ids(self):
+        events_with_request_and_equipment = self.filtered(
+            lambda e: e.of_use_equipment and e.of_request_id and e.of_request_id.equipment_ids
+        )
+        for event in events_with_request_and_equipment:
+            if len(event.of_request_id.equipment_ids) == 1:
+                event.of_equipment_ids = event.of_request_id.equipment_ids
+            else:
+                event.of_equipment_ids = False
+        super(CalendarEvent, self - events_with_request_and_equipment)._compute_of_equipment_ids()
 
     # -------------------------------------------------------------------------
     # ORM methods

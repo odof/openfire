@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
 from odoo import Command, fields
+from odoo.exceptions import UserError
 from odoo.tests.common import Form
 
 from odoo.addons.of_equipment_service.tests.common import TestOFEquipmentServiceCommon
@@ -66,6 +67,8 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
             intervention_form.of_use_equipment = True
             intervention_form.of_employee_ids.add(self.employee_tech_johnny)
             intervention_form.of_force_dates = True  # we don't care about events overlapping in this test
+            if not intervention_form.of_task_id:
+                intervention_form.of_task_id = self.task_installation
             intervention = intervention_form.save()
         return intervention
 
@@ -80,7 +83,7 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
             request_form.company_id = self.company_fr
             request_form.next_date = self.today_8am.date()
             request_form.end_date = self.today_8am.date() + relativedelta(days=15)
-            with self.assertRaises(AssertionError) as create_service_request_error:  # user_equipment is False
+            with self.assertRaises(AssertionError) as create_service_request_error:  # use_equipment is False
                 request_form.equipment_ids.add(self.equipment_wood_stove)
         self.assertEqual("field equipment_ids is not visible", create_service_request_error.exception.args[0])
 
@@ -88,8 +91,8 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
         # Create a service request
         service_request = self.env['of.service.request'].create(
             {
-                'partner_id': self.customer_johnny_crash.id,
-                'address_id': self.customer_johnny_crash.id,
+                'partner_id': self.customer_johnny_holiday.id,
+                'address_id': self.customer_johnny_holiday.id,
                 'task_id': self.task_installation.id,
                 'type_id': self.env.ref('of_service.of_service_request_type_installation').id,
                 'company_id': self.company_fr.id,
@@ -98,10 +101,45 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
                 'end_date': self.today_8am.date() + relativedelta(days=15),
             }
         )
-        # Equipment should be created automatically with the first created equipment of the customer
-        self.assertRecordValues(service_request.equipment_ids, [{'name': "JC/WS00001"}])
+        # Johny Holiday has only one equipment so equipment_ids should be filled automatically with it
+        self.assertRecordValues(service_request.equipment_ids, [{'name': "JH/WS00001"}])
 
-    def test_03_calendar_event_equipments_domain_with_request(self):
+    def test_03_create_service_request_with_no_equipment(self):
+        # Create a service request with no equipment
+        with self.assertRaises(UserError) as error:
+            self.env['of.service.request'].create(
+                {
+                    'partner_id': self.customer_johnny_crash.id,
+                    'address_id': self.customer_johnny_crash.id,
+                    'task_id': self.task_installation.id,
+                    'type_id': self.env.ref('of_service.of_service_request_type_installation').id,
+                    'company_id': self.company_fr.id,
+                    'use_equipment': True,
+                    'next_date': self.today_8am.date(),
+                    'end_date': self.today_8am.date() + relativedelta(days=15),
+                }
+            )
+            # Johny Crash has many equipment so equipment_ids should stay False
+        self.assertEqual(error.exception.args[0], "Veuillez ajouter au moins un équipement")
+
+    def test_04_create_service_request_manual_equipment(self):
+        # Create a service request with one equipment manually
+        service_request = self.env['of.service.request'].create(
+            {
+                'partner_id': self.customer_johnny_crash.id,
+                'address_id': self.customer_johnny_crash.id,
+                'task_id': self.task_installation.id,
+                'type_id': self.env.ref('of_service.of_service_request_type_installation').id,
+                'company_id': self.company_fr.id,
+                'use_equipment': True,
+                'equipment_ids': [Command.set([self.equipment_wood_stove_jc_ch.id])],
+                'next_date': self.today_8am.date(),
+                'end_date': self.today_8am.date() + relativedelta(days=15),
+            }
+        )
+        self.assertRecordValues(service_request.equipment_ids, [{'name': "JC-CH/WS00004"}])
+
+    def test_05_calendar_event_equipments_domain_with_request(self):
         """Test the domain of the equipment_ids field in the calendar event form when linked to a service request
         with equipments.
 
@@ -134,13 +172,13 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
         intervention2 = self._form_create_intervention(
             start=self.today_8am + relativedelta(hour=9, minute=30),  # 9:30
             stop=self.today_8am + relativedelta(hour=10, minute=30),  # 10:30
-            duration=1,
+            duration=1.0,
             name="Test event 2 Johnny Crash",
             service_request=self.service_request_with_equipments,
         )
         self.assertEqual(len(intervention2.of_equipment_ids_domain), 3)
 
-    def test_04_calendar_event_equipments_domain_without_request(self):
+    def test_06_calendar_event_equipments_domain_without_request(self):
         """Test the domain of the equipment_ids field in the calendar event form when not linked to a service request.
         First Intervention should have all equipments available.
         Second Intervention should have all equipments available too because it's not linked to a service request.
@@ -166,9 +204,9 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
 
         # Create a second calendar event without service request (should have all equipments available here too)
         intervention2 = self._form_create_intervention(
-            self.today_8am + relativedelta(hour=10),  # 10:00
-            self.today_8am + relativedelta(hour=11),  # 11:00
-            "Test event 2 Johnny Crash",
+            start=self.today_8am + relativedelta(hour=10),  # 10:00
+            stop=self.today_8am + relativedelta(hour=11),  # 11:00
+            name="Test event 2 Johnny Crash",
             service_request=False,
         )
         self.assertEqual(len(intervention2.of_equipment_ids_domain), 5)
@@ -191,7 +229,7 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
         intervention2._compute_equipment_ids_domain()
         self.assertEqual(len(intervention2.of_equipment_ids_domain), 4)
 
-    def test_05_check_request_intervention_lines_modifying_event(self):
+    def test_07_check_request_intervention_lines_modifying_event(self):
         """
         Test the creation of intervention lines when creating a service request with equipments and modifying equipments
         in the intervention.
@@ -304,7 +342,7 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
         self.assertEqual(len(self.service_request_with_equipments.equipment_intervention_ids), 0)
         self.assertEqual(len(self.service_request_with_equipments.equipment_intervention_ids), 0)
 
-    def test_06_check_request_intervention_lines_modifying_request(self):
+    def test_08_check_request_intervention_lines_modifying_request(self):
         """
         Test the creation of intervention lines when creating a service request with equipments and modifying equipments
         in the service request.

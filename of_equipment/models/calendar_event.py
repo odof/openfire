@@ -66,13 +66,15 @@ class CalendarEvent(models.Model):
         equipment_obj = self.env['of.equipment']
         events_use_equipment = self.filtered('of_use_equipment')
         for event in events_use_equipment:
-            equipment = equipment_obj.search(
-                [('site_address_id', '=', event.of_address_id.id)], limit=1
-            ) or equipment_obj.search([('customer_id', '=', event.of_address_id.id)], limit=1)
-            if not equipment and event.of_partner_id:
-                equipment = equipment_obj.search([('customer_id', '=', event.of_partner_id.id)], limit=1)
-            if equipment:
-                event.of_equipment_ids = equipment
+            equipments = equipment_obj.search(
+                [('site_address_id', '=', event.of_address_id.id)]
+            ) or equipment_obj.search([('customer_id', '=', event.of_address_id.id)])
+            if not equipments and event.of_partner_id:
+                equipments = equipment_obj.search([('customer_id', '=', event.of_partner_id.id)])
+            if len(equipments) == 1:
+                event.of_equipment_ids = equipments
+            else:
+                event.of_equipment_ids = False
         for event in self - events_use_equipment:
             event.of_equipment_ids = False
 
