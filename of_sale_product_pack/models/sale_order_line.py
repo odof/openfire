@@ -107,6 +107,15 @@ class SaleOrderLine(models.Model):
                     pack_line.product_id.lst_price * pack_line.quantity for pack_line in line.of_pack_line_ids
                 )
 
+    @api.depends('product_id', 'product_id.pack_ok', 'of_pack_line_ids', 'of_pack_component_price')
+    def _compute_purchase_price(self):
+        super()._compute_purchase_price()
+        for line in self:
+            if line.of_pack_component_price == 'totalized':
+                line.purchase_price = sum(
+                    pack_line.product_id.standard_price * pack_line.quantity for pack_line in line.of_pack_line_ids
+                )
+
     # ---------------------------------------------------------------------
     # ORM methods
     # ---------------------------------------------------------------------
