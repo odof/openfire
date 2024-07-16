@@ -16,7 +16,7 @@ class ResPartner(models.Model):
         Helper method to sanitize the given name.
         Used through the safe_eval method for an automatic account code generation.
         """
-        return sanitize_text(name)[max_length].upper()
+        return sanitize_text(name)[:max_length].upper()
 
     def _ac_filter_accounts(self, accounts, eval_str):
         """
@@ -146,12 +146,16 @@ class ResPartner(models.Model):
         self, partner, default_account, company, partner_values, field_name, account_type, code_expression
     ):
         if (getattr(partner, field_name) or default_account) == default_account:
+
+            def get_code_wrapper(prefix, digits, required=True, first_num=1, suffix=''):
+                return self._ac_get_code(company, prefix, digits, required, first_num, suffix)
+
             code, name = safe_eval(
                 code_expression,
                 {
                     'partner': partner,
                     'company': company,
-                    'get_code': self._ac_get_code,
+                    'get_code': get_code_wrapper,
                     'sanitize_name': self._ac_sanitize_name,
                     'filter_accounts': self._ac_filter_accounts,
                     'sort_accounts': self._ac_sort_accounts,
