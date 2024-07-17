@@ -544,6 +544,19 @@
         </field>
     </record>
 
+
+    <record id="view_calendar_event_calendar" model="ir.ui.view">
+        <field name="name">calendar.event.view.calendar</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_calendar" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='attendee_status']" position="after">
+                <!-- Needed for `of_planning.CalendarCommonPopover.body` -->
+                <field name="of_type" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="action_calendar_event" model="ir.actions.act_window">
         <field name="name">Intervention Planning</field>
         <field name="res_model">calendar.event</field>

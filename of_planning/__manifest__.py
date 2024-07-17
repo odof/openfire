@@ -49,6 +49,11 @@
         'wizards/of_planning_print_wizard_views.xml',
         'views/ir_action_server.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_planning/static/src/xml/planning_calendar_popover.xml'
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,

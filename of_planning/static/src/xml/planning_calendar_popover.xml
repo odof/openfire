@@ -1,0 +1,11 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_planning.CalendarCommonPopover.body" t-inherit="calendar.AttendeeCalendarCommonPopover.body" t-inherit-mode="extension" owl="1">
+        <xpath expr="//t[@t-foreach='slot.record.fieldNames']/t" position="attributes">
+            <attribute name="t-if">!slot.record.isInvisible(fieldName) and (props.record.rawRecord.of_type == 'event' or (props.record.rawRecord.of_type == 'intervention' and fieldName != 'partner_id' and fieldName != 'privacy'))</attribute>
+        </xpath>
+    </t>
+
+</templates>
