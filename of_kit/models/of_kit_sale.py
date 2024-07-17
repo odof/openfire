@@ -615,8 +615,11 @@ class SaleOrderLine(models.Model):
         'kit_id.kit_line_ids.qty_per_kit',
     )
     def _compute_of_cost_compos_difference(self):
+        has_group = self.env.user.has_group('of_sale.group_of_can_modify_sale_purchase_price')
         for line in self:
-            if line.of_is_kit and line.kit_id:
+            if has_group:
+                line.of_diff_cost_comps = False
+            elif line.of_is_kit and line.kit_id:
                 if line.purchase_price != line.cost_comps:
                     line.of_diff_cost_comps = True
                 else:
