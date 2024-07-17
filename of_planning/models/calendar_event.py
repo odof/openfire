@@ -481,13 +481,12 @@ class CalendarEvent(models.Model):
     @api.depends('of_template_id')
     def _compute_of_line_ids(self):
         for event in self.filtered(lambda e: e.of_template_id):
-            if (
-                lines_to_create := [
-                    Command.create(line._prepare_intervention_line_vals(event))
-                    for line in event.of_template_id.line_ids
-                ]
-            ) and event.of_state == 'draft':
-                event.of_line_ids = [Command.clear()] + lines_to_create[:]
+            if lines_to_create := [
+                Command.create(line._prepare_intervention_line_vals(event)) for line in event.of_template_id.line_ids
+            ]:
+                event.of_line_ids = [
+                    Command.delete(line.id) for line in event.of_line_ids.filtered(lambda li: not li.move_ids)
+                ] + lines_to_create[:]
         for event in self:
             event._recompute_taxes()
 
