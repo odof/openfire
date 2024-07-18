@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
 from dateutil.relativedelta import relativedelta
-from odoo.addons import decimal_precision as dp
-from odoo.exceptions import UserError
-from odoo.exceptions import ValidationError
-from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
-from odoo.tools.safe_eval import safe_eval
+
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.float_utils import float_compare
+from odoo.tools.safe_eval import safe_eval
+
+from odoo.addons import decimal_precision as dp
+from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 
 
 class OfDocumentsJoints(models.AbstractModel):
@@ -1397,7 +1398,6 @@ class OfContractLine(models.Model):
             return self.env['of.popup.wizard'].popup_return(
                 message=u"Vous ne pouvez pas remettre en brouillon une ligne annulée.")
 
-
     @api.multi
     def faire_avenant(self):
         """ Renvoi un wizard pour créer un avenant sur la ligne de contrat sélectionnée """
@@ -1436,6 +1436,28 @@ class OfContractLine(models.Model):
             'target'   : 'new',
             'res_id'   : wizard.id,
             'context'  : self.env.context}
+
+    @api.multi
+    def revalidate_date_end_line(self):
+        """Renvoi un wizard permettant de donner une date de fin à la ligne de contrat"""
+        self.ensure_one()
+        view_id = self.env.ref('of_contract_custom.of_contract_line_cancel_view_form').id
+        ref_date = self.date_end
+        if self.last_invoicing_date and self.last_invoicing_date > ref_date:
+            ref_date = self.last_invoicing_date
+        wizard = self.env['of.contract.line.cancel.wizard'].create({'contract_line_id': self.id, 'date_end': ref_date})
+        return {
+            'name': 'Re-valider la ligne',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'of.contract.line.cancel.wizard',
+            'views': [(view_id, 'form')],
+            'view_id': view_id,
+            'target': 'new',
+            'res_id': wizard.id,
+            'context': self.env.context,
+        }
 
     @api.multi
     def supprimer_la_ligne(self):
