@@ -364,7 +364,10 @@
                         attrs="{'invisible': [('state', '!=', 'draft')]}"
                         confirm="Voulez-vous supprimer la ligne ?"
                         groups="of_contract_custom.group_of_contract_custom_creation"/>
-
+                <button name="revalidate_date_end_line" type="object" icon="fa-undo"
+                        help="Re-valider la ligne"
+                        attrs="{'invisible': [('date_end','=',False)]}"
+                        groups="of_contract_custom.group_of_contract_custom_modification"/>
             </tree>
         </field>
     </record>
