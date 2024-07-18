@@ -1,6 +1,55 @@
 #. module: of_utm
+#: model:utm.medium,name:utm.utm_medium_banner
+msgid "Banner"
+msgstr "Bannière"
+
+#. module: of_utm
+#: model:utm.source,name:utm.utm_source_mailing
+msgid "Lead recall"
+msgstr "Rappel de prospect"
+
+#. module: of_utm
 #: model:ir.actions.act_window,name:utm.utm_medium_action
 #: model:ir.ui.menu,name:utm.menu_utm_medium
 #: model_terms:ir.ui.view,arch_db:utm.utm_medium_view_tree
 msgid "Mediums"
 msgstr "Canaux"
+
+#. module: of_utm
+#: model:utm.medium,name:utm.utm_medium_phone
+msgid "Phone"
+msgstr "Téléphone"
+
+#. module: of_utm
+#: model:utm.source,name:utm.utm_source_search_engine
+msgid "Search Engine"
+msgstr "Moteur de recherche"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_campaign
+msgid "UTM Campaign"
+msgstr "Campagne UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_medium
+msgid "UTM Medium"
+msgstr "Medium UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_mixin
+msgid "UTM Mixin"
+msgstr "Mélange UTM"
+
+#. module: of_utm
+#: model:ir.model,name:of_utm.model_utm_source
+msgid "UTM Source"
+msgstr "Origine"
+
+#. module: of_utm
+#: model:utm.medium,name:utm.utm_medium_website
+msgid "Website"
+msgstr "Site web"
+
+
+
+

@@ -1,0 +1,59 @@
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard.group,name:spreadsheet_dashboard.spreadsheet_dashboard_group_logistics
+msgid "Logistics"
+msgstr "LOGISTIQUE"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_stock_account.spreadsheet_dashboard_inventory_on_hand
+msgid "Inventory On Hand"
+msgstr "Inventaire disponible"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_account.dashboard_invoicing
+msgid "Invoicing"
+msgstr "Facturation"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_account.dashboard_invoicing
+msgid "Medium"
+msgstr "Medium"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_sale.spreadsheet_dashboard_product
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard.group,name:spreadsheet_dashboard.spreadsheet_dashboard_group_project
+msgid "Project"
+msgstr "PROJET"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_purchase_stock.spreadsheet_dashboard_purchase
+msgid "Purchase"
+msgstr "Achat"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard.group,name:spreadsheet_dashboard.spreadsheet_dashboard_group_sales
+msgid "Sales"
+msgstr "VENTES"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_sale.spreadsheet_dashboard_sales
+msgid "Sales"
+msgstr "Ventes"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_hr_timesheet.spreadsheet_dashboard_tasks
+msgid "Tasks"
+msgstr "Tâches"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_sale_timesheet.spreadsheet_dashboard_timesheet
+msgid "Timesheets"
+msgstr "Feuilles de temps"
+
+#. module: of_spreadsheet_dashboard
+#: model:spreadsheet.dashboard,name:spreadsheet_dashboard_purchase.spreadsheet_dashboard_vendors
+msgid "Vendors"
+msgstr "Vendeurs"

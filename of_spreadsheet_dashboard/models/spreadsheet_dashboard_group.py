@@ -1,10 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 from odoo import fields, models
 
 
-class UtmCampaign(models.Model):
-    _inherit = 'utm.campaign'
+class SpreadsheetDashboardGroup(models.Model):
+    _inherit = 'spreadsheet.dashboard.group'
 
-    active = fields.Boolean(default=True)
     name = fields.Char(translate=True)

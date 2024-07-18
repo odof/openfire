@@ -3,8 +3,7 @@
 from odoo import fields, models
 
 
-class UtmCampaign(models.Model):
-    _inherit = 'utm.campaign'
+class SpreadsheetDashboard(models.Model):
+    _inherit = 'spreadsheet.dashboard'
 
-    active = fields.Boolean(default=True)
     name = fields.Char(translate=True)

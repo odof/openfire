@@ -101,18 +101,3 @@ msgstr ""
 #: model:ir.model,name:of_utm.model_utm_campaign
 msgid "UTM Campaign"
 msgstr "Campagne UTM"
-
-#. module: of_utm
-#: model:ir.model,name:of_utm.model_utm_medium
-msgid "UTM Medium"
-msgstr "Medium UTM"
-
-#. module: of_utm
-#: model:ir.model,name:of_utm.model_utm_mixin
-msgid "UTM Mixin"
-msgstr "Mélange UTM"
-
-#. module: of_utm
-#: model:ir.model,name:of_utm.model_utm_source
-msgid "UTM Source"
-msgstr "Origine"
