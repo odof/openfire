@@ -6,10 +6,11 @@ pypdf==3.8.1
 astor==0.8.1
 phonenumbers==8.12.1
 Pygments==2.14.0
-graphql-server
-graphdoc
-graphene
+graphql-server==3.0.0b7
+graphdoc==0.4.0
+graphene==3.3
 unidecode
 pstats_print2list
 openpyxl==3.1.2
 pypdfium2
+pyfcm==2.0.4
