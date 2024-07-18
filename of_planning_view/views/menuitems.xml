@@ -2,6 +2,6 @@
 <odoo>
 
     <!-- Intervention -->
-    <menuitem id="menu_of_planning_calendar_event" name="Planning" parent="of_planning.menu_of_planning_intervention" action="of_planning_view.action_calendar_event_planning" sequence="10" />
+    <menuitem id="menu_of_planning_calendar_event" name="Planning" parent="of_planning.menu_of_planning_intervention" action="of_planning_view.action_calendar_event_planning" sequence="9" />
 
 </odoo>
