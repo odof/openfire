@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="of_planning.calendar_event_view_form" />
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page name="survey" string="Survey">
+                <page name="survey" string="Survey" attrs="{'invisible': [('of_type', '=', 'event')]}">
                     <field name="of_survey_user_input_line_ids" invisible="1" />
                     <div class="row mb-2">
                         <div class="col-6">
