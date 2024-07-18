@@ -1155,7 +1155,7 @@ odoo.define("of_survey.form", function (require) {
                             })
                         );
 
-                        self.$("a.delete").on("click", function () {
+                        self.$(`.form_images_${question_id} a.delete`).on("click", function () {
                             var id = $(this).find("i").attr("id");
                             self.images[question_id].splice(id, 1);
                             $(`.form_images_${question_id}`).html(
@@ -1167,7 +1167,7 @@ odoo.define("of_survey.form", function (require) {
                             $input.attr("data-oe-data", JSON.stringify(self.images[question_id]));
                         });
 
-                        self.$("a.edit").on("click", function () {
+                        self.$(`.form_images_${question_id} a.edit`).on("click", function () {
                             var id = $(this).find("i").attr("id");
                             self.current_question_id = question_id;
                             // on ouvre la modal avec les données pré-remplies
