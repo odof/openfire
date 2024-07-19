@@ -430,7 +430,8 @@ class CalendarEvent(models.Model):
 
     @api.depends('of_employee_ids')
     def _compute_partner_ids(self):
-        for event in self:
+        events = self.filtered(lambda e: e.of_type == 'intervention')
+        for event in events:
             event.partner_ids = event.mapped('of_employee_ids.related_contact_ids').filtered(
                 lambda c: c.type == 'contact'
             )
