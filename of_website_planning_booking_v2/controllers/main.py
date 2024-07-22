@@ -44,7 +44,7 @@ class OFWebsitePlanningBooking(http.Controller):
             vals = {'id': template.id, 'name': template.website_name or template.name}
             if display_price:
                 price = self._get_service_price(template.sudo(), False, partner, pricelist)
-                vals['name'] = vals['name'] + " - " + "%.2f €" % price
+                vals['name'] = vals['name'] + u" - " + u"%.2f €" % price
             service_list.append(vals)
         values['service_list'] = service_list
 
@@ -63,10 +63,10 @@ class OFWebsitePlanningBooking(http.Controller):
             ]).mapped(lambda s: {'id': s.id, 'name': s.template_id.website_name or s.template_id.name or s.name})
             address_list.append({
                 'id': request.env.user.partner_id.id,
-                'name': "%s - %s" % (request.env.user.partner_id.zip, request.env.user.partner_id.city)
+                'name': u"%s - %s" % (request.env.user.partner_id.zip, request.env.user.partner_id.city)
             })
             address_list += request.env.user.partner_id.child_ids.filtered(lambda child: child.zip and child.city).\
-                mapped(lambda c: {'id': c.id, 'name': "%s - %s" % (c.zip, c.city)})
+                mapped(lambda c: {'id': c.id, 'name': u"%s - %s" % (c.zip, c.city)})
         values['contract_list'] = contract_list
         values['address_list'] = address_list
 
@@ -439,7 +439,7 @@ class OFWebsitePlanningBooking(http.Controller):
                                 valid_line.write({
                                     'fin_dt': end_date,
                                     'date_flo_deadline': web_hours_slot[1],
-                                    'description': "%s-%s" % tuple(hours_to_strs(
+                                    'description': u"%s-%s" % tuple(hours_to_strs(
                                         valid_line.date_flo, web_hours_slot[1])),
                                 })
                                 break
@@ -457,7 +457,7 @@ class OFWebsitePlanningBooking(http.Controller):
                             vals = {
                                 'debut_dt': start_date,
                                 'date_flo': web_hours_slot[0],
-                                'description': "%s-%s" % tuple(
+                                'description': u"%s-%s" % tuple(
                                     hours_to_strs(web_hours_slot[0], valid_line.date_flo_deadline)),
                             }
                             if float_compare(web_hours_slot[1], valid_line.date_flo_deadline, 5) == -1:
@@ -468,7 +468,7 @@ class OFWebsitePlanningBooking(http.Controller):
                                 vals.update({
                                     'fin_dt': end_date,
                                     'date_flo_deadline': web_hours_slot[1],
-                                    'description': "%s-%s" % tuple(hours_to_strs(web_hours_slot[0], web_hours_slot[1])),
+                                    'description': u"%s-%s" % tuple(hours_to_strs(web_hours_slot[0], web_hours_slot[1])),
                                 })
                             valid_line.write(vals)
                             break
@@ -553,7 +553,7 @@ class OFWebsitePlanningBooking(http.Controller):
 
         # Le créneau de l'employé peut commencer avant le début d'aprem,
         # on fait donc un max pour s'assurer que le RDV soit pris l'aprem
-        if slot.name.lower() == 'après-midi':
+        if slot.name.lower() == u'après-midi':
             afternoon_start_hour = 13.0  # -> à récupérer depuis de la config en backend?
             if float_compare(afternoon_start_hour, backend_slot.date_flo, 5) <= 0:
                 date_start = backend_slot.debut_dt
