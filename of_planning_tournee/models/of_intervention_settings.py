@@ -74,6 +74,10 @@ class OfInterventionSettings(models.TransientModel):
     tour_day_ids = fields.Many2many(
         comodel_name='of.jours', relation='intervention_settings_tour_days_rel', string="Tours // Days",
         help="Create tours for these days only", default=lambda self: self._default_day_ids())
+    tour_am_limit_float = fields.Float(
+        string=u"Tours // Morning/Afternoon break hour", default=13.0,
+        help=u"Defines the break hour between morning and afternoon. Interventions starting before this hour will be "
+        u"considered in the morning and vice versa.")
     group_of_planning_tournee_manual_creation = fields.Boolean(
         string=u"(OF) Création manuelle des tournées autorisée",
         implied_group='of_planning_tournee.group_planning_tournee_manual_creation', group='base.group_user',
@@ -143,3 +147,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_tour_day_ids(self):
         IrValues = self.env['ir.values'].sudo()
         return IrValues.set_default('of.intervention.settings', 'tour_day_ids', self.tour_day_ids.ids)
+
+    @api.multi
+    def set_tour_am_limit_float(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'tour_am_limit_float', self.tour_am_limit_float)

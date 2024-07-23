@@ -3,6 +3,8 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from ..models.of_planning_tour_line import ROUTES_AVAILABLE_COLORS, AVAILABLE_COLORS_TOUR_LINES
+from odoo.tools.float_utils import float_compare
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_AM_LIMIT_FLOAT
 
 
 class OFTourPlanningOptimizationWizard(models.TransientModel):
@@ -37,6 +39,12 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
         string="New total dur. (h)", readonly=True,
         help="The optimized total duration of the tour, that includes the duration from the start address and "
         "to the stop address (h)")
+    optim_mode = fields.Selection(
+        selection=[
+            ('all', u"Journée entière"),
+            ('half', u"À la demi-journée"),
+            ('morning', u"Matin"),
+            ('afternoon', u"Après-midi")], string=u"Mode d'optim.", default='all')
     # Related fields
     start_address_id = fields.Many2one(related='tour_id.start_address_id', readonly=True)
     return_address_id = fields.Many2one(related='tour_id.return_address_id', readonly=True)
@@ -136,23 +144,81 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
 
         # get the the coordinates of the tour lines to optimize to send them to the OSRM server
         # and also get the tour lines data by hint to be able to retrieve them during the process
-        coordinates_str, tour_data_by_hint = self.tour_id._get_tour_coordinates_data()
+        if self.optim_mode != 'half':
+            coordinates_str, tour_data_by_hint = self.tour_id._get_tour_coordinates_data(self.optim_mode)
 
-        # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
-        res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
-        waypoints = res.get('waypoints')
-        if not waypoints:  # we should always get a list of waypoints here
-            raise UserError(_("No optimized tour lines found."))
+            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
+            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
+            waypoints = res.get('waypoints')
+            if not waypoints:  # we should always get a list of waypoints here
+                raise UserError(_("No optimized tour lines found."))
+        else:
+            coordinates_str, tour_data_by_hint1 = self.tour_id._get_tour_coordinates_data('morning')
+
+            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
+            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
+            waypoints_morning = res.get('waypoints')
+            waypoints_morning = sorted(waypoints_morning, key=lambda k: k['waypoint_index'])
+            waypoints_morning.pop()
+
+            coordinates_str, tour_data_by_hint2 = self.tour_id._get_tour_coordinates_data('afternoon')
+
+            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
+            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
+            waypoints_afternoon = res.get('waypoints')
+            waypoints_afternoon = sorted(waypoints_afternoon, key=lambda k: k['waypoint_index'])
+            waypoints_afternoon.pop(0)
+            morning_pts_num = len(waypoints_morning)
+            for waypoint in waypoints_afternoon:
+                waypoint['waypoint_index'] = waypoint['waypoint_index'] + morning_pts_num - 1
+
+            waypoints = waypoints_morning + waypoints_afternoon
+
+            tour_data_by_hint = {}
+
+            for hint, tour_data in tour_data_by_hint1.iteritems():
+                for tour_datum in tour_data:
+                    if tour_datum['type'] != 'end':
+                        if not tour_data_by_hint.get(hint):
+                            tour_data_by_hint[hint] = []
+                        tour_data_by_hint[hint].append(tour_datum)
+
+            for hint, tour_data in tour_data_by_hint2.iteritems():
+                for tour_datum in tour_data:
+                    if tour_datum['type'] != 'start':
+                        if not tour_data_by_hint.get(hint):
+                            tour_data_by_hint[hint] = []
+                        tour_data_by_hint[hint].append(tour_datum)
+
+            if not waypoints:  # we should always get a list of waypoints here
+                raise UserError(_("No optimized tour lines found."))
+
+        am_limit_float = self.env['ir.values'].get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
+        compare_precision = 5
 
         # sort the waypoints by index to get the optimized tour lines in the right order
         # OSRM will always return the data in the input order, so we need to sort them by index
         ordered_waypoints = sorted(waypoints, key=lambda k: k['waypoint_index'])
         optimized_line_order = self.env['of.planning.tour.line']
+
+        if self.optim_mode == 'afternoon':
+            optimized_line_order |= self.tour_id.tour_line_ids.filtered(
+                lambda tl: float_compare(
+                    self.tour_id._get_float_intervention_start_hour(tl.intervention_id),
+                    am_limit_float, compare_precision) < 0)
+
         for waypoint in ordered_waypoints:
             for data in tour_data_by_hint.get(waypoint['hint']):
                 if data['type'] in ['start', 'end']:
                     continue
                 optimized_line_order |= data['line']
+
+        if self.optim_mode == 'morning':
+            optimized_line_order |= self.tour_id.tour_line_ids.filtered(
+                lambda tl: float_compare(
+                    self.tour_id._get_float_intervention_start_hour(tl.intervention_id),
+                    am_limit_float, compare_precision) >= 0)
 
         # update the wizard lines with the new time slot created by the optimization
         self._update_optimization_lines_time_slots(optimized_line_order, wizard_line_mapping)

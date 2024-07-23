@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_AM_LIMIT_FLOAT
 
 SEARCH_MODES = [
     ('distance', u"Distance (km)"),
@@ -21,8 +22,8 @@ class OFTourneeRdv(models.TransientModel):
         def format_date(date):
             return fields.Date.from_string(date).strftime('%A %d %B %Y').capitalize()
         self.ensure_one()
-        morning_end_hour = 13.0  # -> à récupérer depuis de la config en backend?
-        afternoon_start_hour = 13.0  # -> à récupérer depuis de la config en backend?
+        am_limit_float = self.env['ir.values'].sudo().get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         compare_precision = 5
 
         slots_dict = {}
@@ -51,10 +52,10 @@ class OFTourneeRdv(models.TransientModel):
                 # du matin et de l'après midi si possible
                 keys = []
                 # il y a de la place entre le début du créneau et l'heure de fin de matinée
-                if float_compare(slot.date_flo, morning_end_hour - self.duree, compare_precision) <= 0:
+                if float_compare(slot.date_flo, am_limit_float - self.duree, compare_precision) <= 0:
                     keys.append(slot.date + '-0-matin')
                 # il y a de la place entre l'heure de début d'aprem et la fin du créneau
-                if float_compare(slot.date_flo_deadline, afternoon_start_hour + self.duree, compare_precision) >= 0:
+                if float_compare(slot.date_flo_deadline, am_limit_float + self.duree, compare_precision) >= 0:
                     keys.append(slot.date + '-1-aprem')
                 for key in keys:
                     if key not in slots_dict:

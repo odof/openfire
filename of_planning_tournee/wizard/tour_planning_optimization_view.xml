@@ -22,6 +22,7 @@
                         <group>
                             <field name="start_address_id" options="{'no_open': True}"/>
                             <field name="return_address_id" options="{'no_open': True}"/>
+                            <field name="optim_mode"/>
                         </group>
                         <group>
                             <field name="total_distance"/>

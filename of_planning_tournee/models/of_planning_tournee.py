@@ -7,12 +7,13 @@ from datetime import datetime, timedelta
 from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools import config
+from odoo.tools.float_utils import float_compare
 
 
 _logger = logging.getLogger(__name__)
 
 
-AM_LIMIT_FLOAT = 12.0
+DEFAULT_AM_LIMIT_FLOAT = 13.0
 DEFAULT_MIN_DURATION = 0.5
 DEFAULT_PERIOD_IN_DAYS = 30
 SECURITY_MARGIN = 10
@@ -444,7 +445,7 @@ class OFPlanningTournee(models.Model):
         return start_marker, end_marker
 
     @api.multi
-    def _get_tour_coordinates_data(self):
+    def _get_tour_coordinates_data(self, optim_mode='day'):
         """ Returns a string of coordinates as "longitude, latitude;..." of the tour.
         Also a dict of a hint string of each coordinates associated to the tour line.
         This dict will be used by wizards to be able to retrieve the tour line associated to the coordinates because
@@ -457,15 +458,35 @@ class OFPlanningTournee(models.Model):
         """
         self.ensure_one()
         # start points
-        start_address = self.start_address_id
-        if not start_address:
+        if not self.start_address_id:
             # if no start address is set on the tour, we take the employee's address or the company's address
             self.start_address_id = self._get_start_address()
+        start_address = self.start_address_id
         # end points
-        stop_address = self.return_address_id
-        if not stop_address:
+        if not self.return_address_id:
             # if no start address is set on the tour, we take the employee's address or the company's address
             self.return_address_id = self._get_return_address()
+        stop_address = self.return_address_id
+
+        am_limit_float = self.env['ir.values'].get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
+        compare_precision = 5
+
+        # get tour_lines and adresses depending on optim_mode
+        tour_lines = self.tour_line_ids
+        if optim_mode == 'morning':
+            afternoon_lines = self.tour_line_ids.sorted(key=lambda tl: tl.date_start).filtered(
+                lambda tl: float_compare(
+                    self._get_float_intervention_start_hour(tl.intervention_id),
+                    am_limit_float, compare_precision) >= 0)
+            stop_address = afternoon_lines and afternoon_lines[0].intervention_id.address_id or stop_address
+            tour_lines = self.tour_line_ids - afternoon_lines
+        elif optim_mode == 'afternoon':
+            morning_lines = self.tour_line_ids.sorted(key=lambda tl: tl.date_start).filtered(
+                lambda tl: float_compare(
+                    self._get_float_intervention_start_hour(tl.intervention_id), am_limit_float, compare_precision) < 0)
+            start_address = morning_lines and morning_lines[-1].intervention_id.address_id or start_address
+            tour_lines = self.tour_line_ids - morning_lines
 
         coordinates_str = "%s,%s" % (start_address.geo_lng, start_address.geo_lat)
         hint = self._get_nearest_point_hint(coordinates_str)
@@ -479,8 +500,7 @@ class OFPlanningTournee(models.Model):
             }]
         }
 
-        # get intervention points from the tour lines
-        for line in self.tour_line_ids:
+        for line in tour_lines:
             coord_str = "%s,%s" % (line.geo_lng, line.geo_lat)
             hint = self._get_nearest_point_hint(coord_str)
             coordinates_str += ";%s" % coord_str
@@ -619,6 +639,8 @@ class OFPlanningTournee(models.Model):
         """Returns the employee's working hours on the day of the tour.
         """
         self.ensure_one()
+        am_limit_float = self.env['ir.values'].get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         hours = self.employee_id.get_horaires_date(self.date)[self.employee_id.id] if self.employee_id else []
         # we want to return a list of tuples (start, end) of working hours, so we need to manage the case where
         # the employee has only one or more than two slots of working hours
@@ -629,7 +651,7 @@ class OFPlanningTournee(models.Model):
         elif len(hours) > 2:
             new_hours = [[], []]
             for slot in hours:
-                if slot[0] < AM_LIMIT_FLOAT:
+                if slot[0] < am_limit_float:
                     new_hours[0].append(slot)
                 else:
                     new_hours[1].append(slot)
@@ -720,32 +742,39 @@ class OFPlanningTournee(models.Model):
         if not self.tour_line_ids:
             return False
 
+        am_limit_float = self.env['ir.values'].get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         # get hours of the employee for the afternoon
         employee_wh = self._get_employee_hours()
         complex_hours = len(employee_wh[0]) > 1
         afternoon_hours = (
             employee_wh[1][0]
             if complex_hours
-            else [h[0][0] for h in employee_wh if h[0][0] > AM_LIMIT_FLOAT]
+            else [h[0][0] for h in employee_wh if h[0][0] > am_limit_float]
         )
         if not afternoon_hours:
-            return AM_LIMIT_FLOAT
+            return am_limit_float
 
         # build a list of booleans to know if the line is after the afternoon hours
         lines_dates = self.tour_line_ids.mapped(
             lambda tl: fields.Datetime.context_timestamp(tl, fields.Datetime.from_string(tl.date_start)))
         afternoon_lines = map(
             lambda ds: round(ds.hour + ds.minute / 60.0 + ds.second / 3600.0, 5) >= afternoon_hours[0], lines_dates)
-        # get the index of the first line after the afternoon hours or return AM_LIMIT_FLOAT if not found
+        # get the index of the first line after the afternoon hours or return am_limit_float if not found
         try:
             first_afternoon_line = afternoon_lines.index(True)
         except ValueError:
-            return AM_LIMIT_FLOAT
+            return am_limit_float
 
         first_afternoon_dt = fields.Datetime.context_timestamp(
             self, fields.Datetime.from_string(self.tour_line_ids[first_afternoon_line].date_start))
         return round(
             first_afternoon_dt.hour + first_afternoon_dt.minute / 60.0 + first_afternoon_dt.second / 3600.0, 5)
+
+    def _get_float_intervention_start_hour(self, intervention):
+        start_date = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(intervention.date))
+        return round(
+            start_date.hour + start_date.minute / 60.0 + start_date.second / 3600.0, 5)
 
     def _check_employees_working_hours(self):
         """Check if at least one employee has no working hours on the day of the tour.
