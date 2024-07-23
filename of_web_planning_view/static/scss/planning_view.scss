@@ -676,7 +676,18 @@
 
         .o_planning_row_headers{
             left: 0;
-            z-index: 1001;
+            @include o-planning-zindex(top);
+            background-color: white;
+        }
+    }
+
+    .o_planning_total_rows {
+        grid-template-columns: var(--Planning__RowHeader-width) 1fr !important;
+        grid-column: 1 / -1;
+
+        .o_planning_row_headers{
+            left: 0;
+            @include o-planning-zindex(top);
             background-color: white;
         }
     }
