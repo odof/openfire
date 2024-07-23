@@ -164,7 +164,7 @@ var MapView = View.extend({
         this.record_options.color_field = this.fields_view.arch.attrs.color_field;
         this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
         this.record_options.connect_markers = this.fields_view.arch.attrs.connect_markers || '0';
-        this.record_options.draw_routes = this.fields_view.arch.attrs.draw_routes || '0';
+        this.record_options.remove_routes = this.fields_view.arch.attrs.remove_routes || '0';
         var ir_config = new Model('ir.config_parameter');
         ir_config.call('get_param', ['Map_Marker_Size']).then(function(res){
             if (['x-small', 'small', 'medium', 'large'].includes(res)) {
@@ -1479,7 +1479,9 @@ MapView.LayerGroup = Widget.extend({
         var self = this;
         //TODO : we can do better with layergroup!!
         //We track only lines using path , to avoid deleting the other components
-        $('path.leaflet-interactive').remove()
+        if (this.options.remove_routes == '1') {
+            $('path.leaflet-interactive').remove()
+        }
         for (var i = 0; i < self.records.length; i++) {
             if (self.records[i].geojson_data) {
                 let geoline = JSON.parse(self.records[i].geojson_data);

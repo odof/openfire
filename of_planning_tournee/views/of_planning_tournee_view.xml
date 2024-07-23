@@ -71,7 +71,7 @@
                     </page> <!-- End of Tour lines page -->
                     <page name="tour_lines_map" string="Route"> <!-- Map page -->
                         <field name="map_tour_line_ids" mode="map" nolabel="1"
-                            context="{'map_view_ref':'of_planning_tournee.of_planning_tour_line_map_view_drawroute', 'from_tour':1, 'active_tour_id': active_id, 'additional_records': additional_records}"/>
+                            context="{'map_view_ref':'of_planning_tournee.of_planning_tour_line_map_view_drawroute', 'from_tour':1, 'from_tour_form': 1, 'active_tour_id': active_id, 'additional_records': additional_records}"/>
                     </page> <!-- End of Map page  -->
                     <page name="technical" string="Technical" groups="of_base.of_group_root_only"> <!-- Technial page for OpenFire -->
                         <group name="update_map" string="Map &amp; OSRM data">
@@ -401,6 +401,7 @@
                 <attribute name="endpoint_geojson_data">endpoint_geojson_data</attribute>
                 <attribute name="draw_routes">1</attribute>
                 <attribute name="connect_markers">0</attribute>
+                <attribute name="remove_routes">1</attribute>
             </xpath>
         </field>
     </record>
