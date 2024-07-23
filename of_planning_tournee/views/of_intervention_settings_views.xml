@@ -27,6 +27,7 @@
                     <field name="nbr_days_tour_creation" />
                     <field name="tour_employee_ids" widget="many2many_tags"/>
                     <field name="tour_day_ids" widget="many2many_tags"/>
+                    <field name="tour_am_limit_float" widget="float_time"/>
                     <field name="group_of_planning_tournee_manual_creation"/>
                 </group>
             </xpath>

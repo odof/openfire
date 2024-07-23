@@ -18,7 +18,7 @@ from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELE
 from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import WEEKDAYS_TR
-from odoo.addons.of_planning_tournee.models.of_planning_tournee import AM_LIMIT_FLOAT
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_AM_LIMIT_FLOAT
 
 _logger = logging.getLogger(__name__)
 
@@ -1397,6 +1397,11 @@ class OfTourneeRdv(models.TransientModel):
             tournee_obj = tournee_obj.sudo()
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         un_jour = timedelta(days=1)
+        ir_values_obj = self.env['ir.values']
+        if sudo:
+            ir_values_obj = ir_values_obj.sudo()
+        am_limit_float = ir_values_obj.get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         date_courante = date_debut
         employees = sudo and employees.sudo() or employees
         search_mode = self.search_mode
@@ -1550,7 +1555,7 @@ class OfTourneeRdv(models.TransientModel):
                                     vals['distance_utile'] = min(vals['dist_prec'], vals['dist_suiv'])
                                     vals['duree_utile'] = min(vals['duree_prec'], vals['duree_suiv'])
                                 elif search_mode == 'oneway_am_return_pm':
-                                    if crens[0].date_flo <= AM_LIMIT_FLOAT:  # one way, if morning
+                                    if crens[0].date_flo <= am_limit_float:  # one way, if morning
                                         vals['distance_utile'] = vals['dist_prec']
                                         vals['duree_utile'] = vals['duree_prec']
                                     else:  # return, if afternoon

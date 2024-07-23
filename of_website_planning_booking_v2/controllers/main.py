@@ -12,6 +12,7 @@ from odoo.http import request
 from odoo.tools.float_utils import float_compare
 
 from odoo.addons.of_utils.models.of_utils import hours_to_strs
+from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_AM_LIMIT_FLOAT
 
 _logger = logging.getLogger(__name__)
 
@@ -514,6 +515,8 @@ class OFWebsitePlanningBooking(http.Controller):
     def _get_intervention_vals(self, slot, backend_slot, template, service, partner):
         tz = pytz.timezone('Europe/Paris')
 
+        am_limit_float = request.env['ir.values'].sudo().get_default(
+            'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         default_state = request.env['ir.values'].sudo().with_context(
             force_company=self._get_company_id()).get_default(
                 'of.intervention.settings', 'booking_intervention_state') or 'draft'
@@ -557,14 +560,13 @@ class OFWebsitePlanningBooking(http.Controller):
         # Le créneau de l'employé peut commencer avant le début d'aprem,
         # on fait donc un max pour s'assurer que le RDV soit pris l'aprem
         if slot.name.lower() == u'après-midi':
-            afternoon_start_hour = 13.0  # -> à récupérer depuis de la config en backend?
-            if float_compare(afternoon_start_hour, backend_slot.date_flo, 5) <= 0:
+            if float_compare(am_limit_float, backend_slot.date_flo, 5) <= 0:
                 date_start = backend_slot.debut_dt
             # création d'un dt à partir de l'heure de début d'aprem
             # attention /!\ l'employé doit travailler à partir de l'heure de début d'aprem
             # @todo: gérer le cas ou l'employé commence à travailler après l'heure de début d'aprem
             else:
-                time_str = hours_to_strs('time', afternoon_start_hour)
+                time_str = hours_to_strs('time', am_limit_float)
                 date_start_local = tz.localize(datetime.strptime(slot.date + " %s:00" % time_str, "%Y-%m-%d %H:%M:%S"))
                 date_start = date_start_local.astimezone(pytz.utc).strftime("%Y-%m-%d %H:%M:%S")
         else:
