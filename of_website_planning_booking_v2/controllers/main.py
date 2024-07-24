@@ -284,6 +284,9 @@ class OFWebsitePlanningBooking(http.Controller):
         }
         if request.env.uid != request.website.user_id.id:
             vals['parent_id'] = request.env.user.partner_id.id
+            vals['company_id'] = request.env.user.partner_id.company_id.id
+        else:
+            vals['company_id'] = self._get_company_id()
         partner = partner_obj.create(vals)
         partner.geo_code()
         return partner.id
