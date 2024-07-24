@@ -11,7 +11,7 @@
         <field name="value">no</field>
     </record>
 
-    <record id="of_geolocalize_timeout" model="ir.config_parameter">
+    <record id="of_geolocalize_timeout" model="ir.config_parameter" forcecreate="False">
         <field name="key">of.geolocalize.timeout</field>
         <field name="value">10</field>
     </record>

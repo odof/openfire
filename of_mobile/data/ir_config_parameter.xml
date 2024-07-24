@@ -1,37 +1,37 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo noupdate="1">
 
-    <record id="of_mobile_display_planning_days_before" model="ir.config_parameter">
+    <record id="of_mobile_display_planning_days_before" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.display_planning_days_before</field>
         <field name="value">14</field>
     </record>
 
-    <record id="of_mobile_display_planning_days_after" model="ir.config_parameter">
+    <record id="of_mobile_display_planning_days_after" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.display_planning_days_after</field>
         <field name="value">14</field>
     </record>
 
-    <record id="of_mobile_history_limit" model="ir.config_parameter">
+    <record id="of_mobile_history_limit" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.history_limit</field>
         <field name="value">12</field>
     </record>
 
-    <record id="of_mobile_max_size_attachment" model="ir.config_parameter">
+    <record id="of_mobile_max_size_attachment" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.max_size_attachment</field>
         <field name="value">5</field>
     </record>
 
-    <record id="of_mobile_max_nb_attachment" model="ir.config_parameter">
+    <record id="of_mobile_max_nb_attachment" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.max_nb_attachment</field>
         <field name="value">5</field>
     </record>
 
-    <record id="of_mobile_image_resolution_width" model="ir.config_parameter">
+    <record id="of_mobile_image_resolution_width" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.image_resolution_width</field>
         <field name="value">1920</field>
     </record>
 
-    <record id="of_mobile_image_resolution_height" model="ir.config_parameter">
+    <record id="of_mobile_image_resolution_height" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.image_resolution_height</field>
         <field name="value">1080</field>
     </record>
@@ -41,17 +41,17 @@
         <field name="value">no</field>
     </record>
 
-    <record id="of_mobile_meeting_timesheet_force" model="ir.config_parameter">
+    <record id="of_mobile_meeting_timesheet_force" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.meeting_timesheet_force</field>
         <field name="value">False</field>
     </record>
-    
-    <record id="of_mobile_can_edit_days_before" model="ir.config_parameter">
+
+    <record id="of_mobile_can_edit_days_before" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.can_edit_days_before</field>
         <field name="value">0</field>
     </record>
-    
-    <record id="of_mobile_can_edit_days_after" model="ir.config_parameter">
+
+    <record id="of_mobile_can_edit_days_after" model="ir.config_parameter" forcecreate="False">
         <field name="key">of_mobile.can_edit_days_after</field>
         <field name="value">0</field>
     </record>
