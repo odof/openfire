@@ -63,8 +63,12 @@ class OFSurveyUserInputLine(models.Model):
             elif line.answer_type == 'numerical_box':
                 line.display_name = line.value_numerical_box
             elif line.answer_type == 'date':
-                line.display_name = line.value_date.strftime(
-                    self.env['res.lang'].search([('code', '=', self.env.user.lang)], limit=1).date_format
+                line.display_name = (
+                    line.value_date.strftime(
+                        self.env['res.lang'].search([('code', '=', self.env.user.lang)], limit=1).date_format
+                    )
+                    if line.value_date
+                    else ''
                 )
             elif line.answer_type == 'suggestion':
                 line.display_name = line.suggested_answer_id.value
