@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--Inherited the standard external layout-->
+    <template id="of_custom_standard_external_layout" inherit_id="web.external_layout_standard">
+        <xpath expr="//div[@t-field='company.report_footer']" position="attributes">
+            <attribute name='id'>custom_report_footer</attribute>
+        </xpath>
+    </template>
+
+</odoo>

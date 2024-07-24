@@ -47,6 +47,7 @@
         'wizards/of_popup_wizard_view.xml',
         'wizards/of_res_partner_check_duplications_views.xml',
         'wizards/of_html_sanitize_views.xml',
+        'templates/of_report_footer.xml',
     ],
     'external_dependencies': {
         'python': [
@@ -61,6 +62,9 @@
             'of_base/static/src/js/code_version.js',
             'of_base/static/src/xml/code_version.xml',
             'of_base/static/src/less/of_base.less',
+        ],
+        'web.report_assets_common': [
+            'of_base/static/src/scss/style.scss',
         ],
     },
     'installable': True,
