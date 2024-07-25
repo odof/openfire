@@ -5,6 +5,7 @@ import {registry} from "@web/core/registry";
 import {onMounted, onPatched} from "@odoo/owl";
 
 export class OFMapGeolocalize extends OFPartnerMap {
+    static template = "of_geolocalize.OFMapGeolocalize";
     setup() {
         super.setup();
 
@@ -22,7 +23,7 @@ export class OFMapGeolocalize extends OFPartnerMap {
 
     async loadChilds() {
         const iconChild = L.icon({
-            iconUrl: "/of_web_widgets/static/lib/leaflet/images/marker-icon-black.png",
+            iconUrl: "/of_web_widgets/static/images/marker-icon-black.png",
             shadowUrl: "/of_web_widgets/static/lib/leaflet/images/marker-shadow.png",
             iconSize: [25, 41],
             iconAnchor: [12, 41],
@@ -43,7 +44,7 @@ export class OFMapGeolocalize extends OFPartnerMap {
 
     async loadParent() {
         const iconParent = L.icon({
-            iconUrl: "/of_web_widgets/static/lib/leaflet/images/marker-icon-green.png",
+            iconUrl: "/of_web_widgets/static/images/marker-icon-green.png",
             shadowUrl: "/of_web_widgets/static/lib/leaflet/images/marker-shadow.png",
             iconSize: [25, 41],
             iconAnchor: [12, 41],

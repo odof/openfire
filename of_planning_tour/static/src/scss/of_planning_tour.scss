@@ -1,0 +1,36 @@
+.planning_tour_by_distance_duration [data-field$="_utile"] {
+    font-weight: bold;
+}
+
+.planning_tour_by_date td[name="date"],
+.planning_tour_by_date td[name="description"] {
+    font-weight: bold;
+}
+
+.tour_optimization_line td[name="new_time_slot"],
+.tour_optimization_line td[name="new_index"],
+.tour_optimization_line td[name="new_distance"] {
+    font-weight: bold;
+}
+
+.grid-container-appointment {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
+}
+.grid-item-appointment {
+    display: flex;
+    flex-direction: column;
+    grid-column: span 8;
+}
+.grid-item-map-appointment {
+    display: flex;
+    flex-direction: column;
+    grid-column: span 4;
+}
+.o_kanban_appointmment_wizard {
+    --KanbanRecord-width: 450px;
+    --KanbanRecord-width-small: 350px;
+    --KanbanRecord-margin-v: 10px;
+    --KanbanRecord-margin-h: 5px;
+}

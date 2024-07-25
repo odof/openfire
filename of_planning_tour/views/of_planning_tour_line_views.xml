@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tour_line_form_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.form.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="arch" type="xml">
+            <form string="Tour line">
+                <group>
+                    <field name="sequence"/>
+                    <field name="intervention_id"/>
+                    <field name="date_start"/>
+                    <field name="task_name"/>
+                    <field name="duration" widget="float_time"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                    <field name="partner_name"/>
+                    <field name="address_zip"/>
+                    <field name="address_city"/>
+                    <field name="partner_mobile"/>
+                    <field name="partner_phone"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_line_tree_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.tree.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="arch" type="xml">
+            <tree string="Tour lines">
+                <field name="intervention_id"/>
+                <field name="date_start"/>
+                <field name="date_stop" optional="hide"/>
+                <field name="address_city"/>
+                <field name="is_flexible" optional="hide"/>
+                <field name="employee_ids" optional="hide" widget="many2many_tags" />
+                <field name="duration" widget="float_time"/>
+                <field name="duration_one_way" widget="float_time"/>
+                <field name="distance_one_way"/>
+                <!-- Those fields are used for the map, they are prefetched in records used in the map widget -->
+                <field name="geo_lat" invisible="1"/>
+                <field name="geo_lng" invisible="1"/>
+                <field name="partner_name" invisible="1"/>
+                <field name="partner_name" invisible="1"/>
+                <field name="task_name" invisible="1"/>
+                <field name="address_zip" invisible="1"/>
+                <field name="address_city" invisible="1"/>
+                <field name="partner_mobile" invisible="1"/>
+                <field name="partner_phone" invisible="1"/>
+                <field name="intervention_id" invisible="1"/>
+                <field name="date_start" invisible="1"/>
+                <field name="tour_number" invisible="1"/>
+                <field name="hexa_color" invisible="1"/>
+                <field name="geometry_data" invisible="1"/>
+                <field name="endpoint_geometry_data" invisible="1"/>
+                <field name="is_first_line_of_tour" invisible="1"/>
+                <field name="is_last_line_of_tour" invisible="1"/>
+                <field name="map_latitude" invisible="0"/>
+                <field name="map_longitude" invisible="0"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,199 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_optimization_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.optimization.wizard.view.form</field>
+        <field name="model">of.planning.tour.optimization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Optimize tour">
+                <script>
+                    $('.modal-dialog').css('max-width', '80%');
+                </script>
+                <sheet>
+                    <field name="state" invisible="1"/>
+                    <field name="map_latitude" invisible="1"/>
+                    <field name="map_longitude" invisible="1"/>
+                    <field name="additional_records" invisible="1"/>
+                    <field name="tour_id" invisible="1"/>
+                    <field name="display_overlap_opt" invisible="1"/>
+                    <field name="display_multi_employees_opt" invisible="1"/>
+                    <group col="4">
+                        <group>
+                            <field name="start_address_id" options="{'no_open': True}"/>
+                            <field name="return_address_id" options="{'no_open': True}"/>
+                        </group>
+                        <group>
+                            <field name="total_distance"/>
+                            <field name="total_duration" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="new_total_distance"/>
+                            <field name="new_total_duration" widget="float_time"/>
+                        </group>
+                        <div style="display: inline-grid; width: 25%;">
+                            <div attrs="{'invisible': [('display_multi_employees_opt', '=', False)]}" style="display: inline-flex; align-items: center;">
+                                <div style="width:100%; color: red;">
+                                    Warning : One or more interventions are assigned to several employees. The intervention dates will be forced.
+                                </div>
+                            </div>
+                            <div attrs="{'invisible': ['|', ('state', '!=', 'optimized'), ('display_overlap_opt', '=', False)]}" style="display: inline-flex; align-items: center;">
+                                <div style="width:100%;color: orange;">Accept that an intervention ends during the lunch break.
+                                    <button name="action_button_preview_overlap_lb" string="Preview" type="object" class="oe_link"/> or <button name="action_button_validate_overlap_lb" string="Validate" type="object" class="oe_link"/> directly.
+                                </div>
+                            </div>
+                        </div>
+                    </group>
+                    <group attrs="{'invisible': [('state', '=', 'optimized')]}">
+                        <field name="line_ids"  colspan="2" mode="tree" nolabel="1" style="margin-top:0; margin-bottom:0;"
+                                context="{'of_no_table_layouted': 1, 'tree_view_ref': 'of_planning_tour.of_tour_planning_optimization_line_wizard_view_tree'}"/>
+                    </group>
+                    <group attrs="{'invisible': [('state', '!=', 'optimized')]}"> <!-- When optimized it display a sorted list -->
+                        <field name="optimized_line_ids"  colspan="2" mode="tree" nolabel="1" style="margin-top:0; margin-bottom:0"
+                                context="{'of_no_table_layouted': 1, 'tree_view_ref': 'of_planning_tour.of_tour_planning_optimization_line_wizard_view_tree_order_index'}"/>
+                    </group>
+                    <!-- Using a grid system here, because map widget will compute map width and height easilly -->
+                    <div name="slots_lists" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div name="map_tour" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                            <field name="map_tour_line_ids" widget="of_planning_tour_map_x2many_optz_dialog"
+                                    nolabel="1" options="{'map_rows' : 20}"
+                                    context="{'from_tour':1, 'of_active_tour_id': tour_id, 'additional_records': additional_records}">
+                                <tree string="Tour lines">
+                                    <field name="intervention_id"/>
+                                    <field name="date_start"/>
+                                    <field name="date_stop" optional="hide"/>
+                                    <field name="address_city"/>
+                                    <field name="is_flexible" optional="hide"/>
+                                    <field name="employee_ids" optional="hide" widget="many2many_tags" />
+                                    <field name="duration" widget="float_time"/>
+                                    <field name="duration_one_way" widget="float_time"/>
+                                    <field name="distance_one_way"/>
+                                    <!-- Those fields are used for the map, they are prefetched in records used in the map widget -->
+                                    <field name="geo_lat" invisible="1"/>
+                                    <field name="geo_lng" invisible="1"/>
+                                    <field name="partner_name" invisible="1"/>
+                                    <field name="partner_name" invisible="1"/>
+                                    <field name="task_name" invisible="1"/>
+                                    <field name="address_zip" invisible="1"/>
+                                    <field name="address_city" invisible="1"/>
+                                    <field name="partner_mobile" invisible="1"/>
+                                    <field name="partner_phone" invisible="1"/>
+                                    <field name="intervention_id" invisible="1"/>
+                                    <field name="date_start" invisible="1"/>
+                                    <field name="tour_number" invisible="1"/>
+                                    <field name="hexa_color" invisible="1"/>
+                                    <field name="geometry_data" invisible="1"/>
+                                    <field name="endpoint_geometry_data" invisible="1"/>
+                                    <field name="is_first_line_of_tour" invisible="1"/>
+                                    <field name="is_last_line_of_tour" invisible="1"/>
+                                    <field name="map_latitude" invisible="1"/>
+                                    <field name="map_longitude" invisible="1"/>
+                                </tree>
+                            </field>
+                        </div>
+                        <div name="map_tour_optz" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                            <field name="map_optimized_line_ids" widget="of_planning_tour_map_x2many_optz_dialog"
+                                nolabel="1" options="{'map_rows' : 20}"
+                                context="{'from_tour':1, 'of_active_tour_id': tour_id, 'additional_records': additional_records}">
+                                <tree>
+                                    <field name="geo_lat" invisible="1"/>
+                                    <field name="geo_lng" invisible="1"/>
+                                    <field name="partner_name" invisible="1"/>
+                                    <field name="partner_name" invisible="1"/>
+                                    <field name="task_name" invisible="1"/>
+                                    <field name="address_zip" invisible="1"/>
+                                    <field name="address_city" invisible="1"/>
+                                    <field name="partner_mobile" invisible="1"/>
+                                    <field name="partner_phone" invisible="1"/>
+                                    <field name="intervention_id" invisible="1"/>
+                                    <field name="date_start" invisible="1"/>
+                                    <field name="tour_number" invisible="1"/>
+                                    <field name="hexa_color" invisible="1"/>
+                                    <field name="geometry_data" invisible="1"/>
+                                    <field name="endpoint_geometry_data" invisible="1"/>
+                                    <field name="is_first_line_of_tour" invisible="1"/>
+                                    <field name="is_last_line_of_tour" invisible="1"/>
+                                    <field name="map_latitude" invisible="1"/>
+                                    <field name="map_longitude" invisible="1"/>
+                                </tree>
+                            </field>
+                        </div>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_button_optimize" string="Optimize" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'init')]}"/>
+                    <button name="action_button_relaunch" string="Relaunch" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'optimized')]}"/>
+                    <button name="action_button_reset" string="Reset" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'optimized')]}"/>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'optimized')]}"/>
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_tour_planning_optimization_line_wizard_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.tour.optimization.line.wizard.view.tree</field>
+        <field name="model">of.planning.tour.optimization.line.wizard</field>
+        <field name="arch" type="xml">
+            <tree class="tour_optimization_line" editable="top" create="false" edit="false" delete="false" default_order="old_index asc" decoration-danger="is_multi_employees" decoration-warning="could_overlap">
+                <field name="wizard_state" invisible="1"/>
+                <field name="could_overlap" invisible="1"/>
+                <field name="is_multi_employees" invisible="1"/>
+                <field name="new_intervention_id" invisible="1"/>
+                <field name="intervention_id"/>
+                <field name="employee_ids" widget="many2many_tags"/>
+                <field name="old_index" string=" "/>
+                <field name="old_time_slot" />
+                <field name="old_duration" widget="float_time" string="Duration (h)"/>
+                <field name="old_distance" string="Distance (km)"/>
+                <field name="new_index" string=" "/>
+                <field name="new_time_slot" />
+                <field name="new_duration" string="Duration (h)" widget="float_time" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>
+                <field name="new_distance" string="Distance (km)" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_tour_planning_optimization_line_wizard_view_tree_order_index" model="ir.ui.view">
+        <field name="name">of.planning.tour.optimization.line.wizard.view.tree.order.index</field>
+        <field name="model">of.planning.tour.optimization.line.wizard</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning_tour.of_tour_planning_optimization_line_wizard_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="default_order" value="new_index asc"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_tour_planning_optimization_line_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.optimization.line.wizard.view.form</field>
+        <field name="model">of.planning.tour.optimization.line.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="wizard_state" invisible="1"/>
+                    <field name="could_overlap" invisible="1"/>
+                    <field name="is_multi_employees" invisible="1"/>
+                    <field name="new_intervention_id" invisible="1"/>
+                    <field name="intervention_id"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                </group>
+                <group>
+                    <group name="before" string="Time slot before optimization" col="2">
+                        <field name="old_index" string="Sequence"/>
+                        <field name="old_time_slot"/>
+                        <field name="old_duration" widget="float_time"/>
+                        <field name="old_distance"/>
+                    </group>
+                    <group name="after" string="Time slot after optimization" col="2">
+                        <field name="new_index" string="Sequence"/>
+                        <field name="new_time_slot"/>
+                        <field name="new_duration" widget="float_time" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>
+                        <field name="new_distance" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

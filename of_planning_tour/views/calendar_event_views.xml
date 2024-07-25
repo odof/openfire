@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- This view disables all buttons in the header -->
+    <!-- It is called from the planification wizard to ensure that the user will not change any intervention state by clicking on them -->
+    <record id="of_planning_intervention_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.calendar.event.form.view</field>
+        <field name="model">calendar.event</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="replace">
+                <header>
+                    <field name="of_is_closed" invisible="1"/>
+                    <field name="of_state" widget="statusbar" statusbar_visible="draft,confirmed,done" nolabel="1" />
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

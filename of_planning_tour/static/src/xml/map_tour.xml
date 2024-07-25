@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+    <t t-name="of_planning_tour.OFMapPlanningTour" owl="1">
+        <div class="map-container" t-ref="mapContainer">
+            <ListPopupMap map="this" archInfo="archInfo" records="records" />
+        </div>
+    </t>
+
+    <t t-name="of_planning_tour.OFMapPlanningTourOptimizeDialog" owl="1">
+        <div class="map-container" t-ref="mapContainerOptimizeDialog">
+            <ListPopupMap map="this" archInfo="archInfo" records="records" />
+        </div>
+    </t>
+
+    <t t-name="of_planning_tour.OFMapPlanningTourPlanDialog" owl="1">
+        <div class="map-container" t-ref="mapContainerPlanDialog"/>
+    </t>
+
+</templates>

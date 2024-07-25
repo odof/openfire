@@ -5,7 +5,7 @@ import { Domain } from "@web/core/domain";
 import { useBus, useService } from "@web/core/utils/hooks";
 import { useBounceButton } from "@web/views/view_hook";
 import { localization } from "@web/core/l10n/localization";
-import { ListPopupMap } from "../components/popup";
+import { ListPopupMap } from "@of_web_widgets/components/popup";
 import { renderToString } from "@web/core/utils/render";
 
 import {

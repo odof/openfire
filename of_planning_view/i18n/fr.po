@@ -93,11 +93,6 @@ msgid "Forecast"
 msgstr "Prévisions"
 
 #. module: of_planning_view
-#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_has_geolocalize_warning
-msgid "Geolocalize Warning"
-msgstr "Avetissement de géolocalisation"
-
-#. module: of_planning_view
 #: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_partner_address
 msgid "Helper field, to display Address in the popover"
 msgstr "Champ d'aide, pour afficher l'adresse dans la fenêtre contextuelle"
@@ -113,13 +108,6 @@ msgstr ""
 msgid "Helper field, to display Employees in the popover"
 msgstr ""
 "Champ d'aide, pour afficher les intervenants dans la fenêtre contextuelle"
-
-#. module: of_planning_view
-#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_has_geolocalize_warning
-msgid "Helper field, to display warning if geolocalize is not set"
-msgstr ""
-"Champ d'aide, pour afficher un avertissement si la géolocalisation n'est pas"
-" définie"
 
 #. module: of_planning_view
 #: model:ir.model,name:of_planning_view.model_of_planning_intervention_template

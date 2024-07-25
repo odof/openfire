@@ -107,16 +107,16 @@ export class MapController extends Component {
             );
             // Loading leaflet
             await Promise.all([
-                await loadCSS("/of_map_view/static/lib/leaflet/leaflet.css"),
-                await loadJS(["/of_map_view/static/lib/leaflet/leaflet.js"]),
+                await loadCSS("/of_web_widgets/static/lib/leaflet/leaflet.css"),
+                await loadJS(["/of_web_widgets/static/lib/leaflet/leaflet.js"]),
             ]);
             // Loading awesome markers
             await Promise.all([
                 await loadCSS(
-                    "/of_map_view/static/lib/awesome-markers/leaflet.awesome-markers.css"
+                    "/of_web_widgets/static/lib/awesome-markers/leaflet.awesome-markers.css"
                 ),
                 await loadJS([
-                    "/of_map_view/static/lib/awesome-markers/leaflet.awesome-markers.js",
+                    "/of_web_widgets/static/lib/awesome-markers/leaflet.awesome-markers.js",
                 ]),
             ]);
         });

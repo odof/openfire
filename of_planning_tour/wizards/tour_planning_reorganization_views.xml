@@ -1,0 +1,43 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<odoo>
+
+    <record id="of_tour_planning_reorganization_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.reorganization.wizard.view.form</field>
+        <field name="model">of.planning.tour.reorganization.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reorganization of the tour">
+                <script>
+                    $('.modal-dialog').css('max-width', '80%');
+                </script>
+                <sheet>
+                    <field name="tour_id" invisible="1"/>
+                    <div class="alert alert-info" role="alert">
+                        You are about to reorganize the tour <field name="tour_id" class="oe_inline" readonly="1" /> <br/>
+                        You can change the order of the interventions in tour by dragging and dropping the lines. <br/>
+
+                        When you are done, click on the validate button and the tour will be updated and recomputed automatically.
+                    </div>
+                    <group>
+                        <field name="line_ids" mode="tree" nolabel="1" colspan="2">
+                            <tree string="Tour lines" editable="top" create="false" edit="false" delete="false">
+                                <field name="sequence" widget="handle"/>
+                                <field name="intervention_id" readonly="1"/>
+                                <field name="date_start"/>
+                                <field name="address_city"/>
+                                <field name="employee_ids"/>
+                                <field name="duration" widget="float_time"/>
+                                <field name="duration_one_way" widget="float_time" readonly="1"/>
+                                <field name="distance_one_way" readonly="1"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_button_validate" string="Validate" type="object" class="oe_highlight" />
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

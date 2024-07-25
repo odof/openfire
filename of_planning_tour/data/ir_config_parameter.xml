@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tour_available_slot_min_duration_hours" model="ir.config_parameter">
+        <field name="key">of.planning.tour.available_slot_min_duration_hours</field>
+        <field name="value">0.5</field>
+    </record>
+
+    <data noupdate="1">
+        <record id="of_planning_tour_manual_creation" model="ir.config_parameter">
+            <field name="key">of.planning.tour.group_of_planning_tour_manual_creation</field>
+            <field name="value">0</field>
+        </record>
+    </data>
+
+</odoo>

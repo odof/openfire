@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_tour_appointment_template_form_view" model="ir.ui.view">
+        <field name="name">of.tour.appointment.template.view.form</field>
+        <field name="model">of.tour.appointment.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <div id="header" style="display: flex;">
+                            <div id="title" style="width: 100%;">
+                                <h1>
+                                    <field name="name"/>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="employee_ids" widget="many2many_tags"/>
+                            <field name="task_id"/>
+                            <field name="template_id"/>
+                            <field name="search_type"/>
+                            <field name="search_mode"/>
+                        </group>
+                        <group>
+                            <field name="access_user_ids" widget="many2many_tags"/>
+                            <field name="default_user_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_tour_appointment_template_tree_view" model="ir.ui.view">
+        <field name="name">of.tour.appointment.template.view.tree</field>
+        <field name="model">of.tour.appointment.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="access_user_ids" widget="many2many_tags"/>
+                <field name="default_user_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_tour_appointment_template_action" model="ir.actions.act_window">
+        <field name="name">Slot search templates</field>
+        <field name="res_model">of.tour.appointment.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_planning_tour.of_tour_appointment_template_tree_view"/>
+    </record>
+
+</odoo>

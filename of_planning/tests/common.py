@@ -4,6 +4,9 @@ from odoo import Command
 
 from odoo.addons.of_sale.tests.common import TestOFSaleCommon
 
+BRUZ_JOLY_LAT_LNG = ("48.0243671", "-1.7475088")
+CESSON_VILAINE_LAT_LNG = ("48.1160448", "-1.6058050")
+
 
 class TestOFPlanningCommon(TestOFSaleCommon):
     @classmethod
@@ -68,6 +71,29 @@ class TestOFPlanningCommon(TestOFSaleCommon):
             }
         )
 
+        cls.partner_jean = cls.env['res.partner'].create(
+            {
+                'name': 'Jean',
+                'street': '25 Cr de la Vilaine',
+                'zip': '35510',
+                'city': 'Cesson-Sévigné',
+                'email': 'jean@test.fr',
+                'partner_latitude': CESSON_VILAINE_LAT_LNG[0],
+                'partner_longitude': CESSON_VILAINE_LAT_LNG[1],
+            }
+        )
+        cls.partner_bruce = cls.env['res.partner'].create(
+            {
+                'name': 'Bruce',
+                'street': '3 Pl. du Dr Joly',
+                'zip': '35710',
+                'city': 'Bruz',
+                'email': 'jean@test.fr',
+                'partner_latitude': BRUZ_JOLY_LAT_LNG[0],
+                'partner_longitude': BRUZ_JOLY_LAT_LNG[1],
+            }
+        )
+
         # Employees data
         cls.employee_tech_johnny = cls.env['hr.employee'].create(
             {
@@ -95,6 +121,8 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                     }
                 )
                 .id,
+                'of_start_address_id': cls.partner_bruce.id,
+                'of_return_address_id': cls.partner_bruce.id,
                 'of_task_ids': [Command.set([cls.task_sweeping.id, cls.task_installation.id])],
                 'of_is_operator': True,
             }
@@ -111,6 +139,8 @@ class TestOFPlanningCommon(TestOFSaleCommon):
                     }
                 )
                 .id,
+                'of_start_address_id': cls.partner_jean.id,
+                'of_return_address_id': cls.partner_jean.id,
                 'of_task_ids': [Command.set([cls.task_sweeping.id])],
                 'of_is_operator': True,
                 'of_all_tasks': False,

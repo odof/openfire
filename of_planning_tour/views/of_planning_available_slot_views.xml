@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_available_slot_view_form" model="ir.ui.view">
+        <field name="name">of.planning.available.slot.view.form</field>
+        <field name="model">of.planning.available.slot</field>
+        <field name="arch" type="xml">
+            <form string="Available Slots">
+                <header>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_button_toggle_active" class="oe_stat_button" type="object" icon="fa-archive">
+                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', True)]}">
+                                <span class="text-danger">Unarchive</span>
+                            </div>
+                            <div class="o_stat_info o_field_widget" attrs="{'invisible': [('active', '=', False)]}">
+                                <span class="text-success">Archive</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="weekday"/>
+                            <field name="day_period"/>
+                            <field name="date"/>
+                            <field name="time_slot"/>
+                            <field name="duration" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="tour_id"/>
+                            <field name="previous_tour_line_id"/>
+                            <field name="next_tour_line_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_available_slot_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.available.slot.view.tree</field>
+        <field name="model">of.planning.available.slot</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="day_period"/>
+                <field name="start"/>
+                <field name="stop"/>
+                <field name="duration" widget="float_time"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_planning_available_slot_view_kanban" model="ir.ui.view">
+        <field name="name">of.planning.available.slot.view.kanban</field>
+        <field name="model">of.planning.available.slot</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="employee_id">
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="weekday"/>
+                <field name="day_period"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong class="oe_partner_heading"><field name="weekday"/>&amp;nbsp;<field name="start"/></strong>
+                                <div>
+                                    <field name="employee_id"/>
+                                </div>
+                                <div class="o_kanban_footer">
+                                    <span class="oe_right">Duration: <field name="duration" widget="float_time"/> (hour)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_planning_available_slot_view_filter" model="ir.ui.view">
+        <field name="name">of.planning.available.slot.view.filter</field>
+        <field name="model">of.planning.available.slot</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="tour_id"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter string="Current Week" name="current_week"
+                        domain="[('date', '>=', (context_today() + relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')),
+                                ('date', '&lt;', (context_today() + relativedelta(days=1,weekday=0)).strftime('%Y-%m-%d'))]"/>
+                <filter name="current_month" string="Current Month"
+                        domain="[('date', '&gt;=', (context_today()).strftime('%Y-%m-01')),
+                                ('date', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <separator/>
+                <filter string="Morning" name="morning" domain="[('day_period', '=', 'morning')]"/>
+                <filter string="Afternoon" name="afternoon" domain="[('day_period', '=', 'afternoon')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_planning_available_slot" model="ir.actions.act_window">
+        <field name="name">Planning Available Slots</field>
+        <field name="res_model">of.planning.available.slot</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="search_view_id" ref="of_planning_tour.of_planning_available_slot_view_filter"/>
+    </record>
+
+</odoo>

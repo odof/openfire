@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <t t-inherit="of_map_view.PopupMap" t-inherit-mode="extension" owl="1">
+    <t t-inherit="of_web_widgets.PopupMap" t-inherit-mode="extension" owl="1">
         <xpath expr="//div[@id='popup-content']" position="inside">
             <t t-if="model == 'res.partner'">
                 <t t-if="props.record.name">

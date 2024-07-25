@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_tour_appointment_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.appointment.wizard.view.form</field>
+        <field name="model">of.tour.appointment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Plan an Intervention" style="padding-top: 0px !important;" create="false">
+                <field name="request_id" invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="selected_line_id" invisible="1"/>
+                <field name="name" invisible="1"/>
+                <field name="employee_id" domain="[('id', 'in', context.get('employee_domain',[]))]" invisible="1"/>
+                <field name="selected_datetime" invisible="1"/>
+                <field name="next_date" invisible="1"/>
+                <field name="description" nolabel="1" invisible="1"/>
+                <field name="geo_lat" invisible="1"/>
+                <field name="geo_lng" invisible="1"/>
+                <field name="map_line_id" invisible="1"/>
+                <field name="map_tour_id" invisible="1"/>
+                <field name="source_model" invisible="1"/>
+                <field name="additional_records" invisible="1"/>
+                <field name="additional_record_geometry_data" invisible="1"/>
+                <field name="start_address_id" invisible="1"/>
+                <field name="return_address_id" invisible="1"/>
+                <field name="map_latitude" invisible="1"/>
+                <field name="map_longitude" invisible="1"/>
+                <div class="row">
+                    <div class="col-4 border-end">
+                        <div class="grid-item-map-appointment" style="width: 100%">
+                            <field name="map_tour_line_ids" class="mt-3" mode="tree" widget="of_planning_tour_map_x2many_plan_dialog"
+                                options="{'map_rows' : 16}" context="{'of_from_tour':1, 'additional_records': additional_records, 'of_active_tour_id': map_tour_id}">
+                                <tree>
+                                    <field name="geo_lat"/>
+                                    <field name="geo_lng"/>
+                                    <field name="partner_name"/>
+                                    <field name="partner_name"/>
+                                    <field name="task_name"/>
+                                    <field name="address_zip"/>
+                                    <field name="address_city"/>
+                                    <field name="partner_mobile"/>
+                                    <field name="partner_phone"/>
+                                    <field name="date_start"/>
+                                    <field name="tour_number"/>
+                                    <field name="hexa_color"/>
+                                    <field name="geometry_data"/>
+                                    <field name="endpoint_geometry_data"/>
+                                    <field name="is_first_line_of_tour"/>
+                                    <field name="is_last_line_of_tour"/>
+                                    <field name="map_latitude"/>
+                                    <field name="map_longitude"/>
+                                </tree>
+                            </field>
+                        </div>
+                        <group name="intervention" string="Intervention">
+                            <label for="partner_id"/>
+                            <div class="o_address_format">
+                                <field name="partner_id" />
+                                <div attrs="{'invisible': [('partner_mobile','=',False)]}">
+                                    <i class="fa fa-phone pe-1" title="Phone"/><field name="partner_mobile" class="oe_inline"/>
+                                </div>
+                                <div attrs="{'invisible': [('partner_phone','=',False)]}">
+                                    <i class="fa fa-phone pe-1" title="Phone"/><field name="partner_phone" class="oe_inline"/>
+                                </div>
+                                <div attrs="{'invisible': [('partner_email','=',False)]}">
+                                    <i class="fa fa-envelope pe-1" title="Mail" /><field name="partner_email" widget="email" class="oe_inline"/>
+                                </div>
+                            </div>
+                            <label for="partner_address_id" />
+                            <div class="o_address_format">
+                                <field name="partner_address_id" />
+                                <field name="partner_address_street" attrs="{'invisible': [('partner_address_street','=',False)]}" />
+                                <field name="partner_address_street2" attrs="{'invisible': [('partner_address_street2','=',False)]}" />
+                                <group>
+                                    <field name="partner_address_zip" nolabel="1" />
+                                    <field name="partner_address_city" nolabel="1" />
+                                </group>
+                            </div>
+                            <field name="search_template_id" options="{'no_create': True, 'no_open':True}" invisible="1"/>
+                            <field name="search_type" invisible="1"/>
+                            <field name="search_mode" invisible="1"/>
+                            <field name="template_id"/>
+                            <field name="task_id" invisible="0"/>
+                            <field name="duration" widget="float_time"/>
+                        </group>
+                        <group name="search_criteria" string="Search Criterias">
+                            <field name="start_date_search"/>
+                            <field name="stop_date_search" invisible="1"/>
+                            <field name="search_period_in_days" invisible="1"/>
+                            <field name="day_period"/>
+                            <field name="day_ids" widget="many2many_tags"/>
+                            <field name="pre_employee_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <button name="action_button_search" string="Search" type="object" class="btn btn-primary"/>
+                        </group>
+                    </div>
+                    <div class="col-8">
+                        <group>
+                            <group string="By duration" attrs="{'invisible': [('search_type', '!=', 'duration')]}">
+                                <field name="by_duration_line_ids" mode="kanban" colspan="2" nolabel="1" class="mt-2"/>
+                            </group>
+                            <group string="By distance" attrs="{'invisible': [('search_type', '!=', 'distance')]}">
+                                <field name="by_distance_line_ids" mode="kanban" colspan="2" nolabel="1" class="mt-2"/>
+                            </group>
+                            <group  string="By date">
+                                <field name="by_date_line_ids" mode="kanban" colspan="2" nolabel="1" class="mt-2"/>
+                            </group>
+                        </group>
+                    </div>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_tour_appointment_line_wizard_view_tree" model="ir.ui.view">
+        <field name="name">of.tour.appointment.line.wizard.view.tree</field>
+        <field name="model">of.tour.appointment.line.wizard</field>
+        <field name="arch" type="xml">
+            <tree limit="5" create="false" delete="false" decoration-success="best==True" decoration-info="best == False and selected==True">
+                <field name="weekday"/>
+                <field name="date"/>
+                <field name="time_slot"/>
+                <field name="employee_id"/>
+                <field name="useful_distance"/>
+                <field name="useful_duration"/>
+                <button name="action_button_view_tour" type="object" class="btn btn-link" string="Display" help="Show Tour of the day for this employee on the map"/>
+                <field name="best" invisible="1"/>
+                <field name="selected" invisible="1"/>
+                <field name="search_mode" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_tour_appointment_line_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.tour.appointment.line.wizard.view.form</field>
+        <field name="model">of.tour.appointment.line.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Slot">
+                <field name="selected" invisible="1"/>
+                <group>
+                    <group>
+                        <field name="date"/>
+                        <field name="time_slot"/>
+                        <field name="employee_id"/>
+                        <field name="template_id"/>
+                    </group>
+                    <group>
+                        <field name="useful_distance"/>
+                        <field name="useful_duration"/>
+                        <field name="previous_duration"/>
+                        <field name="next_duration"/>
+                    </group>
+                    <label for="description" colspan="2"/>
+                    <field name="description" nolabel="1" colspan="2"/>
+                </group>
+                <footer>
+                    <button name="action_button_confirm_slot" string="Confirm this slot" type="object" colspan="4" class="btn-primary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_tour_appointment_line_wizard_view_kanban" model="ir.ui.view">
+        <field name="name">of.tour.appointment.line.wizard.view.kanban</field>
+        <field name="model">of.tour.appointment.line.wizard</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_appointmment_wizard" limit="5" archivable="false" js_class="kanban" sample="1">
+                <field name="selected"/>
+                <field name="weekday"/>
+                <field name="date"/>
+                <field name="date_str"/>
+                <field name="time_slot"/>
+                <field name="employee_id"/>
+                <field name="previous_duration"/>
+                <field name="previous_duration_str"/>
+                <field name="previous_distance"/>
+                <field name="next_duration"/>
+                <field name="next_duration_str"/>
+                <field name="next_distance"/>
+                <field name="useful_distance"/>
+                <field name="useful_duration"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_content oe_kanban_global_click">
+                            <div>
+                                <strong class="w-50 d-inline-block"><span><field name="date_str"/></span></strong>
+                                <span class="w-50 text-end d-inline-block"><field name="time_slot"/></span>
+                            </div>
+                            <div>
+                                <span class="w-50 d-inline-block">Going: <t t-esc="record.previous_duration_str.value"/> (<t t-esc="record.previous_distance.raw_value"/> km)</span>
+                                <span class="w-50 text-end d-inline-block">Return: <t t-esc="record.next_duration_str.value"/> (<t t-esc="record.next_distance.raw_value"/> km)</span>
+                            </div>
+                            <div>
+                                <field name="employee_id" class="o_tag_color_0 badge rounded-pill o_tag d-inline-flex align-items-center mw-100 mt-2" style="font-size: inherit;"/>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <button name="action_button_confirm_slot" string="Confirm this slot" type="object" class="btn-sm btn-primary w-75 mt-2 me-2"/>
+                                <button name="action_button_view_tour" type="object" class="btn-sm btn-primary w-25 mt-2" attrs="{'invisible': [('selected', '=', False)]}"><span>Display <i class="fa fa-map-marker" aria-hidden="true" title="Marker"/></span></button>
+                                <button name="action_button_view_tour" type="object" class="btn-sm btn-outline-primary w-25 mt-2" attrs="{'invisible': [('selected', '=', True)]}"><span>Display <i class="fa fa-map-marker" aria-hidden="true" title="Marker"/></span></button>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Ajout bouton planifier une intervention dans vue form partenaire -->
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.res.partner.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_base_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_open_tour_appointment_wizard" string="Plan Intervention" type="object"
+                        groups="of_planning.group_planning_intervention_read_own_write_own"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout bouton planifier une intervention dans vue form demande d'intervention -->
+    <record id="of_service_request_view_form_add_button" model="ir.ui.view">
+        <field name="name">of.planning.tour.service.request.view.form</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_open_tour_appointment_wizard" string="Plan Intervention"
+                        type="object" attrs="{'invisible': [('base_state', '!=', 'calculated')]}"
+                        groups="of_planning.group_planning_intervention_read_own_write_own"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout bouton planifier une intervention dans vue form intervention -->
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header//button[@name='action_button_postponed']" position="after">
+                <button name="action_button_open_tour_appointment_wizard" string="Plan Intervention"
+                        type="object" attrs="{'invisible': [('of_state', '!=', 'postponed')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

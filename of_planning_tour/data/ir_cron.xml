@@ -1,20 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
 
-    <!-- of.planning.tournee cron -->
-    <record id="ir_cron_generate_tour_planning" forcecreate="True" model="ir.cron">
-        <field name="name">Generate tours planning</field>
-        <field name="user_id" ref="base.user_root"/>
-        <field name="doall" eval="False"/>
-        <field name="active" eval="True"/>
-        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 06:00:00')" />
+    <record id="cron_planning_generate_employees_tours" model="ir.cron">
+        <field name="name">Tours: Generate tours for employees for next period</field>
+        <field name="active" eval="True" />
+        <field name="model_id" ref="of_planning_tour.model_of_planning_tour" />
+        <field name="state">code</field>
+        <field name="code">model.cron_generate_employees_tours()</field>
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 06:00:00')"/>
         <field name="numbercall">-1</field>
-        <field name="model" ref="of_planning_tournee.model_of_planning_tournee"/>
-        <field eval="'of.planning.tournee'" name="model" />
-        <field eval="'cron_generate_tour'" name="function" />
-        <field eval="'({})'" name="args" />
+        <field name="user_id" ref="base.user_root" />
+    </record>
+
+    <record id="cron_planning_archive_past_available_slots" model="ir.cron">
+        <field name="name">Available Slots: Archive past slots</field>
+        <field name="active" eval="True" />
+        <field name="model_id" ref="of_planning_tour.model_of_planning_available_slot" />
+        <field name="state">code</field>
+        <field name="code">model.cron_archive_past_available_slots()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 06:00:00')"/>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root" />
+    </record>
+
+    <record id="cron_planning_clean_archived_available_slots" model="ir.cron">
+        <field name="name">Available Slots: Clean archived slots</field>
+        <field name="active" eval="True" />
+        <field name="model_id" ref="of_planning_tour.model_of_planning_available_slot" />
+        <field name="state">code</field>
+        <field name="code">model.cron_clean_archived_available_slots()</field>
+        <field name="interval_number">14</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 06:00:00')"/>
+        <field name="numbercall">-1</field>
+        <field name="user_id" ref="base.user_root" />
     </record>
 
 </odoo>

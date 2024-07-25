@@ -53,7 +53,7 @@ class OFPlanningTask(models.Model):
             ['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]
         )
         for task in self:
-            task.employee_ids = employees.filtered(lambda i: i.of_all_tasks or task.id in i.of_all_tasks.ids)
+            task.employee_ids = employees.filtered(lambda i: i.of_all_tasks or task.id in i.of_task_ids.ids)
 
     def _search_employee_ids(self, operator, value):
         """/!\\ Only 'in' et 'not in' case are treated"""

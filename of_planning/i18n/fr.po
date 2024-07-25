@@ -1153,6 +1153,11 @@ msgstr "Confirmé"
 msgid "Conflict Warning"
 msgstr "Avertissement de conflit"
 
+#. module: of_planning_view
+#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_has_geolocalize_warning
+msgid "Geolocalize Warning"
+msgstr "Avertissement de géolocalisation"
+
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_res_partner
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
@@ -1733,6 +1738,13 @@ msgstr "HISTORIQUE"
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_show_update_fpos
 msgid "Has Fiscal Position Changed"
 msgstr "La position fiscale a-t-elle changé"
+
+#. module: of_planning_view
+#: model:ir.model.fields,help:of_planning_view.field_calendar_event__of_has_geolocalize_warning
+msgid "Helper field, to display warning if geolocalize is not set"
+msgstr ""
+"Champ d'aide, pour afficher un avertissement si la géolocalisation n'est pas"
+" définie"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__of_has_conflict_warning

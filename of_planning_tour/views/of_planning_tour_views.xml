@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tour_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.view.form</field>
+        <field name="model">of.planning.tour</field>
+        <field name="arch" type="xml">
+            <form string="Tours" create="false" delete="false">
+                <field name="need_optimization_update" invisible="1"/>
+                <field name="ignore_alert_optimization_update" invisible="1"/>
+                <field name="additional_records" invisible="1"/>
+                <field name="is_full" invisible="1"/>
+                <field name="hide_action_buttons" invisible="1"/>
+                <header>
+                    <button string="Confirm" name="action_button_confirm_tour" type="object" class="oe_highlight" groups="of_planning.group_planning_intervention_responsible,of_planning.group_planning_intervention_manager"/>
+                    <button string="Set back to draft" name="action_button_set_back_draft" type="object" groups="of_planning.group_planning_intervention_responsible,of_planning.group_planning_intervention_manager"
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', True), ('state', '=', '1-draft')]}"/>
+                    <button string="Set back to full" name="action_button_set_back_full" type="object" groups="of_planning.group_planning_intervention_responsible,of_planning.group_planning_intervention_manager"
+                        class="oe_highlight" attrs="{'invisible': ['|', ('is_full', '=', False), '&amp;', ('is_full', '=', True), ('state', '!=', '3-confirmed')]}"/>
+                    <button string="Optimize" name="action_button_optimize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
+                        groups="of_planning.group_planning_intervention_responsible,of_planning.group_planning_intervention_manager"/>
+                    <button string="Reorganize" name="action_reorganize_tour" type="object" class="oe_highlight" attrs="{'invisible': [('hide_action_buttons', '=', True)]}"
+                        groups="of_planning.group_planning_intervention_responsible,of_planning.group_planning_intervention_manager"/>
+                    <field name="state" widget="statusbar" nolabel="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_button_view_interventions" type="object" class="oe_stat_button" icon="fa-calendar">
+                            <field string="# Interventions" name="intervention_count" widget="statinfo"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <div name="geodata_alert" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}">
+                        <p class="alert alert-warning" role="alertdialog">
+                            The Geodata of an intervention have changed since the last optimization. You should consider re-optimize the tour. <button name="action_button_ignore_alert_optimization_update" string="(Ignore that message)" type="object" class="oe_link"/>
+                        </p>
+                    </div>
+                    <group col="6">
+                        <group colspan="2" col="2">
+                            <field name="weekday"/>
+                            <field name="date" readonly="1"/>
+                            <field name="employee_id" readonly="1" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
+                            <field name="employee_other_ids" widget="many2many_tags" options="{'no_create_edit': True, 'not_delete':True, 'no_create': True}"/>
+                        </group>
+                        <group colspan="2" col="2">
+                            <field name="sector_ids" widget="many2many_tags"/>
+                            <field name="start_address_id" required="1"/>
+                            <field name="return_address_id" required="1"/>
+                            <field name="total_distance"/>
+                            <field name="total_duration" widget="float_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="tour_lines" string="Interventions">
+                            <field name="tour_line_ids" mode="tree" nolabel="1" readonly="1" context="{'of_from_tour': 1, 'of_active_tour_id': active_id}">
+                                <tree string="Tour lines">
+                                    <field name="intervention_id"/>
+                                    <field name="date_start"/>
+                                    <field name="date_stop" optional="hide"/>
+                                    <field name="address_city"/>
+                                    <field name="is_flexible" optional="hide"/>
+                                    <field name="employee_ids" optional="hide" widget="many2many_tags" />
+                                    <field name="duration" widget="float_time"/>
+                                    <field name="duration_one_way" widget="float_time"/>
+                                    <field name="distance_one_way"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="tour_lines_map" string="Route">
+                            <field name="map_latitude" invisible="1"/>
+                            <field name="map_longitude" invisible="1"/>
+                            <div style="width: 100%">
+                                <field name="map_tour_line_ids" widget="of_planning_tour_map_x2many" nolabel="1"
+                                    options="{'map_rows' : 30}"
+                                    context="{'of_from_tour':1, 'of_active_tour_id': active_id, 'additional_records': additional_records}">
+                                    <tree>
+                                        <!-- Those fields are used for the map, they are prefetched in records used in the map widget -->
+                                        <field name="geo_lat" invisible="1"/>
+                                        <field name="geo_lng" invisible="1"/>
+                                        <field name="partner_name" invisible="1"/>
+                                        <field name="partner_name" invisible="1"/>
+                                        <field name="task_name" invisible="1"/>
+                                        <field name="address_zip" invisible="1"/>
+                                        <field name="address_city" invisible="1"/>
+                                        <field name="partner_mobile" invisible="1"/>
+                                        <field name="partner_phone" invisible="1"/>
+                                        <field name="intervention_id" invisible="1"/>
+                                        <field name="date_start" invisible="1"/>
+                                        <field name="tour_number" invisible="1"/>
+                                        <field name="hexa_color" invisible="1"/>
+                                        <field name="geometry_data" invisible="1"/>
+                                        <field name="endpoint_geometry_data" invisible="1"/>
+                                        <field name="is_first_line_of_tour" invisible="1"/>
+                                        <field name="is_last_line_of_tour" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </div>
+                        </page>
+                        <page name="available_slots" string="Available Slots" groups="of_base.of_group_root_only">
+                            <field name="available_slot_ids" mode="tree" nolabel="1" readonly="1" context="{'of_from_tour':1}">
+                                <tree string="Available Slots">
+                                    <field name="date" optional="hide"/>
+                                    <field name="time_slot"/>
+                                    <field name="start" optional="hide"/>
+                                    <field name="stop" optional="hide"/>
+                                    <field name="employee_id" optional="hide" />
+                                    <field name="duration" widget="float_time"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="technical" string="Technical" groups="of_base.of_group_root_only">
+                            <group col="2">
+                                <group name="update_map" string="Map &amp; OSRM data">
+                                    <button string="Update map routes" name="action_button_update_map_and_reload" type="object" class="oe_highlight" colspan="2"/>
+                                </group>
+                                <group name="tour_restore" string="Tour data" attrs="{'invisible': [('last_modification_date', '=', False)]}">
+                                    <group>
+                                        <p class="oe_grey" style="display: inline-block; margin: 0px 0px 0px 8px;">
+                                            Allow to restore the tour as it was before the last optimization/reorganization. <br/>
+                                            Last modification date <field name="last_modification_date" nolabel="1"/>
+                                        </p>
+                                        <button string="Restore tour" name="action_button_restore_tour" type="object" class="oe_highlight" attrs="{'invisible': [('last_modification_date', '=', False)]}"/>
+                                    </group>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_view_form_manual_creation" model="ir.ui.view">
+        <field name="name">of.planning.tour.form.manual.creation</field>
+        <field name="model">of.planning.tour</field>
+        <field name="inherit_id" ref="of_planning_tour.of_planning_tour_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="create">true</attribute>
+                <attribute name="delete">true</attribute>
+            </xpath>
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+                <attribute name="attrs">{'readonly': [('id', '!=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="attributes">
+                <attribute name="readonly">0</attribute>
+                <attribute name="attrs">{'readonly': [('id', '!=', False)]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_view_tree" model="ir.ui.view">
+        <field name="name">of.planning.tour.tree</field>
+        <field name="model">of.planning.tour</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="state=='full' or is_full==True" decoration-warning="need_optimization_update" decoration-success="is_optimized" decoration-muted="state=='3-confirmed'" create="false" edit="false">
+                <button icon="fa-exclamation-triangle" name="action_button_dummy" title="Need optimization update" attrs="{'invisible': ['|', ('need_optimization_update', '=', False), ('ignore_alert_optimization_update', '=', True)]}" />
+                <button icon="fa-check" name="action_button_dummy" title="Optimized" attrs="{'invisible': [('is_optimized', '=', False)]}"/>
+                <field name="weekday"/>
+                <field name="date"/>
+                <field name="employee_id"/>
+                <field name="sector_ids" widget="many2many_tags"/>
+                <field name="start_address_id"/>
+                <field name="return_address_id"/>
+                <field name="state"/>
+                <field name="is_full" invisible="1"/>
+                <field name="is_optimized" invisible="1"/>
+                <field name="need_optimization_update" invisible="1"/>
+                <field name="ignore_alert_optimization_update" invisible="1"/>
+                <field name="intervention_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_view_tree_manual_creation" model="ir.ui.view">
+        <field name="name">of.planning.tour.tree.manual.creation</field>
+        <field name="model">of.planning.tour</field>
+        <field name="inherit_id" ref="of_planning_tour.of_planning_tour_view_tree"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">true</attribute>
+                <attribute name="delete">true</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_view_kanban" model="ir.ui.view">
+        <field name="name">of.planning.tour.view.kanban</field>
+        <field name="model">of.planning.tour</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state">
+                <field name="employee_id"/>
+                <field name="date"/>
+                <field name="sector_kanban_names"/>
+                <field name="weekday"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <strong class="oe_partner_heading"><field name="weekday"/>&amp;nbsp;<field name="date"/></strong>
+                                <div>
+                                    <field name="employee_id"/>
+                                </div>
+                                <div class="o_kanban_footer">
+                                    <field name="sector_kanban_names" class="oe_right"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_view_filter" model="ir.ui.view">
+        <field name="name">of.planning.tour.filter</field>
+        <field name="model">of.planning.tour</field>
+        <field name="arch" type="xml">
+            <search string="Search">
+                <field name="date"/>
+                <field name="date_min" filter_domain="[('date', '&gt;=', self)]"/>
+                <field name="date_max" filter_domain="[('date', '&lt;=', self)]"/>
+                <field name="employee_id"/>
+                <field name="sector_ids" filter_domain="[('sector_ids.name', 'ilike', self)]"/>
+                <separator/>
+                <filter name="not_full" string="Not full" domain="[('is_full', '=', False)]"/>
+                <filter name="optimized" string="Optimized" domain="[('is_optimized', '=', True)]"/>
+                <filter name="not_empty" string="Not empty" domain="[('intervention_count', '>', 0)]"/>
+                <!-- "ignore_alert_optimization_update" not in domain to be able to see the tours that need to be optimized even if the user ignored alert  -->
+                <filter name="need_optimization_update" string="Need optimization update" domain="[('need_optimization_update', '=', True)]"/>
+                <separator/>
+                <filter string="Current Week" name="current_week"
+                        domain="[('date', '&gt;=', (context_today() - relativedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                ('date', '&lt;', (context_today() + relativedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                <filter name="current_month" string="Current Month"
+                        domain="[('date', '&gt;=', (context_today()).strftime('%Y-%m-01')),
+                                ('date', '&lt;', (context_today() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <group string="Group by..." name="group_by">
+                    <filter name="group_by_sector" string="Sector" icon="terp-partner" context="{'group_by' : 'gb_sector_id'}"/>
+                    <filter name="group_by_employee" string="Employee" icon="terp-partner" context="{'group_by' : 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_planning_tour_line_form_view" model="ir.ui.view">
+        <field name="name">of.planning.tour.line.form.view</field>
+        <field name="model">of.planning.tour.line</field>
+        <field name="arch" type="xml">
+            <form string="Tour line">
+                <group>
+                    <field name="sequence"/>
+                    <field name="intervention_id"/>
+                    <field name="date_start"/>
+                    <field name="task_name"/>
+                    <field name="duration" widget="float_time"/>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                    <field name="partner_name"/>
+                    <field name="address_zip"/>
+                    <field name="address_city"/>
+                    <field name="partner_mobile"/>
+                    <field name="partner_phone"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_planning_tour_manual_create" model="ir.actions.act_window">
+        <field name="name">Planning Tours</field>
+        <field name="res_model">of.planning.tour</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_planning_tour.of_planning_tour_view_filter"/>
+        <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_manual_creation')])]"/>
+    </record>
+    <record id="sale_order_action_view_quotation_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_tree_manual_creation"/>
+        <field name="act_window_id" ref="action_of_planning_tour_manual_create"/>
+    </record>
+    <record id="sale_order_action_view_quotation_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_form_manual_creation"/>
+        <field name="act_window_id" ref="action_of_planning_tour_manual_create"/>
+    </record>
+
+
+    <record id="action_of_planning_tour_no_manual_create" model="ir.actions.act_window">
+        <field name="name">Planning Tours</field>
+        <field name="res_model">of.planning.tour</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_planning_tour.of_planning_tour_view_filter"/>
+        <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_no_manual_creation')])]"/>
+    </record>
+    <record id="sale_order_action_view_quotation_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_tree"/>
+        <field name="act_window_id" ref="action_of_planning_tour_no_manual_create"/>
+    </record>
+    <record id="sale_order_action_view_quotation_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_form"/>
+        <field name="act_window_id" ref="action_of_planning_tour_no_manual_create"/>
+    </record>
+
+</odoo>

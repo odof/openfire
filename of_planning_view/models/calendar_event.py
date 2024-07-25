@@ -40,11 +40,6 @@ class CalendarEvent(models.Model):
         store=True,
         help="Helper field, to display Allocated Time in the popover",
     )
-    of_has_geolocalize_warning = fields.Boolean(
-        string="Geolocalize Warning",
-        compute='_compute_of_has_geolocalize_warning',
-        help="Helper field, to display warning if geolocalize is not set",
-    )
 
     # Time allocation
     of_allocated_hours = fields.Float(
@@ -79,13 +74,6 @@ class CalendarEvent(models.Model):
     def _compute_popover_of_allocated_time(self):
         for event in self:
             event.of_allocated_time = str(timedelta(hours=event.duration))[:-3].zfill(5)
-
-    def _compute_of_has_geolocalize_warning(self):
-        for event in self:
-            if partner := event.of_address_id:
-                event.of_has_geolocalize_warning = partner.partner_latitude == 0 or partner.partner_longitude == 0
-            else:
-                event.of_has_geolocalize_warning = False
 
     @api.depends(
         'start',

@@ -319,6 +319,8 @@ class CalendarEvent(models.Model):
     # ===== Duration & time fields =====
     start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0))
     stop = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1))
+    start_time_local_str = fields.Char(string="Start time", compute='_compute_local_times_str')
+    end_time_local_str = fields.Char(string="End time", compute='_compute_local_times_str')
     of_real_start = fields.Datetime(
         string="Real start",
         copy=False,
@@ -394,6 +396,11 @@ class CalendarEvent(models.Model):
         compute='_compute_of_has_conflict_warning',
         help="Helper field, to display warning if there is a conflict",
         store=True,
+    )
+    of_has_geolocalize_warning = fields.Boolean(
+        string="Geolocalize Warning",
+        compute='_compute_of_has_geolocalize_warning',
+        help="Helper field, to display warning if geolocalize is not set",
     )
 
     # Searching
@@ -785,8 +792,27 @@ class CalendarEvent(models.Model):
             else:
                 event.of_has_conflict_warning = False
 
+    def _compute_of_has_geolocalize_warning(self):
+        for event in self:
+            if partner := event.of_address_id:
+                event.of_has_geolocalize_warning = partner.partner_latitude == 0 or partner.partner_longitude == 0
+            else:
+                event.of_has_geolocalize_warning = False
+
     def _search_of_gb_employee_id(self, operator, value):
         return [('of_employee_ids', operator, value)]
+
+    def _compute_local_times_str(self):
+        """
+        Compute start time and end time in local time as a string.
+        """
+        for event in self:
+            start_local_dt = fields.Datetime.context_timestamp(event, event.start)
+            start_local_str = fields.Datetime.to_string(start_local_dt)
+            event.start_time_local_str = start_local_str[10:16]
+            end_local_dt = fields.Datetime.context_timestamp(event, event.stop)
+            end_local_str = fields.Datetime.to_string(end_local_dt)
+            event.end_time_local_str = end_local_str[10:16]
 
     # --------------------------------------------------------------------------
     # Onchange methods

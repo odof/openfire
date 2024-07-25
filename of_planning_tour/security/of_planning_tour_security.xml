@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_of_planning_tour_manual_creation" model="res.groups">
+        <field name="name">(OF) Manual tour creation allowed</field>
+        <field name="comment">This group allows the user to manually create tours. A User in this group shouldn't be in the group "(OF) Unauthorized manual tour creation".</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <record id="group_of_planning_tour_no_manual_creation" model="res.groups">
+        <field name="name">(OF) Unauthorized manual tour creation</field>
+        <field name="comment">This group doesn't allow the user to manually create tours. A User in this group shouldn't be in the group "(OF) Manual tour creation allowed".</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

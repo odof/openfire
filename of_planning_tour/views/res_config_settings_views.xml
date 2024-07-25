@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.res.config.settings.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="of_planning.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='of_intervention_use_deliveries']" position="after">
+
+
+                <!-- Intervention planning -->
+                <h2>Intervention planning</h2>
+                <div class="row mt16 o_settings_container" id="nbr_days_tour_creation">
+                    <div class="col-12 col-lg-6 o_setting_box" id="search_mode">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="search_mode"/>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="search_mode"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="search_type">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="search_type"/>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="search_type"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="planning_default_intervention_template_id">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="planning_default_intervention_template_id"/>
+                            <div class="text-muted">
+                                Default intervention template to use when creating an appointment.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="planning_default_intervention_template_id"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tours -->
+                <h2>Tours</h2>
+                <div class="row mt16 o_settings_container" id="nbr_days_tour_creation">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="nbr_days_tour_creation"/>
+                            <div class="text-muted">
+                                Defines the number of days on which to create the routes for each employee whose work hours are defined. Maximum: 180 days.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="nbr_days_tour_creation"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_employee_ids">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="tour_employee_ids"/>
+                            <div class="text-muted">
+                                If specified, only the selected employees will be taken into account when creating tours by the scheduled action.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="tour_employee_ids_str" invisible="1"/>
+                                    <field name="tour_employee_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="group_of_planning_tour_manual_creation">
+                        <div class="o_setting_left_pane">
+                            <field name="of_planning_tour_manual_creation"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_planning_tour_manual_creation"/>
+                            <div class="text-muted">
+                            Allows the creation of tours manually by the user.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_day_ids">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="tour_day_ids"/>
+                            <div class="text-muted">
+                                If specified, only the selected days will be taken into account when creating tours by the scheduled action.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="tour_day_ids_str" invisible="1"/>
+                                    <field name="tour_day_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

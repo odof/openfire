@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="of_planning_tour.tooltipMarker" owl="1">
+        <div class="m-1">
+            <div><i class="fa fa-flag pe-1"/><strong t-if="record.tour_number" t-esc="record.tour_number"/></div>
+            <div t-if="record.partner_name">
+                <i class="fa fa-user pe-1"/><span t-esc="record.partner_name"/><br/>
+            </div>
+            <div t-if="record.of_address_zip or record.of_address_city"><i class="fa fa-map-marker pe-1"/><span t-if="record.of_address_zip" t-esc="record.of_address_zip"/> <span t-if="record.of_address_city" t-esc="record.of_address_city"/></div>
+            <div t-if="record.partner_phone">
+                <i class="fa fa-phone pe-1"/><span t-esc="record.partner_phone"/><br/>
+            </div>
+            <div t-if="record.partner_mobile">
+                <i class="fa fa-phone pe-1"/><span t-esc="record.partner_mobile"/><br/>
+            </div>
+            <div t-if="record.task_name"><i class="fa fa-cog pe-1"/><span t-esc="record.task_name"/></div>
+            <div t-if="record.date_start or (record.is_service_request and record.date)">
+                <i class="fa fa-truck pe-1"/>
+                <t t-if="record.is_service_request">
+                    <span t-esc="record.date"/>
+                </t>
+                <t t-if="record.date_start">
+                    <t t-if="record.date_start.c.day &lt; 10">0</t><span t-esc="record.date_start.c.day"/>/<t t-if="record.date_start.c.month &lt; 10">0</t><span t-esc="record.date_start.c.month"/>/<span t-esc="record.date_start.c.year" class="pe-1"/>
+                    <t t-if="record.date_start.c.hour &lt; 10">0</t><span t-esc="record.date_start.c.hour"/>:<t t-if="record.date_start.c.minute &lt; 10">0</t><span t-esc="record.date_start.c.minute"/>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>

@@ -1197,9 +1197,11 @@ class OFServiceRequest(models.Model):
         """
         self.ensure_one()
 
-        last_next_date = self.last_next_date or False
-        end_date = self.end_date or self.next_date + relativedelta(days=13)
-        return self._compute_state_punctual_from_date(date_eval, end_date, last_next_date)
+        if self.next_date:
+            last_next_date = self.last_next_date or False
+            end_date = self.end_date or self.next_date + relativedelta(days=13)
+            return self._compute_state_punctual_from_date(date_eval, end_date, last_next_date)
+        return 'null'
 
     def _get_action_view_intervention_context(self, action_context=None):
         """Returns the context to open the intervention view from the service request.

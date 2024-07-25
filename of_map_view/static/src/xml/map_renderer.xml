@@ -4,7 +4,7 @@
     <t t-name="of_map_view.MapRenderer" owl="1">
         <div class="map-renderer row g-0" t-ref="root">
             <div class="col-md-12 col-lg-10 map-renderer--container" t-ref="mapContainer"/>
-            <ListPopupMap map="this" archInfo="props.archInfo" t-if="hasSelectors"/>
+            <ListPopupMap map="this" archInfo="props.archInfo" records="props.map.model.root.records" t-if="hasSelectors"/>
         </div>
     </t>
 
