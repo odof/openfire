@@ -26,6 +26,7 @@
                     form_view_id="%(calendar.view_calendar_event_form)d"
                     date_start="start"
                     date_stop="stop"
+                    duration="duration"
                     default_group_by="of_resource_id"
                     default_scale="day"
                     color="of_planning_color"

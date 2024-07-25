@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Planning d'intervention",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -14,7 +14,7 @@
         'base_geolocalize',
     ],
     'data': [
-        'views/of_planning_intervention_views.xml',
+        'views/calendar_event_views.xml',
         'views/of_planning_intervention_template_views.xml',
         'views/menuitems.xml',
     ],

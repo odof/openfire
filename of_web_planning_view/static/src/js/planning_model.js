@@ -132,7 +132,6 @@ export class PlanningModel extends Model {
 
         this.hideUnassignedRecords = true; // Hide unassigned records by default
         let displayUnassignedRecords = false;
-        console.log(domain);
         for (const node of domain) {
             if (
                 node.length === 3 &&
@@ -141,7 +140,6 @@ export class PlanningModel extends Model {
                 node[2] !== false &&
                 ["of_resource_id"].includes(node[0])
             ) {
-                console.log("displayUnassignedRecords = true");
                 displayUnassignedRecords = true;
             }
         }
@@ -272,12 +270,15 @@ export class PlanningModel extends Model {
      * @param {DateTime} [params.stop]
      * @returns {Record<string, any>}
      */
-    getSchedule({ rowId, start, stop } = {}) {
-        const { dateStartField, dateStopField, fields, groupedBy } = this.metaData;
+    getSchedule({ rowId, start, stop, duration } = {}) {
+        const { dateStartField, dateStopField, durationField, fields, groupedBy } = this.metaData;
 
         /** @type {Record<string, any>} */
         const schedule = {};
 
+        if (duration) {
+            schedule[durationField] = duration;
+        }
         if (start) {
             schedule[dateStartField] = serializeDateTime(start);
         }
@@ -438,6 +439,7 @@ export class PlanningModel extends Model {
         const allowedFields = [
             this.metaData.dateStartField,
             this.metaData.dateStopField,
+            this.metaData.durationField,
             ...this.metaData.groupedBy,
         ];
         return pick(schedule, ...allowedFields);
@@ -552,7 +554,6 @@ export class PlanningModel extends Model {
         ) {
             this.hideUnassignedRecords = false;
         }
-        console.log("_fetchData", domain);
         const fields = this._getFields(metaData);
         const specification = {};
         for (const fieldName of fields) {

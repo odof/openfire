@@ -9,6 +9,7 @@ PLANNING_VALID_ATTRIBUTES = set(
         '__validate__',  # ir.ui.view implementation detail
         'date_start',
         'date_stop',
+        'duration',
         'default_scale',
         'class',
         'js_class',

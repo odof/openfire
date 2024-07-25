@@ -1634,7 +1634,8 @@ export class PlanningRenderer extends Component {
      * @param {Pill} pill
      */
     onPillOpen(ev, pill) {
-        if (this.popover.isOpen) {
+        // La popover ne doit pas s'ouvrir quand on est en mode interaction
+        if (this.popover.isOpen || this.interaction.mode != null) {
             return;
         }
         const popoverTarget = ev.target.closest(".o_planning_pill_wrapper");
@@ -1656,7 +1657,6 @@ export class PlanningRenderer extends Component {
      * @param {Pill} pill
      */
     onPillDblClick(ev, pill) {
-        console.log("onPillDblClick");
         const { record } = pill;
         this.actionService.doAction(
             {

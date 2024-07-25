@@ -161,7 +161,7 @@ export class PlanningDayRenderer extends PlanningRenderer {
      * @param {"start" | "end"} params.direction
      */
     async resizePillDrop({ pill, diff, direction }) {
-        const { dateStartField, dateStopField, scale } = this.model.metaData;
+        const { dateStartField, dateStopField, durationField, scale } = this.model.metaData;
         const { cellTime, time } = scale;
         const { record } = this.pills[pill.dataset.pillId];
         const params = {};
@@ -183,8 +183,12 @@ export class PlanningDayRenderer extends PlanningRenderer {
 
         if (direction === "start") {
             params.start = dateAddFixedOffset(record[dateStartField], { ['minute']: 5 * diff });
+            // On rajoute également la nouvelle durée car sinon la date de fin est recalculée.
+            // Ce qui décalerait l'intervention au lieu da la resizer
+            params.duration = record[durationField] - ((5 * diff)/60);
         } else {
-            params.stop = dateAddFixedOffset(record[dateStopField], { ['minute']: 5 * diff });
+            // (diff + 1) pour compenser certaines imprécisions du resize
+            params.stop = dateAddFixedOffset(record[dateStopField], { ['minute']: 5 * (diff + 1) });
         }
         const schedule = this.model.getSchedule(params);
 
