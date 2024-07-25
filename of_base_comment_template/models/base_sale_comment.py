@@ -58,7 +58,7 @@ class BaseCommentTemplate(models.Model):
             .sudo()
             .search(
                 [
-                    ('wis_comment_template', '=', True),
+                    ('is_comment_template', '=', True),
                     ('model', '!=', 'comment.template'),
                     ('id', 'in', model_ids),
                 ]
