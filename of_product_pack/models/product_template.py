@@ -7,7 +7,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     pack_type = fields.Selection(default='non_detailed', required=True)
-    pack_component_price = fields.Selection(selection='_get_pack_component_price', default='totalized')
+    pack_component_price = fields.Selection(selection='_get_pack_component_price', default='totalized', required=True)
 
     @api.depends(lambda self: self._get_pack_modifiable_invisible_depends())
     def _compute_pack_modifiable_invisible(self):

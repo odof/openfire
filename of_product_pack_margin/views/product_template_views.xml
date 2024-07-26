@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_template_view_form" model="ir.ui.view">
+        <field name="name">of.product.pack.margin.product.template.view.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_product_pack.product_template_view_form_product_pack"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//label[@for='standard_price'][1]" position="attributes">
+                <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
+            </xpath>
+            <xpath expr="//label[@for='standard_price'][2]" position="attributes">
+                <attribute name="groups">of_account.of_group_sale_margin_manager</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
