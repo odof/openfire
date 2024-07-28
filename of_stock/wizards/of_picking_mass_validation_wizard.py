@@ -54,6 +54,7 @@ class OFPickingMassValidationWizard(models.TransientModel):
                 error_msg = e.name if hasattr(e, 'name') else e.message
                 _logger.exception(error_msg)
                 error_picking_ids.append((record.name, error_msg))
+                self._cr.rollback()
             else:
                 done_picking_ids.append(record.id)
                 self._cr.commit()  # On commit pour éviter de bloquer les autres BL / BR en cas d'erreur
