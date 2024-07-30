@@ -44,7 +44,6 @@
                         </group>
                         <group name="customer" string="Customer">
                             <field name="customer_id"/>
-                            <field name="service_date"/>
                             <field name="site_address_id" context="{'show_address': True}"/>
                             <label for="site_street"/>
                             <div class="o_address_format">
@@ -56,6 +55,7 @@
                             </div>
                             <label for="site_phone_number_ids"/>
                             <field name="site_phone_number_ids" widget="many2many_tags" nolabel="1"/>
+                            <field name="service_date"/>
                             <field name="installation_date"/>
                             <field name="end_warranty_date"/>
                             <field name="warranty_type"/>
