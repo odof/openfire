@@ -311,23 +311,19 @@
                                 '&amp;',
                                     ('recurrency', '=', True),
                                     ('state', '=', 'to_plan'),
-                                '&amp;',
-                                    ('recurrency', '=', False),
-                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
-                                ('end_date', '&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
-                                ('next_date', '&lt;', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                            ]" />
+                                ('recurrency', '=', False),
+                            ('end_date', '&gt;=', (context_today() + relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')),
+                            ('next_date', '&lt;', (context_today() + relativedelta(days=-1,weekday=7)).strftime('%Y-%m-%d')),
+                        ]" />
                 <filter string="Next week" name="next_week"
                     domain="['|',
                                 '&amp;',
                                     ('recurrency', '=', True),
                                     ('state', '=', 'to_plan'),
-                                '&amp;',
-                                    ('recurrency', '=', False),
-                                    ('state_punctual', 'in', ('to_plan', 'part_planned')),
-                                ('end_date', '&gt;=', (context_today() + datetime.timedelta(days=7-context_today().weekday())).strftime('%Y-%m-%d')),
-                                ('next_date', '&lt;', (context_today() + datetime.timedelta(days=14-context_today().weekday())).strftime('%Y-%m-%d')),
-                            ]" />
+                                ('recurrency', '=', False),
+                            ('end_date', '&gt;=', (context_today() + relativedelta(weeks=0,weekday=0)).strftime('%Y-%m-%d')),
+                            ('next_date', '&lt;', (context_today() + relativedelta(weeks=1,weekday=7)).strftime('%Y-%m-%d')),
+                        ]" />
                 <filter string="This Month" name="this_month"
                     domain="['|',
                                 '&amp;',

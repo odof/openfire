@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Demande d'intervention",
-    'version': '16.0.1.1.0',
+    'version': '16.0.1.1.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
