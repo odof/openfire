@@ -31,7 +31,7 @@
                             <separator string="Membres réseau"/>
                             <button name="button_load_companies" class="pull-right" colspan="2" string="Charger les sociétés" type="object"/>
                             <field name="child_ids" nolabel="1" colspan="2">
-                                <tree editable="top" options="{'no_create': True}">
+                                <tree editable="top" create="false">
                                     <field name="parent_id" invisible="1"/>
                                     <field name="company" readonly="1"/>
                                     <field name="company_id" invisible="1"/>
