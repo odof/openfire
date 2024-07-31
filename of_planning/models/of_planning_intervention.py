@@ -518,8 +518,12 @@ class OfPlanningIntervention(models.Model):
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
     lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')
     fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
-    partner_pricelist_id = fields.Many2one(comodel_name='product.pricelist', string=u"Liste de prix",
-                                           related='partner_id.property_product_pricelist')
+    partner_pricelist_id = fields.Many2one(
+        comodel_name='product.pricelist',
+        string=u"Liste de prix",
+        related='partner_id.property_product_pricelist',
+        readonly=True,
+    )
     currency_id = fields.Many2one('res.currency', string='Currency', readonly=True, related="company_id.currency_id")
 
     price_subtotal = fields.Monetary(compute='_compute_amount', string='Sous-total HT', readonly=True, store=True)
