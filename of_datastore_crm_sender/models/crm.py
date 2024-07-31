@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -50,27 +50,43 @@ class CrmLead(models.Model):
             if isinstance(client, basestring):
                 raise UserError(u"Échec de la connexion au connecteur CRM !")
 
-            ds_country_obj = datastore_crm.of_datastore_get_model(client, 'res.country')
             ds_lead_obj = datastore_crm.of_datastore_get_model(client, 'crm.lead')
-            ds_stage_obj = datastore_crm.of_datastore_get_model(client, 'crm.stage')
+            values = self._get_connector_lead_values(client, datastore_crm)
+            if datastore_crm.is_multicompany:
+                company_id = datastore_crm.child_ids.filtered(lambda c: c.partner_id == self.of_allocated).company_id
+                values['company_id'] = company_id
 
-            # On récupère le pays s'il existe déjà sur la base fille
-            country_ids = datastore_crm.of_datastore_search(ds_country_obj,  [('name', '=', self.country_id.name)])
-            if country_ids:
-                country_id = country_ids[0]
-            else:
-                country_id = False
+            datastore_crm.of_datastore_create(ds_lead_obj, values)
 
-            stage_id = False
-            # On récupère l'étape kanban en fonction du champ of_crm_stage_id
-            if self.stage_id:
-                stage_ids = datastore_crm.of_datastore_search(
-                    ds_stage_obj,
-                    [('of_crm_stage_id', '=', self.stage_id.of_crm_stage_id), ('of_crm_stage_id', '!=', False)])
-                if stage_ids:
-                    stage_id = stage_ids[0]
+            # On ajoute un message dans le mail thread
+            self.message_post(body=u"Opportunité transmise via le connecteur CRM.")
 
-            values = {
+            self.of_datastore_sent = True
+        else:
+            raise UserError(u"Aucun connecteur CRM trouvé !")
+
+    @api.multi
+    def _get_connector_lead_values(self, client, datastore_crm):
+        self.ensure_one()
+        ds_country_obj = datastore_crm.of_datastore_get_model(client, 'res.country')
+        ds_stage_obj = datastore_crm.of_datastore_get_model(client, 'crm.stage')
+        # On récupère le pays s'il existe déjà sur la base fille
+        country_ids = datastore_crm.of_datastore_search(ds_country_obj,  [('name', '=', self.country_id.name)])
+        if country_ids:
+            country_id = country_ids[0]
+        else:
+            country_id = False
+
+        stage_id = False
+        # On récupère l'étape kanban en fonction du champ of_crm_stage_id
+        if self.stage_id:
+            stage_ids = datastore_crm.of_datastore_search(
+                ds_stage_obj,
+                [('of_crm_stage_id', '=', self.stage_id.of_crm_stage_id), ('of_crm_stage_id', '!=', False)])
+            if stage_ids:
+                stage_id = stage_ids[0]
+
+        return {
                 'of_datastore_lead': self.id,
                 'name': self.name,
                 'contact_name': self.contact_name,
@@ -85,20 +101,6 @@ class CrmLead(models.Model):
                 'email_from': self.email_from,
                 'description': self.description,
             }
-
-            if datastore_crm.is_multicompany:
-                company_id = datastore_crm.child_ids.filtered(lambda c: c.partner_id == self.of_allocated).company_id
-                values['company_id'] = company_id
-
-            datastore_crm.of_datastore_create(ds_lead_obj, values)
-
-            # On ajoute un message dans le mail thread
-            self.message_post(body=u"Opportunité transmise via le connecteur CRM.")
-
-            self.of_datastore_sent = True
-        else:
-            raise UserError(u"Aucun connecteur CRM trouvé !")
-
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
