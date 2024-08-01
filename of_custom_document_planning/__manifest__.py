@@ -2,7 +2,7 @@
 
 {
     'name': 'OpenFire / Rapports personnalisés pour les interventions',
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",

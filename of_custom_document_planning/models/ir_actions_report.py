@@ -26,7 +26,7 @@ class IrActionsReport(models.Model):
 
         if record.of_invoice_ids and template.sheet_invoice_pdf:
             invoices_pdf, _type = self._render_qweb_pdf(
-                'stock.report_deliveryslip', res_ids=record.of_invoice_ids.ids, data=None
+                'account.report_invoice', res_ids=record.of_invoice_ids.ids, data=None
             )
             streams_to_merge.append(io.BytesIO(invoices_pdf))
 
@@ -51,7 +51,7 @@ class IrActionsReport(models.Model):
 
         if record.of_invoice_ids and template.report_invoice_pdf:
             invoices_pdf, _type = self._render_qweb_pdf(
-                'stock.report_deliveryslip', res_ids=record.of_invoice_ids.ids, data=None
+                'account.report_invoice', res_ids=record.of_invoice_ids.ids, data=None
             )
             streams_to_merge.append(io.BytesIO(invoices_pdf))
 
