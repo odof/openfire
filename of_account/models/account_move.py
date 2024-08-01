@@ -74,22 +74,6 @@ class AccountMove(models.Model):
             partner = move.line_ids.mapped('partner_id')
             move.commercial_partner_id = partner.commercial_partner_id if len(partner) == 1 else False
 
-    @api.depends('invoice_date', 'company_id', 'journal_id')
-    def _compute_date(self):
-        """Override to allow to set the date of a move with no invoice date"""
-        for move in self:
-            if move.journal_id:
-                if last_move := self.env['account.move'].search(
-                    [
-                        ('journal_id', '=', move.journal_id.id),
-                        ('date', '!=', False),
-                    ],
-                    order='date DESC',
-                    limit=1,
-                ):
-                    move.date = last_move.date
-        super()._compute_date()
-
     @api.depends('partner_id')
     def _compute_ref(self):
         for move in self:
