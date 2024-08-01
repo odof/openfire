@@ -364,6 +364,7 @@
                 <separator />
                 <field name="next_date" filter_domain="[('next_date','&lt;=',self)]" string="Next Planning" context="{'next_date_max': self}" />
                 <field name="partner_id" />
+                <field name="employee_ids" />
                 <field name="number" />
                 <field name="title" />
                 <field name="address_id" />
