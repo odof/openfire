@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -24,6 +24,12 @@ class CrmLead(models.Model):
         if 'stage_id' in values:
             self.datastore_update_lead()
         return res
+
+    @api.multi
+    def _datastore_update_lead(self, ds_lead_id, datastore, client, stage_id):
+        u"""Le retour de la fonction doit nous permettre de savoir si on doit ou non mettre à jour l'étape"""
+        self.ensure_one()
+        return True
 
     @api.multi
     def datastore_update_lead(self):
@@ -61,9 +67,14 @@ class CrmLead(models.Model):
                                 stage_id = stage_ids[0]
                             else:
                                 stage_id = False
+                            # Le retour de la fonction doit nous permettre de savoir si on doit ou non mettre à jour
+                            # l'étape
+                            update = record._datastore_update_lead(lead_id, datastore_crm, client, stage_id)
 
                             # On met à jour l'étape
-                            datastore_crm.of_datastore_func(ds_lead_obj, 'write', [lead_id, {'stage_id': stage_id}], [])
+                            if update:
+                                datastore_crm.of_datastore_func(
+                                    ds_lead_obj, 'write', [lead_id, {'stage_id': stage_id}], [])
 
                             # On ajoute un message dans le mail thread
                             record.message_post(body=u"Opportunité passée en étape %s à la base mère "
