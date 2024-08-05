@@ -1,0 +1,9 @@
+#. module: of_custom_document_account
+#: model:ir.model.fields,field_description:of_custom_document_account.field_account_move__of_custom_document_ids
+msgid "Custom documents"
+msgstr "Document personnalisés"
+
+#. module: of_custom_document_account
+#: model:ir.model.fields,help:of_custom_document_account.field_account_move__of_custom_document_ids
+msgid "Documents to include into pdf reports."
+msgstr "Documents à inclure dans les rapports pdf"
