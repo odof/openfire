@@ -14,16 +14,16 @@ class Service(Controller):
         headers = {'Content-Type': 'application/json'}
         args = request.params
 
-        request_trigger = request.env['esb.trigger'].search([('slug_name', '=', trigger), ('public', '=', True)])
+        request_trigger = request.env['esb.trigger'].sudo().search([('slug_name', '=', trigger), ('public', '=', True)])
 
         if request_trigger:
             # on vérifie les droits
             if user_id := request_trigger.security.authorize(args):
                 # on ajoute dans les args, le user, et on envoie tout dans le bus
-                args['user_id'] = user_id
-                data = self.env['esb.data'].create({'in_data': args})
+                args["user_id"] = user_id.id
+                data = request.env['esb.data'].sudo().create({'in_data': json.dumps(args)})
                 value = {'data': data.id, 'channel': trigger, 'ttype': 'webhook'}
-                bus = self.env['esb.bus'].create(value)
+                bus = request.env['esb.bus'].sudo().create(value)
                 body = {'res': 'Your webhook have been queued', 'uuid': bus.uuid, 'code': 200}
             else:
                 body = {'res': 'You do not have access to this webhook', 'code': 200}

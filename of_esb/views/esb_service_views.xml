@@ -6,11 +6,6 @@
         <field name="model">esb.service</field>
         <field name="arch" type="xml">
             <form>
-                <header>
-                    <button name="execute" type="object" string="Execute"/>
-                    <button name="execute_with_delay" type="object" string="Execute with delay"/>
-
-                </header>
                 <group>
                     <group>
                         <field name="name"/>

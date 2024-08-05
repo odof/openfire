@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import json
 import logging
 
 from odoo import fields, models
@@ -16,15 +17,26 @@ class ESBService(models.Model):
 
     def execute_with_delay(self, args={}):
         if self.exec_active:
-            return self.with_delay().execute(args)
+            # on regarde si dans args.in_data, il y a un user_id
+            # si oui, on l'utilise pour lancer l'action, sinon on prends le user courant
+            data = json.loads(args.in_data)
+            if user_id := data.get('user_id'):
+                user = self.env['res.users'].browse(user_id)
+                return self.with_user(user).with_delay().execute(args)
+            else:
+                return self.with_delay().execute(args)
         else:
             return {'error': 'this service is not active'}
 
     def execute(self, args={}):
         if self.code and self.exec_active:
             exec(self.code, {'args': args, 'self': self})
-            return args
+            res = {}
+            for field in args._fields:
+                res[field] = args[field]
+            return res
+
         elif not self.exec_active:
-            return {'error': 'this is not active'}
+            return {'error': 'this service is not active'}
         else:
             return {'error': 'Code is empty'}

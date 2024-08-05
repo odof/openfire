@@ -19,7 +19,9 @@ class ESBTrigger(models.Model):
     _name = 'esb.trigger'
 
     name = fields.Char()
-    ttype = fields.Selection([('scheduler', 'Scheduler'), ('webhook', 'Webhook')], default='scheduler', required=True)
+    ttype = fields.Selection(
+        [('scheduler', 'Scheduler'), ('webhook', 'Webhook')], default='scheduler', required=True, string='Type'
+    )
     date_exec = fields.Datetime(string="Date of execution")
     interval_number = fields.Integer(default=1)
     interval_type = fields.Selection(
@@ -28,12 +30,12 @@ class ESBTrigger(models.Model):
         default='months',
     )
     exec_active = fields.Boolean(default=True)
-    data = fields.Many2one(comodel_name='esb.data', required=True)
+    data = fields.Many2one(comodel_name='esb.data')
     data_channel = fields.Char()
     data_type = fields.Char()
     # Type webhook
     slug_name = fields.Char(compute='_compute_slug_name')
-    public = fields.Boolean(help="Check this to make this trigger accessible with the url /service/execute/")
+    public = fields.Boolean(help="Check this to make this trigger accessible with the url /webhook/")
     security = fields.Many2one(comodel_name='esb.security', required=True)
 
     def _compute_slug_name(self):

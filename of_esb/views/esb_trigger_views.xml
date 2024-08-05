@@ -21,9 +21,9 @@
                             <field name="interval_type"/>
                         </group>
                         <group>
-                            <field name="data_channel"/>
-                            <field name="data_type"/>
-                            <field name="data"/>
+                            <field name="data_channel" attrs="{'required': [('ttype','=','scheduler')]}"/>
+                            <field name="data_type" attrs="{'required': [('ttype','=','scheduler')]}"/>
+                            <field name="data" attrs="{'required': [('ttype','=','scheduler')]}"/>
                         </group>
                     </group>
                     <group attrs="{'invisible': [('ttype','!=','webhook')]}" string="Webhook">

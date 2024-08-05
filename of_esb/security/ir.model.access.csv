@@ -8,3 +8,4 @@ of_esb.access_esb_service_all,access_esb_service,of_esb.model_esb_service,,1,0,0
 of_esb.access_esb_security_all,access_esb_security,of_esb.model_esb_security,,1,0,0,0
 of_esb.access_esb_data,access_esb_data,of_esb.model_esb_data,base.group_user,1,1,1,1
 of_esb.access_esb_rule,access_esb_rule,of_esb.model_esb_rule,base.group_user,1,1,1,1
+of_esb.access_esb_history,access_esb_history,of_esb.model_esb_history,base.group_user,1,1,1,1
