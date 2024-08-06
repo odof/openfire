@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / OF Sale Advance Payment",
-    'version': '16.0.1.2.0',
+    'version': '16.0.1.0.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -16,8 +16,9 @@
     'data': [
         'views/sale_order_views.xml',
         'views/account_payment_views.xml',
+        'wizards/sale_advance_payment_wizard_views.xml',
     ],
     'installable': True,
     'application': False,
-    'auto_install': True,
+    'auto_install': False,
 }
