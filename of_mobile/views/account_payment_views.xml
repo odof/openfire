@@ -7,9 +7,9 @@
         <field name="inherit_id" ref="account.view_account_payment_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='ref']" position="after">
-                <field name="of_type" string="Type"/>
-                <field name="of_intervention_id" attrs="{'invisible': [('of_intervention_id','=',False)]}"/>
-                <field name="of_intervention_invoice_id" attrs="{'invisible': [('of_intervention_id','=',False)]}"/>
+                <field name="of_type" string="Type" groups="base.group_no_one"/>
+                <field name="of_intervention_id" attrs="{'invisible': [('of_intervention_id','=',False)]}" groups="base.group_no_one"/>
+                <field name="of_intervention_invoice_id" attrs="{'invisible': [('of_intervention_id','=',False)]}" groups="base.group_no_one"/>
                 <field name="of_sale_id" attrs="{'invisible': [('of_sale_id','=',False)]}"/>
                 <field name="of_sale_invoice_id" attrs="{'invisible': [('of_sale_id','=',False)]}"/>
             </xpath>
