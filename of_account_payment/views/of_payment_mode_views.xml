@@ -44,13 +44,13 @@
 
 
     <record model="ir.actions.server" id="action_set_printed">
-           <field name="name">Update payment mode</field>
-           <field name="model_id" ref="of_account_payment.model_of_payment_mode"/>
-           <field name="binding_model_id" ref="of_account_payment.model_of_payment_mode"/>
-           <field name="state">code</field>
-           <field name="code">
-               action = model.action_update_mode_payment()
-           </field>
-       </record>
+        <field name="name">Update payment mode</field>
+        <field name="model_id" ref="of_account_payment.model_of_payment_mode"/>
+        <field name="binding_model_id" ref="of_account_payment.model_of_payment_mode"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_update_mode_payment()
+        </field>
+    </record>
 
 </odoo>
