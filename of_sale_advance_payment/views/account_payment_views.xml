@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_account_payment_form_view" model="ir.ui.view">
+        <field name="name">of.account.payment.form.view</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="of_account_payment.of_account_payment_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="sale_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
