@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_account_voucher_wizard" model="ir.ui.view">
+        <field name="name">Advance Payment</field>
+        <field name="model">account.voucher.wizard</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="sale_advance_payment.view_account_voucher_wizard"/>
+        <field name="arch" type="xml">
+
+            <!-- Passage sur 2 colonnes -->
+            <xpath expr="//group/group[1]" position="attributes">
+                <attribute name="colspan"></attribute>
+                <attribute name="col"></attribute>
+            </xpath>
+            <xpath expr="//group/group[2]" position="attributes">
+                <attribute name="colspan"></attribute>
+                <attribute name="col"></attribute>
+            </xpath>
+            <xpath expr="//separator" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Masquage de champs -->
+            <xpath expr="//field[@name='currency_amount']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='journal_currency_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <!-- Déplacement de champs -->
+            <xpath expr="//field[@name='journal_id']" position="before">
+                <field name="of_payment_mode_id"/>
+                <field name="partner_bank_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='amount_total']" position="after">
+                <label for="amount_advance"/>
+                <div name="amount_div" class="o_row"/>
+            </xpath>
+            <xpath expr="//div[@name='amount_div']" position="inside">
+                <xpath expr="//field[@name='amount_advance']" position="move"/>
+                <xpath expr="//field[@name='currency_id']" position="move" options="{'no_create': True, 'no_open': True}" groups="base.group_multi_currency"/>
+                <xpath expr="//field[@name='currency_amount']" position="move"/>
+            </xpath>
+            <xpath expr="//group/group[2]" position="inside">
+                <xpath expr="//field[@name='date']" position="move"/>
+                <xpath expr="//field[@name='payment_ref']" position="move"/>
+                <field name="of_payment_ref"/>
+                <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+            </xpath>
+
+            <!-- Bouton Annuler en majuscules -->
+            <xpath expr="//button[@special='cancel']" position="attributes">
+                <attribute name="class">btn btn-secondary</attribute>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
