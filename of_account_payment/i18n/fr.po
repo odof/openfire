@@ -28,6 +28,7 @@ msgid "Balance"
 msgstr "Solde"
 
 #. module: of_account_payment
+
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_search_view
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_form
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_tree
@@ -35,9 +36,10 @@ msgid "Categories"
 msgstr "Étiquettes de paiement"
 
 #. module: of_account_payment
-#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__description
+
+#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__tag_description
 msgid "Category description"
-msgstr ""
+msgstr "Description"
 
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__name
@@ -78,6 +80,11 @@ msgid "Created on"
 msgstr ""
 
 #. module: of_account_payment
+#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__sale_id
+msgid "Customer orders"
+msgstr "Commandes client"
+
+#. module: of_account_payment
 #: model:of.payment.tags,name:of_account_payment.deposit_1
 msgid "Deposit 1"
 msgstr "Acompte 1"
@@ -99,6 +106,7 @@ msgid "Description"
 msgstr ""
 
 #. module: of_account_payment
+
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__display_name
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__display_name
 msgid "Display Name"
@@ -178,8 +186,19 @@ msgstr "Étiquettes de paiement"
 
 #. module: of_account_payment
 #: model:ir.model.fields,help:of_account_payment.field_of_payment_tags__description
+#: model:ir.model.fields,help:of_account_payment.field_of_payment_tags__tag_description
 msgid "Payment category description"
 msgstr "Description de la catégorie de paiement"
+
+#. module: of_account_payment
+#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_ref_reglement
+msgid "Payment reference"
+msgstr "Référence du paiement"
+
+#. module: of_account_payment
+#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_tag_ids
+msgid "Payment tags"
+msgstr "Étiquettes de paiement"
 
 #. module: of_account_payment
 #: model:ir.model,name:of_account_payment.model_account_payment
@@ -190,11 +209,6 @@ msgstr "Paiements"
 #: model:ir.ui.menu,name:of_account_payment.menu_of_payment_mode
 msgid "Payments Mode"
 msgstr "Modes de paiements"
-
-#. module: of_account_payment
-#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_expected_deposit_date
-msgid "Scheduled delivery date"
-msgstr ""
 
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__shortname
