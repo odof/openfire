@@ -16,41 +16,18 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_advance_payment
-#: model:ir.model,name:of_sale_advance_payment.model_account_voucher_wizard
-msgid "Account Voucher Wizard"
-msgstr "Assistant de Configuration Paiement d'Avance"
-
-#. module: of_sale_advance_payment
 #: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_payment__sale_id
 msgid "Customer orders"
 msgstr "Commande client"
 
-#. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__journal_id
-msgid "Journal"
-msgstr ""
 
 #. module: of_sale_advance_payment
 #: model:ir.model,name:of_sale_advance_payment.model_account_payment
 msgid "Payments"
 msgstr "Paiements"
 
-#. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__of_payment_mode_id
-msgid "Payment Mode"
-msgstr "Mode de paiement"
 
 #. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__of_payment_ref
-msgid "Payment reference"
-msgstr "Référence du paiement"
-
-#. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__of_tag_ids
-msgid "Payment tags"
-msgstr "Étiquettes du paiement"
-
-#. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__partner_bank_id
-msgid "Recipient Bank"
-msgstr "Compte bancaire du bénéficiaire"
+#: model:ir.model,name:of_sale_advance_payment.model_account_payment
+msgid "Payments"
+msgstr "Paiements"
