@@ -12,6 +12,7 @@
     'depends': [
         'account_payment',
         'of_account',
+        'sale_advance_payment',
     ],
     'data': [
         'security/ir.model.access.csv',
