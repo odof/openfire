@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="of_payment_mode_id"/>
+                <field name="of_ref_reglement"/>
             </xpath>
             <xpath expr="//field[@name='payment_method_line_id']" position="attributes">
                 <attribute name="invisible">1</attribute>

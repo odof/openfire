@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-09 10:13+0000\n"
-"PO-Revision-Date: 2024-08-09 12:13+0200\n"
+"POT-Creation-Date: 2024-07-23 09:40+0000\n"
+"PO-Revision-Date: 2024-08-06 12:09+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -36,7 +36,6 @@ msgid "Categories"
 msgstr "Étiquettes de paiement"
 
 #. module: of_account_payment
-
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__tag_description
 msgid "Category description"
 msgstr "Description"
@@ -99,6 +98,10 @@ msgstr "Acompte 2"
 msgid "Customer orders"
 msgstr "Commandes clients"
 
+#. module: of_account_payment
+#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_sales_ids
+msgid "Customer orders"
+msgstr "Commandes clients"
 #. module: of_account_payment
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_form
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_tree
@@ -198,7 +201,7 @@ msgstr "Référence du paiement"
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_tag_ids
 msgid "Payment tags"
-msgstr "Étiquettes de paiement"
+msgstr "Étiquettes du paiement"
 
 #. module: of_account_payment
 #: model:ir.model,name:of_account_payment.model_account_payment
