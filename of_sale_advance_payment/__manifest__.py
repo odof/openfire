@@ -16,7 +16,6 @@
     'data': [
         'views/sale_order_views.xml',
         'views/account_payment_views.xml',
-        'wizards/sale_advance_payment_wizard_views.xml',
     ],
     'installable': True,
     'application': False,
