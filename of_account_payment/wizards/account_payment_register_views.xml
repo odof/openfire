@@ -21,7 +21,7 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='communication']" position="after">
-                    <field name="of_ref_reglement"></field>
+                    <field name="of_payment_ref"/>
                     <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"></field>
                 </xpath>
             </field>
