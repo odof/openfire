@@ -4,3 +4,4 @@ from . import account_payment
 from . import of_payment_mode
 from . import account_journal
 from . import account_payment_method_line
+from . import of_payment_tags

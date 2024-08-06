@@ -1,0 +1,9 @@
+#. module: of_sale_advance_payment
+#: model:ir.model.fields,field_description:sale_advance_payment.field_account_voucher_wizard__payment_ref
+msgid "Ref."
+msgstr "Mémo"
+
+#. module: of_sale_advance_payment
+#: model:ir.model.fields,field_description:sale_advance_payment.field_account_voucher_wizard__date
+msgid "Date"
+msgstr "Date de paiement"

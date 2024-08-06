@@ -12,11 +12,14 @@
     'depends': [
         'account_payment',
         'of_account',
+        'sale_advance_payment',
     ],
     'data': [
         'security/ir.model.access.csv',
         'views/account_payment_views.xml',
         'views/of_payment_mode_views.xml',
+        'views/of_payment_tags_views.xml',
+        'wizard/account_payment_register_views.xml',
         'views/menu.xml',
     ],
     'installable': True,
