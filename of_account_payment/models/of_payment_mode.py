@@ -6,8 +6,8 @@ from odoo import api, fields, models
 class OFPaymentMode(models.Model):
     _name = "of.payment.mode"
     _description = "Payment Mode"
-    _order = 'journal_id asc'
-    _rec_name = 'shortname'
+    _order = "journal_id asc"
+    _rec_name = "shortname"
 
     name = fields.Char(compute="_compute_name")
     shortname = fields.Char(related="payment_method_line_id.name", string="Short Name")
