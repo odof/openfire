@@ -2,7 +2,7 @@
 <odoo>
 
     <menuitem id="menu_of_payment_mode" name="Payments Mode" parent="account.root_payment_menu" action="action_of_payment_mode"/>
-    <menuitem action="of_payment_tags_action" id="menu_of_payment_tags_act" name="Payment categories" parent="account.root_payment_menu" sequence="25"/>
+    <menuitem id="menu_of_payment_tags_act" action="of_payment_tags_action" name="Payment categories" parent="account.root_payment_menu" sequence="25"/>
 
 
 </odoo>
