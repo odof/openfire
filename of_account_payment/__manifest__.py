@@ -18,6 +18,7 @@
         'views/account_payment_views.xml',
         'views/of_payment_mode_views.xml',
         'views/of_payment_tags_views.xml',
+        'wizards/account_payment_register_views.xml',
         'views/menu.xml',
     ],
     'installable': True,
