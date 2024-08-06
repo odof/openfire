@@ -26,3 +26,9 @@ msgstr "Date de paiement"
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
 msgid "Create Payment"
 msgstr "Enregistrer un paiement"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_payment_register__payment_date
+#: model_terms:ir.ui.view,arch_db:account.view_account_payment_search
+msgid "Payment Date"
+msgstr "Date de paiement"
