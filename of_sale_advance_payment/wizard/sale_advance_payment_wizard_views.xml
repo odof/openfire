@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_account_voucher_wizard" model="ir.ui.view">
+        <field name="name">Advance Payment</field>
+        <field name="model">account.voucher.wizard</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="sale_advance_payment.view_account_voucher_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='journal_id']" position="before">
+                <field name="of_payment_mode_id"></field>
+            </xpath>
+            <xpath expr="//field[@name='journal_id']" position="before">
+                <field name="partner_bank_id"></field>
+            </xpath>
+            <xpath expr="//field[@name='payment_ref']" position="after">
+                <field name="of_ref_reglement"></field>
+            </xpath>
+            <xpath expr="//field[@name='date']" position="after">
+                <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"></field>
+            </xpath>
+            <xpath expr="//field[@name='journal_currency_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='journal_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
