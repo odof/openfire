@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- Internal layout -->
-    <template id="of_planning.of_internal_layout">
+    <template id="of_internal_layout">
         <t t-if="not company">
             <!-- Multicompany -->
             <t t-if="company_id">
@@ -22,12 +22,13 @@
         <div class="header">
             <div class="row">
                 <div class="col-3 mb4">
-                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 80px;" alt="Logo"/>
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 80px; max-width: 200px;" alt="Logo"/>
                 </div>
                 <div class="col-6 h4 text-center pt-1">
                     <div>
                         <span t-field="template.sheet_title" />
-                        <span t-if="template.sheet_date and doc.start_date"> to </span>
+                        <span t-if="template.sheet_date and doc.start_date" t-field="doc.start_date"/>
+                        <span t-if="template.sheet_date and doc.start_date and doc.stop_date"> to </span>
                         <span t-if="template.sheet_date and doc.stop_date" t-field="doc.stop_date" />
                     </div>
                     <t t-if="template.sheet_partner_id and doc.of_address_id">
