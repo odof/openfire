@@ -44,6 +44,9 @@
                 </t>
                 <div class="page">
                     <t t-if="template">
+                        <h1>
+                            <span t-field="template.report_title"/>
+                        </h1>
                         <!-- Intervention -->
                         <div t-if="template.report_intervention" class="row mb-4"
                             name="report_intervention" style="page-break-inside: avoid;">

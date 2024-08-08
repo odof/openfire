@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Planning",
-    'version': '16.0.1.4.2',
+    'version': '16.0.1.4.3',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
