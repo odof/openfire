@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="form" model="ir.ui.view">
+        <field name="name">esb.history.form</field>
+        <field name="model">esb.history</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="ttype"/>
+                    <field name="date"/>
+                    <field name="uuid"/>
+                    <field name="user"/>
+                    <field name="history"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="tree" model="ir.ui.view">
+        <field name="name">esb.history.tree</field>
+        <field name="model">esb.history</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="ttype"/>
+                <field name="date"/>
+                <field name="uuid"/>
+                <field name="user"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_esb_history" model="ir.actions.act_window">
+        <field name="name">History</field>
+        <field name="res_model">esb.history</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+</odoo>

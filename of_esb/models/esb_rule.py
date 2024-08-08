@@ -7,6 +7,11 @@ class ESBRule(models.Model):
     _name = 'esb.rule'
 
     name = fields.Char()
-    channel = fields.Char(required=True)
-    ttype = fields.Char(required=True, string="Type")
+    channel_bus = fields.Char(required=True, string="Channel")
+    type_bus = fields.Many2one(comodel_name='esb.type.bus', required=True, string="Type of bus")
     service = fields.Many2one(comodel_name='esb.service', required=True)
+    ttype = fields.Selection([('user', 'user'), ('system', 'system')], string="Type", default="user")
+
+    def unlink(self):
+        # on ne peut pas supprimer une rule system, juste les "user"
+        return super(ESBRule, self.filtered(lambda r: r.ttype == "user")).unlink()

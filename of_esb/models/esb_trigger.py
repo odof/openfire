@@ -1,5 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import json
+
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
@@ -32,12 +34,15 @@ class ESBTrigger(models.Model):
     exec_active = fields.Boolean(default=True)
     data = fields.Many2one(comodel_name='esb.data')
     data_channel = fields.Char()
-    data_type = fields.Char()
+    data_type = fields.Many2one(
+        comodel_name='esb.type.bus', string='Type of bus', default=lambda self: self.env.ref('of_esb.type_scheduler').id
+    )
     # Type webhook
     slug_name = fields.Char(compute='_compute_slug_name')
     public = fields.Boolean(help="Check this to make this trigger accessible with the url /webhook/")
     security = fields.Many2one(comodel_name='esb.security', required=True)
 
+    @api.depends('name')
     def _compute_slug_name(self):
         for record in self:
             if record.public:
@@ -50,10 +55,22 @@ class ESBTrigger(models.Model):
         now = fields.Datetime.now()
         triggers = self.search([('exec_active', '=', True), ('ttype', '=', 'scheduler'), ('date_exec', '<=', now)])
         for trigger in triggers:
-            value = {'data': trigger.data, 'channel': trigger.data_channel, 'ttype': trigger.data_type}
-            self.env['esb.bus'].create(value)
+            value = {'data': trigger.data, 'channel': trigger.data_channel, 'ttype': trigger.data_type.id}
+            bus = self.env['esb.bus'].create(value)
             if trigger.interval_number > 0:
                 interval = _intervalTypes[trigger.interval_type](trigger.interval_number)
                 trigger.date_exec += interval
             else:
                 trigger.date_exec = False
+
+            data_value = {
+                'in_data': json.dumps({'type': 'trigger', 'id': trigger.id, 'name': trigger.name}),
+                'properties': json.dumps({'uuid': bus.uuid}),
+            }
+            data = self.env['esb.data'].create(data_value)
+            bus_value = {
+                'channel': 'history',
+                'ttype': self.env.ref('of_esb.type_logs').id,
+                'data': data.id,
+            }
+            self.env['esb.bus'].create(bus_value)

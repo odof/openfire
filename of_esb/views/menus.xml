@@ -8,6 +8,8 @@
         <menuitem id="menu_esb_security" name="Security" action="action_esb_security"/>
         <menuitem id="menu_esb_trigger" name="Triggers" action="action_esb_trigger"/>
         <menuitem id="menu_esb_bus" name="Buses" action="action_esb_bus"/>
+        <menuitem id="menu_esb_history" name="History" action="action_esb_history"/>
+        <menuitem id="menu_esb_data" name="Datas" action="action_esb_data"/>
 
     </menuitem>
 

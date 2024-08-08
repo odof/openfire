@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="type_logs" model="esb.type.bus">
+        <field name="name">Logs</field>
+    </record>
+
+    <record id="type_webhook" model="esb.type.bus">
+        <field name="name">Webhook</field>
+    </record>
+
+    <record id="type_scheduler" model="esb.type.bus">
+        <field name="name">Scheduler</field>
+    </record>
+
+
+</odoo>

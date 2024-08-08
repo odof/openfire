@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <form>
                 <group>
+                    <field name="date"/>
                     <field name="channel"/>
                     <field name="ttype"/>
                     <field name="data"/>
@@ -21,6 +22,7 @@
         <field name="model">esb.bus</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="date"/>
                 <field name="channel"/>
                 <field name="ttype"/>
                 <field name="uuid"/>

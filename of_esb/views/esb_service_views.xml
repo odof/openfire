@@ -10,14 +10,18 @@
                     <group>
                         <field name="name"/>
                         <field name="exec_active"/>
+                        <field name="ttype"/>
                     </group>
 
                     <field name="code" widget="ace" options="{'mode': 'python'}"/>
                 </group>
                     <span>
                         Les arguments envoyés dans la fonction sont dans le dictionnaire args<br/>
-                        Pour retourner un résultat, il suffit de l'affecter à la variable args
-                        exemple : args['result'] = "mon resultat"
+                        La variable args est un dictionnaire contenant trois clefs :
+                        - in_data : "contient les données qui sont envoyées dans le bus",
+                        - out_data : "contient les données de retour du service",
+                        - properties : "dictionnaire contenant des propriétés du message, comme l'UUID du trigger qui
+                        a lancé l'exécution"
                     </span>
             </form>
         </field>
@@ -30,6 +34,7 @@
             <tree>
                 <field name="name"/>
                 <field name="exec_active"/>
+                <field name="ttype"/>
             </tree>
         </field>
     </record>

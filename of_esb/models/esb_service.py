@@ -14,6 +14,7 @@ class ESBService(models.Model):
     name = fields.Char()
     code = fields.Text()
     exec_active = fields.Boolean(string="Active", default=True)
+    ttype = fields.Selection([('user', 'user'), ('system', 'system')], string="Type", default="user")
 
     def execute_with_delay(self, args={}):
         if self.exec_active:
@@ -22,9 +23,12 @@ class ESBService(models.Model):
             data = json.loads(args.in_data)
             if user_id := data.get('user_id'):
                 user = self.env['res.users'].browse(user_id)
-                return self.with_user(user).with_delay().execute(args)
+                res = self.with_user(user).with_delay().execute(args)
             else:
-                return self.with_delay().execute(args)
+                res = self.with_delay().execute(args)
+
+            return res
+
         else:
             return {'error': 'this service is not active'}
 
@@ -40,3 +44,7 @@ class ESBService(models.Model):
             return {'error': 'this service is not active'}
         else:
             return {'error': 'Code is empty'}
+
+    def unlink(self):
+        # on ne peut pas supprimer un service system, juste les "user"
+        return super(ESBService, self.filtered(lambda r: r.ttype == "user")).unlink()

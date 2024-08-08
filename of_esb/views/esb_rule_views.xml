@@ -8,8 +8,9 @@
             <form>
                 <group>
                     <field name="name"/>
-                    <field name="channel"/>
                     <field name="ttype"/>
+                    <field name="channel_bus"/>
+                    <field name="type_bus"/>
                     <field name="service"/>
                 </group>
             </form>
@@ -22,8 +23,9 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="channel"/>
                 <field name="ttype"/>
+                <field name="channel_bus"/>
+                <field name="type_bus"/>
                 <field name="service"/>
             </tree>
         </field>
