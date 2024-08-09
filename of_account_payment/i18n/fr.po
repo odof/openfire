@@ -90,9 +90,7 @@ msgid "Deposit 2"
 msgstr "Acompte 2"
 
 
-#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_sales_ids
-msgid "Customer orders"
-msgstr "Commandes clients"
+
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_sales_ids
 msgid "Customer orders"
