@@ -15,8 +15,10 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'data/of_payment_tags.xml',
         'views/account_payment_views.xml',
         'views/of_payment_mode_views.xml',
+        'views/of_payment_tags_views.xml',
         'views/menu.xml',
     ],
     'installable': True,

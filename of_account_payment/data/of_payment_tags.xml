@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="deposit_1" model="of.payment.tags">
+        <field name="name">Deposit 1</field>
+    </record>
+
+    <record id="deposit_2" model="of.payment.tags">
+        <field name="name">Deposit 2</field>
+    </record>
+
+    <record id="balance" model="of.payment.tags">
+        <field name="name">Balance</field>
+    </record>
+
+</odoo>
