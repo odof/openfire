@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_template_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_template_tree</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="recurring_rule_type"/>
+                <field name="recurring_invoicing_payment_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_template_form_view" model="ir.ui.view">
+        <field name="name">of_contract_template_form</field>
+        <field name="model">of.contract.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title oe_inline">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Facturation">
+                            <field name="contract_type"/>
+                            <label for="recurring_invoicing_payment_id"/>
+                            <div name="invoicing">
+                                <field name="recurring_rule_type" nolabel="1" class="oe_inline" style="margin-right: 5px"/>
+                                <field name="recurring_invoicing_payment_id" nolabel="1" class="oe_inline"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="[('code', 'in', recurring_rule_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                            </div>
+                            <field name="property_journal_id"/>
+                            <field name="property_fiscal_position_id"/>
+                            <field name="payment_term_id" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                            <field name="grouped" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                            <field name="revision" attrs="{'invisible': [('contract_type','=','simple')]}"/>
+                        </group>
+                        <group string="Renouvellement">
+                            <field name="renewal"/>
+                            <field name="use_index"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="lignes" string="Lignes">
+                            <group string="Lignes de contrat">
+                                <field name="line_ids" mode="tree" nolabel="1" colspan="2"
+                                       options="{'reload_on_button': True}"
+                                       context="{'default_recurring_invoicing_payment_id': recurring_invoicing_payment_id,
+                                                 'default_frequency_type': recurring_rule_type,
+                                                 'default_use_index': use_index,
+                                                 'default_revision': revision,
+                                                 'default_grouped': grouped,}">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="task_id"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_contract_template_action" model="ir.actions.act_window">
+        <field name="name">Modèles de contrat</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.contract.template</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help">Créez des modèles de contrat</field>
+    </record>
+
+    <menuitem
+        id="of_contract_template_menu"
+        parent="of_planning.menu_of_planning_configuration_template"
+        name="Modèles de contrat"
+        action="of_contract_template_action"
+        sequence="25"
+    />
+
+</odoo>

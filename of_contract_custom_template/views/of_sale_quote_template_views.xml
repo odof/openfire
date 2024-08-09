@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sale_quote_template_form_view" model="ir.ui.view">
+        <field name="name">of_sale_quote_template_form</field>
+        <field name="model">sale.quote.template</field>
+        <field name="inherit_id" ref="of_questionnaire_quote_template.view_sale_quote_template_form_inh_questionnaire"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_intervention_template_id']" position="before">
+                <field name="of_contract_tmpl_id"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

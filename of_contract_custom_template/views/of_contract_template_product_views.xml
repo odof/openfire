@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_template_product_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_template_product_tree</field>
+        <field name="model">of.contract.template.product</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence" invisible="1"/>
+                <field name="product_id"/>
+                <field name="price_unit"/>
+                <field name="purchase_price"/>
+                <field name="quantity"/>
+                <field name="tax_ids" widget="many2many_tags"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_template_product_form_view" model="ir.ui.view">
+        <field name="name">of_contract_template_product_form</field>
+        <field name="model">of.contract.template.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sequence" invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="price_unit"/>
+                            <field name="purchase_price"/>
+                        </group>
+                        <group>
+                            <field name="quantity"/>
+                            <field name="tax_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="name" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
