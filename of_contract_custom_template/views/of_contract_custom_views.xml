@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_form_view" model="ir.ui.view">
+        <field name="name">of_contract_form</field>
+        <field name="model">of.contract</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='manager_id']" position="after">
+                <field name="contract_tmpl_id"/>
+            </xpath>
+            <xpath expr="//field[@name='contract_tmpl_id']" position="after">
+                <label for="update_lines"/>
+                <button name="update_lines" type="object" class="btn btn-primary" string="Importer les lignes"/>
+            </xpath>
+            <xpath expr="//button[@name='update_lines']" position="after">
+                <field name="order_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_contract_line_tree_view_advanced" model="ir.ui.view">
+        <field name="name">of_contract_line_form</field>
+        <field name="model">of.contract.line</field>
+        <field name="inherit_id" ref="of_contract_custom.of_contract_line_tree_view_advanced"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='supprimer_la_ligne']" position="before">
+                <button name="copy_contract_line" help="Dupliquer" type="object" icon="fa-copy"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

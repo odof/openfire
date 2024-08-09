@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="of.contract.custom.template.hooks" name="_post_hook_install"/>
+
+</odoo>

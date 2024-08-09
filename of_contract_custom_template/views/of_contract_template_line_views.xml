@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_template_line_tree_view" model="ir.ui.view">
+        <field name="name">of_contract_template_line_tree</field>
+        <field name="model">of.contract.template.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_contract_template_line_form_view" model="ir.ui.view">
+        <field name="name">of_contract_template_line_form</field>
+        <field name="model">of.contract.template.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title oe_inline">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <notebook>
+                        <page name="invoicing_contract_line" string="Facturation">
+                            <group>
+                                <group>
+                                    <field name="display_invoicing"/>
+                                    <field name="grouped"/>
+                                </group>
+                                <group col="2" colspan="2" attrs="{'invisible': [('display_invoicing', '=', False)]}">
+                                    <field name="frequency_type" class="oe_inline"/>
+                                    <field name="recurring_invoicing_payment_id"
+                                           options="{'no_create': True, 'no_open': True}"
+                                           domain="[('code', 'in', frequency_type == 'date' and ('date', 'post-paid') or ('pre-paid', 'post-paid'))]"/>
+                                </group>
+                            </group>
+                            <group string="Articles">
+                                <field name="contract_product_ids" nolabel="1"/>
+                            </group>
+                        </page>
+                        <page name="planification_contract_line" string="Planification">
+                            <group>
+                                <group>
+                                    <field name="intervention_template_id"/>
+                                    <field name="task_id"/>
+                                    <label for="interv_frequency_nbr" string="Fréquence"/>
+                                    <div name="interv_frequency">
+                                        <span>Répéter </span>
+                                        <field name="interv_frequency_nbr" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
+                                        <span> fois tous les </span>
+                                        <field name="interv_frequency" nolabel="1" class="oe_inline" attrs="{'form_readonly_exception': True}"/>
+                                    </div>
+                                    <field name="month_reference_ids" widget="many2many_tags" attrs="{'form_readonly_exception': True}"/>
+                                </group>
+                                <group name="sav" string="Sav">
+                                    <field name="use_sav"/>
+                                    <field name="sav_count" attrs="{'invisible': [('use_sav','!=',True)]}"/>
+                                </group>
+                            </group>
+                            <group string="Notes">
+                                <field name="notes" nolabel="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
