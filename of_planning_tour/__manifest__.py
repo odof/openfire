@@ -2,14 +2,14 @@
 
 {
     'name': "OpenFire / Planning des tournées",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.1.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Planning des tournées et optimisation d'itinéraire",
     'depends': [
-        'of_service', # of_planning > of_sale_stock > of_sale_report_settings > of_sale > ... > of_base > of_web_widgets
+        'of_service',  # of_planning > of_sale_stock > of_sale_report_settings > of_sale > ... > of_base > of_web_widgets
     ],
     'data': [
         'data/ir_cron.xml',

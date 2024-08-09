@@ -4,7 +4,7 @@
     <!-- Tours -->
     <record id="menu_of_planning_tour_create" model="ir.ui.menu">
         <field name="name">Tours</field>
-        <field name="sequence">10</field>
+        <field name="sequence">50</field>
         <field name="parent_id" ref="of_planning.menu_of_planning_intervention"/>
         <field name="action" ref="of_planning_tour.action_of_planning_tour_manual_create"/>
         <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_manual_creation')])]"/>
@@ -12,7 +12,7 @@
 
     <record id="menu_of_planning_tour_no_create" model="ir.ui.menu">
         <field name="name">Tours</field>
-        <field name="sequence">10</field>
+        <field name="sequence">50</field>
         <field name="parent_id" ref="of_planning.menu_of_planning_intervention"/>
         <field name="action" ref="of_planning_tour.action_of_planning_tour_no_manual_create"/>
         <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_no_manual_creation')])]"/>
