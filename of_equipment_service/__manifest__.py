@@ -2,13 +2,13 @@
 
 {
     'name': "OpenFire / Équipements et demandes d'intervention",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
     'summary': "Module de lien entre les demandes d'intervention et les équipements",
     'website': "https://www.openfire.fr",
-    'depends' : [
+    'depends': [
         'of_equipment',
         'of_service',
     ],
