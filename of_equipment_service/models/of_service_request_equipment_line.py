@@ -27,7 +27,7 @@ class OFServiceRequestEquipmentLine(models.Model):
     name = fields.Char(string="Name", related='event_id.name')
     start = fields.Datetime(string="Date", related='event_id.start', store=True)
     state = fields.Selection(string="State", related='event_id.of_state')
-    operator_id = fields.Many2one(string="Operator", related='equipment_id.operator_id')
+    operator_id = fields.Many2one(comodel_name='hr.employee', string="Operator")
     equipment_id = fields.Many2one(
         comodel_name='of.equipment',
         string="Equipment",
