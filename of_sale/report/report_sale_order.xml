@@ -2,6 +2,11 @@
 <odoo>
 
     <template id="of_report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[hasclass('page')]/h2/span[2]" position="replace">
+            <span t-elif="doc.state == 'draft'">Estimation # </span>
+            <span t-elif="doc.state == 'sent'">Quotation # </span>
+        </xpath>
+
         <!-- Lines and totals block -->
         <xpath expr="//th[@name='th_priceunit']" position="replace">
             <th name="th_priceunit" t-if="doc.of_price_printing == 'order_line'" class="text-end">Unit Price</th>
