@@ -1051,6 +1051,11 @@ msgid "Product tags"
 msgstr "Étiquettes produit"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+msgid "Quotation #"
+msgstr "Devis #"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_add_quote_wizard__quote_id
 msgid "Quote to add"
 msgstr "Devis à ajouter"
