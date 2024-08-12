@@ -249,6 +249,7 @@ odoo.define("of_survey.form", function (require) {
                     "data-oe-data",
                     JSON.stringify(this.images[this.current_question_id])
                 );
+                $("#addAttachment .thumb").attr("origin", "");
             },
 
             _udpateRenderImages: function () {
@@ -262,11 +263,14 @@ odoo.define("of_survey.form", function (require) {
                 this.$("a.delete").on("click", function () {
                     var id = $(this).find("i").attr("id");
                     self.images[self.current_question_id].splice(id, 1);
+
                     $(`.form_images_${self.current_question_id}`).html(
                         qweb.render("of_survey.form_images", {
                             images: self.images[self.current_question_id],
                         })
                     );
+
+
                     var $input = $(`input[ref="attachment_${self.current_question_id}"]`);
                     $input.attr("data-oe-data", JSON.stringify(self.images[self.current_question_id]));
                 });
