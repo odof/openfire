@@ -36,6 +36,7 @@ class SaleOrder(models.Model):
     of_force_invoice_status = fields.Selection(
         selection=[('invoiced', 'Fully Invoiced'), ('no', 'Nothing to Invoice')],
         string="Force Invoice Status",
+        tracking=True,
         help="Allows you to force the billing status of the order."
         "Useful for invoiced orders that refuse to change status (e.g. a line has been deleted in the invoice).",
         copy=False,
