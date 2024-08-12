@@ -869,7 +869,7 @@ msgstr ""
 #. module: of_sale
 #: model:ir.model.fields.selection,name:of_sale.selection__sale_order__of_force_invoice_status__no
 msgid "Nothing to Invoice"
-msgstr ""
+msgstr "Rien à facturer"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_list
