@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_of_payment_mode" name="Payments Mode" parent="account.root_payment_menu" action="action_of_payment_mode"/>
+    <menuitem id="menu_of_payment_mode" name="Payments Mode" parent="account.root_payment_menu" action="action_of_payment_mode" groups="base.group_no_one"/>
     <menuitem id="menu_of_payment_tags_act" action="of_payment_tags_action" name="Payment categories" parent="account.root_payment_menu" sequence="25"/>
 
 
