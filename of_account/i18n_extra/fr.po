@@ -1,24 +1,44 @@
-#. module: of_account
+#. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_move_reversal__refund_method__refund
 msgid "Partial Refund"
 msgstr "Avoir partiel"
 
-#. module: of_account
+#. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_move_reversal__refund_method__cancel
 msgid "Full Refund"
 msgstr "Avoir intégral"
 
-#. module: of_account
+#. module: account
 #: model:ir.model.fields.selection,name:account.selection__account_move_reversal__refund_method__modify
 msgid "Full refund and new draft invoice"
 msgstr "Avoir intégral et nouvelle facture brouillon"
 
-#. module: of_account
+#. module: oaccount
 #: model_terms:ir.ui.view,arch_db:account.view_account_move_reversal
 msgid "Refund Date"
 msgstr "Date d'avoir"
 
-#. module: of_account
+#. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_tax_form
 msgid "Distribution for Refunds"
 msgstr "Répartition pour Avoirs"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+msgid "Incoming Payments"
+msgstr "Modes de paiement entrant"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+msgid "Outgoing Payments"
+msgstr "Modes de paiement sortant"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__name
+msgid "Name"
+msgstr "Modes de paiement"
+
+#. module: account
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__payment_method_id
+msgid "Payment Method"
+msgstr "Méthodes de paiement"
