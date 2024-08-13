@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-10 12:36+0000\n"
-"PO-Revision-Date: 2024-07-10 12:36+0000\n"
+"POT-Creation-Date: 2024-09-09 12:26+0000\n"
+"PO-Revision-Date: 2024-09-09 12:26+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -348,6 +348,21 @@ msgid "Partner's phone"
 msgstr "Téléphone du partenaire"
 
 #. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.account_payment_method_line_view_form
+msgid "Payment Method"
+msgstr "Méthode de paiement"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.account_payment_method_line_view_form
+msgid "Payment Methods"
+msgstr "Méthodes de paiement"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.account_payment_method_line_view_form
+msgid "Payment Mode Name"
+msgstr "Nom du mode de paiement"
+
+#. module: of_account
 #: model:ir.model,name:of_account.model_account_payment_term
 msgid "Payment Terms"
 msgstr "Conditions de paiement"
@@ -501,6 +516,11 @@ msgstr "Valider"
 #: model_terms:ir.ui.view,arch_db:of_account.of_account_view_account_move_form
 msgid "Vendor details"
 msgstr "Détails fournisseur"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.account_payment_method_line_view_form
+msgid "Waiting Payment Account"
+msgstr "Compte de paiement en attente"
 
 #. module: of_account
 #. odoo-python
