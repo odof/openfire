@@ -13,6 +13,13 @@
                 <attribute name="groups"></attribute>
                 <attribute name="attrs">{'invisible':[('of_is_current_user_admin','=',False),('type','in',('sale','cash','bank'))]}</attribute>
             </xpath>
+            <xpath expr="//page[@id='inbound_payment_settings']//tree" position="attributes">
+                <attribute name="editable"/>
+            </xpath>
+            <xpath expr="//page[@id='outbound_payment_settings']//tree" position="attributes">
+                <attribute name="editable"/>
+            </xpath>
+
         </field>
     </record>
 

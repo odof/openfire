@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="view_account_payment_method_line_form" model="ir.ui.view">
+        <field name="name">account.payment.method.line.form</field>
+        <field name="model">account.payment.method.line</field>
+        <field name="arch" type="xml">
+            <form string="Payment Method Line">
+                <sheet>
+                    <group col="2">
+                    <group>
+
+                        <field name="payment_type" invisible="1"/>
+                        <field name="available_payment_method_ids" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="payment_method_id" placeholder="Leave empty to use the default outstanding account"
+                        string="Outstanding Receipts accounts"
+                        optional="hide"
+                        options="{'no_quick_create': True}"
+                        groups="account.group_account_readonly"/>
+                        <field name="name"/>
+                        <field name="payment_account_id"/>
+                    </group>
+                         <group>
+                            <field name="sequence"/>
+                            <field name="journal_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
