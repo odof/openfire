@@ -22,3 +22,30 @@ msgstr "Date d'avoir"
 #: model_terms:ir.ui.view,arch_db:account.view_tax_form
 msgid "Distribution for Refunds"
 msgstr "Répartition pour Avoirs"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+msgid "Incoming Payments"
+msgstr "Modes de paiements entrant"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+msgid "Outgoing Payments"
+msgstr "Mode de paiement sortant"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:account.field_account_payment__payment_method_line_id
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__payment_method_id
+#: model:ir.model.fields,field_description:account.field_account_payment_register__payment_method_line_id
+msgid "Payment Method"
+msgstr "Méthode de paiement"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__name
+msgid "Name"
+msgstr "Modes de paiement"
+
+#. module: of_account
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__payment_account_id
+msgid "Payment Account"
+msgstr "Compte de paiement en attente"
