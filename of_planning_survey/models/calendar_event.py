@@ -73,11 +73,21 @@ class CalendarEvent(models.Model):
                     # we are on a section
                     answers = ""
                 else:
-                    answers = ", ".join(
-                        event.of_survey_user_input_line_ids.filtered(lambda r: r.question_id.id == question.id).mapped(
-                            'display_name'
-                        )
+                    input_lines = event.of_survey_user_input_line_ids.filtered(
+                        lambda r: r.question_id.id == question.id
                     )
+                    # When we have a multiple choice question with "comment allowed" option, we want to skip the
+                    # skipped answers if there is at least one answer given by the user to avoid having something like
+                    # `"Ignored, Answered text"` in the answers field.
+                    answer_lines = [
+                        line.display_name
+                        for line in input_lines
+                        if len(input_lines.filtered(lambda r: r.question_id.id == line.question_id.id)) <= 1
+                        or not line.skipped
+                        or line.question_id.question_type != 'multiple_choice'
+                    ]
+                    answers = ', '.join(answer_lines)
+
                 if len(question_answers) == 1:
                     if question_answers.answers != answers:
                         question_answers_ids.append(
