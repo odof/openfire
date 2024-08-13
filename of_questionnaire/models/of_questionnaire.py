@@ -75,6 +75,19 @@ class OfQuestionnaireLine(models.Model):
         self.env['of.questionnaire.line.reponse']._vacuum()
         return True
 
+    @api.multi
+    def get_formated_condition(self):
+        self.ensure_one
+        condition = (
+            self.condition_code
+            .replace(' = ', ' == ')
+            .replace(' et ', ' and ')
+            .replace(' ou ', ' or ')
+        )
+        # Remplacement de tous les textes par du unicode
+        condition = re.sub('("(.*?[^\\\\])*?")', 'u\\1', condition)
+        return condition
+
 
 class OfQuestionnaireLineReponse(models.Model):
     _name = "of.questionnaire.line.reponse"
@@ -236,19 +249,13 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def recompute_questions_condition_unmet(self):
-        re_strings = re.compile('(".*?[^\\\\]")')
         for intervention in self:
             ctx = {}
             for question in intervention.question_ids:
                 if question.id_code:
                     ctx[question.id_code] = question.definitive_answer
                 if question.condition:
-                    condition_code = question.condition_code
-                    condition_code = condition_code.replace(' = ', ' == ')
-                    condition_code = condition_code.replace(' et ', ' and ')
-                    condition_code = condition_code.replace(' ou ', ' or ')
-                    # Remplacement de tous les textes par du unicode
-                    condition_code = re_strings.sub('u\\1', condition_code)
+                    condition_code = question.get_formated_condition()
                     try:
                         condition_unmet = not safe_eval(condition_code, ctx)
                     except Exception:
