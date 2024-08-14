@@ -9,6 +9,9 @@
             <xpath expr="//field[@name='pack_component_price']" position="attributes">
                 <attribute name="attrs">{}</attribute>
             </xpath>
+            <xpath expr="//field[@name='pack_type']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
 
             <xpath expr="//field[@name='list_price']" position="attributes">
                 <attribute name="nolabel">1</attribute>
