@@ -10,7 +10,6 @@
                 <field name="of_pack_ok" string="Pack"/>
             </field>
             <field name="of_main_product" position="after">
-                <field name="of_pack_type" string="Pack Display Type" attrs="{'invisible': [('of_pack_ok', '=', False)], 'required': [('of_pack_ok', '=', True)]}"/>
                 <field name="of_pack_component_price" attrs="{'invisible': [('of_pack_ok', '=', False)], 'required': [('of_pack_ok', '=', True)]}"/>
             </field>
             <field name="name" position="after">
