@@ -16,23 +16,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_planning
-#: model:mail.template,body_html:of_planning.email_template_of_planning_intervention_report
-msgid ""
-"\n"
-"    <p>Hello <span t-field=\"object.of_address_id.name\"/>,\n"
-"    <br/><br/>\n"
-"    Please find attached your intervention's report of <span t-field=\"object.start\" t-options=\"{'widget': 'date'}\"/>.\n"
-"    </p>\n"
-"    "
-msgstr ""
-"\n"
-"    <p>Bonjour <span t-field=\"object.of_address_id.name\"/>,\n"
-"    <br/><br/>\n"
-"    Veuillez trouver ci-joint le compte-rendu de votre intervention du <span t-field=\"object.start\" t-options=\"{'widget': 'date'}\"/>.\n"
-"    </p>\n"
-"    "
-
-#. module: of_planning
 #. odoo-python
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
 #: code:addons/of_planning/models/of_planning_intervention_template.py:0
@@ -185,6 +168,25 @@ msgid ""
 msgstr ""
 "* Les données saisies dans ce champ seront visualisées dans la planification"
 " des interventions et imprimées dans le formulaire d'intervention."
+
+#. module: of_planning
+#: model:mail.template,body_html:of_planning.email_template_of_planning_intervention_report
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"margin: 0px; padding: 0px; font-size: 13px;\"> Hello <t t-out=\"object.of_address_id.name\">user</t>, \n"
+"                    <br><br>\n"
+"                    Please find attached your intervention's report of <t t-out=\"object.start\" t-options=\"{'widget': 'date'}\">06/02/2024</t>.\n"
+"                </p>\n"
+"            </div>\n"
+"        "
+msgstr ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"                <p style=\"box-sizing:border-box;margin: 0px; padding: 0px; font-size: 13px;\"> Bonjour <t t-out=\"object.of_address_id.name\">utilisateur</t>, \n"
+"                    <br><br>\n"
+"                    Veuillez trouver ci-joint le compte-rendu de votre intervention du <t t-out=\"object.start\" t-options=\"{'widget': 'date'}\">06/02/2024</t>.\n"
+"                </p>\n"
+"            </div>\n"
+"        "
 
 #. module: of_planning
 #: model:mail.template,body_html:of_planning.email_template_planning
@@ -1023,8 +1025,8 @@ msgstr "Calendrier de l'événement"
 
 #. module: of_planning
 #: model:mail.template,name:of_planning.email_template_of_planning_intervention_report
-msgid "Calendar Event - Intervention report"
-msgstr "Intervention - Rapport d'intervention"
+msgid "Calendar Event: Intervention report"
+msgstr "Intervention : Rapport d'intervention"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
