@@ -27,8 +27,9 @@ class OFSurveyUserInputLine(models.Model):
         if 'skipped' in args:
             mutation['skipped'] = args['skipped']
 
-        if answer_type := args.get('answer_type'):
-            mutation['answer_type'] = answer_type
+        if 'answer_type' in args:
+            mutation['answer_type'] = args['answer_type']
+
         elif question_id := args.get('question'):
             if question_id:
                 # on va chercher le type sur la question
