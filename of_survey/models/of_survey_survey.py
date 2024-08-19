@@ -655,3 +655,11 @@ class OFSurveySurvey(models.Model):
             for question in survey.question_ids:
                 if len(question.conditional_questions) == 0:
                     question.is_conditional = False
+                else:
+                    # Check if there are any invalid conditions
+                    invalid_conditions = question.conditional_questions.filtered(
+                        lambda item: not item.question_id or not item.answer_ids
+                    )
+                    invalid_conditions.unlink()
+                    if not question.conditional_questions:
+                        question.is_conditional = False
