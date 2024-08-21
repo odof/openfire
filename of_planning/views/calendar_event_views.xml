@@ -544,7 +544,6 @@
         </field>
     </record>
 
-
     <record id="view_calendar_event_calendar" model="ir.ui.view">
         <field name="name">calendar.event.view.calendar</field>
         <field name="model">calendar.event</field>
@@ -557,11 +556,26 @@
         </field>
     </record>
 
+    <record id="calendar_event_view_calendar" model="ir.ui.view">
+        <field name="name">calendar.event.view.calendar</field>
+        <field name="model">calendar.event</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.view_calendar_event_calendar" />
+        <field name="arch" type="xml">
+            <xpath expr="//calendar" position="attributes">
+                <attribute name="quick_add">false</attribute>
+                <attribute name="event_open_popup">true</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="action_calendar_event" model="ir.actions.act_window">
         <field name="name">Intervention Planning</field>
         <field name="res_model">calendar.event</field>
         <field name="view_mode">tree,form,calendar,pivot</field>
-        <field name="view_id" ref="view_calendar_event_intervention_tree" />
+        <field name="view_ids" eval="[Command.clear(),
+            Command.create({'view_mode': 'tree', 'view_id': ref('view_calendar_event_intervention_tree')}),
+            Command.create({'view_mode': 'calendar', 'view_id': ref('calendar_event_view_calendar')})]"/>
         <field name="search_view_id" ref="calendar_event_view_search" />
         <field name="domain">[('of_type','=','intervention')]</field>
     </record>
