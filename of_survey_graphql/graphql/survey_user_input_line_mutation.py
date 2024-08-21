@@ -21,6 +21,7 @@ class SurveyUserInputLineCreate(graphene.Mutation):
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
         images = graphene.List(graphene.NonNull(ImageInput))
+        comment = graphene.String()
 
     Output = survey_user_input_line_type.SurveyUserInputLine
 
@@ -44,6 +45,7 @@ class SurveyUserInputLineUpdate(graphene.Mutation):
         suggested_answer = graphene.Argument(survey_question_answer_type.SurveyQuestionAnswerInput)
         question = graphene.Argument(survey_question_page_type.SurveyQuestionPageInput)
         images = graphene.List(graphene.NonNull(ImageInput))
+        comment = graphene.String()
 
     Output = survey_user_input_line_type.SurveyUserInputLine
 

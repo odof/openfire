@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 import logging
 
 import graphene
@@ -55,7 +56,7 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
     # ou bien si on supprime les lignes existantes avant d'ajouter les nouvelles
     obj = self.env[model]
     if context:
-        obj = obj.with_context(context)
+        obj = obj.with_context(**context)
     if user:
         obj = obj.with_user(user)
     res = []
@@ -71,19 +72,22 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
         return [Command.clear()]
 
     for record in input:
-        record_value = default.copy()
         values = obj._prepare_mutation_values(**record)
-        record_value.update(values)
-        if record.id:
-            if not obj.search([('id', '=', record.id)]):
-                raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
-            record = obj.search([('id', '=', record.id)])
-            if len(record_value.keys()) > 0:
-                record.write(record_value)
-            res_ids.append(record.id)
+        if type(values) is dict:
+            values = [values]
+        for value in values:
+            record_value = default.copy()
+            record_value.update(value)
+            if record.id:
+                if not obj.search([('id', '=', record.id)]):
+                    raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
+                record = obj.search([('id', '=', record.id)])
+                if len(record_value.keys()) > 0:
+                    record.write(record_value)
+                res_ids.append(record.id)
 
-        else:
-            creates += [record_value]
+            else:
+                creates += [record_value]
 
     if keep:
         res.extend(Command.link(id) for id in res_ids)
