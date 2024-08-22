@@ -4,3 +4,4 @@ from . import calendar_event
 from . import of_planning_intervention_template
 from . import of_survey_survey
 from . import of_survey_answers
+from . import of_survey_question

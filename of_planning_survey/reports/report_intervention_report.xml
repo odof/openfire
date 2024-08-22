@@ -12,7 +12,7 @@
                         <table class="table table-condensed mb-0" style="border-color: transparent;">
                             <tbody>
                                 <t t-foreach="doc.of_answers_ids" t-as="answer">
-                                    <t t-if="answer.question_id.is_page or answer.answers_images_ids or answer.image_ids">
+                                    <t t-if="(answer.question_id.is_page or answer.answers_images_ids or answer.image_ids) and not answer.question_id.constr_no_report_display">
                                         <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
                                             <td>
                                                 <span><strong t-field="answer.question_id.title"/> :</span>
