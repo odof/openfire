@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 16:22+0000\n"
-"PO-Revision-Date: 2024-07-24 16:22+0000\n"
+"POT-Creation-Date: 2024-08-29 08:57+0000\n"
+"PO-Revision-Date: 2024-08-29 08:57+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -39,6 +39,11 @@ msgstr ""
 #: model:ir.model,name:of_planning_survey.model_calendar_event
 msgid "Calendar Event"
 msgstr "Calendrier de l'événement"
+
+#. module: of_planning_survey
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_survey_question__constr_no_report_display
+msgid "Do not display in reports"
+msgstr "Ne pas afficher dans les rapports"
 
 #. module: of_planning_survey
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.calendar_event_view_form
@@ -145,6 +150,11 @@ msgid "Survey Answers"
 msgstr "Réponses au Questionnaire"
 
 #. module: of_planning_survey
+#: model:ir.model,name:of_planning_survey.model_of_survey_question
+msgid "Survey Question"
+msgstr "Question du Questionnaire"
+
+#. module: of_planning_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_survey_survey__survey_type
 msgid "Survey Type"
 msgstr "Type de Questionnaire"
@@ -164,6 +174,11 @@ msgstr "Ligne d'entrée utilisateur du Questionnaire"
 #: model:ir.ui.menu,name:of_planning_survey.menu_of_survey_survey
 msgid "Surveys"
 msgstr "Questionnaires"
+
+#. module: of_planning_survey
+#: model:ir.model.fields,help:of_planning_survey.field_of_survey_question__constr_no_report_display
+msgid "This question will not be displayed in the intervention report"
+msgstr "Cette question n'apparaîtra pas dans le rapport d'intervention"
 
 #. module: of_planning_survey
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.of_survey_survey_view_search_intervention
