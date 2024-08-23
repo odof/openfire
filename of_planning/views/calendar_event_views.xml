@@ -253,6 +253,10 @@
             <xpath expr="//page[@name='page_details']/group[1]" position="attributes">
                 <attribute name="invisible">1</attribute>
             </xpath>
+            <xpath expr="//page[@name='page_details']//field[@name='description']" position="attributes">
+                <attribute name="options">{'allowCommandImage':false, 'allowCommandLink': false}</attribute>
+                <attribute name="widget">of_html</attribute>
+            </xpath>
             <xpath expr="//page[@name='page_details']//field[@name='description']" position="before">
                 <field name="of_internal_description" attrs="{'invisible':[('of_type', '!=', 'intervention')]}" />
             </xpath>
