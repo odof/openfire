@@ -31,7 +31,7 @@ msgid "Payment Mode"
 msgstr "Mode de paiement"
 
 #. module: of_sale_advance_payment
-#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__of_ref_reglement
+#: model:ir.model.fields,field_description:of_sale_advance_payment.field_account_voucher_wizard__of_payment_ref
 msgid "Payment reference"
 msgstr "Référence de paiement"
 

@@ -10,9 +10,10 @@
     'summary': "Personnalisation des module de OCA ",
     'depends': [
         'sale_advance_payment',
+        'of_account_payment',
     ],
     'data': [
-        'wizard/sale_advance_payment_wizard_views.xml',
+        'wizards/sale_advance_payment_wizard_views.xml',
     ],
     'installable': True,
     'application': False,

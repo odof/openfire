@@ -13,7 +13,7 @@
                 <field name="partner_bank_id"></field>
             </xpath>
             <xpath expr="//field[@name='payment_ref']" position="after">
-                <field name="of_ref_reglement"></field>
+                <field name="of_payment_ref"/>
             </xpath>
             <xpath expr="//field[@name='date']" position="after">
                 <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"></field>

@@ -5,16 +5,18 @@ from odoo import api, fields, models
 
 
 class AccountVoucherWizard(models.TransientModel):
-    _inherit = "account.voucher.wizard"
+    _inherit = 'account.voucher.wizard'
 
     of_payment_mode_id = fields.Many2one(
         comodel_name='of.payment.mode',
         string="Payment Mode",
         domain="[('payment_type', '=', payment_type)]",
     )
-    of_ref_reglement = fields.Char(size=64, string="Payment reference")
+    of_payment_ref = fields.Char(size=64, string="Payment reference")
     of_tag_ids = fields.Many2many(comodel_name='of.payment.tags', string="Payment tags")
-    partner_bank_id = fields.Many2one('res.partner.bank', string='Recipient Bank', related="journal_id.bank_account_id")
+    partner_bank_id = fields.Many2one(
+        comodel_name='res.partner.bank', string="Recipient Bank", related='journal_id.bank_account_id'
+    )
 
     @api.model
     def default_get(self, fields_list):
@@ -23,11 +25,11 @@ class AccountVoucherWizard(models.TransientModel):
         if not sale_ids:
             return res
         sale_id = fields.first(sale_ids)
-        sale = self.env["sale.order"].browse(sale_id)
-        if "amount_total" in fields_list:
+        sale = self.env['sale.order'].browse(sale_id)
+        if 'amount_total' in fields_list:
             res.update(
                 {
-                    "payment_ref": sale.name,
+                    'payment_ref': sale.name,
                 }
             )
 
