@@ -11,7 +11,7 @@
                 <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
                 <field name="sale_id" />
                 <field name="of_payment_mode_id"/>
-                <field name="of_ref_reglement"/>
+                <field name="of_payment_ref"/>
             </xpath>
             <xpath expr="//field[@name='payment_method_line_id']" position="attributes">
                 <attribute name="invisible">1</attribute>
