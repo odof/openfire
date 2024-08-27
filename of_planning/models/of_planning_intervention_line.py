@@ -160,7 +160,9 @@ class OFPlanningInterventionLine(models.Model):
     @api.depends('invoice_line_ids', 'invoice_line_ids.move_id', 'invoice_line_ids.quantity')
     def _compute_qty_invoiced(self):
         for line in self:
-            line.qty_invoiced = sum(line.mapped('invoice_line_ids.quantity'))
+            invoice_lines = line.invoice_line_ids.filtered(lambda il: il.move_id.move_type.endswith('_invoice'))
+            refund_lines = line.invoice_line_ids.filtered(lambda il: il.move_id.move_type.endswith('_refund'))
+            line.qty_invoiced = sum(invoice_lines.mapped('quantity')) - sum(refund_lines.mapped('quantity'))
 
     @api.depends('product_id', 'company_id', 'partner_id')
     def _compute_tax_ids(self):
