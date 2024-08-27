@@ -3558,17 +3558,17 @@ msgstr "Durée totale"
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Totals"
-msgstr ""
+msgstr "Totaux"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__report_order_totals
 msgid "Totals (IR)"
-msgstr "Totals"
+msgstr "Totaux (RI)"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_order_totals
 msgid "Totals (IS)"
-msgstr "Totals"
+msgstr "Totaux (FI)"
 
 #. module: of_planning
 #: model:ir.model,name:of_planning.model_stock_picking
