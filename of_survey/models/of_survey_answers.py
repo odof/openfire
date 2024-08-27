@@ -48,7 +48,7 @@ class OFSurveyAnswers(models.Model):
     def _compute_answers_images_ids(self):
         for answer in self:
             if user_input_lines := answer.user_input.user_input_line_ids.filtered(
-                lambda record: record.question_id == answer.question_id
+                lambda record: record.question_id == answer.question_id and not record.skipped
             ):
                 values = []
                 for line in user_input_lines:
