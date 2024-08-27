@@ -3,7 +3,7 @@
     <template id="report_intervention_sheet_document" inherit_id="of_planning.report_intervention_sheet_document">
         <xpath expr="//div[@name='sheet_invoicing']" position="after">
             <!-- Survey -->
-            <div t-if="template.sheet_survey and doc.of_answers_ids" name="sheet_survey" class="row mb-4" style="page-break-inside: avoid;">
+            <div t-if="template.sheet_survey and doc.of_answers_ids and doc.of_answers_ids.filtered(lambda a: a.answers)" name="sheet_survey" class="row mb-4" style="page-break-inside: avoid;">
                 <div class="col">
                     <h5 name="title_survey">
                         <strong>Survey</strong>
@@ -12,7 +12,7 @@
                         <table class="table table-condensed mb-0" style="border-color: transparent;">
                             <tbody>
                                 <t t-foreach="doc.of_answers_ids" t-as="answer">
-                                    <t t-if="len(answer.user_input.user_input_line_ids.value_image_ids) > 0 and (answer.question_id.is_page or answer.answers_images_ids or answer.image_ids)">
+                                    <t t-if="answer.question_id.is_page or answer.answers_images_ids or answer.image_ids">
                                         <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
                                             <td>
                                                 <span><strong t-field="answer.question_id.title"/> :</span>
