@@ -2,6 +2,7 @@
 
 from . import account_move_line
 from . import calendar_attendee
+from . import res_company
 from . import calendar_event
 from . import hr_employee
 from . import res_partner
@@ -18,6 +19,5 @@ from . import of_planning_tag
 from . import of_planning_task
 from . import of_planning_team
 from . import of_image
-from . import res_company
 from . import res_config_settings
 from . import mail_activity

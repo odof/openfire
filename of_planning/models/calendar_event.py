@@ -281,6 +281,8 @@ class CalendarEvent(models.Model):
         string="Intervention template",
         change_default=True,
         help="Prepare the intervention with a pre-configured intervention template",
+        default=lambda r: r.env.user.company_id.of_default_intervention_template_id,
+        required=lambda r: r.user.company_id.of_is_intervention_template_required,
     )
     of_force_dates = fields.Boolean(
         string="Force dates",

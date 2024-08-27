@@ -18,3 +18,14 @@ class ResConfigSettings(models.TransientModel):
     group_intervention_use_deliveries = fields.Boolean(
         string="(OF) Intervention's pickings", implied_group='of_planning.group_intervention_use_deliveries'
     )
+    of_default_intervention_template_id = fields.Many2one(
+        comodel_name='of.planning.intervention.template',
+        related='company_id.of_default_intervention_template_id',
+        readonly=False,
+        string="(OF) Default Intervention template",
+    )
+    of_is_intervention_template_required = fields.Boolean(
+        related='company_id.of_is_intervention_template_required',
+        readonly=False,
+        string="(OF) Make the Intervention template mandatory",
+    )
