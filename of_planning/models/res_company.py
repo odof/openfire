@@ -24,3 +24,10 @@ class ResCompany(models.Model):
         string="(OF) Auto. Sectors assignation",
         help="If you check this box, the sectors will be assigned automatically when the contact is created.",
     )
+    of_default_intervention_template_id = fields.Many2one(
+        comodel_name='of.planning.intervention.template',
+        string="(OF) Default Intervention template",
+    )
+    of_is_intervention_template_required = fields.Boolean(
+        string="(OF) Make the Intervention template mandatory",
+    )

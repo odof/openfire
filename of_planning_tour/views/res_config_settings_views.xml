@@ -6,9 +6,7 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="of_planning.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='of_intervention_use_deliveries']" position="after">
-
-
+            <xpath expr="//div[@data-key='of_planning']/div[last()]" position="after">
                 <!-- Intervention planning -->
                 <h2>Intervention planning</h2>
                 <div class="row mt16 o_settings_container" id="nbr_days_tour_creation">
