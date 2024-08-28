@@ -22,6 +22,12 @@ class OFPaymentMode(models.Model):
         for mode in self:
             mode.name = f"{mode.journal_id.name} - {mode.payment_method_line_id.name}"
 
+    def name_get(self):
+        result = []
+        for mode in self.sudo():
+            result.append((mode.id, mode.shortname))
+        return result
+
     @api.model
     def action_update_mode_payment(self):
         """
