@@ -496,9 +496,11 @@ class OFWebsitePlanningBooking(http.Controller):
                 else:
                     intervention = request.env['of.planning.intervention'].sudo().create(vals)
                 intervention.onchange_company_id()
-                intervention.with_context(of_import_service_lines=True)._onchange_service_id()
-                intervention.with_context(of_import_service_lines=True)._onchange_tache_id()
-                intervention.with_context(of_import_service_lines=True).onchange_template_id()
+                if intervention.service_id:
+                    intervention = intervention.with_context(of_import_service_lines=True)
+                intervention._onchange_service_id()
+                intervention._onchange_tache_id()
+                intervention.onchange_template_id()
                 if intervention.line_ids:
                     intervention.line_ids.compute_taxes()
                 # mettre à jour le nom du RDV
