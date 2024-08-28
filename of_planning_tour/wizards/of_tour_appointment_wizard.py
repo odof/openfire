@@ -776,8 +776,17 @@ class OFTourAppointmentWizard(models.TransientModel):
             except Exception:
                 self.orthodromic = True
             self._calculate_distance_and_duration()
+            self._unlink_line_too_far()
             self._select_first_line()
             self._handle_first_line()
+
+    def _unlink_line_too_far(self):
+        """
+        Unlink the lines that, once the distance and duration calculated, are too far to fit in their available slots.
+        """
+        self.line_ids.filtered(
+            lambda li: li.wizard_id.duration + (li.useful_duration / 60) > li.available_slot_id.duration
+        ).unlink()
 
     def _select_first_line(self):
         """Mark the first line as the best line"""
@@ -845,6 +854,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             else request.order_id.picking_ids.ids
         )
         name = self.intervention_id.name if self.intervention_id else self.name
+        useful_duration = self.selected_line_id.useful_duration / 60
         values = {
             'of_partner_id': self.partner_id.id,
             'of_address_id': self.partner_address_id.id,
@@ -853,8 +863,8 @@ class OFTourAppointmentWizard(models.TransientModel):
             'of_request_id': request.id,
             'of_employee_ids': [Command.link(self.employee_id.id)],
             'of_tag_ids': tag_ids,
-            'start': self.selected_datetime,
-            'stop': self.selected_datetime + timedelta(hours=self.duration),
+            'start': self.selected_datetime + timedelta(hours=useful_duration),
+            'stop': self.selected_datetime + timedelta(hours=(self.duration + useful_duration)),
             'of_trip_duration': self.selected_line_id.useful_duration / 60,
             'user_id': self._uid,
             'of_company_id': self.company_id.id,
