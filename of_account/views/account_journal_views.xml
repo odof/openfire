@@ -13,13 +13,91 @@
                 <attribute name="groups"></attribute>
                 <attribute name="attrs">{'invisible':[('of_is_current_user_admin','=',False),('type','in',('sale','cash','bank'))]}</attribute>
             </xpath>
-            <xpath expr="//page[@id='inbound_payment_settings']//tree" position="attributes">
-                <attribute name="editable"/>
+            <xpath expr="//page[@id='inbound_payment_settings']" position="replace">
+                <page id="inbound_payment_settings" string="Incoming Payments" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}">
+                    <field name="available_payment_method_ids" invisible="1"/>
+                    <field name="inbound_payment_method_line_ids" nolabel="1" context="{'default_payment_type': 'inbound'}">
+                        <tree string="Payment Methods">
+                            <field name="available_payment_method_ids" invisible="1"/>
+                            <field name="payment_type" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="sequence" widget="handle"/>
+                            <field name="payment_method_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="name"/>
+                            <field name="payment_account_id"
+                                                placeholder="Leave empty to use the default outstanding account"
+                                                string="Outstanding Receipts accounts"
+                                                options="{'no_quick_create': True}"
+                                                groups="account.group_account_readonly"/>
+                        </tree>
+                        <form string="Payment Method Line">
+                            <sheet>
+                                <group col="2">
+                                <group>
+                                    <field name="available_payment_method_ids" invisible="1"/>
+                                    <field name="payment_method_id"  options="{'no_quick_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="payment_account_id"
+                                        domain="[('deprecated', '=', False), ('company_id', '=', company_id),
+                                                    ('account_type', 'not in', ('asset_receivable', 'liability_payable')),
+                                                    '|', ('account_type', 'in', ('asset_current', 'liability_current'))]"
+                                        groups="account.group_account_readonly"/>
+                                </group>
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="journal_id" readonly="1"/>
+                                        <field name="payment_type" />
+                                        <field name="company_id"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
             </xpath>
-            <xpath expr="//page[@id='outbound_payment_settings']//tree" position="attributes">
-                <attribute name="editable"/>
+            <xpath expr="//page[@id='outbound_payment_settings']" position="replace">
+                <page id="outbound_payment_settings" string="Outgoing Payments" attrs="{'invisible': [('type', 'not in', ['cash', 'bank'])]}">
+                    <field name="outbound_payment_method_line_ids" nolabel="1" context="{'default_payment_type': 'outbound'}">
+                        <tree string="Payment Methods">
+                            <field name="available_payment_method_ids" invisible="1"/>
+                            <field name="payment_type" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="sequence" widget="handle"/>
+                            <field name="payment_method_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="name"/>
+                            <field name="payment_account_id"
+                                                placeholder="Leave empty to use the default outstanding account"
+                                                string="Outstanding Receipts accounts"
+                                                options="{'no_quick_create': True}"
+                                                groups="account.group_account_readonly"/>
+                        </tree>
+                        <form string="Payment Method Line">
+                            <sheet>
+                                <group col="2">
+                                <group>
+                                    <field name="available_payment_method_ids" invisible="1"/>
+                                    <field name="payment_method_id"  options="{'no_quick_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="payment_account_id"
+                                        domain="[('deprecated', '=', False), ('company_id', '=', company_id),
+                                                    ('account_type', 'not in', ('asset_receivable', 'liability_payable')),
+                                                    '|', ('account_type', 'in', ('asset_current', 'liability_current'))]"
+                                        groups="account.group_account_readonly"/>
+                                </group>
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="journal_id" readonly="1"/>
+                                        <field name="payment_type" />
+                                        <field name="company_id"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                    <field name="selected_payment_method_codes" invisible="1"/>
+                    <group name="outgoing_payment" />
+                </page>
             </xpath>
-
         </field>
     </record>
 

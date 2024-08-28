@@ -24,14 +24,24 @@ msgid "Distribution for Refunds"
 msgstr "Répartition pour Avoirs"
 
 #. module: of_account
-#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_journal_form_view
 msgid "Incoming Payments"
 msgstr "Modes de paiements entrant"
 
 #. module: of_account
-#: model_terms:ir.ui.view,arch_db:account.view_account_journal_form
+#: model:ir.model.fields,field_description:account.field_account_payment_method_line__name
+msgid "Name"
+msgstr "Modes de paiement"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_journal_form_view
 msgid "Outgoing Payments"
-msgstr "Mode de paiement sortant"
+msgstr "Modes de paiement sortant"
+
+#. module: of_account
+#: model_terms:ir.ui.view,arch_db:of_account.of_account_journal_form_view
+msgid "Outstanding Receipts accounts"
+msgstr "Comptes de paiements entrants en suspens"
 
 #. module: of_account
 #: model:ir.model.fields,field_description:account.field_account_payment__payment_method_line_id
@@ -41,11 +51,6 @@ msgid "Payment Method"
 msgstr "Méthode de paiement"
 
 #. module: of_account
-#: model:ir.model.fields,field_description:account.field_account_payment_method_line__name
-msgid "Name"
-msgstr "Modes de paiement"
-
-#. module: of_account
 #: model:ir.model.fields,field_description:account.field_account_payment_method_line__payment_account_id
 msgid "Payment Account"
-msgstr "Compte de paiement en attente"
+msgstr "Compte de paiement"
