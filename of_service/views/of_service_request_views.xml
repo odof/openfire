@@ -145,10 +145,17 @@
                             <group>
                                 <field name="note" placeholder="Description..." colspan="2" nolabel="1"/>
                             </group>
-                            <!-- Attribut invisible à supprimer une fois que d'autres champs que Commande sera dans cette partie Origine -->
-                            <group name="origin" string="Origin" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}">
-                                <group>
-                                    <field name="order_id" context="{'extended_display': 1}" attrs="{'invisible': [('type_id','not in', [%(of_service.of_service_request_type_installation)d, %(of_service.of_service_request_type_maintenance)d])]}"/>
+                            <group col="4" colspan="4">
+                                <!-- Attribut invisible à supprimer une fois que d'autres champs que Commande sera dans cette partie Origine -->
+                                <group name="origin" string="Origin" colspan="2" attrs="{'invisible': [('type_id','not in', [2, 1])]}">
+                                    <group>
+                                        <field name="order_id" context="{'extended_display': 1}" attrs="{'invisible': [('type_id','not in', [2, 1])]}"/>
+                                    </group>
+                                </group>
+                                <group name="informations" colspan="2" string="Informations">
+                                    <group>
+                                        <field name="stage_id"/>
+                                    </group>
                                 </group>
                             </group>
                         </page>
