@@ -6,6 +6,7 @@ from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
+from ..graphql.company_type import Company
 from ..graphql.employee_type import Employee, EmployeeFilterInput
 from ..graphql.image_type import Image, ImageInput
 from ..graphql.planning_intervention_line_type import PlanningInterventionLine, PlanningInterventionLineInput
@@ -75,6 +76,7 @@ class OFGraphql(models.AbstractModel):
                 PlanningInterventionLine,
                 PlanningInterventionLineInput,
                 SaleOrder,
+                Company,
             ],
         )
 
