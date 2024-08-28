@@ -184,7 +184,7 @@ msgstr "Référence du paiement"
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_tag_ids
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment_register__of_tag_ids
 msgid "Payment tags"
-msgstr "Étiquettes de paiement"
+msgstr "Étiquettes du paiement"
 
 #. module: of_account_payment
 #: model:ir.model,name:of_account_payment.model_account_payment

@@ -13,6 +13,10 @@
                 <xpath expr="//field[@name='journal_id']" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </xpath>
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <xpath expr="//label[@for='amount']" position="move"/>
+                    <xpath expr="//div[@name='amount_div']" position="move"/>
+                </xpath>
                 <xpath expr="//field[@name='payment_method_line_id']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>
@@ -20,7 +24,6 @@
                     <field name="of_payment_ref"/>
                     <field name="of_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"></field>
                 </xpath>
-
             </field>
         </record>
 
