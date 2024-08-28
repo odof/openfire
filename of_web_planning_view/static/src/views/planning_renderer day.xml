@@ -163,7 +163,7 @@
                     <t t-set="alignment" t-value="{ horizontal: 'left', vertical: 'top' }" />
                 </t>
                 <t t-if="pill._trip">
-                    <div class="o_planning_trip_bar position-absolute o_planning_trip" t-att-class="pill.className" t-attf-style="left: -{{ 60 * pill._trip }}px; width:{{ pill._trip * 60 }}px;"/>
+                    <div class="o_planning_trip_bar position-absolute o_planning_trip" t-att-class="pill.className" t-attf-style="left: -{{ (60 * pill._trip) - 2 }}px; width:{{ (pill._trip * 60) - 1 }}px;"/>
                 </t>
                 <div class="o_planning_pill position-relative h-100 d-flex align-items-center"
                     t-att-class="pill.className"
