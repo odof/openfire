@@ -178,6 +178,8 @@ class File(dms_base.DMSModel):
         """
         picking_type_in_ids = self.env['stock.picking.type'].search([('code', '=', 'incoming')]).ids
         picking_type_out_ids = self.env['stock.picking.type'].search([('code', '=', 'outgoing')]).ids
+        picking_type_in_str = ','.join(str(i) for i in picking_type_in_ids)
+        picking_type_out_str = ','.join(str(i) for i in picking_type_out_ids)
         objects = [
             ('of_document.res_partner_file_category', 'res.partner', ""),
             (
@@ -193,12 +195,12 @@ class File(dms_base.DMSModel):
             (
                 'of_document.stock_picking_out_file_category',
                 'stock.picking',
-                "AND picking_type_id IN " + str(tuple(picking_type_out_ids)),
+                "AND picking_type_id IN (%s)" % picking_type_out_str,
             ),
             (
                 'of_document.stock_picking_in_file_category',
                 'stock.picking',
-                "AND picking_type_id IN " + str(tuple(picking_type_in_ids)),
+                "AND picking_type_id IN (%s)" % picking_type_in_str,
             ),
         ]
 
@@ -212,6 +214,8 @@ class File(dms_base.DMSModel):
             ))
 
         for categ, obj_name, where_query in objects:
+            if obj_name not in self.env:
+                continue
             categ = self.env.ref(categ)
             categ_dir_name = False
             if categ in data_ids:
