@@ -5,6 +5,19 @@
         <field name="context">{}</field>
     </record>
 
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">comment_template.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='customer_notes']" position="after">
+                <group string="Comments" name="comments">
+                    <field name="comment_template_ids" />
+                </group>
+            </xpath>
+        </field>
+    </record>
+
     <record id="sale_order_form_add_comment" model="ir.ui.view">
         <field name="name">comment_template.sale.order.form</field>
         <field name="model">sale.order</field>
@@ -17,28 +30,8 @@
                     }
                 </attribute>
             </xpath>
-        </field>
-    </record>
-
-    <!-- Replaces `comments` on OCA view to move it after an OF page -->
-    <record id="sale_order_form_add_comment" model="ir.ui.view" >
-        <field name="name">comment_template.sale.order.form</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale_comment_template.sale_order_form_add_comment" />
-        <field name="arch" type="xml">
-            <xpath expr="//page[@name='comments']" position="replace"/>
-        </field>
-    </record>
-
-    <record id="sale_order_view_form" model="ir.ui.view">
-        <field name="name">comment_template.sale.order.view.form</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="of_sale.of_sale_view_order_form" />
-        <field name="arch" type="xml">
-            <xpath expr="//notebook/page[@name='notes']" position="after">
-                <page string="Comments" name="comments">
-                    <field name="comment_template_ids" />
-                </page>
+            <xpath expr="//page[@name='comments']" position="attributes">
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>

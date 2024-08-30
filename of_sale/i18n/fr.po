@@ -6,14 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:14+0000\n"
-"PO-Revision-Date: 2024-07-11 07:14+0000\n"
+"POT-Creation-Date: 2024-09-03 07:27+0000\n"
+"PO-Revision-Date: 2024-09-03 07:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "&gt;"
+msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_allow_quote_addition
@@ -278,7 +283,7 @@ msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_estimated_invoicing_date
-msgid "Estimated invoicing date"
+msgid "Anticipated invoicing date"
 msgstr "Date de facturation prévisionnelle"
 
 #. module: of_sale
@@ -454,6 +459,11 @@ msgid "Date"
 msgstr ""
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Dates"
+msgstr ""
+
+#. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
 msgid "Delivered"
 msgstr ""
@@ -611,9 +621,19 @@ msgid "Estimated invoicing date"
 msgstr "Date de facturation prévisionnelle"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
+msgid "Estimation #"
+msgstr ""
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_fixed_invoice_date
 msgid "Fixed invoice date"
 msgstr "Date de facturation fixe"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Follow-up"
+msgstr "Suivi"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_color_font_section
@@ -735,6 +755,11 @@ msgid "Invoiced qty(ies)"
 msgstr "Qté(s) facturée(s)"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Invoicing"
+msgstr "Facturation"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_res_partner__of_invoice_policy
 #: model:ir.model.fields,field_description:of_sale.field_res_users__of_invoice_policy
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_invoice_policy
@@ -834,6 +859,11 @@ msgid "Manual"
 msgstr "Manuel"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Marketing"
+msgstr ""
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_verification__message
 msgid "Message"
 msgstr ""
@@ -859,11 +889,6 @@ msgstr "Nbr de livraisons"
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_order_line_view
 msgid "Note"
-msgstr ""
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
-msgid "Notes"
 msgstr ""
 
 #. module: of_sale
@@ -928,6 +953,7 @@ msgstr ""
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_confirmation__order_id
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
 msgid "Order"
 msgstr "Commande"
 
@@ -979,6 +1005,11 @@ msgid "PDF Printing"
 msgstr "Impression PDF"
 
 #. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Partner"
+msgstr "Client"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_gb_partner_tag_id
 msgid "Partner tag"
 msgstr "Étiquette partenaire"
@@ -1003,7 +1034,6 @@ msgid "Price printing"
 msgstr "Impressions des prix"
 
 #. module: of_sale
-#: model:ir.model,name:of_sale.model_product_pricelist
 #: model:ir.model.fields,field_description:of_sale.field_sale_order_line__of_order_pricelist_id
 msgid "Pricelist"
 msgstr "Liste de prix"
@@ -1022,7 +1052,7 @@ msgstr "Paramètres d'impression"
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_product_template
 msgid "Product"
-msgstr "Modèle d'article"
+msgstr "Produit"
 
 #. module: of_sale
 #: model:ir.ui.menu,name:of_sale.of_product_category_config_menu
@@ -1049,6 +1079,11 @@ msgstr "Variante de produit"
 #: model:ir.model.fields,field_description:of_sale.field_sale_report__of_product_tags
 msgid "Product tags"
 msgstr "Étiquettes produit"
+
+#. module: of_sale
+#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_view_order_form
+msgid "Quotation"
+msgstr "Devis"
 
 #. module: of_sale
 #: model_terms:ir.ui.view,arch_db:of_sale.of_report_saleorder_document
