@@ -20,9 +20,9 @@
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_total']" position="after">
                 <field name="of_intervention_state" optional="hide" />
             </xpath>
-            <xpath expr="//page[@name='notes']//group[@name='customer_notes']" position="after">
-                <group string="Intervention notes" name="intervention_notes">
-                    <field name="of_intervention_notes" colspan="2" nolabel="1" />
+            <xpath expr="//group[@name='marketing']" position="after">
+                <group string="Intervention Notes" name="intervention_notes">
+                    <field name="of_intervention_notes" colspan="2" nolabel="1"/>
                     <div class="text-muted" colspan="2">
                         * The data entered in this field will be visualized in the intervention planning and printed in the intervention form.
                     </div>

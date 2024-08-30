@@ -60,6 +60,10 @@
                 <!--/Button box -->
 
                 <!-- Partner details -->
+                <xpath expr="//group[@name='partner_details']" position="attributes">
+                    <attribute name="string">Partner</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='partner_id']" position="after">
                     <label string="Customer details" for="of_partner_phone"/>
                     <div>
@@ -70,16 +74,57 @@
                 </xpath>
                 <!-- /Partner details -->
 
-                <!-- Sale header -->
+                <!-- Date details -->
+                <xpath expr="//group[@name='partner_details']" position="after">
+                    <group name="date_details" string="Dates"/>
+                </xpath>
+
+                <xpath expr="//group[@name='order_details']//label[@for='date_order']" position="attributes">
+                    <attribute name="string">Quotation</attribute>
+                </xpath>
+
+                <xpath expr="//group[@name='date_details']" position="inside">
+                    <xpath expr="//group[@name='order_details']//label[@for='date_order']/.." position="move"/>
+                    <xpath expr="//group[@name='order_details']//field[@name='date_order']" position="move"/>
+                </xpath>
+
+                <xpath expr="//group[@name='order_details']//label[@for='date_order']" position="attributes">
+                    <attribute name="string">Order</attribute>
+                </xpath>
+
+                <xpath expr="//group[@name='date_details']" position="inside">
+                    <xpath expr="//group[@name='order_details']//label[@for='date_order']/.." position="move"/>
+                    <xpath expr="//group[@name='order_details']//field[@name='date_order']" position="move"/>
+                    <newline/>
+                    <xpath expr="//field[@name='validity_date']" position="move"/>
+                </xpath>
+                <!-- /Date details -->
+
+                <!-- Sale details -->
+                <xpath expr="//group[@name='order_details']" position="attributes">
+                    <attribute name="string">Quotation</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
                     <attribute name="options" separator="}" remove="}"/>
                     <attribute name="options" add=", 'no_open': True}"/>
                     <attribute name="domain">[('tax_ids.tax_src_id.type_tax_use', '=', 'sale')]</attribute>
                 </xpath>
+                <!-- /Sale details -->
 
-                <xpath expr="//field[@name='date_order']" position="after">
-                    <xpath expr="//field[@name='validity_date']" position="move"/>
+                <!-- Invoicing details -->
+                <xpath expr="//group[@name='order_details']" position="after">
+                    <group name="invoicing_details" string="Invoicing"/>
                 </xpath>
+
+                <xpath expr="//group[@name='invoicing_details']" position="inside">
+                    <xpath expr="//group[@name='order_details']//field[@name='show_update_pricelist']" position="move"/>
+                    <xpath expr="//group[@name='order_details']//label[@for='pricelist_id']" position="move"/>
+                    <xpath expr="//group[@name='order_details']//div[@groups='product.group_product_pricelist']" position="move"/>
+                    <xpath expr="//label[@for='fiscal_position_id']" position="move"/>
+                    <xpath expr="//field[@name='payment_term_id']" position="move"/>
+                </xpath>
+                <!-- /Invoicing details -->
 
                 <xpath expr="//field[@name='payment_term_id']" position="before">
                     <xpath expr="//label[@for='fiscal_position_id']" position="move"/>
@@ -139,6 +184,31 @@
                 </xpath>
 
                 <!-- Notebook -->
+                <xpath expr="//notebook//page[@name='optional_products']" position="after">
+                    <page string="Follow-up" name="followup">
+                        <group>
+                            <group string="Follow-up" name="followup"/>
+                            <group string="Marketing" name="marketing"/>
+                            <group string="Customer notes" name="customer_notes" attrs="{'invisible':[('of_customer_notes','=',False)]}">
+                                <field name="of_customer_notes" colspan="2" nolabel="1"/>
+                                <div class="text-muted" colspan="2">
+                                    * These notes come from the customer's file. They can only be modified in the customer form.
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+                <xpath expr="//group[@name='followup']" position="inside">
+                    <xpath expr="//field[@name='origin']" position="move"/>
+                </xpath>
+                <xpath expr="//group[@name='sale_reporting']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//group[@name='marketing']" position="inside">
+                    <xpath expr="//field[@name='campaign_id']" position="move"/>
+                    <xpath expr="//field[@name='medium_id']" position="move"/>
+                    <xpath expr="//field[@name='source_id']" position="move"/>
+                </xpath>
                 <xpath expr="//notebook//page[@name='customer_signature']" position="after">
                     <!-- Page printings -->
                     <page string="Printing" name="printing_settings">
@@ -150,16 +220,6 @@
                         </group>
                     </page>
                     <!-- /Page printings -->
-                    <!-- Page notes -->
-                    <page string="Notes" name="notes">
-                        <group string="Customer notes" name="customer_notes" attrs="{'invisible':[('of_customer_notes','=',False)]}">
-                            <field name="of_customer_notes" colspan="2" nolabel="1"/>
-                            <div class="text-muted" colspan="2">
-                                * These notes come from the customer's file. They can only be modified in the customer form.
-                            </div>
-                        </group>
-                    </page>
-                    <!-- /Page notes-->
                 </xpath>
                 <!-- /Notebook -->
 

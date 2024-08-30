@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 13:26+0000\n"
-"PO-Revision-Date: 2023-12-15 13:26+0000\n"
+"POT-Creation-Date: 2024-09-03 07:28+0000\n"
+"PO-Revision-Date: 2024-09-03 07:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -45,9 +45,9 @@ msgid "Config Settings"
 msgstr "Paramètres de configuration"
 
 #. module: of_sale_order_dates
-#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_stock_order_dates_form_view
-msgid "Delivery Date"
-msgstr "Date de livraison"
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.sale_order_view_form
+msgid "Delivery"
+msgstr "Livraison"
 
 #. module: of_sale_order_dates
 #: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_report_setting_of_sale_document_layout_view_form
@@ -83,11 +83,6 @@ msgstr ""
 "Affiche la visite technique dans le bloc d'information supérieur du rapport"
 
 #. module: of_sale_order_dates
-#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_stock_order_dates_form_view
-msgid "Expected:"
-msgstr "Prévu :"
-
-#. module: of_sale_order_dates
 #: model:ir.model.fields,help:of_sale_order_dates.field_sale_order__of_technical_visit_date
 msgid "If filled, it will be displayed in quotation/order report"
 msgstr "Si renseignée, apparaîtra dans le rapport devis/commande"
@@ -106,6 +101,11 @@ msgid "Requested week"
 msgstr "Semaine demandée"
 
 #. module: of_sale_order_dates
+#: model:ir.model,name:of_sale_order_dates.model_of_sale_document_layout
+msgid "Sale Document Layout"
+msgstr "Mise en page du document de vente"
+
+#. module: of_sale_order_dates
 #: model:ir.model,name:of_sale_order_dates.model_sale_order
 msgid "Sales Order"
 msgstr "Bon de commande"
@@ -114,6 +114,11 @@ msgstr "Bon de commande"
 #: model:ir.model,name:of_sale_order_dates.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de commande"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_form_view
+msgid "Technical Visit"
+msgstr "Visite technique"
 
 #. module: of_sale_order_dates
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_sale_order__of_technical_visit_date
@@ -128,8 +133,3 @@ msgstr "Date de visite technique"
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_res_company__pdf_technical_visit_info
 msgid "Technical visit date"
 msgstr "Date de visite technique"
-
-#. module: of_sale_order_dates
-#: model:ir.model,name:of_sale_order_dates.model_of_sale_document_layout
-msgid "of.sale.document.layout"
-msgstr ""
