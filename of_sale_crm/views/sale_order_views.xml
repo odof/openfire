@@ -26,39 +26,14 @@
                     <field name="of_customer_view" invisible ="1"/>
                     <field name="of_priority" widget="priority" attrs="{'invisible': [('of_customer_view', '=', True)]}"/>
                 </xpath>
-                <xpath expr="//sheet/group/group[1]" position="inside">
+                <xpath expr="//group[@name='order_details']" position="inside">
                     <field name="of_sent_quotation"/>
                 </xpath>
                 <xpath expr="//form//sheet//notebook//group[@name='technical']/../.." position="attributes">
                     <attribute name="name">other_info</attribute>
                 </xpath>
-                <xpath expr="//group[@name='technical']" position="after">
-                    <group string="Divers" name="Misc">
-                        <field name="of_referred_id" />
-                    </group>
-                </xpath>
                 <xpath expr="//group[@name='sales_person']//field[@name='user_id']" position="after">
                     <field name="of_canvasser_id"/>
-                </xpath>
-                <xpath expr="//page[2]" position="after">
-                    <page string="Follow-up" name="followup">
-                        <group name="followup_tags" col="4" colspan="2">
-                            <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
-                        </group>
-                    </page>
-                </xpath>
-                <xpath expr="//page[@name='other_information']/group/group[@name='sale_reporting']" position="before">
-                    <!--
-                        FIXME : This view should inherit `of_sale_report_view_order_form_inherit_sale_stock` in `of_sale_report`
-                        This module is not integrated in this working branch yet, so we are moving field after a standard field.
-                        Thoses field should be positionned after `of_installation_date` field.
-                    -->
-                    <group name="installation_dates" string="Installation dates">
-                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
-                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
-                        <field name="of_force_laying_date"/>
-                        <field name="of_laying_week"/>
-                    </group>
                 </xpath>
             </field>
         </record>
@@ -94,13 +69,24 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='customer_notes']" position="after">
-                    <group string="Follow-up notes" name="followup_notes">
+                <xpath expr="//group[@name='followup']" position="inside">
+                    <xpath expr="//field[@name='opportunity_id']" position="move"/>
+                    <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                    <field name="of_info"/>
+                </xpath>
+                <xpath expr="//group[@name='marketing']/field[@name='campaign_id']" position="before">
+                    <field name="of_referred_id"/>
+                </xpath>
+                <xpath expr="//group[@name='marketing']" position="after">
+                    <group string="Follow-up Notes" name="followup_notes">
                         <field name="of_notes" colspan="2" nolabel="1"/>
                     </group>
-                </xpath>
-                <xpath expr="//field[@name='payment_term_id']" position="after">
-                        <field name="of_info"/>
+                    <group string="Project Dates" name="project_dates">
+                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                        <field name="of_force_laying_date"/>
+                        <field name="of_laying_week"/>
+                    </group>
                 </xpath>
             </field>
         </record>

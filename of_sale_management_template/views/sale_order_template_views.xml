@@ -18,4 +18,15 @@
         </field>
     </record>
 
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">of.sale.managmement.template.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='order_details']" position="inside">
+                <xpath expr="//field[@name='sale_order_template_id']" position="move"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">of.sale.product.matrix.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_product_matrix.view_order_form_with_variant_grid" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='report_grids']" position="replace"/>
+        </field>
+    </record>
+
+    <record id="sale_order_view_form_report_grids" model="ir.ui.view">
+        <field name="name">of.sale.product.matrix.sale.order.view.form.report.grids</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale.of_sale_view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_price_printing']" position="before">
+                <field name="report_grids" groups="base.group_no_one"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
