@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:16+0000\n"
-"PO-Revision-Date: 2024-07-11 07:16+0000\n"
+"POT-Creation-Date: 2024-09-02 16:20+0000\n"
+"PO-Revision-Date: 2024-09-02 16:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -46,12 +46,6 @@ msgid ""
 msgstr ""
 "Permet d'indiquer quelle étape est associée à la perte d'opportunité à des "
 "fin d'analyse"
-
-#. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_res_partner__of_warn_block
-#: model:ir.model.fields,field_description:of_sale_crm.field_res_users__of_warn_block
-msgid "Blocking"
-msgstr "Bloquant"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_main_product_brand_id
@@ -146,11 +140,6 @@ msgid "Display Name"
 msgstr "Afficher un nom"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
-msgid "Divers"
-msgstr ""
-
-#. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__state__draft
 msgid "Estimate"
 msgstr "Estimation"
@@ -161,13 +150,12 @@ msgid "Estimates"
 msgstr "Estimations"
 
 #. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
-msgid "Follow-up"
-msgstr "Suivi"
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
+msgid "Follow-up Notes"
+msgstr "Notes de suivi"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_notes
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
 msgid "Follow-up notes"
 msgstr "Notes de suivi"
 
@@ -195,11 +183,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_info
 msgid "Info"
 msgstr ""
-
-#. module: of_sale_crm
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
-msgid "Installation dates"
-msgstr "Dates de pose"
 
 #. module: of_sale_crm
 #: model:ir.model,name:of_sale_crm.model_account_invoice_report
@@ -338,6 +321,11 @@ msgstr "Étiquettes du partenaire"
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_priority
 msgid "Priority"
 msgstr "Priorité"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
+msgid "Project Dates"
+msgstr "Dates de projet"
 
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__res_partner__of_customer_state__lead
