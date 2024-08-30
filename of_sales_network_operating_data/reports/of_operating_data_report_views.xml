@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_operating_data_report_view_pivot" model="ir.ui.view">
+        <field name="name">of.operating.data.report.view.pivot</field>
+        <field name="model">of.operating.data.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Données d'exploitation" disable_linking="True">
+                <field name="date" interval="month" type="row"/>
+                <field name="contact_nb" type="measure"/>
+                <field name="previous_contact_nb" type="measure"/>
+                <field name="contact_progression" type="measure"/>
+                <field name="opportunity_nb" type="measure"/>
+                <field name="previous_opportunity_nb" type="measure"/>
+                <field name="opportunity_progression" type="measure"/>
+                <field name="digital_opportunity_nb" type="measure"/>
+                <field name="previous_digital_opportunity_nb" type="measure"/>
+                <field name="digital_opportunity_progression" type="measure"/>
+                <field name="quotation_nb" type="measure"/>
+                <field name="previous_quotation_nb" type="measure"/>
+                <field name="quotation_progression" type="measure"/>
+                <field name="digital_quotation_nb" type="measure"/>
+                <field name="previous_digital_quotation_nb" type="measure"/>
+                <field name="digital_quotation_progression" type="measure"/>
+                <field name="quotation_amount" type="measure"/>
+                <field name="previous_quotation_amount" type="measure"/>
+                <field name="quotation_amount_progression" type="measure"/>
+                <field name="digital_quotation_amount" type="measure"/>
+                <field name="previous_digital_quotation_amount" type="measure"/>
+                <field name="digital_quotation_amount_progression" type="measure"/>
+                <field name="current_quotation_amount" type="measure"/>
+                <field name="sale_nb" type="measure"/>
+                <field name="previous_sale_nb" type="measure"/>
+                <field name="sale_progression" type="measure"/>
+                <field name="digital_sale_nb" type="measure"/>
+                <field name="previous_digital_sale_nb" type="measure"/>
+                <field name="digital_sale_progression" type="measure"/>
+                <field name="turnover" type="measure"/>
+                <field name="previous_turnover" type="measure"/>
+                <field name="turnover_progression" type="measure"/>
+                <field name="digital_turnover" type="measure"/>
+                <field name="previous_digital_turnover" type="measure"/>
+                <field name="digital_turnover_progression" type="measure"/>
+                <field name="margin" type="measure"/>
+                <field name="previous_margin" type="measure"/>
+                <field name="margin_progression" type="measure"/>
+                <field name="margin_perc" type="measure"/>
+                <field name="previous_margin_perc" type="measure"/>
+                <field name="margin_perc_progression" type="measure"/>
+                <field name="average_cart" type="measure"/>
+                <field name="previous_average_cart" type="measure"/>
+                <field name="avg_cart_progression" type="measure"/>
+                <field name="digital_average_cart" type="measure"/>
+                <field name="previous_digital_average_cart" type="measure"/>
+                <field name="digital_avg_cart_progression" type="measure"/>
+                <field name="invoiced_turnover" type="measure"/>
+                <field name="previous_invoiced_turnover" type="measure"/>
+                <field name="invoiced_turnover_progression" type="measure"/>
+                <field name="deposit_excl_invoiced_turnover" type="measure"/>
+                <field name="previous_deposit_excl_invoiced_turnover" type="measure"/>
+                <field name="deposit_excl_invoiced_turnover_progression" type="measure"/>
+                <field name="digital_turnover_portion" type="measure"/>
+                <field name="previous_digital_turnover_portion" type="measure"/>
+                <field name="digital_turnover_portion_progression" type="measure"/>
+                <field name="quotation_rate" type="measure"/>
+                <field name="previous_quotation_rate" type="measure"/>
+                <field name="quotation_rate_progression" type="measure"/>
+                <field name="realization_rate" type="measure"/>
+                <field name="previous_realization_rate" type="measure"/>
+                <field name="realization_rate_progression" type="measure"/>
+                <field name="digital_realization_rate" type="measure"/>
+                <field name="previous_digital_realization_rate" type="measure"/>
+                <field name="digital_realization_rate_progression" type="measure"/>
+                <field name="volume_realization_rate" type="measure"/>
+                <field name="previous_volume_realization_rate" type="measure"/>
+                <field name="volume_realization_rate_progression" type="measure"/>
+                <field name="volume_digital_realization_rate" type="measure"/>
+                <field name="previous_volume_digital_realization_rate" type="measure"/>
+                <field name="volume_digital_realization_rate_progression" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="of_operating_data_report_view_search" model="ir.ui.view">
+        <field name="name">of.operating.data.report.view.search</field>
+        <field name="model">of.operating.data.report</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <separator/>
+                <filter string="Mois en cours" name="this_month"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;', (context_today() + relativedelta(day=1,months=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Mois précédent" name="previous_month"
+                        domain="[('date', u'&gt;=', (context_today() - relativedelta(day=1,months=1)).strftime('%Y-%m-%d')),
+                                 ('date', u'&lt;', context_today().strftime('%Y-%m-01'))]"/>
+                <filter string="Année en cours" name="this_year"
+                        domain="[('date', '&gt;=', context_today().strftime('%Y-01-01')),
+                                ('date', '&lt;', (context_today() + relativedelta(day=1,years=1)).strftime('%Y-01-01'))]"/>
+                <filter string="Cumul à date - Mensuel" name="monthly_accumulation"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
+                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Cumul à date - Annuel" name="yearly_accumulation"
+                        domain="[('date', u'&gt;=', context_today().strftime('%Y-01-01')),
+                                 ('date', u'&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_operating_data_report_action" model="ir.actions.act_window">
+        <field name="name">Données d'exploitation</field>
+        <field name="res_model">of.operating.data.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">pivot</field>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem name="Données d'exploitation" id="of_sales_network_operating_data_report_menu" parent="of_sales_network.of_sales_network_reports_menu"
+        action="of_operating_data_report_action" groups="sales_team.group_sale_manager" sequence="10"/>
+
+</odoo>

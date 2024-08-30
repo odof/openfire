@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Cron de déclenchement de l'ESB pour récupérer les données d'exploitation -->
+    <record id="of_get_operating_data_cron" model="ir.cron">
+        <field name="name">Récupération des données d'exploitation du réseau</field>
+        <field name="model">of.operating.data</field>
+        <field name="function">trigger_esb</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall" eval="datetime.now().strftime('%Y-%m-%d 03:00:00')"/>
+        <field name="numbercall">-1</field>
+        <field name="active">true</field>
+        <field name="args">('day',)</field>
+    </record>
+
+</odoo>

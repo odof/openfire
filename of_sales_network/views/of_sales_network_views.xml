@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sales_network_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.sales.network.config.settings.view.form</field>
+        <field name="model">of.sales.network.config.settings</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Configuration du réseau commercial">
+                <header>
+                    <button string="Appliquer" type="object" name="execute" class="oe_highlight" confirm="Êtes-vous sûr de valider les modifications ?"/>
+                    <button string="Annuler" type="object" name="cancel" class="oe_link" special="cancel"/>
+                </header>
+                <group name="main">
+                    <field name="company_id" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sales_network_config_settings_action" model="ir.actions.act_window">
+        <field name="name">Configuration</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.sales.network.config.settings</field>
+        <field name="view_id" ref="of_sales_network_config_settings_view_form"/>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+    </record>
+
+    <menuitem name="Réseau" id="of_sales_network_menu" web_icon="of_sales_network,static/description/icon.png"
+        groups="sales_team.group_sale_manager" sequence="100"/>
+
+    <menuitem name="Données" id="of_sales_network_data_menu" parent="of_sales_network.of_sales_network_menu"
+        groups="sales_team.group_sale_manager" sequence="10"/>
+    <menuitem name="Rapports" id="of_sales_network_reports_menu" parent="of_sales_network.of_sales_network_menu"
+        groups="sales_team.group_sale_manager" sequence="20"/>
+    <menuitem name="Configuration" id="of_sales_network_configuration_menu" parent="of_sales_network.of_sales_network_menu"
+        groups="sales_team.group_sale_manager" sequence="30"/>
+
+    <record id="of_sales_network_config_settings_menu" model="ir.ui.menu">
+        <field name="name">Configuration</field>
+        <field name="parent_id" ref="of_sales_network.of_sales_network_configuration_menu"/>
+        <field name="action" ref="of_sales_network_config_settings_action"/>
+        <field name="active" eval="False"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+</odoo>

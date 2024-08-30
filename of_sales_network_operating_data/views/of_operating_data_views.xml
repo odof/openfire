@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_operating_data_view_form" model="ir.ui.view">
+        <field name="name">of.operating.data.view.form</field>
+        <field name="model">of.operating.data</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="origin" readonly="1"/>
+                            <field name="database" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="partner_id" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                        </group>
+                        <group>
+                            <field name="period_type" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="period" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                        </group>
+                    </group>
+                    <group string = "Données">
+                        <group>
+                            <field name="contact_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="opportunity_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_opportunity_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="quotation_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_quotation_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="quotation_amount" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_quotation_amount" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="current_quotation_amount" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                        </group>
+                        <group>
+                            <field name="sale_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_sale_nb" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="turnover" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_turnover" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="margin" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="margin_perc" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="average_cart" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="digital_average_cart" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="invoiced_turnover" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                            <field name="deposit_excl_invoiced_turnover" attrs="{'readonly': [('origin', '!=', 'manual')]}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_operating_data_view_tree" model="ir.ui.view">
+        <field name="name">of.operating.data.view.tree</field>
+        <field name="model">of.operating.data</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="origin"/>
+                <field name="database"/>
+                <field name="partner_id"/>
+                <field name="period_type"/>
+                <field name="period"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_operating_data_view_search" model="ir.ui.view">
+        <field name="name">of.operating.data.view.search</field>
+        <field name="model">of.operating.data</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="database"/>
+                <field name="partner_id"/>
+                <field name="period"/>
+                <separator/>
+                <filter string="Manuelles" name="manual" domain="[('origin', '=', 'manual')]"/>
+                <filter string="Connecteur" name="connector" domain="[('origin', '=', 'connector')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_operating_data_action" model="ir.actions.act_window">
+        <field name="name">Données d'exploitation</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.operating.data</field>
+        <field name="view_id" ref="of_operating_data_view_tree"/>
+        <field name="search_view_id" ref="of_operating_data_view_search"/>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Données d'exploitation" id="of_sales_network_operating_data_menu" parent="of_sales_network.of_sales_network_data_menu"
+        action="of_operating_data_action" groups="sales_team.group_sale_manager" sequence="10"/>
+
+</odoo>

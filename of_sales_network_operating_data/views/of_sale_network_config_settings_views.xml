@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sales_network_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.sales.network.config.settings.view.form</field>
+        <field name="model">of.sales.network.config.settings</field>
+        <field name="inherit_id" ref="of_sales_network.of_sales_network_config_settings_view_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='main']" position="after">
+                <group name="operating_data" string="Données d'exploitation">
+                    <group>
+                        <field name="esb_url"/>
+                        <field name="esb_login"/>
+                        <field name="esb_password" password="True"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sales_network.of_sales_network_config_settings_menu" model="ir.ui.menu">
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>
