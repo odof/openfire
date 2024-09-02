@@ -12,7 +12,7 @@
                     <field name="of_equipments_count" string="Equipments" widget="statinfo"/>
                 </button>
             </xpath>
-            <xpath expr="//group[@name='technical']" position="inside">
+            <xpath expr="//group[@name='sale_reporting']" position="inside">
                 <separator string="Installed product" colspan="2"/>
                 <field name="of_equipment_ids" widget="many2many_tags"/>
                 <field name="of_equipment_id" attrs="{'invisible': [('of_equipments_count', '!=', 1)]}"/>

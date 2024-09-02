@@ -9,6 +9,7 @@
     'category': "OpenFire",
     'summary': "Dates sur les commandes de vente",
     'depends': [
+        'of_sale_crm',
         'of_sale_report_setting',
     ],
     'data': [

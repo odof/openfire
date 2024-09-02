@@ -166,8 +166,7 @@ msgid "Follow-up"
 msgstr "Suivi"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_notes
-#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
 msgid "Follow-up notes"
 msgstr "Notes de suivi"
 
@@ -175,6 +174,16 @@ msgstr "Notes de suivi"
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_sale_followup_tag_ids
 msgid "Follow-up tags"
 msgstr "Balises de suivi"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Followup"
+msgstr "SUIVI"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Follow-up notes"
+msgstr "Note de suivi"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_force_laying_date
@@ -283,6 +292,11 @@ msgid "Normal"
 msgstr ""
 
 #. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Customer notes"
+msgstr "Note d'intervention"
+
+#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__opportunity_id
 msgid "Opportunity"
 msgstr "Opportunité"
@@ -338,6 +352,11 @@ msgstr "Étiquettes du partenaire"
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__of_priority
 msgid "Priority"
 msgstr "Priorité"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_order_form
+msgid "Project dates"
+msgstr "Dates de projet"
 
 #. module: of_sale_crm
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__res_partner__of_customer_state__lead

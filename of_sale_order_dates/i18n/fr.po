@@ -47,7 +47,7 @@ msgstr "Paramètres de configuration"
 #. module: of_sale_order_dates
 #: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_stock_order_dates_form_view
 msgid "Delivery Date"
-msgstr "Date de livraison"
+msgstr "Livraison"
 
 #. module: of_sale_order_dates
 #: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_report_setting_of_sale_document_layout_view_form
@@ -93,9 +93,29 @@ msgid "If filled, it will be displayed in quotation/order report"
 msgstr "Si renseignée, apparaîtra dans le rapport devis/commande"
 
 #. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_form_view
+msgid "Invoicing"
+msgstr "Facturation"
+
+#. module: of_sale_order_dates
 #: model:ir.model,name:of_sale_order_dates.model_account_move
 msgid "Journal Entry"
 msgstr "Pièce comptable"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_form_view
+msgid "Order"
+msgstr "Commande"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_form_view
+msgid "Partner"
+msgstr "Client"
+
+#. module: of_sale_order_dates
+#: model_terms:ir.ui.view,arch_db:of_sale_order_dates.of_sale_order_dates_form_view
+msgid "Quotation"
+msgstr "Devis"
 
 #. module: of_sale_order_dates
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_of_sale_document_layout__pdf_requested_week
@@ -118,7 +138,7 @@ msgstr "Ligne de commande"
 #. module: of_sale_order_dates
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_sale_order__of_technical_visit_date
 msgid "Technical Visit Date"
-msgstr "Date de visite technique"
+msgstr "Visite technique"
 
 #. module: of_sale_order_dates
 #: model:ir.model.fields,field_description:of_sale_order_dates.field_account_bank_statement_line__of_technical_visit_date

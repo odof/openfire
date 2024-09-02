@@ -26,40 +26,45 @@
                     <field name="of_customer_view" invisible ="1"/>
                     <field name="of_priority" widget="priority" attrs="{'invisible': [('of_customer_view', '=', True)]}"/>
                 </xpath>
-                <xpath expr="//sheet/group/group[1]" position="inside">
-                    <field name="of_sent_quotation"/>
-                </xpath>
-                <xpath expr="//form//sheet//notebook//group[@name='technical']/../.." position="attributes">
-                    <attribute name="name">other_info</attribute>
-                </xpath>
-                <xpath expr="//group[@name='technical']" position="after">
-                    <group string="Divers" name="Misc">
-                        <field name="of_referred_id" />
-                    </group>
-                </xpath>
                 <xpath expr="//group[@name='sales_person']//field[@name='user_id']" position="after">
                     <field name="of_canvasser_id"/>
                 </xpath>
                 <xpath expr="//page[2]" position="after">
                     <page string="Follow-up" name="followup">
-                        <group name="followup_tags" col="4" colspan="2">
+                    <group>
+                        <group string="Followup">
+                            <field name="origin"/>
+                            <!--  Display field  opportunity outside developer mode -->
+                            <field name='opportunity_id' groups="sales_team.group_sale_salesman"/>
                             <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                            <field name="of_info"/>
                         </group>
+                        <group string="Marketing">
+                            <field name="of_referred_id"/>
+                            <field name="campaign_id" options="{'create_name_field': 'title', 'always_reload': True}"/>
+                            <field name="medium_id"/>
+                            <field name="source_id"/>
+                        </group>
+                        <group string="Follow-up notes" name="followup_notes">
+                            <field name="of_notes" colspan="2" nolabel="1"/>
+                        </group>
+                        <group  string="Project dates">
+                                <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
+                                <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
+                                <field name="of_force_laying_date"/>
+                                <field name="of_laying_week"/>
+                        </group>
+                        <group string="Customer notes" name="customer_notes" attrs="{'invisible':[('of_customer_notes','=',False)]}">
+                            <field name="of_customer_notes" colspan="2" nolabel="1"/>
+                            <div class="text-muted" colspan="2">
+                                * These notes come from the customer's file. They can only be modified in the customer form.
+                            </div>
+                        </group>
+                    </group>
                     </page>
                 </xpath>
-                <xpath expr="//page[@name='other_information']/group/group[@name='sale_reporting']" position="before">
-                    <!--
-                        FIXME : This view should inherit `of_sale_report_view_order_form_inherit_sale_stock` in `of_sale_report`
-                        This module is not integrated in this working branch yet, so we are moving field after a standard field.
-                        Thoses field should be positionned after `of_installation_date` field.
-                    -->
-                    <group name="installation_dates" string="Installation dates">
-                        <field name="of_reference_laying_date" attrs="{'invisible': [('of_force_laying_date', '!=', False)]}"/>
-                        <field name="of_manual_laying_date" attrs="{'invisible': [('of_force_laying_date', '=', False)]}"/>
-                        <field name="of_force_laying_date"/>
-                        <field name="of_laying_week"/>
-                    </group>
-                </xpath>
+                <xpath expr="//group[@name='technical']" position="replace"/>
+                <xpath expr="//group[@name='utm_link']" position="replace"/>
             </field>
         </record>
 
@@ -68,12 +73,10 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale_crm.sale_view_inherit123"/>
             <field name="arch" type="xml">
-                <!--  Display field  opportunity outside developer mode -->
-                <xpath expr="//field[@name='opportunity_id']" position="attributes">
-                    <attribute name="groups">sales_team.group_sale_salesman</attribute>
-                </xpath>
+                <xpath expr="//field[@name='opportunity_id']" position="replace"/>
             </field>
         </record>
+
 
         <record id="of_crm_sale_order_search_view" model="ir.ui.view">
             <field name="name">of.crm.sale.order.search.view</field>
@@ -85,22 +88,6 @@
                     <filter string="Quotations" name="draft" domain="[('state', '=', 'sent')]" groups="of_sale_crm.group_of_quotation_sale_order_state"/>
                     <filter string="Sent Quotations" name="sent" domain="[('of_sent_quotation', '=', True)]"/>
                     <filter string="Quotations" name="quotation" domain="[('state', '=', 'sent')]" groups="!of_sale_crm.group_of_quotation_sale_order_state"/>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="of_crm_of_sale_view_order_form" model="ir.ui.view">
-            <field name="name">of.crm.of.sale.order.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='customer_notes']" position="after">
-                    <group string="Follow-up notes" name="followup_notes">
-                        <field name="of_notes" colspan="2" nolabel="1"/>
-                    </group>
-                </xpath>
-                <xpath expr="//field[@name='payment_term_id']" position="after">
-                        <field name="of_info"/>
                 </xpath>
             </field>
         </record>

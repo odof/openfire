@@ -14,6 +14,27 @@ class SaleOrder(models.Model):
     def _default_of_price_printing(self):
         return 'order_line'
 
+    advance_payment_status = fields.Selection(
+        selection=[
+            ("not_paid", "Not Paid"),
+            ("paid", "Paid"),
+            ("partial", "Partially Paid"),
+        ],
+        store=True,
+        readonly=True,
+        copy=False,
+        tracking=True,
+        compute="_compute_advance_payment",
+    )
+
+    report_grids = fields.Boolean(string="Print Variant Grids", default=True)
+
+    of_custom_document_ids = fields.Many2many(
+        comodel_name='of.custom.document',
+        string="Custom documents",
+        help="Documents to include into pdf reports.",
+    )
+
     # Dates
     of_date_order = fields.Datetime(string="Forced confirmation date", readonly=True, copy=False)
 

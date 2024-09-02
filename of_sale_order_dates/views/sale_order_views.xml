@@ -7,9 +7,73 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='validity_date']" position="after">
-                <field name="of_requested_week"/>
-                <field name="of_technical_visit_date"/>
+            <xpath expr="//group[@name='sale_header']" position="replace">
+                <group name="sale_header">
+                    <group string="Partner">
+                        <field name="partner_id" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options='{"always_reload": True}'/>
+                        <label string="Customer details" for="of_partner_phone"/>
+                        <div>
+                            <field name="of_partner_phone" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                            <field name="of_partner_mobile" /><br/>
+                            <field name="of_partner_email" />
+                        </div>
+                        <field name="partner_invoice_id" groups="account.group_delivery_invoice_address" context="{'default_type':'invoice'}" options='{"always_reload": True}'/>
+                        <field name="partner_shipping_id" groups="account.group_delivery_invoice_address" context="{'default_type':'delivery'}" options='{"always_reload": True}'/>
+                    </group>
+                    <group string="Dates">
+                        <div class="o_td_label" groups="base.group_no_one" attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}">
+                            <label for="date_order" string="Quotation"/>
+                        </div>
+                        <field name="date_order" nolabel="1" groups="base.group_no_one" attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                        <div class="o_td_label" attrs="{'invisible': [('state', 'in', ['draft', 'sent'])]}">
+                            <label for="date_order" string="Order"/>
+                        </div>
+                        <field name="date_order" attrs="{'invisible': [('state', 'in', ['draft', 'sent'])]}" nolabel="1"/>
+                        <field name="validity_date" attrs="{'invisible': [('state', 'in', ['sale', 'done'])]}"/>
+                        <field name="of_requested_week"/>
+                        <field name="of_technical_visit_date"/>
+                        <label for="commitment_date" string="Delivery Date"/>
+                        <div name="commitment_date_div" class="o_row">
+                            <field name="commitment_date"/>
+                            <span class="text-muted" attrs="{'invisible': [('effective_date', '!=', False), ('commitment_date', '!=', False)]}">
+                                Expected: <field name="expected_date" class="oe_inline" widget="date"/>
+                            </span>
+                        </div>
+                        <field name="effective_date" attrs="{'invisible': [('effective_date', '=', False)]}"/>
+                    </group>
+                    <group name="order" string="Devis">
+                        <field name="sale_order_template_id"/>
+                        <field name="of_sent_quotation"/>
+                    </group>
+                    <group string="Invoicing">
+                        <field name="show_update_pricelist" invisible="1"/>
+                        <label for="pricelist_id" groups="product.group_product_pricelist"/>
+                        <div groups="product.group_product_pricelist" class="o_row">
+                            <field name="pricelist_id" options="{'no_open':True,'no_create': True}"/>
+                            <button name="action_update_prices" type="object"
+                                string=" Update Prices"
+                                help="Recompute all prices based on this pricelist"
+                                class="btn-link mb-1 px-0" icon="fa-refresh"
+                                confirm="This will update all unit prices based on the currently set pricelist."
+                                attrs="{'invisible': ['|', ('show_update_pricelist', '=', False), ('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                        </div>
+                        <field name="company_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="pricelist_id" invisible="1" groups="!product.group_product_pricelist"/>
+                        <field name="tax_country_id" invisible="1"/>
+                        <label for="fiscal_position_id"/>
+                        <div class="o_row">
+                            <field name="fiscal_position_id" options="{'no_create': True}"/>
+                            <button name="action_update_taxes" type="object"
+                                        string=" Update Taxes"
+                                        help="Recompute all taxes based on this fiscal position"
+                                        class="btn-link mb-1 px-0" icon="fa-refresh"
+                                        confirm="This will update all taxes based on the currently selected fiscal position."
+                                        attrs="{'invisible': ['|', ('show_update_fpos', '=', False), ('state', 'in', ['sale', 'done','cancel'])]}"/>
+                        </div>
+                        <field name="payment_term_id" options="{'no_open':True,'no_create': True}"/>
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>
