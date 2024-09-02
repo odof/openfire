@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_trigger_form" model="ir.ui.view">
+        <field name="name">of.esb.trigger.form</field>
+        <field name="model">of.esb.trigger</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="ttype"/>
+                            <field name="exec_active"/>
+                            <field name="security"/>
+                        </group>
+                    </group>
+                    <group attrs="{'invisible': [('ttype','!=','scheduler')]}" string="Scheduler">
+                        <group >
+                            <field name="date_exec"/>
+                            <field name="interval_number"/>
+                            <field name="interval_type"/>
+                        </group>
+                        <group>
+                            <field name="data_channel" attrs="{'required': [('ttype','=','scheduler')]}"/>
+                            <field name="data_type" attrs="{'required': [('ttype','=','scheduler')]}"/>
+                            <field name="data" attrs="{'required': [('ttype','=','scheduler')]}"/>
+                        </group>
+                    </group>
+                    <group attrs="{'invisible': [('ttype','!=','webhook')]}" string="Webhook">
+                        <field name="public"/>
+                        <field name="slug_name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_trigger_tree" model="ir.ui.view">
+        <field name="name">of.esb.trigger.tree</field>
+        <field name="model">of.esb.trigger</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="ttype"/>
+                <field name="exec_active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_trigger" model="ir.actions.act_window">
+        <field name="name">Triggers</field>
+        <field name="res_model">of.esb.trigger</field>
+        <field name="view_mode">tree,form</field>
+        <field
+            name="view_ids"
+            eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('of_esb_trigger_tree')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('of_esb_trigger_form')}
+        )]"
+        />
+    </record>
+
+
+
+</odoo>

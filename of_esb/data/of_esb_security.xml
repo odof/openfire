@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="authenticate_none_admin" model="of.esb.security">
+        <field name="name">None (Admin)</field>
+        <field name="ttype">none</field>
+        <field name="user_id" ref="base.user_admin"/>
+    </record>
+
+    <record id="authenticate_none" model="of.esb.security">
+        <field name="name">None (Public)</field>
+        <field name="ttype">none</field>
+        <field name="user_id" ref="base.public_user"/>
+    </record>
+
+
+</odoo>

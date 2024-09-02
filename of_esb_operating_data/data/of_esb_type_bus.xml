@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="type_transform" model="of.esb.type.bus">
+        <field name="name">Transform</field>
+    </record>
+
+    <record id="type_load" model="of.esb.type.bus">
+        <field name="name">Load</field>
+    </record>
+
+</odoo>

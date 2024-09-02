@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_esb_transform_form" model="ir.ui.view">
+        <field name="name">of.esb.transform.form</field>
+        <field name="model">of.esb.transform</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_button_preview" type="object" string="Preview"/>
+                </header>
+                <group>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="uuid"/>
+                    <field name="code" widget="ace" options="{'mode': 'python'}" help="Tout ce qui sera dans la variable 'result' sera envoyé au 'load' ci-dessous"/>
+                    <field name="example" readonly="1"/>
+                    <field name="load_id"/>
+                    <field name="preview" widget="ace" options="{'mode': 'python'}" readonly="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_transform_tree" model="ir.ui.view">
+        <field name="name">of.esb.transform.tree</field>
+        <field name="model">of.esb.transform</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="load_id"/>
+                <field name="uuid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_of_esb_transform" model="ir.actions.act_window">
+        <field name="name">Transform</field>
+        <field name="res_model">of.esb.transform</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+</odoo>
