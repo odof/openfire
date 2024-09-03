@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <template id="report_intervention_sheet_document" inherit_id="of_planning.report_intervention_sheet_document">
         <xpath expr="//div[@name='sheet_invoicing']" position="after">
             <!-- Survey -->
@@ -11,31 +12,22 @@
                     <div class="border">
                         <table class="table table-condensed mb-0" style="border-color: transparent;">
                             <tbody>
-                                <t t-foreach="doc.of_answers_ids" t-as="answer">
-                                    <t t-if="answer.question_id.is_page or answer.answers_images_ids or answer.image_ids">
-                                        <tr t-att-class="'bg-200' if answer.question_id.is_page else ''">
-                                            <td>
-                                                <span><strong t-field="answer.question_id.title"/> :</span>
-                                                <t t-if="not answer.question_id.is_page and (answer.answers_images_ids or answer.image_ids)">
-                                                    <div t-if="answer.answers_images_ids">
-                                                        <t t-foreach="answer.answers_images_ids" t-as="answer_image">
-                                                            <span t-field="answer_image.answer" class="d-block"/>
-                                                            <t t-if="answer_image.image">
-                                                                <img t-attf-src="data:image/png;base64,#{answer_image.image}" class="mr8 img-fluid" alt="Image" style="max-width: 100%; max-height: 400px;"/>
-                                                            </t>
-                                                        </t>
-                                                    </div>
-                                                    <div>
-                                                        <t t-foreach="answer.image_ids" t-as="image">
-                                                            <figure class="d-inline-block align-top w-25 overflow-hidden" style="max-width: 24.7%; max-height: 320px;">
-                                                                <span t-field="image.image_256" t-options="{'widget': 'image', 'class': 'mx-auto', 'style': 'max-height: 250px;'}" />
-                                                                <figcaption class="text-muted text-center mt-1" t-if="image.caption" t-esc="image.caption"/>
-                                                            </figure>
-                                                        </t>
-                                                    </div>
-                                                </t>
-                                            </td>
-                                        </tr>
+                                <t t-set="pages_to_display" t-value="doc._report_of_get_pages_to_display()"/>
+                                <!-- Avec sections -->
+                                <t t-foreach="pages_to_display" t-as="page">
+                                    <tr class="bg-200">
+                                        <td>
+                                            <strong t-field="page.question_id.title"/> :
+                                        </td>
+                                    </tr>
+                                    <t t-foreach="doc._report_of_get_answers_to_display(page)" t-as="answer">
+                                        <t t-call="of_planning_survey.answer_template"/>
+                                    </t>
+                                </t>
+                                <!-- Sans sections -->
+                                <t t-if="not pages_to_display">
+                                    <t t-foreach="doc._report_of_get_answers_to_display()" t-as="answer">
+                                        <t t-call="of_planning_survey.answer_template"/>
                                     </t>
                                 </t>
                             </tbody>
@@ -45,4 +37,5 @@
             </div>
         </xpath>
     </template>
+
 </odoo>
