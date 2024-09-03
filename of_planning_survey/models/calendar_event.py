@@ -193,3 +193,72 @@ class CalendarEvent(models.Model):
             'target': 'self',
             'url': url,
         }
+
+    # --------------------------------------------------------------------------
+    # Reports methods
+    # --------------------------------------------------------------------------
+
+    def _report_of_get_pages_to_display(self):
+        """Get sections to display."""
+
+        self.ensure_one()
+        pages = self.of_answers_ids.filtered(lambda a: a.question_id.is_page)
+        return pages.filtered(lambda page: self._report_of_display_page(page))
+
+    def _report_of_display_page(self, page):
+        """Determine if a section should be displayed.
+
+        Args:
+            page (of.survey.answers): Section to check.
+        """
+
+        page_answers = self.of_answers_ids.filtered(lambda a: a.question_id in page.mapped('question_id.question_ids'))
+        page_input_lines = page_answers.mapped('user_input.user_input_line_ids').filtered(
+            lambda il: il.question_id in page.mapped('question_id.question_ids')
+        )
+
+        # We display a section only if all its questions have not been ignored.
+        # For a question of type image, this corresponds to whether it has images.
+        return not all(
+            page_input_lines.mapped(
+                lambda il: il.skipped or (il.answer_type == 'multi_image' and len(il.value_image_ids) == 0)
+            )
+        )
+
+    def _report_of_get_answers_to_display(self, page=None, report=False):
+        """Get answers to display.
+
+        Args:
+            page (of.survey.answers): Section to filter on.
+            report (bool): True if we are in the intervention report.
+        """
+
+        self.ensure_one()
+        page_answers = self.of_answers_ids
+
+        # Si une section est renseignée, on filtre sur celle-ci.
+        if page:
+            page_answers = page_answers.filtered(lambda a: a.question_id in page.mapped('question_id.question_ids'))
+
+        return page_answers.filtered(lambda answer: self._report_of_display_answer(answer, report))
+
+    def _report_of_display_answer(self, answer, report):
+        """Determine if an answer should be displayed.
+
+        Args:
+            answer (of.survey.answers): Answer to check.
+            report (bool): True if we are in the intervention report.
+        """
+
+        answer_input_line = answer.mapped('user_input.user_input_line_ids').filtered(
+            lambda il: il.question_id in answer.question_id
+        )
+
+        # We display an answer only if it has not been ignored.
+        # For a question of type image, this corresponds to whether it has images.
+        # If it is for the intervention report, we check if the question should be displayed.
+        return not (
+            (report and answer_input_line.question_id.constr_no_report_display)
+            or answer_input_line.skipped
+            or (answer_input_line.answer_type == 'multi_image' and len(answer_input_line.value_image_ids) == 0)
+        )

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="answer_template">
+        <tr>
+            <td>
+                <span><strong t-field="answer.question_id.title"/> :</span>
+                <div t-if="answer.answers_images_ids">
+                    <t t-foreach="answer.answers_images_ids" t-as="answer_image">
+                        <span t-field="answer_image.answer" class="d-block"/>
+                        <t t-if="answer_image.image">
+                            <img t-attf-src="data:image/png;base64,#{answer_image.image}" class="mr8 img-fluid" alt="Image" style="max-width: 100%; max-height: 400px;"/>
+                        </t>
+                    </t>
+                </div>
+                <div t-if="answer.image_ids">
+                    <t t-foreach="answer.image_ids" t-as="image">
+                        <figure class="d-inline-block align-top w-25 overflow-hidden" style="max-width: 24.7%; max-height: 320px;">
+                            <span t-field="image.image_256" t-options="{'widget': 'image', 'class': 'mx-auto', 'style': 'max-height: 250px;'}" />
+                            <figcaption class="text-muted text-center mt-1" t-if="image.caption" t-esc="image.caption"/>
+                        </figure>
+                    </t>
+                </div>
+            </td>
+        </tr>
+    </template>
+
+</odoo>

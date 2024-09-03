@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Questionnaires intervention",
-    'version': '16.0.1.4.0',
+    'version': '16.0.1.5.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
@@ -24,6 +24,7 @@
         'views/of_survey_survey_views.xml',
         'views/menuitems.xml',
         'views/of_planning_intervention_template_views.xml',
+        'reports/report_intervention_template.xml',
         'reports/report_intervention_report.xml',
         'reports/report_intervention_sheet.xml',
     ],
