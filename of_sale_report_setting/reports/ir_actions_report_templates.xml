@@ -81,18 +81,18 @@
                 <div name="invoicing_address">
                     <strong name="invoicing_shipping_address_label" t-if="pdf_address_title and doc.partner_shipping_id == doc.partner_invoice_id">
                         <t t-if="pdf_invoicing_shipping_address_specific_title and pdf_invoicing_shipping_address_specific_title_label">
-                            <span t-esc="pdf_invoicing_shipping_address_specific_title_label"/>
+                            <strong t-esc="pdf_invoicing_shipping_address_specific_title_label"/>
                         </t>
                         <t t-else="">
-                            <span>Invoicing and Shipping Address:</span>
+                            <strong>Invoicing and Shipping Address:</strong>
                         </t>
                     </strong>
                     <strong name="invoicing_address_label" t-if="pdf_address_title and doc.partner_shipping_id != doc.partner_invoice_id">
                         <t t-if="pdf_invoicing_address_specific_title and pdf_invoicing_address_specific_title_label">
-                            <span t-esc="pdf_invoicing_address_specific_title_label"/>
+                            <strong t-esc="pdf_invoicing_address_specific_title_label"/>
                         </t>
                         <t t-else="">
-                            <span>Invoicing Address:</span>
+                            <strong>Invoicing Address:</strong>
                         </t>
                     </strong>
                     <br/>
