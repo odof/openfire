@@ -6,10 +6,10 @@ OF sale report setting
 Fonctionnalités
 ###############
 
-* Modification du rapport Devis/Commande pour y intérgrer toutes les options d'impression
-    - il est possible d'affichier plusieurs éléments dans le rapport Devis/Commande comme :
+* Modification du rapport Devis/Commande pour y intégrer toutes les options d'impression
+    - il est possible d'afficher plusieurs éléments dans le rapport Devis/Commande comme :
         - les informations client (adresse, téléphone, email, etc.),
-        - les informations du venteur (nom, téléphone, email, signature, etc.),
+        - les informations du vendeur (nom, téléphone, email, signature, etc.),
         - les informations des lignes de commande (référence, montant HT/TTC, images, etc.),
         - et d'autres informations comme :
             - condition de règlement;
@@ -21,7 +21,7 @@ Fonctionnalités
 * Ajout d'une fenêtre de configuration dédiée aux paramètres d'impression
 
 
-Droits utilistaeurs
+Droits utilisateurs
 ###################
 
 * Ajout d'un groupe **"Groupe signature vendeur pré-remplie"**
