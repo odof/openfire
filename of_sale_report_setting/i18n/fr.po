@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:30+0000\n"
-"PO-Revision-Date: 2024-07-11 07:30+0000\n"
+"POT-Creation-Date: 2024-09-04 06:49+0000\n"
+"PO-Revision-Date: 2024-09-04 06:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -33,14 +33,12 @@ msgstr ""
 "title=\"Téléphone\"/>"
 
 #. module: of_sale_report_setting
-#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
-msgid "<span>Invoicing Address:</span>"
-msgstr "<span>Adresse de Facturation :</span>"
-
-#. module: of_sale_report_setting
-#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
-msgid "<span>Invoicing and Shipping Address:</span>"
-msgstr "<span>Adresse de Facturation et de Livraison :</span>"
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
@@ -79,6 +77,16 @@ msgstr "<strong>Date de validité :</strong>"
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Invoicing Address:</strong>"
+msgstr "<strong>Adresse de Facturation :</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
+msgid "<strong>Invoicing and Shipping Address:</strong>"
+msgstr "<strong>Adresse de Facturation et de Livraison :</strong>"
+
+#. module: of_sale_report_setting
+#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
 msgid "<strong>Payment Terms:</strong>"
 msgstr "<strong>Conditions de règlement :</strong>"
 
@@ -91,11 +99,6 @@ msgstr "<strong>Signature Vendeur</strong>"
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
 msgid "<strong>Salesperson:</strong>"
 msgstr "<strong>Vendeur :</strong>"
-
-#. module: of_sale_report_setting
-#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.of_sale_report_invoice_document
-msgid "<strong>Shipping Address:</strong>"
-msgstr "<strong>Adresse d'expédition :</strong>"
 
 #. module: of_sale_report_setting
 #: model_terms:ir.ui.view,arch_db:of_sale_report_setting.report_saleorder_document
@@ -930,11 +933,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_res_company__pdf_signatures_insert
 msgid "Signatures (Sale PDF Display)"
 msgstr "Signatures"
-
-#. module: of_sale_report_setting
-#: model_terms:ir.ui.view,arch_db:of_sale_report_setting.of_sale_report_invoice_document
-msgid "Tax ID"
-msgstr "N° TVA"
 
 #. module: of_sale_report_setting
 #: model:ir.model.fields,field_description:of_sale_report_setting.field_of_sale_document_layout__pdf_address_contact_titles
