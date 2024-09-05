@@ -29,10 +29,10 @@
 
             <!-- Partner related information -->
             <xpath expr="//group[@id='header_left_group']//field[@name='partner_id']" position="after">
-                <label string="Customer details" for="of_partner_phone" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt'))]}"/>
-                <label string="Vendor details" for="of_partner_phone" attrs="{'invisible': [('move_type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}"/>
-                <div name="partner_details" attrs="{'invisible': [('move_type', 'not in', ('in_invoice', 'in_refund', 'in_receipt'))]}">
-                    <field name="of_partner_phone" nolabel="1" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
+                <label string="Customer details" for="of_partner_phone" attrs="{'invisible': ['|', ('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt')), ('of_partner_phone', '=', False)]}"/>
+                <label string="Vendor details" for="of_partner_phone" attrs="{'invisible': ['|', ('move_type', 'not in', ('in_invoice', 'in_refund', 'in_receipt')), ('of_partner_phone', '=', False)]}"/>
+                <div name="partner_details" attrs="{'invisible': ['|', ('of_partner_phone', '=', False), ('move_type', '=', 'entry')]}">
+                    <field name="of_partner_phone" nolabel="1" style="margin-right:10px;"/>
                     <field name="of_partner_mobile" nolabel="1"/><br/>
                     <field name="of_partner_email" nolabel="1"/>
                 </div>
