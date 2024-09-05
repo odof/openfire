@@ -1083,10 +1083,16 @@ class CalendarEvent(models.Model):
                 raise AccessError(_("Unable to find email template")) from e
 
             if self.env.user.email:
-                email_template = self.env.ref(
-                    'of_planning.email_template_of_planning_intervention_report'
-                ).with_context(default_email_from=self.env.user.email_formatted)
-                email_template.with_context(force_attachment=True).send_mail(event.id, force_send=True)
+                composer = self.env['mail.compose.message'].create(
+                    {
+                        'composition_mode': 'comment',
+                        'model': 'calendar.event',
+                        'res_id': event.id,
+                        'template_id': email_template.id,
+                    }
+                )
+                composer._onchange_template_id_wrapper()
+                composer.action_send_mail()
                 event.of_report_send_date = fields.Datetime.now()
 
     def action_button_import_order_line(self):
