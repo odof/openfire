@@ -265,12 +265,12 @@
 
         <!-- Lines and totals block -->
         <xpath expr="//th[@name='th_description']" position="before">
-            <th t-if="pdf_product_reference" name="th_product_reference" class="text-start">Reference</th>
+            <th name="th_product_reference" t-if="pdf_product_reference" class="text-start">Reference</th>
             <th name="th_image" class="text-end" t-if="pdf_print_image_level == 'line'">Image</th>
         </xpath>
 
         <xpath expr="//td[@name='td_name']" position="before">
-            <td t-if="pdf_product_reference" >
+            <td name="td_product_reference" t-if="pdf_product_reference" >
                 <span t-field="line.product_id.default_code"/>
             </td>
             <td name="td_image" class="text-center" t-if="pdf_print_image_level == 'line'" style="vertical-align: middle;">

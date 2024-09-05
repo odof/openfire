@@ -48,8 +48,9 @@ class SaleOrderLine(models.Model):
         """
         Compute the amounts of the SO line.
         """
+        tax_obj = self.env["account.tax"]
         for line in self:
-            tax_results = self.env["account.tax"]._compute_taxes([line._of_pack_convert_to_tax_base_line_dict()])
+            tax_results = tax_obj._compute_taxes([line._of_pack_convert_to_tax_base_line_dict()])
             totals = list(tax_results["totals"].values())[0]
             amount_untaxed = totals["amount_untaxed"]
             amount_tax = totals["amount_tax"]
@@ -66,7 +67,8 @@ class SaleOrderLine(models.Model):
         """Convert the current record to a dictionary in order to use the generic taxes computation method
         defined on account.tax.
 
-        :return: A python dictionary.
+        Returns:
+            dict: The dictionary representing the record.
         """
         self.ensure_one()
         return self.env["account.tax"]._convert_to_tax_base_line_dict(
@@ -83,4 +85,38 @@ class SaleOrderLine(models.Model):
 
     def _get_items_lines_data_to_report(self):
         self.ensure_one()
-        return self.order_id.order_line.filtered(lambda line: line.pack_parent_line_id == self)
+        data = []
+        for pack_line in self.of_pack_line_ids:
+            pack_prices = self._get_packline_prices(pack_line)
+            pack_amounts = self._get_pack_line_amounts(pack_line)
+            data.append(
+                {
+                    "default_code": pack_line.product_id.default_code,
+                    "name": f" > {pack_line.product_id.name}",
+                    "product_id": pack_line.product_id.id,
+                    "product_uom_qty": pack_line.quantity,
+                    "product_uom": self.product_uom.name,
+                    "of_pack_item_price_unit_taxexcl": pack_prices["total_excluded"],
+                    "of_pack_item_price_unit_taxinc": pack_prices["total_included"],
+                    "tax_id": self.tax_id,
+                    "of_pack_item_price_subtotal": pack_amounts[0],
+                    "of_pack_item_price_total": pack_amounts[1],
+                }
+            )
+        return data
+
+    def _get_packline_prices(self, pack_line):
+        return self.tax_id.compute_all(
+            pack_line.price_unit,
+            currency=self.currency_id,
+            quantity=1,
+            product=pack_line.product_id,
+            partner=self.order_id.partner_shipping_id,
+        )
+
+    def _get_pack_line_amounts(self, pack_line):
+        tax_results = self.env["account.tax"]._compute_taxes([self._of_pack_convert_to_tax_base_line_dict()])
+        totals = list(tax_results["totals"].values())[0]
+        amount_untaxed = totals["amount_untaxed"]
+        amount_total = amount_untaxed + totals["amount_tax"]
+        return amount_untaxed, amount_total

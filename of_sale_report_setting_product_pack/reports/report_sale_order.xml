@@ -10,22 +10,22 @@
     <template id="of_sale_report_setting_product_pack_lines" inherit_id="of_sale_report_setting.of_report_saleorder_document">
         <!-- Price unit is displayed as 0.00 if we are in `pack_components_details` mode -->
         <xpath expr="//td[@name='td_priceunit_taxexcl']/span[@t-field='line.of_price_unit_taxexcl']" position="replace">
-            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxexcl"/>
-            <span t-else="">0.00</span>
+            <span t-if="not line.of_pack_ok or pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxexcl"/>
+            <span t-else="" t-out="0.0" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
         </xpath>
         <xpath expr="//td[@name='td_priceunit_taxinc']/span[@t-field='line.of_price_unit_taxinc']" position="replace">
-            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxinc"/>
-            <span t-else="">0.00</span>
+            <span t-if="not line.of_pack_ok or pack_report_type != 'pack_components_details'" t-field="line.of_price_unit_taxinc"/>
+            <span t-else="" t-out="0.0" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
         </xpath>
 
         <!-- Subtotal is displayed as 0.00 if we are in `pack_components_details` mode -->
         <xpath expr="//td[@name='td_subtotal_taxexcl']/span[@t-field='line.price_subtotal']" position="replace">
-            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.price_subtotal"/>
-            <span t-else="">0.00</span>
+            <span t-if="not line.of_pack_ok or pack_report_type != 'pack_components_details'" t-field="line.price_subtotal"/>
+            <span t-else="" t-out="0.0" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
         </xpath>
         <xpath expr="//td[@name='td_subtotal_taxinc']/span[@t-field='line.price_total']" position="replace">
-            <span t-if="pack_report_type != 'pack_components_details'" t-field="line.price_total"/>
-            <span t-else="">0.00</span>
+            <span t-if="not line.of_pack_ok or pack_report_type != 'pack_components_details'" t-field="line.price_total"/>
+            <span t-else="" t-out="0.0" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
         </xpath>
 
         <!-- Positionning after sale order lines <tr/> -->
@@ -34,15 +34,20 @@
                 <t t-set="packlines_to_report" t-value="line._get_items_lines_data_to_report()"/>
                 <t t-foreach="packlines_to_report" t-as="packline">
                     <tr name="tr_packlines">
-                        <td name="td_pack_reference" t-if="pdf_product_reference"><span t-field="packline.product_id.default_code"/></td>
-                        <td name="td_pack_name"><span t-field="packline.name"/></td>
+                        <td name="td_pack_reference" t-if="pdf_product_reference">
+                            <span t-out="packline['default_code']"/>
+                        </td>
+                        <td name="td_image" class="text-center" t-if="pdf_print_image_level == 'line'" style="vertical-align: middle;"/>
+                        <td name="td_pack_name">
+                            <span t-out="packline['name']"/>
+                        </td>
                         <td name="td_pack_quantity" class="text-end">
-                            <span t-field="packline.product_uom_qty"/>
-                            <span t-field="packline.product_uom"/>
+                            <span t-out="packline['product_uom_qty']" t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
+                            <span t-out="packline['product_uom']"/>
                         </td>
                         <td name="td_pack_priceunit_taxexcl" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">
                             <t t-if="pack_report_type == 'pack_components_details'">
-                                <span t-field="packline.of_pack_item_price_unit_taxexcl"/>
+                                <span t-out="packline['of_pack_item_price_unit_taxexcl']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
                             </t>
                             <t t-else="">
                                 <span>-</span>
@@ -50,7 +55,7 @@
                         </td>
                         <td name="td_pack_priceunit_taxinc" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">
                             <t t-if="pack_report_type == 'pack_components_details'">
-                                <span t-field="packline.of_pack_item_price_unit_taxinc"/>
+                                <span t-out="packline['of_pack_item_price_unit_taxinc']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
                             </t>
                             <t t-else="">
                                 <span>-</span>
@@ -61,7 +66,7 @@
                         </td>
                         <td name="td_pack_taxes" class="text-end">
                             <t t-if="pack_report_type == 'pack_components_details'">
-                                <span t-out="', '.join(map(lambda x: (x.description or x.name), packline.tax_id))"/>
+                                <span t-out="', '.join(map(lambda x: (x.description or x.name), packline['tax_id']))"/>
                             </t>
                             <t t-else="">
                                 <span>-</span>
@@ -69,7 +74,7 @@
                         </td>
                         <td name="td_pack_subtotal_taxexcl" class="text-end o_price_total" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">
                             <t t-if="pack_report_type == 'pack_components_details'">
-                                <span t-field="packline.of_pack_item_price_subtotal"/>
+                                <span t-out="packline['of_pack_item_price_subtotal']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
                             </t>
                             <t t-else="">
                                 <span>-</span>
@@ -77,7 +82,7 @@
                         </td>
                         <td name="td_pack_subtotal_taxinc" class="text-end o_price_total" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">
                             <t t-if="pack_report_type == 'pack_components_details'">
-                                <span t-field="packline.of_pack_item_price_total"/>
+                                <span t-out="packline['of_pack_item_price_total']" t-options="{'widget': 'float', 'decimal_precision': 'Product Price'}"/>
                             </t>
                             <t t-else="">
                                 <span>-</span>

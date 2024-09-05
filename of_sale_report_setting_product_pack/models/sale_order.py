@@ -10,7 +10,9 @@ class SaleOrder(models.Model):
         selection=[
             ("pack_only", "Pack Only"),
             ("pack_components", "Pack and Components"),
-            ("pack_components_details", "Pack and Components with prices details"),
+            # On commente l'option pack_components_details dans l'attente de décider d'une solution pour les problèmes
+            # d'arrondi. La logique associée dans le rapport de vente reste présente elle.
+            # ("pack_components_details", "Pack and Components with prices details"),
         ],
         default="pack_components",
         string="Pack print configuration",
