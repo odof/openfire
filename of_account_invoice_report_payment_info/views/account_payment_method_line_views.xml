@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="account_payment_method_line_view_form" model="ir.ui.view">
+        <field name="name">of.account.invoice.report.payment.info.account.payment.method.line.view.form</field>
+        <field name="model">account.payment.method.line</field>
+        <field name="inherit_id" ref="of_account.account_payment_method_line_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group string="Document printing">
+                    <field name="of_display_config"/>
+                </group>
+                <div class="mt-2">
+                    <h5>Variable examples</h5>
+                    <ul>
+                        <li><code>{payment_amount}</code> : Amount</li>
+                        <li><code>{payment_mode}</code> : Payment mode</li>
+                        <li><code>{payment_reference}</code> : Payment reference</li>
+                        <li><code>{payment_method_name}</code> : Payment method</li>
+                        <li><code>{date}</code> : Payment date</li>
+                        <li><code>{journal_name}</code> : Payment journal</li>
+                    </ul>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
