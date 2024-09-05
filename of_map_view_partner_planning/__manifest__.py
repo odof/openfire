@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Vue carte pour les clients (planning)",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -12,11 +12,12 @@
         'of_planning',
         'of_map_view_partner',
     ],
-    'data': [],
+    'data': [
+        'data/data.xml',
+        ],
     'assets': {},
     'installable': True,
     'application': False,
     'auto_install': True,
-    'post_init_hook': '_post_init_hook',
     'uninstall_hook': '_uninstall_hook',
 }

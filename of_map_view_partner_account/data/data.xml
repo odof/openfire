@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="ir.actions.act_window" name="action_add_view_mode_map" eval="[[
+        ref('account.res_partner_action_customer'),
+        ref('account.res_partner_action_supplier'),
+    ]]"/>
+
+</odoo>

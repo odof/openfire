@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="ir.actions.act_window" name="action_add_view_mode_map" eval="[[ref('of_planning_view.action_calendar_event_planning')]]"/>
+
+</odoo>
