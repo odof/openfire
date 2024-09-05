@@ -278,6 +278,7 @@ class SaleOrder(models.Model):
             self.campaign_id = self.opportunity_id.campaign_id
             self.medium_id = self.opportunity_id.medium_id
             self.source_id = self.opportunity_id.source_id
+            self.of_digital = self.opportunity_id.of_digital
             self.team_id = self.opportunity_id.team_id
             if self.opportunity_id.user_id and self.state != 'sale':
                 self.user_id = self.opportunity_id.user_id
@@ -486,6 +487,10 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         invoice_vals = super(SaleOrder, self)._prepare_invoice()
         invoice_vals['of_canvasser_id'] = self.of_canvasser_id.id
+        invoice_vals['campaign_id'] = self.campaign_id.id
+        invoice_vals['medium_id'] = self.medium_id.id
+        invoice_vals['source_id'] = self.source_id.id
+        invoice_vals['of_digital'] = self.of_digital
         return invoice_vals
 
     @api.model

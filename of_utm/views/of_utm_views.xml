@@ -39,6 +39,7 @@
                     </div>
                 </xpath>
                 <xpath expr="//form//group" position="inside">
+                    <field name="of_digital"/>
                     <field name="source_ids" mode="tree">
                         <tree>
                             <field name="sequence" widget="handle"/>

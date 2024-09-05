@@ -580,6 +580,7 @@
                                         <field name="campaign_id" />
                                         <field name="medium_id" string="Canal"/>
                                         <field name="source_id" />
+                                        <field name="of_digital"/>
                                     </group>
 
                                     <group string="Parrainage" name="parrainage">
@@ -652,9 +653,20 @@
         <record id="of_crm_case_form_view_oppor" model="ir.ui.view">
             <field name="name">of.crm.lead.form.opportunity</field>
             <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
                 <!-- Modifications header -->
+                <xpath expr="//button[1]" position="attributes">
+                    <attribute name="context">
+                        {'search_default_partner_id': partner_id,
+                        'default_partner_id': partner_id,
+                        'default_team_id': team_id,
+                        'default_campaign_id': campaign_id,
+                        'default_medium_id': medium_id,
+                        'default_source_id': source_id,
+                        'default_of_digital': of_digital}
+                    </attribute>
+                </xpath>
                 <!-- Bouton Nouvelle activité -->
                 <xpath expr="//button[1]" position="after">
                     <button string="Nouvelle activité" name="%(of_crm_activity_schedule_action)d" type="action" class="oe_highlight"
@@ -854,6 +866,7 @@
                                         <field name="campaign_id" />
                                         <field name="medium_id" string="Canal"/>
                                         <field name="source_id" />
+                                        <field name="of_digital"/>
                                     </group>
 
                                     <group string="Parrainage" name="parrainage">

@@ -42,6 +42,9 @@
                 <xpath expr="//group[@name='technical']/field[@name='opportunity_id']" position="attributes">
                     <attribute name="groups">sales_team.group_sale_salesman</attribute>
                 </xpath>
+                <xpath expr="//group[@name='technical']/field[@name='opportunity_id']" position="after">
+                    <field name="of_digital" groups="sales_team.group_sale_salesman"/>
+                </xpath>
                 <xpath expr="//page[@name='notes']" position="after">
                     <page string="Follow-up" name="followup">
                         <group name="followup_tags">
