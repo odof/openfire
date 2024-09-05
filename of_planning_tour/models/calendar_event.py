@@ -564,25 +564,7 @@ class CalendarEvent(models.Model):
 
         dates_eval = self._get_tour_dates()
         address = self.of_address_id
-
-        for employee in self.of_employee_ids:
-            for date_eval in dates_eval:
-                tour = tour_obj.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
-                address_sector = address.of_tech_sector_id
-                if not tour:
-                    tour = tour_obj.create(
-                        {
-                            'date': date_eval,
-                            'employee_id': employee.id,
-                            'sector_ids': [Command.set([address_sector.id])] if address_sector else False,
-                        }
-                    )
-                elif not tour.sector_ids and address_sector:
-                    tour.sector_ids = [Command.set([address_sector.id])]
-                elif address_sector and address_sector.id not in tour.sector_ids.ids:
-                    tour.sector_ids = [Command.link(address_sector.id)]
-                tours += tour
-        return tours
+        return tour_obj._create_tours_for_employees(self.of_employee_ids, dates_eval, address.of_tech_sector_id)
 
     def _events_unlink_get_tours_to_recompute(self):
         """
