@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="config_payment_info_view" model="ir.ui.view">
+        <field name="name">config.payment.info.form</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="of_account.of_account_journal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='inbound_payment_method_line_ids']/form/sheet/group" position="after">
+                <group string="Document printing">
+                    <field name="config" string="Paid Invoice Setup"/>
+                </group>
+                <div>
+                    <br/>
+                    <strong>Exemples de variables</strong>
+                </div>
+                <div style="margin-top: 4px;">
+                    <ul>
+                        <li><code>{amount}</code> : Amount</li>
+                        <li><code>{payment_mode}</code> : Payment mode</li>
+                        <li><code>{payment_method_name}</code> : Payment method</li>
+                        <li><code>{date_payment}</code> : Payment date</li>
+                        <li><code>{journal_name}</code> : Payment journal</li>
+                    </ul>
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='outbound_payment_method_line_ids']/form/sheet/group" position="after">
+                <group string="Document printing">
+                    <field name="config"/>
+                </group>
+                <div>
+                    <br/>
+                    <strong>Exemples de variables</strong>
+                </div>
+                <div style="margin-top: 4px;">
+                    <ul>
+                        <li><code>Name</code> : {name}</li>
+                        <li><code>Payment journal</code> : {journal_name}</li>
+                        <li><code>Amount</code> : {amount}</li>
+                        <li><code>Currency</code> :  {currency_id}</li>
+                        <li><code>Payment date</code> : {date_payment}</li>
+                        <li><code>Partial</code> : {partial_id}</li>
+                        <li><code>Payment account</code> : {account_payment_id}</li>
+                        <li><code>Payment method</code> : {payment_method_name}</li>
+                        <li><code>payment mode</code> : {payment_mode}</li>
+                        <li><code>Move id</code> : {move_id}</li>
+                        <li><code>Reference</code> : {ref}</li>
+                    </ul>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+    <record id="of_config_parameter_info_pattern" model="ir.config_parameter">
+        <field name="key">of_account_invoice_report_payment_info.info_pattern</field>
+        <field name="value">{amount} € payé par {payment_mode} le {date_payment}</field>
+    </record>
+
+</odoo>
