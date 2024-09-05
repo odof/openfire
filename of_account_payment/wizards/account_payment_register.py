@@ -24,6 +24,6 @@ class AccountPaymentRegister(models.TransientModel):
     def _create_payment_vals_from_wizard(self, batch_result):
         payment_vals = super()._create_payment_vals_from_wizard(batch_result)
         payment_vals['of_payment_mode_id'] = self.of_payment_mode_id.id
-        payment_vals['of_payment_ref'] = self.of_payment_ref
+        payment_vals['payment_reference'] = self.of_payment_ref
         payment_vals['of_tag_ids'] = self.of_tag_ids.ids
         return payment_vals
