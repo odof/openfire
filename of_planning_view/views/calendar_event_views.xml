@@ -98,7 +98,6 @@
     </record>
 
     <record id="of_planning.action_calendar_event" model="ir.actions.act_window">
-        <field name="view_mode">tree,planning,form,calendar,pivot</field>
         <field name="view_ids" eval="[Command.clear(),
             Command.create({'view_mode': 'tree', 'view_id': ref('of_planning.view_calendar_event_intervention_tree')}),
             Command.create({'view_mode': 'planning', 'view_id': ref('of_planning_intervention_view_planning')}),

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="ir.actions.act_window" name="action_add_view_mode_map" eval="[[ref('contacts.action_contacts')]]"/>
+
+</odoo>

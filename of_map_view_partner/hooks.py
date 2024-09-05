@@ -3,16 +3,6 @@
 from odoo import SUPERUSER_ID, api
 
 
-def _post_init_hook(cr, registry):
-    """Add map from following action"""
-    env = api.Environment(cr, SUPERUSER_ID, {})
-    action = env.ref('contacts.action_contacts')
-    view_modes = action.view_mode.split(',')
-    if 'map' not in view_modes:
-        view_modes.append('map')
-        action.view_mode = ','.join(view_modes)
-
-
 def _uninstall_hook(cr, registry):
     """Remove map from modified action"""
     env = api.Environment(cr, SUPERUSER_ID, {})

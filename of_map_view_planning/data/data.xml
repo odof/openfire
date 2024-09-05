@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <function model="ir.actions.act_window" name="action_add_view_mode_map" eval="[[ref('of_planning.action_calendar_event')]]"/>
+
+    <function model="ir.actions.report" name="action_add_binding_view_type_map" eval="[[
+        ref('of_planning.action_report_intervention_report'),
+        ref('of_planning.action_report_intervention_sheet'),
+    ]]" />
+
+    <function model="ir.actions.server" name="action_add_binding_view_type_map" eval="[[
+        ref('of_planning.action_of_planning_intervention_generate_invoice_tree_view'),
+        ref('of_planning.action_of_planning_intervention_generate_delivery'),
+    ]]" />
+
+</odoo>
