@@ -863,6 +863,42 @@ class OFPlanningTour(models.Model):
         )
 
     @api.model
+    def _create_tours_for_employees(self, employees, dates_eval, address_sector):
+        """
+        Create or update tours for a list of employees on specified dates.
+
+        This method iterates over the provided employees and dates, and for each combination,
+        it either finds an existing tour or creates a new one. If an address sector is provided,
+        it updates the sector information of the tour accordingly.
+
+        Args:
+            employees (list): List of employee records.
+            dates_eval (list): List of dates to evaluate.
+            address_sector (record): Address sector record to associate with the tours.
+
+        Returns:
+            recordset: A recordset of the created or updated tours.
+        """
+        tours = self.browse()
+        for employee in employees:
+            for date_eval in dates_eval:
+                tour = self.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
+                if not tour:
+                    tour = self.create(
+                        {
+                            'date': date_eval,
+                            'employee_id': employee.id,
+                            'sector_ids': [Command.set([address_sector.id])] if address_sector else False,
+                        }
+                    )
+                elif not tour.sector_ids and address_sector:
+                    tour.sector_ids = [Command.set([address_sector.id])]
+                elif address_sector and address_sector.id not in tour.sector_ids.ids:
+                    tour.sector_ids = [Command.link(address_sector.id)]
+                tours += tour
+        return tours
+
+    @api.model
     def cron_generate_employees_tours(self, force_date=False, force_company_id=False):
         """
         Generate tours for employees for the next period of days defined in the configuration.
