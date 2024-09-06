@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     of_purchase_id = fields.Many2one(
-        'purchase.order', string="Associer à la commande fournisseur",
-        compute='_compute_of_purchase_id', inverse='_inverse_of_purchase_id', store=True
+        'purchase.order',
+        string=u"Associer à la commande fournisseur",
+        compute='_compute_of_purchase_id',
+        inverse='_inverse_of_purchase_id',
+        store=True,
     )
 
     @api.depends('purchase_line_id')
@@ -19,6 +22,8 @@ class AccountInvoiceLine(models.Model):
     def _inverse_of_purchase_id(self):
         purchase_line_obj = self.env['purchase.order.line']
         for inv_line in self:
+            if inv_line.invoice_id.type == 'in_refund':
+                continue
             if not inv_line.of_purchase_id:
                 continue
             product = inv_line.product_id
