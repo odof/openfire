@@ -116,11 +116,26 @@ Cette action irréversible recalculera la catégorie, le prix d'achat et le prix
     <record id="of_import_product_template_form_view" model="ir.ui.view">
         <field name="name">of.import.product.template.common.form</field>
         <field name="model">product.template</field>
-        <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
                 <button name="%(action_of_import_update_product_brand_products_no_context)d" type="action" string="Appliquer les règles"
                         context="{'default_product_ids': active_ids, 'default_brand_id': brand_id}"/>
+            </xpath>
+            <xpath expr="//field[@name='purchase_ok']" position="after">
+                <field name="of_is_net_price" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_import_product_form_view" model="ir.ui.view">
+        <field name="name">of.import.product.form</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_of_import_update_product_brand_products_no_context)d" type="action" string="Appliquer les règles"
+                        context="{'default_product_ids': [product_tmpl_id], 'default_brand_id': brand_id}"/>
             </xpath>
             <xpath expr="//field[@name='purchase_ok']" position="after">
                 <field name="of_is_net_price" readonly="1"/>
