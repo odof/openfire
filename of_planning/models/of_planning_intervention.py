@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-import pytz
-import re
-import requests
-import urllib
 import base64
+import re
+import urllib
+from datetime import datetime, timedelta
 
-from odoo import api, models, fields, _
+import pytz
+import requests
+from dateutil.relativedelta import relativedelta
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import config, DEFAULT_SERVER_DATETIME_FORMAT, float_is_zero
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, config, float_is_zero
 from odoo.tools.float_utils import float_compare
 from odoo.tools.safe_eval import safe_eval
 
@@ -1928,17 +1929,11 @@ class OfPlanningIntervention(models.Model):
         msg_succes = u"SUCCÈS : création de la facture depuis l'intervention %s"
         msg_erreur = u"ÉCHEC : création de la facture depuis l'intervention %s : %s"
 
-        partner = self.partner_id
+        partner = self.partner_id or self.address_id.parent_id or self.address_id
         if not partner:
-            if self.address_id:
-                if self.address_id.parent_id:
-                    invoice_address_id = self.address_id.parent_id.address_get(['invoice'])['invoice']
-                else:
-                    invoice_address_id = self.address_id.address_get(['invoice'])['invoice']
-                partner = self.env['res.partner'].browse(invoice_address_id)
-            else:
-                return (False,
-                        msg_erreur % (self.name, u'Pas de partenaire défini'))
+            return (False, msg_erreur % (self.name, u'Pas de partenaire défini'))
+        invoice_address_id = partner.address_get(['invoice'])['invoice']
+        partner = self.env['res.partner'].browse(invoice_address_id)
         pricelist = partner.property_product_pricelist
         lines_data, error = self._prepare_invoice_lines()
         if error:
