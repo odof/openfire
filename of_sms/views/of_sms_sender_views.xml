@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_sms_sender_view_fornm" model="ir.ui.view">
+        <field name="name">of.sms.sender.view.form</field>
+        <field name="model">of.sms.sender</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="sender_name"/>
+                    <field name="model"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_sms_sender_view_tree" model="ir.ui.view">
+        <field name="name">of.sms.sender.view.tree</field>
+        <field name="model">of.sms.sender</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="sender_name"/>
+                <field name="model"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_sms_sender_action" model="ir.actions.act_window">
+        <field name="name">SMS sender</field>
+        <field name="res_model">of.sms.sender</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>List of senders.</p>
+        </field>
+    </record>
+
+    <menuitem id="of_sms_sender_menu" name="Senders" parent="phone_validation.phone_menu_main" action="of_sms_sender_action" sequence="20"/>
+
+</odoo>

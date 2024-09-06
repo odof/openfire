@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_sms_res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.sms.res.config.settings.view.form.inherit</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='contacts_settings']//div[@id='sms']/.." position="after">
+                <div class="col-xs-12 col-md-6 o_setting_box">
+                    <div class="o_setting_left_pane">
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_team_alert_intervention"/>
+                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img"/>
+                        <div class="text-muted">
+                            Send SMS alert to the teams with summary of the intervention for the next day
+                        </div>
+                        <div class="content-group mt-2">
+                            <div class="row">
+                                <field name="of_team_alert_intervention"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-md-6 o_setting_box">
+                    <div class="o_setting_left_pane">
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_customer_alert_intervention"/>
+                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img"/>
+                        <div class="text-muted">
+                            Send SMS alert to the customers with summary of the intervention for the next day
+                        </div>
+                        <div class="content-group mt-2">
+                            <div class="row">
+                                <field name="of_customer_alert_intervention"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

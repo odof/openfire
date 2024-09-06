@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vue partenaire formulaire : ajouter exemple de paramètre (placeholder) pour le champ mobile format international -->
+    <record id="of_view_partner_form_inherit_of_sms" model="ir.ui.view">
+        <field name="name">E.164 mobile placeholder</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="mobile" position="replace">
+                <field name="mobile" placeholder="Format E.164 - ex : +61 427 671 760"/>
+            </field>
+        </field>
+    </record>
+
+
+</odoo>
