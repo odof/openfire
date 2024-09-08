@@ -356,7 +356,7 @@ class OFSMSGatewayOVH(models.Model):
 
         # Format the from number before sending
         format_from = from_number
-        if u" " in format_from:
+        if format_from and u" " in format_from:
             format_from = format_from.replace(u" ", u"")
         # Format the to number before sending
         format_to = re.sub('[^+,0-9]', "", to_number)
@@ -377,7 +377,7 @@ class OFSMSGatewayOVH(models.Model):
                 raise UserError("Le compte passerelle sms n'a pas de mot de passe.")
 
             req = api_url + u"&account=" + acc_name + u"&login=" + login + u"&password=" + psswrd\
-                + u"&from=" + format_from + u"&to=" + format_to\
+                + u"&from=" + (format_from or "&senderForResponse=1") + u"&to=" + format_to\
                 + u"&message=" + urllib.quote(sms_content.encode('utf8')) + u"&contentType=text/json"
             if not is_commercial:
                 req = req + u"&noStop=1"
