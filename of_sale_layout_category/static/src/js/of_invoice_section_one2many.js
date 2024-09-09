@@ -75,6 +75,8 @@ export class OFInvoiceSectionListRenderer extends ListRenderer {
         super.setup();
         this.titleField = "name";
         this.titleFields = ["name", "of_section_name"];
+        this.creates = this.creates.filter((record) => (record.context && !record.context.includes("line_section")) || !record.context);
+
 
         useEffect(
             () => this.focusToName(this.props.list.editedRecord),
