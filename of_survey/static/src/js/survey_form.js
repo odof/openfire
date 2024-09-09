@@ -26,6 +26,43 @@ odoo.define("of_survey.form", function (require) {
         });
     }
 
+    function updateRenderImages(self){
+        self.$(`.form_images_${self.current_question_id}`).html(
+            qweb.render("of_survey.form_images", {
+                images: self.images[self.current_question_id],
+            })
+        );
+
+        self.$("a.delete").on("click", function () {
+            var id = $(self).find("i").attr("id");
+            self.images[self.current_question_id].splice(id, 1);
+            updateRenderImages(self);
+            var $input = $(`input[ref="attachment_${self.current_question_id}"]`);
+            $input.attr("data-oe-data", JSON.stringify(self.images[self.current_question_id]));
+        });
+
+        self.$("a.edit").on("click", function () {
+            var id = $(self).find("i").attr("id");
+            // on ouvre la modal avec les données pré-remplies
+            $("#addAttachment #title").val(
+                self.images[self.current_question_id][id]["title"]
+            );
+            $("#addAttachment #legend").val(
+                self.images[self.current_question_id][id]["legend"]
+            );
+            $("#addAttachment .thumb").attr(
+                "src",
+                self.images[self.current_question_id][id]["src"]
+            );
+            $("#addAttachment .thumb").attr(
+                "filename",
+                self.images[self.current_question_id][id]["src"]
+            );
+            $("#addAttachment .thumb").attr("origin", id);
+            $("#addAttachment").modal("show");
+        });
+    }
+
     publicWidget.registry.OFSurveyFormWidget = publicWidget.Widget.extend(
         OFSurveyPreloadImageMixin,
         {
@@ -254,47 +291,7 @@ odoo.define("of_survey.form", function (require) {
 
             _udpateRenderImages: function () {
                 var self = this;
-                this.$(`.form_images_${this.current_question_id}`).html(
-                    qweb.render("of_survey.form_images", {
-                        images: this.images[this.current_question_id],
-                    })
-                );
-
-                this.$("a.delete").on("click", function () {
-                    var id = $(this).find("i").attr("id");
-                    self.images[self.current_question_id].splice(id, 1);
-
-                    $(`.form_images_${self.current_question_id}`).html(
-                        qweb.render("of_survey.form_images", {
-                            images: self.images[self.current_question_id],
-                        })
-                    );
-
-
-                    var $input = $(`input[ref="attachment_${self.current_question_id}"]`);
-                    $input.attr("data-oe-data", JSON.stringify(self.images[self.current_question_id]));
-                });
-
-                this.$("a.edit").on("click", function () {
-                    var id = $(this).find("i").attr("id");
-                    // on ouvre la modal avec les données pré-remplies
-                    $("#addAttachment #title").val(
-                        self.images[self.current_question_id][id]["title"]
-                    );
-                    $("#addAttachment #legend").val(
-                        self.images[self.current_question_id][id]["legend"]
-                    );
-                    $("#addAttachment .thumb").attr(
-                        "src",
-                        self.images[self.current_question_id][id]["src"]
-                    );
-                    $("#addAttachment .thumb").attr(
-                        "filename",
-                        self.images[self.current_question_id][id]["src"]
-                    );
-                    $("#addAttachment .thumb").attr("origin", id);
-                    $("#addAttachment").modal("show");
-                });
+                updateRenderImages(self);
             },
             _onClickBtnCloseAttachment: function (event) {
                 event.preventDefault();
