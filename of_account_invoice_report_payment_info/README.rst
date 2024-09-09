@@ -2,11 +2,10 @@
 Of Account Invoice Report Payment Extended Info
 ===============================================
 
-Configuration
-=============
+Module d'ajout d'information étendue sur les factures payées pour OpenFire.
 
-* Activate developer mode.
-* Go to *Settings > Technical > Parameters > System Parameters*.
-* Locate the setting with key
-  "of_account_invoice_report_payment_info.info_pattern"
-  or create a new one if not exists.
+
+Fonctionnalités
+###############
+
+* Permet la définition du paramètre d'impression sur les factures payées au niveau de la méthode de paiement et plus seulement au niveau des paramètres systèmes

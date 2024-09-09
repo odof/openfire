@@ -1,16 +1,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class AccountPaymentMethodLine(models.Model):
     _inherit = 'account.payment.method.line'
 
-    def _get_default_config(self):
-        return (
-            self.env["ir.config_parameter"]
-            .sudo()
-            .get_param("of_account_invoice_report_payment_info.info_pattern", default="")
+    @api.model
+    def _get_default_of_display_config(self):
+        config_parameter_obj = self.env['ir.config_parameter'].sudo()
+        config_parameter = config_parameter_obj.get_param(
+            'account_invoice_report_payment_info.info_pattern', default=''
         )
+        return config_parameter
 
-    config = fields.Char(default=_get_default_config)
+    of_display_config = fields.Char(string="Paid Invoice Configuration", default=_get_default_of_display_config)
