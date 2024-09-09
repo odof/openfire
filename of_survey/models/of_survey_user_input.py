@@ -2,7 +2,7 @@
 
 import uuid
 
-from odoo import _, api, fields, models
+from odoo import Command, _, api, fields, models
 from odoo.osv.expression import FALSE_LEAF, TRUE_LEAF, is_false
 from odoo.tools.safe_eval import safe_eval
 
@@ -181,6 +181,7 @@ class OFSurveyUserInput(models.Model):
         vals = self._get_line_answer_values(question, answer, question.question_type, attachments)
         if not old_answers:
             return self.env['of.survey.user_input.line'].create(vals)
+
         old_answers.write(vals)
 
         return old_answers
@@ -295,7 +296,7 @@ class OFSurveyUserInput(models.Model):
                         }
                     )
                 attachment_ids.append(att.id)
-            vals['value_image_ids'] = attachment_ids
+            vals['value_image_ids'] = [Command.set(attachment_ids)]
         return vals
 
     def _get_line_comment_values(self, question, comment, attachments):
@@ -331,7 +332,7 @@ class OFSurveyUserInput(models.Model):
                     }
                 )
                 attachment_ids.append(attachment.id)
-            vals['value_image_ids'] = attachment_ids
+            vals['value_image_ids'] = [Command.set(attachment_ids)]
         return vals
 
     def _get_line_answer_file_upload_values(self, question, answer_type, answer):
@@ -369,7 +370,7 @@ class OFSurveyUserInput(models.Model):
                         }
                     )
                     attachment_ids.append(attachment.id)
-                vals['value_image_ids'] = attachment_ids
+                vals['value_image_ids'] = [Command.set(attachment_ids)]
             else:
                 vals['skipped'] = True
         return vals
