@@ -8,9 +8,7 @@ class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     of_payment_mode_id = fields.Many2one(
-        comodel_name='of.payment.mode',
-        string="Payment Mode",
-        domain="[('payment_type', '=', payment_type)]",
+        comodel_name='of.payment.mode', string="Payment Mode", domain="[('payment_type', '=', payment_type)]"
     )
     of_payment_ref = fields.Char(size=64, string="Payment reference")
     of_tag_ids = fields.Many2many(comodel_name='of.payment.tags', string="Payment tags")

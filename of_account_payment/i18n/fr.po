@@ -26,6 +26,7 @@ msgid "Balance"
 msgstr "Solde"
 
 #. module: of_account_payment
+
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_search_view
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_form
 #: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_tree
@@ -33,7 +34,8 @@ msgid "Categories"
 msgstr "Étiquettes de paiement"
 
 #. module: of_account_payment
-#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__description
+
+#: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__tag_description
 msgid "Category description"
 msgstr "Description"
 
@@ -78,7 +80,7 @@ msgstr ""
 #. module: of_account_payment
 #: model:ir.model.fields,field_description:of_account_payment.field_account_payment__sale_id
 msgid "Customer orders"
-msgstr "Vente"
+msgstr "Commandes client"
 
 #. module: of_account_payment
 #: model:of.payment.tags,name:of_account_payment.deposit_1
@@ -90,7 +92,18 @@ msgstr "Acompte 1"
 msgid "Deposit 2"
 msgstr "Acompte 2"
 
+
+#: model:ir.model.fields,field_description:of_account_payment.field_account_payment__of_sales_ids
+msgid "Customer orders"
+msgstr "Commandes clients"
 #. module: of_account_payment
+#: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_form
+#: model_terms:ir.ui.view,arch_db:of_account_payment.of_payment_tags_view_tree
+msgid "Description"
+msgstr ""
+
+#. module: of_account_payment
+
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_mode__display_name
 #: model:ir.model.fields,field_description:of_account_payment.field_of_payment_tags__display_name
 msgid "Display Name"
@@ -171,6 +184,7 @@ msgstr "Catégories de paiement"
 
 #. module: of_account_payment
 #: model:ir.model.fields,help:of_account_payment.field_of_payment_tags__description
+#: model:ir.model.fields,help:of_account_payment.field_of_payment_tags__tag_description
 msgid "Payment category description"
 msgstr "Description de la catégorie de paiement"
 

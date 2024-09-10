@@ -7,10 +7,13 @@ class OFPaymentMode(models.Model):
     _name = 'of.payment.mode'
     _description = "Payment Mode"
     _order = 'journal_id asc'
+    _rec_name = "shortname"
 
     name = fields.Char(compute='_compute_name')
     shortname = fields.Char(related='payment_method_line_id.name', string="Short Name")
-    journal_id = fields.Many2one(comodel_name='account.journal', string="Journal", required=True, ondelete='cascade')
+    journal_id = fields.Many2one(
+        comodel_name='account.journal', string="Journal", required=True, ondelete='cascade', _order="id asc"
+    )
     payment_method_line_id = fields.Many2one(
         comodel_name='account.payment.method.line', string="Payment Method Line", required=True, ondelete='cascade'
     )
