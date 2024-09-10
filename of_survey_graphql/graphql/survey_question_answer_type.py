@@ -19,9 +19,7 @@ class SurveyQuestionAnswer(OdooObjectType):
 
     @staticmethod
     def resolve_image(root, info):
-        if root.value_of_image_id and root.value_of_image_id.image_1920:
-            return root.value_of_image_id
-        return None
+        return root.value_of_image_id or None
 
 
 class SurveyQuestionAnswerInput(graphene.InputObjectType):
