@@ -29,3 +29,9 @@ class CrmLead(models.Model):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context['default_of_referred_id'] = self.of_referred_id.id
         return quotation_context
+
+    def action_set_lost(self, **additional_values):
+        res = super().action_set_lost(**additional_values)
+        orders = self.mapped('order_ids').filtered(lambda order: order.state in ['draft', 'sent'])
+        orders and orders._action_cancel()
+        return res
