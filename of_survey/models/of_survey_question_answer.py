@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class OFSurveyQuestionAnswer(models.Model):
@@ -28,6 +28,36 @@ class OFSurveyQuestionAnswer(models.Model):
     value_image_filename = fields.Char(string="Image Filename")
     is_correct = fields.Boolean(string="Correct")
     is_default = fields.Boolean(string="Is default")
+    value_of_image_id = fields.Many2one(comodel_name='of.image', string="Value Image")
+
+    @api.model_create_multi
+    def create(self, list_vals):
+        for vals in list_vals:
+            if 'value_image' in vals:
+                vals['value_of_image_id'] = (
+                    self.env['of.image']
+                    .create({'name': vals.get('value_image_filename'), 'image_1920': vals.get('value_image')})
+                    .id
+                )
+        return super().create(list_vals)
+
+    def write(self, vals):
+        if 'value_image' in vals:
+            for record in self:
+                if record.value_of_image_id:
+                    record.value_of_image_id.image_1920 = vals.get('value_image')
+            vals['value_of_image_id'] = (
+                self.env['of.image']
+                .create({'name': vals.get('value_image_filename'), 'image_1920': vals.get('value_image')})
+                .id
+            )
+        return super().write(vals)
+
+    def unlink(self):
+        of_images = self.mapped('value_of_image_id')
+        res = super().unlink()
+        of_images.unlink()
+        return res
 
     def action_button_check_suggested_answer_ids(self):
         if answer_id := self.env.context.get('active_answer'):
