@@ -346,31 +346,37 @@ class OFSurveyUserInput(models.Model):
         }
         if answer_type == 'multi_image':
             if len(answer) > 0:
-                attachment_ids = []
+                # ici, on va tester si la réponse qui vient du controller de réponse au questionnaire
+                # est au format liste ou non. S'il est au format liste, on retrouve dedans toutes les
+                # images de réponses (mêmes celles non modifiées)
+                # si la réponse est '' alors, c'est que les images sont les mêmes (on évite ainsi de retourner
+                # de nouveau toutes les images), donc on ne fait rien.
+                if type(answer[0]) is list:
+                    attachment_ids = []
 
-                for file in answer[0]:
-                    name = file.get('title')
-                    if name == '':
-                        name = file.get('filename')
+                    for file in answer[0]:
+                        name = file.get('title')
+                        if name == '':
+                            name = file.get('filename')
 
-                    # on regarde dans la data si on a l'information que c'est une image ou pas
-                    # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
-                    datas = file['src'].split(',')
-                    if len(datas) > 0:
-                        datas = datas[1]
-                    else:
-                        datas = datas[0]
-                    datas = bytes(datas, 'utf-8')
+                        # on regarde dans la data si on a l'information que c'est une image ou pas
+                        # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
+                        datas = file['src'].split(',')
+                        if len(datas) > 0:
+                            datas = datas[1]
+                        else:
+                            datas = datas[0]
+                        datas = bytes(datas, 'utf-8')
 
-                    attachment = self.env['of.image'].create(
-                        {
-                            'name': name,
-                            'caption': file.get('legend', ''),
-                            'image_1920': datas,
-                        }
-                    )
-                    attachment_ids.append(attachment.id)
-                vals['value_image_ids'] = [Command.set(attachment_ids)]
+                        attachment = self.env['of.image'].create(
+                            {
+                                'name': name,
+                                'caption': file.get('legend', ''),
+                                'image_1920': datas,
+                            }
+                        )
+                        attachment_ids.append(attachment.id)
+                    vals['value_image_ids'] = [Command.set(attachment_ids)]
             else:
                 vals['skipped'] = True
         return vals
