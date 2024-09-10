@@ -3,6 +3,7 @@
 import graphene
 
 from odoo.addons.graphql_base import OdooObjectType
+from odoo.addons.of_base_graphql.graphql.image_type import Image
 
 
 class SurveyQuestionAnswer(OdooObjectType):
@@ -14,6 +15,11 @@ class SurveyQuestionAnswer(OdooObjectType):
     sequence = graphene.Int()
     is_correct = graphene.Boolean()
     is_default = graphene.Boolean()
+    image = graphene.Field(Image)
+
+    @staticmethod
+    def resolve_image(root, info):
+        return root.value_of_image_id or None
 
 
 class SurveyQuestionAnswerInput(graphene.InputObjectType):
