@@ -84,7 +84,6 @@
                         />
                     </td>
                 </t>
-                <td t-else="" tabindex="-1" />
             </t>
         </tr>
     </t>
