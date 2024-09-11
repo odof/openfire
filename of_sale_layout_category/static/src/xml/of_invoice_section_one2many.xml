@@ -13,15 +13,15 @@
                 <div class="col-1">
                     <t t-esc="props.record.data.of_section_name"/>
                 </div>
-                <div class="col-6">
+                <div class="col">
                     <t t-esc="props.record.data.name"/>
                 </div>
-                <div class="col text-end section_action">
-                    <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
-                        <i class="fa fa-trash-o me-2"/>
-                    </a>
-                </div>
             </div>
+        </td>
+        <td colspan="1">
+            <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
+                <i class="fa fa-trash-o me-2"/>
+            </a>
         </td>
     </t>
 
