@@ -1170,8 +1170,14 @@ class StockQuant(models.Model):
             total_in = sum(move_pack_in.mapped('product_qty'))
             total_quant = sum(quant.qty for quant in quants if quant.location_id == location)
             if round(total_in - total_out, 2) != round(total_quant, 2):
-                print u"Incohérence :", min(move_pack.mapped('create_date')), round(total_in - total_out, 2),\
-                    round(total_quant, 2), move.id, move_pack, quants
+                print(
+                    u"Incohérence :",
+                    min(move_pack.mapped('create_date')),
+                    round(total_in - total_out, 2),
+                    round(total_quant, 2),
+                    move.id,
+                    move_pack, quants
+                )
                 to_check -= move_pack
             else:
                 to_check -= move
@@ -1337,34 +1343,69 @@ class StockQuant(models.Model):
         purchase_lines_to_recompute = self.env['purchase.order.line']
         for move in move_obj.search([('state', '=', 'done')] + domain):
             quant_qty = sum([quant.qty for quant in move.quant_ids if quant.qty > 0])
-            if float_compare(quant_qty, move.product_qty, precision_rounding=move.product_id.uom_id.rounding):
-                # Plusieurs cas possibles
-                # 1 - Si la quantité réservée donne raison au quant, c'est le mouvement de stock qui a tort
-                if not float_compare(
-                        quant_qty, sum(move.linked_move_operation_ids.mapped('qty')),
-                        precision_rounding=move.product_id.uom_id.rounding):
-                    # SQL pas top, mais la surcharge de write dans le module stock empêche de modifier la quantité
-                    # d'un mouvement traité
-                    self._cr.execute(
-                        "UPDATE stock_move SET product_qty = %s, product_uom_qty = %s WHERE id = %s"
-                        % (quant_qty,
-                           move.product_id.uom_id._compute_quantity(quant_qty, move.product_uom),
-                           move.id))
-                    # Il faut recalculer les quantités des lignes de commande, mais le cache est périmé à cause
-                    # de la modification en SQL.
-                    # On va donc reléguer ce calcul à la fin et on nettoiera le cache avant de l'effectuer
-                    sale_lines_to_recompute |= move.procurement_id.sale_line_id
-                    purchase_lines_to_recompute |= move.purchase_line_id
-                # 2 - Si la quantité réservée donne raison au mouvement de stock, c'est le quant qui a tort
-                elif not float_compare(
-                        move.product_qty, sum(move.linked_move_operation_ids.mapped('qty')),
-                        precision_rounding=move.product_id.uom_id.rounding):
-                    if move.product_qty > quant_qty:
-                        quant_obj._quant_create_from_move(
-                            float_round(
-                                move.product_qty - quant_qty,
-                                precision_rounding=move.product_id.uom_id.rounding),
-                            move)
+            rounding = move.product_id.uom_id.rounding
+            if float_compare(quant_qty, move.product_qty, precision_rounding=rounding) == 0:
+                continue
+            # Plusieurs cas possibles
+            # 1 - Si la quantité réservée donne raison au quant, c'est le mouvement de stock qui a tort
+            if not float_compare(
+                    quant_qty, sum(move.linked_move_operation_ids.mapped('qty')),
+                    precision_rounding=move.product_id.uom_id.rounding):
+                # SQL pas top, mais la surcharge de write dans le module stock empêche de modifier la quantité
+                # d'un mouvement traité
+                self._cr.execute(
+                    "UPDATE stock_move SET product_qty = %s, product_uom_qty = %s WHERE id = %s"
+                    % (quant_qty,
+                        move.product_id.uom_id._compute_quantity(quant_qty, move.product_uom),
+                        move.id))
+                # Il faut recalculer les quantités des lignes de commande, mais le cache est périmé à cause
+                # de la modification en SQL.
+                # On va donc reléguer ce calcul à la fin et on nettoiera le cache avant de l'effectuer
+                sale_lines_to_recompute |= move.procurement_id.sale_line_id
+                purchase_lines_to_recompute |= move.purchase_line_id
+            # 2 - Si la quantité réservée donne raison au mouvement de stock, c'est le quant qui a tort
+            elif not float_compare(
+                    move.product_qty, sum(move.linked_move_operation_ids.mapped('qty')),
+                    precision_rounding=rounding):
+                if move.product_qty > quant_qty:
+                    quant_obj._quant_create_from_move(
+                        float_round(
+                            move.product_qty - quant_qty,
+                            precision_rounding=move.product_id.uom_id.rounding),
+                        move)
+                else:
+                    # Il faut couper le lien entre le mouvement de stock et un des quants
+                    # Cherchons les meilleurs liens à couper
+                    # On essaie de couper les liens de plus grosse quantité sans dépasser la quantité de mouvement
+                    #
+                    delta = quant_qty - move.product_qty
+                    quants = move.quant_ids.filtered(lambda q: q.qty > 0 and q.location_id == move.location_dest_id)
+                    if float_compare(delta, sum(quants.mapped('qty')), precision_rounding=rounding) > 0:
+                        quants = move.quant_ids.filtered(lambda q: q.qty > 0)
+                    quants = quants.sorted(key=lambda q: q.qty)
+                    removed = self.env['stock.quant']
+
+                    while delta:
+                        # On essaie de ne pas prendre de quant de qté supérieure à celle du mouvement
+                        quants_tmp = quants.filtered(
+                            lambda q: float_compare(q.qty, delta, precision_rounding=rounding) <= 0)
+                        cmp = float_compare(delta, sum(quants_tmp.mapped('qty')), precision_rounding=rounding)
+                        if cmp == 0:
+                            to_remove = quants_tmp
+                            delta = 0
+                        else:
+                            if cmp < 0:
+                                to_remove = quants_tmp[-1]
+                            else:
+                                to_remove = quants[len(quants_tmp)]
+                            delta = float_round(delta - to_remove.qty, precision_rounding=rounding)
+                        removed += to_remove
+                    if delta < 0:
+                        # On a retiré plus de quantité que le delta initial, il faut donc ajouter un quant
+                        quant_obj._quant_create_from_move(-delta, move)
+                    move.quant_ids = move.quant_ids - removed
+                    self.action_of_repair_quant_chain(domain=[('id', 'in', removed.ids)])
+
         move_obj.invalidate_cache(['product_uom_qty'])
         # Recalcul de la qté livrée de la commande client associée
         for sale_line in sale_lines_to_recompute:
@@ -1377,6 +1418,8 @@ class StockQuant(models.Model):
     def action_of_repair_quant_chain(self, domain=[]):
         """ Identifie et répare les problèmes de chaîne sur les quants.
         Plusieurs problèmes possibles sont corrigés par cette fonction :
+        - Si des mouvements de stock non terminés composent le quant, on les dissocie
+        - Si le quant ne contient aucun mouvement de stock, on le supprime
         - Si les mouvements de stock liés au quant ne forment pas un chemin continu, on crée des quants pour séparer
           ces mouvements en différents chemins continus
         - Correction de l'emplacement du quant s'il n'est pas cohérent avec ses mouvements de stock
@@ -1407,7 +1450,7 @@ class StockQuant(models.Model):
                         neg_quant.write(vals)
             elif location.usage != 'internal' and quant.propagated_from_id:
                 # Il y a un quant négatif en trop
-                quant.propagated_from_id.unlink()
+                quant.with_context(force_unlink=True).propagated_from_id.unlink()
 
         quant_obj = self.env['stock.quant']
         new_quant_defaults = {
@@ -1420,6 +1463,12 @@ class StockQuant(models.Model):
 
         for quant in quant_obj.search([('qty', '>', 0)] + domain):
             loc_vals = {}
+            if any(move.state != 'done' for move in quant.history_ids):
+                quant.write({'history_ids': [(6, 0, quant.history_ids.filtered(lambda m: m.state == 'done').ids)]})
+            if not quant.history_ids:
+                quant.with_context(force_unlink=True).unlink()
+                continue
+
             for move in quant.history_ids:
                 loc_vals[move.location_id] = loc_vals.get(move.location_id, 0) - 1
                 loc_vals[move.location_dest_id] = loc_vals.get(move.location_dest_id, 0) + 1
