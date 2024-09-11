@@ -22,8 +22,13 @@ from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_A
 
 _logger = logging.getLogger(__name__)
 
+
 def round_to_next_minute(dt):
-    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute + (dt.second >= 1))
+    result = datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute)
+    if dt.second >= 1:
+        result += timedelta(minutes=1)
+    return result
+
 
 """
 bug description quand changement de tache ou service lié puis changé?
