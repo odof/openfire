@@ -49,7 +49,6 @@
                             }" name="delete" aria-label="Delete row" tabindex="-1" />
                         </td>
                     </t>
-                    <td t-else="" tabindex="-1" />
                 </t>
             </tr>
         </t>
