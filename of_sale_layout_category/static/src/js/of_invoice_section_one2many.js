@@ -18,6 +18,7 @@ export class OFInvoiceSectionLine extends Component {
     }
 
     setup() {
+        this.nbColumns = this.props.columns.length;
         this.state = useState({
             nbColumns: this.props.columns.length,
         });
