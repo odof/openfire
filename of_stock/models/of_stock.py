@@ -1070,6 +1070,15 @@ class StockMove(models.Model):
         return super(StockMove, self).read_group(
             domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
+    @api.multi
+    def force_assign(self):
+        # Suppression de potentiels anciens approvisionnements
+        # Ce cas peut survenir si le module OCA stock_picking_back2draft est utilisé
+        self.env['procurement.order']\
+            .search([('move_dest_id', 'in', self.ids), ('state', '=', 'cancel')])\
+            .write({'move_dest_id': False})
+        return super(StockMove, self).force_assign()
+
 
 class StockQuant(models.Model):
     _inherit = 'stock.quant'

@@ -13,13 +13,19 @@ class StockMove(models.Model):
         procurements = self.env['procurement.order']
         for move in self:
             if move.state != 'confirmed':
-                raise UserError(u"Seul un mouvement en attente de disponibilitré peut être approvisionné.")
+                raise UserError(u"Seul un mouvement en attente de disponibilité peut être approvisionné.")
 
             # Code copié depuis stock.move.action_confirm()
             # create procurements for make to order moves
             procurements |= procurements.create(move._prepare_procurement_from_move())
         if procurements:
             procurements.run()
+
+        # Suppression de potentiels anciens approvisionnements
+        # Ce cas peut survenir si le module OCA stock_picking_back2draft est utilisé
+        self.env['procurement.order']\
+            .search([('move_dest_id', 'in', self.ids), ('state', '=', 'cancel')])\
+            .write({'move_dest_id': False})
 
         self.write({'state': 'waiting'})
 
