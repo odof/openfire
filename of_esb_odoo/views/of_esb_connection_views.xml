@@ -11,6 +11,7 @@
                     <field name="odoo_server"/>
                     <field name="odoo_port"/>
                     <field name="odoo_base"/>
+                    <field name="odoo_company_id"/>
                     <field name="odoo_protocol"/>
                 </group>
             </xpath>

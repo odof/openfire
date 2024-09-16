@@ -25,6 +25,8 @@ class ESBService(models.Model):
                 for line in lines:
                     logger.info(line)
                     obj = odoo_base.env[line['model']]
+                    if connection.company_id:
+                        obj = obj.with_context(allowed_company_ids=[connection.company_id])
                     line['result'] = obj.search_read(
                         domain=line.get('domain', []),
                         offset=line.get('offset', 0),
@@ -44,6 +46,8 @@ class ESBService(models.Model):
                 lines = data['data']
                 for line in lines:
                     obj = odoo_base.env[line['model']]
+                    if connection.company_id:
+                        obj = obj.with_context(allowed_company_ids=[connection.company_id])
                     results = line['result']
                     for result in results:
                         if res_id := result.get('id'):
@@ -63,6 +67,8 @@ class ESBService(models.Model):
             odoo_base = connection.connect()
             for line in lines:
                 obj = odoo_base.env[line['model']]
+                if connection.company_id:
+                    obj = obj.with_context(allowed_company_ids=[connection.company_id])
                 line['result'] = obj.search_read(
                     domain=line.get('domain', []),
                     offset=line.get('offset', 0),
