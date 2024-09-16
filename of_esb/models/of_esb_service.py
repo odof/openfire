@@ -3,7 +3,7 @@
 import json
 import logging
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 logger = logging.getLogger(__name__)
 

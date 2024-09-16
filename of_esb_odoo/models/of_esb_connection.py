@@ -10,12 +10,13 @@ class ESBConnection(models.Model):
     _inherit = 'of.esb.connection'
 
     ttype = fields.Selection(selection_add=[('odoo', 'Odoo')])
-    odoo_server = fields.Char("Odoo Server")
-    odoo_port = fields.Char('Odoo Port')
-    odoo_base = fields.Char('Odoo Base')
+    odoo_server = fields.Char(string="Odoo Server")
+    odoo_port = fields.Char(string="Odoo Port")
+    odoo_base = fields.Char(string="Odoo Base")
     odoo_protocol = fields.Selection(
-        [('jsonrpc', 'jsonrpc'), ('jsonrpc+ssl', 'jsonrpc+ssl')], default='jsonrpc+ssl', string='Odoo Protocol'
+        [('jsonrpc', 'jsonrpc'), ('jsonrpc+ssl', 'jsonrpc+ssl')], default='jsonrpc+ssl', string="Odoo Protocol"
     )
+    odoo_company_id = fields.Integer(string="Company ID")
 
     def connect(self):
         odoo_base = odoorpc.ODOO(self.odoo_server, port=self.odoo_port, protocol=self.odoo_protocol)

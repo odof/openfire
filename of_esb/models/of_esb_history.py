@@ -115,12 +115,13 @@ class ESBHistory(models.Model):
                     jobs[line['name']] = line
 
             for service in services:
-                mermaid_service = f"""{trigger}{services[service]['slug']}
-                subgraph "Service: {services[service]['name']} (durée : {jobs[services[service]['job_id']]['exec_time']} secondes)"
-                {services[service]['slug']} --> {jobs[services[service]['job_id']]['name']}
-                end
-                {jobs[services[service]['job_id']]['name']} -.-> {jobs[services[service]['job_id']]['state']}
-                """
+                mermaid_service = f"""{trigger}{services[service]['slug']}"""
+                f"""subgraph "Service: {services[service]['name']} (durée : """
+                f"""{jobs[services[service]['job_id']] ['exec_time']} secondes)\""""
+                f"""{services[service]['slug']} --> {jobs[services[service]['job_id']]['name']}"""
+                """end"""
+                f"""{jobs[services[service]['job_id']]['name']} -.-> """
+                f"""{jobs[services[service]['job_id']]['state']}"""
                 mermaid += mermaid_service
             return mermaid
 

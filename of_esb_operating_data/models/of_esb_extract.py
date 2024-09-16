@@ -3,7 +3,7 @@
 import json
 import uuid
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class ESBExtract(models.Model):
