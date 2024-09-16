@@ -25,46 +25,45 @@ class ESBBus(models.Model):
 
         for res in res_list:
             # on va chercher les règles qui sont configurées sur le channel / ttype
-            rules = self.env['of.esb.rule'].search([('channel_bus', '=', res.channel), ('type_bus', '=', res.ttype.id)])
+            rules = self.env['of.esb.rule'].search(
+                [('channel_bus', 'in', [res.channel, False]), ('type_bus', '=', res.ttype.id)]
+            )
             for rule in rules:
                 service_exec = rule.service.execute_with_delay(args=res.data)
-                data_value = {
-                    'in_data': json.dumps(
-                        {
-                            'type': 'service',
-                            'id': rule.service.id,
-                            'job': service_exec._uuid,
-                            'name': rule.service.name,
-                        }
-                    ),
-                    'properties': json.dumps({'uuid': res.uuid}),
+                data = {
+                    'type': 'service',
+                    'id': rule.service.id,
+                    'job': service_exec._uuid,
+                    'name': rule.service.name,
                 }
-                data = self.env['of.esb.data'].create(data_value)
-                bus_value = {
-                    'channel': 'history',
-                    'ttype': self.env.ref('of_esb.type_logs').id,
-                    'data': data.id,
-                }
-                self.create(bus_value)
+                properties = {'uuid': res.uuid}
+
+                self.send_bus(
+                    ttype=self.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+                )
+
         return res_list
 
     @api.model
-    def send_bus(self, ttype, channel, data):
+    def send_bus(self, ttype, channel, data, properties=None):
         # ttype : contient le nom du type de bus
         # channel : le nom du channel
         # data : dictionnaire contenant deux clefs uuid et in_data
         #   uuid est l'uuid du trigger en cours d'exécution
         #   in_data c'est la donnée à envoyer dans le bus
+        if not properties:
+            properties = {}
         value_data = {
             'in_data': json.dumps(data),
-            'properties': json.dumps({}),
+            'properties': json.dumps(properties),
         }
         if data.get('uuid'):
-            value_data['properties'] = json.dumps({'uuid': data['uuid']})
+            value_data['properties'] = json.dumps(dict({'uuid': data['uuid']}).update(properties))
 
         res_data = self.env['of.esb.data'].create(value_data)
 
         ttype = self.env['of.esb.type.bus'].search([('name', '=', ttype)])
 
         value_bus = {'channel': channel, 'ttype': ttype.id, 'data': res_data.id, 'uuid': data.get('uuid')}
-        self.create(value_bus)
+        bus = self.create(value_bus)
+        return bus

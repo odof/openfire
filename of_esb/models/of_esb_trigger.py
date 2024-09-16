@@ -61,29 +61,18 @@ class ESBTrigger(models.Model):
         now = fields.Datetime.now()
         triggers = self.search([('exec_active', '=', True), ('ttype', '=', 'scheduler'), ('date_exec', '<=', now)])
         for trigger in triggers:
-            value = {
-                'data': trigger.data.id,
-                'channel': trigger.data_channel,
-                'ttype': trigger.data_type.id,
-            }
-            logger.info(value)
-            bus = self.env['of.esb.bus'].create(value)
+            bus = self.env['of.esb.bus'].send_bus(
+                ttype=trigger.data_type.id, channel=trigger.data_channel, data=trigger.data.in_data
+            )
+
             if trigger.interval_number > 0:
                 interval = _intervalTypes[trigger.interval_type](trigger.interval_number)
                 trigger.date_exec += interval
             else:
                 trigger.date_exec = False
 
-            data_value = {
-                'in_data': json.dumps(
-                    {'type': 'trigger', 'id': trigger.id, 'name': trigger.name, 'user_id': self.env.user.id}
-                ),
-                'properties': json.dumps({'uuid': bus.uuid}),
-            }
-            data = self.env['of.esb.data'].create(data_value)
-            bus_value = {
-                'channel': 'history',
-                'ttype': self.env.ref('of_esb.type_logs').id,
-                'data': data.id,
-            }
-            self.env['of.esb.bus'].create(bus_value)
+            data = {'type': 'trigger', 'id': trigger.id, 'name': trigger.name, 'user_id': self.env.user.id}
+            properties = {'uuid': bus.uuid}
+            self.env['of.esb.bus'].send_bus(
+                ttype=self.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+            )
