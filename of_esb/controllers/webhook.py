@@ -33,24 +33,18 @@ class Service(Controller):
                 data.properties = json.dumps({'uuid': bus.uuid})
                 body = {'res': 'Your webhook have been queued', 'uuid': bus.uuid, 'code': 200}
                 # on loggue tout ça
-                data_value = {
-                    'in_data': json.dumps(
-                        {
-                            'type': 'trigger',
-                            'id': request_trigger.id,
-                            'name': request_trigger.name,
-                            'user_id': user_id.id,
-                        }
-                    ),
-                    'properties': json.dumps({'uuid': bus.uuid}),
+
+                data = {
+                    'type': 'trigger',
+                    'id': request_trigger.id,
+                    'name': request_trigger.name,
+                    'user_id': user_id.id,
                 }
-                data = request.env['of.esb.data'].create(data_value)
-                bus_value = {
-                    'channel': 'history',
-                    'ttype': request.env.ref('of_esb.type_logs').id,
-                    'data': data.id,
-                }
-                request.env['of.esb.bus'].create(bus_value)
+                properties = {'uuid': bus.uuid}
+
+                request.env['of.esb.bus'].send_bus(
+                    ttype=request.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+                )
 
             else:
                 body = {'res': 'You do not have access to this webhook', 'code': 200}

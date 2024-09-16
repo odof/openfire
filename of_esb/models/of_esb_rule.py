@@ -7,7 +7,7 @@ class ESBRule(models.Model):
     _name = 'of.esb.rule'
 
     name = fields.Char()
-    channel_bus = fields.Char(required=True, string="Channel")
+    channel_bus = fields.Char(string="Channel")
     type_bus = fields.Many2one(comodel_name='of.esb.type.bus', required=True, string="Type of bus")
     service = fields.Many2one(comodel_name='of.esb.service', required=True)
     ttype = fields.Selection([('user', 'user'), ('system', 'system')], string="Type", default="user")
