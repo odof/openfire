@@ -12,22 +12,15 @@ class SmsApi(models.AbstractModel):
 
     def _prepare_ovh_http_params(self, account, message, sms_id):
         sms = self.env['sms.sms'].browse(sms_id)
-
-        res = {
-            "smsAccount": account.sms_ovh_http_account,
-            "login": account.sms_ovh_http_login,
-            "password": account.sms_ovh_http_password,
-            "from": sms.of_sender_id.name or account.sms_ovh_http_from,
-            "to": sms.number,
-            "message": message,
+        return {
+            'smsAccount': account.sms_ovh_http_account,
+            'login': account.sms_ovh_http_login,
+            'password': account.sms_ovh_http_password,
+            'from': sms.of_sender_id.name or account.sms_ovh_http_from,
+            'to': sms.number,
+            'message': message,
+            'noStop': '0' if sms.of_is_commercial else '1',
         }
-
-        if sms.of_is_commercial:
-            res['noStop'] = "0"
-        else:
-            res['noStop'] = "1"
-
-        return res
 
     def _send_sms_with_ovh_http(self, number, message, sms_id):
         # Try to return same error code like odoo
@@ -40,7 +33,7 @@ class SmsApi(models.AbstractModel):
             params=self._prepare_ovh_http_params(account, message, sms_id),
         )
         response = r.text
-        if response[0:2] != "OK":
+        if response[:2] != "OK":
             self.env["sms.sms"].browse(sms_id).error_detail = response
-            return "server_error"
-        return "success"
+            return 'server_error'
+        return 'success'

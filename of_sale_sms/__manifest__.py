@@ -1,23 +1,19 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': "OpenFire / SMS sale",
-    'version': "16.0.0.0.0",
+    'version': "16.0.1.0.0",
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'license': 'LGPL-3',
-    'website': "www.openfire.fr",
-    'category': "Generic Modules/",
-    'description': u"""
-Module de SMS OpenFire pour les ventes
-======================================
-
-- Envoi de SMS depuis les ventes instantanément ou en différé
-""",
+    'category': "OpenFire",
+    'summary': "Module de SMS OpenFire pour les ventes",
+    'website': "https://www.openfire.fr",
     'depends': [
         'of_sms',
         'of_sale',
     ],
-    'demo_xml': [],
     'data': [
-        'views/sale_order_views.xml',
+        'data/ir_actions_server.xml',
     ],
     'installable': True,
 }

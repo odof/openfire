@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 try:
     import phonenumbers
 except ImportError:
-    _logger.debug(u"Impossible d'importer la librairie Python 'phonenumbers'.")
+    _logger.debug("Please install the 'phonenumbers' Python library.")
 
 
 class ResPartner(models.Model):
@@ -21,8 +21,7 @@ class ResPartner(models.Model):
         mobile_numbers = []
         for partner in self:
             for mobile in partner.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile' and p.number):
-                phone_number = convert_phone_number(mobile.number, new_format='e164', strict=True)
-                if phone_number:
+                if phone_number := convert_phone_number(mobile.number, new_format='e164', strict=True):
                     mobile_numbers.append(phone_number)
                 else:
                     country_code = (

@@ -9,8 +9,7 @@ class OFSMS(models.AbstractModel):
 
     @api.model
     def action_send_sms(self, res_id, model, partner_id):
-        ir_model = self.env['ir.model'].search([('model', '=', model)], limit=1)
-        if ir_model:
+        if ir_model := self.env['ir.model'].search([('model', '=', model)], limit=1):
             sender = self.env['of.sms.sender'].search([('model', '=', ir_model.id)], limit=1)
         if not sender:
             sender = self.env['of.sms.sender'].search([('model', '=', False)], limit=1)
@@ -19,10 +18,9 @@ class OFSMS(models.AbstractModel):
             raise UserError("Error ! (#ED100)\n\nNo sender(s) found. Please configure it.")
 
         if partner_id:
-            mobile_numbers = partner_id.get_mobile_numbers()
-            if mobile_numbers:
+            if mobile_numbers := partner_id.get_mobile_numbers():
                 return {
-                    'name': u'Compose SMS',
+                    'name': _("Compose SMS"),
                     'view_mode': 'form',
                     'res_model': 'sms.composer',
                     'target': 'new',
@@ -35,5 +33,6 @@ class OFSMS(models.AbstractModel):
                         'default_composition_mode': 'comment',
                     },
                 }
-        # Si on arrive ici, c'est que l'on n'a pas de numéro de mobile à qui envoyer le SMS
-        raise UserError("This customer has no valid mobile number!")
+
+        # Here, we don't have any mobile number to send the SMS to, so we raise an error
+        raise UserError(_("This customer has no valid mobile number!"))

@@ -1,21 +1,17 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 {
     'name': "OpenFire / SMS Account",
-    'version': "16.0.0.0.0",
-    'author': "OpenFire",
+    'version': "16.0.1.0.0",
     'license': 'LGPL-3',
-    'website': "www.openfire.fr",
-    'category': "Generic Modules/",
-    'description': u"""
-Module de SMS OpenFire pour la comptabilité
-===========================================
-
-- Envoi de SMS depuis la comptabilité instantanément ou en différé
-""",
+    'author': "OpenFire",
+    'category': "OpenFire",
+    'summary': "Module de SMS OpenFire pour la comptabilité",
+    'website': "https://www.openfire.fr",
     'depends': [
         'of_sms',
         'of_account',
     ],
-    'demo_xml': [],
     'data': [
         'views/account_move_views.xml',
     ],

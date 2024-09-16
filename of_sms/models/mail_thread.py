@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-
 from odoo import models
 from odoo.tools import html2plaintext
 
@@ -22,37 +21,12 @@ class MailThread(models.AbstractModel):
         **kwargs,
     ):
         """
-        Copie du code d'Odoo pour ajouter nos infos à nous en plus dans kwargs :
-        - sender_id : pour les expéditeurs OVH
-        - is_commercial : pour gérer les messages commerciaux
-        - date_send : pour choisir une date
+        Copy of Odoo code to add our own information in kwargs:
+        - sender_id: for OVH senders
+        - is_commercial: to manage commercial messages
+        - date_send: to choose a date
 
-        Notification method: by SMS.
-
-        :param message: ``mail.message`` record to notify;
-        :param recipients_data: list of recipients information (based on res.partner
-          records), formatted like
-            [{'active': partner.active;
-              'id': id of the res.partner being recipient to notify;
-              'groups': res.group IDs if linked to a user;
-              'notif': 'inbox', 'email', 'sms' (SMS App);
-              'share': partner.partner_share;
-              'type': 'customer', 'portal', 'user;'
-             }, {...}].
-          See ``MailThread._notify_get_recipients``;
-        :param msg_vals: dictionary of values used to create the message. If given it
-          may be used to access values related to ``message`` without accessing it
-          directly. It lessens query count in some optimized use cases by avoiding
-          access message content in db;
-
-        :param sms_numbers: additional numbers to notify in addition to partners
-          and classic recipients;
-        :param pid_to_number: force a number to notify for a given partner ID
-              instead of taking its mobile / phone number;
-        :param resend_existing: check for existing notifications to update based on
-          mailed recipient, otherwise create new notifications;
-        :param put_in_queue: use cron to send queued SMS instead of sending them
-          directly;
+        See `mail.thread._notify_thread_by_sms()` for more information.
         """
         sms_pid_to_number = sms_pid_to_number if sms_pid_to_number is not None else {}
         sms_numbers = sms_numbers if sms_numbers is not None else []
@@ -66,7 +40,7 @@ class MailThread(models.AbstractModel):
             'mail_message_id': message.id,
             'state': 'outgoing',
         }
-        # Modification OpenFire ####
+        # OF : Add `of_send_date`, `of_is_commercial` and `of_sender_id` to sms_base_vals
         if send_date := kwargs.get('of_send_date'):
             sms_base_vals['state'] = 'to_send'
             sms_base_vals['of_date_send'] = send_date
@@ -76,7 +50,7 @@ class MailThread(models.AbstractModel):
 
         if sender_id := kwargs.get('of_sender_id'):
             sms_base_vals['of_sender_id'] = sender_id
-        # Fin modification OpenFire ###
+        # End OF
 
         # notify from computed recipients_data (followers, specific recipients)
         partners_data = [r for r in recipients_data if r['notif'] == 'sms']
