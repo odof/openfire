@@ -76,7 +76,10 @@
 
             <!-- Hiding fields part -->
             <!-- Removing -->
-            <xpath expr="//div[@name='send_buttons']" position="replace" />
+            <xpath expr="//div[@name='send_buttons']" position="attributes">
+                <!-- Don't replace it to avoid conflicts with `calendar_sms` module -->
+                <attribute name="invisible">1</attribute>
+            </xpath>
             <!-- Repostionning them in the body part -->
             <xpath expr="//field[@name='partner_ids']" position="replace" />
             <xpath expr="//field[@name='recurrency']/../.." position="replace" />

@@ -1,0 +1,140 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_planning_sms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-17 11:12+0000\n"
+"PO-Revision-Date: 2024-09-17 11:12+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_planning_sms
+#: model_terms:ir.ui.view,arch_db:of_planning_sms.of_sms_res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont "
+"propres à la société.\" aria-label=\"Les valeurs définies ici sont propres à "
+"la société.\" groups=\"base.group_multi_company\" role=\"img\"/>"
+
+#. module: of_planning_sms
+#: model:ir.model,name:of_planning_sms.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_planning_sms
+#: model:ir.model,name:of_planning_sms.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_planning_sms
+#: model:ir.model,name:of_planning_sms.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_planning_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_calendar_event__of_is_customer_sms_sent
+msgid "Customer SMS sent ?"
+msgstr "SMS client envoyé ?"
+
+#. module: of_planning_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_of_connector_config_settings__of_customer_alert_intervention_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_res_company__of_customer_alert_intervention_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_res_config_settings__of_customer_alert_intervention_sms
+msgid "Customers alert"
+msgstr "Alerte clients"
+
+#. module: of_planning_sms
+#: model_terms:ir.ui.view,arch_db:of_planning_sms.of_sms_res_config_settings_view_form
+msgid ""
+"If this checkbox is ticked, you will be able to send SMS alerts to customer "
+"with summary of the intervention for the next day."
+msgstr ""
+"Si cette case est cochée, vous pourrez envoyer des alertes SMS au client "
+"avec un résumé de l'intervention pour le lendemain."
+
+#. module: of_planning_sms
+#: model_terms:ir.ui.view,arch_db:of_planning_sms.of_sms_res_config_settings_view_form
+msgid ""
+"If this checkbox is ticked, you will be able to send SMS alerts to the teams"
+" with summary of the intervention for the next day."
+msgstr ""
+"Si cette case est cochée, vous pourrez envoyer des alertes SMS aux équipes "
+"avec un résumé de l'intervention pour le lendemain."
+
+#. module: of_planning_sms
+#: model:sms.template,name:of_planning_sms.of_sms_planning_customer_appointment_reminder
+msgid "SMS Customer appointment reminder"
+msgstr "SMS Rappel de rendez-vous client"
+
+#. module: of_planning_sms
+#: model:ir.actions.server,name:of_planning_sms.of_cron_sms_daily_intervention_reminder_ir_actions_server
+#: model:ir.cron,cron_name:of_planning_sms.of_cron_sms_daily_intervention_reminder
+msgid "SMS: Daily intervention reminder"
+msgstr "SMS : Rappel d'intervention quotidien"
+
+#. module: of_planning_sms
+#: model:ir.model.fields,help:of_planning_sms.field_of_connector_config_settings__of_customer_alert_intervention_sms
+#: model:ir.model.fields,help:of_planning_sms.field_res_company__of_customer_alert_intervention_sms
+#: model:ir.model.fields,help:of_planning_sms.field_res_config_settings__of_customer_alert_intervention_sms
+#: model_terms:ir.ui.view,arch_db:of_planning_sms.of_sms_res_config_settings_view_form
+msgid ""
+"Send SMS alert to the customers with summary of the intervention for the "
+"next day."
+msgstr ""
+"Envoyer une alerte SMS aux clients avec un résumé de l'intervention pour le "
+"lendemain."
+
+#. module: of_planning_sms
+#: model:ir.model.fields,help:of_planning_sms.field_of_connector_config_settings__of_team_alert_intervention_sms
+#: model:ir.model.fields,help:of_planning_sms.field_res_company__of_team_alert_intervention_sms
+#: model:ir.model.fields,help:of_planning_sms.field_res_config_settings__of_team_alert_intervention_sms
+#: model_terms:ir.ui.view,arch_db:of_planning_sms.of_sms_res_config_settings_view_form
+msgid ""
+"Send SMS alert to the teams with summary of the intervention for the next "
+"day."
+msgstr ""
+"Envoyer une alerte SMS aux équipes avec un résumé de l'intervention pour le "
+"lendemain."
+
+#. module: of_planning_sms
+#: model:ir.actions.server,name:of_planning_sms.of_planning_action_send_sms
+msgid "Send SMS to Customer"
+msgstr "Envoyer un SMS au client"
+
+#. module: of_planning_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_of_connector_config_settings__of_team_alert_intervention_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_res_company__of_team_alert_intervention_sms
+#: model:ir.model.fields,field_description:of_planning_sms.field_res_config_settings__of_team_alert_intervention_sms
+msgid "Teams alert"
+msgstr "Alerte équipes"
+
+#. module: of_planning_sms
+#. odoo-python
+#: code:addons/of_planning_sms/models/calendar_event.py:0
+#, python-format
+msgid "Your next interventions :\n"
+msgstr "Vos prochaines interventions :\n"
+
+#. module: of_planning_sms
+#. odoo-python
+#: code:addons/of_planning_sms/models/calendar_event.py:0
+#, python-format
+msgid "duration"
+msgstr "durée"
+
+#. module: of_planning_sms
+#: model:sms.template,body:of_planning_sms.of_sms_planning_customer_appointment_reminder
+msgid ""
+"{{ object.company_id.name }} - Reminder : You have an appointment on {{object.date and format_date(object.date) or \"\"}}."
+msgstr ""
+"{{ object.company_id.name }} - Rappel : Vous avez un rendez-vous le {{object.date and format_date(object.date) or \"\"}}."

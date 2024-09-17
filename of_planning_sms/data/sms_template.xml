@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<odoo noupdate="1">
+
+        <record id="of_sms_planning_customer_appointment_reminder" model="sms.template">
+            <field name="name">SMS Customer appointment reminder</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="body">{{ object.of_company_id.name }} - Reminder : You have an appointment on {{object.start and format_date(object.start) or ""}}.</field>
+            <field name="lang">{{ object.of_partner_id.lang }}</field>
+        </record>
+
+</odoo>
