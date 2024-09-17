@@ -13,13 +13,12 @@ class CalendarEvent(models.Model):
     _inherit = 'calendar.event'
 
     def write(self, vals):
-        res = super().write(vals)
         if vals.get('of_state') == 'done' and not self.env.context.get('of_from_button'):
             # Le mobile passe l'intervention à done en passant juste le state
             # On lance donc les actions qui doivent être faites à la fin de l'intervention
             # Si on vient du action_button_done (indiqué par le contexte of_from_button), on ne le redéclenche pas
             self.action_button_done()
-        return res
+        return super().write(vals)
 
     @api.model
     def _prepare_mutation_values(self, **args):
