@@ -72,26 +72,25 @@ class AccountPayment(models.Model):
         # si jamais une facture n'est pas en état "posted", on doit faire un paiement non lettré
         # à la facture
         payments = self.env['account.payment'].browse()
-        for invoice in invoices:
-            if invoice.state != 'posted':
-                value_payment = {
-                    'amount': amount,
-                    'date': date,
-                    'partner_id': partner.id,
-                    'of_payment_mode_id': mode.id,
-                    'of_intervention_id': intervention.id,
-                    'of_type': ttype,
-                }
-                if intervention_invoice:
-                    value_payment['of_intervention_invoice_id'] = intervention_invoice.id
-                if sale:
-                    value_payment['of_sale_id'] = sale.id
-                if sale_invoice:
-                    value_payment['of_sale_invoice_id'] = sale_invoice.id
-                payment = self.env['account.payment'].create(value_payment)
-                payment.action_post()
-                payments += payment
-                invoices -= invoice
+        if non_posted_invoices := invoices.filtered(lambda i: i.state != 'posted'):
+            value_payment = {
+                'amount': amount,
+                'date': date,
+                'partner_id': partner.id,
+                'of_payment_mode_id': mode.id,
+                'of_intervention_id': intervention.id,
+                'of_type': ttype,
+            }
+            if intervention_invoice:
+                value_payment['of_intervention_invoice_id'] = intervention_invoice.id
+            if sale:
+                value_payment['of_sale_id'] = sale.id
+            if sale_invoice:
+                value_payment['of_sale_invoice_id'] = sale_invoice.id
+            payment = self.env['account.payment'].create(value_payment)
+            payment.action_post()
+            payments += payment
+            invoices -= non_posted_invoices
 
         if not invoices:
             # il ne reste plus de factures "posted", donc on retourne les paiements
