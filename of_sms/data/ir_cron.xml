@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_cron_sms_send_delayed" model="ir.cron">
+        <field name="name">SMS: Send Delayed (planified)</field>
+        <field name="active">True</field>
+        <field name="model_id" ref="sms.model_sms_sms"/>
+        <field name="code">model.cron_sms_send_delayed()</field>
+        <field name="state">code</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 02:00:00')"/>
+    </record>
+
+</odoo>
