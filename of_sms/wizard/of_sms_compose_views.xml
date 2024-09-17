@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ######################################################################################################################### -->
+    <!-- #############################                COMPOSE                  ################################################### -->
+    <!-- ######################################################################################################################### -->
+
+    <record id="of_sms_compose_view_form" model="ir.ui.view">
+        <field name="name">of.sms.compose.view.form</field>
+        <field name="model">of.sms.compose</field>
+        <field name="arch" type="xml">
+            <form>
+                <div style="color:blue;font-size:20px;">
+                    <field name="success_message"/>
+                </div>
+                <div style="color:green;font-size:20px;">
+                    <field name="queued_message"/>
+                </div>
+                <div style="color:red;font-size:20px;">
+                    <field name="error_message"/>
+                </div>
+                <field name="all_passed" invisible="1"/>
+                <group attrs="{'invisible': [('all_passed', '=', True)]}">
+                    <field name="record_id" invisible="1"/>
+                    <field name="model" invisible="1"/>
+                    <field name="record_ids" invisible="1"/>
+                    <field name="to_number" invisible="1"/>
+
+                    <field name="sms_template_id" domain="[('model_id.model','=',model)]"/>
+                    <field name="from_mobile_id"/>
+                    <field name="show_desti"/>
+                    <field name="partner_ids" widget="many2many_tags" readonly="1"
+                           attrs="{'invisible': ['|', ('model', '!=', 'res.partner'), ('show_desti', '=', False)]}"/>
+                    <field name="lead_ids" widget="many2many_tags" readonly="1"
+                           attrs="{'invisible': ['|', ('model', '!=', 'crm.lead'), ('show_desti', '=', False)]}"/>
+                    <field name="intervention_ids" widget="many2many_tags" readonly="1"
+                           attrs="{'invisible':
+                                      ['|', ('model', '!=', 'of.planning.intervention'), ('show_desti', '=', False)]}"/>
+                    <field name="order_ids" widget="many2many_tags" readonly="1"
+                           attrs="{'invisible': ['|', ('model', '!=', 'sale.order'), ('show_desti', '=', False)]}"/>
+                    <field name="invoice_ids" widget="many2many_tags" readonly="1"
+                           attrs="{'invisible':
+                                      ['|', ('model', '!=', 'account.invoice'), ('show_desti', '=', False)]}"/>
+                    <field name="sms_content"/>
+                    <field name="show_previ"/>
+                    <field name="sms_content_previ" attrs="{'invisible': [('show_previ', '=', False)]}"/>
+                    <field name="delivery_time"/>
+                    <field name="is_commercial"/>
+                </group>
+                <footer attrs="{'invisible': [('all_passed', '=', True)]}">
+                    <button type="object" name="send_entity" string="Envoyer SMS"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window
+        name="Envoyer un SMS"
+        res_model="of.sms.compose"
+        src_model="res.partner"
+        view_mode="form"
+        view_id="of_sms_compose_view_form"
+        id="action_of_sms_compose_view_form_partner"
+        target="new"
+        key2="client_action_multi"
+        groups="base.group_user"
+    />
+
+    <act_window
+        name="Envoyer un SMS"
+        res_model="of.sms.compose"
+        src_model="crm.lead"
+        view_mode="form"
+        view_id="of_sms_compose_view_form"
+        id="action_of_sms_compose_view_form_lead"
+        target="new"
+        key2="client_action_multi"
+        groups="base.group_user"
+    />
+
+    <act_window
+        name="Envoyer un SMS"
+        res_model="of.sms.compose"
+        src_model="of.planning.intervention"
+        view_mode="form"
+        view_id="of_sms_compose_view_form"
+        id="action_of_sms_compose_view_form_intervention"
+        target="new"
+        key2="client_action_multi"
+        groups="base.group_user"
+    />
+
+    <act_window
+        name="Envoyer un SMS"
+        res_model="of.sms.compose"
+        src_model="sale.order"
+        view_mode="form"
+        view_id="of_sms_compose_view_form"
+        id="action_of_sms_compose_view_form_sale"
+        target="new"
+        key2="client_action_multi"
+        groups="base.group_user"
+    />
+
+    <act_window
+        name="Envoyer un SMS"
+        res_model="of.sms.compose"
+        src_model="account.invoice"
+        view_mode="form"
+        view_id="of_sms_compose_view_form"
+        id="action_of_sms_compose_view_form_invoice"
+        target="new"
+        key2="client_action_multi"
+        groups="base.group_user"
+    />
+
+</odoo>
