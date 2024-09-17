@@ -987,9 +987,9 @@ class CalendarEvent(models.Model):
         self.write({'of_state': 'ongoing'})
 
     def action_button_done(self):
-        self.action_attach_reports()
         # Avoid writing on records that are already done
         if events_not_done := self.filtered(lambda e: e.of_state != 'done'):
+            events_not_done.action_attach_reports()
             events_not_done.with_context(of_from_button=True).write({'of_state': 'done'})
         self.action_send_reports_auto_done()
 
@@ -1045,22 +1045,21 @@ class CalendarEvent(models.Model):
         Returns:
             None
         """
-        for event in self:
-            if event.of_attach_report:
-                pdf, extension = self.env['ir.actions.report']._render_qweb_pdf(
-                    'of_planning.report_intervention_report', res_ids=event.ids
-                )
+        for event in self.filtered('of_attach_report'):
+            pdf, extension = self.env['ir.actions.report']._render_qweb_pdf(
+                'of_planning.report_intervention_report', res_ids=event.ids
+            )
 
-                self.env['ir.attachment'].sudo().create(
-                    {
-                        'name': _("Intervention Report"),
-                        'type': 'binary',
-                        'datas': base64.b64encode(pdf),
-                        'mimetype': 'application/pdf',
-                        'res_model': 'calendar.event',
-                        'res_id': event.id,
-                    }
-                )
+            self.env['ir.attachment'].sudo().create(
+                {
+                    'name': _("Intervention Report"),
+                    'type': 'binary',
+                    'datas': base64.b64encode(pdf),
+                    'mimetype': 'application/pdf',
+                    'res_model': 'calendar.event',
+                    'res_id': event.id,
+                }
+            )
 
     def action_send_reports_auto_done(self):
         """
