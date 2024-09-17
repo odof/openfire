@@ -31,4 +31,9 @@ class ESBLoad(models.Model):
 
             bus_data = {'data': in_data, 'type': record.connection_id.ttype, 'uuid': properties.get('uuid')}
 
-            self.env['of.esb.bus'].send_bus('Internal', 'set_data', bus_data)
+            self.env['of.esb.bus'].send_bus(
+                ttype=self.env.ref('of_esb.type_internal'),
+                channel='set_data',
+                data=bus_data,
+                properties={'uuid': properties.get('uuid')},
+            )

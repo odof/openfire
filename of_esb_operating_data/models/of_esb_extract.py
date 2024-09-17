@@ -29,4 +29,9 @@ class ESBExtract(models.Model):
                 ]
 
                 data = {'data': in_data, 'type': line.connection_id.ttype, 'uuid': properties.get('uuid')}
-                self.env['of.esb.bus'].send_bus('Internal', 'get_data', data)
+                self.env['of.esb.bus'].send_bus(
+                    ttype=self.env.ref('of_esb.type_internal'),
+                    channel='get_data',
+                    data=data,
+                    properties={'uid': properties.get('uuid')},
+                )

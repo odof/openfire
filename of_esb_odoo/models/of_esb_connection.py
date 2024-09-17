@@ -29,7 +29,7 @@ class ESBConnection(models.Model):
             result = [
                 {
                     'model': 'res.partner',
-                    'result' [
+                    'result': [
                         { 'id' : 1, 'name': 'test' },
                         { 'id' : 2, 'name': 'test2' },
                     ]
@@ -45,7 +45,7 @@ class ESBConnection(models.Model):
             [
                 {
                     'model': 'res.partner',
-                    'fields' [ 'id', 'name' ],
+                    'fields': [ 'id', 'name' ],
                     'domain': [],
                     'limit': 0,
                     'offset': 0,

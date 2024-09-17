@@ -16,17 +16,22 @@ class ESBTransform(models.Model):
 
     name = fields.Char('Name')
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
-    code = fields.Text(required=True)
+    code = fields.Text(required=True, default=lambda r: r._default_code())
     load_id = fields.Many2one(comodel_name='of.esb.load', string="Load", required=True)
     uuid = fields.Char(default=lambda r: uuid.uuid4())
     example = fields.Text(compute="_compute_example")
     preview = fields.Text()
 
+    def _default_code(self):
+        return """
+# Vous retrouvez dans la variable data, toutes les données qui viennent de l'étape précédente
+# Vous devez retourner dans la variable result, tout ce qui ira dans l'étape suivante"""
+
     @api.depends('load_id')
     def _compute_example(self):
         for record in self:
             if record.load_id and record.load_id.connection_id:
-                record.example = record.load_id.connection_id.get_in_example()
+                record.example = record.load_id.connection_id.get_out_example()
             else:
                 record.example = "#Todo"
 
@@ -41,7 +46,12 @@ class ESBTransform(models.Model):
             )
             # on ne garde dans result que ce qui est contenu dans la variable result
             data = {'data': result.get('result', {}), 'uuid': properties.get('uuid')}
-            self.env['of.esb.bus'].send_bus('Load', record.load_id.name, data)
+            self.env['of.esb.bus'].send_bus(
+                ttype=self.env.ref('of_esb_operating_data.type_load'),
+                channel=record.load_id.name,
+                data=data,
+                properties={'uuid': properties.get('uuid')},
+            )
 
     def action_button_preview(self):
         # on lance une preview qu'on affiche ensuite

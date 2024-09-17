@@ -61,7 +61,7 @@ class ESBTrigger(models.Model):
         triggers = self.search([('exec_active', '=', True), ('ttype', '=', 'scheduler'), ('date_exec', '<=', now)])
         for trigger in triggers:
             bus = self.env['of.esb.bus'].send_bus(
-                ttype=trigger.data_type.id, channel=trigger.data_channel, data=trigger.data.in_data
+                ttype=trigger.data_type, channel=trigger.data_channel, data=trigger.data.in_data
             )
 
             if trigger.interval_number > 0:
@@ -70,8 +70,14 @@ class ESBTrigger(models.Model):
             else:
                 trigger.date_exec = False
 
-            data = {'type': 'trigger', 'id': trigger.id, 'name': trigger.name, 'user_id': self.env.user.id}
+            data = {
+                'type': 'trigger',
+                'id': trigger.id,
+                'name': trigger.name,
+                'user_id': self.env.user.id,
+                'uuid': bus.uuid,
+            }
             properties = {'uuid': bus.uuid}
             self.env['of.esb.bus'].send_bus(
-                ttype=self.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+                ttype=self.env.ref('of_esb.type_logs'), channel='history', data=data, properties=properties
             )

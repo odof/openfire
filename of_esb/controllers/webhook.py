@@ -39,11 +39,12 @@ class Service(Controller):
                     'id': request_trigger.id,
                     'name': request_trigger.name,
                     'user_id': user_id.id,
+                    'uuid': bus.uuid,
                 }
                 properties = {'uuid': bus.uuid}
 
                 request.env['of.esb.bus'].send_bus(
-                    ttype=request.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+                    ttype=request.env.ref('of_esb.type_logs'), channel='history', data=data, properties=properties
                 )
 
             else:

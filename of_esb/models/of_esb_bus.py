@@ -35,11 +35,12 @@ class ESBBus(models.Model):
                     'id': rule.service.id,
                     'job': service_exec._uuid,
                     'name': rule.service.name,
+                    'uuid': res.uuid,
                 }
                 properties = {'uuid': res.uuid}
 
                 self.send_bus(
-                    ttype=self.env.ref('of_esb.type_logs').id, channel='history', data=data, properties=properties
+                    ttype=self.env.ref('of_esb.type_logs'), channel='history', data=data, properties=properties
                 )
 
         return res_list
@@ -51,6 +52,8 @@ class ESBBus(models.Model):
         # data : dictionnaire contenant deux clefs uuid et in_data
         #   uuid est l'uuid du trigger en cours d'exécution
         #   in_data c'est la donnée à envoyer dans le bus
+        logger.info(f"send_bus: {ttype.name},{channel},{data},{properties}")
+
         if not properties:
             properties = {}
         value_data = {
@@ -58,11 +61,9 @@ class ESBBus(models.Model):
             'properties': json.dumps(properties),
         }
         if data.get('uuid'):
-            value_data['properties'] = json.dumps(dict({'uuid': data['uuid']}).update(properties))
+            value_data['properties'] = json.dumps(dict({'uuid': data['uuid']}))
 
         res_data = self.env['of.esb.data'].create(value_data)
-
-        ttype = self.env['of.esb.type.bus'].search([('name', '=', ttype)])
 
         value_bus = {'channel': channel, 'ttype': ttype.id, 'data': res_data.id, 'uuid': data.get('uuid')}
         bus = self.create(value_bus)
