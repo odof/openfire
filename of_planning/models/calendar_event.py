@@ -232,7 +232,9 @@ class CalendarEvent(models.Model):
         compute='_compute_of_invoice_status',
         store=True,
     )
-    of_invoice_ids = fields.One2many(comodel_name='account.move', string="Invoices", compute='_compute_invoice_ids')
+    of_invoice_ids = fields.One2many(
+        comodel_name='account.move', string="Invoices", compute='_compute_invoice_ids', search='_search_invoice_ids'
+    )
     of_invoice_count = fields.Integer(string="# Invoices", compute='_compute_invoice_ids')
 
     # ===== Delivery fields =====
@@ -619,7 +621,7 @@ class CalendarEvent(models.Model):
     @api.depends('of_line_ids', 'of_line_ids.invoice_line_ids', 'of_order_id', 'of_order_id.invoice_ids')
     def _compute_invoice_ids(self):
         for event in self:
-            invoices = event.of_line_ids.sudo().mapped('invoice_line_ids').mapped('move_id')
+            invoices = event.of_line_ids.sudo().mapped('invoice_line_ids.move_id')
             if event.of_order_id:
                 for invoice in event.of_order_id.sudo().invoice_ids:
                     invoices |= invoice
@@ -803,6 +805,15 @@ class CalendarEvent(models.Model):
 
     def _search_of_gb_employee_id(self, operator, value):
         return [('of_employee_ids', operator, value)]
+
+    def _search_invoice_ids(self, operator, value):
+        invoices = self.mapped('of_line_ids.invoice_line_ids.move_id')
+        if self.of_order_id:
+            for invoice in self.mapped('of_order_id.invoice_ids'):
+                invoices |= invoice
+        return [
+            ('id', 'in', invoices.ids),
+        ]
 
     def _compute_local_times_str(self):
         """
