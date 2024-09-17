@@ -1,0 +1,191 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_sms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-18 14:55+0000\n"
+"PO-Revision-Date: 2024-09-18 14:55+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_sms
+#. odoo-python
+#: code:addons/of_sms/models/of_sms.py:0
+#, python-format
+msgid "Compose SMS"
+msgstr "Écrire un SMS"
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_sms_composer__of_send_date
+#: model:ir.model.fields,field_description:of_sms.field_sms_sms__of_date_to_send
+msgid "Date to send"
+msgstr "Date d'envoi"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_mail_thread
+msgid "Email Thread"
+msgstr "Discussion par email"
+
+#. module: of_sms
+#: model:ir.model.fields,help:of_sms.field_of_sms_sender__model
+msgid "Empty means all model"
+msgstr ""
+
+#. module: of_sms
+#. odoo-python
+#: code:addons/of_sms/models/of_sms.py:0
+#, python-format
+msgid ""
+"Error ! (#ED100)\n"
+"\n"
+"No sender(s) found. Please configure it."
+msgstr ""
+"Erreur ! (#ED100)\n"
+"\n"
+"Aucun expéditeur trouvé. Veuillez le configurer."
+
+#. module: of_sms
+#: model_terms:ir.ui.view,arch_db:of_sms.of_view_partner_inherit_of_sms_form
+msgid "Format E.164 - ex : +61 427 671 760"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__id
+msgid "ID"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_sms_composer__of_is_commercial
+msgid "Is Commercial"
+msgstr "Est commercial"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_sms_sms__of_is_commercial
+msgid "Is commercial"
+msgstr "Est commercial"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_sms
+#: model_terms:ir.actions.act_window,help:of_sms.of_sms_sender_action
+msgid "List of senders."
+msgstr "Liste des expéditeurs."
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__model
+msgid "Model"
+msgstr "Modèle"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__name
+msgid "Name"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_of_sms
+msgid "OF SMS"
+msgstr ""
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_sms_sms
+msgid "Outgoing SMS"
+msgstr "SMS sortant"
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_sms_api
+msgid "SMS API"
+msgstr "API SMS"
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_of_sms_sender
+msgid "SMS Sender"
+msgstr "Expéditeur de SMS"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_sms_sms__state
+msgid "SMS Status"
+msgstr "Statut du SMS"
+
+#. module: of_sms
+#: model:ir.actions.act_window,name:of_sms.of_sms_sender_action
+msgid "SMS sender"
+msgstr "Expéditeur de SMS"
+
+#. module: of_sms
+#: model:ir.actions.server,name:of_sms.of_cron_sms_send_delayed_ir_actions_server
+#: model:ir.cron,cron_name:of_sms.of_cron_sms_send_delayed
+msgid "SMS: Send Delayed (planified)"
+msgstr "SMS : Envoyer les SMS planifiés"
+
+#. module: of_sms
+#: model:ir.model,name:of_sms.model_sms_composer
+msgid "Send SMS Wizard"
+msgstr "Assistant d'envoi de SMS"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_sms_composer__of_sender_id
+#: model:ir.model.fields,field_description:of_sms.field_sms_sms__of_sender_id
+msgid "Sender"
+msgstr "Expéditeur"
+
+#. module: of_sms
+#: model:ir.model.fields,field_description:of_sms.field_of_sms_sender__sender_name
+msgid "Sender Name"
+msgstr "Nom de l'expéditeur"
+
+#. module: of_sms
+#: model:ir.ui.menu,name:of_sms.of_sms_sender_menu
+msgid "Senders"
+msgstr "Expéditeurs"
+
+#. module: of_sms
+#. odoo-python
+#: code:addons/of_sms/models/of_sms.py:0
+#, python-format
+msgid "This customer has no valid mobile number!"
+msgstr "Ce client n'a pas de numéro de mobile valide !"
+
+#. module: of_sms
+#: model:ir.model.fields.selection,name:of_sms.selection__sms_sms__state__to_send
+msgid "To Send"
+msgstr "À envoyer"

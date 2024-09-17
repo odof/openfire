@@ -17,7 +17,7 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='phone']" position="after">
+            <xpath expr="//field[@name='category_id']" position="before">
                 <field name="of_birthdate_short" />
             </xpath>
         </field>
