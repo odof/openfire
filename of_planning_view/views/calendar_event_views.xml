@@ -109,6 +109,7 @@
         <field name="res_model">calendar.event</field>
         <field name="search_view_id" ref="of_planning.calendar_event_view_search" />
         <field name="domain">[('of_type','=','intervention')]</field>
+        <field name="context">{'default_of_type': 'intervention'}</field>
         <field name="view_mode">planning,tree,form,calendar,pivot</field>
         <field name="view_id" ref="of_planning_intervention_view_planning" />
         <field name="view_ids" eval="[Command.clear(),

@@ -18,6 +18,11 @@ class CalendarEvent(models.Model):
     def _domain_employee_ids(self):
         return ["|", ("of_is_operator", "=", True), ("of_is_salesperson", "=", True)]
 
+    @api.model
+    def get_employee_ids(self):
+        employees = self.env["hr.employee"].search(self._domain_employee_ids())
+        return employees.sudo().mapped("related_contact_ids").filtered(lambda c: c.type == "contact").ids
+
     name = fields.Char(
         required=False,
         help="Define a name for the intervention; by default, the name of the customer and the task will be used.",

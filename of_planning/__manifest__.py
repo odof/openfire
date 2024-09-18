@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Planning",
-    'version': '16.0.1.12.1',
+    'version': '16.0.1.13.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
@@ -51,7 +51,10 @@
         'views/ir_action_server.xml',
     ],
     'assets': {
-        'web.assets_backend': ['of_planning/static/src/xml/planning_calendar_popover.xml'],
+        'web.assets_backend': [
+            'of_planning/static/src/js/calendar_filter_panel.js',
+            'of_planning/static/src/xml/planning_calendar_popover.xml'
+        ],
     },
     'installable': True,
     'application': False,
