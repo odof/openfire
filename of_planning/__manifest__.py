@@ -51,7 +51,10 @@
         'views/ir_action_server.xml',
     ],
     'assets': {
-        'web.assets_backend': ['of_planning/static/src/xml/planning_calendar_popover.xml'],
+        'web.assets_backend': [
+            'of_planning/static/src/js/calendar_filter_panel.js',
+            'of_planning/static/src/xml/planning_calendar_popover.xml'
+        ],
     },
     'installable': True,
     'application': False,

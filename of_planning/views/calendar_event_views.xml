@@ -582,6 +582,7 @@
             Command.create({'view_mode': 'calendar', 'view_id': ref('calendar_event_view_calendar')})]"/>
         <field name="search_view_id" ref="calendar_event_view_search" />
         <field name="domain">[('of_type','=','intervention')]</field>
+        <field name="context">{'default_of_type': 'intervention'}</field>
     </record>
 
     <record id="calendar.action_calendar_event" model="ir.actions.act_window">
