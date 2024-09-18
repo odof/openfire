@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-28 12:29+0000\n"
-"PO-Revision-Date: 2024-08-28 12:29+0000\n"
+"POT-Creation-Date: 2024-09-19 09:25+0000\n"
+"PO-Revision-Date: 2024-09-19 09:25+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -2485,6 +2485,13 @@ msgid "No product to deliver in the selected interventions."
 msgstr "Aucun produit à livrer dans les interventions sélectionnées."
 
 #. module: of_planning
+#. odoo-javascript
+#: code:addons/of_planning/static/src/js/calendar_filter_panel.js:0
+#, python-format
+msgid "No records"
+msgstr "Aucun enregistrement"
+
+#. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Not closed"
 msgstr "Non clôturé"
@@ -2572,6 +2579,14 @@ msgstr "Technicien(s)"
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_intervention_template__sheet_intervention_employee_ids
 msgid "Operator(s) (IS)"
 msgstr "Technicien(s)"
+
+#. module: of_planning
+#. odoo-javascript
+#: code:addons/of_planning/static/src/js/calendar_filter_panel.js:0
+#: code:addons/of_planning/static/src/js/calendar_filter_panel.js:0
+#, python-format
+msgid "Operators"
+msgstr "Intervenants"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_employee_ids
@@ -3032,6 +3047,13 @@ msgstr "Ligne de commande"
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_search
 msgid "Salespersons"
 msgstr "Commerciaux"
+
+#. module: of_planning
+#. odoo-javascript
+#: code:addons/of_planning/static/src/js/calendar_filter_panel.js:0
+#, python-format
+msgid "Search More..."
+msgstr "Rechercher plus..."
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_sector_id
