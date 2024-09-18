@@ -447,10 +447,7 @@ class GooglePlanning(models.AbstractModel):
 
         if not self.env.user.email:
             raise UserError(u"Your email needs to be set in your partner form")
-        employees = self.env['hr.employee'].sudo().search(
-            [('email_synchro', '=', self.env.user.email),
-             '|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
-        employee_record = [(6, 0, employees.ids)]
+        employee_record = [(6, 0, [])]
         duree = 0.5
         partner_record = [(5,)]
         result = {}
@@ -480,7 +477,7 @@ class GooglePlanning(models.AbstractModel):
             partner_record.append((4, new_partner.id))
 
         if emp_op_list:
-            employee_record += [(4, emp_id) for emp_id in emp_op_list]
+            employee_record = [(6, 0, emp_op_list)]
 
         if partner_list:
             partner_record += [(4, part_id) for part_id in partner_list]
@@ -492,7 +489,7 @@ class GooglePlanning(models.AbstractModel):
                     ('email_synchro', '=', user_email),
                     '|', ('of_est_intervenant', '=', True), ('of_est_commercial', '=', True)])
                 if intervenants:
-                    employee_record += [(4, emp_id) for emp_id in intervenants.ids]
+                    employee_record = [(6, 0, intervenants.ids)]
         if len(employee_record) == 1 and not employee_record[0][2]:
             # no op employee in attendees, we add default google op employee
             employee_google = self.env.ref('of_planning_google.employee_google')
