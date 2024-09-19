@@ -1,0 +1,24 @@
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.user_groups_view
+msgid "Accounting"
+msgstr "Facturation"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.user_groups_view
+msgid "Human ressources"
+msgstr "Ressources humaines"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.user_groups_view
+msgid "Inventory"
+msgstr "Inventaire"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.user_groups_view
+msgid "Sales"
+msgstr "Ventes"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.user_groups_view
+msgid "Technical"
+msgstr "Technique"
