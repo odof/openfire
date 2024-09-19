@@ -46,6 +46,17 @@
             <!-- /Header right group -->
 
             <!-- Invoice line tab -->
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="context" operation="update">{"of_only_default_code": True}</attribute>
+            </xpath>
+
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']/tree/field[@name='name']" position="attributes">
+                <attribute name="string">Description</attribute>
+            </xpath>
+            <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']/kanban/field[@name='name']" position="attributes">
+                <attribute name="string">Description</attribute>
+            </xpath>
+
             <xpath expr="//page[@id='invoice_tab']//field[@name='invoice_line_ids']/tree//field[@name='product_id']" position="before">
                 <button name="action_button_open_account_move_line" style="max-width: 39px;" type="object" icon="fa-folder-open" title="Open account move line"
                         attrs="{'invisible': ['|', ('id', '=', False), ('parent.state', '!=', 'draft')]}"/>
