@@ -60,6 +60,12 @@
                     }
                 </attribute>
             </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='product_id']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='name']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
             <!-- /Invoice line tab -->
 
             <!-- Move line tab -->
