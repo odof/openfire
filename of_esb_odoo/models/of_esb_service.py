@@ -17,7 +17,7 @@ class ESBService(models.Model):
         for data in datas:
             bus_type = data['bus_type']
             bus_channel = data['bus_channel']
-            connection = self.env['of.esb.connection'].search([('name', '=', data['connection'])], limit=1)
+            connection = self.env['of.esb.connection'].search([('id', '=', data['connection_id'])], limit=1)
             if connection:
                 odoo_base = connection.connect()
                 lines = data['data']
@@ -43,7 +43,7 @@ class ESBService(models.Model):
     def set_data_odoo(self, args):
         datas = json.loads(args.in_data)['data']
         for data in datas:
-            connection = self.env['of.esb.connection'].search([('name', '=', data['connection'])], limit=1)
+            connection = self.env['of.esb.connection'].search([('id', '=', data['connection_id'])], limit=1)
             if connection:
                 odoo_base = connection.connect()
                 lines = data['data']

@@ -41,7 +41,7 @@ class ESBTransform(models.Model):
             result = {}
             exec(
                 record.code,
-                {'data': json.loads(args.in_data), 'env': self.env},
+                {'data': json.loads(args.in_data), 'env': self.env, 'logger': logger, 'self': record, 'json': json},
                 result,
             )
             # on ne garde dans result que ce qui est contenu dans la variable result

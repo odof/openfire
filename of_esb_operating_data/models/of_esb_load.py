@@ -24,7 +24,7 @@ class ESBLoad(models.Model):
 
             in_data = [
                 {
-                    'connection': record.connection_id.name,
+                    'connection_id': record.connection_id.id,
                     'data': data.get('data', {}),
                 }
             ]

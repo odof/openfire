@@ -18,8 +18,10 @@
                         <form>
                             <group>
                                 <field name="connection_id"/>
-                                <field name="data" widget="ace" options="{'mode': 'python'}"/>
-                                <field name="example" readonly="1"/>
+                                <field name="type_data"/>
+                                <field name="code" widget="ace" options="{'mode': 'python'}" attrs="{'invisible':[('type_data','!=','code')]}"/>
+                                <field name="data" widget="ace" options="{'mode': 'python'}" attrs="{'invisible':[('type_data','!=','data')]}"/>
+                                <field name="example" readonly="1" attrs="{'invisible':[('type_data','!=','data')]}"/>
                                 <field name="transform_id"/>
                             </group>
                         </form>

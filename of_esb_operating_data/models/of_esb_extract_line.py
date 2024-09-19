@@ -1,11 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import ast
 import json
+import logging
 
 from odoo import api, fields, models
 
 from odoo.addons.http_routing.models.ir_http import slugify_one
+
+logger = logging.getLogger(__name__)
 
 
 class ESBExtractLine(models.Model):
@@ -14,9 +16,16 @@ class ESBExtractLine(models.Model):
 
     connection_id = fields.Many2one(comodel_name='of.esb.connection', string="Connection", required=True)
     data = fields.Text()
+    code = fields.Text(required=True, default=lambda r: r._default_code())
     transform_id = fields.Many2one(comodel_name='of.esb.transform', string="Transform", required=True)
     extract_id = fields.Many2one(comodel_name='of.esb.extract', string="Extract", ondelete='cascade')
     example = fields.Text(compute="_compute_example")
+    type_data = fields.Selection(selection=[('code', 'Code'), ('data', 'Data')], default='code')
+
+    def _default_code(self):
+        return """
+# Vous retrouvez dans la variable data, toutes les données qui viennent de l'étape précédente
+# Vous devez retourner dans la variable result, tout ce qui ira dans l'étape suivante"""
 
     @api.depends('connection_id')
     def _compute_example(self):
@@ -26,11 +35,21 @@ class ESBExtractLine(models.Model):
             else:
                 record.example = "#TODO"
 
+    def execute(self, args):
+        for record in self:
+            result = {}
+            exec(
+                record.code,
+                {'data': json.loads(args.in_data), 'env': self.env, 'logger': logger, 'self': record},
+                result,
+            )
+            record.data = json.dumps(result.get('result', []), indent=2)
+
     @api.model_create_multi
     def create(self, list_vals):
         for vals in list_vals:
             if data := vals.get("data"):
-                vals["data"] = json.dumps(ast.literal_eval(data), indent=2)
+                vals["data"] = json.dumps(json.loads(data), indent=2)
 
         list_res = super().create(list_vals)
 
@@ -58,6 +77,6 @@ self.env['of.esb.transform'].search([('uuid','=','{res.extract_id.uuid}')]).exec
 
     def write(self, vals):
         if data := vals.get("data"):
-            vals['data'] = json.dumps(ast.literal_eval(data), indent=2)
+            vals['data'] = json.dumps(json.loads(data), indent=2)
 
         return super().write(vals)

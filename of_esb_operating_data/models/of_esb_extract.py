@@ -19,12 +19,16 @@ class ESBExtract(models.Model):
             properties = json.loads(args.properties)
 
             for line in record.lines:
+                if line.type_data == 'code':
+                    line.execute(args)
+                    # ici, on a le résultat de l'exécution dans le champs data
                 in_data = [
                     {
-                        'connection': line.connection_id.name,
+                        'connection_id': line.connection_id.id,
                         'data': json.loads(line.data),
                         'bus_type': self.env.ref("of_esb_operating_data.type_transform").name,
                         'bus_channel': line.transform_id.name,
+                        'args': args.in_data,
                     }
                 ]
 
