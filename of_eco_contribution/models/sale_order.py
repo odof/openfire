@@ -4,7 +4,7 @@
 import itertools
 import math
 
-from odoo import api, models, fields, _
+from odoo import _, api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -53,6 +53,17 @@ class SaleOrderLine(models.Model):
             # L'éco-contribution doit être incluse dans le prix unitaire
             self.price_unit = self.price_unit + self.of_unit_eco_contribution
         return result
+
+    @api.depends(
+        'product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'price_subtotal', 'of_total_eco_contribution'
+    )
+    def _product_margin(self):
+        for line in self:
+            currency = line.order_id.pricelist_id.currency_id
+            price = line.purchase_price
+            line.margin = currency.round(
+                line.price_subtotal - line.of_total_eco_contribution - (price * line.product_uom_qty)
+            )
 
     @api.depends('product_id', 'product_uom_qty', 'product_uom', 'kit_id.of_total_eco_contribution', 'of_is_kit',
                  'of_product_qty_brut')
@@ -139,4 +150,3 @@ class OfSaleOrderKitLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
-
