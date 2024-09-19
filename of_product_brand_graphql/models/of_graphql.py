@@ -26,3 +26,20 @@ class OFGraphql(models.AbstractModel):
                 ProductBrandMutation,
             ],
         )
+
+    def _prepare_arguments(self):
+        arguments = super()._prepare_arguments()
+
+        new_arguments = {
+            "ProductMutation": {
+                "product_create": {
+                    "brand": ProductBrandInput,
+                },
+                "product_update": {
+                    "brand": ProductBrandInput,
+                },
+            },
+        }
+        arguments = self._add_arguments(new_arguments, arguments)
+
+        return arguments
