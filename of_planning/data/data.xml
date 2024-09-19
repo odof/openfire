@@ -2,7 +2,7 @@
 <odoo noupdate="1">
 
     <record id="of_planning_default_intervention_template" model="of.planning.intervention.template">
-        <field name="name">Default template</field>
+        <field name="name">Reference template</field>
         <field name="active" eval="True" />
         <field name="code">DEFAULT</field>
 

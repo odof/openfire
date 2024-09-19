@@ -69,7 +69,7 @@ class OFPlanningInterventionTemplate(models.Model):
         )
 
         if default_template and self.id == default_template.id and self.mobile:
-            raise UserError(_("The default template cannot be unpublished."))
+            raise UserError(_("The reference template cannot be unpublished."))
 
         self.mobile = not self.mobile
         if self.mobile and self.task_id:

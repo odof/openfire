@@ -1366,8 +1366,8 @@ msgstr "Durée par défaut"
 
 #. module: of_planning
 #: model:of.planning.intervention.template,name:of_planning.of_planning_default_intervention_template
-msgid "Default template"
-msgstr "Modèle par défaut"
+msgid "Reference template"
+msgstr "Modèle de référence"
 
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__name

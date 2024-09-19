@@ -95,7 +95,7 @@ class OFPlanningInterventionTemplate(models.Model):
     sheet_use_default = fields.Boolean(
         string="Use default report (IS)",
         default=True,
-        help="Use the values defined in the default template for the intervention sheet.",
+        help="Use the values defined in the reference template for the intervention sheet.",
     )
     sheet_title = fields.Char(
         string="Report title (IS)",
@@ -221,7 +221,7 @@ class OFPlanningInterventionTemplate(models.Model):
 
     # Intervention report
     report_use_default = fields.Boolean(
-        string="Use default report (IR)", default=True, help="Use values set in the default template for the report."
+        string="Use default report (IR)", default=True, help="Use values set in the reference template for the report."
     )
     report_title = fields.Char(
         string="Report title (IR)",
@@ -513,7 +513,7 @@ class OFPlanningInterventionTemplate(models.Model):
             'of_planning.of_planning_default_intervention_template', raise_if_not_found=False
         )
         if default_template and default_template in self and self.env.uid != SUPERUSER_ID:
-            raise UserError(_("You cannot unlink the default template"))
+            raise UserError(_("You cannot unlink the reference template"))
         return super().unlink()
 
     def copy(self, default=None):
