@@ -107,6 +107,7 @@ class AccountMoveLine(models.Model):
 
     @api.depends('product_id')
     def _compute_name(self):
+        self = self.with_context(display_default_code=False)
         if self._context.get('of_only_default_code'):
             self = self.with_context(of_only_default_code=False)
         super(AccountMoveLine, self)._compute_name()
