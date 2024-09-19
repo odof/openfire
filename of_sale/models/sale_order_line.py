@@ -201,6 +201,7 @@ class SaleOrderLine(models.Model):
 
     @api.depends("product_id")
     def _compute_name(self):
+        self = self.with_context(display_default_code=False)
         super()._compute_name()
         show_manufacturer_description = self.env.user.company_id.show_manufacturer_description in (
             "sales",
