@@ -8,12 +8,12 @@
 
     <record id="of_documentation_url" model="ir.config_parameter">
         <field name="key">of.openfire.documentation.url</field>
-        <field name="value">https://documentation.openfire.fr</field>
+        <field name="value">https://support.openfire.fr/docs</field>
     </record>
 
     <record id="of_support_url" model="ir.config_parameter">
         <field name="key">of.openfire.support.url</field>
-        <field name="value">https://www.openfire.fr/support/ticket/submit</field>
+        <field name="value">https://back.openfire.fr/support/ticket/submit</field>
     </record>
 
 </odoo>
