@@ -18,6 +18,13 @@ class AccountPayment(models.Model):
             sign = -1 if rec.payment_type in ['outbound'] else 1
             rec.of_amount_total = rec.amount * sign
 
+    @api.one
+    @api.depends('invoice_ids', 'payment_type', 'partner_type', 'partner_id')
+    def _compute_destination_account_id(self):
+        # Certains modules peuvent utiliser le sudo() pour créer un paiement
+        self = self.with_context(force_company=self.company_id.id)
+        return super(AccountPayment, self)._compute_destination_account_id()
+
     @api.multi
     def button_invoices(self):
         """ (smart button facture sur les paiements)
