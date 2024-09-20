@@ -171,6 +171,7 @@ class ResPartner(models.Model):
                         "No match found for %(partner_names)s address(es).",
                         partner_names=", ".join(partners_not_geo_localized.mapped("name")),
                     ),
+                    "warning": True,
                 },
             )
 
