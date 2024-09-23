@@ -33,57 +33,61 @@ class CrmLead(models.Model):
 
     @api.multi
     def datastore_update_lead(self):
+        records = self.filtered('of_datastore_lead')
+        if not records:
+            return
+
         datastore_crm = self.env['of.datastore.crm.receiver'].search([], limit=1)
+        if not datastore_crm:
+            return
 
-        if datastore_crm:
-            client = datastore_crm.of_datastore_connect()
-            if isinstance(client, basestring):
-                # On passe les opportunités en à traiter
-                self.write({'of_send_stage_update': True})
+        client = datastore_crm.of_datastore_connect()
+        if isinstance(client, basestring):
+            # On passe les opportunités en à traiter
+            records.write({'of_send_stage_update': True})
+            return
 
-            else:
-                ds_lead_obj = datastore_crm.of_datastore_get_model(client, 'crm.lead')
-                ds_stage_obj = datastore_crm.of_datastore_get_model(client, 'crm.stage')
+        ds_lead_obj = datastore_crm.of_datastore_get_model(client, 'crm.lead')
+        ds_stage_obj = datastore_crm.of_datastore_get_model(client, 'crm.stage')
 
-                for record in self:
+        for record in records:
+            # On passe l'opportunité en à traiter
+            record.of_send_stage_update = True
 
-                    # On passe l'opportunité en à traiter
-                    record.of_send_stage_update = True
+            try:
+                # Si l'opportunité existe dans la base mère
+                lead_ids = datastore_crm.of_datastore_search(ds_lead_obj, [('id', '=', record.of_datastore_lead)])
+                if lead_ids:
+                    lead_id = lead_ids[0]
 
-                    try:
-                        # Si l'opportunité existe dans la base mère
-                        lead_ids = datastore_crm.of_datastore_search(
-                            ds_lead_obj, [('id', '=', record.of_datastore_lead)])
-                        if lead_ids:
-                            lead_id = lead_ids[0]
+                    # Si l'étape existe dans la base mère
+                    stage_ids = datastore_crm.of_datastore_search(
+                        ds_stage_obj, [
+                            ('of_crm_stage_id', '=', record.stage_id.of_crm_stage_id),
+                            ('of_crm_stage_id', '!=', False)
+                        ])
+                    if stage_ids:
+                        stage_id = stage_ids[0]
+                    else:
+                        stage_id = False
+                    # Le retour de la fonction doit nous permettre de savoir si on doit ou non mettre à jour
+                    # l'étape
+                    update = record._datastore_update_lead(lead_id, datastore_crm, client, stage_id)
 
-                            # Si l'étape existe dans la base mère
-                            stage_ids = datastore_crm.of_datastore_search(
-                                ds_stage_obj, [
-                                    ('of_crm_stage_id', '=', record.stage_id.of_crm_stage_id),
-                                    ('of_crm_stage_id', '!=', False)
-                                ])
-                            if stage_ids:
-                                stage_id = stage_ids[0]
-                            else:
-                                stage_id = False
-                            # Le retour de la fonction doit nous permettre de savoir si on doit ou non mettre à jour
-                            # l'étape
-                            update = record._datastore_update_lead(lead_id, datastore_crm, client, stage_id)
+                    # On met à jour l'étape
+                    if update:
+                        datastore_crm.of_datastore_func(
+                            ds_lead_obj, 'write', [lead_id, {'stage_id': stage_id}], [])
 
-                            # On met à jour l'étape
-                            if update:
-                                datastore_crm.of_datastore_func(
-                                    ds_lead_obj, 'write', [lead_id, {'stage_id': stage_id}], [])
+                    # On ajoute un message dans le mail thread
+                    record.message_post(
+                        body=u"Opportunité passée à l'étape \"%s\" sur la base mère via le connecteur CRM."
+                        % record.stage_id.name)
 
-                            # On ajoute un message dans le mail thread
-                            record.message_post(body=u"Opportunité passée en étape %s à la base mère "
-                                                   u"via le connecteur CRM." % record.stage_id.name)
-
-                            # On passe l'opportunité en traitée
-                            record.of_send_stage_update = False
-                    except Exception:
-                        pass
+                    # On passe l'opportunité en traitée
+                    record.of_send_stage_update = False
+            except Exception:
+                pass
 
     @api.model
     def datastore_leads_to_update(self):

@@ -63,22 +63,31 @@ class OFDatastoreCRM(models.Model):
 
     @api.model
     def create(self, values):
-        if values.get('partner_id'):
-            # On passe le partner en membre réseau
-            self.env['res.partner'].browse(values['partner_id']).of_network_member = True
-        return super(OFDatastoreCRM, self).create(values)
+        record = super(OFDatastoreCRM, self).create(values)
+        # On passe le partner en membre réseau
+        if record.active and record.partner_id:
+            record.partner_id.of_network_member = True
+        return record
 
     @api.multi
     def write(self, values):
-        if 'partner_id' in values:
+        partners = False
+        if 'partner_id' in values or not values.get('active', True):
+            partners = self.mapped('partner_id')
             # On passe le nouveau à True
-            if values['partner_id']:
-                self.env['res.partner'].browse(values['partner_id']).of_network_member = True
-            for datastore in self:
-                # On passe l'ancien membre réseau à False
-                if not datastore.is_multicompany and datastore.partner_id:
-                    datastore.partner_id.of_network_member = False
-        return super(OFDatastoreCRM, self).write(values)
+            if values.get('partner_id'):
+                new_partner = self.env['res.partner'].browse(values['partner_id'])
+                new_partner.of_network_member = True
+                # Si les connecteurs son inactifs, cela annulera le passage du partenaire comme membre du réseau
+                partners |= new_partner
+        result = super(OFDatastoreCRM, self).write(values)
+        if partners:
+            to_dismiss = partners - self.search([('partner_id', 'in', partners.ids)]).mapped('partner_id')
+            if to_dismiss:
+                to_dismiss.write({'of_network_member': False})
+        if values.get('active'):
+            self.mapped('partner_id').write({'of_network_member': True})
+        return result
 
 
 class OFDatastoreCRMNetworkMember(models.Model):

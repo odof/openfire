@@ -42,8 +42,12 @@ class CrmLead(models.Model):
 
         # On vérifie s'il existe un connecteur achat pour ce fournisseur
         datastore_crm = self.env['of.datastore.crm.sender'].search(
-            ['|', '&', ('partner_id', '=', self.of_allocated.id), ('is_multicompany', '=', False),
-             '&', ('child_ids', 'in', network_members.ids), ('is_multicompany', '=', True)], limit=1)
+            [
+                '|',
+                '&', ('partner_id', '=', self.of_allocated.id), ('is_multicompany', '=', False),
+                '&', ('child_ids', 'in', network_members.ids), ('is_multicompany', '=', True)
+            ],
+            limit=1)
 
         if datastore_crm:
             client = datastore_crm.of_datastore_connect()
@@ -71,36 +75,34 @@ class CrmLead(models.Model):
         ds_country_obj = datastore_crm.of_datastore_get_model(client, 'res.country')
         ds_stage_obj = datastore_crm.of_datastore_get_model(client, 'crm.stage')
         # On récupère le pays s'il existe déjà sur la base fille
-        country_ids = datastore_crm.of_datastore_search(ds_country_obj,  [('name', '=', self.country_id.name)])
-        if country_ids:
-            country_id = country_ids[0]
-        else:
-            country_id = False
+        country_ids = datastore_crm.of_datastore_search(ds_country_obj, [('code', '=', self.country_id.code)])
+        country_id = country_ids and country_ids[0] or False
 
         stage_id = False
         # On récupère l'étape kanban en fonction du champ of_crm_stage_id
-        if self.stage_id:
+        if self.stage_id.of_crm_stage_id:
             stage_ids = datastore_crm.of_datastore_search(
                 ds_stage_obj,
-                [('of_crm_stage_id', '=', self.stage_id.of_crm_stage_id), ('of_crm_stage_id', '!=', False)])
+                [('of_crm_stage_id', '=', self.stage_id.of_crm_stage_id)])
             if stage_ids:
                 stage_id = stage_ids[0]
 
         return {
-                'of_datastore_lead': self.id,
-                'name': self.name,
-                'contact_name': self.contact_name,
-                'stage_id': stage_id,
-                'street': self.street,
-                'street2': self.street2,
-                'zip': self.zip,
-                'city': self.city,
-                'country_id': country_id,
-                'phone': self.phone,
-                'mobile': self.mobile,
-                'email_from': self.email_from,
-                'description': self.description,
-            }
+            'of_datastore_lead': self.id,
+            'name': self.name,
+            'contact_name': self.contact_name,
+            'stage_id': stage_id,
+            'street': self.street,
+            'street2': self.street2,
+            'zip': self.zip,
+            'city': self.city,
+            'country_id': country_id,
+            'phone': self.phone,
+            'mobile': self.mobile,
+            'email_from': self.email_from,
+            'description': self.description,
+        }
+
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
