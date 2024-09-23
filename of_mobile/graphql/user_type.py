@@ -59,7 +59,7 @@ class User(OdooObjectType):
 
     @staticmethod
     def resolve_price_change_access_right(root, info):
-        return 'allowed' if root.has_group('of_sale.group_price_change') else 'none'
+        return 'allowed' if root.has_group('of_mobile.group_price_change_mobile') else 'none'
 
 
 class UserInput(graphene.InputObjectType):
