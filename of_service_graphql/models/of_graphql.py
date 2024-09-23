@@ -89,11 +89,11 @@ class OFGraphql(models.AbstractModel):
             'PlanningInterventionMutation': {
                 'planning_intervention_create': {
                     'ttype': ServiceRequestTypeInput,
-                    'serviceRequest': ServiceRequestInput,
+                    'request': ServiceRequestInput,
                 },
                 'planning_intervention_update': {
                     'ttype': ServiceRequestTypeInput,
-                    'serviceRequest': ServiceRequestInput,
+                    'request': ServiceRequestInput,
                 },
             },
         }
