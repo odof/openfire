@@ -12,7 +12,8 @@
                             <field name="name"/>
                             <field name="ttype"/>
                             <field name="exec_active"/>
-                            <field name="security"/>
+                            <field name="security" required="1"/>
+                            <field name="uuid"/>
                         </group>
                     </group>
                     <group attrs="{'invisible': [('ttype','!=','scheduler')]}" string="Scheduler">

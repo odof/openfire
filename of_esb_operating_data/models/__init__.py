@@ -4,3 +4,4 @@ from . import of_esb_extract
 from . import of_esb_load
 from . import of_esb_transform
 from . import of_esb_trigger
+from . import models

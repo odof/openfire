@@ -11,7 +11,7 @@
                     <field name="partner_id" required="1"/>
                     <field name="uuid"/>
                     <field name="slug_name"/>
-                    <field name="security"/>
+                    <field name="security" required="1"/>
                 </group>
             </form>
         </field>

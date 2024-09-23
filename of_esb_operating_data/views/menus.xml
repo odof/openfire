@@ -6,6 +6,10 @@
         <menuitem id="menu_operating_data_extract" name="Extract" action="action_of_esb_extract" sequence="11"/>
         <menuitem id="menu_operating_data_transform" name="Transform" action="action_of_esb_transform" sequence="12"/>
         <menuitem id="menu_operating_data_load" name="Load" action="action_of_esb_load" sequence="13"/>
+        <menuitem id="menu_operating_data_import_export" name="Import/Export" sequence="14">
+            <menuitem id="of_esb_export_wizard_menu" name="Export JSON" action="of_esb_export_wizard_action"/>
+            <menuitem id="of_esb_import_wizard_menu" name="Import JSON" action="of_esb_import_wizard_action"/>
+        </menuitem>
     </menuitem>
 
 </odoo>

@@ -12,6 +12,7 @@
                     <field name="channel_bus"/>
                     <field name="type_bus"/>
                     <field name="service"/>
+                    <field name="uuid"/>
                 </group>
             </form>
         </field>
@@ -27,6 +28,7 @@
                 <field name="channel_bus"/>
                 <field name="type_bus"/>
                 <field name="service"/>
+                <field name="uuid"/>
             </tree>
         </field>
     </record>

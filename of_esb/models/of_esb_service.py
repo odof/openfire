@@ -2,6 +2,7 @@
 
 import json
 import logging
+import uuid
 
 from odoo import fields, models
 
@@ -15,6 +16,7 @@ class ESBService(models.Model):
     code = fields.Text()
     exec_active = fields.Boolean(string="Active", default=True)
     ttype = fields.Selection([('user', 'user'), ('system', 'system')], string="Type", default="user")
+    uuid = fields.Char(default=lambda r: uuid.uuid4())
 
     def execute_with_delay(self, args={}):
         if self.exec_active:

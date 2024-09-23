@@ -15,7 +15,6 @@ class ESBTrigger(models.Model):
 
     is_operating_data = fields.Boolean()
     partner_id = fields.Many2one(comodel_name='res.partner', string="Partner")
-    uuid = fields.Char(default=lambda r: uuid.uuid4())
 
     @api.model_create_multi
     def create(self, list_vals):
@@ -46,6 +45,7 @@ class ESBTrigger(models.Model):
 self.env['of.esb.extract'].search([('uuid','=','{vals.get('uuid')}')]).execute(args)
 """,
                 'ttype': 'user',
+                'uuid': vals.get('uuid'),
             }
             service = self.env['of.esb.service'].create(value_service)
 
@@ -55,6 +55,7 @@ self.env['of.esb.extract'].search([('uuid','=','{vals.get('uuid')}')]).execute(a
                 'channel_bus': slugify_one(vals.get('name')),
                 'type_bus': self.env.ref('of_esb.type_webhook').id,
                 'service': service.id,
+                'uuid': vals.get('uuid'),
             }
             self.env['of.esb.rule'].create(value_rule)
         return super().create(list_vals)

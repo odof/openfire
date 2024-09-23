@@ -14,10 +14,10 @@ class ESBExtractLine(models.Model):
     _name = 'of.esb.extract.line'
     _rec_name = 'connection_id'
 
-    connection_id = fields.Many2one(comodel_name='of.esb.connection', string="Connection", required=True)
+    connection_id = fields.Many2one(comodel_name='of.esb.connection', string="Connection")
     data = fields.Text()
     code = fields.Text(required=True, default=lambda r: r._default_code())
-    transform_id = fields.Many2one(comodel_name='of.esb.transform', string="Transform", required=True)
+    transform_id = fields.Many2one(comodel_name='of.esb.transform', string="Transform")
     extract_id = fields.Many2one(comodel_name='of.esb.extract', string="Extract", ondelete='cascade')
     example = fields.Text(compute="_compute_example")
     type_data = fields.Selection(selection=[('code', 'Code'), ('data', 'Data')], default='code')
@@ -61,6 +61,7 @@ class ESBExtractLine(models.Model):
 self.env['of.esb.transform'].search([('uuid','=','{res.extract_id.uuid}')]).execute(args)
 """,
                 'ttype': 'user',
+                'uuid': res.extract_id.uuid,
             }
             service = self.env['of.esb.service'].create(value_service)
 
@@ -70,6 +71,7 @@ self.env['of.esb.transform'].search([('uuid','=','{res.extract_id.uuid}')]).exec
                 'channel_bus': slugify_one(res.extract_id.name),
                 'type_bus': self.env.ref('of_esb_operating_data.type_transform').id,
                 'service': service.id,
+                'uuid': res.extract_id.uuid,
             }
             self.env['of.esb.rule'].create(value_rule)
 

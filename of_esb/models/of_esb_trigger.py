@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
+import uuid
 
 from dateutil.relativedelta import relativedelta
 
@@ -45,7 +46,8 @@ class ESBTrigger(models.Model):
     # Type webhook
     slug_name = fields.Char(compute='_compute_slug_name', store=True)
     public = fields.Boolean(help="Check this to make this trigger accessible with the url /webhook/")
-    security = fields.Many2one(comodel_name='of.esb.security', required=True)
+    security = fields.Many2one(comodel_name='of.esb.security')
+    uuid = fields.Char(default=lambda r: uuid.uuid4())
 
     @api.depends('name')
     def _compute_slug_name(self):

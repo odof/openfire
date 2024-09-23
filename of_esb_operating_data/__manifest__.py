@@ -20,6 +20,8 @@
         'views/of_esb_extract.xml',
         'views/of_esb_transform.xml',
         'views/of_esb_load.xml',
+        'wizards/wizard_esb_export.xml',
+        'wizards/wizard_esb_import.xml',
         'views/menus.xml',
     ],
     'installable': True,

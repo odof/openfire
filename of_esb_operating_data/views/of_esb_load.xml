@@ -9,7 +9,7 @@
                 <group>
                     <field name="name"/>
                     <field name="partner_id"/>
-                    <field name="connection_id"/>
+                    <field name="connection_id" required="1"/>
                     <field name="uuid"/>
                 </group>
             </form>

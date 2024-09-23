@@ -11,6 +11,7 @@
                         <field name="name"/>
                         <field name="exec_active"/>
                         <field name="ttype"/>
+                        <field name="uuid"/>
                     </group>
 
                     <field name="code" widget="ace" options="{'mode': 'python'}"/>
@@ -36,6 +37,7 @@
                 <field name="name"/>
                 <field name="exec_active"/>
                 <field name="ttype"/>
+                <field name="uuid"/>
             </tree>
         </field>
     </record>

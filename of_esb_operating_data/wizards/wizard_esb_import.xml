@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="wizard_of_esb_import_form" model="ir.ui.view">
+        <field name="name">of.esb.import.wizard.form</field>
+        <field name="model">of.esb.import.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="import_file"/>
+                </group>
+                <footer>
+                    <button name="action_import_json" type="object" string="Import JSON" class="oe_highlight"/>
+                    ou
+                    <button special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_esb_import_wizard_action" model="ir.actions.act_window">
+        <field name="name">Import JSON</field>
+        <field name="res_model">of.esb.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="wizard_of_esb_import_form"/>
+    </record>
+
+
+</odoo>

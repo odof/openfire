@@ -4,7 +4,8 @@ import json
 import logging
 import uuid
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 from odoo.addons.http_routing.models.ir_http import slugify_one
 
@@ -58,6 +59,8 @@ class ESBTransform(models.Model):
         # il faut retrouver l'extract juste avant le transform
         extract_line = self.env['of.esb.extract.line'].search([('transform_id', '=', self.id)], limit=1)
         # on retrouve la connection et on lance le connect
+        if extract_line.type_data == 'code':
+            raise UserError(_("You can not see preview with an extract line of type 'code'"))
         self.preview = self.env['of.esb.service'].preview(extract_line.connection_id, json.loads(extract_line.data))
 
     @api.model_create_multi
@@ -71,6 +74,7 @@ class ESBTransform(models.Model):
 self.env['of.esb.load'].search([('uuid','=','{res.load_id.uuid}')]).execute(args)
 """,
                 'ttype': 'user',
+                'uuid': res.load_id.uuid,
             }
             service = self.env['of.esb.service'].create(value_service)
 
@@ -80,6 +84,7 @@ self.env['of.esb.load'].search([('uuid','=','{res.load_id.uuid}')]).execute(args
                 'channel_bus': slugify_one(res.load_id.name),
                 'type_bus': self.env.ref('of_esb_operating_data.type_load').id,
                 'service': service.id,
+                'uuid': res.load_id.uuid,
             }
             self.env['of.esb.rule'].create(value_rule)
         return list_res
