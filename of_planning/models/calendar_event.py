@@ -38,6 +38,7 @@ class CalendarEvent(models.Model):
         "that will be communicated to the customer. This description can be added to "
         "the intervention form or report by configuring the intervention models",
     )
+    location = fields.Char(compute="_compute_location", store=True, readonly=False)
 
     # ===== Intervention specifics fields =====
     of_state = fields.Selection(
@@ -531,6 +532,27 @@ class CalendarEvent(models.Model):
                 else event.of_partner_id.company_id or event.user_id.company_id
             )
             event.of_company_id = company or False
+
+    @api.depends("of_address_street", "of_address_street2", "of_address_zip", "of_address_city")
+    def _compute_location(self):
+        meeting_events = self.filtered(lambda e: e.of_type != "intervention")
+        for event in meeting_events:
+            event.location = ""
+
+        for event in self - meeting_events:
+            address = []
+            if event.of_address_street2:
+                address.append(event.of_address_street2)
+            if event.of_address_street:
+                address.append(event.of_address_street)
+            if event.of_address_zip or event.of_address_city:
+                city = []
+                if event.of_address_zip:
+                    city.append(event.of_address_zip)
+                if event.of_address_city:
+                    city.append(event.of_address_city)
+                address.append(" ".join(city))
+            event.location = ", ".join(address)
 
     @api.depends("of_partner_id")
     def _compute_of_address_id(self):
