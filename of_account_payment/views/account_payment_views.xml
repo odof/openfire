@@ -33,6 +33,17 @@
         </field>
     </record>
 
+    <record id="of_account_payment_view_account_payment_tree" model="ir.ui.view">
+        <field name="name">account.payment.tree</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_method_line_id']" position="replace">
+                <field name="of_payment_mode_id"/>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_account_payment_form_inherit_payment" model="ir.ui.view">
         <field name="name">of.account.payment.form.inherit.payment</field>
         <field name="model">account.payment</field>
