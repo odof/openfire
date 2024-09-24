@@ -105,6 +105,10 @@ export class PlanningModel extends Model {
         this.searchParams = null;
         this.start_hour = null;
         this.end_hour = null;
+        this.defaultSearch = true;
+        this.domainCopy = this.env.searchModel._domain;
+        this.groupByCopy = this.env.searchModel._groupBy;
+        this.orderByCopy = this.env.searchModel._orderBy;
 
         /** @type {Set<RowId>} */
         this.closedRows = new Set();
@@ -159,6 +163,7 @@ export class PlanningModel extends Model {
 
         this.start_hour = await this.getStartHour();
         this.end_hour = await this.getEndHour();
+        this.defaultSearch = _.isEqual(this.domainCopy, this.env.searchModel._domain) &&_.isEqual(this.groupByCopy, this.env.searchModel._groupBy) && _.isEqual(this.orderByCopy, this.env.searchModel._orderBy)
 
         await this._fetchData(this._buildMetaData(params));
     }
@@ -204,6 +209,7 @@ export class PlanningModel extends Model {
             [session.company_id],
         ]);
     }
+
     async getEndHour() {
         return await this.orm.call("res.company", "get_end_hour", [
             [session.company_id],
