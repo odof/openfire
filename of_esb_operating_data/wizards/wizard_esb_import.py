@@ -3,11 +3,8 @@
 
 import base64
 import json
-import logging
 
 from odoo import fields, models
-
-logger = logging.getLogger(__name__)
 
 
 class ImportESBWizard(models.TransientModel):
@@ -19,8 +16,6 @@ class ImportESBWizard(models.TransientModel):
         data = base64.b64decode(self.import_file)
         data = json.loads(data)
 
-        logger.info(data)
-
         triggers, xml_id = self.env['of.esb.trigger'].action_import_json(
             data=data.get('triggers'),
             parser=[
@@ -31,9 +26,15 @@ class ImportESBWizard(models.TransientModel):
                 'public',
             ],
         )
-        logger.info(f"Triggers : {triggers}")
+        if type(triggers) is dict:
+            triggers = [triggers]
+
         for trigger in triggers:
-            self.env["of.esb.trigger"].create(trigger)
+            if xml_id:
+                record = self.env['of.esb.trigger'].browse(xml_id.res_id)
+                record.write(trigger)
+            else:
+                self.env["of.esb.trigger"].create(trigger)
 
         extracts, xml_id = self.env['of.esb.extract'].action_import_json(
             data=data.get('extracts'),
@@ -65,7 +66,12 @@ class ImportESBWizard(models.TransientModel):
                 ),
             ],
         )
+        if type(extracts) is dict:
+            extracts = [extracts]
 
-        logger.info(f"Extracts: {extracts}")
         for extract in extracts:
-            self.env['of.esb.extract'].create(extract)
+            if xml_id:
+                record = self.env['of.esb.extract'].browse(xml_id.res_id)
+                record.write(trigger)
+            else:
+                self.env['of.esb.extract'].create(extract)

@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import logging
 
 from odoo import Command, fields, models
 
@@ -10,13 +9,17 @@ type_related = [
 ]
 type_list = ['one2many', 'many2many']
 
-logger = logging.getLogger(__name__)
-
 
 class Base(models.AbstractModel):
     _inherit = 'base'
 
     def convert_parser(self, parser, name=None):
+        # on convertir le parser qui est sous forme de liste (plus facile à écrire pour un humain)
+        # en parser sous forme de dict, plus facile à parcourir pour une machine :)
+
+        # on est déjà dans un parser bien fait, on le retourne
+        if type(parser) is dict:
+            return parser
         res = {}
         for key in parser:
             if type(key) is tuple:
@@ -28,10 +31,8 @@ class Base(models.AbstractModel):
     def action_export_json(self, parser=None):
         if not parser:
             parser = []
-        # on convertir le parser qui est sous forme de liste (plus facile à écrire pour un humain)
-        # en parser sous forme de dict, plus facile à parcourir pour une machine :)
-        if type(parser) is list:
-            parser = self.convert_parser(parser)
+
+        parser = self.convert_parser(parser)
 
         ir_model_data_obj = self.env['ir.model.data']
         res = []
@@ -110,8 +111,16 @@ class Base(models.AbstractModel):
             value = {}
             xml_id = False
             if line_xml_id := line.get('xml_id'):
+                module = line_xml_id.split('.')[0]
+                name_with_id = line_xml_id.split('.')[1]
+                name_list = name_with_id.split('_')
+                name = "_".join(name_list[0 : len(name_list) - 1])
                 xml_id = ir_model_data_obj.search(
-                    [('module', '=', line_xml_id.split('.')[0]), ('name', '=', line_xml_id.split('.')[1])], limit=1
+                    [
+                        ('module', '=', module),
+                        ('name', '=', name),
+                    ],
+                    limit=1,
                 )
             for name in parser:
                 if name in line:
@@ -142,7 +151,7 @@ class Base(models.AbstractModel):
                                 record = self.env[field.relation].create(val)
                             lines += record.ids
                         value[name] = [Command.set(lines)]
-                res.append(value)
+            res.append(value)
         if len(res) == 1:
             res = res[0]
         return res, xml_id
