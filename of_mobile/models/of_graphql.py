@@ -14,6 +14,8 @@ from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
 from ..graphql.fcm_token_mutation import FCMTokenMutation
 from ..graphql.fcm_token_type import FCMToken, FCMTokenInput
+from ..graphql.geo_localize_address_query import GeoLocalizeAddressQuery
+from ..graphql.geo_localize_address_type import GeoLocalizedAddress
 from ..graphql.partner_query import PartnerQuery
 from ..graphql.partner_type import PartnerCheckDuplications
 from ..graphql.payment_intervention_mutation import PaymentInterventionCreateMutation
@@ -99,6 +101,8 @@ class OFGraphql(models.AbstractModel):
                 DrivingRoutePath,
                 DrivingRouteStop,
                 DrivingRoute,
+                GeoLocalizedAddress,
+                GeoLocalizeAddressQuery,
             ],
         )
 
