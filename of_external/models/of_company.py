@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, api
+from odoo import api, fields, models
 
 line_sizes = [
     ('medium', 'Moyen'),
@@ -51,6 +51,16 @@ class ResCompany(models.Model):
         help=u"Position des lignes d'en-tête relativement au logo de société\n"
              u"Sous le logo : les lignes d'en-tête seront placées sous le logo de société.\n"
              u"À droite du logo : les lignes d'en-tête seront placées à droite du logo.")
+    of_footer_invoice_number = fields.Boolean(
+        string=u"Afficher le numéro de facture sur l'ensemble des pages de mes factures"
+    )
+
+    @api.onchange('of_position_header_lines')
+    def _onchange_of_position_header_lines(self):
+        if self.of_position_header_lines == 'bandeau_totalite':
+            self.of_footer_invoice_number = True
+        else:
+            self.of_footer_invoice_number = False
 
     @api.multi
     def get_line_content(self, header_or_footer="header", number=1):
@@ -73,6 +83,19 @@ class ResCompany(models.Model):
                 field_to_render = self.of_custom_footer_line_3
         content = self.env['mail.template'].render_template(field_to_render, 'res.company', self.id, post_process=False)
         return content
+
+    @api.model
+    def _get_paperformat_margin_footer_invoice_correspondance(self):
+        return {
+            self.env.ref('report.paperformat_euro', raise_if_not_found=False): 0
+        }
+
+    @api.multi
+    def get_paperformat_margin_footer_invoice(self):
+        self.ensure_one()
+        correspondance = self._get_paperformat_margin_footer_invoice_correspondance()
+        return correspondance.get(self.paperformat_id, 0)
+
 
 
 class View(models.Model):

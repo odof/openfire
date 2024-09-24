@@ -45,6 +45,14 @@ class ResCompany(models.Model):
                 return logos.logo
         return False
 
+    @api.model
+    def _get_paperformat_margin_footer_invoice_correspondance(self):
+        res = super(ResCompany, self)._get_paperformat_margin_footer_invoice_correspondance()
+        res.update({
+            self.env.ref('of_company_multi_logos.paperformat_euro_of_logo_footer', raise_if_not_found=False): 80
+        })
+        return res
+
 
 class OfCompanyMultiLogos(models.Model):
     _name = 'of.company.multi.logos'
