@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Mobile",
-    'version': '16.0.1.0.3',
+    'version': '16.0.1.1.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -25,6 +25,8 @@
         'of_sale_crm_graphql',
         'of_planning_survey',
         'of_planning_survey_graphql',
+        'of_planning_tour',
+        'of_planning_tour_graphql',
         'of_product_brand',
         'of_product_brand_graphql',
         'of_service',
