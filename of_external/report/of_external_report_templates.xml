@@ -272,6 +272,13 @@
             </div>
 
             <!-- Affichage des numéros de pages -->
+            <div class="col-xs-2 text-right" t-attf-style="font-size: x-small;  position: absolute; top: #{company.get_paperformat_margin_footer_invoice()}px; right: 0px;">
+                <t t-if="o and o._name == 'account.invoice' and company.of_footer_invoice_number">
+                    <t t-set="number" t-value="o.number or u'-'"/>
+                    <span>Facture&amp;nbsp;n°</span><br/>
+                    <span t-raw="number"/>
+                </t>
+            </div>
             <div class="col-xs-1 text-right" style="font-size: x-small; padding-top: 45px">
                 <span class="page"/>/<span class="topage"/>
             </div>

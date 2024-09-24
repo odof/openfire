@@ -26,7 +26,7 @@
                             <div>Ligne 1 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_header_line_1" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_header_line_1" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 1" style="min-width: 90%"/>
                                 <br/>
                                 <span>Size: </span>
@@ -36,7 +36,7 @@
                             <div>Ligne 2 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_header_line_2" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_header_line_2" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 2" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
@@ -46,7 +46,7 @@
                             <div>Ligne 3 : <em class="oe_grey">/!\ Ne sera pas imprimée dans les bons de préparation !</em></div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_header_line_3" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_header_line_3" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 3" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
@@ -65,6 +65,13 @@
 
                         <separator string="Lignes du pied de page externe de la société" colspan="2"/>
                         <div>
+                            <i class="oe_grey">Il est recommandé d'avoir le numéro de facture en bas de page si vous utilisez un en-tête de type 'Bandeau image totalité page'</i>
+                        </div>
+                        <div>
+                            <field name="of_footer_invoice_number" nolabel="1" class="oe_inline"/>
+                            <span> Afficher le numéro de facture sur l'ensemble des pages de mes factures.</span>
+                        </div>
+                        <div>
                             <field name="use_of_custom_footer" nolabel="1" class="oe_inline"/>
                             <span> Utiliser le pied de page personnalisé pour cette société.</span>
                         </div>
@@ -72,7 +79,7 @@
                             <div>Ligne 1 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_footer_line_1" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 1" style="min-width: 90%"/>
                                 <br/>
                                 <span>Size: </span>
@@ -82,7 +89,7 @@
                             <div>Ligne 2 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_footer_line_2" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 2" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
@@ -92,7 +99,7 @@
                             <div>Ligne 3 : </div>
                             <div style="padding: 8px 16px; border: 1px dotted lightgray">
                                 <span style="max-width: 10%">Contenu : </span>
-                                <field name="of_custom_footer_line_3" nolabel="1" class="oe_inline" 
+                                <field name="of_custom_footer_line_3" nolabel="1" class="oe_inline"
                                   placeholder="remplacer par le contenu voulu pour la ligne 3" style="min-width: 90%;"/>
                                 <br/>
                                 <span>Size: </span>
