@@ -12,12 +12,6 @@ class AccountPayment(models.Model):
     )
     of_payment_ref = fields.Char(size=64, string="Payment reference")
     of_tag_ids = fields.Many2many(comodel_name='of.payment.tags', string="Payment tags")
-    sale_id = fields.Many2one(
-        comodel_name='sale.order',
-        string="Customer orders",
-        copy=False,
-        domain="[('partner_id', '=', partner_id)]",
-    )
 
     @api.onchange('of_payment_mode_id')
     def _onchange_of_payment_mode_id(self):
