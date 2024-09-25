@@ -22,11 +22,19 @@ class OFInvoiceReportTotalGroup(models.Model):
 
     @api.model
     def get_payments_group(self):
-        return self.env.ref('of_account_sale_report_totals.of_invoice_report_total_group_payments')
+        return (
+            self.env.ref(
+                'of_account_sale_report_totals.of_invoice_report_total_group_payments', raise_if_not_found=False
+            )
+            or self.browse()
+        )
 
     @api.model
     def get_taxes_group(self):
-        return self.env.ref('of_account_sale_report_totals.of_invoice_report_total_group_taxes')
+        return (
+            self.env.ref('of_account_sale_report_totals.of_invoice_report_total_group_taxes', raise_if_not_found=False)
+            or self.browse()
+        )
 
     def is_payments_group(self):
         return self == self.get_payments_group()

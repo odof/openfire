@@ -8,7 +8,8 @@ from odoo.tools.misc import formatLang
 class AccountMove(models.Model):
     """Methods that are starts with `_of_report_` are used in the report template."""
 
-    _inherit = 'account.move'
+    _name = 'account.move'
+    _inherit = ['account.move', 'of.account.sale.report.totals.mixin']
 
     # --------------------------------------------------------------------------
     # Reporting methods
@@ -19,7 +20,7 @@ class AccountMove(models.Model):
         Returns the invoice lines, separated by the group in which they should be displayed.
 
         The groups are defined by the `of.invoice.report.total` object, allowing to move the rendering of the invoice
-        lines under the total amount (TTC).
+        lines under the total amount (Taxes included).
 
         Groups are displayed in their own order, followed by the lines in the order they appear in the invoice.
 
@@ -32,7 +33,6 @@ class AccountMove(models.Model):
                 The second element is `(group_tax, <Tax Lines>)`.
                 The third element is `(group_payment, <Payment Lines>)`.
         """
-
         self.ensure_one()
         group_obj = self.env['of.invoice.report.total.group']
         move_line_obj = self.env['account.move.line']
@@ -308,30 +308,6 @@ class AccountMove(models.Model):
         result['total'] = self._of_report_process_subtotals_with_taxes(moves, group_lines, amount_total, i)
 
         return result
-
-    def _of_report_calculate_ungrouped_subtotal(self, group_lines):
-        """Calculate the initial subtotal based on ungrouped lines."""
-        return sum(group_lines[0][1].mapped('price_subtotal'))
-
-    def _of_report_get_subtotal_title(self):
-        """Retrieve the title for the subtotal based on tax data."""
-        taxes = self.tax_totals['subtotals']
-        return taxes[0]['name'] if taxes else _("Total")
-
-    def _of_report_process_untaxed_subtotals(self, group_lines, amount_total, i):
-        """Process the subtotals for untaxed lines."""
-        round_curr = self.currency_id.round
-        result_untaxed = []
-
-        while i < len(group_lines) and group_lines[i][0].position == '0-pre-tax':
-            group, lines = group_lines[i]
-            lines_vals = [(line.of_display_name, line.price_subtotal) for line in lines]
-            amount_total += sum(line.price_subtotal for line in lines)
-            total_vals = (group.subtotal_name, round_curr(amount_total))
-            result_untaxed.append([lines_vals, total_vals])
-            i += 1
-
-        return result_untaxed, amount_total, i
 
     def _of_report_process_taxes(self, moves, group_lines, amount_total, i):
         """Process the tax-related totals."""

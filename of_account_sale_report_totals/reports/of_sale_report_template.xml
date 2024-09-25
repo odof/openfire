@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+
+        <!-- Header block -->
+        <xpath expr="//t[@t-set='forced_vat']" position="after">
+            <t t-set="sale_data" t-value="doc.of_report_get_printable_data()"/>
+        </xpath>
+        <!-- /Header block -->
+
+        <!-- Lines and totals block -->
+        <xpath expr="//div[hasclass('page')]/t[@t-set='lines_to_report']" position="attributes">
+            <attribute name="t-value">sale_data['lines']</attribute>
+        </xpath>
+
+        <xpath expr="//t[@t-foreach='lines_to_report']//td[@name='td_name']/span" position="replace">
+            <span t-field="line.of_display_name"/>
+        </xpath>
+
+        <xpath expr="//div[@id='total']/div/table" position="replace">
+            <table class="table table-sm table-borderless" style="page-break-inside: avoid;">
+
+                <t t-set="totals_group" t-value="sale_data['totals']"/>
+
+                <!-- Sous-total H.T. -->
+                <td><strong t-esc="totals_group['subtotal_title']"/></td>
+                <td class="text-end">
+                    <span
+                        t-att-class="oe_subtotal_footer_separator"
+                        t-esc="totals_group['subtotal']"
+                        t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                    />
+                </td>
+
+                <t t-foreach="totals_group['untaxed'] + totals_group['taxes'] + totals_group['total']" t-as="total_group">
+                    <!-- Données sous la forme [[Libellé', montant), ...], Libellé total', montant_total)] -->
+                    <tr t-foreach="total_group[0]" t-as="total_line">
+                        <td>
+                            <span>
+                                <t t-esc="total_line[0]"/>
+                            </span>
+                        </td>
+                        <td class="text-end o_price_total">
+                            <span class="text-nowrap">
+                                <t t-esc="total_line[1]" t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"/>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr name="totals_group_total" class="border-black o_subtotal" t-if="len(total_group) > 1">
+                        <td><strong><t t-esc="total_group[1][0]"/></strong></td>
+                        <td class="text-end">
+                            <span
+                                t-att-class="oe_subtotal_footer_separator"
+                                t-esc="total_group[1][1]"
+                                t-options="{'widget': 'monetary', 'display_currency': doc.currency_id}"
+                            />
+                        </td>
+                    </tr>
+                </t>
+            </table>
+        </xpath>
+        <!-- /Lines and totals block -->
+
+    </template>
+
+</odoo>

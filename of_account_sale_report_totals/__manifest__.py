@@ -1,20 +1,22 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Impression totaux des factures",
+    'name': "OpenFire / Impression totaux des devis/factures",
     'version': '16.0.1.0.0',
     'license': 'LGPL-3',
     'author': "OpenFire",
     'website': 'https://www.openfire.fr',
     'category': 'OpenFire',
-    'summary': "Affichage des totaux dans les factures",
+    'summary': "Affichage des totaux dans les devis/factures",
     'depends': [
+        'of_sale_report_setting',
         'of_invoice_report_setting',
     ],
     'data': [
         'data/of_invoice_report_data.xml',
         'security/ir.model.access.csv',
-        'report/of_invoice_report_templates.xml',
+        'reports/of_invoice_report_templates.xml',
+        'reports/of_sale_report_template.xml',
         'views/of_invoice_report_total_group_views.xml',
     ],
     'installable': True,
