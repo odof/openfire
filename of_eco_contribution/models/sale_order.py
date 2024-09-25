@@ -10,6 +10,21 @@ from odoo import _, api, fields, models
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+        res = super(SaleOrder, self)._auto_init()
+        return res
+
     of_total_eco_contribution = fields.Float(
         string=u"Dont éco-contribution PMCB", compute='_compute_of_total_eco_contribution')
 
@@ -39,6 +54,24 @@ class SaleOrder(models.Model):
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
+
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_unit_eco_contribution NUMERIC" % self._table
+            )
+        res = super(SaleOrderLine, self)._auto_init()
+        return res
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
@@ -101,6 +134,21 @@ class SaleOrderLine(models.Model):
 class OfSaleOrderKit(models.Model):
     _inherit = 'of.saleorder.kit'
 
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+        res = super(OfSaleOrderKit, self)._auto_init()
+        return res
+
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
@@ -129,6 +177,24 @@ class OfSaleOrderKit(models.Model):
 
 class OfSaleOrderKitLine(models.Model):
     _inherit = 'of.saleorder.kit.line'
+
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_unit_eco_contribution NUMERIC" % self._table
+            )
+        res = super(OfSaleOrderKitLine, self)._auto_init()
+        return res
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)

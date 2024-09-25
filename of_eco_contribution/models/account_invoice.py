@@ -10,6 +10,21 @@ from odoo import api, models, fields, _
 class AccountInvoice(models.Model):
     _inherit = 'account.invoice'
 
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+        res = super(AccountInvoice, self)._auto_init()
+        return res
+
     of_total_eco_contribution = fields.Float(
         string=u"Dont éco-contribution PMCB", compute='_compute_of_total_eco_contribution')
 
@@ -51,6 +66,24 @@ class AccountInvoice(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
+
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_unit_eco_contribution NUMERIC" % self._table
+            )
+        res = super(AccountInvoiceLine, self)._auto_init()
+        return res
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
@@ -116,6 +149,21 @@ class AccountInvoiceLine(models.Model):
 class OfAccountInvoiceKit(models.Model):
     _inherit = 'of.invoice.kit'
 
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+        res = super(OfAccountInvoiceKit, self)._auto_init()
+        return res
+
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
@@ -144,6 +192,24 @@ class OfAccountInvoiceKit(models.Model):
 
 class OfAccountInvoiceKitLine(models.Model):
     _inherit = 'of.invoice.kit.line'
+
+    @api.model
+    def _auto_init(self):
+        cr = self.env.cr
+        cr.execute(
+            "SELECT 1 "
+            "FROM information_schema.columns "
+            "WHERE table_name = '%s' "
+            "AND column_name = 'of_total_eco_contribution'" % self._table)
+        if not bool(cr.fetchall()):
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_total_eco_contribution NUMERIC" % self._table
+            )
+            cr.execute(
+                "ALTER TABLE %s ADD COLUMN of_unit_eco_contribution NUMERIC" % self._table
+            )
+        res = super(OfAccountInvoiceKitLine, self)._auto_init()
+        return res
 
     of_total_eco_contribution = fields.Float(
         string=u"Montant éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
