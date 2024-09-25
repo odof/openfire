@@ -32,9 +32,15 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
+            <!-- Passage en lecture seule de champs -->
+            <xpath expr="//field[@name='journal_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+                <attribute name="force_save">1</attribute>
+            </xpath>
+
             <!-- Déplacement de champs -->
             <xpath expr="//field[@name='journal_id']" position="before">
-                <field name="of_payment_mode_id"/>
+                <field name="of_payment_mode_id" required="1"/>
                 <field name="partner_bank_id" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='amount_total']" position="after">

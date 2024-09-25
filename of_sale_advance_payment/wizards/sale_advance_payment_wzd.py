@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 
 
 class AccountVoucherWizard(models.TransientModel):
@@ -41,3 +41,14 @@ class AccountVoucherWizard(models.TransientModel):
             self.journal_id = self.of_payment_mode_id.journal_id
         else:
             self.journal_id = False
+
+    def _prepare_payment_vals(self, sale):
+        res = super()._prepare_payment_vals(sale)
+        res.update(
+            {
+                'of_payment_mode_id': self.of_payment_mode_id.id,
+                'of_tag_ids': [Command.set(self.of_tag_ids.ids)],
+                'payment_reference': self.of_payment_ref,
+            }
+        )
+        return res
