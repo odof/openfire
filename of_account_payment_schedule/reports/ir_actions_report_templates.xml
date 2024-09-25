@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="of_account_report_invoice_document" inherit_id="of_invoice_report_setting.report_invoice_document">
+        <xpath expr="//t[@t-set='pdf_address_title']" position="after">
+            <t t-set="pdf_invoice_payment_schedule" t-value="o.pdf_invoice_payment_schedule()"/>
+        </xpath>
+        <xpath expr="//div[@name='payment_term']" position="before">
+            <div t-if="pdf_invoice_payment_schedule and o.of_payment_schedule_ids" class="mt-4 mb-4" name="payment_schedule">
+                <div class="col-6" style="page-break-inside:avoid;">
+                    <t t-set="show_payment_schedule_date" t-value="bool(o.of_payment_schedule_ids.filtered('date'))"/>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Payment Schedule</th>
+                                <th class="text-start" t-if="show_payment_schedule_date">Date</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.of_payment_schedule_ids" t-as="p">
+                                <td><span t-field="p.name"/></td>
+                                <td t-if="show_payment_schedule_date"><span t-field="p.date"/></td>
+                                <td class="text-end">
+                                    <span t-field="p.amount" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

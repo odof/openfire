@@ -1,0 +1,173 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_account_payment_schedule
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-09-24 07:31+0000\n"
+"PO-Revision-Date: 2024-09-24 07:31+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_account_payment_schedule
+#: model:ir.model,name:of_account_payment_schedule.model_of_account_move_payment_schedule
+msgid "Account Payment Schedule"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__amount
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+msgid "Amount"
+msgstr "Montant"
+
+#. module: of_account_payment_schedule
+#: model:ir.model,name:of_account_payment_schedule.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__date
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+msgid "Date"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_account_payment_schedule
+#. odoo-python
+#: code:addons/of_account_payment_schedule/models/of_account_move_payment_schedule.py:0
+#, python-format
+msgid "Due"
+msgstr "Échéance"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__id
+msgid "ID"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__move_id
+msgid "Invoice"
+msgstr "Facture"
+
+#. module: of_account_payment_schedule
+#: model:ir.model,name:of_account_payment_schedule.model_account_move
+msgid "Journal Entry"
+msgstr "Pièce comptable"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__is_last
+msgid "Last payment"
+msgstr "Dernier paiement"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+msgid "Payment Schedule"
+msgstr "Échéancier de paiement"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_bank_statement_line__of_payment_schedule_ids
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_move__of_payment_schedule_ids
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_payment__of_payment_schedule_ids
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_invoice_document_layout__pdf_invoice_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_res_company__pdf_invoice_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+msgid "Payment schedule"
+msgstr "Vos échéances"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_bank_statement_line__of_show_update_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_move__of_show_update_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_payment__of_show_update_payment_schedule
+msgid "Payment schedule needs to be updated"
+msgstr "Le calendrier des paiements doit être mis à jour"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__percent
+msgid "Percentage"
+msgstr "Pourcentage"
+
+#. module: of_account_payment_schedule
+#: model:ir.model,name:of_account_payment_schedule.model_of_invoice_document_layout
+msgid "Printing Settings for Invoice"
+msgstr "Paramètres d'impression pour facture"
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+msgid ""
+"Recompute the payment schedule based on the current pricelist and the "
+"payment terms."
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+msgid ""
+"This will update the payment schedule based on the current pricelist and the"
+" payment terms. Do you want to continue ?"
+msgstr ""
+ "Ceci mettra à jour l'échéancier de paiement sur la base de la liste de prix actuelle et des conditions de paiement. "
+ "Voulez-vous continuer ? "
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+msgid "Total"
+msgstr ""
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+msgid "Update Payment Schedule"
+msgstr "Mise à jour de l'échéancier de paiements"
+
+#. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_document_layout_view_form
+msgid "Displays the payment schedule in the report"
+msgstr "Affiche l'échancier de paiement dans le rapport"
