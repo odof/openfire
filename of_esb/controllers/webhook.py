@@ -27,9 +27,9 @@ class Service(Controller):
             if user_id := request_trigger.security.authorize(args):
                 # on ajoute dans les args, le user, et on envoie tout dans le bus
                 args["user_id"] = user_id.id
-                data = request.env['of.esb.data'].sudo().create({'in_data': json.dumps(args)})
+                data = request.env['of.esb.data'].with_user(user_id.id).create({'in_data': json.dumps(args)})
                 value = {'data': data.id, 'channel': trigger, 'ttype': request.env.ref('of_esb.type_webhook').id}
-                bus = request.env['of.esb.bus'].sudo().create(value)
+                bus = request.env['of.esb.bus'].with_user(user_id.id).create(value)
                 data.properties = json.dumps({'uuid': bus.uuid})
                 body = {'res': 'Your webhook have been queued', 'uuid': bus.uuid, 'code': 200}
                 # on loggue tout ça
@@ -38,17 +38,19 @@ class Service(Controller):
                     'type': 'trigger',
                     'id': request_trigger.id,
                     'name': request_trigger.name,
+                    'uuid': bus.uuid,
                     'user_id': user_id.id,
+                }
+                properties = {
                     'uuid': bus.uuid,
                 }
-                properties = {'uuid': bus.uuid}
 
-                request.env['of.esb.bus'].send_bus(
+                request.env['of.esb.bus'].with_user(user_id.id).send_bus(
                     ttype=request.env.ref('of_esb.type_logs'), channel='history', data=data, properties=properties
                 )
 
             else:
-                body = {'res': 'You do not have access to this webhook', 'code': 200}
+                body = {'res': 'You do not have access to this webhook', 'code': 403}
         else:
             body = {'res': 'Webhook not found', 'code': 404}
 

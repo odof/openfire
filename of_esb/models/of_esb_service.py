@@ -19,6 +19,7 @@ class ESBService(models.Model):
     uuid = fields.Char(default=lambda r: uuid.uuid4())
 
     def execute_with_delay(self, args={}):
+        logger.info(f"Context : {self.env.context}")
         if self.exec_active:
             # on regarde si dans args.in_data, il y a un user_id
             # si oui, on l'utilise pour lancer l'action, sinon on prends le user courant
@@ -27,7 +28,11 @@ class ESBService(models.Model):
                 user = self.env['res.users'].browse(user_id)
                 res = self.with_user(user).with_delay().execute(args)
             else:
-                res = self.with_delay().execute(args)
+                if user_id := self.env.context.get('uid'):
+                    user = self.env['res.users'].browse(user_id)
+                    res = self.with_user(user).with_delay().execute(args)
+                else:
+                    res = self.with_delay().execute(args)
 
             return res
 

@@ -18,7 +18,7 @@ class ESBTransform(models.Model):
     name = fields.Char('Name')
     partner_id = fields.Many2one(comodel_name='res.partner', string='Partner')
     code = fields.Text(required=True, default=lambda r: r._default_code())
-    load_id = fields.Many2one(comodel_name='of.esb.load', string="Load", required=True)
+    load_id = fields.Many2one(comodel_name='of.esb.load', string="Load")
     uuid = fields.Char(default=lambda r: uuid.uuid4())
     example = fields.Text(compute="_compute_example")
     preview = fields.Text()

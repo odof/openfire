@@ -3,11 +3,8 @@
 
 import base64
 import json
-import logging
 
 from odoo import fields, models
-
-logger = logging.getLogger(__name__)
 
 
 class ExportESBWizard(models.TransientModel):
@@ -16,67 +13,55 @@ class ExportESBWizard(models.TransientModel):
     trigger_id = fields.Many2one(comodel_name='of.esb.trigger', string="Trigger")
     export_file = fields.Binary()
     filename = fields.Char()
-    with_connexion = fields.Boolean()
-    with_security = fields.Boolean()
 
     def action_export_json(self):
         # on export les triggers, extracts, transforms et loads avec le même uuid
         uuid = self.trigger_id.uuid
         triggers = self.env['of.esb.trigger'].search([('uuid', '=', uuid)])
         extracts = self.env['of.esb.extract'].search([('uuid', '=', uuid)])
-        rules = self.env['of.esb.rule'].search([('uuid', '=', uuid)])
+        # Les transforms et loads étant lié plus ou moins directement avec les extracts,
+        # pas besoin de les ajouter dans l'export
 
-        res = {
-            'triggers': triggers.action_export_json(
-                parser=[
-                    'name',
-                    'uuid',
-                    'is_operating_data',
-                    'ttype',
-                    'public',
-                ]
-            ),
-            'extracts': extracts.action_export_json(
-                parser=[
-                    'name',
-                    'uuid',
+        trigger_parser = [
+            'name',
+            'uuid',
+            'is_operating_data',
+            'ttype',
+            'public',
+        ]
+
+        extract_parser = [
+            'name',
+            'uuid',
+            (
+                'lines',
+                [
+                    'type_data',
+                    'code',
+                    'data',
                     (
-                        'lines',
+                        'transform_id',
                         [
-                            'type_data',
+                            'name',
+                            'uuid',
                             'code',
-                            'data',
                             (
-                                'transform_id',
+                                'load_id',
                                 [
                                     'name',
                                     'uuid',
-                                    'code',
-                                    (
-                                        'load_id',
-                                        [
-                                            'name',
-                                            'uuid',
-                                        ],
-                                    ),
                                 ],
                             ),
                         ],
                     ),
-                ]
+                ],
             ),
-            'rules': rules.action_export_json(
-                parser=[
-                    'name',
-                    'ttype',
-                    'channel',
-                    ('type_bus', ['name']),
-                    ('service_id', ['name', 'exec_active', 'ttype', 'uuid', 'code']),
-                    'uuid',
-                ]
-            ),
+        ]
+
+        res = {
+            'triggers': triggers.action_export_json(parser=trigger_parser),
+            'extracts': extracts.action_export_json(parser=extract_parser),
         }
-        logger.info(res)
 
         self.filename = f"{self.trigger_id.name}.json"
 

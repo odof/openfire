@@ -15,7 +15,7 @@
                     <field name="uuid"/>
                     <field name="code" widget="ace" options="{'mode': 'python'}" help="Tout ce qui sera dans la variable 'result' sera envoyé au 'load' ci-dessous"/>
                     <field name="example" readonly="1"/>
-                    <field name="load_id"/>
+                    <field name="load_id" required="1"/>
                     <field name="preview" widget="ace" options="{'mode': 'python'}" readonly="1"/>
                 </group>
             </form>

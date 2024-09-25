@@ -8,8 +8,6 @@
             <form>
                 <group>
                     <field name="trigger_id"/>
-                    <field name="with_connexion"/>
-                    <field name="with_security"/>
                 </group>
                 <footer>
                     <button name="action_export_json" type="object" string="Export JSON" class="oe_highlight"/>

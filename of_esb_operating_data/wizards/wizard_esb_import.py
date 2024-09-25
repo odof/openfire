@@ -3,11 +3,8 @@
 
 import base64
 import json
-import logging
 
 from odoo import fields, models
-
-logger = logging.getLogger(__name__)
 
 
 class ImportESBWizard(models.TransientModel):
@@ -16,12 +13,12 @@ class ImportESBWizard(models.TransientModel):
     import_file = fields.Binary()
 
     def action_import_json(self):
+        ir_model_data_obj = self.env['ir.model.data']
+
         data = base64.b64decode(self.import_file)
         data = json.loads(data)
 
-        logger.info(data)
-
-        triggers, xml_id = self.env['of.esb.trigger'].action_import_json(
+        triggers = self.env['of.esb.trigger'].action_import_json(
             data=data.get('triggers'),
             parser=[
                 'name',
@@ -31,11 +28,28 @@ class ImportESBWizard(models.TransientModel):
                 'public',
             ],
         )
-        logger.info(f"Triggers : {triggers}")
-        for trigger in triggers:
-            self.env["of.esb.trigger"].create(trigger)
+        if type(triggers) is dict:
+            triggers = [triggers]
 
-        extracts, xml_id = self.env['of.esb.extract'].action_import_json(
+        for trigger in triggers:
+            if xml_id := trigger.get('xml_id'):
+                record = self.env['of.esb.trigger'].browse(xml_id.res_id)
+                record.write(trigger.get('value'))
+            else:
+                record = self.env["of.esb.trigger"].create(trigger.get('value'))
+
+                # on crée le xml_id pour une prochaine mise à jour
+                ir_model_data_obj.create(
+                    {
+                        'name': trigger.get('name'),
+                        'module': trigger.get('module'),
+                        'model': record._name,
+                        'res_id': record.id,
+                        'noupdate': True,
+                    }
+                )
+
+        extracts = self.env['of.esb.extract'].action_import_json(
             data=data.get('extracts'),
             parser=[
                 'name',
@@ -65,7 +79,22 @@ class ImportESBWizard(models.TransientModel):
                 ),
             ],
         )
+        if type(extracts) is dict:
+            extracts = [extracts]
 
-        logger.info(f"Extracts: {extracts}")
         for extract in extracts:
-            self.env['of.esb.extract'].create(extract)
+            if xml_id := extract.get('xml_id'):
+                record = self.env['of.esb.extract'].browse(xml_id.res_id)
+                record.write(extract.get('value'))
+            else:
+                record = self.env['of.esb.extract'].create(extract.get('value'))
+                # on crée le xml_id pour une prochaine mise à jour
+                ir_model_data_obj.create(
+                    {
+                        'name': extract.get('name'),
+                        'module': extract.get('module'),
+                        'model': record._name,
+                        'res_id': record.id,
+                        'noupdate': True,
+                    }
+                )
