@@ -100,6 +100,7 @@ class OFPlanningTourneeLine(models.Model):
     partner_mobile = fields.Char(related='intervention_id.partner_id.mobile', readonly=True)
     map_color_tour = fields.Char(related='intervention_id.map_color_tour', string="Color", readonly=True)
     tour_number = fields.Char(related='intervention_id.tour_number', string="Tour number", readonly=True)
+    state = fields.Selection(related='intervention_id.state', string="State", readonly=True)
     # OSRM data for the map
     osrm_query = fields.Text(
         string="OSRM query",
