@@ -99,6 +99,15 @@ export class OFSaleSectionLine extends Component {
         this.lastIsDirty = isDirty;
     }
 
+    getNewNodeID() {
+        if (this.props.list.records.length == 0){
+            return 1;
+        } else {
+            const maxId = Math.max(...this.props.list.records.map(item => item.data.of_node_id));
+            return maxId + 1;
+        }
+    }
+
     async add(recordValue) {
         // D'abord on calcule sa position selon les autres possibles enfants du record auquel on ajoute celui ci
         let children = this.props.list.records.filter((record) => record.data.of_parent_node_id == this.props.record.data.of_node_id);
@@ -109,7 +118,7 @@ export class OFSaleSectionLine extends Component {
         }
 
         let context = {
-            'default_of_node_id': this.props.list.records.length + 1,
+            'default_of_node_id': this.getNewNodeID(),
             'default_of_parent_node_id': this.props.record.data.of_node_id,
             'default_of_position_node': index,
         }
@@ -179,7 +188,7 @@ export class OFSaleSectionLine extends Component {
 
         // D'abord, on duplique le node en cours, c'est un add avec des différences
         let recordValue = this.props.record.data;
-        recordValue['of_node_id'] = this.props.list.records.length + 1;
+        recordValue['of_node_id'] = this.getNewNodeID();
         recordValue['of_parent_node_id'] = this.props.record.data.of_parent_node_id;
         recordValue['name'] = recordValue['name'] + _t(" (copy)");
         let newRecord = await this.add(recordValue);
@@ -198,7 +207,7 @@ export class OFSaleSectionLine extends Component {
             // on duplique le child
             let recordValue = child.data;
             let taxes = child.data.tax_id.records;
-            recordValue['of_node_id'] = this.props.list.records.length + 1;
+            recordValue['of_node_id'] = this.getNewNodeID();
             recordValue['of_parent_node_id'] = parentRecord.data.of_node_id;
             if (recordValue.display_type == 'line_section'){
                 recordValue['name'] = recordValue['name'] + _t(" (copy)");
@@ -488,11 +497,20 @@ export class OFSaleSectionOne2Many extends X2ManyField {
         ListRenderer: OFSaleSectionListRenderer,
     };
 
+    getNewNodeID() {
+        if (this.list.records.length == 0){
+            return 1;
+        } else {
+            const maxId = Math.max(...this.list.records.map(item => item.data.of_node_id));
+            return maxId + 1;
+        }
+    }
+
     onAdd({ context, editable } = {}) {
         // on extrait le contexte pour avoir un dictionnaire
         context = makeContext([context]);
         if (context.default_display_type && context.default_display_type == 'line_section') {
-            context['default_of_node_id'] = this.list.records.length + 1;
+            context['default_of_node_id'] = this.getNewNodeID();
             context['default_of_parent_node_id'] = 0;
             context['default_of_section_name'] = this.list.records.filter((record) => record.data.of_parent_node_id == 0 && record.data.display_type == 'line_section').length + 1;
             context['default_sequence'] = this.list.records.length + 1;
@@ -507,7 +525,7 @@ export class OFSaleSectionOne2Many extends X2ManyField {
             if (sections.length > 0){
                 let section = sections.slice(-1)[0];
                 context['default_of_parent_node_id'] = section.data.of_node_id;
-                context['default_of_node_id'] = this.list.records.length + 1;
+                context['default_of_node_id'] = this.getNewNodeID();
             }
         }
         return super.onAdd({ context, editable });
