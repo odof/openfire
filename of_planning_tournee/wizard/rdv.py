@@ -15,7 +15,7 @@ from odoo.tools import config
 from odoo.tools.float_utils import float_compare
 from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_TYPES
 from odoo.addons.of_planning_tournee.models.of_intervention_settings import SELECTION_SEARCH_MODES
-from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs
+from odoo.addons.of_utils.models.of_utils import distance_points, hours_to_strs, get_selection_label
 from odoo.addons.calendar.models.calendar import calendar_id2real_id
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import WEEKDAYS_TR
 from odoo.addons.of_planning_tournee.models.of_planning_tournee import DEFAULT_AM_LIMIT_FLOAT
@@ -66,7 +66,8 @@ class OfTourneeRdv(models.TransientModel):
             else:
                 intervention = active_record
                 service = intervention.service_id
-            res['pre_employee_ids'] = [(6, 0, [emp.id for emp in active_record.employee_ids])]
+            if active_record.employee_ids:
+                res['pre_employee_ids'] = [(6, 0, [emp.id for emp in active_record.employee_ids])]
         elif active_model == 'sale.order':
             order_id = self._context['active_ids'][0]
             order = self.env['sale.order'].browse(order_id)
@@ -427,7 +428,7 @@ class OfTourneeRdv(models.TransientModel):
         operation to be planned.
         """
         for wizard in self:
-            additionnal_record = wizard.service_id or wizard.origin_intervention_id
+            additionnal_record = wizard.service_id or wizard.origin_intervention_id or wizard.partner_address_id
             if not additionnal_record:
                 wizard.additional_record = json.dumps({})
                 continue
@@ -467,7 +468,7 @@ class OfTourneeRdv(models.TransientModel):
             map_description_html = False
             if wizard.map_line_id:
                 line_date = fields.Date.from_string(wizard.map_line_id.date).strftime(date_format)
-                line_day = wizard.map_line_id.weekday
+                line_day = get_selection_label(self, wizard.map_line_id._name, 'weekday', wizard.map_line_id.weekday)
                 line_day_str = '%s %s' % (line_day, line_date)
                 line_employee = wizard.map_line_id.employee_id
                 color = 'color: orange;' if wizard.res_line_id != wizard.map_line_id else ''
@@ -562,8 +563,7 @@ class OfTourneeRdv(models.TransientModel):
                 vals['creer_recurrence'] = self.tache_id.recurrence
 
             # If the duration is not set, we set it to 1 hour by default to avoid an error when searching time slots
-            if not self.duree:
-                vals['duree'] = self.tache_id.duree or 1.0
+            vals['duree'] = self.tache_id.duree or 1.0
 
             employees = [employee.id for employee in self.pre_employee_ids if employee in self.tache_id.employee_ids]
             vals['pre_employee_ids'] = employees
