@@ -96,6 +96,7 @@ class AccountRegisterPayments(models.TransientModel):
         res['of_payment_mode_id'] = self.of_payment_mode_id.id
         return res
 
+
 class AccountPayment(models.Model):
     _name = "account.payment"
     _inherit = ["account.payment", "account.abstract.payment"]
@@ -105,9 +106,6 @@ class AccountPayment(models.Model):
 
     # Champ Categories (Tags)
     of_tag_ids = fields.Many2many('of.payment.tags', string=u'Catégorie', help=u"Sélectionnez la catégorie de paiement")
-
-    # Surcharge pour modification du domain, dans le cas de multi company
-    writeoff_account_id = fields.Many2one(domain="[('deprecated', '=', False), ('company_id', '=', company_id)]")
 
     @api.multi
     def get_payment_mode_display(self):
