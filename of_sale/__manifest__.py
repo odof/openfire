@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Ventes",
-    'version': '16.0.1.3.0',
+    'version': '16.0.1.4.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -39,6 +39,7 @@
         'wizards/of_sale_order_add_quote_views.xml',
         'report/of_report_sale_order_list.xml',
         'report/sale_report_views.xml',
+        'templates/sale_order_portal_templates.xml',
         'wizards/sale_make_invoice_advance_views.xml',
         'wizards/of_sale_order_verification_views.xml',
         'wizards/of_sale_order_confirmation_views.xml',
