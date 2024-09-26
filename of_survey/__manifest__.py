@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Questionnaires",
-    'version': '16.0.1.1.3',
+    'version': '16.0.1.2.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -11,6 +11,7 @@
     'depends': ['auth_signup', 'http_routing', 'mail', 'web_tour', 'of_web_widgets', 'of_base'],
     'data': [
         'security/of_survey_security.xml',
+        'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'views/of_survey_menus.xml',
         'views/of_survey_survey_views.xml',
@@ -27,7 +28,7 @@
         'of_survey.survey_assets': [
             'web/static/lib/Chart/Chart.js',
             'of_survey/static/src/js/survey_image_zoomer.js',
-            '/of_survey/static/src/xml/survey_image_zoomer_templates.xml',
+            'of_survey/static/src/xml/survey_image_zoomer_templates.xml',
             'of_survey/static/src/js/survey_quick_access.js',
             'of_survey/static/src/js/survey_breadcrumb.js',
             'of_survey/static/src/js/survey_form.js',

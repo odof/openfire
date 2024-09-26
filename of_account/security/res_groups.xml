@@ -16,6 +16,7 @@
         <field name="name">OF Margin</field>
         <field name="description">Defines access rights to margins.</field>
         <field name="sequence">92</field>
+        <field name="parent_id" ref="base.module_category_sales"/>
     </record>
 
     <record id="of_group_sale_margin_manager" model="res.groups">

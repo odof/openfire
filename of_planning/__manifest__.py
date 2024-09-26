@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Planning",
-    'version': '16.0.1.5.0',
+    'version': '16.0.1.6.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
@@ -24,6 +24,7 @@
         'reports/report_intervention_report.xml',  # required before email_intervention.xml for email template
         'data/email_intervention.xml',
         'security/res_groups.xml',
+        'security/ir_rule.xml',
         'security/ir.model.access.csv',
         'views/of_sector_views.xml',
         'views/of_planning_intervention_line_views.xml',
