@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-10 13:05+0000\n"
-"PO-Revision-Date: 2024-07-10 13:05+0000\n"
+"POT-Creation-Date: 2024-09-26 13:21+0000\n"
+"PO-Revision-Date: 2024-09-26 13:21+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -336,6 +336,7 @@ msgid "An access token must be unique!"
 msgstr "Un jeton d'accès doit être unique !"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__answer
 #: model_terms:ir.ui.view,arch_db:of_survey.survey_user_input_view_form
 msgid "Answer"
 msgstr "Réponse"
@@ -544,6 +545,7 @@ msgstr "Réponse numérique correcte"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__create_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_uid
@@ -555,6 +557,7 @@ msgstr "Créé par"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__create_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__create_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__create_date
@@ -662,6 +665,7 @@ msgstr "Réponses détaillées"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__display_name
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__display_name
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__display_name
@@ -822,6 +826,7 @@ msgstr "Vous aide à gérer votre Questionnaire OpenFire"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__id
@@ -871,7 +876,9 @@ msgstr "Si coché, de nouveaux messages demandent votre attention."
 
 #. module: of_survey
 #: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_error
+#: model:ir.model.fields,help:of_survey.field_of_survey_survey__message_has_sms_error
 #: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_has_error
+#: model:ir.model.fields,help:of_survey.field_of_survey_user_input__message_has_sms_error
 msgid "If checked, some messages have a delivery error."
 msgstr "Si coché, certains messages ont une erreur de livraison."
 
@@ -930,6 +937,7 @@ msgstr ""
 "aléatoires par section. Ce mode est ignoré dans la session en direct."
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__image
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_image
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_form_image
 msgid "Image"
@@ -1032,6 +1040,7 @@ msgstr ""
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers____last_update
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question____last_update
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer____last_update
@@ -1043,6 +1052,7 @@ msgstr "Dernière modification le"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__write_uid
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_uid
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_uid
@@ -1054,6 +1064,7 @@ msgstr "Dernière mise à jour par"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__write_date
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__write_date
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__write_date
@@ -1516,6 +1527,7 @@ msgstr "Imprimer"
 
 #. module: of_survey
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_answers__question_id
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_answers_images__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_conditional_question__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__question_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__question_id
@@ -1617,6 +1629,12 @@ msgstr "Responsable"
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__activity_user_id
 msgid "Responsible User"
 msgstr "Utilisateur responsable"
+
+#. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_survey__message_has_sms_error
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr ""
 
 #. module: of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.multi_upload_image
@@ -1795,6 +1813,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_question__survey_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input__survey_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__survey_id
+#: model:ir.module.category,name:of_survey.module_category_of_survey
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_question_search
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_form
 #: model_terms:ir.ui.view,arch_db:of_survey.of_survey_survey_view_search
@@ -2222,6 +2241,7 @@ msgid "Validation Error message"
 msgstr "Message d'erreur de validation"
 
 #. module: of_survey
+#: model:ir.model.fields,field_description:of_survey.field_of_survey_question_answer__value_of_image_id
 #: model:ir.model.fields,field_description:of_survey.field_of_survey_user_input_line__value_image_ids
 msgid "Value Image"
 msgstr "Valeur image"

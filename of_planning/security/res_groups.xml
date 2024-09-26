@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
+<odoo>
 
     <!-- ################# Module category ################# -->
+
+    <record id="module_category_of_intervention" model="ir.module.category">
+        <field name="sequence">95</field>
+        <field name="name">Intervention</field>
+        <field name="parent_id" eval="False" />
+    </record>
 
     <record id="of_planning_intervention_category" model="ir.module.category">
         <field name="name">OF Interventions</field>
         <field name="description">Defines access rights to the OpenFire intervention planning</field>
         <field name="sequence">95</field>
+        <field name="parent_id" ref="module_category_of_intervention" />
     </record>
 
     <!-- ################# Planning access right groups ################# -->
 
     <record id="group_intervention_use_deliveries" model="res.groups">
         <field name="name">Intervention's pickings</field>
-        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="category_id" ref="base.module_category_hidden" />
     </record>
 
     <!-- Rights to modify intervention planning -->
@@ -44,7 +51,8 @@
     <record id="group_planning_intervention_manager" model="res.groups">
         <field name="name">Manager</field>
         <field name="category_id" ref="of_planning_intervention_category" />
-        <field name="users" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"/>
+        <field name="users"
+            eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]" />
         <field name="implied_ids" eval="[(4, ref('group_planning_intervention_responsible'))]" />
     </record>
 
@@ -53,70 +61,6 @@
         <field name="name">(OF) Block access to intervention configuration</field>
         <field name="category_id" ref="base.module_category_hidden" />
         <field name="comment">Restrict access to intervention settings</field>
-    </record>
-
-    <!-- Reading rights -->
-
-    <record id="of_planning_intervention_read_own_write_own_rule" model="ir.rule">
-        <field name="name">Read own interventions</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
-        <field name="domain_force">[('of_type','=','intervention'),('of_employee_ids.user_id','=',user.id)]</field>
-        <field name="perm_write" eval="False" />
-        <field name="perm_create" eval="False" />
-        <field name="perm_unlink" eval="False" />
-        <field name="groups" eval="[(4, ref('group_planning_intervention_read_own_write_own'))]" />
-    </record>
-
-    <record id="of_planning_intervention_read_all_write_own_rule" model="ir.rule">
-        <field name="name">Read all interventions</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
-        <field name="domain_force">[('of_type','=','intervention')]</field>
-        <field name="perm_write" eval="False" />
-        <field name="perm_create" eval="False" />
-        <field name="perm_unlink" eval="False" />
-        <field name="groups" eval="[(4, ref('group_planning_intervention_read_all_write_own'))]" />
-    </record>
-
-    <!-- Writing rights -->
-
-    <record id="of_planning_intervention_group_access_rule" model="ir.rule">
-        <field name="name">Write own interventions</field>
-        <field ref="calendar.model_calendar_event" name="model_id" />
-        <field name="domain_force">[('of_type','=','intervention'),('of_employee_ids.user_id','=',user.id)]</field>
-        <field name="perm_read" eval="False" />
-        <field name="perm_create" eval="False" />
-        <field name="perm_unlink" eval="False" />
-        <field name="groups" eval="[(4, ref('group_planning_intervention_read_own_write_own'))]" />
-    </record>
-
-    <record id="of_planning_intervention_group_manage_my_interventions_rule" model="ir.rule">
-        <field name="name">Write/create own interventions</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
-        <field name="domain_force">[('of_type','=','intervention'),('of_employee_ids.user_id','=',user.id)]</field>
-        <field name="perm_read" eval="False" />
-        <field name="perm_unlink" eval="False" />
-        <field name="groups"
-            eval="[(4, ref('group_planning_intervention_read_all_write_own'))]" />
-    </record>
-
-    <record id="of_planning_intervention_edit_all_rule" model="ir.rule">
-        <field name="name">Edit all interventions</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
-        <field name="domain_force">[('of_type','=','intervention')]</field>
-        <field name="perm_read" eval="False" />
-        <field name="groups"
-            eval="[(4, ref('group_planning_intervention_responsible'))]" />
-    </record>
-
-    <!-- Delete rights -->
-
-    <record id="of_planning_intervention_done_deletion" model="ir.rule">
-        <field name="name">Delete interventions done</field>
-        <field name="model_id" ref="calendar.model_calendar_event" />
-        <field name="domain_force">[('of_state', '!=', 'done')]</field>
-        <field name="perm_read" eval="False" />
-        <field name="perm_write" eval="False" />
-        <field name="perm_create" eval="False" />
     </record>
 
 </odoo>
