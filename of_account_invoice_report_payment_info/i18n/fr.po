@@ -6,19 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-09 15:12+0000\n"
-"PO-Revision-Date: 2024-09-09 15:12+0000\n"
+"POT-Creation-Date: 2024-09-26 16:59+0000\n"
+"PO-Revision-Date: 2024-09-26 16:59+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
-
-#. module: of_account_invoice_report_payment_info
-#: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
-msgid "<code>{amount}</code> : Amount"
-msgstr "<code>{amount}</code> : Montant"
 
 #. module: of_account_invoice_report_payment_info
 #: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
@@ -32,6 +27,11 @@ msgstr "<code>{journal_name}</code> : Journal de paiement"
 
 #. module: of_account_invoice_report_payment_info
 #: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
+msgid "<code>{payment_amount}</code> : Amount"
+msgstr "<code>{payment_amount}</code> : Montant"
+
+#. module: of_account_invoice_report_payment_info
+#: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
 msgid "<code>{payment_method_name}</code> : Payment method"
 msgstr "<code>{payment_method_name}</code> : Méthode de paiement"
 
@@ -42,13 +42,13 @@ msgstr "<code>{payment_mode}</code> : Mode de paiement"
 
 #. module: of_account_invoice_report_payment_info
 #: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
-msgid "Document printing"
-msgstr "Impression sur document"
+msgid "<code>{payment_reference}</code> : Payment reference"
+msgstr "<code>{payment_reference}</code> : Référence de paiement"
 
 #. module: of_account_invoice_report_payment_info
-#: model:ir.model,name:of_account_invoice_report_payment_info.model_account_move
-msgid "Journal Entry"
-msgstr "Entrées Journal"
+#: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
+msgid "Document printing"
+msgstr "Impression sur document"
 
 #. module: of_account_invoice_report_payment_info
 #: model:ir.model.fields,field_description:of_account_invoice_report_payment_info.field_account_payment_method_line__of_display_config
@@ -59,6 +59,13 @@ msgstr "Configuration de facture payée"
 #: model:ir.model,name:of_account_invoice_report_payment_info.model_account_payment_method_line
 msgid "Payment Methods"
 msgstr "Modes de paiement"
+
+#. module: of_account_invoice_report_payment_info
+#: model:ir.model,name:of_account_invoice_report_payment_info.model_of_account_invoice_report_payment_info_installed
+msgid ""
+"This model is used to test if the module is installed and avoid monkey "
+"patching side-effects."
+msgstr ""
 
 #. module: of_account_invoice_report_payment_info
 #: model_terms:ir.ui.view,arch_db:of_account_invoice_report_payment_info.account_payment_method_line_view_form
