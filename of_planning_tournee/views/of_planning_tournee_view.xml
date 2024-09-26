@@ -57,7 +57,8 @@
                 <notebook>
                     <page name="tour_lines" string="Interventions"> <!-- Tour lines page -->
                         <field name="tour_line_ids" mode="tree" nolabel="1" readonly="1" context="{'from_tour':1}">
-                            <tree string="Tour lines">
+                            <tree string="Tour lines" decoration-success="state=='done'">
+                                <field name="state" invisible="1"/>
                                 <field name="intervention_id"/>
                                 <field name="date_start"/>
                                 <field name="address_city"/>

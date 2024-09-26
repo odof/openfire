@@ -2288,3 +2288,8 @@ msgstr "Définit l'heure de coupure entre matin et après-midi. Les intervention
 #: model:ir.model.fields,field_description:of_planning_tournee.field_of_intervention_settings_tour_am_limit_float
 msgid "Tours // Morning/Afternoon break hour"
 msgstr "Tournées // Heure de coupure matin/après-midi"
+
+#. module: of_planning_tournee
+#: model:ir.model.fields,field_description:of_planning_tournee.field_of_planning_tour_line_state
+msgid "State"
+msgstr "État"
