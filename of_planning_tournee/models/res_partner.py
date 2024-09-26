@@ -79,14 +79,17 @@ class OFResPartner(models.Model):
             # remove virtual_id from context to avoid error in search. It's not needed here, we don't want fake records
             del context['virtual_id']
         return (
-            self.env['of.planning.tour.line']
+            self.env['of.planning.tournee']
             .sudo()
             .with_context(context)
             .search([
-                ('address_id', 'in', geodata_changed.ids),
-                ('tour_id.date', '>=', fields.Date.today())
+                ('date', '>=', fields.Date.today()),
+                '|',
+                '|',
+                ('start_address_id', 'in', geodata_changed.ids),
+                ('return_address_id', 'in', geodata_changed.ids),
+                ('tour_line_ids.address_id', 'in', geodata_changed.ids),
             ])
-            .mapped('tour_id')
         )
 
     @api.multi

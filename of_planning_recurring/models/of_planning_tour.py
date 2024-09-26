@@ -19,4 +19,4 @@ class OfPlanningTour(models.Model):
             ('date', '<=', self.date),
             ('date_deadline', '>=', self.date),
             ('recurrency', '=', False),
-            ('state', 'in', ('draft', 'confirm'))], order='date')
+            ('state', 'not in', self._get_intervention_state_values_to_exclude())], order='date')

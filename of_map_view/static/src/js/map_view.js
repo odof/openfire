@@ -24,8 +24,7 @@ var Sidebar = require('web.Sidebar');
  *	TODO: add warning when using OSM tile server
  */
 
-//var TILE_SERVER_ADDR = 'http://192.168.1.80/osm_tiles/{z}/{x}/{y}.png';
-var TILE_SERVER_ADDR = '//{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
+var TILE_SERVER_ADDR = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 // ratio to get marker width out of marker height
 var H2W_RATIO = 1.64
 
@@ -351,6 +350,18 @@ var MapView = View.extend({
         var self = this;
         var dfd_1 = $.Deferred();
         var dfd_2 = $.Deferred();
+
+        // Reloads additional records when loading records (usefull when additional records depend of records, like in tour lines)
+        var additional_records = self.dataset.get_context().eval().additional_records;
+        if (additional_records) {
+            // Data that we want to display on the map with a fake record marker.
+            self.additional_records = JSON.parse(additional_records);
+        } else {
+            self.additional_records = false;
+        }
+
+        self.record_options.additional_records = self.additional_records;
+
         if (origin === "search" || origin === "reload") {  // get records from datasbase
             dfd_1 = this.get_records(offset, origin)
                     .then(function(){

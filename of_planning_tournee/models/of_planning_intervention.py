@@ -22,27 +22,22 @@ class OfPlanningIntervention(models.Model):
     @api.depends('employee_ids', 'date', 'tournee_ids.date', 'tournee_ids.employee_id', 'state')
     def _compute_tournee_ids(self):
         tournee_obj = self.env['of.planning.tournee']
+        states_to_exclude = tournee_obj._get_intervention_state_values_to_exclude()
         for intervention in self:
             if intervention.employee_ids and intervention.date \
-                    and intervention.state in ('draft', 'confirm', 'done', 'unfinished'):
+                    and intervention.state not in states_to_exclude:
                 tournees = tournee_obj.search([
                     ('employee_id', 'in', intervention.employee_ids.ids),
                     ('date', '=', intervention.date[:10])])
                 intervention.tournee_ids = [(5, 0, 0)] + [(4, le_id, 0) for le_id in tournees._ids]
 
-    def _compute_tour_data_state_values(self):
-        return ['cancel', 'being_optimized']
-
     @api.multi
     def _compute_tour_data(self):
         if self._context.get('active_tour_id'):
-            tour = self.env['of.planning.tournee'].browse(self._context.get('active_tour_id'))
+            tour_obj = self.env['of.planning.tournee']
+            tour = tour_obj.browse(self._context.get('active_tour_id'))
             address_dict = {}
-            tour_interventions = self.search([
-                ('employee_ids', 'in', tour.employee_id.id),
-                ('date', '<=', tour.date),
-                ('date_deadline', '>=', tour.date),
-                ('state', 'not in', self._compute_tour_data_state_values())], order='date')
+            tour_interventions = tour._get_linked_interventions()
             for idx, inter in enumerate(tour_interventions, 1):
                 if not address_dict.get(inter.address_id.id):
                     address_dict[inter.address_id.id] = {inter: idx}
@@ -260,7 +255,8 @@ class OfPlanningIntervention(models.Model):
     def _get_tours_to_update_on_write(self):
         """ Helper function to get tours to update on write. It could be overridden to filter/change tours to update.
         """
-        return self.filtered(lambda i: i.state != 'cancel').mapped('tournee_ids')
+        states_to_exclude = self.env['of.planning.tournee']._get_intervention_state_values_to_exclude()
+        return self.filtered(lambda i: i.state not in states_to_exclude).mapped('tournee_ids')
 
     @api.multi
     def unlink(self):
@@ -332,12 +328,13 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def _get_cancelled_interventions(self, vals):
-        """ Helper function to get interventions whose state has changed to 'cancelled'
+        """ Helper function to get interventions whose state has changed to 'cancelled' or 'postponed'
 
         :param vals: Values to write
         :return: interventions recordset
         """
-        return self.filtered(lambda i: 'state' in vals and vals.get('state') == 'cancel')
+        states_to_exclude = self.env['of.planning.tournee']._get_intervention_state_values_to_exclude()
+        return self.filtered(lambda i: 'state' in vals and vals.get('state') in states_to_exclude)
 
     @api.multi
     def _get_interventions_only_hours_changed(self, vals):
@@ -400,9 +397,9 @@ class OfPlanningIntervention(models.Model):
         """
         self.ensure_one()
         res = []
-        if self.state in ('cancel', 'postponed'):
-            return res
         tournee_obj = self.env['of.planning.tournee']
+        if self.state in tournee_obj._get_intervention_state_values_to_exclude():
+            return res
         dates_eval = self.get_date_tournees()
         address = self.address_id
 

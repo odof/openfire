@@ -294,6 +294,10 @@ class OFPlanningTournee(models.Model):
         self.start_address_id = self.employee_id.of_address_depart_id.id
         self.return_address_id = self.employee_id.of_address_retour_id.id
 
+    @api.model
+    def _get_intervention_state_values_to_exclude(self):
+        return ['cancel', 'postponed', 'being_optimized']
+
     @api.multi
     def _get_linked_interventions(self):
         """ Get the interventions of the tour, sorted by date.
@@ -303,7 +307,7 @@ class OFPlanningTournee(models.Model):
             ('employee_ids', 'in', self.employee_id.id),
             ('date', '<=', self.date),
             ('date_deadline', '>=', self.date),
-            ('state', 'in', ('draft', 'confirm'))], order='date')
+            ('state', 'not in', self._get_intervention_state_values_to_exclude())], order='date')
 
     @api.multi
     def _get_start_address(self):
@@ -949,7 +953,7 @@ class OFPlanningTournee(models.Model):
         # @todo: vérifier pertinence du champ is_blocked avec aymeric
         if vals.get('is_blocked'):
             if intervention_obj.search([('date', '>=', vals['date']), ('date', '<=', vals['date']),
-                                        ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
+                                        ('state', 'not in', self._get_intervention_state_values_to_exclude()),
                                         ('employee_ids', 'in', vals['employee_id'])]):
                 raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
 
@@ -974,7 +978,7 @@ class OFPlanningTournee(models.Model):
                 date_intervention = vals.get('date', tournee.date)
                 employee_id = vals.get('employee_id', tournee.employee_id.id)
                 if intervention_obj.search([('date', '>=', date_intervention), ('date', '<=', date_intervention),
-                                            ('state', 'in', ('draft', 'confirm', 'done', 'unfinished')),
+                                            ('state', 'not in', self._get_intervention_state_values_to_exclude()),
                                             ('employee_ids', 'in', employee_id)]):
                     raise ValidationError(u'Il existe déjà des interventions dans la journée pour cet intervenant.')
 
