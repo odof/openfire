@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrderInput
@@ -123,3 +123,9 @@ class OFGraphql(models.AbstractModel):
         arguments = self._add_arguments(new_arguments, arguments)
 
         return arguments
+
+    @api.model
+    def server_capabilities(self):
+        capabilities = super(OFGraphql, self).server_capabilities()
+        capabilities["mobile"] = True
+        return capabilities
