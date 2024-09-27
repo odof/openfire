@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ir_cron.xml',
+        'data/of_sms_sender.xml',
         'views/of_sms_sender_views.xml',
         'views/res_partner_views.xml',
         'views/sms_sms_views.xml',

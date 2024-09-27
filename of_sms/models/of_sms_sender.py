@@ -7,6 +7,7 @@ class OFSMSSender(models.Model):
     _name = "of.sms.sender"
     _description = "SMS Sender"
 
-    name = fields.Char()
+    name = fields.Char(translate=True)
     sender_name = fields.Char()
     model = fields.Many2one(comodel_name="ir.model", help="Empty means all model")
+    by_default = fields.Boolean()

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="no_sender_name" model="of.sms.sender">
+        <field name="name">No sender name</field>
+        <field name="sender_name"></field>
+    </record>
+
+</odoo>
