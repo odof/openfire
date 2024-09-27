@@ -82,7 +82,7 @@ class SaleOrder(models.Model):
 
     @api.depends('order_line.of_amount_to_invoice')
     def _compute_of_amount_to_invoice_no_prorata(self):
-        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting'),
+        categ_id = self.env['ir.values'].get_default('sale.config.settings', 'of_deposit_product_categ_id_setting')
         product_ids = [
             self.env['ir.values'].get_default('sale.config.settings', 'of_product_prorata_id_setting'),
             self.env['ir.values'].get_default('sale.config.settings', 'of_product_retenue_id_setting'),
