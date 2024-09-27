@@ -4,11 +4,13 @@ import logging
 
 import graphene
 
-from odoo import models
+from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.company_type import Company
+from ..graphql.server_capability_query import ServerCapabilityQuery
+from ..graphql.server_capability_type import ServerCapability
 from ..graphql.user_mutation import UserMutation
 from ..graphql.user_query import UserQuery
 from ..graphql.user_type import User, UserFilterInput, UserInput
@@ -53,6 +55,8 @@ class OFGraphql(models.AbstractModel):
                 Company,
                 UserQuery,
                 UserMutation,
+                ServerCapability,
+                ServerCapabilityQuery,
             ],
         )
 
@@ -93,3 +97,9 @@ class OFGraphql(models.AbstractModel):
                         to_patch.args.update(patch_arguments[prop])
                     else:
                         logger.error(f"Mutation {mutation} doesn't have the prop {prop}, so it cannot be patched.")
+
+    @api.model
+    def server_capabilities(self):
+        """Retourne un dictionnaire des capacités du serveur
+        La clé est le nom de la capacité et la valeur est un booleen indiquant si la capacité est activée."""
+        return {}
