@@ -14,13 +14,19 @@ class SmsApi(models.AbstractModel):
         sms = self.env["sms.sms"].browse(sms_id)
         params = super()._prepare_ovh_http_params(account, sms.number, message)
 
+        sender_name = sms.of_sender_id.sender_name or ""
+
         params.update(
             {
-                "from": sms.of_sender_id.sender_name or account.sms_ovh_http_from,
+                "from": sender_name,
                 "noStop": "0" if sms.of_is_commercial else "1",
                 "to": sms.number,
             }
         )
+
+        if sender_name == "":
+            params.update({"senderForResponse": 1})
+
         return params
 
     def _send_sms_with_ovh_http(self, number, message, sms_id):

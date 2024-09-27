@@ -17,6 +17,8 @@ Expéditeur (`of.sms.sender`)
 
 * Cela permet de définir des expéditeurs de SMS en fonction du modèle Odoo (partenaire, intervention, etc.).
 
+* Ajout d'un expéditeur "Sans nom" qui permet d'envoyer des SMS sans avoir à configurer de noms d'expéditeurs chez OVH.
+
 
 SMS (`sms.sms`)
 ---------------

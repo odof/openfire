@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / SMS",
-    'version': "16.0.1.0.0",
+    'version': "16.0.1.1.0",
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
@@ -16,6 +16,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ir_cron.xml',
+        'data/of_sms_sender.xml',
         'views/of_sms_sender_views.xml',
         'views/res_partner_views.xml',
         'views/sms_sms_views.xml',

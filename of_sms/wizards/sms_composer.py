@@ -15,13 +15,22 @@ class SendSMS(models.TransientModel):
     def default_get(self, fields):
         result = super().default_get(fields)
         model = result.get("res_model")
+        sender = self.env["of.sms.sender"]
 
         if model and not result.get("of_sender_id"):
             if ir_model := self.env["ir.model"].search([("model", "=", model)], limit=1):
-                sender = self.env["of.sms.sender"].search([("model", "=", ir_model.id)], limit=1)
-            else:
-                sender = self.env["of.sms.sender"].search([("model", "=", "")], limit=1)
-            result["of_sender_id"] = sender.id
+                sender = self.env["of.sms.sender"].search(
+                    [("model", "=", ir_model.id), ("by_default", "=", True)], limit=1
+                ) or self.env["of.sms.sender"].search([("model", "=", ir_model.id)], limit=1)
+
+        if not sender:
+            sender = self.env["of.sms.sender"].search([("by_default", "=", True), ("model", "=", False)], limit=1)
+        if not sender:
+            sender = self.env["of.sms.sender"].search([("by_default", "=", True)], limit=1)
+        if not sender:
+            sender = self.env["of.sms.sender"].search([("model", "=", False)], limit=1)
+
+        result["of_sender_id"] = sender.id
 
         if model == "res.partner":
             if numbers := self.env["res.partner"].browse(result.get("res_id")).get_mobile_numbers():
