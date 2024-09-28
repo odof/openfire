@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- ################# Module category ################# -->
+
+    <record id="of_refrigerant_management_category" model="ir.module.category">
+        <field name="name">OF refrigerant management</field>
+        <field name="description">Defines access rights to the OpenFire refrigerant management</field>
+        <field name="sequence">95</field>
+    </record>
+
+    <!-- ################# Refrigerant management access right groups ################# -->
+
+
+    <!-- Rights to modify refrigerant management -->
+    <!-- User -->
+    <record id="group_refrigerant_management_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="category_id" ref="of_refrigerant_management_category" />
+    </record>
+
+    <!-- Manager -->
+    <record id="group_refrigerant_management_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="category_id" ref="of_refrigerant_management_category" />
+        <field name="users" eval="[Command.link(ref('base.user_root')), Command.link(ref('base.user_admin'))]"/>
+        <field name="implied_ids" eval="[(4, ref('group_refrigerant_management_user'))]" />
+    </record>
+</odoo>

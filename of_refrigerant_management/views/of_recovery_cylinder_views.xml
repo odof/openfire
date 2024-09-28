@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_recovery_cylinder_view_tree" model="ir.ui.view">
+        <field name="name">of.recovery.cylinder.view.tree</field>
+        <field name="model">of.recovery.cylinder</field>
+        <field name="arch" type="xml">
+            <tree string="Recovery cylinders">
+                <field name="name"/>
+                <field name="fluid_type_id"/> 
+                <field name="total_capacity"/>
+            </tree>
+        </field>
+    </record>
+ 
+    <record id="of_recovery_cylinder_view_form" model="ir.ui.view">
+        <field name="name">of.recovery.cylinder.view.form</field>
+        <field name="model">of.recovery.cylinder</field>
+        <field name="arch" type="xml">
+            <form>
+                <header></header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <div class="oe_button_box" name="button_box">
+                        <field name="active" invisible="1" />
+                    </div>
+                    <group>
+                        <group name="equipment" string="Recovery cylinder">
+                            <field name="name"/>
+                            <field name="total_capacity" />
+                            <field name="fluid_type_id"/> 
+                            <field name="employee_id"/> 
+                            <field name="supplier_id"/> 
+                            <field name="delivery_date"/> 
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_recovery_cylinder_view_search" model="ir.ui.view">
+        <field name="name">of.recovery.cylinder.view.search</field>
+        <field name="model">of.recovery.cylinder</field>
+        <field name="arch" type="xml">
+            <search string="Recovery cylinders">
+                <field name="name"/>
+                <field name="supplier_id"/>
+                <field name="employee_id"/>
+                <separator/>
+                <filter string="Archived" name="active" domain="[('active', '=', False)]"/>
+                <group string="Group By" name="groupby">
+                    <filter name="fluid_type_groupby" string="Fluid type " context="{'group_by': 'fluid_type_id'}"/>
+                    <filter name="supplier_groupby" string="Supplier" context="{'group_by': 'supplier_id'}"/>
+                    <filter name="employee_groupby" string="Employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_recovery_cylinder" model="ir.actions.act_window">
+        <field name="name">Recycling cylinders</field>
+        <field name="res_model">of.recovery.cylinder</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_refrigerant_management.of_recovery_cylinder_view_tree"/>
+        <field name="search_view_id" ref="of_refrigerant_management.of_recovery_cylinder_view_search"/>
+    </record>
+
+</odoo>

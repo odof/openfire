@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+        <record id="fluid_type_r22" model="of.fluid.type">
+            <field name="name">R22</field>
+            <field name="gwp">1500</field>    
+            <field name="category">hcfc</field>
+        </record>
+        <record id="fluid_type_r32" model="of.fluid.type">
+            <field name="name">R32</field>
+            <field name="gwp">675</field>    
+            <field name="category">hfc</field>
+        </record>
+        <record id="fluid_type_r448a" model="of.fluid.type">
+            <field name="name">R448A</field>
+            <field name="gwp">1386</field>    
+            <field name="category">hfc</field>
+        </record>
+</odoo>
