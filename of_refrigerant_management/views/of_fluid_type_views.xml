@@ -1,0 +1,51 @@
+<odoo>
+    <record id="of_fluid_type_view_tree" model="ir.ui.view">
+        <field name="name">of.fluid.type.tree</field>
+        <field name="model">of.fluid.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="gwp"/>
+                <field name="category"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fluid_type_view_form" model="ir.ui.view">
+        <field name="name">of.fluid.type.form</field>
+        <field name="model">of.fluid.type</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="gwp"/>
+                        <field name="category"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_fluid_type_view_search" model="ir.ui.view">
+        <field name="name">of.fluid.type.view.search</field>
+        <field name="model">of.fluid.type</field>
+        <field name="arch" type="xml">
+            <search string="Recovery cylinders">
+                <field name="name"/>
+                <separator/>
+                <filter string="CFC" name="cfc" domain="[('category', '=', 'cfc')]"/>
+                <filter string="HCFC" name="hcfc" domain="[('category', '=', 'hcfc')]"/>
+                <filter string="HFC" name="hfc" domain="[('category', '=', 'hfc')]"/>
+                <filter string="Archived" name="active" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_fluid_type" model="ir.actions.act_window">
+        <field name="name">Fluid Types</field>
+        <field name="res_model">of.fluid.type</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_refrigerant_management.of_fluid_type_view_search"/>
+    </record>
+</odoo>
