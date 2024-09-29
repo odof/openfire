@@ -87,6 +87,18 @@ class SaleOrderLine(models.Model):
             self.price_unit = self.price_unit + self.of_unit_eco_contribution
         return result
 
+    @api.onchange('of_product_forbidden_discount')
+    def _onchange_of_product_forbidden_discount(self):
+        result = super(SaleOrderLine, self)._onchange_of_product_forbidden_discount()
+        if self.of_product_forbidden_discount and self.product_id:
+            price_unit = self.product_id.list_price
+            if not self.env['ir.values'].sudo().get_default(
+                    'account.config.settings', 'of_eco_contribution_price_included'):
+                # L'éco-contribution doit être incluse dans le prix unitaire
+                price_unit += self.of_unit_eco_contribution
+            self.price_unit = price_unit
+        return result
+
     @api.depends(
         'product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'price_subtotal', 'of_total_eco_contribution'
     )
