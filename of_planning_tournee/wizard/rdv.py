@@ -240,7 +240,7 @@ class OfTourneeRdv(models.TransientModel):
         "the previous/next coordinates")
     map_description_html = fields.Html(string="Map description", compute='_compute_intervention_map_data')
     map_tour_line_ids = fields.One2many(
-        comodel_name='of.planning.tour.line', related='map_tour_id.tour_line_ids', string="Tour lines")
+        comodel_name='of.planning.tour.line', related='map_tour_id.tour_line_ids', string="Tour lines", readonly=True)
 
     name = fields.Char(string=u"Libellé", size=64, required=False)
     description = fields.Text(string="Description")
@@ -476,7 +476,6 @@ class OfTourneeRdv(models.TransientModel):
                     "<span style=\"font-size: x-small;font-weight: bold;%s\">Tour of %s, on %s</span>") % (
                         color, line_employee.name, line_day_str)
             wizard.map_description_html = map_description_html
-            wizard.map_tour_line_ids = tour.map_tour_line_ids if tour else []
 
     # @api.onchange
     @api.onchange('search_period_in_days')

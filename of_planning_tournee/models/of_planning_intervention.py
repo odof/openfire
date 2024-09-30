@@ -467,6 +467,6 @@ class OfPlanningIntervention(models.Model):
     @api.model
     def custom_get_color_map(self):
         title = ""
-        v0 = {'label': u"DI à planifier", 'value': 'green'}
+        v0 = {'label': u"Intervention à planifier", 'value': 'green'}
         v1 = {'label': u'Intervention(s) de la tournée', 'value': 'blue'}
         return {"title": title, "values": (v0, v1)}
