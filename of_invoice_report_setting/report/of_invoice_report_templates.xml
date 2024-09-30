@@ -64,6 +64,7 @@
             <!-- price -->
             <t t-set="pdf_price_taxexcl" t-value="o.pdf_invoice_invoice_price_taxexcl()"/>
             <t t-set="pdf_price_taxinc" t-value="o.pdf_invoice_invoice_price_taxinc()"/>
+            <t t-set="pdf_invoice_product_reference" t-value="o.pdf_invoice_product_reference()"/>
         </xpath>
         <!-- /Settings block -->
 
@@ -229,6 +230,10 @@
             <attribute name="t-att-style">'background-color: ' + o.pdf_invoice_get_color_section() + ' !important; color: ' + o.pdf_invoice_get_color_font() + ' !important;'</attribute>
         </xpath>
 
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th t-if="pdf_invoice_product_reference" name="th_product_reference" class="text-start">Reference</th>
+        </xpath>
+
         <xpath expr="//th[@name='th_priceunit']" position="replace">
             <th name="th_priceunit_taxexcl" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxexcl">Unit Price Tax excl.</th>
             <th name="th_priceunit_taxinc" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxinc">Unit Price Tax incl.</th>
@@ -237,6 +242,12 @@
         <xpath expr="//th[@name='th_subtotal']" position="replace">
             <th name="th_subtotal_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Price Tax excl.</th>
             <th name="th_subtotal_taxinc" class="text-end" t-if="pdf_price_taxinc">Price Tax incl.</th>
+        </xpath>
+
+        <xpath expr="//td[@name='account_invoice_line_name']" position="before">
+            <td t-if="pdf_invoice_product_reference" >
+                <span t-field="line.product_id.default_code"/>
+            </td>
         </xpath>
 
         <xpath expr="//span[@t-field='line.price_unit']/.." position="replace">

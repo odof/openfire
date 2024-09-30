@@ -132,8 +132,11 @@ class AccountMove(models.Model):
 
     def pdf_invoice_get_color_section(self):
         """Get the color of the section background for the PDF invoice."""
-        return self.env.company.pdf_invoice_section_bg_color
+        return self.company_id.pdf_invoice_section_bg_color
 
     def pdf_invoice_get_color_font(self):
         """Get the color of the section font for the PDF invoice."""
-        return self.env.company.pdf_invoice_section_font_color
+        return self.company_id.pdf_invoice_section_font_color
+
+    def pdf_invoice_product_reference(self):
+        return self.company_id.pdf_invoice_product_reference
