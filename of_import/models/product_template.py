@@ -4,8 +4,8 @@ from odoo import fields, models
 
 
 class ProductTemplate(models.Model):
-    _name = 'product.template'
-    _inherit = ['product.template', 'of.import.product.config.template']
+    _name = "product.template"
+    _inherit = ["product.template", "of.import.product.config.template"]
 
     of_is_net_price = fields.Boolean(
         string="Based on net price",
