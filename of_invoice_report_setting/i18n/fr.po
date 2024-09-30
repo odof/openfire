@@ -615,6 +615,11 @@ msgid "Product reference (Invoice report settings)"
 msgstr "Référence produit"
 
 #. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.report_invoice_document
+msgid "Reference"
+msgstr "Référence"
+
+#. module: of_invoice_report_setting
 #: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_salesperson_email
 msgid "Salesperson Email (Invoice report settings)"
 msgstr "Email vendeur"
