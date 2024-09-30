@@ -40,7 +40,7 @@ def compute_discount(*discounts):
 def _compute_encoding(file_enc):
     try:
         if result := chardet.detect(file_enc):
-            return result['encoding']
+            return result["encoding"]
         else:
             raise UserError("Encoding not recognized")
     except Exception as e:
@@ -60,11 +60,11 @@ def _read_csv(file, separator=None):
     file_encoding = _compute_encoding(csv_data)
 
     # Encode en utf-8
-    if file_encoding != 'utf-8':
-        csv_data = csv_data.decode(file_encoding).encode('utf-8')
+    if file_encoding != "utf-8":
+        csv_data = csv_data.decode(file_encoding).encode("utf-8")
 
-    if separator and separator.strip(' '):
-        dialect.delimiter = separator.strip(' ').replace('\\t', '\t')
+    if separator and separator.strip(" "):
+        dialect.delimiter = separator.strip(" ").replace("\\t", "\t")
 
     reader = csv.DictReader(StringIO(csv_data), dialect=dialect)
 
@@ -72,12 +72,12 @@ def _read_csv(file, separator=None):
     for row in reader:
         if first:
             first = False
-            yield [item.strip().decode('utf8', 'ignore') for item in row]
+            yield [item.strip().decode("utf8", "ignore") for item in row]
         if not any(x for x in row if x.strip()):
             # Ligne vide
             continue
         yield {
-            key.strip().decode('utf8', 'ignore'): value.strip().decode('utf8', 'ignore')
+            key.strip().decode("utf8", "ignore"): value.strip().decode("utf8", "ignore")
             for key, value in row.iteritems()
         }
 
@@ -105,7 +105,7 @@ def _read_xls(file):
                     else dt.strftime(DEFAULT_SERVER_DATE_FORMAT)
                 )
             elif cell.ctype is xlrd.XL_CELL_BOOLEAN:
-                values.append('True' if cell.value else 'False')
+                values.append("True" if cell.value else "False")
             elif cell.ctype is xlrd.XL_CELL_ERROR:
                 raise ValueError(
                     _("Error cell found while reading XLS/XLSX file: %s")
@@ -142,11 +142,11 @@ def _read_xlsx(file):
                     else cell.strftime(DEFAULT_SERVER_DATE_FORMAT)
                 )
             elif isinstance(cell, bool):
-                values.append('True' if cell else 'False')
+                values.append("True" if cell else "False")
             elif cell in ERROR_CODES:
                 raise ValueError(_(f"Error cell found while reading XLSX file: {cell}"))
             else:
-                values.append(cell.strip() if cell else '')
+                values.append(cell.strip() if cell else "")
         if any(values):
             if header:
                 yield {header[i]: values[i] for i in range(len(header))}
@@ -157,39 +157,39 @@ def _read_xlsx(file):
 
 def _get_odoo_fields_attachment():
     return {
-        'name': {
-            'description': "Label",
-            'required': True,
-            'type': 'char',
-            'lang': False,
-            'translate': False,
+        "name": {
+            "description": "Label",
+            "required": True,
+            "type": "char",
+            "lang": False,
+            "translate": False,
         },
-        'store_fname': {
-            'description': "Filepath",
-            'required': True,
-            'type': 'char',
-            'lang': False,
-            'translate': False,
+        "store_fname": {
+            "description": "Filepath",
+            "required": True,
+            "type": "char",
+            "lang": False,
+            "translate": False,
         },
-        'res_model': {
-            'description': "Model",
-            'required': True,
-            'type': 'char',
-            'lang': False,
-            'translate': False,
+        "res_model": {
+            "description": "Model",
+            "required": True,
+            "type": "char",
+            "lang": False,
+            "translate": False,
         },
-        'res_id': {
-            'description': "Product reference",
-            'required': True,
-            'type': 'char',
-            'lang': False,
-            'translate': False,
+        "res_id": {
+            "description": "Product reference",
+            "required": True,
+            "type": "char",
+            "lang": False,
+            "translate": False,
         },
-        'res_field': {
-            'description': "Field (or empty if attachement)",
-            'required': False,
-            'type': 'char',
-            'lang': False,
-            'translate': False,
+        "res_field": {
+            "description": "Field (or empty if attachement)",
+            "required": False,
+            "type": "char",
+            "lang": False,
+            "translate": False,
         },
     }

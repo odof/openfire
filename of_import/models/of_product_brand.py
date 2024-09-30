@@ -9,34 +9,34 @@ from .utils import compute_discount
 
 
 class OFProductBrand(models.Model):
-    _name = 'of.product.brand'
-    _inherit = ['of.product.brand', 'of.import.product.config.template']
+    _name = "of.product.brand"
+    _inherit = ["of.product.brand", "of.import.product.config.template"]
 
     categ_ids = fields.One2many(
-        comodel_name='of.import.product.categ.config', inverse_name='brand_id', string="Categories"
+        comodel_name="of.import.product.categ.config", inverse_name="brand_id", string="Categories"
     )
     product_config_ids = fields.One2many(
-        comodel_name='product.template',
+        comodel_name="product.template",
         string="Products",
-        compute='_compute_product_config_ids',
+        compute="_compute_product_config_ids",
         domain="[('brand_id', '=', id)]",
     )
 
-    of_import_sale_price = fields.Char(required=True, default='ppht', string="Sale Price")
-    of_import_cost_price = fields.Char(required=True, default='pa', string="Cost Price")
-    of_import_categ_id = fields.Many2one(comodel_name='product.category', required=True, string="Category")
+    of_import_sale_price = fields.Char(required=True, default="ppht", string="Sale Price")
+    of_import_cost_price = fields.Char(required=True, default="pa", string="Cost Price")
+    of_import_categ_id = fields.Many2one(comodel_name="product.category", required=True, string="Category")
 
     # -------------------------------------------------------------------------
     # Compute methods
     # -------------------------------------------------------------------------
 
-    @api.depends('product_ids.of_import_sale_price', 'product_ids.of_import_discount', 'product_ids.of_import_categ_id')
+    @api.depends("product_ids.of_import_sale_price", "product_ids.of_import_discount", "product_ids.of_import_categ_id")
     def _compute_product_config_ids(self):
-        product_obj = self.env['product.template']
+        product_obj = self.env["product.template"]
         fields_list = self._get_config_field_list()
-        domain = ['|'] * (len(fields_list) - 1) + [(field, '!=', False) for field in fields_list]
+        domain = ["|"] * (len(fields_list) - 1) + [(field, "!=", False) for field in fields_list]
         for brand in self:
-            brand.product_config_ids = product_obj.search([('brand_id', '=', brand.id)] + domain)
+            brand.product_config_ids = product_obj.search([("brand_id", "=", brand.id)] + domain)
 
     # -------------------------------------------------------------------------
     # ORM methods
@@ -44,11 +44,11 @@ class OFProductBrand(models.Model):
 
     def write(self, vals):
         res = super().write(vals)
-        if vals.get('product_config_ids'):
-            product_obj = self.env['product.template']
+        if vals.get("product_config_ids"):
+            product_obj = self.env["product.template"]
             fields_list = self._get_config_field_list()
             deleted_product_ids = []
-            for line in vals['product_config_ids']:
+            for line in vals["product_config_ids"]:
                 # For the value "line[0] == 4" no modification allowed here and we don't want to update the Product.
                 # For the value "line[0] == 0" we will do nothing because we are assuming that nobody would create
                 # a Product here.
@@ -71,7 +71,7 @@ class OFProductBrand(models.Model):
     def action_button_update_products(self):
         """Recalculates item fields according to brand configuration and item import parameters
         (in product_supplierinfo)"""
-        self.mapped('product_ids').action_button_update_from_brand()
+        self.mapped("product_ids").action_button_update_from_brand()
 
     # -------------------------------------------------------------------------
     # Business methods
@@ -92,8 +92,8 @@ class OFProductBrand(models.Model):
             return product.of_import_categ_id
 
         # Configuration de la catégorie dans la marque pour ce nom de catégorie fournisseur
-        categ_config = self.env['of.import.product.categ.config'].search(
-            [('brand_id', '=', self.id), ('categ_origin', '=', categ_name)]
+        categ_config = self.env["of.import.product.categ.config"].search(
+            [("brand_id", "=", self.id), ("categ_origin", "=", categ_name)]
         )
         if categ_config and categ_config.of_import_categ_id:
             return categ_config.of_import_categ_id
@@ -134,8 +134,8 @@ class OFProductBrand(models.Model):
         if not other_vals:
             other_vals = {}
 
-        categ_config = self.env['of.import.product.categ.config'].search(
-            [('brand_id', '=', self.id), ('categ_origin', '=', categ_name)]
+        categ_config = self.env["of.import.product.categ.config"].search(
+            [("brand_id", "=", self.id), ("categ_origin", "=", categ_name)]
         )
 
         udm_ratio = uom_po._compute_price(1.0, uom) if uom_po else 1.0
@@ -145,23 +145,23 @@ class OFProductBrand(models.Model):
         if (
             not product
             or product.id < 0
-            or product.cost_method == 'standard'
+            or product.cost_method == "standard"
             or product.categ_id.of_import_update_standard_price
         ):
             # Do not calculate the cost for items that use real cost or average cost
-            price_fields.append(('of_import_cost_price', 'standard_price', _("Cost Price")))
+            price_fields.append(("of_import_cost_price", "standard_price", _("Cost Price")))
 
         values = self._calculate_price_fields(
             price_fields, product, categ_config, eval_dict, public_price_untaxed, price, discount, based_on_price
         )
-        values['of_seller_pp_untaxed'] = eval_dict['ppht']
-        values['of_seller_price'] = eval_dict['pa']
-        if 'list_price' in values:
-            values['list_price'] *= udm_ratio
-        if 'standard_price' in values:
-            values['standard_price'] *= udm_ratio
-        if 'of_theoretical_cost' in values:
-            values['of_theoretical_cost'] *= udm_ratio
+        values["of_seller_pp_untaxed"] = eval_dict["ppht"]
+        values["of_seller_price"] = eval_dict["pa"]
+        if "list_price" in values:
+            values["list_price"] *= udm_ratio
+        if "standard_price" in values:
+            values["standard_price"] *= udm_ratio
+        if "of_theoretical_cost" in values:
+            values["of_theoretical_cost"] *= udm_ratio
         return values
 
     def compute_product_values(
@@ -207,7 +207,7 @@ class OFProductBrand(models.Model):
             cost=cost,
             based_on_price=based_on_price,
         )
-        values['categ_id'] = categ.id
+        values["categ_id"] = categ.id
         return values
 
     def _calculate_price_fields(
@@ -230,28 +230,28 @@ class OFProductBrand(models.Model):
         for config_field, product_field, text in price_fields:
             for obj in (product, categ_config, self):
                 if obj and obj[config_field]:
-                    if product_field == 'list_price' and obj[config_field].strip() == 'pv':
+                    if product_field == "list_price" and obj[config_field].strip() == "pv":
                         # Do nothing, keep the sale price unchanged
                         break
                     value = safe_eval(obj[config_field], eval_dict)
-                    if product_field == 'discount':
+                    if product_field == "discount":
                         if based_on_price:
                             # Sale price based on the purchase price
                             if not price:
                                 # During an import, there is often only one column for both values
                                 # The sale price becomes the purchase price
-                                eval_dict['pa'] = public_price_untaxed
+                                eval_dict["pa"] = public_price_untaxed
                                 price = public_price_untaxed
-                            eval_dict['ppht'] = price * 100.0 / (100.0 - value)
+                            eval_dict["ppht"] = price * 100.0 / (100.0 - value)
                         else:
                             # Once the discount is calculated, add the purchase price to eval_dict
                             # for the calculation of the final cost
-                            eval_dict['pa'] = public_price_untaxed * (100.0 - value) / 100.0
+                            eval_dict["pa"] = public_price_untaxed * (100.0 - value) / 100.0
                     else:
                         values[product_field] = value
                     break
             else:  # no break occurred
-                if product_field != 'discount':
+                if product_field != "discount":
                     raise OfImportError(
                         _(
                             "No formula is provided for %(text)s of this item (brand to be configured: %(name)s)..",
@@ -263,19 +263,19 @@ class OFProductBrand(models.Model):
                 # If the discount formula is not specified, keep the original purchase price
                 if price is not None:
                     # The price is specified at the import level
-                    eval_dict['pa'] = price
+                    eval_dict["pa"] = price
                 elif discount is not None:
                     # The discount is specified at the import level
                     if based_on_price:
                         # Sale price based on the purchase price
-                        eval_dict['ppht'] = price * 100.0 / (100.0 - discount)
+                        eval_dict["ppht"] = price * 100.0 / (100.0 - discount)
                     else:
                         # Once the discount is calculated, add the purchase price to eval_dict
                         # for the calculation of the final cost
-                        eval_dict['pa'] = public_price_untaxed * (100.0 - discount) / 100.0
+                        eval_dict["pa"] = public_price_untaxed * (100.0 - discount) / 100.0
                 elif product:
                     # The item already exists, keep its purchase price
-                    eval_dict['pa'] = product.of_seller_price
+                    eval_dict["pa"] = product.of_seller_price
                 else:
                     # The formula is not specified and no value can be deduced
                     raise OfImportError(
@@ -290,9 +290,9 @@ class OFProductBrand(models.Model):
     def _get_price_fields(self):
         """Get the list of price fields to be calculated."""
         return [
-            ('of_import_discount', 'discount', _("Discount")),
-            ('of_import_sale_price', 'list_price', _("Selling price excluding taxes")),
-            ('of_import_cost_price', 'of_theoretical_cost', _("Theoretical cost")),
+            ("of_import_discount", "discount", _("Discount")),
+            ("of_import_sale_price", "list_price", _("Selling price excluding taxes")),
+            ("of_import_cost_price", "of_theoretical_cost", _("Theoretical cost")),
         ]
 
     def _get_eval_dict(self, public_price_untaxed, price, cost, other_vals, product, udm_ratio):
@@ -301,16 +301,16 @@ class OFProductBrand(models.Model):
         They are also used to explain the user what he can use in the formulas.
         """
         return {
-            'ppht': public_price_untaxed,
-            'pa': price,
-            'pr': cost,
-            'cumul': compute_discount,
-            'udm_ratio': udm_ratio,
+            "ppht": public_price_untaxed,
+            "pa": price,
+            "pr": cost,
+            "cumul": compute_discount,
+            "udm_ratio": udm_ratio,
             # Pricing structure
-            'tr_a': other_vals.get('of_purchase_transport', product and product.of_purchase_transport or 0),
-            'tr_v': other_vals.get('of_sale_transport', product and product.of_sale_transport or 0),
-            'coef': other_vals.get('of_sale_coeff', product and product.of_sale_coeff or 0),
-            'fr_l': other_vals.get('of_other_logistic_costs', product and product.of_other_logistic_costs or 0),
-            'taxe': other_vals.get('of_misc_taxes', product and product.of_misc_taxes or 0),
-            'fr_d': other_vals.get('of_misc_costs', product and product.of_misc_costs or 0),
+            "tr_a": other_vals.get("of_purchase_transport", product and product.of_purchase_transport or 0),
+            "tr_v": other_vals.get("of_sale_transport", product and product.of_sale_transport or 0),
+            "coef": other_vals.get("of_sale_coeff", product and product.of_sale_coeff or 0),
+            "fr_l": other_vals.get("of_other_logistic_costs", product and product.of_other_logistic_costs or 0),
+            "taxe": other_vals.get("of_misc_taxes", product and product.of_misc_taxes or 0),
+            "fr_d": other_vals.get("of_misc_costs", product and product.of_misc_costs or 0),
         }
