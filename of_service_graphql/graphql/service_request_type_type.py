@@ -8,17 +8,17 @@ from .service_request_stage_type import ServiceRequestStage, ServiceRequestStage
 
 
 class ServiceRequestType(OdooObjectType):
-    _name = 'ServiceRequestType'
-    _type = 'types'
+    _name = "ServiceRequestType"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.NonNull(graphene.String)
-    stage_ids = graphene.List(graphene.NonNull(ServiceRequestStage), name='stages')
+    stage_ids = graphene.List(graphene.NonNull(ServiceRequestStage), name="stages")
 
 
 class ServiceRequestTypeInput(graphene.InputObjectType):
-    _name = 'ServiceRequestTypeInput'
-    _type = 'types'
+    _name = "ServiceRequestTypeInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -26,4 +26,4 @@ class ServiceRequestTypeInput(graphene.InputObjectType):
 
 
 class ServiceRequestTypeFilterInput(ServiceRequestTypeInput):
-    _name = 'ServiceRequestTypeFilterInput'
+    _name = "ServiceRequestTypeFilterInput"

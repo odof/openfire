@@ -8,8 +8,8 @@ from odoo.addons.of_survey_graphql.graphql.survey_user_input_type import SurveyU
 
 
 class PlanningIntervention(OdooObjectType):
-    _name = 'PlanningIntervention'
-    _type = 'types'
+    _name = "PlanningIntervention"
+    _type = "types"
 
     survey = graphene.Field(Survey)
     survey_user_input = graphene.Field(SurveyUserInput)

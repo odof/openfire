@@ -8,50 +8,50 @@ from odoo.tools import float_is_zero
 from odoo.tools.misc import get_lang
 
 AVAILABLE_ENCODING = [
-    ('utf-8', "UTF-8"),
-    ('iso-8859-1', "ISO-8859-1"),
-    ('windows-1252', "Windows-1252"),
+    ("utf-8", "UTF-8"),
+    ("iso-8859-1", "ISO-8859-1"),
+    ("windows-1252", "Windows-1252"),
 ]
 
 
 class OFAccountFrFec(models.TransientModel):
-    _inherit = 'account.fr.fec'
+    _inherit = "account.fr.fec"
 
     def _get_default_opening_journal_label(self):
         return "Balance initiale"
 
     def _get_defaut_journal_ids(self):
-        return self.env['account.journal'].search([]).ids
+        return self.env["account.journal"].search([]).ids
 
     of_journal_ids = fields.Many2many(
-        comodel_name='account.journal',
-        relation='of_account_fec_wiz_journal_ids_rel',
-        column1='wizard_id',
-        column2='journal_id',
+        comodel_name="account.journal",
+        relation="of_account_fec_wiz_journal_ids_rel",
+        column1="wizard_id",
+        column2="journal_id",
         string="Journals",
         required=True,
         default=lambda self: self._get_defaut_journal_ids(),
     )
     of_order_by = fields.Selection(
-        selection=[('sort_date', 'Date'), ('sort_journal_partner', 'Journal & Partner')],
+        selection=[("sort_date", "Date"), ("sort_journal_partner", "Journal & Partner")],
         string="Sort by",
         required=True,
-        default='sort_date',
+        default="sort_date",
     )
     export_type = fields.Selection(
-        selection_add=[('nonofficial_posted', "Non-official FEC report (posted entries only)")],
-        ondelete={'nonofficial_posted': 'set default'},
+        selection_add=[("nonofficial_posted", "Non-official FEC report (posted entries only)")],
+        ondelete={"nonofficial_posted": "set default"},
     )
     of_file_extension = fields.Selection(
-        selection=[('csv', 'CSV'), ('txt', 'TXT')], string="File extension", required=True, default='csv'
+        selection=[("csv", "CSV"), ("txt", "TXT")], string="File extension", required=True, default="csv"
     )
     of_output_encoding = fields.Selection(
         selection=AVAILABLE_ENCODING,
         string="File encoding",
         required=True,
-        default='utf-8',
+        default="utf-8",
     )
-    of_opening_journal_code = fields.Char(string="Opening journal code", required=True, default='OUV')
+    of_opening_journal_code = fields.Char(string="Opening journal code", required=True, default="OUV")
     of_opening_journal_label = fields.Char(
         string="Opening Journal Label", required=True, default=lambda self: self._get_default_opening_journal_label()
     )
@@ -63,7 +63,7 @@ class OFAccountFrFec(models.TransientModel):
     )
 
     def _do_query_unaffected_earnings(self):
-        '''Copy of l10n_fr_fec method.
+        """Copy of l10n_fr_fec method.
 
         If the export type is "official", that will call the standard method.
         If the export type is "nonofficial" or "nonofficial_posted", that will return the specifics Openfire query
@@ -72,13 +72,13 @@ class OFAccountFrFec(models.TransientModel):
             - allow to use the date of creation of the move instead of the date of the move.
             Because some customers want to use the date of creation of the move for monthly export
             to an Accounting software.
-        '''
-        if self.export_type == 'official':
+        """
+        if self.export_type == "official":
             return super()._do_query_unaffected_earnings()
 
-        date_clause = 'am.date < %s'
+        date_clause = "am.date < %s"
         if self.of_use_create_date:
-            date_clause = 'am.create_date < %s'
+            date_clause = "am.create_date < %s"
 
         debit_select = (
             "replace(CASE WHEN COALESCE(sum(aml.balance), 0) <= 0 THEN '0,00' "
@@ -88,7 +88,8 @@ class OFAccountFrFec(models.TransientModel):
             "replace(CASE WHEN COALESCE(sum(aml.balance), 0) >= 0 THEN '0,00' "
             "ELSE to_char(-SUM(aml.balance), '000000000000000D99') END, '.', ',')"
         )
-        sql_query = f'''
+
+        sql_query = f"""
         SELECT
             %s AS JournalCode,
             %s AS JournalLib,
@@ -117,18 +118,18 @@ class OFAccountFrFec(models.TransientModel):
             AND am.company_id = %s
             AND aa.include_initial_balance IS NOT TRUE
             AND am.journal_id IN %s
-        '''  # nosec B608
+        """  # nosec B608 # noqa: E221, E231, E241
 
-        if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+        if self.export_type == "nonofficial_posted":
+            sql_query += """
             AND am.state = 'posted'
-            '''
+            """
 
         company = self.env.company
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
 
-        formatted_date_from = fields.Date.to_string(self.date_from).replace('-', '')
+        formatted_date_from = fields.Date.to_string(self.date_from).replace("-", "")
         args = (
             self.of_opening_journal_code,
             self.of_opening_journal_label,
@@ -144,7 +145,7 @@ class OFAccountFrFec(models.TransientModel):
         return list(row)
 
     def generate_fec(self):
-        '''Copy of l10n_fr_fec method.
+        """Copy of l10n_fr_fec method.
         If the export type is "official", the FEC file will be generated by the standard method.
 
         If the export type is "nonofficial" or "nonofficial_posted", the FEC file will be generated with the
@@ -152,56 +153,56 @@ class OFAccountFrFec(models.TransientModel):
             - allow to use the date of creation of the move instead of the date of the move.
             - allow to don't export the opening journal.
             - added a specific customisation of the file extension.
-        '''
+        """
         self.ensure_one()
-        if not (self.env.is_admin() or self.env.user.has_group('account.group_account_user')):
+        if not (self.env.is_admin() or self.env.user.has_group("account.group_account_user")):
             raise AccessDenied()
 
         today = fields.Date.today()
         if self.date_from > today or self.date_to > today:
-            raise UserError(_('You could not set the start date or the end date in the future.'))
+            raise UserError(_("You could not set the start date or the end date in the future."))
         if self.date_from >= self.date_to:
-            raise UserError(_('The start date must be inferior to the end date.'))
+            raise UserError(_("The start date must be inferior to the end date."))
 
         company = self.env.company
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
         company_legal_data = self._get_company_legal_data(company)
 
-        if self.export_type == 'official':  # use parent function instead
+        if self.export_type == "official":  # use parent function instead
             result = super().generate_fec()
-            if self.of_file_extension != 'csv':
+            if self.of_file_extension != "csv":
                 old_filename = self.filename
                 new_filename = old_filename[:-3] + self.of_file_extension if old_filename else old_filename
-                self.write({'filename': new_filename})
-                result['url'] = result['url'].replace(old_filename, new_filename)
+                self.write({"filename": new_filename})
+                result["url"] = result["url"].replace(old_filename, new_filename)
             return result
 
         header = [
-            'JournalCode',  # 0
-            'JournalLib',  # 1
-            'EcritureNum',  # 2
-            'EcritureDate',  # 3
-            'CompteNum',  # 4
-            'CompteLib',  # 5
-            'CompAuxNum',  # 6  We use partner.id
-            'CompAuxLib',  # 7
-            'PieceRef',  # 8
-            'PieceDate',  # 9
-            'EcritureLib',  # 10
-            'Debit',  # 11
-            'Credit',  # 12
-            'EcritureLet',  # 13
-            'DateLet',  # 14
-            'ValidDate',  # 15
-            'Montantdevise',  # 16
-            'Idevise',  # 17
+            "JournalCode",  # 0
+            "JournalLib",  # 1
+            "EcritureNum",  # 2
+            "EcritureDate",  # 3
+            "CompteNum",  # 4
+            "CompteLib",  # 5
+            "CompAuxNum",  # 6  We use partner.id
+            "CompAuxLib",  # 7
+            "PieceRef",  # 8
+            "PieceDate",  # 9
+            "EcritureLib",  # 10
+            "Debit",  # 11
+            "Credit",  # 12
+            "EcritureLet",  # 13
+            "DateLet",  # 14
+            "ValidDate",  # 15
+            "Montantdevise",  # 16
+            "Idevise",  # 17
         ]
         rows_to_write = [header]
 
         # INITIAL BALANCE
-        unaffected_earnings_account = self.env['account.account'].search(
-            [('account_type', '=', 'equity_unaffected'), ('company_id', '=', company.id)], limit=1
+        unaffected_earnings_account = self.env["account.account"].search(
+            [("account_type", "=", "equity_unaffected"), ("company_id", "=", company.id)], limit=1
         )
 
         # used to make sure that we add the unaffected earning initial balance only once
@@ -211,7 +212,7 @@ class OFAccountFrFec(models.TransientModel):
             unaffected_earnings_results = self._do_query_unaffected_earnings()
             unaffected_earnings_line = False
 
-        if self.pool['account.account'].name.translate:
+        if self.pool["account.account"].name.translate:
             lang = self.env.user.lang or get_lang(self.env).code
             aa_name = f"COALESCE(aa.name->>'{lang}', aa.name->>'en_US')"
         else:
@@ -228,35 +229,35 @@ class OFAccountFrFec(models.TransientModel):
                 listrow = list(row)
                 account_id = listrow.pop()
                 if not unaffected_earnings_line:
-                    account = self.env['account.account'].browse(account_id)
-                    if account.account_type == 'equity_unaffected':
+                    account = self.env["account.account"].browse(account_id)
+                    if account.account_type == "equity_unaffected":
                         # add the benefit/loss of previous fiscal year to the first unaffected earnings account found.
                         unaffected_earnings_line = True
-                        current_amount = float(listrow[11].replace(',', '.')) - float(listrow[12].replace(',', '.'))
-                        unaffected_earnings_amount = float(unaffected_earnings_results[11].replace(',', '.')) - float(
-                            unaffected_earnings_results[12].replace(',', '.')
+                        current_amount = float(listrow[11].replace(",", ".")) - float(listrow[12].replace(",", "."))
+                        unaffected_earnings_amount = float(unaffected_earnings_results[11].replace(",", ".")) - float(
+                            unaffected_earnings_results[12].replace(",", ".")
                         )
                         listrow_amount = current_amount + unaffected_earnings_amount
                         if float_is_zero(listrow_amount, precision_digits=currency_digits):
                             continue
                         if listrow_amount > 0:
-                            listrow[11] = str(listrow_amount).replace('.', ',')
-                            listrow[12] = '0,00'
+                            listrow[11] = str(listrow_amount).replace(".", ",")
+                            listrow[12] = "0,00"
                         else:
-                            listrow[11] = '0,00'
-                            listrow[12] = str(-listrow_amount).replace('.', ',')
+                            listrow[11] = "0,00"
+                            listrow[12] = str(-listrow_amount).replace(".", ",")
                 rows_to_write.append(listrow)
 
         # if the unaffected earnings account wasn't in the selection yet: add it manually
         if (
             not unaffected_earnings_line
             and unaffected_earnings_results
-            and (unaffected_earnings_results[11] != '0,00' or unaffected_earnings_results[12] != '0,00')
+            and (unaffected_earnings_results[11] != "0,00" or unaffected_earnings_results[12] != "0,00")
         ):
-            if unaffected_earnings_account := self.env['account.account'].search(
+            if unaffected_earnings_account := self.env["account.account"].search(
                 [
-                    ('account_type', '=', 'equity_unaffected'),
-                    ('company_id', '=', company.id),
+                    ("account_type", "=", "equity_unaffected"),
+                    ("company_id", "=", company.id),
                 ],
                 limit=1,
             ):
@@ -271,13 +272,13 @@ class OFAccountFrFec(models.TransientModel):
 
         rows_to_write.extend(list(row) for row in self._cr.fetchall())
         fecvalue = self._csv_write_rows(rows_to_write)
-        if self.of_output_encoding != 'utf-8':
-            fecvalue = fecvalue.decode().encode('iso-8859-1')
-        end_date = fields.Date.to_string(self.date_to).replace('-', '')
+        if self.of_output_encoding != "utf-8":
+            fecvalue = fecvalue.decode().encode("iso-8859-1")
+        end_date = fields.Date.to_string(self.date_to).replace("-", "")
         self.write(
             {
-                'fec_data': base64.encodebytes(fecvalue),
-                'filename': f'{company_legal_data}FEC{end_date}-NONOFFICIAL.{self.of_file_extension}',
+                "fec_data": base64.encodebytes(fecvalue),
+                "filename": f"{company_legal_data}FEC{end_date}-NONOFFICIAL.{self.of_file_extension}",
             }
         )
 
@@ -286,14 +287,14 @@ class OFAccountFrFec(models.TransientModel):
             f"filename_field=filename&field=fec_data&download=true&filename={self.filename}"
         )
         return {
-            'name': 'FEC',
-            'type': 'ir.actions.act_url',
-            'url': url,
-            'target': 'self',
+            "name": "FEC",
+            "type": "ir.actions.act_url",
+            "url": url,
+            "target": "self",
         }
 
     def _get_opening_journal_args(self, company):
-        formatted_date_from = fields.Date.to_string(self.date_from).replace('-', '')
+        formatted_date_from = fields.Date.to_string(self.date_from).replace("-", "")
         return (
             self.of_opening_journal_code,
             self.of_opening_journal_label,
@@ -313,9 +314,9 @@ class OFAccountFrFec(models.TransientModel):
         :return: the query as a string
         """
 
-        date_clause = 'am.date < %s'
+        date_clause = "am.date < %s"
         if self.of_use_create_date:
-            date_clause = 'am.create_date < %s'
+            date_clause = "am.create_date < %s"
 
         debit_select = (
             "replace(CASE WHEN sum(aml.balance) <= 0 THEN '0,00' "
@@ -325,7 +326,7 @@ class OFAccountFrFec(models.TransientModel):
             "replace(CASE WHEN sum(aml.balance) >= 0 THEN '0,00' "
             "ELSE to_char(-SUM(aml.balance), '000000000000000D99') END, '.', ',')"
         )
-        sql_query = f'''
+        sql_query = f"""
         SELECT
             %s AS JournalCode,
             %s AS JournalLib,
@@ -371,17 +372,17 @@ class OFAccountFrFec(models.TransientModel):
             AND am.company_id = %s
             AND aa.include_initial_balance IS TRUE
             AND am.journal_id IN %s
-        '''  # nosec B608
+        """  # nosec B608 # noqa: E221, E231, E241
 
-        if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+        if self.export_type == "nonofficial_posted":
+            sql_query += """
                 AND am.state = 'posted'
-            '''
+            """
 
-        sql_query += '''
+        sql_query += """
         GROUP BY aml.account_id, aa.code, aa.account_type
         ORDER BY CompteNum, aa.code
-        '''
+        """
         return sql_query
 
     def _get_lines_query_args(self, company):
@@ -393,15 +394,15 @@ class OFAccountFrFec(models.TransientModel):
         :param aa_name: part of the query to get the account name
         :return: the query as a string
         """
-        if self.pool['account.journal'].name.translate:
+        if self.pool["account.journal"].name.translate:
             lang = self.env.user.lang or get_lang(self.env).code
             aj_name = f"COALESCE(aj.name->>'{lang}', aj.name->>'en_US')"
         else:
             aj_name = "aj.name"
 
-        date_clause = 'am.date >= %s AND am.date <= %s'
+        date_clause = "am.date >= %s AND am.date <= %s"
         if self.of_use_create_date:
-            date_clause = 'am.create_date >= %s AND am.create_date <= %s'
+            date_clause = "am.create_date >= %s AND am.create_date <= %s"
 
         debit_select = (
             "replace(CASE WHEN aml.debit = 0 THEN '0,00' ELSE to_char(aml.debit, '000000000000000D99') END, '.', ',')"
@@ -410,7 +411,7 @@ class OFAccountFrFec(models.TransientModel):
             "replace(CASE WHEN aml.credit = 0 THEN '0,00' ELSE to_char(aml.credit, '000000000000000D99') END, '.', ',')"
         )
         # Il faudra ajouter les comptes de tiers nécessaires au cas par cas (Associés, Fournisseurs, Clients, etc.)
-        sql_query = f'''
+        sql_query = f"""
         SELECT
             REGEXP_REPLACE(replace(aj.code, '|', '/'), '[\\t\\r\\n]', ' ', 'g') AS JournalCode,
             REGEXP_REPLACE(replace({aj_name}, '|', '/'), '[\\t\\r\\n]', ' ', 'g') AS JournalLib,
@@ -468,17 +469,17 @@ class OFAccountFrFec(models.TransientModel):
             {date_clause}
             AND am.company_id = %s
             AND am.journal_id IN %s
-        '''  # nosec B608
+        """  # nosec B608 # noqa: E221, E231, E241
 
-        if self.export_type == 'nonofficial_posted':
-            sql_query += '''
+        if self.export_type == "nonofficial_posted":
+            sql_query += """
             AND am.state = 'posted'
-            '''
+            """
 
-        order_by = 'am.date, am.name, aml.id'
-        if self.of_order_by == 'sort_journal_partner':
-            order_by = 'aj.code, rp.name, aml.id'
-        sql_query += f'''
+        order_by = "am.date, am.name, aml.id"
+        if self.of_order_by == "sort_journal_partner":
+            order_by = "aj.code, rp.name, aml.id"
+        sql_query += f"""
         ORDER BY {order_by}
-        '''
+        """
         return sql_query

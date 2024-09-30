@@ -8,8 +8,8 @@ from .employee_type import Employee, EmployeeInput
 
 
 class User(OdooObjectType):
-    _name = 'User'
-    _type = 'types'
+    _name = "User"
+    _type = "types"
 
     employee = graphene.Field(Employee)
 
@@ -19,7 +19,7 @@ class User(OdooObjectType):
 
 
 class UserInput(graphene.InputObjectType):
-    _name = 'UserInput'
-    _type = 'types'
+    _name = "UserInput"
+    _type = "types"
 
     employee = EmployeeInput()

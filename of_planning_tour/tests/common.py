@@ -18,9 +18,9 @@ class TestOFPlanningTourCommon(TestOFServiceCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.calendar_obj = cls.env['calendar.event']
-        cls.planning_tour_obj = cls.env['of.planning.tour']
-        cls.tour_appointment_wizard_obj = cls.env['of.tour.appointment.wizard']
+        cls.calendar_obj = cls.env["calendar.event"]
+        cls.planning_tour_obj = cls.env["of.planning.tour"]
+        cls.tour_appointment_wizard_obj = cls.env["of.tour.appointment.wizard"]
 
         cls.now_dt = fields.Datetime.now() + timedelta(days=1)
         (
@@ -49,57 +49,57 @@ class TestOFPlanningTourCommon(TestOFServiceCommon):
             cls.now_dt.replace(hour=18, minute=0),
         )
 
-        cls.group_tour_manual_creation = cls.env.ref('of_planning_tour.group_of_planning_tour_manual_creation')
-        cls.group_tour_no_manual_creation = cls.env.ref('of_planning_tour.group_of_planning_tour_no_manual_creation')
+        cls.group_tour_manual_creation = cls.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
+        cls.group_tour_no_manual_creation = cls.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
 
-        cls.partner_antoine = cls.env['res.partner'].create(
+        cls.partner_antoine = cls.env["res.partner"].create(
             {
-                'name': 'Antoine',
-                'street': '3 rue Coulabin',
-                'zip': '35000',
-                'city': 'Rennes',
-                'email': 'antoine@test.fr',
-                'partner_latitude': RENNES_COULABIN_LAT_LNG[0],
-                'partner_longitude': RENNES_COULABIN_LAT_LNG[1],
-                'of_geocoding_state': 'success',
+                "name": "Antoine",
+                "street": "3 rue Coulabin",
+                "zip": "35000",
+                "city": "Rennes",
+                "email": "antoine@test.fr",
+                "partner_latitude": RENNES_COULABIN_LAT_LNG[0],
+                "partner_longitude": RENNES_COULABIN_LAT_LNG[1],
+                "of_geocoding_state": "success",
             }
         )
 
-        cls.partner_saif = cls.env['res.partner'].create(
+        cls.partner_saif = cls.env["res.partner"].create(
             {
-                'name': 'Saïf',
-                'street': '18 rue du champ de la justice',
-                'zip': '35000',
-                'city': 'Rennes',
-                'email': 'saif@test.fr',
-                'partner_latitude': RENNES_CHAMP_JUSTICE_LAT_LNG[0],
-                'partner_longitude': RENNES_CHAMP_JUSTICE_LAT_LNG[1],
-                'of_geocoding_state': 'success',
+                "name": "Saïf",
+                "street": "18 rue du champ de la justice",
+                "zip": "35000",
+                "city": "Rennes",
+                "email": "saif@test.fr",
+                "partner_latitude": RENNES_CHAMP_JUSTICE_LAT_LNG[0],
+                "partner_longitude": RENNES_CHAMP_JUSTICE_LAT_LNG[1],
+                "of_geocoding_state": "success",
             }
         )
 
-        cls.partner_hounaida = cls.env['res.partner'].create(
+        cls.partner_hounaida = cls.env["res.partner"].create(
             {
-                'name': 'Hounaida',
-                'street': '13 rue des ormeaux',
-                'zip': '35000',
-                'city': 'Rennes',
-                'email': 'hounaida@test.fr',
-                'partner_latitude': RENNES_ORMEAUX_LAT_LNG[0],
-                'partner_longitude': RENNES_ORMEAUX_LAT_LNG[1],
-                'of_geocoding_state': 'success',
+                "name": "Hounaida",
+                "street": "13 rue des ormeaux",
+                "zip": "35000",
+                "city": "Rennes",
+                "email": "hounaida@test.fr",
+                "partner_latitude": RENNES_ORMEAUX_LAT_LNG[0],
+                "partner_longitude": RENNES_ORMEAUX_LAT_LNG[1],
+                "of_geocoding_state": "success",
             }
         )
 
-        cls.partner_guillaume = cls.env['res.partner'].create(
+        cls.partner_guillaume = cls.env["res.partner"].create(
             {
-                'name': 'Guillaume',
-                'street': '11 avenue Brizeux',
-                'zip': '35740',
-                'city': 'Pacé',
-                'email': 'guillaume@test.fr',
-                'partner_latitude': PACE_BRIZEUX_LAT_LNG[0],
-                'partner_longitude': PACE_BRIZEUX_LAT_LNG[1],
-                'of_geocoding_state': 'success',
+                "name": "Guillaume",
+                "street": "11 avenue Brizeux",
+                "zip": "35740",
+                "city": "Pacé",
+                "email": "guillaume@test.fr",
+                "partner_latitude": PACE_BRIZEUX_LAT_LNG[0],
+                "partner_longitude": PACE_BRIZEUX_LAT_LNG[1],
+                "of_geocoding_state": "success",
             }
         )

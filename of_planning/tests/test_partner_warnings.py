@@ -9,20 +9,20 @@ class TestOFPartnerWarning(TestOFPlanningCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.partner_with_warning = cls.env['res.partner'].create(
+        cls.partner_with_warning = cls.env["res.partner"].create(
             {
-                'name': 'Partner with warning',
-                'of_is_intervention_warn': True,
-                'invoice_warn_msg': 'This is a warning message',
+                "name": "Partner with warning",
+                "of_is_intervention_warn": True,
+                "invoice_warn_msg": "This is a warning message",
             }
         )
 
     def test_01_no_partner_warning(self):
-        event = self.env['calendar.event'].create(
+        event = self.env["calendar.event"].create(
             {
-                'name': 'Test Intervention',
-                'of_type': 'intervention',
-                'of_partner_id': self.customer_a.id,
+                "name": "Test Intervention",
+                "of_type": "intervention",
+                "of_partner_id": self.customer_a.id,
             }
         )
         res = event._onchange_partner_id_warning()
@@ -34,17 +34,17 @@ class TestOFPartnerWarning(TestOFPlanningCommon):
     def test_03_partner_blocking_warning(self):
         self.partner_with_warning.of_warn_block = True
         event = self._create_assert_calendar_event()
-        self.assertEqual(event.of_partner_id, self.env['res.partner'].browse())
+        self.assertEqual(event.of_partner_id, self.env["res.partner"].browse())
 
     def _create_assert_calendar_event(self):
-        event = self.env['calendar.event'].create(
+        event = self.env["calendar.event"].create(
             {
-                'name': 'Test Intervention',
-                'of_type': 'intervention',
-                'of_partner_id': self.partner_with_warning.id,
-                'of_employee_ids': [Command.set([self.employee_tech_johnny.id])],
+                "name": "Test Intervention",
+                "of_type": "intervention",
+                "of_partner_id": self.partner_with_warning.id,
+                "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
             }
         )
         res = event._onchange_partner_id_warning()
-        self.assertEqual(res['warning']['message'], 'This is a warning message')
+        self.assertEqual(res["warning"]["message"], "This is a warning message")
         return event

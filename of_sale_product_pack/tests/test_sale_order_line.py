@@ -20,43 +20,43 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         self.assertEqual(self.product_1.pack_ok, False)
 
         order_values = self._prepare_empty_sale_order_values()
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_1.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_1.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order_pack_not_ok = self.env['sale.order'].create(order_values)
+        order_pack_not_ok = self.env["sale.order"].create(order_values)
         self.assertEqual(order_pack_not_ok.order_line[0].of_pack_ok, False)
 
         order_values = self._prepare_empty_sale_order_values()
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order_pack_ok = self.env['sale.order'].create(order_values)
+        order_pack_ok = self.env["sale.order"].create(order_values)
         self.assertEqual(order_pack_ok.order_line[0].of_pack_ok, True)
 
     def test_01_sale_order_line_of_pack_type(self):
         """Test if sale order line are correctly created and removed when changing of_pack_type"""
-        self.assertEqual(self.product_pack_detailed.pack_type, 'detailed')
+        self.assertEqual(self.product_pack_detailed.pack_type, "detailed")
 
         order_values = self._prepare_empty_sale_order_values()
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order = self.env['sale.order'].create(order_values)
+        order = self.env["sale.order"].create(order_values)
         # 3 because the pack has 2 components
         self.assertEqual(len(order.order_line), 3)
 
@@ -65,32 +65,32 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         )
 
         # Change the pack type to 'non_detailed' and check if the pack components are removed
-        pack_order_line.of_pack_type = 'non_detailed'
+        pack_order_line.of_pack_type = "non_detailed"
         self.assertEqual(len(order.order_line), 1)
 
         # Change the pack type to 'detailed' and check if the pack components are added back
-        pack_order_line.of_pack_type = 'detailed'
+        pack_order_line.of_pack_type = "detailed"
         self.assertEqual(len(order.order_line), 3)
 
     def test_02_sale_order_line_of_pack_component_price(self):
         """Test if price_unit is correctly computed when pack_component_price is 'totalized' or 'ignored'"""
 
-        self.assertEqual(self.product_pack_detailed.pack_component_price, 'ignored')
+        self.assertEqual(self.product_pack_detailed.pack_component_price, "ignored")
 
         # Set the list price of the pack components differently to check the price_unit computation
         self.product_pack_detailed.pack_line_ids[0].product_id.list_price = 20.0
         self.product_pack_detailed.pack_line_ids[1].product_id.list_price = 10.0
 
         order_values = self._prepare_empty_sale_order_values()
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order = self.env['sale.order'].create(order_values)
+        order = self.env["sale.order"].create(order_values)
         self.assertEqual(len(order.order_line), 3)
 
         pack_order_line = order.order_line.filtered(
@@ -101,7 +101,7 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         self.assertEqual(pack_order_line.price_unit, 40.0)
 
         # Change the pack_component_price to 'totalized'
-        pack_order_line.of_pack_component_price = 'totalized'
+        pack_order_line.of_pack_component_price = "totalized"
 
         # Should be sum of the list prices of the pack components
         self.assertEqual(pack_order_line.price_unit, 30.0)
@@ -128,30 +128,30 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         - The stand-alone line with the same product as a pack component should not be removed when the pack
             component is removed.
         """
-        self.assertEqual(self.product_pack_detailed.pack_type, 'detailed')
+        self.assertEqual(self.product_pack_detailed.pack_type, "detailed")
 
-        new_product = self.env['product.product'].create(
+        new_product = self.env["product.product"].create(
             {
-                'name': "Product 4",
-                'default_code': "BA_PROD_004",
-                'brand_id': self.product_brand_a.id,
-                'categ_id': self.env.ref('product.product_category_all').id,
-                'standard_price': 10,
-                'list_price': 20,
-                'type': 'service',
+                "name": "Product 4",
+                "default_code": "BA_PROD_004",
+                "brand_id": self.product_brand_a.id,
+                "categ_id": self.env.ref("product.product_category_all").id,
+                "standard_price": 10,
+                "list_price": 20,
+                "type": "service",
             },
         )
 
         order_values = self._prepare_empty_sale_order_values()
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order = self.env['sale.order'].create(order_values)
+        order = self.env["sale.order"].create(order_values)
         self.assertEqual(len(order.order_line), 3)
 
         pack_order_line = order.order_line.filtered(
@@ -160,8 +160,8 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
 
         self.assertEqual(len(pack_order_line.of_pack_line_ids), 2)
         self.assertEqual(
-            pack_order_line.of_pack_line_ids.mapped('product_id'),
-            self.product_pack_detailed.pack_line_ids.mapped('product_id'),
+            pack_order_line.of_pack_line_ids.mapped("product_id"),
+            self.product_pack_detailed.pack_line_ids.mapped("product_id"),
         )
 
         # Add a new product into the pack in sale order line
@@ -169,24 +169,24 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         pack_order_line.of_pack_line_ids = [
             Command.create(
                 {
-                    'product_id': new_product.id,
-                    'quantity': 1.0,
+                    "product_id": new_product.id,
+                    "quantity": 1.0,
                 },
             ),
         ]
         self.assertEqual(len(pack_order_line.of_pack_line_ids), 3)
         self.assertEqual(
-            pack_order_line.of_pack_line_ids.mapped('product_id'),
-            self.product_pack_detailed.pack_line_ids.mapped('product_id') | new_product,
+            pack_order_line.of_pack_line_ids.mapped("product_id"),
+            self.product_pack_detailed.pack_line_ids.mapped("product_id") | new_product,
         )
         self.assertEqual(len(order.order_line), 4)  # 4 because the pack has 3 components (2 original + 1 new)
 
         # Change the pack type to 'non_detailed' and check if the pack components are removed
-        pack_order_line.of_pack_type = 'non_detailed'
+        pack_order_line.of_pack_type = "non_detailed"
         self.assertEqual(len(order.order_line), 1)
 
         # Set it back to 'detailed' and check if the pack components are added back
-        pack_order_line.of_pack_type = 'detailed'
+        pack_order_line.of_pack_type = "detailed"
         self.assertEqual(len(order.order_line), 4)  # 4 because the pack has 2 components (2 original + 1 new)
         print(order.order_line.mapped(lambda line: (line.product_id, line.product_id.name)))
 
@@ -207,8 +207,8 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         pack_order_line.of_pack_line_ids = [
             Command.create(
                 {
-                    'product_id': self.product_2.id,
-                    'quantity': 1.0,
+                    "product_id": self.product_2.id,
+                    "quantity": 1.0,
                 },
             ),
         ]
@@ -223,8 +223,8 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         order.order_line = [
             Command.create(
                 {
-                    'product_id': new_product.id,
-                    'product_uom_qty': 1,
+                    "product_id": new_product.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
@@ -244,15 +244,15 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         order_values = self._prepare_empty_sale_order_values()
 
         # On rajoute un pack
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order = self.env['sale.order'].create(order_values)
+        order = self.env["sale.order"].create(order_values)
         self.assertEqual(order.order_line[0].product_uom_qty, 1)
         self.assertEqual(order.order_line[1].product_uom_qty, 1)
         self.assertEqual(order.order_line[2].product_uom_qty, 1)
@@ -261,7 +261,7 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         self.assertEqual(order.order_line[2].price_unit, 0)
 
         # On modifie les quantités des composants du pack
-        with Form(order.order_line[0], 'of_sale_product_pack.of_sale_order_line_view') as line_form:
+        with Form(order.order_line[0], "of_sale_product_pack.of_sale_order_line_view") as line_form:
             with line_form.of_pack_line_ids.edit(0) as pack_line_form:
                 pack_line_form.quantity = 2
                 pack_line_form.save()
@@ -297,20 +297,20 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         order_values = self._prepare_empty_sale_order_values()
 
         # On rajoute un pack
-        order_values['order_line'] = [
+        order_values["order_line"] = [
             Command.create(
                 {
-                    'product_id': self.product_pack_non_detailed.id,
-                    'product_uom_qty': 1,
+                    "product_id": self.product_pack_non_detailed.id,
+                    "product_uom_qty": 1,
                 },
             ),
         ]
-        order = self.env['sale.order'].create(order_values)
+        order = self.env["sale.order"].create(order_values)
         self.assertEqual(order.order_line[0].product_uom_qty, 1)
         self.assertEqual(order.order_line[0].price_unit, 32.0)
 
         # On modifie les quantités des composants du pack
-        with Form(order.order_line[0], 'of_sale_product_pack.of_sale_order_line_view') as line_form:
+        with Form(order.order_line[0], "of_sale_product_pack.of_sale_order_line_view") as line_form:
             with line_form.of_pack_line_ids.edit(0) as pack_line_form:
                 pack_line_form.quantity = 2
                 pack_line_form.save()

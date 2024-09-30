@@ -8,8 +8,8 @@ from .picking_type import Picking, PickingFilterInput
 
 
 class PickingQuery(graphene.ObjectType):
-    _name = 'PickingQuery'
-    _type = 'query'
+    _name = "PickingQuery"
+    _type = "query"
 
     pickings = graphene.List(
         graphene.NonNull(Picking),
@@ -21,7 +21,7 @@ class PickingQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_pickings(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['stock.picking']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["stock.picking"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['stock.picking'].search(odoo_domain, offset=offset, limit=limit)
+        return env["stock.picking"].search(odoo_domain, offset=offset, limit=limit)

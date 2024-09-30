@@ -6,8 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class Employee(OdooObjectType):
-    _name = 'Employee'
-    _type = 'types'
+    _name = "Employee"
+    _type = "types"
 
     company_id = graphene.Int()
 

@@ -9,7 +9,7 @@ from odoo.addons.of_utils.models.misc import sanitize_text
 
 
 class ResPartner(models.Model):
-    _inherit = 'res.partner'
+    _inherit = "res.partner"
 
     def _ac_sanitize_name(self, name, max_length=12):
         """
@@ -38,16 +38,16 @@ class ResPartner(models.Model):
         Used through the safe_eval method for an automatic account code generation.
         """
         # search for accounts with the same prefix
-        accounts = partner.env['account.account'].search([('code', '=like', f'{eval_str}%')])
+        accounts = partner.env["account.account"].search([("code", "=like", f"{eval_str}%")])
         # filter and sort the accounts
         filtered_accounts = self._ac_filter_accounts(accounts, eval_str)
         sorted_accounts = self._ac_sort_accounts(filtered_accounts)
         # get the last code and increment it
-        last_code = sorted_accounts[-1].code if sorted_accounts else '0' * (len(eval_str) + 1)
-        return int(last_code[len(eval_str) :] or '1') + 1
+        last_code = sorted_accounts[-1].code if sorted_accounts else "0" * (len(eval_str) + 1)
+        return int(last_code[len(eval_str) :] or "1") + 1
 
     @api.model
-    def _ac_get_code(self, company, prefix, digits, required=True, first_num=1, suffix=''):
+    def _ac_get_code(self, company, prefix, digits, required=True, first_num=1, suffix=""):
         """
         Generate a unique code (with increment) based on the given parameters.
 
@@ -64,9 +64,9 @@ class ResPartner(models.Model):
         """
 
         def postgres_regexp_escape(text):
-            return re.sub(r'([!$()*+.:<=>?[\]^{|}-])', r'\\\1', text)
+            return re.sub(r"([!$()*+.:<=>?[\]^{|}-])", r"\\\1", text)
 
-        code_pattern = f'^{postgres_regexp_escape(prefix)}' + '\\d*' + postgres_regexp_escape(suffix) + '$'
+        code_pattern = f"^{postgres_regexp_escape(prefix)}" + "\\d*" + postgres_regexp_escape(suffix) + "$"
 
         self.env.cr.execute(
             "SELECT code "
@@ -103,15 +103,15 @@ class ResPartner(models.Model):
             update_supplier_account (bool): If True, update the supplier account.
         """
         # Pas de création de compte de tiers pour les contacts, mais uniquement pour les vrais partenaires
-        partners = self.mapped('commercial_partner_id')
+        partners = self.mapped("commercial_partner_id")
         if not partners:
             return
 
         while not company.chart_template_id and company.parent_id:
             company = company.parent_id
 
-        default_account_receivable = self.env['ir.property']._get('property_account_receivable_id', self._name)
-        default_account_payable = self.env['ir.property']._get('property_account_payable_id', self._name)
+        default_account_receivable = self.env["ir.property"]._get("property_account_receivable_id", self._name)
+        default_account_payable = self.env["ir.property"]._get("property_account_payable_id", self._name)
 
         if not (default_account_payable and default_account_receivable):
             # La comptabilité de la société n'est pas configurée
@@ -125,8 +125,8 @@ class ResPartner(models.Model):
                     default_account_receivable,
                     company,
                     partner_values,
-                    'property_account_receivable_id',
-                    'asset_receivable',
+                    "property_account_receivable_id",
+                    "asset_receivable",
                     company.of_customer_code,
                 )
             if update_supplier_account and company.of_supplier_code:
@@ -135,8 +135,8 @@ class ResPartner(models.Model):
                     default_account_payable,
                     company,
                     partner_values,
-                    'property_account_payable_id',
-                    'liability_payable',
+                    "property_account_payable_id",
+                    "liability_payable",
                     company.of_supplier_code,
                 )
             if partner_values:
@@ -147,34 +147,34 @@ class ResPartner(models.Model):
     ):
         if (getattr(partner, field_name) or default_account) == default_account:
 
-            def get_code_wrapper(prefix, digits, required=True, first_num=1, suffix=''):
+            def get_code_wrapper(prefix, digits, required=True, first_num=1, suffix=""):
                 return self._ac_get_code(company, prefix, digits, required, first_num, suffix)
 
             code, name = safe_eval(
                 code_expression,
                 {
-                    'partner': partner,
-                    'company': company,
-                    'get_code': get_code_wrapper,
-                    'sanitize_name': self._ac_sanitize_name,
-                    'filter_accounts': self._ac_filter_accounts,
-                    'sort_accounts': self._ac_sort_accounts,
-                    'get_next_code': self._ac_get_next_code,
-                    'sanitize': sanitize_text,
+                    "partner": partner,
+                    "company": company,
+                    "get_code": get_code_wrapper,
+                    "sanitize_name": self._ac_sanitize_name,
+                    "filter_accounts": self._ac_filter_accounts,
+                    "sort_accounts": self._ac_sort_accounts,
+                    "get_next_code": self._ac_get_next_code,
+                    "sanitize": sanitize_text,
                 },
             )
-            ac_obj = self.env['account.account']
-            if account := ac_obj.search([('code', '=', code), ('company_id', '=', company.id)], limit=1):
+            ac_obj = self.env["account.account"]
+            if account := ac_obj.search([("code", "=", code), ("company_id", "=", company.id)], limit=1):
                 partner_values[field_name] = account.id
                 account.name = code
             else:
                 partner_values[field_name] = ac_obj.create(
                     {
-                        'account_type': account_type,
-                        'code': code,
-                        'name': name,
-                        'reconcile': True,
-                        'company_id': default_account.company_id.id,
+                        "account_type": account_type,
+                        "code": code,
+                        "name": name,
+                        "reconcile": True,
+                        "company_id": default_account.company_id.id,
                     }
                 )
 

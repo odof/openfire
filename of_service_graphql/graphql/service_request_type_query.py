@@ -8,8 +8,8 @@ from .service_request_type_type import ServiceRequestType, ServiceRequestTypeFil
 
 
 class ServiceRequestTypeQuery(graphene.ObjectType):
-    _name = 'ServiceRequestTypeQuery'
-    _type = 'query'
+    _name = "ServiceRequestTypeQuery"
+    _type = "query"
 
     service_request_types = graphene.List(
         graphene.NonNull(ServiceRequestType),
@@ -21,7 +21,7 @@ class ServiceRequestTypeQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_service_request_types(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.service.request.type']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.service.request.type"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.service.request.type'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.service.request.type"].search(odoo_domain, offset=offset, limit=limit)

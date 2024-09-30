@@ -4,26 +4,26 @@ from odoo import api, fields, models
 
 
 class OFPlanningTeam(models.Model):
-    _inherit = 'of.planning.team'
+    _inherit = "of.planning.team"
 
     start_address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Start Address",
-        compute='_compute_start_address_id',
+        compute="_compute_start_address_id",
         store=True,
         readonly=False,
     )
     return_address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Return Address",
-        compute='_compute_return_address_id',
+        compute="_compute_return_address_id",
         store=True,
         readonly=False,
     )
-    partner_latitude = fields.Float(related='start_address_id.partner_latitude')
-    partner_longitude = fields.Float(related='start_address_id.partner_longitude')
+    partner_latitude = fields.Float(related="start_address_id.partner_latitude")
+    partner_longitude = fields.Float(related="start_address_id.partner_longitude")
 
-    @api.depends('employee_ids')
+    @api.depends("employee_ids")
     def _compute_start_address_id(self):
         for team in self:
             if team.employee_ids:
@@ -31,10 +31,10 @@ class OFPlanningTeam(models.Model):
             else:
                 team.start_address_id = False
 
-    @api.depends('employee_ids', 'start_address_id')
+    @api.depends("employee_ids", "start_address_id")
     def _compute_return_address_id(self):
         cache = {}
-        team_with_employee = self.filtered('employee_ids')
+        team_with_employee = self.filtered("employee_ids")
         for team in team_with_employee:
             key = (team.employee_ids[0].id or False, team.start_address_id.id, team.return_address_id.id)
             if key not in cache:

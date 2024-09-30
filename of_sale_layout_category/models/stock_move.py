@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class StockMove(models.Model):
-    _inherit = 'stock.move'
+    _inherit = "stock.move"
 
     of_section = fields.Char(string="Section")

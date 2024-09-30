@@ -4,23 +4,23 @@ from odoo import _, api, fields, models
 
 
 class SaleReport(models.Model):
-    _inherit = 'sale.report'
+    _inherit = "sale.report"
 
-    of_brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", readonly=True)
-    of_margin_percentage = fields.Float(string="Margin (%)", compute='_compute_dummy')
-    of_diff_price = fields.Float(string="Δ% HT", compute='_compute_dummy')
-    of_diff_margin = fields.Float(string="Δ% Margin", compute='_compute_dummy')
-    of_diff_qty_delivered = fields.Float(string="Δ% Shipped qty.", compute='_compute_dummy')
+    of_brand_id = fields.Many2one(comodel_name="of.product.brand", string="Brand", readonly=True)
+    of_margin_percentage = fields.Float(string="Margin (%)", compute="_compute_dummy")
+    of_diff_price = fields.Float(string="Δ% HT", compute="_compute_dummy")
+    of_diff_margin = fields.Float(string="Δ% Margin", compute="_compute_dummy")
+    of_diff_qty_delivered = fields.Float(string="Δ% Shipped qty.", compute="_compute_dummy")
     of_confirmation_date = fields.Datetime(string="Confirmation date", readonly=True)
     of_delivery_date = fields.Datetime(string="Delivery date", readonly=True)
     of_delivered_amount = fields.Float(string="Delivered amount", readonly=True)
-    of_my_company = fields.Boolean(string="Is my store ?", compute='_get_is_my_company', search='_search_is_my_company')
+    of_my_company = fields.Boolean(string="Is my store ?", compute="_get_is_my_company", search="_search_is_my_company")
 
     @api.model
     def _search_is_my_company(self, operator, value):
-        if operator != '=' or not value:
+        if operator != "=" or not value:
             raise ValueError(_("Unsupported search operator"))
-        return [('company_id', '=', self.env.user.company_id.id)]
+        return [("company_id", "=", self.env.user.company_id.id)]
 
     def _get_is_my_company(self):
         for rec in self:
@@ -35,12 +35,12 @@ class SaleReport(models.Model):
 
     def _select_additional_fields(self):
         res = super()._select_additional_fields()
-        res['of_brand_id'] = "t.brand_id"
-        res['of_confirmation_date'] = "s.date_order"
-        res['of_delivery_date'] = (
+        res["of_brand_id"] = "t.brand_id"
+        res["of_confirmation_date"] = "s.date_order"
+        res["of_delivery_date"] = (
             "CASE WHEN sm.qty = sum(l.product_uom_qty / u.factor * u2.factor) " "    THEN sm.date ELSE NULL END"
         )
-        res['of_delivered_amount'] = (
+        res["of_delivered_amount"] = (
             "CASE WHEN sum(l.product_uom_qty / u.factor * u2.factor) != 0 THEN "
             "    sum(l.price_subtotal / COALESCE(currency_table.rate, 1.0)) * "
             "    sm.qty / sum(l.product_uom_qty / u.factor * u2.factor) "
@@ -79,33 +79,33 @@ class SaleReport(models.Model):
         # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
         # field no more here. Theses fields should be comptued on the fly after with the values of the previous period
         depends_mapping = {
-            'of_diff_price': ('of_diff_price', 'price_subtotal'),
-            'of_diff_margin': ('of_diff_margin', 'margin'),
-            'of_diff_qty_delivered': ('of_diff_qty_delivered', 'qty_delivered'),
+            "of_diff_price": ("of_diff_price", "price_subtotal"),
+            "of_diff_margin": ("of_diff_margin", "margin"),
+            "of_diff_qty_delivered": ("of_diff_qty_delivered", "qty_delivered"),
         }
         depends_mapping_margin = {
-            'of_margin_percentage': ('of_margin_percentage', 'margin', 'price_total'),
+            "of_margin_percentage": ("of_margin_percentage", "margin", "price_total"),
         }
         fields_keys = list(depends_mapping.keys()) + list(depends_mapping_margin.keys())
         of_compute_fields = [
             f.name for f in self._fields.values() if f.name in fields_keys and not f.store and not f.search
         ]
-        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))]
+        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f"{e}:sum", of_compute_fields))]  # noqa
         res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
         if res:
             time_groupbys = (
-                'date:month',
-                'date:year',
-                'date',
-                'of_confirmation_date',
-                'of_confirmation_date:month',
-                'of_confirmation_date:year',
-                'of_delivery_date',
-                'of_delivery_date:month',
-                'of_delivery_date:year',
+                "date:month",
+                "date:year",
+                "date",
+                "of_confirmation_date",
+                "of_confirmation_date:month",
+                "of_confirmation_date:year",
+                "of_delivery_date",
+                "of_delivery_date:month",
+                "of_delivery_date:year",
             )
             # Les deltas dépendent d'un champ qui doit être calculé
-            diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]
+            diff_percent = [v for v in depends_mapping.values() if f"{v[0]}:sum" in fields and f"{v[1]}:sum" in fields]
             diff = []
             if groupby and (diff or diff_percent) and any(gb in time_groupbys for gb in groupby[-2:]):
                 # Regroupement des résultats par période pour calcul des deltas
@@ -145,8 +145,8 @@ class SaleReport(models.Model):
                                 )
                     period_prec = period
 
-            display_margin_percent = depends_mapping_margin.get('of_margin_percentage')
-            if all(f'{val}:sum' in fields for val in display_margin_percent):
+            display_margin_percent = depends_mapping_margin.get("of_margin_percentage")
+            if all(f"{val}:sum" in fields for val in display_margin_percent):  # noqa
                 for entry in res:
                     if entry[display_margin_percent[1]] is not None and entry[display_margin_percent[2]] is not None:
                         entry[display_margin_percent[0]] = (

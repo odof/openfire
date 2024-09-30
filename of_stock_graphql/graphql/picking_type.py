@@ -10,13 +10,13 @@ from .stock_move_type import StockMove, StockMoveInput
 
 
 class Picking(OdooObjectType):
-    _name = 'Picking'
-    _type = 'types'
+    _name = "Picking"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
     partner = graphene.Field(Partner)
-    move_ids_without_package = graphene.List(StockMove, name='lines')
+    move_ids_without_package = graphene.List(StockMove, name="lines")
     location = graphene.Field(StockLocation)
 
     @staticmethod
@@ -29,8 +29,8 @@ class Picking(OdooObjectType):
 
 
 class PickingInput(graphene.InputObjectType):
-    _name = 'PickingInput'
-    _type = 'types'
+    _name = "PickingInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -40,4 +40,4 @@ class PickingInput(graphene.InputObjectType):
 
 
 class PickingFilterInput(PickingInput):
-    _name = 'PickingFilterInput'
+    _name = "PickingFilterInput"

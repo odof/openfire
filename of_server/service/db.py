@@ -35,7 +35,7 @@ _logger = logging.getLogger(__name__)
 
 
 def get_temp_db_name(db_name):
-    return f'{db_name}_temp_{int(time.time())}'
+    return f"{db_name}_temp_{int(time.time())}"
 
 
 def _sanitize_database(cr):
@@ -50,7 +50,7 @@ def _sanitize_database(cr):
         cr.execute("SELECT query, query_if FROM of_sanitize_query")
         rows = cr.fetchall()
     except psycopg2.Error as e:
-        _logger.info('Sanitize DB: %s failed\n%s', cr.dbname, e)
+        _logger.info("Sanitize DB: %s failed\n%s", cr.dbname, e)
     if rows:
         for query, query_if in rows:
             if query_if:
@@ -58,17 +58,17 @@ def _sanitize_database(cr):
                 if not cr.fetchall():
                     continue
             cr.execute(query)
-        _logger.info('Sanitized DB: %s', cr.dbname)
+        _logger.info("Sanitized DB: %s", cr.dbname)
     cr._cnx.autocommit = False
-    _logger.info('Installing module web_environment_ribbon on DB: %s', cr.dbname)
+    _logger.info("Installing module web_environment_ribbon on DB: %s", cr.dbname)
     cr.execute("SELECT state FROM ir_module_module WHERE name = 'web_environment_ribbon'")
-    if cr.fetchall()[0][0] in ('uninstalled', 'to install'):
+    if cr.fetchall()[0][0] in ("uninstalled", "to install"):
         env = odoo.api.Environment(cr, SUPERUSER_ID, {})
-        module_ribbon = env['ir.module.module'].search([('name', '=', 'web_environment_ribbon')])
-        if module_ribbon.state in ('uninstalled', 'to install'):
-            module_ribbon.state = 'to install'
-            env['base.module.upgrade'].upgrade_module()
-    _logger.info('Module web_environment_ribbon installed on DB: %s', cr.dbname)
+        module_ribbon = env["ir.module.module"].search([("name", "=", "web_environment_ribbon")])
+        if module_ribbon.state in ("uninstalled", "to install"):
+            module_ribbon.state = "to install"
+            env["base.module.upgrade"].upgrade_module()
+    _logger.info("Module web_environment_ribbon installed on DB: %s", cr.dbname)
 
 
 def sanitize_database(db_name):
@@ -79,17 +79,17 @@ def sanitize_database(db_name):
     except Exception:
         # En cas d'échec du nettoyage de la base, on la supprime
         # Code copié de la fonction odoo.service.db.exp_drop
-        db = odoo.sql_db.db_connect('postgres')
+        db = odoo.sql_db.db_connect("postgres")
         with closing(db.cursor()) as cr:
             # database-altering operations cannot be executed inside a transaction
             cr._cnx.autocommit = True
             _drop_conn(cr, db_name)
             try:
-                cr.execute(sql.SQL('DROP DATABASE {}').format(sql.Identifier(db_name)))
+                cr.execute(sql.SQL("DROP DATABASE {}").format(sql.Identifier(db_name)))
             except Exception as e:
-                _logger.info('DROP DB: %s failed:\n%s', db_name, e)
+                _logger.info("DROP DB: %s failed:\n%s", db_name, e)
             else:
-                _logger.info('DROP DB: %s', db_name)
+                _logger.info("DROP DB: %s", db_name)
         raise
 
 
@@ -110,7 +110,7 @@ native_dump_db = db.dump_db
 
 
 @check_db_management_enabled
-def dump_db(db_name, stream, backup_format='zip', **kwargs):
+def dump_db(db_name, stream, backup_format="zip", **kwargs):
     """Dump database `db` into file-like object `stream` if stream is None
     return a file object with the dump
 
@@ -119,14 +119,14 @@ def dump_db(db_name, stream, backup_format='zip', **kwargs):
 
     Utilisation de kwargs en raison d'autres héritages possibles ajoutant des champs (e.g. module smile_anonymization)
     """
-    if backup_format != 'minizip':
+    if backup_format != "minizip":
         return native_dump_db(db_name, stream, backup_format=backup_format, **kwargs)
     with tempfile.TemporaryDirectory() as dump_dir:
         filestore = odoo.tools.config.filestore(db_name)
         db = odoo.sql_db.db_connect(db_name)
         if os.path.exists(filestore):
             # On ne conserve que le minimum de fichiers
-            dump_filestore_dir = os.path.join(dump_dir, 'filestore')
+            dump_filestore_dir = os.path.join(dump_dir, "filestore")
             with db.cursor() as cr:
                 cr.execute(get_minimum_files_query())
                 for (store_fname,) in cr.fetchall():
@@ -134,17 +134,17 @@ def dump_db(db_name, stream, backup_format='zip', **kwargs):
                     if not os.path.exists(file_path):
                         continue
                     # Création du répertoire
-                    fdir = os.path.join(dump_filestore_dir, store_fname.rpartition('/')[0])
+                    fdir = os.path.join(dump_filestore_dir, store_fname.rpartition("/")[0])
                     if not os.path.exists(fdir):
                         os.makedirs(fdir)
                     # Copie du fichier
                     shutil.copy(file_path, os.path.join(dump_filestore_dir, store_fname))
-        with open(os.path.join(dump_dir, 'manifest.json'), 'w') as fh:
+        with open(os.path.join(dump_dir, "manifest.json"), "w") as fh:
             with db.cursor() as cr:
                 json.dump(dump_db_manifest(cr), fh, indent=4)
 
         subprocess.run(  # nosec B603
-            [find_pg_tool('pg_dump'), f"--file={os.path.join(dump_dir, 'dump.sql')}", '--no-owner', db_name],
+            [find_pg_tool("pg_dump"), f"--file={os.path.join(dump_dir, 'dump.sql')}", "--no-owner", db_name],
             env=exec_pg_environ(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.STDOUT,
@@ -152,12 +152,12 @@ def dump_db(db_name, stream, backup_format='zip', **kwargs):
 
         if stream:
             odoo.tools.osutil.zip_dir(
-                dump_dir, stream, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql'
+                dump_dir, stream, include_dir=False, fnct_sort=lambda file_name: file_name != "dump.sql"
             )
         else:
             t = tempfile.TemporaryFile()
             odoo.tools.osutil.zip_dir(
-                dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != 'dump.sql'
+                dump_dir, t, include_dir=False, fnct_sort=lambda file_name: file_name != "dump.sql"
             )
             t.seek(0)
             return t
@@ -176,16 +176,16 @@ def exp_duplicate_database(db_original_name, db_name, neutralize_database=False,
     - utilisation d'un nom de base temporaire pour éviter que la base soit chargée par un processus Odoo avant la fin
         de la duplication.
     """
-    _logger.info('Duplicate database `%s` to `%s`.', db_original_name, db_name)
+    _logger.info("Duplicate database `%s` to `%s`.", db_original_name, db_name)
 
     existing = exp_db_exist(db_name)
     if existing and not drop_existing:
-        _logger.info('DUPLICATE DB: %s already exists', db_name)
+        _logger.info("DUPLICATE DB: %s already exists", db_name)
         raise DatabaseExists(f"Database {db_name} already exists !")
 
     temp_db_name = get_temp_db_name(db_name)
     odoo.sql_db.close_db(db_original_name)
-    db = odoo.sql_db.db_connect('postgres')
+    db = odoo.sql_db.db_connect("postgres")
     with closing(db.cursor()) as cr:
         # database-altering operations cannot be executed inside a transaction
         cr._cnx.autocommit = True
@@ -200,7 +200,7 @@ def exp_duplicate_database(db_original_name, db_name, neutralize_database=False,
     with registry.cursor() as cr:
         # if it's a copy of a database, force generation of a new dbuuid
         env = odoo.api.Environment(cr, SUPERUSER_ID, {})
-        env['ir.config_parameter'].init(force=True)
+        env["ir.config_parameter"].init(force=True)
         if neutralize_database:
             odoo.modules.neutralize.neutralize_database(cr)
 
@@ -217,7 +217,7 @@ def exp_duplicate_database(db_original_name, db_name, neutralize_database=False,
                     if not os.path.exists(file_path):
                         continue
                     # Création du répertoire
-                    fdir = os.path.join(to_fs, store_fname.rpartition('/')[0])
+                    fdir = os.path.join(to_fs, store_fname.rpartition("/")[0])
                     if not os.path.exists(fdir):
                         os.makedirs(fdir)
                     # Copie du fichier
@@ -227,14 +227,14 @@ def exp_duplicate_database(db_original_name, db_name, neutralize_database=False,
     if sanitize:
         sanitize_database(temp_db_name)
     if existing:
-        _logger.info('DUPLICATE DB: Dropping database %s', db_name)
+        _logger.info("DUPLICATE DB: Dropping database %s", db_name)
         exp_drop(db_name)
     with closing(db.cursor()) as cr:
         # database-altering operations cannot be executed inside a transaction
         cr._cnx.autocommit = True
         _drop_conn(cr, temp_db_name)
         cr.execute(
-            sql.SQL('ALTER DATABASE {} RENAME TO {}').format(sql.Identifier(temp_db_name), sql.Identifier(db_name))
+            sql.SQL("ALTER DATABASE {} RENAME TO {}").format(sql.Identifier(temp_db_name), sql.Identifier(db_name))
         )
 
     # remove temporary database registry to avoid cron jobs to run on it
@@ -286,10 +286,10 @@ def restore_db(db, dump_file, copy=False, neutralize_database=False, sanitize=Tr
     assert isinstance(db, str)
     existing = exp_db_exist(db)
     if existing and not drop_existing:
-        _logger.warning('RESTORE DB: %s already exists', db)
+        _logger.warning("RESTORE DB: %s already exists", db)
         raise DatabaseExists("Database already exists")
 
-    _logger.info('RESTORING DB: %s', db)
+    _logger.info("RESTORING DB: %s", db)
     temp_db_name = get_temp_db_name(db)
     _create_empty_database(temp_db_name)
 
@@ -297,25 +297,25 @@ def restore_db(db, dump_file, copy=False, neutralize_database=False, sanitize=Tr
     with tempfile.TemporaryDirectory() as dump_dir:
         if zipfile.is_zipfile(dump_file):
             # v8 format
-            with zipfile.ZipFile(dump_file, 'r') as z:
+            with zipfile.ZipFile(dump_file, "r") as z:
                 # only extract known members!
-                filestore = [m for m in z.namelist() if m.startswith('filestore/')]
-                z.extractall(dump_dir, ['dump.sql'] + filestore)
+                filestore = [m for m in z.namelist() if m.startswith("filestore/")]
+                z.extractall(dump_dir, ["dump.sql"] + filestore)
 
                 if filestore:
-                    filestore_path = os.path.join(dump_dir, 'filestore')
+                    filestore_path = os.path.join(dump_dir, "filestore")
 
-            pg_cmd = 'psql'
-            pg_args = ['-q', '-f', os.path.join(dump_dir, 'dump.sql')]
+            pg_cmd = "psql"
+            pg_args = ["-q", "-f", os.path.join(dump_dir, "dump.sql")]
 
         else:
             # <= 7.0 format (raw pg_dump output)
-            pg_cmd = 'pg_restore'
-            pg_args = ['--no-owner', dump_file]
+            pg_cmd = "pg_restore"
+            pg_args = ["--no-owner", dump_file]
 
         try:
             r = subprocess.run(  # nosec B603
-                [find_pg_tool(pg_cmd), f'--dbname={temp_db_name}', *pg_args],
+                [find_pg_tool(pg_cmd), f"--dbname={temp_db_name}", *pg_args],
                 env=exec_pg_environ(),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.STDOUT,
@@ -325,19 +325,19 @@ def restore_db(db, dump_file, copy=False, neutralize_database=False, sanitize=Tr
         except Exception:
             # La base a pu se créer quand-même, il vaut mieux la supprimer
             # Code copié de la fonction exp_drop de odoo/service/db.py
-            db = odoo.sql_db.db_connect('postgres')
+            db = odoo.sql_db.db_connect("postgres")
             with closing(db.cursor()) as cr:
                 # database-altering operations cannot be executed inside a transaction
                 cr._cnx.autocommit = True
                 _drop_conn(cr, temp_db_name)
 
                 try:
-                    cr.execute(sql.SQL('DROP DATABASE {}').format(sql.Identifier(temp_db_name)))
+                    cr.execute(sql.SQL("DROP DATABASE {}").format(sql.Identifier(temp_db_name)))
                 except Exception as e:
-                    _logger.info('DROP DB: %s failed:\n%s', temp_db_name, e)
+                    _logger.info("DROP DB: %s failed:\n%s", temp_db_name, e)
                     raise Exception(f"Couldn't drop database {temp_db_name}: {e}") from e
                 else:
-                    _logger.info('DROP DB: %s', temp_db_name)
+                    _logger.info("DROP DB: %s", temp_db_name)
             raise
 
         registry = odoo.modules.registry.Registry.new(temp_db_name)
@@ -345,41 +345,41 @@ def restore_db(db, dump_file, copy=False, neutralize_database=False, sanitize=Tr
             env = odoo.api.Environment(cr, SUPERUSER_ID, {})
             if copy:
                 # if it's a copy of a database, force generation of a new dbuuid
-                env['ir.config_parameter'].init(force=True)
+                env["ir.config_parameter"].init(force=True)
             if neutralize_database:
                 odoo.modules.neutralize.neutralize_database(cr)
 
         if sanitize:
             sanitize_database(temp_db_name)
         if existing:
-            _logger.info('RESTORE DB: Dropping database %s', db)
+            _logger.info("RESTORE DB: Dropping database %s", db)
             exp_drop(db)
 
-        postgres_db = odoo.sql_db.db_connect('postgres')
+        postgres_db = odoo.sql_db.db_connect("postgres")
         with closing(postgres_db.cursor()) as cr:
             # database-altering operations cannot be executed inside a transaction
             cr._cnx.autocommit = True
             _drop_conn(cr, temp_db_name)
             try:
                 cr.execute(
-                    sql.SQL('ALTER DATABASE {} RENAME TO {}').format(sql.Identifier(temp_db_name), sql.Identifier(db))
+                    sql.SQL("ALTER DATABASE {} RENAME TO {}").format(sql.Identifier(temp_db_name), sql.Identifier(db))
                 )
-                _logger.info('RENAME DB: %s -> %s', temp_db_name, db)
+                _logger.info("RENAME DB: %s -> %s", temp_db_name, db)
             except Exception as e:
-                _logger.info('RENAME DB: %s -> %s failed:\n%s', temp_db_name, db, e)
+                _logger.info("RENAME DB: %s -> %s failed:\n%s", temp_db_name, db, e)
                 raise Exception(f"Couldn't rename database {temp_db_name} to {db}: {e}") from e
 
         if filestore_path:
             registry = odoo.modules.registry.Registry.new(db)
             with registry.cursor() as cr:
                 env = odoo.api.Environment(cr, SUPERUSER_ID, {})
-                filestore_dest = env['ir.attachment']._filestore()
+                filestore_dest = env["ir.attachment"]._filestore()
                 shutil.move(filestore_path, filestore_dest)
 
     # remove temporary database registry to avoid cron jobs try to run on it
     odoo.modules.registry.Registry.delete(temp_db_name)
 
-    _logger.info('RESTORE DB: %s', db)
+    _logger.info("RESTORE DB: %s", db)
 
 
 # override odoo.service.db.restore_db

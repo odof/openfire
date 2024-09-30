@@ -4,17 +4,17 @@ from odoo import api, fields, models
 
 
 class OFPaymentMode(models.Model):
-    _name = 'of.payment.mode'
+    _name = "of.payment.mode"
     _description = "Payment Mode"
 
-    name = fields.Char(compute='_compute_name')
-    shortname = fields.Char(related='payment_method_line_id.name', string="Short Name")
-    journal_id = fields.Many2one(comodel_name='account.journal', string="Journal", required=True, ondelete='cascade')
+    name = fields.Char(compute="_compute_name")
+    shortname = fields.Char(related="payment_method_line_id.name", string="Short Name")
+    journal_id = fields.Many2one(comodel_name="account.journal", string="Journal", required=True, ondelete="cascade")
     payment_method_line_id = fields.Many2one(
-        comodel_name='account.payment.method.line', string="Payment Method Line", required=True, ondelete='cascade'
+        comodel_name="account.payment.method.line", string="Payment Method Line", required=True, ondelete="cascade"
     )
-    payment_type = fields.Selection(related='payment_method_line_id.payment_type')
-    company_id = fields.Many2one(comodel_name='res.company', related='journal_id.company_id', string="Company")
+    payment_type = fields.Selection(related="payment_method_line_id.payment_type")
+    company_id = fields.Many2one(comodel_name="res.company", related="journal_id.company_id", string="Company")
     active = fields.Boolean()
 
     def _compute_name(self):
@@ -35,17 +35,17 @@ class OFPaymentMode(models.Model):
             None
         """
         journal_ids = (
-            self.env['account.journal'].with_context(active_test=False).search([('type', 'in', ['cash', 'bank'])])
+            self.env["account.journal"].with_context(active_test=False).search([("type", "in", ["cash", "bank"])])
         )
         for journal in journal_ids:
-            for mode in self.env['account.payment.method.line'].search([('journal_id', '=', journal.id)]):
-                if not self.env['of.payment.mode'].search(
-                    [('journal_id', '=', journal.id), ('payment_method_line_id', '=', mode.id)]
+            for mode in self.env["account.payment.method.line"].search([("journal_id", "=", journal.id)]):
+                if not self.env["of.payment.mode"].search(
+                    [("journal_id", "=", journal.id), ("payment_method_line_id", "=", mode.id)]
                 ):
-                    self.env['of.payment.mode'].create(
+                    self.env["of.payment.mode"].create(
                         {
-                            'journal_id': journal.id,
-                            'payment_method_line_id': mode.id,
-                            'active': journal.active,
+                            "journal_id": journal.id,
+                            "payment_method_line_id": mode.id,
+                            "active": journal.active,
                         }
                     )

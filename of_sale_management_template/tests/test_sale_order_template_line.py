@@ -9,7 +9,7 @@ from odoo.addons.of_sale_management_template.tests.common import TestOFSaleManag
 class TestOFSaleOrderTemplate(TestOFSaleManagementCommon):
     def test_01_sale_order_template_create(self):
         """Test creation of sale order template"""
-        with Form(self.env['sale.order.template']) as template_form:
+        with Form(self.env["sale.order.template"]) as template_form:
             template_form.name = "Sale order template create test"
             template_form.of_fiscal_position_id = self.fiscal_pos_10
             template_form.of_payment_term_id = self.payment_term_1
@@ -27,24 +27,24 @@ class TestOFSaleOrderTemplate(TestOFSaleManagementCommon):
         self.assertEqual(
             template.sale_order_template_line_ids[0].name,
             # get from product.template._recompute_product_name()
-            '[BA_PCA_123] Brand A - Product Consu A\nBrand A Description\nProduct : Product Consu A',
+            "[BA_PCA_123] Brand A - Product Consu A\nBrand A Description\nProduct : Product Consu A",
         )
 
     def test_02_sale_order_create_with_template(self):
         """Test creation of sale order from template"""
         self.sale_order_template_1.write(
             {
-                'sale_order_template_line_ids': [
-                    Command.create({'product_id': self.product_consu_a.id, 'product_uom_qty': 3})
+                "sale_order_template_line_ids": [
+                    Command.create({"product_id": self.product_consu_a.id, "product_uom_qty": 3})
                 ]
             }
         )
 
-        sale_order = self.env['sale.order'].browse()
+        sale_order = self.env["sale.order"].browse()
         # Création d'un devis à partir du modèle de devis
         order_values = self._prepare_sale_order_values()
-        order_values['sale_order_template_id'] = self.sale_order_template_1.id
-        sale_order = self.env['sale.order'].create(order_values)
+        order_values["sale_order_template_id"] = self.sale_order_template_1.id
+        sale_order = self.env["sale.order"].create(order_values)
         sale_order._onchange_sale_order_template_id()
 
         # Vérification des champs copiés
@@ -57,5 +57,5 @@ class TestOFSaleOrderTemplate(TestOFSaleManagementCommon):
         self.assertEqual(
             sale_order.order_line[0].name,
             # get from product.template._recompute_product_name()
-            '[BA_PCA_123] Brand A - Product Consu A\nBrand A Description\nProduct : Product Consu A',
+            "[BA_PCA_123] Brand A - Product Consu A\nBrand A Description\nProduct : Product Consu A",
         )

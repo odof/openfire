@@ -23,54 +23,54 @@ class TestResPartner(TestOFServiceCommon):
         three_days_ago = today - relativedelta(days=3)
 
         request_base_values = {
-            'name': 'Test Request',
-            'partner_id': self.partner_tony.id,
-            'state': 'draft',
-            'type_id': self.env.ref('of_service.of_service_request_type_installation').id,
-            'task_id': self.task_installation.id,
-            'company_id': self.company_fr.id,
-            'next_date': today,
-            'end_date': in_15_days,
+            "name": "Test Request",
+            "partner_id": self.partner_tony.id,
+            "state": "draft",
+            "type_id": self.env.ref("of_service.of_service_request_type_installation").id,
+            "task_id": self.task_installation.id,
+            "company_id": self.company_fr.id,
+            "next_date": today,
+            "end_date": in_15_days,
         }
-        request_1 = self.env['of.service.request'].create(request_base_values)
+        request_1 = self.env["of.service.request"].create(request_base_values)
 
         request_values = request_base_values | {
-            'name': 'Test Request 2',
-            'state': 'to_plan',
-            'base_state': 'calculated',
+            "name": "Test Request 2",
+            "state": "to_plan",
+            "base_state": "calculated",
         }
-        request_2 = self.env['of.service.request'].create(request_values)
+        request_2 = self.env["of.service.request"].create(request_values)
 
         request_values = request_base_values | {
-            'name': 'Test Request 3',
-            'state': 'part_planned',
-            'base_state': 'calculated',
+            "name": "Test Request 3",
+            "state": "part_planned",
+            "base_state": "calculated",
         }
-        request_3 = self.env['of.service.request'].create(request_values)
+        request_3 = self.env["of.service.request"].create(request_values)
 
-        request_values = request_base_values | {'name': 'Test Request 4', 'state': 'late'}
-        request_4 = self.env['of.service.request'].create(request_values)
-
-        request_values = request_base_values | {
-            'name': 'Test Request 5',
-            'state': 'done',
-            'recurrency': True,
-            'remaining_duration': 0,
-            'last_next_date': three_days_ago,
-            'contract_end_date': three_days_ago,
-            'base_state': 'calculated',
-        }
-        self.env['of.service.request'].create(request_values)
+        request_values = request_base_values | {"name": "Test Request 4", "state": "late"}
+        request_4 = self.env["of.service.request"].create(request_values)
 
         request_values = request_base_values | {
-            'name': 'Test Request 6',
-            'state': 'done',
-            'recurrency': True,
-            'remaining_duration': 0,
-            'last_next_date': three_days_ago,
-            'base_state': 'calculated',
+            "name": "Test Request 5",
+            "state": "done",
+            "recurrency": True,
+            "remaining_duration": 0,
+            "last_next_date": three_days_ago,
+            "contract_end_date": three_days_ago,
+            "base_state": "calculated",
         }
-        request_6 = self.env['of.service.request'].create(request_values)
+        self.env["of.service.request"].create(request_values)
+
+        request_values = request_base_values | {
+            "name": "Test Request 6",
+            "state": "done",
+            "recurrency": True,
+            "remaining_duration": 0,
+            "last_next_date": three_days_ago,
+            "base_state": "calculated",
+        }
+        request_6 = self.env["of.service.request"].create(request_values)
 
         # Compute the requests for the partner
         self.partner_tony._compute_requests()

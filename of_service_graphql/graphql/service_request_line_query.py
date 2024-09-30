@@ -8,8 +8,8 @@ from .service_request_line_type import ServiceRequestLine, ServiceRequestLineFil
 
 
 class ServiceRequestLineQuery(graphene.ObjectType):
-    _name = 'ServiceRequestLineQuery'
-    _type = 'query'
+    _name = "ServiceRequestLineQuery"
+    _type = "query"
 
     service_request_lines = graphene.List(
         graphene.NonNull(ServiceRequestLine),
@@ -21,7 +21,7 @@ class ServiceRequestLineQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_service_request_lines(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.service.request.line']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.service.request.line"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.service.request.line'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.service.request.line"].search(odoo_domain, offset=offset, limit=limit)

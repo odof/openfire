@@ -9,8 +9,8 @@ from .account_tax_type import AccountTaxType
 
 
 class AccountFiscalPosition(OdooObjectType):
-    _name = 'AccountFiscalPosition'
-    _type = 'types'
+    _name = "AccountFiscalPosition"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -25,14 +25,14 @@ class AccountFiscalPosition(OdooObjectType):
 
 
 class AccountFiscalPositionInput(graphene.InputObjectType):
-    _name = 'AccountFiscalPositionInput'
-    _type = 'types'
+    _name = "AccountFiscalPositionInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
 
 
 class AccountFiscalPositionFilterInput(AccountFiscalPositionInput):
-    _name = 'AccountFiscalPositionFilterInput'
+    _name = "AccountFiscalPositionFilterInput"
 
     tax_type_use = graphene.Field(AccountTaxType)

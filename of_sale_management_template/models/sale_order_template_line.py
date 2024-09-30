@@ -4,9 +4,9 @@ from odoo import api, models
 
 
 class SaleOrderTemplateLine(models.Model):
-    _inherit = 'sale.order.template.line'
+    _inherit = "sale.order.template.line"
 
-    @api.depends('product_id')
+    @api.depends("product_id")
     def _compute_name(self):
         super()._compute_name()
         for option in self:

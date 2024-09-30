@@ -16,7 +16,7 @@ from ..graphql.sale_order_type import SaleOrder, SaleOrderInput
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_sale_management_template_graphql_register(self, dbname):
         # ici on charge le graphql de ce module
@@ -40,12 +40,12 @@ class OFGraphql(models.AbstractModel):
         arguments = super()._prepare_arguments()
 
         new_arguments = {
-            'SaleOrderMutation': {
-                'sale_order_update': {
-                    'sale_template': SaleOrderTemplateInput,
+            "SaleOrderMutation": {
+                "sale_order_update": {
+                    "sale_template": SaleOrderTemplateInput,
                 },
-                'sale_order_create': {
-                    'sale_template': SaleOrderTemplateInput,
+                "sale_order_create": {
+                    "sale_template": SaleOrderTemplateInput,
                 },
             },
         }

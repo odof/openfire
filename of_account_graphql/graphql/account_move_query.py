@@ -8,8 +8,8 @@ from .account_move_type import AccountMove, AccountMoveFilterInput
 
 
 class AccountMoveQuery(graphene.ObjectType):
-    _name = 'AccountMoveQuery'
-    _type = 'query'
+    _name = "AccountMoveQuery"
+    _type = "query"
 
     account_moves = graphene.List(
         graphene.NonNull(AccountMove),
@@ -21,7 +21,7 @@ class AccountMoveQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_account_moves(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['account.move']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["account.move"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['account.move'].search(odoo_domain, offset=offset, limit=limit)
+        return env["account.move"].search(odoo_domain, offset=offset, limit=limit)

@@ -4,14 +4,14 @@ from odoo import fields, models
 
 
 class OFServiceRequestStage(models.Model):
-    _inherit = 'of.service.request.stage'
+    _inherit = "of.service.request.stage"
 
     state = fields.Selection(
         selection=[
-            ('draft', "Draft"),
-            ('open', "Open"),
-            ('pending', "Pending"),
-            ('done', "Done"),
-            ('cancelled', "Cancelled"),
+            ("draft", "Draft"),
+            ("open", "Open"),
+            ("pending", "Pending"),
+            ("done", "Done"),
+            ("cancelled", "Cancelled"),
         ],
     )

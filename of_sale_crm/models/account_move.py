@@ -4,12 +4,12 @@ from odoo import fields, models
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     of_canvasser_id = fields.Many2one(
-        comodel_name='res.users',
+        comodel_name="res.users",
         string="Canvasser",
         readonly=True,
-        states={'draft': [('readonly', False)]},
+        states={"draft": [("readonly", False)]},
         default=lambda self: self.env.user,
     )

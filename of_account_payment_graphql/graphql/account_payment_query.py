@@ -8,8 +8,8 @@ from .account_payment_type import AccountPayment, AccountPaymentFilterInput
 
 
 class AccountPaymentQuery(graphene.ObjectType):
-    _name = 'AccountPaymentQuery'
-    _type = 'query'
+    _name = "AccountPaymentQuery"
+    _type = "query"
 
     account_payments = graphene.List(
         graphene.NonNull(AccountPayment),
@@ -21,8 +21,8 @@ class AccountPaymentQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_account_payments(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['account.payment']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["account.payment"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['account.payment'].search(odoo_domain, offset=offset, limit=limit)
+        return env["account.payment"].search(odoo_domain, offset=offset, limit=limit)

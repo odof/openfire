@@ -10,7 +10,7 @@ from .partner_type import CompanyType, Partner, PartnerInput
 
 
 class PartnerCreate(graphene.Mutation):
-    _name = 'PartnerCreate'
+    _name = "PartnerCreate"
 
     class Arguments:
         name = graphene.String()
@@ -33,13 +33,13 @@ class PartnerCreate(graphene.Mutation):
     Output = Partner
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['res.partner']._prepare_mutation_values(**args)
-        return env['res.partner'].create(values)
+        env = info.context["env"]
+        values = env["res.partner"]._prepare_mutation_values(**args)
+        return env["res.partner"].create(values)
 
 
 class PartnerUpdate(graphene.Mutation):
-    _name = 'PartnerUpdate'
+    _name = "PartnerUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -63,15 +63,15 @@ class PartnerUpdate(graphene.Mutation):
     Output = Partner
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['res.partner']._prepare_mutation_values(**args)
-        partner = env['res.partner'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["res.partner"]._prepare_mutation_values(**args)
+        partner = env["res.partner"].search([("id", "=", id)])
         partner.write(values)
         return partner
 
 
 class PartnerDelete(graphene.Mutation):
-    _name = 'PartnerDelete'
+    _name = "PartnerDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -79,13 +79,13 @@ class PartnerDelete(graphene.Mutation):
     Output = Partner
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'res.partner', id)
+        env = info.context["env"]
+        return lazy_delete(env, "res.partner", id)
 
 
 class PartnerMutation(graphene.ObjectType):
-    _name = 'PartnerMutation'
-    _type = 'mutation'
+    _name = "PartnerMutation"
+    _type = "mutation"
 
     partner_create = PartnerCreate.Field()
     partner_update = PartnerUpdate.Field()

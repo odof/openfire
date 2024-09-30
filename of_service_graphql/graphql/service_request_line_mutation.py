@@ -12,7 +12,7 @@ from .service_request_line_type import ServiceRequestLine
 
 
 class ServiceRequestLineCreate(graphene.Mutation):
-    _name = 'ServiceRequestLineCreate'
+    _name = "ServiceRequestLineCreate"
 
     class Arguments:
         name = graphene.String()
@@ -32,13 +32,13 @@ class ServiceRequestLineCreate(graphene.Mutation):
     Output = ServiceRequestLine
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.service.request.line']._prepare_mutation_values(**args)
-        return env['of.service.request.line'].create(values)
+        env = info.context["env"]
+        values = env["of.service.request.line"]._prepare_mutation_values(**args)
+        return env["of.service.request.line"].create(values)
 
 
 class ServiceRequestLineUpdate(graphene.Mutation):
-    _name = 'ServiceRequestLineUpdate'
+    _name = "ServiceRequestLineUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -59,15 +59,15 @@ class ServiceRequestLineUpdate(graphene.Mutation):
     Output = ServiceRequestLine
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.service.request.line']._prepare_mutation_values(**args)
-        service_request_line = env['of.service.request.line'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.service.request.line"]._prepare_mutation_values(**args)
+        service_request_line = env["of.service.request.line"].search([("id", "=", id)])
         service_request_line.write(values)
         return service_request_line
 
 
 class ServiceRequestLineDelete(graphene.Mutation):
-    _name = 'ServiceRequestLineDelete'
+    _name = "ServiceRequestLineDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -75,13 +75,13 @@ class ServiceRequestLineDelete(graphene.Mutation):
     Output = ServiceRequestLine
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.service.request.line', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.service.request.line", id)
 
 
 class ServiceRequestLineMutation(graphene.ObjectType):
-    _name = 'ServiceRequestLineMutation'
-    _type = 'mutation'
+    _name = "ServiceRequestLineMutation"
+    _type = "mutation"
 
     service_request_line_create = ServiceRequestLineCreate.Field()
     service_request_line_update = ServiceRequestLineUpdate.Field()

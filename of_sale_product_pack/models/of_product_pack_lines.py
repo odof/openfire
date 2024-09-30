@@ -4,19 +4,19 @@ from odoo import fields, models
 
 
 class OFProductPackLines(models.Model):
-    _inherit = 'of.product.pack.lines'
+    _inherit = "of.product.pack.lines"
 
     parent_product_id = fields.Many2one(
-        comodel_name='sale.order.line',
-        string='Parent Product',
-        ondelete='cascade',
+        comodel_name="sale.order.line",
+        string="Parent Product",
+        ondelete="cascade",
         index=True,
         required=True,
     )
     _sql_constraints = [
         (
-            'product_uniq',
-            'unique(parent_product_id, product_id)',
+            "product_uniq",
+            "unique(parent_product_id, product_id)",
             "Product must be only once on a pack !",
         ),
     ]
@@ -26,7 +26,7 @@ class OFProductPackLines(models.Model):
         parent_line_procurement_values = self.parent_product_id._prepare_procurement_values(group_id)
         parent_line_procurement_values.update(
             {
-                'sale_line_id': self.parent_product_id.id,
+                "sale_line_id": self.parent_product_id.id,
             }
         )
         return parent_line_procurement_values

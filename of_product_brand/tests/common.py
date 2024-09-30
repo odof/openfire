@@ -13,44 +13,44 @@ class TestOFProductCommon(TestOFProductCommon):
 
         # Brand data
         cls.product_brand_a = (
-            cls.env['of.product.brand']
+            cls.env["of.product.brand"]
             .with_company(cls.company_fr)
             .create(
                 {
-                    'name': 'Brand A',
-                    'code': 'BA',
-                    'partner_id': cls.supplier_a.id,
-                    'use_brand_description_sale': True,
-                    'description_sale': "Brand A Description\nProduct : {{object.name}}",
-                    'show_in_sales': True,
+                    "name": "Brand A",
+                    "code": "BA",
+                    "partner_id": cls.supplier_a.id,
+                    "use_brand_description_sale": True,
+                    "description_sale": "Brand A Description\nProduct : {{object.name}}",
+                    "show_in_sales": True,
                 }
             )
         )
         cls.product_brand_b = (
-            cls.env['of.product.brand']
+            cls.env["of.product.brand"]
             .with_company(cls.company_fr)
             .create(
                 {
-                    'name': 'Brand B',
-                    'code': 'BB',
-                    'partner_id': cls.supplier_b.id,
-                    'use_brand_description_sale': False,
-                    'description_sale': "Brand B Description\nProduct : {{object.name}}",
-                    'show_in_sales': True,
+                    "name": "Brand B",
+                    "code": "BB",
+                    "partner_id": cls.supplier_b.id,
+                    "use_brand_description_sale": False,
+                    "description_sale": "Brand B Description\nProduct : {{object.name}}",
+                    "show_in_sales": True,
                 }
             )
         )
         cls.product_brand_c = (
-            cls.env['of.product.brand']
+            cls.env["of.product.brand"]
             .with_company(cls.company_fr)
             .create(
                 {
-                    'name': 'Brand C',
-                    'code': 'BC',
-                    'partner_id': cls.supplier_a.id,
-                    'use_brand_description_sale': False,
-                    'description_sale': False,
-                    'show_in_sales': False,
+                    "name": "Brand C",
+                    "code": "BC",
+                    "partner_id": cls.supplier_a.id,
+                    "use_brand_description_sale": False,
+                    "description_sale": False,
+                    "show_in_sales": False,
                 }
             )
         )

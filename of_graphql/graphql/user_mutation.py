@@ -8,7 +8,7 @@ from .user_type import User
 
 
 class UserUpdate(graphene.Mutation):
-    _name = 'UserUpdate'
+    _name = "UserUpdate"
 
     # ici on définit les arguments qui sont à utiliser pour mettre à jour un utilisateur
     class Arguments:
@@ -28,15 +28,15 @@ class UserUpdate(graphene.Mutation):
 
     # c'est cette fonction qui sera appelée lors l'appel de la classe UpdateUser
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['res.users']._prepare_mutation_values(**args)
-        user = env['res.users'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["res.users"]._prepare_mutation_values(**args)
+        user = env["res.users"].search([("id", "=", id)])
         user.write(values)
         return user
 
 
 class UserMutation(graphene.ObjectType):
-    _name = 'UserMutation'
-    _type = 'mutation'
+    _name = "UserMutation"
+    _type = "mutation"
 
     user_update = UserUpdate.Field(description="Documentation of UserUpdate")

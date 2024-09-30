@@ -10,18 +10,18 @@ from odoo.tools import frozendict
 
 
 class ResUsers(models.Model):
-    _inherit = 'res.users'
+    _inherit = "res.users"
 
     @api.model
     def _default_of_type_selection(self):
-        return 'web'
+        return "web"
 
     of_user_type = fields.Selection(
         selection=[
-            ('web', "Web"),
-            ('technical', "Technical"),
-            ('external', "External"),
-            ('inactive', "Inactive resource"),
+            ("web", "Web"),
+            ("technical", "Technical"),
+            ("external", "External"),
+            ("inactive", "Inactive resource"),
         ],
         string="User type",
         default=lambda u: u._default_of_type_selection(),
@@ -29,7 +29,7 @@ class ResUsers(models.Model):
     of_reactivated_user = fields.Boolean(string="Reactivated user")
 
     @api.model
-    @tools.ormcache('self._uid')
+    @tools.ormcache("self._uid")
     def context_get(self):
         # Pour désactiver l'envoi des notifications par courriel des changements d'affectation des commandes
         # et factures. On met par défaut dans le contexte des utilisateurs la valeur mail_auto_subscribe_no_notify
@@ -37,12 +37,12 @@ class ResUsers(models.Model):
         # de /addons/mail/models.mail_thread.py.
         frozen_context = super().context_get()
         new_context = dict(frozen_context)
-        new_context['mail_auto_subscribe_no_notify'] = 1
+        new_context["mail_auto_subscribe_no_notify"] = 1
         return frozendict(new_context)
 
     def _get_default_email(self):
         self.ensure_one()
-        return re.sub('[^a-zA-Z0-9._%+-]', '', unidecode(self.partner_id.name)).lower() + "@example.com"
+        return re.sub("[^a-zA-Z0-9._%+-]", "", unidecode(self.partner_id.name)).lower() + "@example.com"
 
     def write(self, values):
         if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
@@ -51,19 +51,19 @@ class ResUsers(models.Model):
             )
         # save current inactive users to check if they are reactivated
         inactive_users = self.browse()
-        if values.get('active'):
+        if values.get("active"):
             inactive_users = self.filtered(lambda u: not u.active)
         result = super().write(values)
         # mark reactivated users as such
-        if inactive_users and values.get('active'):
-            inactive_users.write({'of_reactivated_user': True})
+        if inactive_users and values.get("active"):
+            inactive_users.write({"of_reactivated_user": True})
 
         # check that we don't add the group of_group_root_only to a user that is not an admin
-        group_root = self.env.ref('of_base.of_group_root_only').sudo()
+        group_root = self.env.ref("of_base.of_group_root_only").sudo()
         self._check_admin_only_group()
 
         if not len(group_root.users):
-            raise UserError(_("The group \"%s\" cannot be removed from the administrator account.") % group_root.name)
+            raise UserError(_('The group "%s" cannot be removed from the administrator account.') % group_root.name)
         return result
 
     @api.model_create_multi
@@ -104,14 +104,14 @@ class ResUsers(models.Model):
 
         for user in self:
             for notification_type in notifications:
-                if notification_type == 'backoffice':
-                    self.env['bus.bus']._sendone(
+                if notification_type == "backoffice":
+                    self.env["bus.bus"]._sendone(
                         user.partner_id,
-                        'simple_notification',
+                        "simple_notification",
                         notifications[notification_type],
                     )
                 else:
-                    self.env['bus.bus']._sendone(
+                    self.env["bus.bus"]._sendone(
                         user.partner_id,
                         notification_type,
                         notifications[notification_type],
@@ -119,8 +119,8 @@ class ResUsers(models.Model):
 
     def _check_admin_only_group(self):
         for user in self:
-            group_root = self.env.ref('of_base.of_group_root_only').sudo()
-            if group_root in user.groups_id and user not in self.env.ref('base.user_root') | self.env.ref(
-                'base.user_admin'
+            group_root = self.env.ref("of_base.of_group_root_only").sudo()
+            if group_root in user.groups_id and user not in self.env.ref("base.user_root") | self.env.ref(
+                "base.user_admin"
             ):
-                raise UserError(_("Only the admin account can belong to group \"%s\".") % group_root.name)
+                raise UserError(_('Only the admin account can belong to group "%s".') % group_root.name)

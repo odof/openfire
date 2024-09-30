@@ -22,7 +22,7 @@ from ..graphql.stock_warehouse_type import StockWarehouse, StockWarehouseFilterI
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_stock_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

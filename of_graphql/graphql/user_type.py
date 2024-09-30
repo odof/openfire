@@ -9,8 +9,8 @@ from ..graphql.company_type import Company
 
 
 class User(OdooObjectType):
-    _name = 'User'
-    _type = 'types'
+    _name = "User"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -34,8 +34,8 @@ class User(OdooObjectType):
 
 
 class UserInput(graphene.InputObjectType):
-    _name = 'UserInput'
-    _type = 'types'
+    _name = "UserInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -50,4 +50,4 @@ class UserInput(graphene.InputObjectType):
 
 
 class UserFilterInput(UserInput):
-    _name = 'UserFilterInput'
+    _name = "UserFilterInput"

@@ -7,8 +7,8 @@ from odoo.addons.of_graphql.graphql.odoo_type import OdooImage
 
 
 class Image(OdooObjectType):
-    _name = 'Image'
-    _type = 'types'
+    _name = "Image"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(default_value="")
@@ -19,8 +19,8 @@ class Image(OdooObjectType):
 
 
 class ImageInput(graphene.InputObjectType):
-    _name = 'ImageInput'
-    _type = 'types'
+    _name = "ImageInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -31,4 +31,4 @@ class ImageInput(graphene.InputObjectType):
 
 
 class ImageFilterInput(ImageInput):
-    _name = 'ImageFilterInput'
+    _name = "ImageFilterInput"

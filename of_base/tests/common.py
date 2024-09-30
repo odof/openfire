@@ -3,7 +3,7 @@
 from odoo.tests import TransactionCase, tagged
 
 
-@tagged('post_install', '-at_install', 'openfire_custom')
+@tagged("post_install", "-at_install", "openfire_custom")
 class TestOFBaseCommon(TransactionCase):
     def setUp(self):
         super().setUp()
@@ -22,46 +22,46 @@ class TestOFBaseCommon(TransactionCase):
         # Company data
         cls.company_fr = cls.create_company(
             {
-                'name': "Openfire FR",
-                'currency_id': cls.env.ref('base.EUR').id,
-                'country_id': cls.env.ref('base.fr').id,
-                'account_fiscal_country_id': cls.env.ref('base.fr').id,
+                "name": "Openfire FR",
+                "currency_id": cls.env.ref("base.EUR").id,
+                "country_id": cls.env.ref("base.fr").id,
+                "account_fiscal_country_id": cls.env.ref("base.fr").id,
             }
         )
 
         # Customer data
         cls.customer_a = cls.create_partner(
             {
-                'name': "Partner A",
-                'company_id': cls.company_fr.id,
-                'customer_rank': 1,
-                'email': 'test-customer-a@openfire.fr',
+                "name": "Partner A",
+                "company_id": cls.company_fr.id,
+                "customer_rank": 1,
+                "email": "test-customer-a@openfire.fr",
             }
         )
         cls.supplier_a = cls.create_partner(
             {
-                'name': "Supplier A",
-                'company_id': cls.company_fr.id,
-                'supplier_rank': 1,
-                'email': 'test-supplier-a@openfire.fr',
+                "name": "Supplier A",
+                "company_id": cls.company_fr.id,
+                "supplier_rank": 1,
+                "email": "test-supplier-a@openfire.fr",
             }
         )
-        cls.supplier_b = cls.env['res.partner'].create(
+        cls.supplier_b = cls.env["res.partner"].create(
             {
-                'name': "Supplier B",
-                'company_id': cls.company_fr.id,
-                'supplier_rank': 1,
+                "name": "Supplier B",
+                "company_id": cls.company_fr.id,
+                "supplier_rank": 1,
             }
         )
 
     @classmethod
     def create_company(cls, values):
-        return cls.env['res.company'].create(values)
+        return cls.env["res.company"].create(values)
 
     @classmethod
     def create_partner(cls, values):
-        if 'company_id' not in values:
-            values['company_id'] = cls.company_fr.id
-        if 'email' not in values:
-            values['email'] = 'test-partner@openfire.fr'
-        return cls.env['res.partner'].create(values)
+        if "company_id" not in values:
+            values["company_id"] = cls.company_fr.id
+        if "email" not in values:
+            values["email"] = "test-partner@openfire.fr"
+        return cls.env["res.partner"].create(values)

@@ -5,13 +5,13 @@ from odoo import models
 
 
 class OFEquipment(models.Model):
-    _inherit = 'of.equipment'
+    _inherit = "of.equipment"
 
     def write(self, vals):
         res = super().write(vals)
-        self.env['calendar.event'].action_update_date([('of_equipment_ids', 'in', self.ids)])
+        self.env["calendar.event"].action_update_date([("of_equipment_ids", "in", self.ids)])
         return res
 
     def unlink(self):
-        self.env['calendar.event'].action_update_date([('of_equipment_ids', 'in', self.ids)])
+        self.env["calendar.event"].action_update_date([("of_equipment_ids", "in", self.ids)])
         return super().unlink()

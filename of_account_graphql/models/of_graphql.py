@@ -28,7 +28,7 @@ from ..graphql.product_type import Product, ProductInput
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_account_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class SaleReport(models.Model):
-    _inherit = 'sale.report'
+    _inherit = "sale.report"
 
-    of_canvasser_id = fields.Many2one(comodel_name='res.users', string="Canvasser", readonly=True)
+    of_canvasser_id = fields.Many2one(comodel_name="res.users", string="Canvasser", readonly=True)
 
     def _select(self):
         res = super()._select()

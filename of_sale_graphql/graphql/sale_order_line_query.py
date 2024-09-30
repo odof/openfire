@@ -8,8 +8,8 @@ from .sale_order_line_type import SaleOrderLine, SaleOrderLineFilterInput
 
 
 class SaleOrderLineQuery(graphene.ObjectType):
-    _name = 'SaleOrderLineQuery'
-    _type = 'query'
+    _name = "SaleOrderLineQuery"
+    _type = "query"
 
     sale_lines = graphene.List(
         graphene.NonNull(SaleOrderLine),
@@ -21,7 +21,7 @@ class SaleOrderLineQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_sale_lines(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['sale.order.line']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["sale.order.line"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['sale.order.line'].search(odoo_domain, offset=offset, limit=limit)
+        return env["sale.order.line"].search(odoo_domain, offset=offset, limit=limit)

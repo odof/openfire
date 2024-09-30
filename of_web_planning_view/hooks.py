@@ -5,7 +5,7 @@ from odoo import SUPERUSER_ID, api
 
 def _init_planning_config(cr):
     env = api.Environment(cr, SUPERUSER_ID, {})
-    companies = env['res.company'].search([])
+    companies = env["res.company"].search([])
     for company in companies:
         company.of_planning_start_hour = 6
         company.of_planning_end_hour = 20

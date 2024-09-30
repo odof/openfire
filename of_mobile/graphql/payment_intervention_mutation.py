@@ -10,7 +10,7 @@ from .account_payment_type import PaymentType
 
 
 class PaymentInterventionCreate(graphene.Mutation):
-    _name = 'PaymentInterventionCreate'
+    _name = "PaymentInterventionCreate"
 
     class Arguments:
         intervention = PlanningInterventionInput(required=True)
@@ -23,16 +23,16 @@ class PaymentInterventionCreate(graphene.Mutation):
     Output = AccountPayment
 
     def mutate(self, info, **args):
-        env = info.context['env']
+        env = info.context["env"]
 
-        payment_obj = env['account.payment']
+        payment_obj = env["account.payment"]
         payment = payment_obj.create_payment_intervention(**args)
 
         return payment or None
 
 
 class PaymentInterventionCreateMutation(graphene.ObjectType):
-    _name = 'PaymentInterventionCreateMutation'
-    _type = 'mutation'
+    _name = "PaymentInterventionCreateMutation"
+    _type = "mutation"
 
     payment_intervention_create = PaymentInterventionCreate.Field()

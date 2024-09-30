@@ -5,38 +5,38 @@ from odoo.tests import tagged
 from odoo.addons.of_survey.tests import common
 
 
-@tagged('openfire_custom')
+@tagged("openfire_custom")
 class TestSurveyComputePagesQuestions(common.TestSurveyCommon):
     def test_compute_pages_questions(self):
-        with self.with_user('survey_manager'):
-            survey = self.env['of.survey.survey'].create(
+        with self.with_user("survey_manager"):
+            survey = self.env["of.survey.survey"].create(
                 {
-                    'title': 'Test compute survey',
+                    "title": "Test compute survey",
                 }
             )
 
-            page_0 = self.env['of.survey.question'].create(
-                {'is_page': True, 'question_type': False, 'sequence': 1, 'title': 'P1', 'survey_id': survey.id}
+            page_0 = self.env["of.survey.question"].create(
+                {"is_page": True, "question_type": False, "sequence": 1, "title": "P1", "survey_id": survey.id}
             )
-            page0_q0 = self._add_question(page_0, 'Q1', 'text_box', survey_id=survey.id)
-            page0_q1 = self._add_question(page_0, 'Q2', 'text_box', survey_id=survey.id)
-            page0_q2 = self._add_question(page_0, 'Q3', 'text_box', survey_id=survey.id)
-            page0_q3 = self._add_question(page_0, 'Q4', 'text_box', survey_id=survey.id)
-            page0_q4 = self._add_question(page_0, 'Q5', 'text_box', survey_id=survey.id)
+            page0_q0 = self._add_question(page_0, "Q1", "text_box", survey_id=survey.id)
+            page0_q1 = self._add_question(page_0, "Q2", "text_box", survey_id=survey.id)
+            page0_q2 = self._add_question(page_0, "Q3", "text_box", survey_id=survey.id)
+            page0_q3 = self._add_question(page_0, "Q4", "text_box", survey_id=survey.id)
+            page0_q4 = self._add_question(page_0, "Q5", "text_box", survey_id=survey.id)
 
-            page_1 = self.env['of.survey.question'].create(
+            page_1 = self.env["of.survey.question"].create(
                 {
-                    'is_page': True,
-                    'question_type': False,
-                    'sequence': 7,
-                    'title': 'P2',
-                    'survey_id': survey.id,
+                    "is_page": True,
+                    "question_type": False,
+                    "sequence": 7,
+                    "title": "P2",
+                    "survey_id": survey.id,
                 }
             )
-            page1_q0 = self._add_question(page_1, 'Q6', 'text_box', survey_id=survey.id)
-            page1_q1 = self._add_question(page_1, 'Q7', 'text_box', survey_id=survey.id)
-            page1_q2 = self._add_question(page_1, 'Q8', 'text_box', survey_id=survey.id)
-            page1_q3 = self._add_question(page_1, 'Q9', 'text_box', survey_id=survey.id)
+            page1_q0 = self._add_question(page_1, "Q6", "text_box", survey_id=survey.id)
+            page1_q1 = self._add_question(page_1, "Q7", "text_box", survey_id=survey.id)
+            page1_q2 = self._add_question(page_1, "Q8", "text_box", survey_id=survey.id)
+            page1_q3 = self._add_question(page_1, "Q9", "text_box", survey_id=survey.id)
 
         self.assertEqual(len(survey.page_ids), 2, "Survey should have 2 pages")
         self.assertIn(page_0, survey.page_ids, "Page 1 should be contained in survey's page_ids")
@@ -67,6 +67,6 @@ class TestSurveyComputePagesQuestions(common.TestSurveyCommon):
         self.assertEqual(page1_q3.page_id, page_1, "Question 9 should belong to page 2")
 
         # move 1 question from page 1 to page 2
-        page0_q2.write({'sequence': 12})
+        page0_q2.write({"sequence": 12})
         page0_q2._compute_page_id()
         self.assertEqual(page0_q2.page_id, page_1, "Question 3 should now belong to page 2")

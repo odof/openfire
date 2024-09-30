@@ -8,7 +8,7 @@ from odoo.addons.of_planning_graphql.graphql.planning_intervention_type import P
 
 
 class PlanningInterventionSendReport(graphene.Mutation):
-    _name = 'PlanningInterventionSendReport'
+    _name = "PlanningInterventionSendReport"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -16,10 +16,10 @@ class PlanningInterventionSendReport(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
+        env = info.context["env"]
 
-        intervention_obj = env['calendar.event']
-        intervention = intervention_obj.search([('id', '=', id)])
+        intervention_obj = env["calendar.event"]
+        intervention = intervention_obj.search([("id", "=", id)])
 
         if not intervention:
             raise AccessError(f"Unable to find intervention with id: {id}")
@@ -30,7 +30,7 @@ class PlanningInterventionSendReport(graphene.Mutation):
 
 
 class PlanningInterventionSendReportMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionSendReportMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionSendReportMutation"
+    _type = "mutation"
 
     planning_intervention_send_report = PlanningInterventionSendReport.Field()

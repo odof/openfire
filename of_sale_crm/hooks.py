@@ -32,20 +32,20 @@ def _update_of_customer_state_on_partners(env):
         else: of_customer_state = 'lead'
     We take care of children after taking care of their parent.
     """
-    partner_obj = env['res.partner'].with_context(active_test=False)
+    partner_obj = env["res.partner"].with_context(active_test=False)
     # all partners
     partners = partner_obj.search([])
     # init of_customer_state to 'other' for all partners
-    partners.write({'of_customer_state': 'other'})
+    partners.write({"of_customer_state": "other"})
 
     # init of_customer_state for customers
-    customers = partner_obj.search([('customer_rank', '>=', 1)])
-    to_lead = env['res.partner']
-    to_customer = env['res.partner']
+    customers = partner_obj.search([("customer_rank", ">=", 1)])
+    to_lead = env["res.partner"]
+    to_customer = env["res.partner"]
     len_customers = len(customers)
 
     todo = partner_obj.search(
-        [('customer_rank', '>=', 1), '|', ('parent_id', '=', False), ('parent_id.customer_rank', '>=', 1)]
+        [("customer_rank", ">=", 1), "|", ("parent_id", "=", False), ("parent_id.customer_rank", ">=", 1)]
     )
     while todo:
         partner = todo[0]
@@ -58,10 +58,10 @@ def _update_of_customer_state_on_partners(env):
         else:
             to_customer += partner
         # potentially inactive children
-        todo += partner_obj.search([('parent_id', '=', partner.id), ('customer_rank', '>=', 1)])
+        todo += partner_obj.search([("parent_id", "=", partner.id), ("customer_rank", ">=", 1)])
 
-    to_lead.write({'of_customer_state': 'lead'})
-    to_customer.write({'of_customer_state': 'customer'})
+    to_lead.write({"of_customer_state": "lead"})
+    to_customer.write({"of_customer_state": "customer"})
     len_done = len(to_lead) + len(to_customer)
 
     if len_customers != len_done:  # not all partners have been processed
@@ -92,8 +92,8 @@ def _sale_order_post_install(cr):
 
 
 def _set_default_order_start_state(env):
-    settings = env['res.config.settings'].create({})
-    settings.of_sale_order_start_state = 'quotation'
+    settings = env["res.config.settings"].create({})
+    settings.of_sale_order_start_state = "quotation"
     settings.execute()
 
 

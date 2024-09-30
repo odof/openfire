@@ -7,15 +7,15 @@ logger = logging.getLogger(__name__)
 
 
 class CityZipGeonamesImport(models.TransientModel):
-    _inherit = 'city.zip.geonames.import'
+    _inherit = "city.zip.geonames.import"
 
     @api.model
     def prepare_zip(self, row, city_id):
         vals = super().prepare_zip(row, city_id)
         vals.update(
             {
-                'geo_lat': row[9],
-                'geo_lng': row[10],
+                "geo_lat": row[9],
+                "geo_lng": row[10],
             }
         )
         return vals
@@ -56,8 +56,8 @@ class CityZipGeonamesImport(models.TransientModel):
                 zip_vals = self.prepare_zip(row, city_id)
                 # extract zip and city name to avoid duplicates cause of latitiude and longitude
                 zip_vals_check = zip_vals.copy()
-                zip_vals_check.pop('geo_lat')
-                zip_vals_check.pop('geo_lng')
+                zip_vals_check.pop("geo_lat")
+                zip_vals_check.pop("geo_lng")
                 if zip_vals_check not in zip_vals_list_check:
                     zip_vals_list_check.append(zip_vals_check)
                     zip_vals_list.append(zip_vals)

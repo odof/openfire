@@ -4,7 +4,7 @@ from odoo import models
 
 
 class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+    _inherit = "stock.picking"
 
     def _get_delivery_slip_value(self):
         """
@@ -26,6 +26,6 @@ class StockPicking(models.Model):
                         product=sale_line.product_id,
                         partner=sale_line.order_id.partner_shipping_id,
                     )
-                    amount += amounts['total_included']
+                    amount += amounts["total_included"]
 
         return self.sale_id.currency_id.round(amount) if amount else amount

@@ -8,8 +8,8 @@ from . import survey_question_answer_type, survey_user_input_line_type
 
 
 class SurveyQuestionPage(OdooObjectType):
-    _name = 'SurveyQuestionPage'
-    _type = 'types'
+    _name = "SurveyQuestionPage"
+    _type = "types"
 
     id = graphene.Int(required=True)
     title = graphene.NonNull(graphene.String)
@@ -45,8 +45,8 @@ class SurveyQuestionPage(OdooObjectType):
 
 
 class SurveyConditionalQuestion(OdooObjectType):
-    _name = 'SurveyConditionalQuestion'
-    _type = 'types'
+    _name = "SurveyConditionalQuestion"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -65,8 +65,8 @@ class SurveyConditionalQuestion(OdooObjectType):
 
 
 class SurveyQuestionPageInput(graphene.InputObjectType):
-    _name = 'SurveyQuestionPageInput'
-    _type = 'types'
+    _name = "SurveyQuestionPageInput"
+    _type = "types"
 
     id = graphene.Int()
     title = graphene.String()
@@ -92,8 +92,8 @@ class SurveyQuestionPageInput(graphene.InputObjectType):
 
 
 class SurveyConditionalQuestionInput(graphene.InputObjectType):
-    _name = 'SurveyConditionalQuestionInput'
-    _type = 'types'
+    _name = "SurveyConditionalQuestionInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -104,8 +104,8 @@ class SurveyConditionalQuestionInput(graphene.InputObjectType):
 
 
 class SurveyConditionalQuestionFilterInput(graphene.InputObjectType):
-    _name = 'SurveyConditionalQuestionFilterInput'
-    _type = 'types'
+    _name = "SurveyConditionalQuestionFilterInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -113,8 +113,8 @@ class SurveyConditionalQuestionFilterInput(graphene.InputObjectType):
 
 
 class SurveyQuestionPageFilterInput(graphene.InputObjectType):
-    _name = 'SurveyQuestionPageFilterInput'
-    _type = 'types'
+    _name = "SurveyQuestionPageFilterInput"
+    _type = "types"
 
     id = graphene.Int()
     title = graphene.String()

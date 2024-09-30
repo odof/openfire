@@ -8,9 +8,9 @@ from odoo import api, fields, models
 
 
 class OfLogMessage(models.Model):
-    _name = 'of.log.message'
+    _name = "of.log.message"
     _description = "Log Message"
-    _order = 'create_date DESC'
+    _order = "create_date DESC"
 
     name = fields.Char(string="Title")
     model = fields.Char()
@@ -19,13 +19,13 @@ class OfLogMessage(models.Model):
     function = fields.Char()
     log_level = fields.Selection(
         selection=[
-            ('info', "Info"),
-            ('warning', "Warning"),
-            ('error', "Error"),
+            ("info", "Info"),
+            ("warning", "Warning"),
+            ("error", "Error"),
         ],
         string="Log level",
         required=True,
-        default='warning',
+        default="warning",
     )
 
     @api.model
@@ -34,18 +34,18 @@ class OfLogMessage(models.Model):
             return
         remove_from = datetime.now() - relativedelta(days=day_limit)
         st = fields.Datetime.to_string(remove_from)
-        self.search([('create_date', '<=', st)]).unlink()
+        self.search([("create_date", "<=", st)]).unlink()
 
     @api.model
-    def new_log(self, obj, name, ttype, message, function, log_level='warning'):
+    def new_log(self, obj, name, ttype, message, function, log_level="warning"):
         model = hasattr(obj, "_name") and obj._name or ""
-        self.env['of.log.message'].create(
+        self.env["of.log.message"].create(
             {
-                'name': name,
-                'model': model,
-                'type': ttype,
-                'message': message,
-                'function': function,
-                'log_level': log_level,
+                "name": name,
+                "model": model,
+                "type": ttype,
+                "message": message,
+                "function": function,
+                "log_level": log_level,
             }
         )

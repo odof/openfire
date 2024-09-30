@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    _inherit = 'res.config.settings'
+    _inherit = "res.config.settings"
 
     of_planning_start_hour = fields.Integer(
         string="Day start time", related="company_id.of_planning_start_hour", readonly=False

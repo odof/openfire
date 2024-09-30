@@ -9,11 +9,11 @@ from .models.res_partner import convert_phone_number
 
 
 def _set_partner_bank_account_type(env):
-    for bank in env['res.partner.bank'].search([]):
+    for bank in env["res.partner.bank"].search([]):
         try:
             validate_iban(bank.acc_number)
         except ValidationError:
-            bank.acc_type = 'bank'
+            bank.acc_type = "bank"
 
 
 def _set_partner_phones(env, cr):
@@ -22,20 +22,20 @@ def _set_partner_phones(env, cr):
     for partner_id, phone, mobile in cr.fetchall():
         vals = {}
         if phone:
-            vals['01_domicile'] = phone
+            vals["01_domicile"] = phone
         if mobile:
-            vals['03_mobile'] = mobile
+            vals["03_mobile"] = mobile
         if vals:
             partner_phones[partner_id] = vals
 
-    for partner in env['res.partner'].browse(partner_phones):
-        country_code = partner.country_id.code or 'FR'
+    for partner in env["res.partner"].browse(partner_phones):
+        country_code = partner.country_id.code or "FR"
         phone_number_ids = []
         for phone_type, phone_number in partner_phones[partner.id].items():
             if number := convert_phone_number(phone_number, country_code):
-                phone_number_ids.append(Command.create({'number': number, 'type': phone_type}))
+                phone_number_ids.append(Command.create({"number": number, "type": phone_type}))
         if phone_number_ids:
-            partner.write({'of_phone_number_ids': phone_number_ids})
+            partner.write({"of_phone_number_ids": phone_number_ids})
 
 
 def post_init_hook(cr, registry):
@@ -51,5 +51,5 @@ def pre_init_hook(cr):
     That view is in conflict with our search view, so we deactivate it to resolve the conflict in a specific
     auto-installed module depending on `sms` and `of_base`."""
     env = api.Environment(cr, SUPERUSER_ID, {})
-    if env['ir.module.module']._get('sms').state == 'installed':
-        env.ref('sms.res_partner_view_search').active = False
+    if env["ir.module.module"]._get("sms").state == "installed":
+        env.ref("sms.res_partner_view_search").active = False

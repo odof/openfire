@@ -4,8 +4,8 @@ from odoo import models
 
 
 class Attendee(models.Model):
-    _inherit = 'calendar.attendee'
+    _inherit = "calendar.attendee"
 
     def _should_notify_attendee(self):
         """Override to not notify attendees for interventions"""
-        return super()._should_notify_attendee() and self.event_id.of_type != 'intervention'
+        return super()._should_notify_attendee() and self.event_id.of_type != "intervention"

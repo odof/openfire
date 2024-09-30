@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class OFPlanningTask(models.Model):
-    _name = 'of.planning.task'
+    _name = "of.planning.task"
     _description = "Task"
-    _order = 'sequence'
+    _order = "sequence"
 
     name = fields.Char(size=100, required=True, help="Enter a task name")
     description = fields.Text()
@@ -20,37 +20,37 @@ class OFPlanningTask(models.Model):
         "It can be modified in the interventions",
     )
     team_ids = fields.Many2many(
-        comodel_name='of.planning.team',
-        relation='of_team_task_rel',
-        column1='task_id',
-        column2='team_id',
+        comodel_name="of.planning.team",
+        relation="of_team_task_rel",
+        column1="task_id",
+        column2="team_id",
         string="Qualified teams",
     )
     employee_ids = fields.Many2many(
-        comodel_name='hr.employee',
+        comodel_name="hr.employee",
         string="Qualified employees",
-        compute='_compute_employee_ids',
-        search='_search_employee_ids',
+        compute="_compute_employee_ids",
+        search="_search_employee_ids",
     )
     templates_ids = fields.Many2many(
-        comodel_name='of.planning.intervention.template',
-        compute='_compute_templates_ids',
+        comodel_name="of.planning.intervention.template",
+        compute="_compute_templates_ids",
         string="Templates",
         copy=False,
         store=True,
     )
-    templates_count = fields.Integer(string="# Templates", compute='_compute_templates_ids', compute_sudo=True)
+    templates_count = fields.Integer(string="# Templates", compute="_compute_templates_ids", compute_sudo=True)
 
     def _compute_templates_ids(self):
-        intervention_template_obj = self.env['of.planning.intervention.template']
+        intervention_template_obj = self.env["of.planning.intervention.template"]
         for task in self:
-            templates = intervention_template_obj.search([('task_id', '=', task.id)])
+            templates = intervention_template_obj.search([("task_id", "=", task.id)])
             task.templates_ids = templates
             task.templates_count = len(templates)
 
     def _compute_employee_ids(self):
-        employees = self.env['hr.employee'].search(
-            ['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]
+        employees = self.env["hr.employee"].search(
+            ["|", ("of_is_operator", "=", True), ("of_is_salesperson", "=", True)]
         )
         for task in self:
             task.employee_ids = employees.filtered(lambda i: i.of_all_tasks or task.id in i.of_task_ids.ids)
@@ -59,25 +59,25 @@ class OFPlanningTask(models.Model):
         """/!\\ Only 'in' et 'not in' case are treated"""
         tasks = self.search([])
 
-        if operator == 'in':
+        if operator == "in":
             tasks = tasks.filtered(lambda t: set(t.employee_ids.ids).intersection(value))
-        elif operator == 'not in':
+        elif operator == "not in":
             tasks = tasks.filtered(lambda t: not set(t.employee_ids.ids).intersection(value))
 
-        return [('id', 'in', tasks.ids)]
+        return [("id", "in", tasks.ids)]
 
     def action_button_view_template(self):
         return self._get_action_view_template(self.templates_ids)
 
     def _get_action_view_template(self, templates):
         self.ensure_one()
-        result = self.env["ir.actions.actions"]._for_xml_id('of_planning.action_of_planning_intervention_template')
+        result = self.env["ir.actions.actions"]._for_xml_id("of_planning.action_of_planning_intervention_template")
         # choose the view_mode accordingly
         if not templates or len(templates) > 1:
-            result['domain'] = [('id', 'in', templates.ids)]
+            result["domain"] = [("id", "in", templates.ids)]
         elif len(templates) == 1:
-            res = self.env.ref('of_planning.of_planning_intervention_template_view_form', False)
-            form_view = [(res and res.id or False, 'form')]
-            result['views'] = form_view + [(state, view) for state, view in result.get('views', []) if view != 'form']
-            result['res_id'] = templates.id
+            res = self.env.ref("of_planning.of_planning_intervention_template_view_form", False)
+            form_view = [(res and res.id or False, "form")]
+            result["views"] = form_view + [(state, view) for state, view in result.get("views", []) if view != "form"]
+            result["res_id"] = templates.id
         return result

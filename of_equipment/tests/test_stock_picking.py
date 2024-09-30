@@ -10,17 +10,17 @@ class TestOFStockPicking(TestOFEquipmentCommon):
         super().setUp()
 
         # Create Equipment
-        self.lot_wood_stove = self.env['stock.lot'].create(
-            {'name': "LOT/WS00001", 'product_id': self.product_wood_stove.id}
+        self.lot_wood_stove = self.env["stock.lot"].create(
+            {"name": "LOT/WS00001", "product_id": self.product_wood_stove.id}
         )
 
         # Create Sale Order used in the tests
-        self.order = self.env['sale.order'].create(
+        self.order = self.env["sale.order"].create(
             {
-                'partner_id': self.customer_a.id,
-                'order_line': [
-                    Command.create({'product_id': self.product_wood_stove.id, 'product_uom_qty': 1}),
-                    Command.create({'product_id': self.product_ash_vacuum_cleaner.id, 'product_uom_qty': 1}),
+                "partner_id": self.customer_a.id,
+                "order_line": [
+                    Command.create({"product_id": self.product_wood_stove.id, "product_uom_qty": 1}),
+                    Command.create({"product_id": self.product_ash_vacuum_cleaner.id, "product_uom_qty": 1}),
                 ],
             }
         )
@@ -28,20 +28,20 @@ class TestOFStockPicking(TestOFEquipmentCommon):
 
         # Process quantities and assign a lot to the wood stove product move line
         self.picking = self.order.picking_ids[-1]
-        self.picking.move_ids_without_package.write({'quantity_done': 1})
+        self.picking.move_ids_without_package.write({"quantity_done": 1})
         self.picking.move_line_nosuggest_ids.filtered(lambda m: m.product_id == self.product_wood_stove).write(
             {
-                'lot_id': self.lot_wood_stove.id,
+                "lot_id": self.lot_wood_stove.id,
             }
         )
 
     def check_existing_lot_equipment(self, picking, arg1):
-        lot_equipment = self.env['of.equipment'].search(
+        lot_equipment = self.env["of.equipment"].search(
             [
-                ('name', '=', f"{self.lot_wood_stove.name} - {picking.partner_id.name}"),
-                ('customer_id', '=', picking.partner_id.id),
-                ('product_id', '=', self.product_wood_stove.id),
-                ('lot_id', '=', self.lot_wood_stove.id),
+                ("name", "=", f"{self.lot_wood_stove.name} - {picking.partner_id.name}"),
+                ("customer_id", "=", picking.partner_id.id),
+                ("product_id", "=", self.product_wood_stove.id),
+                ("lot_id", "=", self.lot_wood_stove.id),
             ]
         )
         self.assertEqual(len(lot_equipment), arg1)
@@ -59,8 +59,8 @@ class TestOFStockPicking(TestOFEquipmentCommon):
         Expected result:
         - An equipment should be created during the process.
         """
-        self.env['res.config.settings'].create(
-            {'group_stock_production_lot': True, 'of_equipment_auto_create': True}
+        self.env["res.config.settings"].create(
+            {"group_stock_production_lot": True, "of_equipment_auto_create": True}
         ).execute()
 
         # No equipment should be existing yet
@@ -85,8 +85,8 @@ class TestOFStockPicking(TestOFEquipmentCommon):
         - No equipment should be created during the process.
 
         """
-        self.env['res.config.settings'].create(
-            {'group_stock_production_lot': True, 'of_equipment_auto_create': False}
+        self.env["res.config.settings"].create(
+            {"group_stock_production_lot": True, "of_equipment_auto_create": False}
         ).execute()
 
         self.order.action_confirm()

@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class IrModelFields(models.Model):
-    _inherit = 'ir.model.fields'
+    _inherit = "ir.model.fields"
 
     of_custom_groupby = fields.Boolean(string="Force authorization for grouping")
 
@@ -13,4 +13,4 @@ class IrModelFields(models.Model):
         query = "UPDATE ir_model_fields SET of_custom_groupby=%s WHERE model=%s AND name=%s"
         for model_name in model_names:
             for field_name, field in self.env[model_name]._fields.items():
-                self._cr.execute(query, (getattr(field, 'of_custom_groupby', False), model_name, field.name))
+                self._cr.execute(query, (getattr(field, "of_custom_groupby", False), model_name, field.name))

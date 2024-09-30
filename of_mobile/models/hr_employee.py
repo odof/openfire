@@ -4,30 +4,30 @@ from odoo import models
 
 
 class HrEmployee(models.Model):
-    _inherit = 'hr.employee'
+    _inherit = "hr.employee"
 
     def write(self, vals):
         res = super().write(vals)
 
         domain_employee = [
-            '|',
-            '|',
-            ('of_employee_ids', 'in', self.ids),
-            ('of_employee_id', 'in', self.ids),
-            ('of_gb_employee_id', 'in', self.ids),
+            "|",
+            "|",
+            ("of_employee_ids", "in", self.ids),
+            ("of_employee_id", "in", self.ids),
+            ("of_gb_employee_id", "in", self.ids),
         ]
-        self.env['calendar.event'].action_update_date(domain_employee)
+        self.env["calendar.event"].action_update_date(domain_employee)
 
         return res
 
     def unlink(self):
         domain_employee = [
-            '|',
-            '|',
-            ('of_employee_ids', 'in', self.ids),
-            ('of_employee_id', 'in', self.ids),
-            ('of_gb_employee_id', 'in', self.ids),
+            "|",
+            "|",
+            ("of_employee_ids", "in", self.ids),
+            ("of_employee_id", "in", self.ids),
+            ("of_gb_employee_id", "in", self.ids),
         ]
-        self.env['calendar.event'].action_update_date(domain_employee)
+        self.env["calendar.event"].action_update_date(domain_employee)
 
         return super().unlink()

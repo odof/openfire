@@ -9,7 +9,7 @@ from .product_type import Product
 
 
 class ProductCreate(graphene.Mutation):
-    _name = 'ProductCreate'
+    _name = "ProductCreate"
 
     class Arguments:
         name = graphene.String()
@@ -19,13 +19,13 @@ class ProductCreate(graphene.Mutation):
     Output = Product
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['product.product']._prepare_mutation_values(**args)
-        return env['product.product'].create(values)
+        env = info.context["env"]
+        values = env["product.product"]._prepare_mutation_values(**args)
+        return env["product.product"].create(values)
 
 
 class ProductUpdate(graphene.Mutation):
-    _name = 'ProductUpdate'
+    _name = "ProductUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -36,15 +36,15 @@ class ProductUpdate(graphene.Mutation):
     Output = Product
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['product.product']._prepare_mutation_values(**args)
-        product = env['product.product'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["product.product"]._prepare_mutation_values(**args)
+        product = env["product.product"].search([("id", "=", id)])
         product.write(values)
         return product
 
 
 class ProductDelete(graphene.Mutation):
-    _name = 'ProductDelete'
+    _name = "ProductDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -52,13 +52,13 @@ class ProductDelete(graphene.Mutation):
     Output = Product
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'product.product', id)
+        env = info.context["env"]
+        return lazy_delete(env, "product.product", id)
 
 
 class ProductMutation(graphene.ObjectType):
-    _name = 'ProductMutation'
-    _type = 'mutation'
+    _name = "ProductMutation"
+    _type = "mutation"
 
     product_create = ProductCreate.Field()
     product_update = ProductUpdate.Field()

@@ -4,7 +4,7 @@ from odoo import models
 
 
 class StockPicking(models.Model):
-    _inherit = 'stock.picking'
+    _inherit = "stock.picking"
 
     def _action_done(self):
         """
@@ -14,10 +14,10 @@ class StockPicking(models.Model):
         if (
             len(self) == 1
             and res
-            and self.user_has_groups('stock.group_production_lot')
-            and self.picking_type_id.code == 'outgoing'
+            and self.user_has_groups("stock.group_production_lot")
+            and self.picking_type_id.code == "outgoing"
             and self.company_id.of_equipment_auto_create
         ):
-            if lots := self.mapped('move_line_ids.lot_id'):
+            if lots := self.mapped("move_line_ids.lot_id"):
                 lots.sudo().action_create_equipment(picking=self)
         return res

@@ -7,8 +7,8 @@ from odoo.addons.of_sale_management_template_graphql.graphql.sale_order_template
 
 
 class SaleOrder(OdooObjectType):
-    _name = 'SaleOrder'
-    _type = 'types'
+    _name = "SaleOrder"
+    _type = "types"
 
     sale_template = graphene.Field(SaleOrderTemplate)
     signature_url = graphene.String()

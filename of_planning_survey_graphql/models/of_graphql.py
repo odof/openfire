@@ -11,7 +11,7 @@ from ..graphql.planning_intervention_type import PlanningIntervention
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_planning_survey_graphql_register(self, dbname):
         # ici on charge le graphql de ce module
@@ -27,14 +27,14 @@ class OFGraphql(models.AbstractModel):
         arguments = super()._prepare_arguments()
 
         new_arguments = {
-            'PlanningInterventionMutation': {
-                'planning_intervention_create': {
-                    'survey': SurveyInput,
-                    'survey_user_input': SurveyUserInputInput,
+            "PlanningInterventionMutation": {
+                "planning_intervention_create": {
+                    "survey": SurveyInput,
+                    "survey_user_input": SurveyUserInputInput,
                 },
-                'planning_intervention_update': {
-                    'survey': SurveyInput,
-                    'survey_user_input': SurveyUserInputInput,
+                "planning_intervention_update": {
+                    "survey": SurveyInput,
+                    "survey_user_input": SurveyUserInputInput,
                 },
             }
         }

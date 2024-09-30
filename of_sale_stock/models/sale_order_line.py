@@ -6,18 +6,18 @@ from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    _inherit = "sale.order.line"
 
     of_product_brand_id = fields.Many2one(
-        comodel_name='of.product.brand',
-        related='product_id.brand_id',
+        comodel_name="of.product.brand",
+        related="product_id.brand_id",
         string="Brand",
         store=True,
         index=True,
         readonly=True,
     )
 
-    @api.depends('product_id')
+    @api.depends("product_id")
     def _compute_name(self):
         super()._compute_name()
         for line in self:
@@ -25,7 +25,7 @@ class SaleOrderLine(models.Model):
 
     def _write(self, vals):
         for field in vals:
-            if field != 'of_product_brand_id':
+            if field != "of_product_brand_id":
                 break
         else:  # No other field than of_product_brand_id
             self = self.sudo()
@@ -40,19 +40,19 @@ class SaleOrderLine(models.Model):
             # Only inline templates are supported here.
             # ie: {{ description_sale and '\n' + description_sale or '' }}
             brand_desc = (
-                self.env['mail.template']
+                self.env["mail.template"]
                 .with_context(safe=True)
                 ._render_template(
                     line.product_id.brand_id.description_sale,
-                    'product.product',
+                    "product.product",
                     [line.product_id.id],
                     post_process=False,
                 )[line.product_id.id]
             )
-            line_name += '\n%s' % brand_desc
+            line_name += "\n%s" % brand_desc
         if line.product_id.brand_id.show_in_sales:
             # Ajout de la marque dans le descriptif de l'article
-            brand_code = f'{line.product_id.brand_id.name} - '
+            brand_code = f"{line.product_id.brand_id.name} - "
             # This regex will match the first occurrence of "[XXXX]" in the product's name as the default code
             # and will capture the rest of the string.
             # So if the product's name is "[XXXX] This is the product's [YYYY] name" it will capture groups

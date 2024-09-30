@@ -8,8 +8,8 @@ from . import survey_question_answer_type
 
 
 class SurveyQuestionAnswerQuery(graphene.ObjectType):
-    _name = 'SurveyQuestionAnswerQuery'
-    _type = 'query'
+    _name = "SurveyQuestionAnswerQuery"
+    _type = "query"
 
     survey_question_answers = graphene.List(
         graphene.NonNull(survey_question_answer_type.SurveyQuestionAnswer),
@@ -21,7 +21,7 @@ class SurveyQuestionAnswerQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_survey_question_answers(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.survey.question.answer']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.survey.question.answer"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.survey.question.answer'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.survey.question.answer"].search(odoo_domain, offset=offset, limit=limit)

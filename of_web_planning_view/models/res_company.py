@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     of_planning_start_hour = fields.Integer(string="Day start time")
     of_planning_end_hour = fields.Integer(string="Day end time")

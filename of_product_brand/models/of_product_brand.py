@@ -4,8 +4,8 @@ from odoo import api, fields, models
 
 
 class OfProductBrand(models.Model):
-    _name = 'of.product.brand'
-    _order = 'name'
+    _name = "of.product.brand"
+    _order = "name"
 
     _description = "Product brand"
 
@@ -18,27 +18,27 @@ class OfProductBrand(models.Model):
         help="The products internal references will be prefixed with the brand code",
     )
     partner_id = fields.Many2one(
-        comodel_name='res.partner', string="Supplier", domain=[('supplier_rank', '>', 0)], required=True
+        comodel_name="res.partner", string="Supplier", domain=[("supplier_rank", ">", 0)], required=True
     )
     supplier_delay = fields.Integer(
         string="Delivery Delay (days)",
         help="The number of days it takes for the supplier to deliver products of this brand",
     )
     product_ids = fields.One2many(
-        comodel_name='product.template', inverse_name='brand_id', string="Products", readonly=True
+        comodel_name="product.template", inverse_name="brand_id", string="Products", readonly=True
     )
     product_variant_ids = fields.One2many(
-        comodel_name='product.product', inverse_name='brand_id', string="Product variants", readonly=True
+        comodel_name="product.product", inverse_name="brand_id", string="Product variants", readonly=True
     )
     logo = fields.Binary()
     product_count = fields.Integer(
-        string="# Products", compute='_compute_product_count', help="The number of products of this brand"
+        string="# Products", compute="_compute_product_count", help="The number of products of this brand"
     )
     price_date = fields.Date(
-        compute='_compute_price_date', store=True, help="Last price date of this brand's products."
+        compute="_compute_price_date", store=True, help="Last price date of this brand's products."
     )
     note = fields.Text(string="Notes")
-    product_change_warn = fields.Boolean(compute='_compute_product_change_warn')
+    product_change_warn = fields.Boolean(compute="_compute_product_change_warn")
     show_in_sales = fields.Boolean(
         string="Show in sales order lines",
         help="If this option is checked, the brand will be added at the beginning of the description "
@@ -48,25 +48,25 @@ class OfProductBrand(models.Model):
     use_brand_description_sale = fields.Boolean(string="Use brand-level sales description")
 
     def _compute_product_count(self):
-        read_group_res = self.env['product.template'].read_group(
-            [('brand_id', 'in', self.ids)], ['brand_id'], ['brand_id']
+        read_group_res = self.env["product.template"].read_group(
+            [("brand_id", "in", self.ids)], ["brand_id"], ["brand_id"]
         )
-        group_data = {data['brand_id'][0]: data['brand_id_count'] for data in read_group_res}
+        group_data = {data["brand_id"][0]: data["brand_id_count"] for data in read_group_res}
         for categ in self:
             categ.product_count = group_data.get(categ.id, 0)
 
-    @api.depends('product_ids.of_cost_date')
+    @api.depends("product_ids.of_cost_date")
     def _compute_price_date(self):
-        product_obj = self.env['product.template']
+        product_obj = self.env["product.template"]
         for brand in self:
             product = product_obj.search(
-                [('brand_id', '=', brand.id), ('of_cost_date', '!=', False)], order='of_cost_date desc', limit=1
+                [("brand_id", "=", brand.id), ("of_cost_date", "!=", False)], order="of_cost_date desc", limit=1
             )
             brand.price_date = product.of_cost_date if product else False
 
-    @api.depends('code', 'use_prefix')
+    @api.depends("code", "use_prefix")
     def _compute_product_change_warn(self):
-        brand_orig = getattr(self, '_origin', False)
+        brand_orig = getattr(self, "_origin", False)
         for brand in self:
             warn = False
             if brand_orig and brand_orig.product_ids:
@@ -77,7 +77,7 @@ class OfProductBrand(models.Model):
             brand.product_change_warn = warn
 
     _sql_constraints = [
-        ('code', 'unique(code)', "Another brand already exists with this code"),
+        ("code", "unique(code)", "Another brand already exists with this code"),
     ]
 
     @api.model_create_multi
@@ -86,16 +86,16 @@ class OfProductBrand(models.Model):
         brands = super().create(vals_list)
         for vals in vals_list:
             for brand in brands.filtered(lambda b: b.use_prefix):
-                product_obj = self.env['product.product'].with_context(active_test=False)
-                products = product_obj.search([('default_code', '=like', vals['code'] + r'\_%')])
-                products.write({'brand_id': brand.id})
+                product_obj = self.env["product.product"].with_context(active_test=False)
+                products = product_obj.search([("default_code", "=like", vals["code"] + r"\_%")])
+                products.write({"brand_id": brand.id})
         return brands
 
     def write(self, vals):
         previous_codes_dict = {brand.id: brand.code for brand in self}
         res = super().write(vals)
         for rec in self:
-            if 'use_prefix' in vals or (rec.use_prefix and 'code' in vals):
+            if "use_prefix" in vals or (rec.use_prefix and "code" in vals):
                 rec.update_products_default_code(remove_previous_prefix=previous_codes_dict[rec.id])
         return res
 
@@ -118,12 +118,12 @@ class OfProductBrand(models.Model):
         if (
             remove_previous_prefix
             and isinstance(remove_previous_prefix, str)
-            and not remove_previous_prefix.endswith('_')
+            and not remove_previous_prefix.endswith("_")
         ):
-            remove_previous_prefix += '_'
+            remove_previous_prefix += "_"
         for product in products.with_context(skip_default_code_lock=True):
             # update_products_default_code() can be called from onchange, when default_code is not already filled
-            default_code = product.default_code or ''
+            default_code = product.default_code or ""
             if remove_previous_prefix:
                 if isinstance(remove_previous_prefix, str):
                     if not default_code:

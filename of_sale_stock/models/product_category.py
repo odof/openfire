@@ -4,14 +4,14 @@ from odoo import fields, models
 
 
 class ProductCategory(models.Model):
-    _inherit = 'product.category'
+    _inherit = "product.category"
 
     route_ids = fields.Many2many(
-        comodel_name='stock.route',
-        relation='stock_location_route_categ',
-        column1='categ_id',
-        column2='route_id',
+        comodel_name="stock.route",
+        relation="stock_location_route_categ",
+        column1="categ_id",
+        column2="route_id",
         string="Routes",
-        domain=[('product_categ_selectable', '=', True)],
+        domain=[("product_categ_selectable", "=", True)],
         copy=True,
     )

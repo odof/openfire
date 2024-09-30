@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class SpreadsheetDashboard(models.Model):
-    _inherit = 'spreadsheet.dashboard'
+    _inherit = "spreadsheet.dashboard"
 
     name = fields.Char(translate=True)

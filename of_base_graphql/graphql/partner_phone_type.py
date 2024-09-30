@@ -8,8 +8,8 @@ from .partner_title_type import PartnerTitle, PartnerTitleInput
 
 
 class PartnerPhone(OdooObjectType):
-    _name = 'PartnerPhone'
-    _type = 'types'
+    _name = "PartnerPhone"
+    _type = "types"
 
     id = graphene.Int(required=True)
     type = graphene.String(required=True)
@@ -22,8 +22,8 @@ class PartnerPhone(OdooObjectType):
 
 
 class PartnerPhoneInput(graphene.InputObjectType):
-    _name = 'PartnerPhoneInput'
-    _type = 'types'
+    _name = "PartnerPhoneInput"
+    _type = "types"
 
     id = graphene.Int()
     type = graphene.String()

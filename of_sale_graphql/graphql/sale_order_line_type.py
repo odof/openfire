@@ -8,13 +8,13 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInp
 
 
 class SaleOrderLine(OdooObjectType):
-    _name = 'SaleOrderLine'
-    _type = 'types'
+    _name = "SaleOrderLine"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
     product = graphene.Field(Product, required=True)
-    tax_id = graphene.List(graphene.NonNull(AccountTax), name='taxes')
+    tax_id = graphene.List(graphene.NonNull(AccountTax), name="taxes")
     product_uom_qty = graphene.Float(required=True)
     price_unit = graphene.Float(required=True)
     price_subtotal = graphene.Float()
@@ -25,8 +25,8 @@ class SaleOrderLine(OdooObjectType):
 
 
 class SaleOrderLineInput(graphene.InputObjectType):
-    _name = 'SaleOrderLineInput'
-    _type = 'types'
+    _name = "SaleOrderLineInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -38,4 +38,4 @@ class SaleOrderLineInput(graphene.InputObjectType):
 
 
 class SaleOrderLineFilterInput(SaleOrderLineInput):
-    _name = 'SaleOrderLineFilterInput'
+    _name = "SaleOrderLineFilterInput"

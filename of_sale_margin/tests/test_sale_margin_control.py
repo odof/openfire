@@ -15,24 +15,24 @@ class TestOFSaleOrderMarginControl(TestOFSaleCommon):
 
         # Product data
         cls.category_margin_45 = (
-            cls.env['product.category']
+            cls.env["product.category"]
             .with_company(cls.company_fr)
             .create(
                 {
-                    'name': 'Test margin < 45 %',
-                    'of_main_product': True,
-                    'of_margin_rate': 45.0,
+                    "name": "Test margin < 45 %",
+                    "of_main_product": True,
+                    "of_margin_rate": 45.0,
                 }
             )
         )
 
         cls.product_margin_control = cls.create_product(
             {
-                'name': 'Product Margin Control',
-                'categ_id': cls.category_margin_45.id,
-                'standard_price': 40,
-                'list_price': 150,
-                'default_code': 'BA_PMC_123',
+                "name": "Product Margin Control",
+                "categ_id": cls.category_margin_45.id,
+                "standard_price": 40,
+                "list_price": 150,
+                "default_code": "BA_PMC_123",
             }
         )
 
@@ -48,10 +48,10 @@ class TestOFSaleOrderMarginControl(TestOFSaleCommon):
         if as_user is None:
             as_user = self.user_salesman
 
-        config = self.env['res.config.settings'].create({'of_sale_order_margin_control': margin_control})
+        config = self.env["res.config.settings"].create({"of_sale_order_margin_control": margin_control})
         config.execute()
         order_values = self._prepare_sale_order_values(dict(product=self.product_margin_control, price_unit=50))
-        sale_order = self.env['sale.order'].with_user(as_user).create(order_values)
+        sale_order = self.env["sale.order"].with_user(as_user).create(order_values)
         self.assertEqual(
             float_compare(sale_order.of_margin_percent, 20.0, precision_digits=2),
             0,
@@ -79,8 +79,8 @@ class TestOFSaleOrderMarginControl(TestOFSaleCommon):
             as_user=self.user_salesman,
         )
         # A wizard should be opened to warn the user about the margin.
-        self.assertEqual(action['res_model'], 'of.sale.order.verification')
-        self.assertEqual(action['context']['default_type'], 'margin')
+        self.assertEqual(action["res_model"], "of.sale.order.verification")
+        self.assertEqual(action["context"]["default_type"], "margin")
 
     def test_03_margin_control_order_confirm_manager(self):
         """Test margin control on sale order confirmation as a salesman.

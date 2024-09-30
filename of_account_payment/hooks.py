@@ -4,7 +4,7 @@ from odoo import SUPERUSER_ID, api
 
 
 def _set_of_payment_mode(env):
-    env['of.payment.mode'].action_update_mode_payment()
+    env["of.payment.mode"].action_update_mode_payment()
 
 
 def post_init_hook(cr, registry):

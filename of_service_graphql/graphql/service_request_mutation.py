@@ -21,7 +21,7 @@ from .service_request_type import ServiceRequest
 
 
 class ServiceRequestCreate(graphene.Mutation):
-    _name = 'ServiceRequestCreate'
+    _name = "ServiceRequestCreate"
 
     class Arguments:
         name = graphene.String()
@@ -59,13 +59,13 @@ class ServiceRequestCreate(graphene.Mutation):
     Output = ServiceRequest
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.service.request']._prepare_mutation_values(**args)
-        return env['of.service.request'].create(values)
+        env = info.context["env"]
+        values = env["of.service.request"]._prepare_mutation_values(**args)
+        return env["of.service.request"].create(values)
 
 
 class ServiceRequestUpdate(graphene.Mutation):
-    _name = 'ServiceRequestUpdate'
+    _name = "ServiceRequestUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -103,15 +103,15 @@ class ServiceRequestUpdate(graphene.Mutation):
     Output = ServiceRequest
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.service.request']._prepare_mutation_values(**args)
-        service_request = env['of.service.request'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.service.request"]._prepare_mutation_values(**args)
+        service_request = env["of.service.request"].search([("id", "=", id)])
         service_request.write(values)
         return service_request
 
 
 class ServiceRequestDelete(graphene.Mutation):
-    _name = 'ServiceRequestDelete'
+    _name = "ServiceRequestDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -119,13 +119,13 @@ class ServiceRequestDelete(graphene.Mutation):
     Output = ServiceRequest
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.service.request', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.service.request", id)
 
 
 class ServiceRequestMutation(graphene.ObjectType):
-    _name = 'ServiceRequestMutation'
-    _type = 'mutation'
+    _name = "ServiceRequestMutation"
+    _type = "mutation"
 
     service_request_create = ServiceRequestCreate.Field()
     service_request_update = ServiceRequestUpdate.Field()

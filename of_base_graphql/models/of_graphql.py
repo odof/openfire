@@ -37,7 +37,7 @@ from ..graphql.user_type import User, UserInput
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_base_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

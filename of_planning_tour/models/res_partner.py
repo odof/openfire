@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
-    _inherit = 'res.partner'
+    _inherit = "res.partner"
 
     # ---------------------------------------------------------
     # ORM methods
@@ -45,15 +45,15 @@ class ResPartner(models.Model):
         if not self.partner_latitude and not self.partner_longitude:
             raise UserError(_("This address is not geocoded, please geocode it to plan an intervention."))
 
-        icp_obj = self.env['ir.config_parameter']
-        tour_appointment_obj = self.env['of.tour.appointment.wizard']
+        icp_obj = self.env["ir.config_parameter"]
+        tour_appointment_obj = self.env["of.tour.appointment.wizard"]
         context = self.env.context.copy()
         # In case we came from a wizard (for instance 'of.asterisk.number.not.found'),
         # we add partner id in context manually
-        context['of_default_partner_id'] = self.id
+        context["of_default_partner_id"] = self.id
 
         default_planning_intervention_template = icp_obj.sudo().get_param(
-            'of.planning.tour.default_planning_intervention_template_id'
+            "of.planning.tour.default_planning_intervention_template_id"
         )
 
         default_values = tour_appointment_obj.with_context(
@@ -63,26 +63,26 @@ class ResPartner(models.Model):
 
         default_values.update(
             {
-                'partner_id': self.id,
-                'search_period_in_days': 8,
-                'template_id': int(default_planning_intervention_template),
-                'company_id': self.company_id.id or self.env.company.id,
+                "partner_id": self.id,
+                "search_period_in_days": 8,
+                "template_id": int(default_planning_intervention_template),
+                "company_id": self.company_id.id or self.env.company.id,
             }
         )
         tour_appointment_wizard = tour_appointment_obj.create(default_values)
         # start time slots computing
         tour_appointment_wizard._populate_line_ids()
-        form_view_id = self.env.ref('of_planning_tour.of_tour_appointment_wizard_view_form').id
+        form_view_id = self.env.ref("of_planning_tour.of_tour_appointment_wizard_view_form").id
         return {
-            'name': _("Plan intervention"),
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'of.tour.appointment.wizard',
-            'views': [(form_view_id, 'form')],
-            'res_id': tour_appointment_wizard.id,
-            'target': 'current',
-            'context': context,
+            "name": _("Plan intervention"),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "of.tour.appointment.wizard",
+            "views": [(form_view_id, "form")],
+            "res_id": tour_appointment_wizard.id,
+            "target": "current",
+            "context": context,
         }
 
     # ---------------------------------------------------------
@@ -100,10 +100,10 @@ class ResPartner(models.Model):
             recordset: filtered recordset of partners whose geodata has been updated
         """
         return self.filtered(
-            lambda r: 'partner_latitude' in vals
-            and r.partner_latitude != vals['partner_latitude']
-            or 'partner_longitude' in vals
-            and r.partner_longitude != vals['partner_longitude']
+            lambda r: "partner_latitude" in vals
+            and r.partner_latitude != vals["partner_latitude"]
+            or "partner_longitude" in vals
+            and r.partner_longitude != vals["partner_longitude"]
         )
 
     def _handle_geodata_change(self):
@@ -119,21 +119,21 @@ class ResPartner(models.Model):
             None
         """
         context = self.env.context.copy()
-        self.invalidate_recordset(['partner_latitude', 'partner_longitude'])
+        self.invalidate_recordset(["partner_latitude", "partner_longitude"])
 
         if tours_to_recompute := (
-            self.env['of.planning.tour.line']
+            self.env["of.planning.tour.line"]
             .sudo()
             .with_context(**context)
             .search(
                 [
-                    ('address_id', 'in', self.ids),
-                    ('tour_id.date', '>=', fields.Date.today()),
+                    ("address_id", "in", self.ids),
+                    ("tour_id.date", ">=", fields.Date.today()),
                 ]
             )
-            .mapped('tour_id')
+            .mapped("tour_id")
         ):
             tours_to_recompute = tours_to_recompute.filtered(
-                lambda t: t.state != 'confirmed' and t.date >= fields.Date.today()
+                lambda t: t.state != "confirmed" and t.date >= fields.Date.today()
             )
             tours_to_recompute.action_compute_osrm_data(reload=True)

@@ -8,14 +8,14 @@ from .equipment_type import Equipment, EquipmentInput
 
 
 class PlanningIntervention(OdooObjectType):
-    _name = 'PlanningIntervention'
-    _type = 'types'
+    _name = "PlanningIntervention"
+    _type = "types"
 
-    of_equipment_ids = graphene.List(graphene.NonNull(Equipment), name='equipments')
+    of_equipment_ids = graphene.List(graphene.NonNull(Equipment), name="equipments")
 
 
 class PlanningInterventionInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionInput'
-    _type = 'types'
+    _name = "PlanningInterventionInput"
+    _type = "types"
 
     equipments = graphene.List(graphene.NonNull(EquipmentInput))

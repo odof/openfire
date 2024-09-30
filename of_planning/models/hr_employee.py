@@ -11,26 +11,26 @@ _logger = logging.getLogger(__name__)
 
 
 class HREmployee(models.Model):
-    _inherit = 'hr.employee'
+    _inherit = "hr.employee"
 
     of_task_ids = fields.Many2many(
-        comodel_name='of.planning.task',
-        relation='of_employee_task_rel',
-        column1='employee_id',
-        column2='task_id',
+        comodel_name="of.planning.task",
+        relation="of_employee_task_rel",
+        column1="employee_id",
+        column2="task_id",
         string="Tasks",
         help="Defines the tasks for which the employee is qualified.\n"
-        "Tasks can be set in the \"Tasks\" submenu of the intervention configuration.",
+        'Tasks can be set in the "Tasks" submenu of the intervention configuration.',
     )
     of_all_tasks = fields.Boolean(
         string="Able to handle all task",
         default=True,
     )
     of_team_ids = fields.Many2many(
-        comodel_name='of.planning.team',
-        relation='of_team_employee_rel',
-        column1='employee_id',
-        column2='team_id',
+        comodel_name="of.planning.team",
+        relation="of_team_employee_rel",
+        column1="employee_id",
+        column2="team_id",
         string="Teams",
         help="Allows you to assign one or more teams to the employee.",
     )
@@ -68,8 +68,8 @@ class HREmployee(models.Model):
         It generates a planning report for each employee, attaches it to an email, and sends it using a predefined
         email template.
         """
-        _logger.info('# Cron job: Send planning emails to employees')
-        timezone = self._context.get('tz') or self.env.user.partner_id.tz or 'UTC'
+        _logger.info("# Cron job: Send planning emails to employees")
+        timezone = self._context.get("tz") or self.env.user.partner_id.tz or "UTC"
 
         # convert date and time into user timezone
         self_tz = self.with_context(tz=timezone)
@@ -79,7 +79,7 @@ class HREmployee(models.Model):
 
         # Group employees by company
         employees_by_company = {}
-        for employee in self.search([('of_daily_email', '=', True)]):
+        for employee in self.search([("of_daily_email", "=", True)]):
             company = employee.company_id
             if company not in employees_by_company:
                 employees_by_company[company] = []
@@ -88,47 +88,47 @@ class HREmployee(models.Model):
         # Send emails by company
         for company, employees in employees_by_company.items():
             _logger.info(
-                '> Sending planning (%s) emails to employees of company %s',
-                start_date.strftime('%Y-%m-%d'),
+                "> Sending planning (%s) emails to employees of company %s",
+                start_date.strftime("%Y-%m-%d"),
                 company.name,
             )
-            wz_report = self.env['of.planning.print.wizard'].create(
+            wz_report = self.env["of.planning.print.wizard"].create(
                 {
-                    'report_type': 'day',
-                    'start_date': start_date,
+                    "report_type": "day",
+                    "start_date": start_date,
                 }
             )
             for employee in employees:
-                _logger.info('  > Generating planning for employee %s', employee.name)
+                _logger.info("  > Generating planning for employee %s", employee.name)
                 if not wz_report._get_employee_interventions(employee.id):
-                    _logger.info('    > No interventions found for employee %s', employee.name)
+                    _logger.info("    > No interventions found for employee %s", employee.name)
                     continue
 
                 wz_report.employee_ids = [Command.set([employee.id])]
-                generated_report, report_extension = self.env['ir.actions.report']._render_qweb_pdf(
-                    'of_planning.report_planning_day', res_ids=[wz_report.id]
+                generated_report, report_extension = self.env["ir.actions.report"]._render_qweb_pdf(
+                    "of_planning.report_planning_day", res_ids=[wz_report.id]
                 )
 
                 report_attachment = (
-                    self.env['ir.attachment']
+                    self.env["ir.attachment"]
                     .sudo()
                     .create(
                         {
-                            'name': f"Planning_{start_date.strftime('%Y%m%d')}.{report_extension}",
-                            'type': 'binary',
-                            'datas': base64.b64encode(generated_report),
-                            'mimetype': 'application/pdf',
-                            'res_model': 'hr.employee',
-                            'res_id': employee.id,
+                            "name": f"Planning_{start_date.strftime('%Y%m%d')}.{report_extension}",
+                            "type": "binary",
+                            "datas": base64.b64encode(generated_report),
+                            "mimetype": "application/pdf",
+                            "res_model": "hr.employee",
+                            "res_id": employee.id,
                         }
                     )
                 )
-                email_template = self.env.ref('of_planning.email_template_planning')
+                email_template = self.env.ref("of_planning.email_template_planning")
                 email_values = {
-                    'email_to': employee.work_contact_id.email_formatted,
-                    'email_from': company.email_formatted,
+                    "email_to": employee.work_contact_id.email_formatted,
+                    "email_from": company.email_formatted,
                 }
                 email_template.attachment_ids = [Command.set([report_attachment.id])]
                 email_template.send_mail(employee.id, email_values=email_values, force_send=True)
-                _logger.info('    > Planning email sent to employee %s', employee.name)
-        _logger.info('# Cron job: Send planning emails to employees finished')
+                _logger.info("    > Planning email sent to employee %s", employee.name)
+        _logger.info("# Cron job: Send planning emails to employees finished")

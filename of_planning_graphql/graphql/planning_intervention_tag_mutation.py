@@ -9,7 +9,7 @@ from .planning_intervention_tag_type import PlanningInterventionTag
 
 
 class PlanningInterventionTagCreate(graphene.Mutation):
-    _name = 'PlanningInterventionTagCreate'
+    _name = "PlanningInterventionTagCreate"
 
     class Arguments:
         name = graphene.String()
@@ -21,13 +21,13 @@ class PlanningInterventionTagCreate(graphene.Mutation):
     Output = PlanningInterventionTag
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.planning.tag']._prepare_mutation_values(**args)
-        return env['of.planning.tag'].create(values)
+        env = info.context["env"]
+        values = env["of.planning.tag"]._prepare_mutation_values(**args)
+        return env["of.planning.tag"].create(values)
 
 
 class PlanningInterventionTagUpdate(graphene.Mutation):
-    _name = 'PlanningInterventionTagUpdate'
+    _name = "PlanningInterventionTagUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -40,15 +40,15 @@ class PlanningInterventionTagUpdate(graphene.Mutation):
     Output = PlanningInterventionTag
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.planning.tag']._prepare_mutation_values(**args)
-        planning_tag = env['of.planning.tag'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.planning.tag"]._prepare_mutation_values(**args)
+        planning_tag = env["of.planning.tag"].search([("id", "=", id)])
         planning_tag.write(values)
         return planning_tag
 
 
 class PlanningInterventionTagDelete(graphene.Mutation):
-    _name = 'PlanningInterventionTagDelete'
+    _name = "PlanningInterventionTagDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -56,13 +56,13 @@ class PlanningInterventionTagDelete(graphene.Mutation):
     Output = PlanningInterventionTag
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.planning.tag', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.planning.tag", id)
 
 
 class PlanningInterventionTagMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionTagMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionTagMutation"
+    _type = "mutation"
 
     planning_intervention_tag_create = PlanningInterventionTagCreate.Field()
     planning_intervention_tag_update = PlanningInterventionTagUpdate.Field()

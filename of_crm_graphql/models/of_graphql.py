@@ -9,7 +9,7 @@ from ..graphql.utm_source_type import UtmSource
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_crm_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

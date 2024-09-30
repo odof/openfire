@@ -8,18 +8,18 @@ from .sale_order_template_type import SaleOrderTemplate, SaleOrderTemplateInput
 
 
 class SaleOrder(OdooObjectType):
-    _name = 'SaleOrder'
-    _type = 'types'
+    _name = "SaleOrder"
+    _type = "types"
 
     sale_template = graphene.Field(SaleOrderTemplate)
 
 
 class SaleOrderInput(graphene.InputObjectType):
-    _name = 'SaleOrderInput'
-    _type = 'types'
+    _name = "SaleOrderInput"
+    _type = "types"
 
     sale_template = graphene.Field(SaleOrderTemplateInput)
 
 
 class SaleOrderFilterInput(SaleOrderInput):
-    _name = 'SaleOrderFilterInput'
+    _name = "SaleOrderFilterInput"

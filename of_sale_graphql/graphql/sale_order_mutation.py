@@ -12,7 +12,7 @@ from .sale_order_type import SaleOrder
 
 
 class SaleOrderCreate(graphene.Mutation):
-    _name = 'SaleOrderCreate'
+    _name = "SaleOrderCreate"
 
     class Arguments:
         name = graphene.String()
@@ -27,13 +27,13 @@ class SaleOrderCreate(graphene.Mutation):
     Output = SaleOrder
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['sale.order']._prepare_mutation_values(**args)
-        return env['sale.order'].create(values)
+        env = info.context["env"]
+        values = env["sale.order"]._prepare_mutation_values(**args)
+        return env["sale.order"].create(values)
 
 
 class SaleOrderUpdate(graphene.Mutation):
-    _name = 'SaleOrderUpdate'
+    _name = "SaleOrderUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -49,15 +49,15 @@ class SaleOrderUpdate(graphene.Mutation):
     Output = SaleOrder
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['sale.order']._prepare_mutation_values(**args)
-        order = env['sale.order'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["sale.order"]._prepare_mutation_values(**args)
+        order = env["sale.order"].search([("id", "=", id)])
         order.write(values)
         return order
 
 
 class SaleOrderDelete(graphene.Mutation):
-    _name = 'SaleOrderDelete'
+    _name = "SaleOrderDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -65,14 +65,14 @@ class SaleOrderDelete(graphene.Mutation):
     Output = SaleOrder
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'sale.order', id)
+        return lazy_delete(env, "sale.order", id)
 
 
 class SaleOrderMutation(graphene.ObjectType):
-    _name = 'SaleOrderMutation'
-    _type = 'mutation'
+    _name = "SaleOrderMutation"
+    _type = "mutation"
 
     sale_order_create = SaleOrderCreate.Field()
     sale_order_update = SaleOrderUpdate.Field()

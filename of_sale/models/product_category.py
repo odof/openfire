@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ProductCategory(models.Model):
-    _inherit = 'product.category'
+    _inherit = "product.category"
 
     of_main_product = fields.Boolean(
         string="Main product",

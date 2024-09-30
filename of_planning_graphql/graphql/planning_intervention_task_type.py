@@ -6,8 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class PlanningInterventionTask(OdooObjectType):
-    _name = 'PlanningInterventionTask'
-    _type = 'types'
+    _name = "PlanningInterventionTask"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -16,8 +16,8 @@ class PlanningInterventionTask(OdooObjectType):
 
 
 class PlanningInterventionTaskInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionTaskInput'
-    _type = 'types'
+    _name = "PlanningInterventionTaskInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -26,4 +26,4 @@ class PlanningInterventionTaskInput(graphene.InputObjectType):
 
 
 class PlanningInterventionTaskFilterInput(PlanningInterventionTaskInput):
-    _name = 'PlanningInterventionTaskFilterInput'
+    _name = "PlanningInterventionTaskFilterInput"

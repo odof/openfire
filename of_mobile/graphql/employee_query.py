@@ -6,8 +6,8 @@ from odoo.addons.of_base_graphql.graphql.employee_type import Employee
 
 
 class EmployeeQuery(graphene.ObjectType):
-    _name = 'EmployeeQuery'
-    _type = 'query'
+    _name = "EmployeeQuery"
+    _type = "query"
 
     employees_field_workers = graphene.List(
         graphene.NonNull(Employee),
@@ -17,12 +17,12 @@ class EmployeeQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_employees_field_workers(root, info, company_id):
-        env = info.context['env']
+        env = info.context["env"]
 
         domain = [
-            '|',
-            ['of_is_operator', '=', True],
-            ['of_is_salesperson', '=', True],
+            "|",
+            ["of_is_operator", "=", True],
+            ["of_is_salesperson", "=", True],
         ]
 
-        return env['hr.employee'].with_company(company_id).search(domain)
+        return env["hr.employee"].with_company(company_id).search(domain)

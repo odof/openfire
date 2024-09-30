@@ -6,8 +6,8 @@ from .configuration_type import Configuration
 
 
 class ConfigurationQuery(graphene.ObjectType):
-    _name = 'ConfigurationQuery'
-    _type = 'query'
+    _name = "ConfigurationQuery"
+    _type = "query"
 
     configuration = graphene.Field(Configuration)
 

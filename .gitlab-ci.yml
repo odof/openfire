@@ -50,4 +50,4 @@ linting:
   script:
     - isort . --check-only
     - flake8 .
-    - black . --check --skip-string-normalization --line-length 120 --force-exclude="__(init|manifest)__\.py"
+    - black . --check --line-length 120 --force-exclude="__(init|manifest)__\.py"

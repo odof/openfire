@@ -4,18 +4,18 @@ from odoo import _, api, fields, models
 
 
 class AccountInvoiceReport(models.Model):
-    _inherit = 'account.invoice.report'
+    _inherit = "account.invoice.report"
 
-    of_brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", readonly=True)
-    of_diff_price = fields.Float(string="Δ% HT", compute='_compute_dummy')
-    of_diff_qty = fields.Float(string="Δ% Qty", compute='_compute_dummy')
-    of_my_company = fields.Boolean(string="Is my store ?", compute='_get_is_my_company', search='_search_is_my_company')
+    of_brand_id = fields.Many2one(comodel_name="of.product.brand", string="Brand", readonly=True)
+    of_diff_price = fields.Float(string="Δ% HT", compute="_compute_dummy")
+    of_diff_qty = fields.Float(string="Δ% Qty", compute="_compute_dummy")
+    of_my_company = fields.Boolean(string="Is my store ?", compute="_get_is_my_company", search="_search_is_my_company")
 
     @api.model
     def _search_is_my_company(self, operator, value):
-        if operator != '=' or not value:
+        if operator != "=" or not value:
             raise ValueError(_("Unsupported search operator"))
-        return [('company_id', '=', self.env.user.company_id.id)]
+        return [("company_id", "=", self.env.user.company_id.id)]
 
     def _get_is_my_company(self):
         for rec in self:
@@ -40,20 +40,20 @@ class AccountInvoiceReport(models.Model):
         # Workarround to remove unstored computed field of the fields list, beacause we can't send non stored
         # field no more here. Theses fields should be comptued on the fly after with the values of the previous period
         depends_mapping = {
-            'of_diff_price': ('of_diff_price', 'price_subtotal'),
-            'of_diff_qty': ('of_diff_qty', 'quantity'),
+            "of_diff_price": ("of_diff_price", "price_subtotal"),
+            "of_diff_qty": ("of_diff_qty", "quantity"),
         }
         of_compute_fields = [
             f.name for f in self._fields.values() if f.name in depends_mapping and not f.store and not f.search
         ]
-        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f'{e}:sum', of_compute_fields))]
+        fields_copy = [f for f in fields if f not in tuple(map(lambda e: f"{e}:sum", of_compute_fields))]  # noqa
         res = super()._read_group_raw(domain, fields_copy, groupby, offset, limit, orderby, lazy)
         if not res:  # No data, no need to compute
             return res
 
-        time_groupbys = ('invoice_date:month', 'invoice_date:year', 'invoice_date')
+        time_groupbys = ("invoice_date:month", "invoice_date:year", "invoice_date")
         # Les deltas dépendent d'un champ qui doit être calculé
-        diff_percent = [v for v in depends_mapping.values() if f'{v[0]}:sum' in fields and f'{v[1]}:sum' in fields]
+        diff_percent = [v for v in depends_mapping.values() if f"{v[0]}:sum" in fields and f"{v[1]}:sum" in fields]
         diff = []
         if groupby and (diff or diff_percent) and any(gb in time_groupbys for gb in groupby[-2:]):
             # Regroupement des résultats par période pour calcul des deltas

@@ -9,8 +9,8 @@ from .of_payment_mode_type import PaymentMode, PaymentModeInput
 
 
 class AccountPayment(OdooObjectType):
-    _name = 'AccountPayment'
-    _type = 'types'
+    _name = "AccountPayment"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -30,8 +30,8 @@ class AccountPayment(OdooObjectType):
 
 
 class AccountPaymentInput(graphene.InputObjectType):
-    _name = 'AccountPaymentInput'
-    _type = 'types'
+    _name = "AccountPaymentInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -43,4 +43,4 @@ class AccountPaymentInput(graphene.InputObjectType):
 
 
 class AccountPaymentFilterInput(AccountPaymentInput):
-    _name = 'AccountPaymentFilterInput'
+    _name = "AccountPaymentFilterInput"

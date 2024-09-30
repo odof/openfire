@@ -8,8 +8,8 @@ from .product_category_type import ProductCategory, ProductCategoryInput
 
 
 class Product(OdooObjectType):
-    _name = 'Product'
-    _type = 'types'
+    _name = "Product"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -18,8 +18,8 @@ class Product(OdooObjectType):
 
 
 class ProductInput(graphene.InputObjectType):
-    _name = 'ProductInput'
-    _type = 'types'
+    _name = "ProductInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -28,4 +28,4 @@ class ProductInput(graphene.InputObjectType):
 
 
 class ProductFilterInput(ProductInput):
-    _name = 'ProductFilterInput'
+    _name = "ProductFilterInput"

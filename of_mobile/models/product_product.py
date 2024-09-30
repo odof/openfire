@@ -4,7 +4,7 @@ from odoo import models
 
 
 class ProductProduct(models.Model):
-    _inherit = 'product.product'
+    _inherit = "product.product"
 
     def action_button_toggle_mobile(self):
         self.ensure_one()

@@ -5,6 +5,6 @@ from odoo import fields, models
 
 
 class SpreadsheetDashboardGroup(models.Model):
-    _inherit = 'spreadsheet.dashboard.group'
+    _inherit = "spreadsheet.dashboard.group"
 
     name = fields.Char(translate=True)

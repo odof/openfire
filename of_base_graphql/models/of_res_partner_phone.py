@@ -6,19 +6,19 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
 
 
 class OFResPartnerPhone(models.Model):
-    _inherit = 'of.res.partner.phone'
+    _inherit = "of.res.partner.phone"
 
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
 
-        if ttype := args.get('type'):
-            mutation['type'] = ttype
+        if ttype := args.get("type"):
+            mutation["type"] = ttype
 
-        if number_display := args.get('number_display'):
-            mutation['number_display'] = number_display
+        if number_display := args.get("number_display"):
+            mutation["number_display"] = number_display
 
-        if title := args.get('title'):
-            mutation['title_id'] = many2one(self=self, model='res.partner.title', input=title)
+        if title := args.get("title"):
+            mutation["title_id"] = many2one(self=self, model="res.partner.title", input=title)
 
         return mutation
