@@ -468,7 +468,7 @@ class OFAccountFrFec(models.TransientModel):
             {date_clause}
             AND am.company_id = %s
             AND am.journal_id IN %s
-        """  # nosec B608  # noqa: E221, E231, E241
+        """  # nosec B608 # noqa: E221, E231, E241
 
         if self.export_type == "nonofficial_posted":
             sql_query += """

@@ -231,7 +231,7 @@ class TestSurveyCommon(SurveyCase):
             email="survey.manager@example.com",
             groups="of_survey.group_of_survey_manager,base.group_user",
             password="survey_manager",
-        )
+        )  # nosec B106
 
         self.survey_user = mail_new_test_user(  # nosec : B106
             self.env,
@@ -240,7 +240,7 @@ class TestSurveyCommon(SurveyCase):
             email="survey.user@example.com",
             groups="of_survey.group_of_survey_user,base.group_user",
             password="survey_user",
-        )
+        )  # nosec B106
 
         self.user_emp = mail_new_test_user(  # nosec : B106
             self.env,
@@ -249,7 +249,7 @@ class TestSurveyCommon(SurveyCase):
             email="employee@example.com",
             groups="base.group_user",
             password="user_emp",
-        )
+        )  # nosec B106
 
         self.user_portal = mail_new_test_user(
             self.env, name="Patrick Portal", login="user_portal", email="portal@example.com", groups="base.group_portal"
