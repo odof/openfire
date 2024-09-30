@@ -8,7 +8,7 @@ from . import survey_question_answer_type, survey_question_page_type, survey_use
 
 
 class SurveyConditionalQuestionCreate(graphene.Mutation):
-    _name = 'SurveyConditionalQuestionCreate'
+    _name = "SurveyConditionalQuestionCreate"
 
     class Arguments:
         name = graphene.String()
@@ -20,13 +20,13 @@ class SurveyConditionalQuestionCreate(graphene.Mutation):
     Output = survey_question_page_type.SurveyConditionalQuestion
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.survey.conditional.question']._prepare_mutation_values(**args)
-        return env['of.survey.conditional.question'].create(values)
+        env = info.context["env"]
+        values = env["of.survey.conditional.question"]._prepare_mutation_values(**args)
+        return env["of.survey.conditional.question"].create(values)
 
 
 class SurveyConditionalQuestionUpdate(graphene.Mutation):
-    _name = 'SurveyConditionalQuestionUpdate'
+    _name = "SurveyConditionalQuestionUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -39,15 +39,15 @@ class SurveyConditionalQuestionUpdate(graphene.Mutation):
     Output = survey_question_page_type.SurveyConditionalQuestion
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.survey.conditional.question']._prepare_mutation_values(**args)
-        conditional_question = env['of.survey.conditional.question'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.survey.conditional.question"]._prepare_mutation_values(**args)
+        conditional_question = env["of.survey.conditional.question"].search([("id", "=", id)])
         conditional_question.write(values)
         return conditional_question
 
 
 class SurveyConditionalQuestionDelete(graphene.Mutation):
-    _name = 'SurveyConditionalQuestionDelete'
+    _name = "SurveyConditionalQuestionDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -55,13 +55,13 @@ class SurveyConditionalQuestionDelete(graphene.Mutation):
     Output = survey_question_page_type.SurveyConditionalQuestion
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.survey.conditional.question', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.survey.conditional.question", id)
 
 
 class SurveyConditionalQuestionMutation(graphene.ObjectType):
-    _name = 'SurveyConditionalQuestionMutation'
-    _type = 'mutation'
+    _name = "SurveyConditionalQuestionMutation"
+    _type = "mutation"
 
     survey_conditional_question_create = SurveyConditionalQuestionCreate.Field()
     survey_conditional_question_update = SurveyConditionalQuestionUpdate.Field()
@@ -69,7 +69,7 @@ class SurveyConditionalQuestionMutation(graphene.ObjectType):
 
 
 class SurveyQuestionPageCreate(graphene.Mutation):
-    _name = 'SurveyQuestionPageCreate'
+    _name = "SurveyQuestionPageCreate"
 
     class Arguments:
         title = graphene.String()
@@ -90,13 +90,13 @@ class SurveyQuestionPageCreate(graphene.Mutation):
     Output = survey_question_page_type.SurveyQuestionPage
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.survey.question']._prepare_mutation_values(**args)
-        return env['of.survey.question'].create(values)
+        env = info.context["env"]
+        values = env["of.survey.question"]._prepare_mutation_values(**args)
+        return env["of.survey.question"].create(values)
 
 
 class SurveyQuestionPageUpdate(graphene.Mutation):
-    _name = 'SurveyQuestionPageUpdate'
+    _name = "SurveyQuestionPageUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -118,14 +118,14 @@ class SurveyQuestionPageUpdate(graphene.Mutation):
     Output = survey_question_page_type.SurveyQuestionPage
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.survey.question']._prepare_mutation_values(**args)
-        question = env['of.survey.question'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.survey.question"]._prepare_mutation_values(**args)
+        question = env["of.survey.question"].search([("id", "=", id)])
         return question.write(values)
 
 
 class SurveyQuestionPageDelete(graphene.Mutation):
-    _name = 'SurveyQuestionPageDelete'
+    _name = "SurveyQuestionPageDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -133,13 +133,13 @@ class SurveyQuestionPageDelete(graphene.Mutation):
     Output = survey_question_page_type.SurveyQuestionPage
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.survey.question', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.survey.question", id)
 
 
 class SurveyQuestionPageMutation(graphene.ObjectType):
-    _name = 'SurveyQuestionPageMutation'
-    _type = 'mutation'
+    _name = "SurveyQuestionPageMutation"
+    _type = "mutation"
 
     survey_question_page_create = SurveyQuestionPageCreate.Field()
     survey_question_page_update = SurveyQuestionPageUpdate.Field()

@@ -4,8 +4,8 @@ from odoo import fields, models
 
 
 class AccountTaxTemplate(models.Model):
-    _inherit = 'account.tax.template'
+    _inherit = "account.tax.template"
 
     of_account_ids = fields.One2many(
-        comodel_name='of.account.tax.account.template', inverse_name='template_tax_id', string="Account matching"
+        comodel_name="of.account.tax.account.template", inverse_name="template_tax_id", string="Account matching"
     )

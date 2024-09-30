@@ -4,7 +4,7 @@ from odoo import models
 
 
 class OFPriceManagementWizard(models.TransientModel):
-    _inherit = 'of.sale.price.management.wizard'
+    _inherit = "of.sale.price.management.wizard"
 
     def compute(self, dry_run=False):
         """
@@ -12,4 +12,4 @@ class OFPriceManagementWizard(models.TransientModel):
         """
         super().compute(dry_run=dry_run)
         # Updates the payment schedule
-        self.order_id.write({'of_payment_schedule_ids': self.order_id._of_compute_payment_schedule()})
+        self.order_id.write({"of_payment_schedule_ids": self.order_id._of_compute_payment_schedule()})

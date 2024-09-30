@@ -8,7 +8,7 @@ from .stock_lot_type import StockLot
 
 
 class StockLotCreate(graphene.Mutation):
-    _name = 'StockLotCreate'
+    _name = "StockLotCreate"
 
     class Arguments:
         name = graphene.String()
@@ -16,13 +16,13 @@ class StockLotCreate(graphene.Mutation):
     Output = StockLot
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['stock.lot']._prepare_mutation_values(**args)
-        return env['stock.lot'].create(values)
+        env = info.context["env"]
+        values = env["stock.lot"]._prepare_mutation_values(**args)
+        return env["stock.lot"].create(values)
 
 
 class StockLotUpdate(graphene.Mutation):
-    _name = 'StockLotUpdate'
+    _name = "StockLotUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -31,15 +31,15 @@ class StockLotUpdate(graphene.Mutation):
     Output = StockLot
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['stock.lot']._prepare_mutation_values(**args)
-        lot = env['stock.lot'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["stock.lot"]._prepare_mutation_values(**args)
+        lot = env["stock.lot"].search([("id", "=", id)])
         lot.write(values)
         return lot
 
 
 class StockLotDelete(graphene.Mutation):
-    _name = 'StockLotDelete'
+    _name = "StockLotDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -47,13 +47,13 @@ class StockLotDelete(graphene.Mutation):
     Output = StockLot
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'stock.lot', id)
+        env = info.context["env"]
+        return lazy_delete(env, "stock.lot", id)
 
 
 class StockLotMutation(graphene.ObjectType):
-    _name = 'StockLotMutation'
-    _type = 'mutation'
+    _name = "StockLotMutation"
+    _type = "mutation"
 
     stock_lot_mutation_create = StockLotCreate.Field()
     stock_lot_mutation_update = StockLotUpdate.Field()

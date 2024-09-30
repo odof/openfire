@@ -4,9 +4,9 @@ from odoo import api, models
 
 
 class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
-    @api.onchange('partner_id')
+    @api.onchange("partner_id")
     def _onchange_partner_id(self):
         if self.partner_id:
             self.partner_id.update_account(update_customer_account=True, update_supplier_account=True)

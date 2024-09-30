@@ -15,25 +15,25 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
 
         cls.product_forbidden_discount = cls.create_product(
             {
-                'name': 'Product Forbidden Discount',
-                'default_code': 'BA_FD_123',
-                'of_forbidden_discount': True,
+                "name": "Product Forbidden Discount",
+                "default_code": "BA_FD_123",
+                "of_forbidden_discount": True,
             }
         )
 
         # If users don't have group we add them, because we are using Form here and we need discount fields
         # to be visible
-        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_salesman.groups_id:
-            cls.user_salesman.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
-        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_sale_responsible.groups_id:
-            cls.user_sale_responsible.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
-        if cls.env.ref('product.group_discount_per_so_line') not in cls.user_sale_manager.groups_id:
-            cls.user_sale_manager.write({'groups_id': [(4, cls.env.ref('product.group_discount_per_so_line').id)]})
+        if cls.env.ref("product.group_discount_per_so_line") not in cls.user_salesman.groups_id:
+            cls.user_salesman.write({"groups_id": [(4, cls.env.ref("product.group_discount_per_so_line").id)]})
+        if cls.env.ref("product.group_discount_per_so_line") not in cls.user_sale_responsible.groups_id:
+            cls.user_sale_responsible.write({"groups_id": [(4, cls.env.ref("product.group_discount_per_so_line").id)]})
+        if cls.env.ref("product.group_discount_per_so_line") not in cls.user_sale_manager.groups_id:
+            cls.user_sale_manager.write({"groups_id": [(4, cls.env.ref("product.group_discount_per_so_line").id)]})
 
     def test_01_salesman_order_line_price_unit_edit_without_price_unit_group_nok(self):
         """Test that a salesman can't edit the price unit of a sale order line with a non forbidden discount product if
         he doesn't have the group group_of_can_modify_sale_price_unit"""
-        order = self.env['sale.order'].with_user(self.user_salesman).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_salesman).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 with self.assertRaises(AssertionError):
@@ -43,9 +43,9 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a salesman can edit the price unit of a sale order line with a non forbidden discount product if
         he have the group group_of_can_modify_sale_price_unit"""
         self.user_salesman.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
-        order = self.env['sale.order'].with_user(self.user_salesman).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_salesman).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.price_unit = 100
@@ -53,7 +53,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_03_salesman_order_line_discount_edit_without_price_unit_group_nok(self):
         """Test that a salesman can't edit the discount of a sale order line with a non forbidden discount product
         if he doesn't have the group group_of_can_modify_sale_price_unit"""
-        order = self.env['sale.order'].with_user(self.user_salesman).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_salesman).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 with self.assertRaises(AssertionError):
@@ -63,9 +63,9 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a salesman can edit the discount of a sale order line with a non forbidden discount product
         if he have the group group_of_can_modify_sale_price_unit"""
         self.user_salesman.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
-        order = self.env['sale.order'].with_user(self.user_salesman).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_salesman).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.of_discount_formula = 20
@@ -73,7 +73,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_05_salesman_order_line_price_unit_edit_without_price_unit_group_nok(self):
         """Test that a responsible can't edit the price unit of a sale order line with a non forbidden discount product
         if he doesn't have the group group_of_can_modify_sale_price_unit"""
-        order = self.env['sale.order'].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 with self.assertRaises(AssertionError):
@@ -83,9 +83,9 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can edit the price unit of a sale order line with a non forbidden discount product if
         he have the group group_of_can_modify_sale_price_unit"""
         self.user_sale_responsible.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
-        order = self.env['sale.order'].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.price_unit = 100
@@ -93,7 +93,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_07_salesman_order_line_discount_edit_without_price_unit_group_nok(self):
         """Test that a responsible can't edit the discount of a sale order line with a non forbidden discount product
         if he doesn't have the group group_of_can_modify_sale_price_unit"""
-        order = self.env['sale.order'].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 with self.assertRaises(AssertionError):
@@ -103,23 +103,23 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can edit the discount of a sale order line with a non forbidden discount product if
         he have the group group_of_can_modify_sale_price_unit"""
         self.user_sale_responsible.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
-        order = self.env['sale.order'].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_responsible).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.of_discount_formula = 20
 
     def test_09_manager_order_line_price_unit_edit_ok(self):
         """Test that a manager can edit the price unit of a sale order line with a non forbidden discount product"""
-        order = self.env['sale.order'].with_user(self.user_sale_manager).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_manager).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.price_unit = 100
 
     def test_10_manager_order_line_discount_edit_ok(self):
         """Test that a manager can edit the discount of a sale order line with a non forbidden discount product"""
-        order = self.env['sale.order'].with_user(self.user_sale_manager).create(self._prepare_sale_order_values())
+        order = self.env["sale.order"].with_user(self.user_sale_manager).create(self._prepare_sale_order_values())
         with Form(order) as order_form:
             with order_form.order_line.edit(0) as line_form:
                 line_form.of_discount_formula = 20
@@ -127,7 +127,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_11_salesman_forbidden_product_order_line_price_unit_edit_nok(self):
         """Test that a salesman can't edit the price unit of a sale order line with a forbidden discount product"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_salesman)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -139,7 +139,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_12_salesman_forbidden_product_order_line_discount_edit_ok(self):
         """Test that a salesman can't edit the discount of a sale order line with a forbidden discount product"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_salesman)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -152,7 +152,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can't edit the price unit of a sale order line with a forbidden discount product if
         he doesn't have the group group_of_can_modify_sale_price_unit"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_responsible)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -165,10 +165,10 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can edit the price unit of a sale order line with a forbidden discount product if
         he have the group group_of_can_modify_sale_price_unit"""
         self.user_sale_responsible.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_responsible)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -180,7 +180,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can't edit the discount of a sale order line with a forbidden discount product if
         he doesn't have the group group_of_can_modify_sale_price_unit"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_responsible)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -193,10 +193,10 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
         """Test that a responsible can edit the discount of a sale order line with a forbidden discount product if
         he have the group group_of_can_modify_sale_price_unit"""
         self.user_sale_responsible.write(
-            {'groups_id': [(4, self.env.ref('of_sale_no_discount.group_of_can_modify_sale_price_unit').id)]}
+            {"groups_id": [(4, self.env.ref("of_sale_no_discount.group_of_can_modify_sale_price_unit").id)]}
         )
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_responsible)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -207,7 +207,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_17_manager_forbidden_product_order_line_price_unit_edit_ok(self):
         """Test that a manager can edit the price unit of a sale order line with a non forbidden discount product"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_manager)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )
@@ -218,7 +218,7 @@ class TestOFSaleNoDiscountCommon(TestOFSaleCommon):
     def test_18_manager_forbidden_product_order_line_discount_edit_ok(self):
         """Test that a manager can edit the discount of a sale order line with a non forbidden discount product"""
         order = (
-            self.env['sale.order']
+            self.env["sale.order"]
             .with_user(self.user_sale_manager)
             .create(self._prepare_sale_order_values(dict(product=self.product_forbidden_discount)))
         )

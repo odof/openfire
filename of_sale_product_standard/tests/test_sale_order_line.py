@@ -15,19 +15,19 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
 
         cls.product_standard_test = cls.create_product(
             {
-                'name': 'Product Standard Test',
-                'standard_price': 40,
-                'list_price': 100,
-                'brand_id': cls.product_brand_c.id,  # brand with show_in_sales set to False
-                'default_code': f'{cls.product_brand_c.code}_PST_123',
-                'of_manufacturer_description': False,
-                'of_standard_id': cls.product_standard.id,
+                "name": "Product Standard Test",
+                "standard_price": 40,
+                "list_price": 100,
+                "brand_id": cls.product_brand_c.id,  # brand with show_in_sales set to False
+                "default_code": f"{cls.product_brand_c.code}_PST_123",
+                "of_manufacturer_description": False,
+                "of_standard_id": cls.product_standard.id,
             }
         )
 
     def test_01_sale_order_line_compute_name(self):
         """Test that the name of the sale order line is correctly computed when the product has a standard"""
-        order = self.env['sale.order'].create(self._prepare_sale_order_values(dict(product=self.product_standard_test)))
+        order = self.env["sale.order"].create(self._prepare_sale_order_values(dict(product=self.product_standard_test)))
         self.assertEqual(len(order.order_line), 1)
         self.assertEqual(
             order.order_line[0].name,
@@ -38,12 +38,12 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
         self.product_standard_test.of_standard_id = self.product_standard2.id
         order.write(
             {
-                'order_line': [
+                "order_line": [
                     Command.create(
                         {
-                            'product_id': self.product_standard_test.id,
-                            'product_uom_qty': 1,
-                            'price_unit': 100,
+                            "product_id": self.product_standard_test.id,
+                            "product_uom_qty": 1,
+                            "price_unit": 100,
                         }
                     )
                 ]
@@ -69,12 +69,12 @@ class TestOFProductStandardSaleLineName(TestOFProductStandardCommon):
         # Add a new line
         order.write(
             {
-                'order_line': [
+                "order_line": [
                     Command.create(
                         {
-                            'product_id': self.product_standard_test.id,
-                            'product_uom_qty': 1,
-                            'price_unit': 100,
+                            "product_id": self.product_standard_test.id,
+                            "product_uom_qty": 1,
+                            "price_unit": 100,
                         }
                     )
                 ]

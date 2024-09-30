@@ -7,8 +7,8 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInp
 
 
 class AccountMoveLine(OdooObjectType):
-    _name = 'AccountMoveLine'
-    _type = 'types'
+    _name = "AccountMoveLine"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -22,8 +22,8 @@ class AccountMoveLine(OdooObjectType):
 
 
 class AccountMoveLineInput(graphene.InputObjectType):
-    _name = 'AccountMoveLineUpdateInput'
-    _type = 'types'
+    _name = "AccountMoveLineUpdateInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -33,4 +33,4 @@ class AccountMoveLineInput(graphene.InputObjectType):
 
 
 class AccountMoveLineFilterInput(AccountMoveLineInput):
-    _name = 'AccountMoveLineFilterInput'
+    _name = "AccountMoveLineFilterInput"

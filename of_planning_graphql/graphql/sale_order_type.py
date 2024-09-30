@@ -6,7 +6,7 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class SaleOrder(OdooObjectType):
-    _name = 'SaleOrder'
-    _type = 'types'
+    _name = "SaleOrder"
+    _type = "types"
 
-    of_intervention_notes = graphene.String(name='interventionNotes')
+    of_intervention_notes = graphene.String(name="interventionNotes")

@@ -22,13 +22,13 @@ class GraphQLControllerMixin(object):
         # We use mimetype here since we don't need the other
         # information provided by content_type
         content_type = req.mimetype
-        if content_type == 'application/graphql':
-            return {"query": req.data.decode('utf8')}
-        elif content_type == 'application/json':
-            return load_json_body(req.data.decode('utf8'))
+        if content_type == "application/graphql":
+            return {"query": req.data.decode("utf8")}
+        elif content_type == "application/json":
+            return load_json_body(req.data.decode("utf8"))
         elif content_type in (
-            'application/x-www-form-urlencoded',
-            'multipart/form-data',
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
         ):
             return http.request.params
         return {}
@@ -38,8 +38,8 @@ class GraphQLControllerMixin(object):
             request = http.request.httprequest
             headers = request.headers
 
-            client_version = headers.get('X-Client-Version')
-            correlation_id = headers.get('X-Correlation-Id')
+            client_version = headers.get("X-Client-Version")
+            correlation_id = headers.get("X-Correlation-Id")
 
             execution_results, all_params = run_http_query(
                 schema,
@@ -49,9 +49,9 @@ class GraphQLControllerMixin(object):
                 batch_enabled=False,
                 catch=False,
                 context_value={
-                    'env': http.request.env,
-                    'client_version': client_version,
-                    'correlation_id': correlation_id,
+                    "env": http.request.env,
+                    "client_version": client_version,
+                    "correlation_id": correlation_id,
                 },
                 middleware=[
                     LoggingErrorsMiddleware(),
@@ -64,7 +64,7 @@ class GraphQLControllerMixin(object):
                 encode=partial(json_encode, pretty=False),
             )
             headers = {}
-            headers['Content-Type'] = 'application/json'
+            headers["Content-Type"] = "application/json"
             response = http.request.make_response(result, headers=headers)
             response.status_code = status_code
             if any(er.errors for er in execution_results):
@@ -75,7 +75,7 @@ class GraphQLControllerMixin(object):
         except HttpQueryError as e:
             result = json_encode({"errors": [{"message": str(e)}]})
             headers = dict(e.headers or {})
-            headers['Content-Type'] = 'application/json'
+            headers["Content-Type"] = "application/json"
             response = http.request.make_response(result, headers=headers)
             response.status_code = e.status_code
             env = http.request.env
@@ -89,7 +89,7 @@ class GraphQLControllerMixin(object):
 
     def _handle_graphiql_request(self, schema):
         req = http.request.httprequest
-        if req.method == 'GET' and req.accept_mimetypes.accept_html:
+        if req.method == "GET" and req.accept_mimetypes.accept_html:
             return http.request.render("graphql_base.graphiql", {})
         # this way of passing a GraphQL query over http is not spec compliant
         # (https://graphql.org/learn/serving-over-http/), but we use

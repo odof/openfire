@@ -14,8 +14,8 @@ from .sale_order_template_line_type import SaleOrderTemplateLine, SaleOrderTempl
 
 
 class SaleOrderTemplate(OdooObjectType):
-    _name = 'SaleOrderTemplate'
-    _type = 'types'
+    _name = "SaleOrderTemplate"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -38,8 +38,8 @@ class SaleOrderTemplate(OdooObjectType):
 
 
 class SaleOrderTemplateInput(graphene.InputObjectType):
-    _name = 'SaleOrderTemplateInput'
-    _type = 'types'
+    _name = "SaleOrderTemplateInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -49,4 +49,4 @@ class SaleOrderTemplateInput(graphene.InputObjectType):
 
 
 class SaleOrderTemplateFilterInput(SaleOrderTemplateInput):
-    _name = 'SaleOrderTemplateFilterInput'
+    _name = "SaleOrderTemplateFilterInput"

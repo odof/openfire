@@ -6,7 +6,7 @@ from odoo.addons.of_graphql.graphql.user_type import User
 
 
 class UserSubscribeNotification(graphene.Mutation):
-    _name = 'UserSubscribeNotification'
+    _name = "UserSubscribeNotification"
 
     class Arguments:
         token = graphene.String(required=True)
@@ -14,16 +14,16 @@ class UserSubscribeNotification(graphene.Mutation):
     Output = User
 
     def mutate(self, info, token, **args):
-        env = info.context['env']
+        env = info.context["env"]
 
         if not env.user.of_fcm_token_ids.filtered(lambda u: u.token == token):
-            env['of.fcm.device.token'].create({'token': token, 'user_id': env.user.id})
+            env["of.fcm.device.token"].create({"token": token, "user_id": env.user.id})
 
         return env.user
 
 
 class UserSubscribeNotificationMutation(graphene.ObjectType):
-    _name = 'UserSubscribeNotificationMutation'
-    _type = 'mutation'
+    _name = "UserSubscribeNotificationMutation"
+    _type = "mutation"
 
     user_subscribe_notification = UserSubscribeNotification.Field()

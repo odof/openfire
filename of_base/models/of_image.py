@@ -10,10 +10,10 @@ from odoo import api, fields, models, tools
 
 
 class OFImage(models.Model):
-    _name = 'of.image'
+    _name = "of.image"
     _description = "Image"
-    _inherit = ['image.mixin']
-    _order = 'sequence, id'
+    _inherit = ["image.mixin"]
+    _order = "sequence, id"
 
     name = fields.Char()
     sequence = fields.Integer(default=10)
@@ -21,7 +21,7 @@ class OFImage(models.Model):
     image_1920 = fields.Image(required=True)
 
     can_image_1024_be_zoomed = fields.Boolean(
-        string="Can Image 1024 be zoomed", compute='_compute_can_image_1024_be_zoomed', store=True
+        string="Can Image 1024 be zoomed", compute="_compute_can_image_1024_be_zoomed", store=True
     )
 
     caption = fields.Text()
@@ -31,14 +31,14 @@ class OFImage(models.Model):
         return self.action_rotate()
 
     def action_button_rotate_right(self):
-        return self.action_rotate(mode='right')
+        return self.action_rotate(mode="right")
 
-    def action_rotate(self, mode='left'):
+    def action_rotate(self, mode="left"):
         self.ensure_one()
         image_opened = Image.open(BytesIO(base64.b64decode(self.image_1920)))
 
         # Rotate the image by 90 degrees
-        angle = 90 if mode == 'left' else 270
+        angle = 90 if mode == "left" else 270
         rotated_img = image_opened.rotate(angle, expand=True)
 
         # Save the rotated image as a base64 string
@@ -46,10 +46,10 @@ class OFImage(models.Model):
         rotated_img.save(buffered, format=image_opened.format)
         image_data = base64.b64encode(buffered.getvalue())
 
-        self.write({'image_1920': image_data})
+        self.write({"image_1920": image_data})
         return True
 
-    @api.depends('image_1920', 'image_1024')
+    @api.depends("image_1920", "image_1024")
     def _compute_can_image_1024_be_zoomed(self):
         for image in self:
             image.can_image_1024_be_zoomed = image.image_1920 and tools.is_image_size_above(

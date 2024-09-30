@@ -4,7 +4,7 @@ from odoo import models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     def action_send_sms(self):
-        return self.env['of.sms'].action_send_sms(self.id, 'sale.order', self.partner_id)
+        return self.env["of.sms"].action_send_sms(self.id, "sale.order", self.partner_id)

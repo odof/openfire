@@ -16,15 +16,15 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
     def test_01_of_product_brand_id(self):
         product = self.create_product(
             {
-                'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_a.id,
+                "name": "Test Product Use Desc",
+                "brand_id": self.product_brand_a.id,
             }
         )
 
         with Form(
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant)
-            .with_context(default_move_type='out_invoice', default_journal_id=self.journal_sale.id)
+            .with_context(default_move_type="out_invoice", default_journal_id=self.journal_sale.id)
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:
                 line_form.product_id = product
@@ -36,36 +36,36 @@ class TestOFAccountMoveLineBrand(TestOFAccountCommon):
     def test_02_compute_name_use_description(self):
         product = self.create_product(
             {
-                'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_a.id,
+                "name": "Test Product Use Desc",
+                "brand_id": self.product_brand_a.id,
             }
         )
 
         with Form(
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant)
-            .with_context(default_move_type='out_invoice', default_journal_id=self.journal_sale.id)
+            .with_context(default_move_type="out_invoice", default_journal_id=self.journal_sale.id)
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:
                 line_form.product_id = product
                 self.assertEqual(
                     line_form.name,
-                    'Brand A - Test Product Use Desc\nBrand A Description\n' 'Product : Test Product Use Desc',
+                    "Brand A - Test Product Use Desc\nBrand A Description\n" "Product : Test Product Use Desc",
                 )
 
     def test_03_compute_name_no_use_description(self):
         product = self.create_product(
             {
-                'name': 'Test Product Use Desc',
-                'brand_id': self.product_brand_b.id,
+                "name": "Test Product Use Desc",
+                "brand_id": self.product_brand_b.id,
             }
         )
 
         with Form(
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant)
-            .with_context(default_move_type='out_invoice', default_journal_id=self.journal_sale.id)
+            .with_context(default_move_type="out_invoice", default_journal_id=self.journal_sale.id)
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:
                 line_form.product_id = product
-                self.assertEqual(line_form.name, 'Brand B - Test Product Use Desc')
+                self.assertEqual(line_form.name, "Brand B - Test Product Use Desc")

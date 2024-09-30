@@ -4,7 +4,7 @@ from odoo import api, models
 
 
 class AccountFiscalPosition(models.Model):
-    _inherit = 'account.fiscal.position'
+    _inherit = "account.fiscal.position"
 
     @api.model
     def _prepare_graphql_domain(self, select, domain):
@@ -12,11 +12,11 @@ class AccountFiscalPosition(models.Model):
 
         if select and select.tax_type_use:
             # on va chercher le tuple qui doit être remplacé
-            odoo_domain.remove(('tax_ids.tax_src_id.type_tax_use', '=', select.tax_type_use.value))
+            odoo_domain.remove(("tax_ids.tax_src_id.type_tax_use", "=", select.tax_type_use.value))
             odoo_domain += [
-                '|',
-                ('tax_ids.tax_src_id.type_tax_use', '=', select.tax_type_use.value),
-                ('of_default_tax_ids.type_tax_use', '=', select.tax_type_use.value),
+                "|",
+                ("tax_ids.tax_src_id.type_tax_use", "=", select.tax_type_use.value),
+                ("of_default_tax_ids.type_tax_use", "=", select.tax_type_use.value),
             ]
 
         return odoo_domain

@@ -28,26 +28,26 @@ from ..graphql.service_request_type_type import ServiceRequestType, ServiceReque
 
 
 class AffectationType(graphene.Enum):
-    MINE = 'mine'
-    ALL = 'all'
-    NOT_AFFECTED = 'not_affected'
+    MINE = "mine"
+    ALL = "all"
+    NOT_AFFECTED = "not_affected"
 
 
 class SortType(graphene.Enum):
-    NEAREST_END_DATE = 'nearest_end_date'
-    NEAREST_DISTANCE = 'nearest_distance'
+    NEAREST_END_DATE = "nearest_end_date"
+    NEAREST_DISTANCE = "nearest_distance"
 
 
 class TaskDurationType(graphene.Enum):
-    ONE_HOUR = 'one_hour'
-    TWO_HOURS = 'two_hours'
-    FOUR_HOURS = 'four_hours'
-    FOUR_HOURS_MORE = 'four_hours_more'
+    ONE_HOUR = "one_hour"
+    TWO_HOURS = "two_hours"
+    FOUR_HOURS = "four_hours"
+    FOUR_HOURS_MORE = "four_hours_more"
 
 
 class ServiceRequest(OdooObjectType):
-    _name = 'ServiceRequest'
-    _type = 'types'
+    _name = "ServiceRequest"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -60,18 +60,18 @@ class ServiceRequest(OdooObjectType):
     state = graphene.String(name="planningStatus")
     base_state = graphene.String(name="calculationStatus")
     state_punctual = graphene.String(name="state")
-    intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='interventions')
+    intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name="interventions")
     intervention_count = graphene.Int()
     template = graphene.Field(PlanningInterventionTemplate)
     type = graphene.Field(ServiceRequestType)
-    history_intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name='historyInterventions')
+    history_intervention_ids = graphene.List(graphene.NonNull(PlanningIntervention), name="historyInterventions")
     task = graphene.Field(PlanningInterventionTask, required=True)
     company = graphene.Field(Company, required=True)
     user = graphene.Field(User)
     stage = graphene.Field(ServiceRequestStage)
-    employee_ids = graphene.List(graphene.NonNull(Employee), name='employees')
+    employee_ids = graphene.List(graphene.NonNull(Employee), name="employees")
     last_attachment = graphene.Field(Attachment)
-    line_ids = graphene.List(graphene.NonNull(ServiceRequestLine), name='lines')
+    line_ids = graphene.List(graphene.NonNull(ServiceRequestLine), name="lines")
     partner = graphene.Field(Partner, required=True)
     address = graphene.Field(Partner)
     next_date = graphene.Date()
@@ -121,8 +121,8 @@ class ServiceRequest(OdooObjectType):
 
 
 class ServiceRequestInput(graphene.InputObjectType):
-    _name = 'ServiceRequestInput'
-    _type = 'types'
+    _name = "ServiceRequestInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -159,13 +159,13 @@ class ServiceRequestInput(graphene.InputObjectType):
 
 
 class ServiceRequestFilterPeriodInput(ServiceRequestInput):
-    _name = 'ServiceRequestFilterPeriodInput'
+    _name = "ServiceRequestFilterPeriodInput"
     start = graphene.Date(required=True)
     end = graphene.Date(required=True)
 
 
 class ServiceRequestFilterInput(ServiceRequestInput):
-    _name = 'ServiceRequestFilterInput'
+    _name = "ServiceRequestFilterInput"
     affectation = graphene.Field(AffectationType)
     periods = graphene.List(graphene.NonNull(ServiceRequestFilterPeriodInput))
     latitude = graphene.Float()

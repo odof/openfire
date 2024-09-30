@@ -13,7 +13,7 @@ from ..graphql.sale_order_type import SaleOrder, SaleOrderFilterInput, SaleOrder
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_sale_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

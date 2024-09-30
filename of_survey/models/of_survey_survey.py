@@ -12,14 +12,14 @@ class OFSurveySurvey(models.Model):
     """Settings for a multi-page/multi-question survey. Each survey can have one or more attached pages
     and each page can display one or more questions."""
 
-    _name = 'of.survey.survey'
+    _name = "of.survey.survey"
     _description = "Survey"
-    _order = 'create_date DESC'
-    _rec_name = 'title'
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = "create_date DESC"
+    _rec_name = "title"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     survey_type = fields.Selection(
-        required=True, default='lead_opportunity', selection=[('lead_opportunity', "Lead/Opportunity")]
+        required=True, default="lead_opportunity", selection=[("lead_opportunity", "Lead/Opportunity")]
     )
 
     def _get_default_access_token(self):
@@ -30,8 +30,8 @@ class OFSurveySurvey(models.Model):
         result = super().default_get(fields_list)
         # allows to propagate the text one write in a many2one widget after
         # clicking on 'Create and Edit...' to the popup form.
-        if 'title' in fields_list and not result.get('title') and self.env.context.get('default_name'):
-            result['title'] = self.env.context.get('default_name')
+        if "title" in fields_list and not result.get("title") and self.env.context.get("default_name"):
+            result["title"] = self.env.context.get("default_name")
         return result
 
     # description
@@ -49,63 +49,63 @@ class OFSurveySurvey(models.Model):
     )
 
     background_image = fields.Image()
-    background_image_url = fields.Char(string="Background Url", compute='_compute_background_image_url')
+    background_image_url = fields.Char(string="Background Url", compute="_compute_background_image_url")
     active = fields.Boolean(default=True)
     user_id = fields.Many2one(
-        comodel_name='res.users',
+        comodel_name="res.users",
         string="Responsible",
-        domain=[('share', '=', False)],
+        domain=[("share", "=", False)],
         tracking=True,
         default=lambda self: self.env.user,
     )
     # questions
     question_and_page_ids = fields.One2many(
-        comodel_name='of.survey.question', inverse_name='survey_id', string="Sections and Questions", copy=True
+        comodel_name="of.survey.question", inverse_name="survey_id", string="Sections and Questions", copy=True
     )
     page_ids = fields.One2many(
-        comodel_name='of.survey.question', string="Pages", compute='_compute_page_and_question_ids'
+        comodel_name="of.survey.question", string="Pages", compute="_compute_page_and_question_ids"
     )
     question_ids = fields.One2many(
-        comodel_name='of.survey.question', string="Questions", compute='_compute_page_and_question_ids'
+        comodel_name="of.survey.question", string="Questions", compute="_compute_page_and_question_ids"
     )
-    question_count = fields.Integer(string="# Questions", compute='_compute_page_and_question_ids')
+    question_count = fields.Integer(string="# Questions", compute="_compute_page_and_question_ids")
     questions_layout = fields.Selection(
         selection=[
-            ('page_per_question', "One page per question"),
-            ('page_per_section', "One page per section"),
-            ('one_page', "One page with all the questions"),
+            ("page_per_question", "One page per question"),
+            ("page_per_section", "One page per section"),
+            ("one_page", "One page with all the questions"),
         ],
         string="Pagination",
         required=True,
-        default='one_page',
+        default="one_page",
     )
     questions_selection = fields.Selection(
-        selection=[('all', "All questions")],
+        selection=[("all", "All questions")],
         string="Question Selection",
         required=True,
-        default='all',
+        default="all",
         help="If randomized is selected, you can configure the number of random questions by section. This mode is "
         "ignored in live session.",
     )
     progression_mode = fields.Selection(
-        selection=[('percent', "Percentage left"), ('number', "Number")],
+        selection=[("percent", "Percentage left"), ("number", "Number")],
         string="Display Progress as",
-        default='percent',
+        default="percent",
         help="If Number is selected, it will display the number of questions answered on the total number of question "
         "to answer.",
     )
     # attendees
     user_input_ids = fields.One2many(
-        comodel_name='of.survey.user_input',
-        inverse_name='survey_id',
+        comodel_name="of.survey.user_input",
+        inverse_name="survey_id",
         string="User responses",
         readonly=True,
-        groups='of_survey.group_of_survey_user',
+        groups="of_survey.group_of_survey_user",
     )
     # security / access
     access_mode = fields.Selection(
-        selection=[('public', "Anyone with the link"), ('token', "Invited people only")],
-        default='public',
+        selection=[("public", "Anyone with the link"), ("token", "Invited people only")],
+        default="public",
         required=True,
     )
     access_token = fields.Char(default=lambda self: self._get_default_access_token(), copy=False)
@@ -115,11 +115,11 @@ class OFSurveySurvey(models.Model):
     users_can_go_back = fields.Boolean(
         string="Users can go back", help="If checked, users can go back to previous pages.", default=True
     )
-    users_can_signup = fields.Boolean(string="Users can signup", compute='_compute_users_can_signup')
+    users_can_signup = fields.Boolean(string="Users can signup", compute="_compute_users_can_signup")
 
     # live sessions - current question fields
     session_question_id = fields.Many2one(
-        comodel_name='of.survey.question',
+        comodel_name="of.survey.question",
         string="Current Question",
         copy=False,
         help="The current question of the survey session.",
@@ -130,14 +130,14 @@ class OFSurveySurvey(models.Model):
         copy=False,
         help="The time at which the current question has started, used to handle the timer for attendees.",
     )
-    session_answer_count = fields.Integer(string="Answers Count", compute='_compute_session_answer_count')
+    session_answer_count = fields.Integer(string="Answers Count", compute="_compute_session_answer_count")
     session_question_answer_count = fields.Integer(
-        string="Question Answers Count", compute='_compute_session_question_answer_count'
+        string="Question Answers Count", compute="_compute_session_question_answer_count"
     )
 
     # conditional questions management
     has_conditional_questions = fields.Boolean(
-        string="Contains conditional questions", compute='_compute_has_conditional_questions'
+        string="Contains conditional questions", compute="_compute_has_conditional_questions"
     )
 
     # page display
@@ -145,28 +145,28 @@ class OFSurveySurvey(models.Model):
     show_end = fields.Boolean(string="Show end page")
 
     _sql_constraints = [
-        ('access_token_unique', 'unique(access_token)', "Access token should be unique"),
+        ("access_token_unique", "unique(access_token)", "Access token should be unique"),
     ]
 
-    @api.depends('background_image', 'access_token')
+    @api.depends("background_image", "access_token")
     def _compute_background_image_url(self):
         self.background_image_url = False
         for survey in self.filtered(lambda survey: survey.background_image and survey.access_token):
-            survey.background_image_url = f'/of_survey/{survey.access_token}/get_background_image'
+            survey.background_image_url = f"/of_survey/{survey.access_token}/get_background_image"
 
     def _compute_users_can_signup(self):
-        signup_allowed = self.env['res.users'].sudo()._get_signup_invitation_scope() == 'b2c'
+        signup_allowed = self.env["res.users"].sudo()._get_signup_invitation_scope() == "b2c"
         for survey in self:
             survey.users_can_signup = signup_allowed
 
-    @api.depends('question_and_page_ids')
+    @api.depends("question_and_page_ids")
     def _compute_page_and_question_ids(self):
         for survey in self:
             survey.page_ids = survey.question_and_page_ids.filtered(lambda question: question.is_page)
             survey.question_ids = survey.question_and_page_ids - survey.page_ids
             survey.question_count = len(survey.question_ids)
 
-    @api.depends('session_start_time', 'user_input_ids')
+    @api.depends("session_start_time", "user_input_ids")
     def _compute_session_answer_count(self):
         """We have to loop since our result is dependent of the survey.session_start_time.
         This field is currently used to display the count about a single survey, in the
@@ -174,21 +174,21 @@ class OFSurveySurvey(models.Model):
 
         for survey in self:
             answer_count = 0
-            if input_count := self.env['of.survey.user_input']._read_group(
+            if input_count := self.env["of.survey.user_input"]._read_group(
                 [
-                    ('survey_id', '=', survey.id),
-                    ('is_session_answer', '=', True),
-                    ('state', '!=', 'done'),
-                    ('create_date', '>=', survey.session_start_time),
+                    ("survey_id", "=", survey.id),
+                    ("is_session_answer", "=", True),
+                    ("state", "!=", "done"),
+                    ("create_date", ">=", survey.session_start_time),
                 ],
-                ['create_uid:count'],
-                ['survey_id'],
+                ["create_uid:count"],
+                ["survey_id"],
             ):
-                answer_count = input_count[0].get('create_uid', 0)
+                answer_count = input_count[0].get("create_uid", 0)
 
             survey.session_answer_count = answer_count
 
-    @api.depends('session_question_id', 'session_start_time', 'user_input_ids.user_input_line_ids')
+    @api.depends("session_question_id", "session_start_time", "user_input_ids.user_input_line_ids")
     def _compute_session_question_answer_count(self):
         """We have to loop since our result is dependent of the survey.session_question_id and
         the survey.session_start_time.
@@ -196,20 +196,20 @@ class OFSurveySurvey(models.Model):
         context of sessions, so it should not matter too much."""
         for survey in self:
             answer_count = 0
-            if input_line_count := self.env['of.survey.user_input.line']._read_group(
+            if input_line_count := self.env["of.survey.user_input.line"]._read_group(
                 [
-                    ('question_id', '=', survey.session_question_id.id),
-                    ('survey_id', '=', survey.id),
-                    ('create_date', '>=', survey.session_start_time),
+                    ("question_id", "=", survey.session_question_id.id),
+                    ("survey_id", "=", survey.id),
+                    ("create_date", ">=", survey.session_start_time),
                 ],
-                ['user_input_id:count_distinct'],
-                ['question_id'],
+                ["user_input_id:count_distinct"],
+                ["question_id"],
             ):
-                answer_count = input_line_count[0].get('user_input_id', 0)
+                answer_count = input_line_count[0].get("user_input_id", 0)
 
             survey.session_question_answer_count = answer_count
 
-    @api.depends('question_and_page_ids.is_conditional')
+    @api.depends("question_and_page_ids.is_conditional")
     def _compute_has_conditional_questions(self):
         for survey in self:
             survey.has_conditional_questions = any(question.is_conditional for question in survey.question_and_page_ids)
@@ -219,7 +219,7 @@ class OFSurveySurvey(models.Model):
     # ------------------------------------------------------------
 
     def copy_data(self, default=None):
-        new_defaults = {'title': _("%s (copy)") % (self.title)}
+        new_defaults = {"title": _("%s (copy)") % (self.title)}
         default = dict(new_defaults, **(default or {}))
         return super().copy_data(default)
 
@@ -243,42 +243,42 @@ class OFSurveySurvey(models.Model):
             public user in which case an email is welcomed;
         :param email: email of the person asking the token is no user exists;
         """
-        self.check_access_rights('read')
-        self.check_access_rule('read')
+        self.check_access_rights("read")
+        self.check_access_rule("read")
 
-        user_inputs = self.env['of.survey.user_input']
+        user_inputs = self.env["of.survey.user_input"]
         for survey in self:
             if partner and not user and partner.user_ids:
                 user = partner.user_ids[0]
 
-            invite_token = additional_vals.pop('invite_token', False)
+            invite_token = additional_vals.pop("invite_token", False)
             survey._check_answer_creation(
                 user, partner, email, test_entry=test_entry, check_attempts=check_attempts, invite_token=invite_token
             )
             answer_vals = {
-                'survey_id': survey.id,
-                'test_entry': test_entry,
+                "survey_id": survey.id,
+                "test_entry": test_entry,
             }
             if user and not user._is_public():
-                answer_vals['partner_id'] = user.partner_id.id
-                answer_vals['email'] = user.email
-                answer_vals['nickname'] = user.name
+                answer_vals["partner_id"] = user.partner_id.id
+                answer_vals["email"] = user.email
+                answer_vals["nickname"] = user.name
             elif partner:
-                answer_vals['partner_id'] = partner.id
-                answer_vals['email'] = partner.email
-                answer_vals['nickname'] = partner.name
+                answer_vals["partner_id"] = partner.id
+                answer_vals["email"] = partner.email
+                answer_vals["nickname"] = partner.name
             else:
-                answer_vals['email'] = email
-                answer_vals['nickname'] = email
+                answer_vals["email"] = email
+                answer_vals["nickname"] = email
 
             if invite_token:
-                answer_vals['invite_token'] = invite_token
+                answer_vals["invite_token"] = invite_token
 
             answer_vals |= additional_vals
             user_inputs += user_inputs.create(answer_vals)
 
-        for question in self.mapped('question_ids').filtered(
-            lambda q: q.question_type == 'char_box' and (q.save_as_email)
+        for question in self.mapped("question_ids").filtered(
+            lambda q: q.question_type == "char_box" and (q.save_as_email)
         ):
             for user_input in user_inputs:
                 if question.save_as_email and user_input.email:
@@ -291,25 +291,25 @@ class OFSurveySurvey(models.Model):
         self.ensure_one()
         if test_entry:
             # the current user must have the access rights to survey
-            if not user.has_group('of_survey.group_of_survey_user'):
-                raise exceptions.UserError(_('Creating test token is not allowed for you.'))
+            if not user.has_group("of_survey.group_of_survey_user"):
+                raise exceptions.UserError(_("Creating test token is not allowed for you."))
         else:
             if not self.active:
-                raise exceptions.UserError(_('Creating token for closed/archived surveys is not allowed.'))
-            if self.access_mode == 'authentication':
+                raise exceptions.UserError(_("Creating token for closed/archived surveys is not allowed."))
+            if self.access_mode == "authentication":
                 # signup possible -> should have at least a partner to create an account
                 if self.users_can_signup and not user and not partner:
                     raise exceptions.UserError(
-                        _('Creating token for external people is not allowed for surveys requesting authentication.')
+                        _("Creating token for external people is not allowed for surveys requesting authentication.")
                     )
                 # no signup possible -> should be a not public user (employee or portal users)
                 if not self.users_can_signup and (not user or user._is_public()):
                     raise exceptions.UserError(
-                        _('Creating token for external people is not allowed for surveys requesting authentication.')
+                        _("Creating token for external people is not allowed for surveys requesting authentication.")
                     )
-            if self.access_mode == 'internal' and (not user or not user._is_internal()):
+            if self.access_mode == "internal" and (not user or not user._is_internal()):
                 raise exceptions.UserError(
-                    _('Creating token for anybody else than employees is not allowed for internal surveys.')
+                    _("Creating token for anybody else than employees is not allowed for internal surveys.")
                 )
 
     def _prepare_user_input_predefined_questions(self):
@@ -318,7 +318,7 @@ class OFSurveySurvey(models.Model):
         pick a random number of questions and returns the merged recordset"""
         self.ensure_one()
 
-        questions = self.env['of.survey.question']
+        questions = self.env["of.survey.question"]
 
         # First append questions without page
         for question in self.question_ids:
@@ -343,11 +343,11 @@ class OFSurveySurvey(models.Model):
                 (pages are displayed in 'page_per_question' layout when they have a description, see PR#44271)
         """
         self.ensure_one()
-        if self.users_can_go_back and answer.state == 'in_progress':
-            if self.questions_layout == 'page_per_section' and page_or_question != self.page_ids[0]:
+        if self.users_can_go_back and answer.state == "in_progress":
+            if self.questions_layout == "page_per_section" and page_or_question != self.page_ids[0]:
                 return True
             elif (
-                self.questions_layout == 'page_per_question'
+                self.questions_layout == "page_per_question"
                 and not answer.is_session_answer
                 and page_or_question != answer.predefined_question_ids[0]
                 and (not self.page_ids or page_or_question != self.page_ids[0])
@@ -366,10 +366,10 @@ class OFSurveySurvey(models.Model):
         to the user taking the survey.
         In 'page_per_question' layout, we also want to show pages that have a description."""
 
-        result = self.env['of.survey.question']
-        if self.questions_layout == 'page_per_section':
+        result = self.env["of.survey.question"]
+        if self.questions_layout == "page_per_section":
             result = self.page_ids
-        elif self.questions_layout == 'page_per_question':
+        elif self.questions_layout == "page_per_question":
             result = self._get_pages_and_questions_to_show()
         return result
 
@@ -406,7 +406,7 @@ class OFSurveySurvey(models.Model):
 
         survey = user_input.survey_id
         pages_or_questions = survey._get_pages_or_questions(user_input)
-        question_record = self.env['of.survey.question']
+        question_record = self.env["of.survey.question"]
 
         # Get Next
         if not go_back:
@@ -424,7 +424,7 @@ class OFSurveySurvey(models.Model):
 
         # Conditional Questions Management
         inactive_questions = user_input._get_inactive_conditional_questions()
-        if survey.questions_layout == 'page_per_question':
+        if survey.questions_layout == "page_per_question":
             question_candidates = (
                 pages_or_questions[:current_page_index] if go_back else pages_or_questions[current_page_index + 1 :]
             )
@@ -441,7 +441,7 @@ class OFSurveySurvey(models.Model):
                     # ici on doit regarder si la question est affichable ou non selon les conditions
                     if user_input.is_valid_question(question):
                         return question
-        elif survey.questions_layout == 'page_per_section':
+        elif survey.questions_layout == "page_per_section":
             section_candidates = (
                 pages_or_questions[:current_page_index] if go_back else pages_or_questions[current_page_index + 1 :]
             )
@@ -476,13 +476,13 @@ class OFSurveySurvey(models.Model):
         current_page_index = pages_or_questions.ids.index(page_or_question.id)
         if next_page_or_question_candidates := pages_or_questions[current_page_index + 1 :]:
             inactive_questions = user_input._get_inactive_conditional_questions()
-            if self.questions_layout == 'page_per_question':
+            if self.questions_layout == "page_per_question":
                 next_active_question = any(
                     next_question not in inactive_questions for next_question in next_page_or_question_candidates
                 )
                 is_triggering_question = user_input.is_valid_question(page_or_question)
                 return not (next_active_question or is_triggering_question)
-            elif self.questions_layout == 'page_per_section':
+            elif self.questions_layout == "page_per_section":
                 is_triggering_section = any(
                     user_input.is_valid_question(question) for question in page_or_question.question_ids
                 )
@@ -518,19 +518,19 @@ class OFSurveySurvey(models.Model):
 
         if answer and answer.is_session_answer:
             return self.session_question_id, self.session_question_id.id
-        if self.questions_layout == 'page_per_section':
+        if self.questions_layout == "page_per_section":
             if not page_id:
                 raise ValueError(_("Page id is needed for question layout 'page_per_section'"))
             page_id = int(page_id)
             questions = (
-                self.env['of.survey.question'].sudo().search([('survey_id', '=', self.id), ('page_id', '=', page_id)])
+                self.env["of.survey.question"].sudo().search([("survey_id", "=", self.id), ("page_id", "=", page_id)])
             )
             page_or_question_id = page_id
-        elif self.questions_layout == 'page_per_question':
+        elif self.questions_layout == "page_per_question":
             if not question_id:
                 raise ValueError(_("Question id is needed for question layout 'page_per_question'"))
             question_id = int(question_id)
-            questions = self.env['of.survey.question'].sudo().browse(question_id)
+            questions = self.env["of.survey.question"].sudo().browse(question_id)
             page_or_question_id = question_id
         else:
             questions = self.question_ids
@@ -557,17 +557,17 @@ class OFSurveySurvey(models.Model):
 
         # get user_inputs from current session
         current_user_inputs = self.user_input_ids.filtered(lambda input: input.create_date > self.session_start_time)
-        current_user_input_lines = current_user_inputs.mapped('user_input_line_ids').filtered(
+        current_user_input_lines = current_user_inputs.mapped("user_input_line_ids").filtered(
             lambda answer: answer.suggested_answer_id
         )
 
         # count the number of vote per answer
-        votes_by_answer = dict.fromkeys(current_user_input_lines.mapped('suggested_answer_id'), 0)
+        votes_by_answer = dict.fromkeys(current_user_input_lines.mapped("suggested_answer_id"), 0)
         for answer in current_user_input_lines:
             votes_by_answer[answer.suggested_answer_id] += 1
 
         # extract most voted answer for each question
-        most_voted_answer_by_questions = dict.fromkeys(current_user_input_lines.mapped('question_id'))
+        most_voted_answer_by_questions = dict.fromkeys(current_user_input_lines.mapped("question_id"))
         for question in most_voted_answer_by_questions.keys():
             for answer in votes_by_answer.keys():
                 if answer.question_id != question:
@@ -577,21 +577,21 @@ class OFSurveySurvey(models.Model):
                     most_voted_answer_by_questions[question] = answer
 
         # return a fake 'audience' user_input
-        fake_user_input = self.env['of.survey.user_input'].new(
+        fake_user_input = self.env["of.survey.user_input"].new(
             {
-                'survey_id': self.id,
-                'predefined_question_ids': [(6, 0, self._prepare_user_input_predefined_questions().ids)],
+                "survey_id": self.id,
+                "predefined_question_ids": [(6, 0, self._prepare_user_input_predefined_questions().ids)],
             }
         )
 
-        fake_user_input_lines = self.env['of.survey.user_input.line']
+        fake_user_input_lines = self.env["of.survey.user_input.line"]
         for question, answer in most_voted_answer_by_questions.items():
-            fake_user_input_lines |= self.env['of.survey.user_input.line'].new(
+            fake_user_input_lines |= self.env["of.survey.user_input.line"].new(
                 {
-                    'question_id': question.id,
-                    'suggested_answer_id': answer.id,
-                    'survey_id': self.id,
-                    'user_input_id': fake_user_input.id,
+                    "question_id": question.id,
+                    "suggested_answer_id": answer.id,
+                    "survey_id": self.id,
+                    "user_input_id": fake_user_input.id,
                 }
             )
 
@@ -603,42 +603,42 @@ class OFSurveySurvey(models.Model):
     def action_button_open_test_survey(self):
         self.ensure_one()
         return {
-            'type': 'ir.actions.act_url',
-            'name': _("Test Survey"),
-            'target': 'self',
-            'url': f'/of_survey/test/{self.access_token}',
+            "type": "ir.actions.act_url",
+            "name": _("Test Survey"),
+            "target": "self",
+            "url": f"/of_survey/test/{self.access_token}",
         }
 
     def action_start_survey(self, answer=None):
         """Open the website page with the survey form"""
         self.ensure_one()
-        url = '%s?%s' % (
+        url = "%s?%s" % (
             self.get_start_url(),
-            werkzeug.urls.url_encode({'answer_token': answer and answer.access_token or None}),
+            werkzeug.urls.url_encode({"answer_token": answer and answer.access_token or None}),
         )
         return {
-            'type': 'ir.actions.act_url',
-            'name': "Start Survey",
-            'target': 'self',
-            'url': url,
+            "type": "ir.actions.act_url",
+            "name": "Start Survey",
+            "target": "self",
+            "url": url,
         }
 
     def action_survey_user_input_completed(self):
-        action = self.env['ir.actions.act_window']._for_xml_id('of_survey.action_survey_user_input')
+        action = self.env["ir.actions.act_window"]._for_xml_id("of_survey.action_survey_user_input")
         ctx = dict(self.env.context)
-        ctx |= {'search_default_survey_id': self.ids[0], 'search_default_completed': 1}
-        action['context'] = ctx
+        ctx |= {"search_default_survey_id": self.ids[0], "search_default_completed": 1}
+        action["context"] = ctx
         return action
 
     def get_start_url(self):
-        return f'/of_survey/start/{self.access_token}'
+        return f"/of_survey/start/{self.access_token}"
 
     def get_start_short_url(self):
         """See controller method docstring for more details."""
-        return f'/of_s/{self.access_token[:6]}'
+        return f"/of_s/{self.access_token[:6]}"
 
     def get_print_url(self):
-        return f'/of_survey/print/{self.access_token}'
+        return f"/of_survey/print/{self.access_token}"
 
     def _check_conditional_questions(self):
         """

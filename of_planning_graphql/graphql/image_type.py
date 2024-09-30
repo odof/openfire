@@ -8,10 +8,10 @@ from .planning_intervention_type import PlanningIntervention, PlanningInterventi
 
 
 class Image(OdooObjectType):
-    _name = 'Image'
-    _type = 'types'
+    _name = "Image"
+    _type = "types"
 
-    intervention_id = graphene.Field(PlanningIntervention, name='intervention')
+    intervention_id = graphene.Field(PlanningIntervention, name="intervention")
     intervention_date = graphene.DateTime()
     intervention_status = graphene.String()
 
@@ -21,8 +21,8 @@ class Image(OdooObjectType):
 
 
 class ImageInput(graphene.InputObjectType):
-    _name = 'ImageInput'
-    _type = 'types'
+    _name = "ImageInput"
+    _type = "types"
 
     intervention = graphene.Field(PlanningInterventionInput)
     intervention_date = graphene.DateTime()

@@ -14,8 +14,8 @@ class _PlanningInterventionsOfflineResult:
 
 
 class PlanningInterventionQuery(graphene.ObjectType):
-    _name = 'PlanningInterventionQuery'
-    _type = 'query'
+    _name = "PlanningInterventionQuery"
+    _type = "query"
 
     planning_interventions_offline = graphene.Field(
         PlanningInterventionsOffline,
@@ -38,15 +38,15 @@ class PlanningInterventionQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_planning_interventions_offline(root, info, update_date=None, local_intervention_ids=None):
-        env = info.context['env']
+        env = info.context["env"]
         odoo_domain = []
 
         display_planning_days_before = (
-            env['ir.config_parameter'].sudo().get_param('of_mobile.display_planning_days_before')
+            env["ir.config_parameter"].sudo().get_param("of_mobile.display_planning_days_before")
         )
 
         display_planning_days_after = (
-            env['ir.config_parameter'].sudo().get_param('of_mobile.display_planning_days_after')
+            env["ir.config_parameter"].sudo().get_param("of_mobile.display_planning_days_after")
         )
 
         today = fields.Date.from_string(fields.Date.today())
@@ -54,18 +54,18 @@ class PlanningInterventionQuery(graphene.ObjectType):
         after = today + relativedelta(days=int(display_planning_days_after))
 
         original_domain = [
-            ('of_employee_ids.user_id', '=', env.user.id),
-            ('start', '>=', fields.Date.to_string(before)),
-            ('start', '<=', fields.Date.to_string(after)),
-            ('of_state', 'not in', ['cancel', 'postponed']),
+            ("of_employee_ids.user_id", "=", env.user.id),
+            ("start", ">=", fields.Date.to_string(before)),
+            ("start", "<=", fields.Date.to_string(after)),
+            ("of_state", "not in", ["cancel", "postponed"]),
         ]
 
         odoo_domain += original_domain
 
         if update_date:
-            odoo_domain += [('of_update_date', '>=', fields.Datetime.to_string(update_date))]
+            odoo_domain += [("of_update_date", ">=", fields.Datetime.to_string(update_date))]
 
-        interventions = env['calendar.event'].search(odoo_domain)
+        interventions = env["calendar.event"].search(odoo_domain)
 
         result = _PlanningInterventionsOfflineResult()
         result.interventions = [inter for inter in interventions] or []
@@ -77,7 +77,7 @@ class PlanningInterventionQuery(graphene.ObjectType):
         if update_date:
             local_intervention_ids = local_intervention_ids or []
             # On va rechercher toutes les interventions sur la période de synchro
-            synchronizable_interventions = env['calendar.event'].search(original_domain)
+            synchronizable_interventions = env["calendar.event"].search(original_domain)
 
             for inter in synchronizable_interventions:
                 # si l'intervention n'est pas dans la liste des locales,
@@ -95,15 +95,15 @@ class PlanningInterventionQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_planning_interventions_preview(root, info, employee_id, starting_date, number_of_days):
-        env = info.context['env']
+        env = info.context["env"]
 
         after = starting_date + relativedelta(days=int(number_of_days))
 
         domain = [
-            ('of_employee_ids', 'in', employee_id),
-            ('start', '>=', fields.Date.to_string(starting_date)),
-            ('start', '<=', fields.Date.to_string(after)),
-            ('of_state', 'not in', ['cancel', 'postponed']),
+            ("of_employee_ids", "in", employee_id),
+            ("start", ">=", fields.Date.to_string(starting_date)),
+            ("start", "<=", fields.Date.to_string(after)),
+            ("of_state", "not in", ["cancel", "postponed"]),
         ]
 
-        return env['calendar.event'].search(domain) or []
+        return env["calendar.event"].search(domain) or []

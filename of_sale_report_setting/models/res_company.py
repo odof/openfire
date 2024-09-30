@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     pdf_address_title = fields.Boolean(string="Address title (Sale PDF display)", default=True)
     pdf_address_contact_titles = fields.Boolean(string="Titles (Sale PDF display)", default=True)
@@ -70,13 +70,13 @@ class ResCompany(models.Model):
     pdf_price_taxinc = fields.Boolean(string="Price Tax Incl. (Sale PDF Display)")
     pdf_print_image_level = fields.Selection(
         selection=[
-            ('no', "Do not print"),
-            ('line', "Print on each line"),
-            ('appendix', "Print on appendix"),
-            ('line_appendix', "Print first image on line and others on appendix"),
+            ("no", "Do not print"),
+            ("line", "Print on each line"),
+            ("appendix", "Print on appendix"),
+            ("line_appendix", "Print first image on line and others on appendix"),
         ],
         string="Product images (Sale PDF Display)",
-        default='no',
+        default="no",
     )
 
     # Signatures insert

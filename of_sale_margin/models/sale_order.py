@@ -4,13 +4,13 @@ from odoo import _, api, fields, models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     of_margin_percent = fields.Float(
-        compute='_compute_of_margin_percent', string="Margin %", search='_search_of_margin_percent'
+        compute="_compute_of_margin_percent", string="Margin %", search="_search_of_margin_percent"
     )
 
-    @api.depends('margin_percent')
+    @api.depends("margin_percent")
     def _compute_of_margin_percent(self):
         for order in self:
             order.of_margin_percent = order.margin_percent * 100
@@ -27,29 +27,29 @@ class SaleOrder(models.Model):
         down = value - 0.005
         params = []
         request = "SELECT id FROM sale_order WHERE "
-        if operator == '=':
+        if operator == "=":
             request += "(100 * margin_percent) >= %s AND " "(100 * margin_percent) <= %s;"
             params = (down, top)
-        elif operator == '!=':
+        elif operator == "!=":
             request += "(100 * margin_percent) <= %s OR " "(100 * margin_percent) >= %s;"
             params = (down, top)
-        elif operator == '>=':
+        elif operator == ">=":
             request += "(100 * margin_percent) >= %s;"
             params = (down,)
-        elif operator == '>':
+        elif operator == ">":
             request += "(100 * margin_percent) > %s;"
             params = (top,)
-        elif operator == '<=':
+        elif operator == "<=":
             request += "(100 * margin_percent) <= %s;"
             params = (top,)
-        elif operator == '<':
+        elif operator == "<":
             request += "(100 * margin_percent) < %s;"
             params = (down,)
         else:
             raise NotImplementedError(_("Search operator %s not implemented for value %s") % (operator, value))
         self.env.cr.execute(request, params)
         ids = [r[0] for r in self.env.cr.fetchall()]
-        return [('id', 'in', ids)]
+        return [("id", "in", ids)]
 
     @api.model
     def fields_get(self, allfields=None, attributes=None):
@@ -62,7 +62,7 @@ class SaleOrder(models.Model):
         """
         res = super().fields_get(allfields, attributes=attributes)
         for field in res:
-            if field != 'margin_percent':
+            if field != "margin_percent":
                 continue
-            res[field]['searchable'] = False
+            res[field]["searchable"] = False
         return res

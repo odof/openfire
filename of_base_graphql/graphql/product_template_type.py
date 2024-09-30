@@ -6,8 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class ProductTemplate(OdooObjectType):
-    _name = 'ProductTemplate'
-    _type = 'types'
+    _name = "ProductTemplate"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -15,8 +15,8 @@ class ProductTemplate(OdooObjectType):
 
 
 class ProductTemplateInput(graphene.InputObjectType):
-    _name = 'ProductTemplateInput'
-    _type = 'types'
+    _name = "ProductTemplateInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -24,4 +24,4 @@ class ProductTemplateInput(graphene.InputObjectType):
 
 
 class ProductTemplateFilterInput(ProductTemplateInput):
-    _name = 'ProductTemplateFilterInput'
+    _name = "ProductTemplateFilterInput"

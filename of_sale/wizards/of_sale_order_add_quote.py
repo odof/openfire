@@ -6,24 +6,24 @@ from odoo import Command, _, api, fields, models
 class OFSaleOrderAddQuoteWizard(models.TransientModel):
     """Wizard to add a quote to a sales order"""
 
-    _name = 'of.sale.order.add.quote.wizard'
+    _name = "of.sale.order.add.quote.wizard"
     _description = __doc__
 
-    order_id = fields.Many2one(comodel_name='sale.order', string="Sales order to update")
-    quote_id = fields.Many2one(comodel_name='sale.order', string="Quote to add")
+    order_id = fields.Many2one(comodel_name="sale.order", string="Sales order to update")
+    quote_id = fields.Many2one(comodel_name="sale.order", string="Quote to add")
     addable_quote_ids = fields.Many2many(
-        comodel_name='sale.order', compute='_compute_addable_quote_ids', string="Addable quotes"
+        comodel_name="sale.order", compute="_compute_addable_quote_ids", string="Addable quotes"
     )
 
-    @api.depends('order_id')
+    @api.depends("order_id")
     def _compute_addable_quote_ids(self):
         for rec in self:
-            addable_quote = self.env['sale.order'].search(
+            addable_quote = self.env["sale.order"].search(
                 [
-                    ('partner_invoice_id', '=', rec.order_id.partner_invoice_id.id),
-                    ('partner_shipping_id', '=', rec.order_id.partner_shipping_id.id),
-                    ('company_id', '=', rec.order_id.company_id.id),
-                    ('state', 'in', ['draft', 'sent']),
+                    ("partner_invoice_id", "=", rec.order_id.partner_invoice_id.id),
+                    ("partner_shipping_id", "=", rec.order_id.partner_shipping_id.id),
+                    ("company_id", "=", rec.order_id.company_id.id),
+                    ("state", "in", ["draft", "sent"]),
                 ]
             )
             if rec.order_id:
@@ -38,8 +38,8 @@ class OFSaleOrderAddQuoteWizard(models.TransientModel):
             new_name = line.name + "\n\n" + _("Line added from the complementary quote %s") % self.quote_id.name
             line.copy(
                 {
-                    'order_id': self.order_id.id,
-                    'name': new_name,
+                    "order_id": self.order_id.id,
+                    "name": new_name,
                 }
             )
 

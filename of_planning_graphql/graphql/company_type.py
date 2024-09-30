@@ -8,8 +8,8 @@ from .planning_intervention_template_type import PlanningInterventionTemplate
 
 
 class Company(OdooObjectType):
-    _name = 'Company'
-    _type = 'types'
+    _name = "Company"
+    _type = "types"
 
     default_intervention_template = graphene.Field(PlanningInterventionTemplate)
     intervention_template_mandatory = graphene.Boolean()

@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFPlanningInterventionTemplate(models.Model):
-    _inherit = 'of.planning.intervention.template'
+    _inherit = "of.planning.intervention.template"
 
     # -- Intervention Sheet - Joined Documents
     sheet_order_pdf = fields.Boolean(
@@ -23,8 +23,8 @@ class OFPlanningInterventionTemplate(models.Model):
         help="Adds the PDF of the purchase order associated with the intervention as an appendix to the PDF document.",
     )
     sheet_custom_document_ids = fields.Many2many(
-        comodel_name='of.custom.document',
-        relation='sheet_intervention_custom_document',
+        comodel_name="of.custom.document",
+        relation="sheet_intervention_custom_document",
         string="Joined documents (IS)",
         help="Adds customized documents selected in the intervention as an appendix to the PDF document.",
     )
@@ -46,8 +46,8 @@ class OFPlanningInterventionTemplate(models.Model):
         help="Adds the PDF of the purchase order associated with the intervention as an appendix to the PDF document.",
     )
     report_custom_document_ids = fields.Many2many(
-        comodel_name='of.custom.document',
-        relation='report_intervention_custom_document',
+        comodel_name="of.custom.document",
+        relation="report_intervention_custom_document",
         string="Joined documents (IR)",
         help="Adds customized documents selected in the intervention as an appendix to the PDF document.",
     )

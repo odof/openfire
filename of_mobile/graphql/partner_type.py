@@ -4,8 +4,8 @@ import graphene
 
 
 class PartnerCheckDuplications(graphene.InputObjectType):
-    _name = 'PartnerCheckDuplications'
-    _type = 'types'
+    _name = "PartnerCheckDuplications"
+    _type = "types"
 
     email = graphene.String()
     phone_numbers = graphene.List(graphene.NonNull(graphene.String))

@@ -4,37 +4,37 @@ from odoo import Command, _, api, fields, models
 
 
 class CalendarEvent(models.Model):
-    _inherit = 'calendar.event'
+    _inherit = "calendar.event"
 
     of_survey_id = fields.Many2one(
-        comodel_name='of.survey.survey',
+        comodel_name="of.survey.survey",
         string="Survey",
-        domain=[('survey_type', '=', 'intervention_survey')],
-        compute='_compute_of_survey_id',
+        domain=[("survey_type", "=", "intervention_survey")],
+        compute="_compute_of_survey_id",
         store=True,
         readonly=False,
         help="Select the survey to be answered as part of the intervention",
     )
     of_survey_user_input_id = fields.Many2one(
-        comodel_name='of.survey.user_input',
+        comodel_name="of.survey.user_input",
         string="Survey User Input",
-        compute='_compute_of_survey_user_input_id',
+        compute="_compute_of_survey_user_input_id",
         store=True,
         readonly=False,
     )
     of_survey_user_input_line_ids = fields.One2many(
-        comodel_name='of.survey.user_input.line',
-        related='of_survey_user_input_id.user_input_line_ids',
+        comodel_name="of.survey.user_input.line",
+        related="of_survey_user_input_id.user_input_line_ids",
         string="Survey User Input Line",
     )
     of_question_ids = fields.One2many(
-        comodel_name='of.survey.question', related='of_survey_id.question_and_page_ids', string="Questions"
+        comodel_name="of.survey.question", related="of_survey_id.question_and_page_ids", string="Questions"
     )
     of_answers_ids = fields.One2many(
-        comodel_name='of.survey.answers',
-        inverse_name='intervention_id',
+        comodel_name="of.survey.answers",
+        inverse_name="intervention_id",
         string="Question and Answers",
-        compute='_compute_question_answers_ids',
+        compute="_compute_question_answers_ids",
         store=True,
         readonly=False,
     )
@@ -43,12 +43,12 @@ class CalendarEvent(models.Model):
     # Compute methods
     # --------------------------------------------------------------------------
 
-    @api.depends('of_template_id')
+    @api.depends("of_template_id")
     def _compute_of_survey_id(self):
         for event in self:
             event.of_survey_id = event.of_template_id.survey_id
 
-    @api.depends('of_survey_id')
+    @api.depends("of_survey_id")
     def _compute_of_survey_user_input_id(self):
         for event in self:
             if event.of_survey_id:
@@ -57,10 +57,10 @@ class CalendarEvent(models.Model):
                 )
                 event.of_survey_user_input_id.res_model = event._name
                 event.of_survey_user_input_id.res_id = event._origin.id
-                event.of_survey_user_input_id.redirect_action_id = self.env.ref('calendar.action_calendar_event').id
-                event.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+                event.of_survey_user_input_id.redirect_action_id = self.env.ref("calendar.action_calendar_event").id
+                event.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
 
-    @api.depends('of_survey_user_input_line_ids', 'of_question_ids')
+    @api.depends("of_survey_user_input_line_ids", "of_question_ids")
     def _compute_question_answers_ids(self):
         for event in self:
             event.of_answers_ids = False
@@ -84,24 +84,24 @@ class CalendarEvent(models.Model):
                         for line in input_lines
                         if len(input_lines.filtered(lambda r: r.question_id.id == line.question_id.id)) <= 1
                         or not line.skipped
-                        or line.question_id.question_type != 'multiple_choice'
+                        or line.question_id.question_type != "multiple_choice"
                     ]
-                    answers = ', '.join(answer_lines)
+                    answers = ", ".join(answer_lines)
 
                 if len(question_answers) == 1:
                     if question_answers.answers != answers:
                         question_answers_ids.append(
                             Command.update(
                                 question_answers.id,
-                                {'answers': answers, 'user_input': event.of_survey_user_input_id.id},
+                                {"answers": answers, "user_input": event.of_survey_user_input_id.id},
                             )
                         )
                 else:
                     question_answers_value = {
-                        'question_id': question.id,
-                        'answers': answers,
-                        'sequence': question.sequence,
-                        'user_input': event.of_survey_user_input_id.id,
+                        "question_id": question.id,
+                        "answers": answers,
+                        "sequence": question.sequence,
+                        "user_input": event.of_survey_user_input_id.id,
                     }
                     question_answers_ids.append(Command.create(question_answers_value))
             event.of_answers_ids = question_answers_ids
@@ -110,7 +110,7 @@ class CalendarEvent(models.Model):
     # Onchange methods
     # --------------------------------------------------------------------------
 
-    @api.onchange('of_survey_id')
+    @api.onchange("of_survey_id")
     def _onchange_of_survey_id(self):
         """When the survey is changed we remove the answers and create a new user input.
 
@@ -126,8 +126,8 @@ class CalendarEvent(models.Model):
             )
             self.of_survey_user_input_id.res_model = self._name
             self.of_survey_user_input_id.res_id = self._origin.id
-            self.of_survey_user_input_id.redirect_action_id = self.env.ref('of_planning.action_calendar_event').id
-            self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+            self.of_survey_user_input_id.redirect_action_id = self.env.ref("of_planning.action_calendar_event").id
+            self.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
 
     # --------------------------------------------------------------------------
     # ORM methods
@@ -159,24 +159,24 @@ class CalendarEvent(models.Model):
         """
         self.ensure_one()
         # cleaning up old data
-        self.env['of.survey.user_input'].search(
+        self.env["of.survey.user_input"].search(
             [
-                ('res_model', '=', self._name),
-                ('res_id', '=', self._origin.id),
+                ("res_model", "=", self._name),
+                ("res_id", "=", self._origin.id),
             ]
         ).unlink()
         self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
         self.of_survey_user_input_id.res_model = self._name
         self.of_survey_user_input_id.res_id = self._origin.id
-        self.of_survey_user_input_id.redirect_action_id = self.env.ref('of_planning.action_calendar_event').id
-        self.of_survey_user_input_id.menu_id = self.env.ref('of_planning.menu_of_planning_main').id
+        self.of_survey_user_input_id.redirect_action_id = self.env.ref("of_planning.action_calendar_event").id
+        self.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
 
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
+        url = f"/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}"
         return {
-            'type': 'ir.actions.act_url',
-            'name': _("Start Survey"),
-            'target': 'self',
-            'url': url,
+            "type": "ir.actions.act_url",
+            "name": _("Start Survey"),
+            "target": "self",
+            "url": url,
         }
 
     def action_button_edit_survey(self):
@@ -186,12 +186,12 @@ class CalendarEvent(models.Model):
         # on met sur la première question
         self.of_survey_user_input_id.last_displayed_page_id = 0
 
-        url = f'/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}'
+        url = f"/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}"
         return {
-            'type': 'ir.actions.act_url',
-            'name': _("Edit Survey"),
-            'target': 'self',
-            'url': url,
+            "type": "ir.actions.act_url",
+            "name": _("Edit Survey"),
+            "target": "self",
+            "url": url,
         }
 
     # --------------------------------------------------------------------------
@@ -212,16 +212,16 @@ class CalendarEvent(models.Model):
             page (of.survey.answers): Section to check.
         """
 
-        page_answers = self.of_answers_ids.filtered(lambda a: a.question_id in page.mapped('question_id.question_ids'))
-        page_input_lines = page_answers.mapped('user_input.user_input_line_ids').filtered(
-            lambda il: il.question_id in page.mapped('question_id.question_ids')
+        page_answers = self.of_answers_ids.filtered(lambda a: a.question_id in page.mapped("question_id.question_ids"))
+        page_input_lines = page_answers.mapped("user_input.user_input_line_ids").filtered(
+            lambda il: il.question_id in page.mapped("question_id.question_ids")
         )
 
         # We display a section only if all its questions have not been ignored.
         # For a question of type image, this corresponds to whether it has images.
         return not all(
             page_input_lines.mapped(
-                lambda il: il.skipped or (il.answer_type == 'multi_image' and len(il.value_image_ids) == 0)
+                lambda il: il.skipped or (il.answer_type == "multi_image" and len(il.value_image_ids) == 0)
             )
         )
 
@@ -237,7 +237,7 @@ class CalendarEvent(models.Model):
 
         # Si une section est renseignée, on filtre sur celle-ci.
         if page:
-            page_answers = page_answers.filtered(lambda a: a.question_id in page.mapped('question_id.question_ids'))
+            page_answers = page_answers.filtered(lambda a: a.question_id in page.mapped("question_id.question_ids"))
 
         return page_answers.filtered(lambda answer: self._report_of_display_answer(answer, report))
 
@@ -249,7 +249,7 @@ class CalendarEvent(models.Model):
             report (bool): True if we are in the intervention report.
         """
 
-        answer_input_line = answer.mapped('user_input.user_input_line_ids').filtered(
+        answer_input_line = answer.mapped("user_input.user_input_line_ids").filtered(
             lambda il: il.question_id in answer.question_id
         )
 
@@ -258,6 +258,6 @@ class CalendarEvent(models.Model):
         # If it is for the intervention report, we check if the question should be displayed.
         return answer_input_line and not (
             (report and answer.question_id.constr_no_report_display)
-            or all(answer_input_line.mapped('skipped'))
-            or (answer.question_type == 'multi_image' and len(answer_input_line.mapped('value_image_ids')) == 0)
+            or all(answer_input_line.mapped("skipped"))
+            or (answer.question_type == "multi_image" and len(answer_input_line.mapped("value_image_ids")) == 0)
         )

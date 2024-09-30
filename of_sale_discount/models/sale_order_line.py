@@ -5,39 +5,39 @@ from odoo.exceptions import UserError
 
 
 class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    _inherit = "sale.order.line"
 
-    discount = fields.Float(compute='_compute_discount')
+    discount = fields.Float(compute="_compute_discount")
     of_discount_formula = fields.Char(
         string="Discount formula (%)",
-        compute='_compute_of_discount_formula',
+        compute="_compute_of_discount_formula",
         store=True,
         readonly=False,
         precompute=True,
-        help="Discount or amount of discounts.\nEg. \"40 + 10.5\" equals \"46.3\"",
+        help='Discount or amount of discounts.\nEg. "40 + 10.5" equals "46.3"',
     )
 
-    @api.depends('product_id', 'product_uom', 'product_uom_qty', 'of_discount_formula')
+    @api.depends("product_id", "product_uom", "product_uom_qty", "of_discount_formula")
     def _compute_discount(self):
         super()._compute_discount()
         for line in self:
             price_percent = 100.0
             if line.of_discount_formula:
                 try:
-                    for discount in map(float, line.of_discount_formula.replace(',', '.').split('+')):
+                    for discount in map(float, line.of_discount_formula.replace(",", ".").split("+")):
                         price_percent *= (100 - discount) / 100.0
                 except Exception as e:
                     raise UserError(_("Invalid discount formula:\n%s") % line.of_discount_formula) from e
             line.discount = 100.0 - price_percent
 
-    @api.depends('product_id', 'product_uom', 'product_uom_qty', 'price_unit', 'pricelist_item_id')
+    @api.depends("product_id", "product_uom", "product_uom_qty", "price_unit", "pricelist_item_id")
     def _compute_of_discount_formula(self):
         for line in self:
             if (
                 not (
                     line.product_id
                     and line.order_id.pricelist_id
-                    and line.order_id.pricelist_id.discount_policy == 'without_discount'
+                    and line.order_id.pricelist_id.discount_policy == "without_discount"
                 )
                 or line.display_type
             ):
@@ -45,26 +45,26 @@ class SaleOrderLine(models.Model):
                 continue
 
             line.of_discount_formula = str(line.discount) if line.discount else False
-            if line.pricelist_item_id.compute_price == 'percentage':
+            if line.pricelist_item_id.compute_price == "percentage":
                 line.of_discount_formula = line.pricelist_item_id.of_percent_price_formula
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if not vals.get('of_discount_formula') and vals.get('discount'):
-                vals['of_discount_formula'] = f"{vals['discount']}"
+            if not vals.get("of_discount_formula") and vals.get("discount"):
+                vals["of_discount_formula"] = f"{vals['discount']}"
         return super().create(vals_list)
 
     def write(self, vals):
-        if not vals.get('of_discount_formula') and vals.get('discount'):
-            vals['of_discount_formula'] = f"{vals['discount']}"
+        if not vals.get("of_discount_formula") and vals.get("discount"):
+            vals["of_discount_formula"] = f"{vals['discount']}"
         return super().write(vals)
 
     def _get_blocked_fields_on_write(self):
         fields = super()._get_blocked_fields_on_write()
-        return fields + ['of_discount_formula']
+        return fields + ["of_discount_formula"]
 
     def _prepare_invoice_line(self, **optional_values):
         values = super()._prepare_invoice_line(**optional_values)
-        values['of_discount_formula'] = self.of_discount_formula
+        values["of_discount_formula"] = self.of_discount_formula
         return values

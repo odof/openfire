@@ -10,22 +10,22 @@ logger = logging.getLogger(__name__)
 
 
 class OFPlanningInterventionTemplate(models.Model):
-    _inherit = 'of.planning.intervention.template'
+    _inherit = "of.planning.intervention.template"
 
     @api.model
     def _default_section_to_display_ids(self):
-        section_to_display_ids = self.env['of.planning.intervention.section'].search([])
+        section_to_display_ids = self.env["of.planning.intervention.section"].search([])
         return [Command.link(section_to_display.id) for section_to_display in section_to_display_ids]
 
     mobile = fields.Boolean(string="Mobile Intervention Template")
     section_to_display_ids = fields.Many2many(
-        comodel_name='of.planning.intervention.section',
-        relation='of_planning_intervention_template_section_rel',
+        comodel_name="of.planning.intervention.section",
+        relation="of_planning_intervention_template_section_rel",
         string="Sections to display on the intervention",
         default=lambda r: r._default_section_to_display_ids(),
     )
     send_reports = fields.Selection(
-        selection_add=[('mobile', "Manual dispatch from Mobile")],
+        selection_add=[("mobile", "Manual dispatch from Mobile")],
         help="* Manual dispatch: manually from the OpenFire web database.\n"
         "* Automatic dispatch at intervention closure: from the mobile app, as soon as the user"
         " clicks on 'Completed' in an intervention, the intervention becomes completed and the intervention"
@@ -34,38 +34,38 @@ class OFPlanningInterventionTemplate(models.Model):
         " in an intervention, he can send the intervention report by e-mail to the customer.",
     )
     additional_line_ids = fields.One2many(
-        comodel_name='of.planning.intervention.template.additional.line',
-        inverse_name='additional_template_id',
+        comodel_name="of.planning.intervention.template.additional.line",
+        inverse_name="additional_template_id",
         string="Additional Invoice lines",
     )
     mobile_payment = fields.Boolean(string="Mobile payment")
     payment_mode_ids = fields.Many2many(
-        comodel_name='of.payment.mode',
+        comodel_name="of.payment.mode",
         string="Payment Mode",
-        default=lambda self: self.env['of.payment.mode'].search([('payment_type', '=', 'inbound')]).ids,
+        default=lambda self: self.env["of.payment.mode"].search([("payment_type", "=", "inbound")]).ids,
     )
     mobile_payment_fiscal_position_id = fields.Many2one(
-        comodel_name='account.fiscal.position', string="Fiscal Position"
+        comodel_name="account.fiscal.position", string="Fiscal Position"
     )
     auto_confirm_invoice = fields.Boolean(string="Invoice Auto confirmation")
 
-    @api.onchange('mobile_payment_fiscal_position_id')
+    @api.onchange("mobile_payment_fiscal_position_id")
     def onchange_mobile_payment_fiscal_position_id(self):
         self.fiscal_position_id = self.mobile_payment_fiscal_position_id
 
     def write(self, vals):
         res = super().write(vals)
-        self.env['calendar.event'].action_update_date([('of_template_id', 'in', self.ids)])
+        self.env["calendar.event"].action_update_date([("of_template_id", "in", self.ids)])
         return res
 
     def unlink(self):
-        self.env['calendar.event'].action_update_date([('of_template_id', 'in', self.ids)])
+        self.env["calendar.event"].action_update_date([("of_template_id", "in", self.ids)])
         return super().unlink()
 
     def action_button_toggle_mobile(self):
         self.ensure_one()
         default_template = self.env.ref(
-            'of_planning.of_planning_default_intervention_template', raise_if_not_found=False
+            "of_planning.of_planning_default_intervention_template", raise_if_not_found=False
         )
 
         if default_template and self.id == default_template.id and self.mobile:
@@ -80,7 +80,7 @@ class OFPlanningInterventionTemplate(models.Model):
         odoo_domain = super()._prepare_graphql_domain(select, domain)
 
         if select:
-            if 'mobile' in select:
-                odoo_domain += [('mobile', '=', select.mobile)]
+            if "mobile" in select:
+                odoo_domain += [("mobile", "=", select.mobile)]
 
         return odoo_domain

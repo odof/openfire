@@ -9,8 +9,8 @@ from odoo.addons.of_graphql.graphql.company_type import Company
 
 
 class SaleOrderTemplateLine(OdooObjectType):
-    _name = 'SaleOrderTemplateLine'
-    _type = 'types'
+    _name = "SaleOrderTemplateLine"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -28,8 +28,8 @@ class SaleOrderTemplateLine(OdooObjectType):
 
 
 class SaleOrderTemplateLineInput(graphene.InputObjectType):
-    _name = 'SaleOrderTemplateLineInput'
-    _type = 'types'
+    _name = "SaleOrderTemplateLineInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -39,4 +39,4 @@ class SaleOrderTemplateLineInput(graphene.InputObjectType):
 
 
 class SaleOrderTemplateLineFilterInput(SaleOrderTemplateLineInput):
-    _name = 'SaleOrderTemplateLineFilterInput'
+    _name = "SaleOrderTemplateLineFilterInput"

@@ -8,8 +8,8 @@ from odoo.addons.of_graphql.graphql.company_type import Company
 
 
 class AccountPaymentTerm(OdooObjectType):
-    _name = 'AccountPaymentTerm'
-    _type = 'types'
+    _name = "AccountPaymentTerm"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -21,8 +21,8 @@ class AccountPaymentTerm(OdooObjectType):
 
 
 class AccountPaymentTermInput(graphene.InputObjectType):
-    _name = 'AccountPaymentTermInput'
-    _type = 'types'
+    _name = "AccountPaymentTermInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -30,4 +30,4 @@ class AccountPaymentTermInput(graphene.InputObjectType):
 
 
 class AccountPaymentTermFilterInput(AccountPaymentTermInput):
-    _name = 'AccountPaymentTermFilterInput'
+    _name = "AccountPaymentTermFilterInput"

@@ -4,10 +4,10 @@ from odoo import models
 
 
 class OFMarkAccountMoveAsExported(models.TransientModel):
-    _name = 'of.mark.account.move.as.exported'
+    _name = "of.mark.account.move.as.exported"
     _description = "Mark Account Move as Exported"
 
     def action_button_validate(self):
-        active_ids = self._context.get('active_ids')
-        move_object = self.env['account.move']
-        return move_object.browse(active_ids).write({'of_exported': True})
+        active_ids = self._context.get("active_ids")
+        move_object = self.env["account.move"]
+        return move_object.browse(active_ids).write({"of_exported": True})

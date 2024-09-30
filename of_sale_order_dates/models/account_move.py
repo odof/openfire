@@ -4,13 +4,13 @@ from odoo import fields, models
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     of_technical_visit_date = fields.Date(string="Technical visit date")
 
     def pdf_technical_visit_info(self):
         return (
-            self.env['ir.config_parameter']
+            self.env["ir.config_parameter"]
             .sudo()
-            .get_param('of.sale.report.setting.account.move.pdf_technical_visit_info')
+            .get_param("of.sale.report.setting.account.move.pdf_technical_visit_info")
         )

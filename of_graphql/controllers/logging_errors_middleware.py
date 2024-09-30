@@ -18,7 +18,7 @@ class LoggingErrorsMiddleware:
             key = info.path.key
 
             # Filtre des logs sur les Query et les Mutations
-            if typename in ['Mutation', 'Query']:
+            if typename in ["Mutation", "Query"]:
                 logger.info(format_log(info.context, f"{typename} on {key}"))
 
             return next(root, info, **args)

@@ -8,8 +8,8 @@ from . import survey_user_input_type
 
 
 class SurveyUserInputQuery(graphene.ObjectType):
-    _name = 'SurveyUserInputQuery'
-    _type = 'query'
+    _name = "SurveyUserInputQuery"
+    _type = "query"
 
     survey_user_inputs = graphene.List(
         graphene.NonNull(survey_user_input_type.SurveyUserInput),
@@ -21,7 +21,7 @@ class SurveyUserInputQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_survey_user_inputs(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.survey.user_input']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.survey.user_input"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.survey.user_input'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.survey.user_input"].search(odoo_domain, offset=offset, limit=limit)

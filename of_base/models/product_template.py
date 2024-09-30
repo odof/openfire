@@ -4,7 +4,7 @@ from odoo import api, models
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
     # Recherche multi-mots
     @api.model
@@ -13,19 +13,19 @@ class ProductTemplate(models.Model):
         i = 0
         while i < len(args):
             if (
-                args[i] == '|'
+                args[i] == "|"
                 and isinstance(args[i + 1], (list))
-                and args[i + 1][0] == 'default_code'
+                and args[i + 1][0] == "default_code"
                 and isinstance(args[i + 2], (list))
-                and args[i + 2][0] == 'name'
-                and args[i + 1][1] in ('like', 'ilike')
+                and args[i + 2][0] == "name"
+                and args[i + 1][1] in ("like", "ilike")
                 and args[i + 1][2] == args[i + 2][2]
             ):
                 operator = args[i + 1][1]
                 mots = args[i + 1][2].split()
-                args2 += ['&'] * (len(mots) - 1)
+                args2 += ["&"] * (len(mots) - 1)
                 for mot in mots:
-                    args2 += ['|', ('default_code', operator, mot), ('name', operator, mot)]
+                    args2 += ["|", ("default_code", operator, mot), ("name", operator, mot)]
                 i += 3
             else:
                 args2.append(args[i])

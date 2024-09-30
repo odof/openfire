@@ -4,9 +4,9 @@ from odoo import api, fields, models
 
 
 class AccountInvoiceReport(models.Model):
-    _inherit = 'account.invoice.report'
+    _inherit = "account.invoice.report"
 
-    of_canvasser_id = fields.Many2one(comodel_name='res.users', string="Canvasser", readonly=True)
+    of_canvasser_id = fields.Many2one(comodel_name="res.users", string="Canvasser", readonly=True)
     of_partner_tags = fields.Char(string="Partner Tags")
 
     @api.model

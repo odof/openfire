@@ -7,12 +7,12 @@ from odoo.addons.of_graphql.graphql.odoo_graphql import x2many
 
 
 class CalendarEvent(models.Model):
-    _inherit = 'calendar.event'
+    _inherit = "calendar.event"
 
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = super()._prepare_mutation_values(**args)
 
-        if 'equipments' in args:
-            mutation['of_equipment_ids'] = x2many(self=self, model='of.equipment', input=args.get('equipments'))
+        if "equipments" in args:
+            mutation["of_equipment_ids"] = x2many(self=self, model="of.equipment", input=args.get("equipments"))
         return mutation

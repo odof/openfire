@@ -4,9 +4,9 @@ from odoo import models
 
 
 class IRModuleModule(models.Model):
-    _inherit = 'ir.module.module'
+    _inherit = "ir.module.module"
 
     def _get_forbidden_uninstall(self):
         modules = super()._get_forbidden_uninstall()
-        modules.update({'of_sale'})
+        modules.update({"of_sale"})
         return modules

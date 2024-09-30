@@ -43,7 +43,7 @@ from ..graphql.service_request_type_type import (
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_service_graphql_register(self, dbname):
         # ici on charge le graphql de ce module
@@ -86,14 +86,14 @@ class OFGraphql(models.AbstractModel):
         arguments = super()._prepare_arguments()
 
         new_arguments = {
-            'PlanningInterventionMutation': {
-                'planning_intervention_create': {
-                    'ttype': ServiceRequestTypeInput,
-                    'request': ServiceRequestInput,
+            "PlanningInterventionMutation": {
+                "planning_intervention_create": {
+                    "ttype": ServiceRequestTypeInput,
+                    "request": ServiceRequestInput,
                 },
-                'planning_intervention_update': {
-                    'ttype': ServiceRequestTypeInput,
-                    'request': ServiceRequestInput,
+                "planning_intervention_update": {
+                    "ttype": ServiceRequestTypeInput,
+                    "request": ServiceRequestInput,
                 },
             },
         }

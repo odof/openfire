@@ -8,9 +8,9 @@ class TestOFSaleOrderTypeCommon(TestOFSaleManagementCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.default_sale_order_type = cls.env['sale.order.type'].create(
+        cls.default_sale_order_type = cls.env["sale.order.type"].create(
             {
-                'name': "Defaut Type 1",
+                "name": "Defaut Type 1",
             }
         )
 
@@ -18,5 +18,5 @@ class TestOFSaleOrderTypeCommon(TestOFSaleManagementCommon):
         if default_values is None:
             default_values = {}
         order_values = super()._prepare_sale_order_values(default_values)
-        order_values['type_id'] = default_values.get('type_id', self.default_sale_order_type.id)
+        order_values["type_id"] = default_values.get("type_id", self.default_sale_order_type.id)
         return order_values

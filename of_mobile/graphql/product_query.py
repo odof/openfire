@@ -8,8 +8,8 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product
 
 
 class ProductQuery(graphene.ObjectType):
-    _name = 'PartnerQuery'
-    _type = 'query'
+    _name = "PartnerQuery"
+    _type = "query"
 
     additional_products = graphene.List(graphene.NonNull(Product))
 
@@ -22,22 +22,22 @@ class ProductQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_additional_products(root, info):
-        env = info.context['env']
-        return env['product.product'].search([('of_mobile_available', '=', True)])
+        env = info.context["env"]
+        return env["product.product"].search([("of_mobile_available", "=", True)])
 
     @staticmethod
     def resolve_products_search(root, info, query, brand_ids=[], category_ids=[]):
-        env = info.context['env']
+        env = info.context["env"]
         domain = [
-            '|',
-            ('name', 'ilike', query),
-            ('default_code', 'ilike', query),
+            "|",
+            ("name", "ilike", query),
+            ("default_code", "ilike", query),
         ]
 
         if brand_ids:
-            domain = expression.AND([domain, [('brand_id', 'in', brand_ids)]])
+            domain = expression.AND([domain, [("brand_id", "in", brand_ids)]])
 
         if category_ids:
-            domain = expression.AND([domain, [('categ_id', 'in', category_ids)]])
+            domain = expression.AND([domain, [("categ_id", "in", category_ids)]])
 
-        return env['product.product'].search(domain, limit=20)
+        return env["product.product"].search(domain, limit=20)

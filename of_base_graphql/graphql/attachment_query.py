@@ -8,8 +8,8 @@ from .attachment_type import Attachment, AttachmentFilterInput
 
 
 class AttachmentQuery(graphene.ObjectType):
-    _name = 'AttachmentQuery'
-    _type = 'query'
+    _name = "AttachmentQuery"
+    _type = "query"
 
     attachments = graphene.List(
         graphene.NonNull(Attachment),
@@ -21,8 +21,8 @@ class AttachmentQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_attachments(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['ir.attachment']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["ir.attachment"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['ir.attachment'].search(odoo_domain, offset=offset, limit=limit)
+        return env["ir.attachment"].search(odoo_domain, offset=offset, limit=limit)

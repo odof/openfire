@@ -8,8 +8,8 @@ from . import survey_question_page_type, survey_user_input_type
 
 
 class Survey(OdooObjectType):
-    _name = 'Survey'
-    _type = 'types'
+    _name = "Survey"
+    _type = "types"
 
     id = graphene.Int(required=True)
     title = graphene.NonNull(graphene.String)
@@ -27,8 +27,8 @@ class Survey(OdooObjectType):
 
 
 class SurveyInput(graphene.InputObjectType):
-    _name = 'SurveyInput'
-    _type = 'types'
+    _name = "SurveyInput"
+    _type = "types"
 
     id = graphene.Int()
     title = graphene.String()
@@ -38,8 +38,8 @@ class SurveyInput(graphene.InputObjectType):
 
 
 class SurveyFilterInput(graphene.InputObjectType):
-    _name = 'SurveyFilterInput'
-    _type = 'types'
+    _name = "SurveyFilterInput"
+    _type = "types"
 
     id = graphene.Int()
     title = graphene.String()

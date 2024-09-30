@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
-    of_request_line_id = fields.Many2one(comodel_name='of.service.request.line', string="Service Request Line")
+    of_request_line_id = fields.Many2one(comodel_name="of.service.request.line", string="Service Request Line")

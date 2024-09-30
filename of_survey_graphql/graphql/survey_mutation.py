@@ -8,7 +8,7 @@ from . import survey_question_page_type, survey_type, survey_user_input_type
 
 
 class SurveyCreate(graphene.Mutation):
-    _name = 'SurveyCreate'
+    _name = "SurveyCreate"
 
     class Arguments:
         title = graphene.String()
@@ -19,13 +19,13 @@ class SurveyCreate(graphene.Mutation):
     Output = survey_type.Survey
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.survey.survey']._prepare_mutation_values(**args)
-        return env['of.survey.survey'].create(values)
+        env = info.context["env"]
+        values = env["of.survey.survey"]._prepare_mutation_values(**args)
+        return env["of.survey.survey"].create(values)
 
 
 class SurveyUpdate(graphene.Mutation):
-    _name = 'SurveyUpdate'
+    _name = "SurveyUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -37,15 +37,15 @@ class SurveyUpdate(graphene.Mutation):
     Output = survey_type.Survey
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.survey.survey']._prepare_mutation_values(**args)
-        survey = env['of.survey.survey'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.survey.survey"]._prepare_mutation_values(**args)
+        survey = env["of.survey.survey"].search([("id", "=", id)])
         survey.write(values)
         return survey
 
 
 class SurveyDelete(graphene.Mutation):
-    _name = 'SurveyDelete'
+    _name = "SurveyDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -53,13 +53,13 @@ class SurveyDelete(graphene.Mutation):
     Output = survey_type.Survey
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.survey', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.survey", id)
 
 
 class SurveyMutation(graphene.ObjectType):
-    _name = 'SurveyMutation'
-    _type = 'mutation'
+    _name = "SurveyMutation"
+    _type = "mutation"
 
     survey_create = SurveyCreate.Field()
     survey_update = SurveyUpdate.Field()

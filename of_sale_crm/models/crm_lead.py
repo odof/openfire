@@ -4,11 +4,11 @@ from odoo import _, api, fields, models
 
 
 class CrmLead(models.Model):
-    _inherit = 'crm.lead'
+    _inherit = "crm.lead"
 
-    of_customer_state = fields.Selection(related='partner_id.of_customer_state', required=False)
+    of_customer_state = fields.Selection(related="partner_id.of_customer_state", required=False)
 
-    @api.onchange('partner_id')
+    @api.onchange("partner_id")
     def _onchange_partner_id_warning(self):
         if not (partner := self.partner_id):
             return
@@ -17,21 +17,21 @@ class CrmLead(models.Model):
         if not partner.of_is_lead_warn and partner.parent_id:
             partner = partner.parent_id
 
-        if partner.of_is_lead_warn and partner.invoice_warn != 'no-message':
-            if partner.invoice_warn != 'block' and partner.parent_id and partner.parent_id.invoice_warn == 'block':
+        if partner.of_is_lead_warn and partner.invoice_warn != "no-message":
+            if partner.invoice_warn != "block" and partner.parent_id and partner.parent_id.invoice_warn == "block":
                 partner = partner.parent_id
-            warning = {'title': _("Warning for %s") % partner.name, 'message': partner.invoice_warn_msg}
-            if partner.invoice_warn == 'block':
+            warning = {"title": _("Warning for %s") % partner.name, "message": partner.invoice_warn_msg}
+            if partner.invoice_warn == "block":
                 self.partner_id = False
-            return {'warning': warning}
+            return {"warning": warning}
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
-        quotation_context['default_of_referred_id'] = self.of_referred_id.id
+        quotation_context["default_of_referred_id"] = self.of_referred_id.id
         return quotation_context
 
     def action_set_lost(self, **additional_values):
         res = super().action_set_lost(**additional_values)
-        orders = self.mapped('order_ids').filtered(lambda order: order.state in ['draft', 'sent'])
+        orders = self.mapped("order_ids").filtered(lambda order: order.state in ["draft", "sent"])
         orders and orders._action_cancel()
         return res

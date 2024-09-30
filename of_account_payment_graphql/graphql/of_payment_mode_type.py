@@ -7,8 +7,8 @@ from odoo.addons.of_graphql.graphql.company_type import Company
 
 
 class PaymentMode(OdooObjectType):
-    _name = 'PaymentMode'
-    _type = 'types'
+    _name = "PaymentMode"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -21,11 +21,11 @@ class PaymentMode(OdooObjectType):
 
 
 class PaymentModeInput(graphene.InputObjectType):
-    _name = 'PaymentModeInput'
-    _type = 'types'
+    _name = "PaymentModeInput"
+    _type = "types"
 
     id = graphene.Int()
 
 
 class PaymentModeFilterInput(PaymentModeInput):
-    _name = 'PaymentModeFilterInput'
+    _name = "PaymentModeFilterInput"

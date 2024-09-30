@@ -9,15 +9,15 @@ from odoo.addons.of_sale_graphql.graphql.sale_order_type import SaleOrder
 
 
 class PaymentType(graphene.Enum):
-    INTERVENTION = 'intervention'
-    SALE = 'sale'
-    ALL = 'all'
-    NONE = 'none'
+    INTERVENTION = "intervention"
+    SALE = "sale"
+    ALL = "all"
+    NONE = "none"
 
 
 class AccountPayment(OdooObjectType):
-    _name = 'AccountPayment'
-    _type = 'types'
+    _name = "AccountPayment"
+    _type = "types"
 
     ttype = graphene.Field(PaymentType)
     intervention = graphene.Field(PlanningIntervention)
@@ -28,13 +28,13 @@ class AccountPayment(OdooObjectType):
     @staticmethod
     def resolve_ttype(root, info):
         if root.of_intervention_id and root.of_sale_id:
-            return 'all'
+            return "all"
         if root.of_intervention_id:
-            return 'intervention'
+            return "intervention"
         elif root.of_sale_id:
-            return 'sale'
+            return "sale"
         else:
-            return 'none'
+            return "none"
 
     @staticmethod
     def resolve_intervention(root, info):

@@ -13,13 +13,13 @@ from .account_move_line_type import AccountMoveLine, AccountMoveLineInput
 
 
 class AccountMove(OdooObjectType):
-    _name = 'AccountMove'
-    _type = 'types'
+    _name = "AccountMove"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
     partner = graphene.Field(Partner)
-    invoice_line_ids = graphene.List(AccountMoveLine, name='lines')
+    invoice_line_ids = graphene.List(AccountMoveLine, name="lines")
     fiscal_position = graphene.Field(AccountFiscalPosition)
 
     @staticmethod
@@ -32,15 +32,15 @@ class AccountMove(OdooObjectType):
 
 
 class AccountMoveInput(graphene.InputObjectType):
-    _name = 'AccountMoveInput'
-    _type = 'types'
+    _name = "AccountMoveInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
     partner = graphene.Field(PartnerInput)
-    invoice_line_ids = graphene.List(AccountMoveLineInput, name='lines')
+    invoice_line_ids = graphene.List(AccountMoveLineInput, name="lines")
     fiscal_position = graphene.Field(AccountFiscalPositionInput)
 
 
 class AccountMoveFilterInput(AccountMoveInput):
-    _name = 'AccountMoveUpdateFilterInput'
+    _name = "AccountMoveUpdateFilterInput"

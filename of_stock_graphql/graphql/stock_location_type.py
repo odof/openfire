@@ -8,8 +8,8 @@ from .stock_warehouse_type import StockWarehouse, StockWarehouseInput
 
 
 class StockLocation(OdooObjectType):
-    _name = 'StockLocation'
-    _type = 'types'
+    _name = "StockLocation"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -21,8 +21,8 @@ class StockLocation(OdooObjectType):
 
 
 class StockLocationInput(graphene.InputObjectType):
-    _name = 'StockLocationInput'
-    _type = 'types'
+    _name = "StockLocationInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -30,4 +30,4 @@ class StockLocationInput(graphene.InputObjectType):
 
 
 class StockLocationFilterInput(StockLocationInput):
-    _name = 'StockLocationFilterInput'
+    _name = "StockLocationFilterInput"

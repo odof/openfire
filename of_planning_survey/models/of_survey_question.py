@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFSurveyQuestion(models.Model):
-    _inherit = 'of.survey.question'
+    _inherit = "of.survey.question"
 
     constr_no_report_display = fields.Boolean(
         string="Do not display in reports",

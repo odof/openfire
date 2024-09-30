@@ -4,13 +4,13 @@ from odoo import api, models
 
 
 class ResPartnerCategory(models.Model):
-    _inherit = 'res.partner.category'
+    _inherit = "res.partner.category"
 
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
 
-        if name := args.get('name'):
-            mutation['name'] = name
+        if name := args.get("name"):
+            mutation["name"] = name
 
         return mutation

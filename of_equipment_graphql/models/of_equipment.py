@@ -7,74 +7,74 @@ from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 
 class OFEquipment(models.Model):
-    _inherit = 'of.equipment'
+    _inherit = "of.equipment"
 
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
 
-        if name := args.get('name'):
-            mutation['name'] = name
+        if name := args.get("name"):
+            mutation["name"] = name
 
-        if warranty_type := args.get('warranty_type'):
-            mutation['warranty_type'] = warranty_type
+        if warranty_type := args.get("warranty_type"):
+            mutation["warranty_type"] = warranty_type
 
-        if state := args.get('state'):
-            mutation['state'] = state
+        if state := args.get("state"):
+            mutation["state"] = state
 
-        if model_name := args.get('model_name'):
-            mutation['model_name'] = model_name
+        if model_name := args.get("model_name"):
+            mutation["model_name"] = model_name
 
-        if installation_type := args.get('installation_type'):
-            mutation['installation_type'] = installation_type
+        if installation_type := args.get("installation_type"):
+            mutation["installation_type"] = installation_type
 
-        if 'is_compliant' in args:
-            mutation['is_compliant'] = args['is_compliant']
+        if "is_compliant" in args:
+            mutation["is_compliant"] = args["is_compliant"]
 
-        if piece_number := args.get('piece_number'):
-            mutation['piece_number'] = piece_number
+        if piece_number := args.get("piece_number"):
+            mutation["piece_number"] = piece_number
 
-        if note := args.get('note'):
-            mutation['note'] = note
+        if note := args.get("note"):
+            mutation["note"] = note
 
-        if service_date := args.get('service_date'):
-            mutation['service_date'] = service_date
+        if service_date := args.get("service_date"):
+            mutation["service_date"] = service_date
 
-        if installation_date := args.get('installation_date'):
-            mutation['installation_date'] = installation_date
+        if installation_date := args.get("installation_date"):
+            mutation["installation_date"] = installation_date
 
-        if end_warranty_date := args.get('end_warranty_date'):
-            mutation['end_warranty_date'] = end_warranty_date
+        if end_warranty_date := args.get("end_warranty_date"):
+            mutation["end_warranty_date"] = end_warranty_date
 
-        if product := args.get('product'):
-            mutation['product_id'] = many2one(self=self, model='product.product', input=product)
+        if product := args.get("product"):
+            mutation["product_id"] = many2one(self=self, model="product.product", input=product)
 
-        if customer := args.get('customer'):
-            mutation['customer_id'] = many2one(self=self, model='res.partner', input=customer)
+        if customer := args.get("customer"):
+            mutation["customer_id"] = many2one(self=self, model="res.partner", input=customer)
 
-        if product_category := args.get('product_category'):
-            mutation['product_category_id'] = many2one(self=self, model='product.category', input=product_category)
+        if product_category := args.get("product_category"):
+            mutation["product_category_id"] = many2one(self=self, model="product.category", input=product_category)
 
-        if brand := args.get('brand'):
-            mutation['brand_id'] = many2one(self=self, model='of.product.brand', input=brand)
+        if brand := args.get("brand"):
+            mutation["brand_id"] = many2one(self=self, model="of.product.brand", input=brand)
 
-        if lot := args.get('lot'):
-            mutation['lot_id'] = many2one(self=self, model='stock.lot', input=lot)
+        if lot := args.get("lot"):
+            mutation["lot_id"] = many2one(self=self, model="stock.lot", input=lot)
 
-        if reseller := args.get('reseller'):
-            mutation['reseller_id'] = many2one(self=self, model='res.partner', input=reseller)
+        if reseller := args.get("reseller"):
+            mutation["reseller_id"] = many2one(self=self, model="res.partner", input=reseller)
 
-        if installer := args.get('installer'):
-            mutation['installer_id'] = many2one(self=self, model='res.partner', input=installer)
+        if installer := args.get("installer"):
+            mutation["installer_id"] = many2one(self=self, model="res.partner", input=installer)
 
-        if intervention := args.get('intervention'):
+        if intervention := args.get("intervention"):
             # on va d'abord chercher l'intervention
-            intervention_id = many2one(self=self, model='calendar.event', input=intervention)
+            intervention_id = many2one(self=self, model="calendar.event", input=intervention)
             # puis on l'ajoute à la liste des interventions de cet équipement
-            mutation['intervention_ids'] = [Command.link(intervention_id)]
+            mutation["intervention_ids"] = [Command.link(intervention_id)]
 
-        if site_address := args.get('site_address'):
-            mutation['site_address_id'] = many2one(self=self, model='res.partner', input=site_address)
+        if site_address := args.get("site_address"):
+            mutation["site_address_id"] = many2one(self=self, model="res.partner", input=site_address)
 
         return mutation
 
@@ -83,12 +83,12 @@ class OFEquipment(models.Model):
         odoo_domain = []
 
         if domain:
-            odoo_domain = graphqlOdooDomain(self=self, model='of.equipment', domain=domain)
+            odoo_domain = graphqlOdooDomain(self=self, model="of.equipment", domain=domain)
 
         if select:
             if select.id:
-                odoo_domain += [('id', '=', select.id)]
+                odoo_domain += [("id", "=", select.id)]
             if select.name:
-                odoo_domain += [('name', 'like', select.name)]
+                odoo_domain += [("name", "like", select.name)]
 
         return odoo_domain

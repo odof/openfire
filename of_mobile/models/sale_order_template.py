@@ -5,10 +5,10 @@ from odoo.exceptions import UserError
 
 
 class SaleOrderTemplate(models.Model):
-    _inherit = 'sale.order.template'
+    _inherit = "sale.order.template"
 
     of_mobile_available = fields.Boolean(string="Mobile Product")
-    of_mobile_can_create_additional_sale = fields.Boolean(compute='_compute_of_mobile_can_create_additional_sale')
+    of_mobile_can_create_additional_sale = fields.Boolean(compute="_compute_of_mobile_can_create_additional_sale")
 
     def _compute_of_mobile_can_create_additional_sale(self):
         for sot in self:
@@ -28,7 +28,7 @@ class SaleOrderTemplate(models.Model):
         self.of_mobile_available = not self.of_mobile_available
         if self.of_mobile_available:
             # alors on doit aussi publier les articles du devis s'ils ne le sont pas
-            for product in self.sale_order_template_line_ids.mapped('product_id'):
+            for product in self.sale_order_template_line_ids.mapped("product_id"):
                 if not product.of_mobile_available:
                     product.product_tmpl_id.action_button_toggle_mobile()
 
@@ -36,7 +36,7 @@ class SaleOrderTemplate(models.Model):
     def _prepare_graphql_domain(self, select, domain):
         odoo_domain = super()._prepare_graphql_domain(select, domain)
 
-        if select and 'mobile' in select:
-            odoo_domain += [('of_mobile_available', '=', select.mobile)]
+        if select and "mobile" in select:
+            odoo_domain += [("of_mobile_available", "=", select.mobile)]
 
         return odoo_domain

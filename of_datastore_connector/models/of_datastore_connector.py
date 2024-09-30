@@ -24,7 +24,7 @@ class OFDatastoreConnector(models.AbstractModel):
         redéfinition des méthodes de cette classe.
     """
 
-    _name = 'of.datastore.connector'
+    _name = "of.datastore.connector"
     _description = "Datastore Connector"
 
     server_address = fields.Char(string="Server address", required=True)
@@ -33,16 +33,16 @@ class OFDatastoreConnector(models.AbstractModel):
     password = fields.Char()
     new_password = fields.Char(
         string="Set Password",
-        compute='_compute_new_password',
-        inverse='_inverse_new_password',
+        compute="_compute_new_password",
+        inverse="_inverse_new_password",
         help="Specify a value only when changing the password, otherwise leave empty",
     )
-    error_msg = fields.Char(string="Error", compute='_compute_error_msg')
+    error_msg = fields.Char(string="Error", compute="_compute_error_msg")
 
     @api.depends()
     def _compute_new_password(self):
         for connector in self:
-            connector.new_password = ''  # nosec B105:hardcoded_password_string
+            connector.new_password = ""  # nosec B105:hardcoded_password_string
 
     # Fonctions récupérées depuis le champ new_password défini pour res_users.
     def _inverse_new_password(self):
@@ -53,18 +53,18 @@ class OFDatastoreConnector(models.AbstractModel):
                 continue
             connector.password = connector.new_password
 
-    @api.depends('db_name', 'server_address', 'login', 'password', 'new_password')
+    @api.depends("db_name", "server_address", "login", "password", "new_password")
     def _compute_error_msg(self):
         for connector in self:
-            for field_name in ('db_name', 'server_address', 'login', 'password', 'new_password'):
-                if field_name == 'new_password' and connector.password:
+            for field_name in ("db_name", "server_address", "login", "password", "new_password"):
+                if field_name == "new_password" and connector.password:
                     # Le nouveau mot de passe n'est obligatoire que s'il n'en existe pas déjà un
                     continue
                 if not connector[field_name]:
                     error_msg = (
-                        _("You must fill the field \"%s\"")
-                        % self.env['ir.model.fields']
-                        .search([('model', '=', self._name), ('name', '=', field_name)])
+                        _('You must fill the field "%s"')
+                        % self.env["ir.model.fields"]
+                        .search([("model", "=", self._name), ("name", "=", field_name)])
                         .name_get()[0][1]
                     )
                     break
@@ -76,7 +76,7 @@ class OFDatastoreConnector(models.AbstractModel):
 
     @api.model
     def _get_context(self):
-        return {key: val for key, val in self._context.copy().items() if key in ('lang', 'tz', 'active_test')}
+        return {key: val for key, val in self._context.copy().items() if key in ("lang", "tz", "active_test")}
 
     @api.model
     def get_connector(self, url, db_name, login, password):
@@ -105,18 +105,18 @@ class OFDatastoreConnector(models.AbstractModel):
                     # server_address = f'http://{ip_address}{port}'
                     # =======================================================================
 
-                    i = server_address.find('://')
+                    i = server_address.find("://")
                     if i == -1:
                         # Protocole xmlrpcs par defaut
-                        protocol = 'xmlrpcs'
+                        protocol = "xmlrpcs"
                         address = server_address
                     else:
                         # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
-                        protocol = server_address[:i].replace('http', 'xmlrpc')
+                        protocol = server_address[:i].replace("http", "xmlrpc")
                         address = server_address[i + 3 :]
-                    j = address.find(':')
+                    j = address.find(":")
                     if j == -1:
-                        port = 443 if server_address[:i] == 'https' else 80
+                        port = 443 if server_address[:i] == "https" else 80
                     else:
                         port = int(address[j + 1 :])
                         address = address[:j]
@@ -125,7 +125,7 @@ class OFDatastoreConnector(models.AbstractModel):
                     )
 
                     # Opération pour vérifier la connexion
-                    self.result = cli.get_model('res.users').search([]) and cli or ''
+                    self.result = cli.get_model("res.users").search([]) and cli or ""
                 except xmlrpc.client.Fault as exc:
                     self.result = exc.faultCode
                 except Exception as exc:
@@ -154,11 +154,11 @@ class OFDatastoreConnector(models.AbstractModel):
         kwargs = {
             key: val
             for key, val in [
-                ('offset', offset),
-                ('limit', limit),
-                ('order', order),
-                ('count', count),
-                ('context', self._get_context()),
+                ("offset", offset),
+                ("limit", limit),
+                ("order", order),
+                ("count", count),
+                ("context", self._get_context()),
             ]
             if val is not None
         }
@@ -169,11 +169,11 @@ class OFDatastoreConnector(models.AbstractModel):
         kwargs = {
             key: val
             for key, val in [
-                ('name', name),
-                ('args', args),
-                ('operator', operator),
-                ('limit', limit),
-                ('context', self._get_context()),
+                ("name", name),
+                ("args", args),
+                ("operator", operator),
+                ("limit", limit),
+                ("context", self._get_context()),
             ]
             if val is not None
         }
@@ -190,7 +190,7 @@ class OFDatastoreConnector(models.AbstractModel):
             fields = [f for f in fields if f in ds_fields]
         kwargs = {
             key: val
-            for key, val in [('fields', fields), ('load', load), ('context', self._get_context())]
+            for key, val in [("fields", fields), ("load", load), ("context", self._get_context())]
             if val is not None
         }
         return ds_model.read(ids, **kwargs)
@@ -202,11 +202,11 @@ class OFDatastoreConnector(models.AbstractModel):
         kwargs = {
             key: val
             for key, val in [
-                ('offset', offset),
-                ('limit', limit),
-                ('orderby', orderby),
-                ('lazy', lazy),
-                ('context', self._get_context()),
+                ("offset", offset),
+                ("limit", limit),
+                ("orderby", orderby),
+                ("lazy", lazy),
+                ("context", self._get_context()),
             ]
             if val is not None
         }
@@ -221,17 +221,17 @@ class OFDatastoreConnector(models.AbstractModel):
 
     @api.model
     def of_datastore_create(self, ds_model, values):
-        kwargs = {'context': self._get_context()}
+        kwargs = {"context": self._get_context()}
         return ds_model.create(values, **kwargs)
 
     @api.model
     def of_datastore_write(self, ds_model, ids, values):
-        kwargs = {'context': self._get_context()}
+        kwargs = {"context": self._get_context()}
         return ds_model.write(ids, values, **kwargs)
 
     @api.model
     def of_datastore_func(self, ds_model, func, params, optional_params):
         kwargs = {key: val for key, val in optional_params if val is not None}
-        kwargs['context'] = self._get_context()
+        kwargs["context"] = self._get_context()
         args = tuple(params)
         return getattr(ds_model, func)(*args, **kwargs)

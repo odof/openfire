@@ -11,7 +11,7 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.calendar_event_obj = cls.env['calendar.event']
+        cls.calendar_event_obj = cls.env["calendar.event"]
         cls.dt_now = fields.Datetime.now() + timedelta(days=1)
 
     def setUp(self):
@@ -21,82 +21,82 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
         ).create(
             [
                 {
-                    'name': 'Event1',
-                    'of_type': 'intervention',
-                    'start': self.now_dt_10am,
-                    'stop': self.now_dt_11am,
-                    'of_partner_id': self.partner_antoine.id,
-                    'of_task_id': self.task_sweeping.id,
-                    'duration': 1,
-                    'of_employee_id': self.employee_tech_jean.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_jean.id])],
+                    "name": "Event1",
+                    "of_type": "intervention",
+                    "start": self.now_dt_10am,
+                    "stop": self.now_dt_11am,
+                    "of_partner_id": self.partner_antoine.id,
+                    "of_task_id": self.task_sweeping.id,
+                    "duration": 1,
+                    "of_employee_id": self.employee_tech_jean.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_jean.id])],
                 },
                 {
-                    'name': 'Event2',
-                    'of_type': 'intervention',
-                    'start': self.now_dt_11am,
-                    'stop': self.now_dt_12pm,
-                    'of_partner_id': self.partner_saif.id,
-                    'of_task_id': self.task_sweeping.id,
-                    'duration': 1,
-                    'of_employee_id': self.employee_tech_jean.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_jean.id])],
+                    "name": "Event2",
+                    "of_type": "intervention",
+                    "start": self.now_dt_11am,
+                    "stop": self.now_dt_12pm,
+                    "of_partner_id": self.partner_saif.id,
+                    "of_task_id": self.task_sweeping.id,
+                    "duration": 1,
+                    "of_employee_id": self.employee_tech_jean.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_jean.id])],
                 },
                 {
-                    'name': 'Event3',
-                    'of_type': 'intervention',
-                    'start': self.now_dt_8am,
-                    'stop': self.now_dt_9am,
-                    'of_partner_id': self.partner_hounaida.id,
-                    'of_task_id': self.task_sweeping.id,
-                    'duration': 1,
-                    'of_employee_id': self.employee_tech_jean.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_jean.id])],
+                    "name": "Event3",
+                    "of_type": "intervention",
+                    "start": self.now_dt_8am,
+                    "stop": self.now_dt_9am,
+                    "of_partner_id": self.partner_hounaida.id,
+                    "of_task_id": self.task_sweeping.id,
+                    "duration": 1,
+                    "of_employee_id": self.employee_tech_jean.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_jean.id])],
                 },
                 {
-                    'name': 'Event4',
-                    'of_type': 'intervention',
-                    'start': self.now_dt_1pm,
-                    'stop': self.now_dt_3pm,
-                    'of_partner_id': self.partner_hounaida.id,
-                    'of_task_id': self.task_sweeping.id,
-                    'duration': 2,
-                    'of_employee_id': self.employee_tech_jean.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_jean.id])],
+                    "name": "Event4",
+                    "of_type": "intervention",
+                    "start": self.now_dt_1pm,
+                    "stop": self.now_dt_3pm,
+                    "of_partner_id": self.partner_hounaida.id,
+                    "of_task_id": self.task_sweeping.id,
+                    "duration": 2,
+                    "of_employee_id": self.employee_tech_jean.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_jean.id])],
                 },
             ]
         )
 
-        self.bruce_event = self.env['calendar.event'].create(
+        self.bruce_event = self.env["calendar.event"].create(
             [
                 {
-                    'name': 'Test Event 1',
-                    'of_type': 'intervention',
-                    'start': self.now_dt_1pm.replace(minute=45, second=0),
-                    'stop': self.now_dt_2pm.replace(minute=45, second=0),
-                    'of_company_id': self.company_fr.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_bruce.id])],
-                    'of_partner_id': self.customer_a.id,
-                    'of_travel_duration': 0.0,
+                    "name": "Test Event 1",
+                    "of_type": "intervention",
+                    "start": self.now_dt_1pm.replace(minute=45, second=0),
+                    "stop": self.now_dt_2pm.replace(minute=45, second=0),
+                    "of_company_id": self.company_fr.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_bruce.id])],
+                    "of_partner_id": self.customer_a.id,
+                    "of_travel_duration": 0.0,
                 },
             ]
         )
-        self.bruce_tour = self.env['of.planning.tour'].search(
-            [('employee_id', '=', self.employee_tech_bruce.id), ('date', '=', fields.Date.today() + timedelta(days=1))]
+        self.bruce_tour = self.env["of.planning.tour"].search(
+            [("employee_id", "=", self.employee_tech_bruce.id), ("date", "=", fields.Date.today() + timedelta(days=1))]
         )
-        self.jean_tour = self.env['of.planning.tour'].search(
-            [('employee_id', '=', self.employee_tech_jean.id), ('date', '=', fields.Date.today() + timedelta(days=1))]
+        self.jean_tour = self.env["of.planning.tour"].search(
+            [("employee_id", "=", self.employee_tech_jean.id), ("date", "=", fields.Date.today() + timedelta(days=1))]
         )
 
     def test_01_compute_line_data(self):
         """Checks the computation of the line data of a tour."""
         tour = self.planning_tour_obj.search(
-            [('date', '=', self.now_dt.date()), ('employee_id', '=', self.employee_tech_jean.id)], limit=1
+            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_jean.id)], limit=1
         )
         self.assertEqual(len(tour), 1)
         self.assertEqual(len(tour.tour_line_ids), 4)
 
-        tour.mapped('tour_line_ids')._compute_line_data()
+        tour.mapped("tour_line_ids")._compute_line_data()
 
         # Lines are sorted by sequence (Event3, Event1, Event2, Event4)
         line1, line2, line3, line4 = tour.tour_line_ids.sorted(key=lambda x: x.sequence)
@@ -141,7 +141,7 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
     def test_02_tour_created(self):
         """Check that when a intervention is created, a tour, a tour line and available slots are created."""
         self.assertEqual(len(self.bruce_tour), 1)
-        self.assertTrue(self.bruce_event in self.bruce_tour.mapped('tour_line_ids.intervention_id'))
+        self.assertTrue(self.bruce_event in self.bruce_tour.mapped("tour_line_ids.intervention_id"))
         self.assertEqual(len(self.bruce_tour.available_slot_ids), 2)
 
         self.assertEqual(
@@ -242,20 +242,20 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
         """Check that the coordinates are correctly computed."""
         line1, line2, line3, line4 = self.jean_tour.tour_line_ids.sorted(key=lambda x: x.sequence)
         map_tour_line_coordinates = (
-            f'{round(self.jean_tour.start_address_id.partner_longitude, 7)},'  # noqa
-            f'{round(self.jean_tour.start_address_id.partner_latitude, 7)};'  # noqa
-            f'{round(line1.geo_lng, 7)},{round(line1.geo_lat, 7)};'  # noqa
-            f'{round(line2.geo_lng, 7)},{round(line2.geo_lat, 7)};'  # noqa
-            f'{round(line3.geo_lng, 7)},{round(line3.geo_lat, 7)};'  # noqa
-            f'{round(line4.geo_lng, 7)},{round(line4.geo_lat, 7)};'  # noqa
-            f'{round(self.jean_tour.return_address_id.partner_longitude, 7)},'  # noqa
-            f'{round(self.jean_tour.return_address_id.partner_latitude, 7)}'
+            f"{round(self.jean_tour.start_address_id.partner_longitude, 7)},"  # noqa
+            f"{round(self.jean_tour.start_address_id.partner_latitude, 7)};"  # noqa
+            f"{round(line1.geo_lng, 7)},{round(line1.geo_lat, 7)};"  # noqa
+            f"{round(line2.geo_lng, 7)},{round(line2.geo_lat, 7)};"  # noqa
+            f"{round(line3.geo_lng, 7)},{round(line3.geo_lat, 7)};"  # noqa
+            f"{round(line4.geo_lng, 7)},{round(line4.geo_lat, 7)};"  # noqa
+            f"{round(self.jean_tour.return_address_id.partner_longitude, 7)},"  # noqa
+            f"{round(self.jean_tour.return_address_id.partner_latitude, 7)}"
         )
         self.assertEqual(self.jean_tour.map_tour_line_coordinates, map_tour_line_coordinates)
 
     def test_06_day_period(self):
         """Check that day period is correctly computed."""
         self.task_sweeping.duration = 0.5
-        self.assertEqual(self.bruce_tour.available_slot_ids[0].day_period, 'morning')
-        self.assertEqual(self.bruce_tour.available_slot_ids[1].day_period, 'afternoon')
-        self.assertEqual(self.bruce_tour.available_slot_ids[2].day_period, 'afternoon')
+        self.assertEqual(self.bruce_tour.available_slot_ids[0].day_period, "morning")
+        self.assertEqual(self.bruce_tour.available_slot_ids[1].day_period, "afternoon")
+        self.assertEqual(self.bruce_tour.available_slot_ids[2].day_period, "afternoon")

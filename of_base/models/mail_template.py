@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class MailTemplate(models.Model):
-    _inherit = 'mail.template'
+    _inherit = "mail.template"
 
     of_copy_to_sender = fields.Boolean(string="E-mail copy to sender")
 

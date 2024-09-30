@@ -9,7 +9,7 @@ from .partner_title_type import PartnerTitleInput
 
 
 class PartnerPhoneCreate(graphene.Mutation):
-    _name = 'PartnerPhoneCreate'
+    _name = "PartnerPhoneCreate"
 
     class Arguments:
         type = graphene.String()
@@ -19,13 +19,13 @@ class PartnerPhoneCreate(graphene.Mutation):
     Output = PartnerPhone
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.res.partner.phone']._prepare_mutation_values(**args)
-        return env['of.res.partner.phone'].create(values)
+        env = info.context["env"]
+        values = env["of.res.partner.phone"]._prepare_mutation_values(**args)
+        return env["of.res.partner.phone"].create(values)
 
 
 class PartnerPhoneUpdate(graphene.Mutation):
-    _name = 'PartnerPhoneUpdate'
+    _name = "PartnerPhoneUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -36,15 +36,15 @@ class PartnerPhoneUpdate(graphene.Mutation):
     Output = PartnerPhone
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.res.partner.phone']._prepare_mutation_values(**args)
-        phone = env['of.res.partner.phone'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.res.partner.phone"]._prepare_mutation_values(**args)
+        phone = env["of.res.partner.phone"].search([("id", "=", id)])
         phone.write(values)
         return phone
 
 
 class PartnerPhoneDelete(graphene.Mutation):
-    _name = 'PartnerPhoneDelete'
+    _name = "PartnerPhoneDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -52,13 +52,13 @@ class PartnerPhoneDelete(graphene.Mutation):
     Output = PartnerPhone
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.res.product.phone', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.res.product.phone", id)
 
 
 class PartnerPhoneMutation(graphene.ObjectType):
-    _name = 'PartnerPhoneMutation'
-    _type = 'mutation'
+    _name = "PartnerPhoneMutation"
+    _type = "mutation"
 
     partner_phone_create = PartnerPhoneCreate.Field()
     partner_phone_update = PartnerPhoneUpdate.Field()

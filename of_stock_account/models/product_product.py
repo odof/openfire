@@ -6,11 +6,11 @@ from odoo.tools import float_compare, float_round
 
 
 class ProductProduct(models.Model):
-    _inherit = 'product.product'
+    _inherit = "product.product"
 
     of_theoretical_cost = fields.Float(
         string="Theoretical cost",
-        digits='Product Price',
+        digits="Product Price",
         groups="base.group_user",
         help="Corresponds to the cost calculated by applying the rules defined in the brand or in the import files."
         " This cost value can be used for margin calculation in quotes and invoices; however, it is never used "
@@ -25,11 +25,11 @@ class ProductProduct(models.Model):
     def create(self, vals_list):
         products = super(ProductProduct, self).create(vals_list)
         for product in products:
-            if product.cost_method == 'standard':
+            if product.cost_method == "standard":
                 product.of_theoretical_cost = product.standard_price
 
             # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
-            if 'of_purchase_coeff_cost_propagation' in dir(product):
+            if "of_purchase_coeff_cost_propagation" in dir(product):
                 product.of_purchase_coeff_cost_propagation(product.get_cost())
 
         return products
@@ -38,22 +38,22 @@ class ProductProduct(models.Model):
         res = super(ProductProduct, self).write(values)
 
         for product in self:
-            if product.cost_method == 'standard':
-                if 'standard_price' in values and values['standard_price'] != product.of_theoretical_cost:
+            if product.cost_method == "standard":
+                if "standard_price" in values and values["standard_price"] != product.of_theoretical_cost:
                     product.of_theoretical_cost = product.standard_price
-                elif 'of_theoretical_cost' in values and values['of_theoretical_cost'] != product.standard_price:
+                elif "of_theoretical_cost" in values and values["of_theoretical_cost"] != product.standard_price:
                     product.standard_price = product.of_theoretical_cost
 
             # FIXME: of_purchase_coeff_cost_propagation is from of_purchase module (not migrated yet)
-            if 'of_purchase_coeff_cost_propagation' in dir(product):
+            if "of_purchase_coeff_cost_propagation" in dir(product):
                 if (
-                    product.cost_method == 'standard' or product.categ_id.of_sale_cost == 'standard'
-                ) and 'standard_price' in values:
+                    product.cost_method == "standard" or product.categ_id.of_sale_cost == "standard"
+                ) and "standard_price" in values:
                     product.of_purchase_coeff_cost_propagation(product.standard_price)
                 elif (
-                    product.cost_method == 'standard'
-                    and product.categ_id.of_sale_cost == 'theoretical'
-                    and 'of_theoretical_cost' in values
+                    product.cost_method == "standard"
+                    and product.categ_id.of_sale_cost == "theoretical"
+                    and "of_theoretical_cost" in values
                 ):
                     product.of_purchase_coeff_cost_propagation(product.of_theoretical_cost)
 
@@ -75,9 +75,9 @@ class ProductProduct(models.Model):
         """
         # Handle stock valuation layers.
 
-        if self.filtered(lambda p: p.valuation == 'real_time') and not self.env[
-            'stock.valuation.layer'
-        ].check_access_rights('read', raise_exception=False):
+        if self.filtered(lambda p: p.valuation == "real_time") and not self.env[
+            "stock.valuation.layer"
+        ].check_access_rights("read", raise_exception=False):
             raise UserError(
                 _(
                     "You cannot update the cost of a product in automated valuation as it leads to the "
@@ -85,19 +85,19 @@ class ProductProduct(models.Model):
                 )
             )
 
-        companies = self.env['res.company'].search(  # OF
-            ['|', ('chart_template_id', '!=', False), ('parent_id', '=', False)]
+        companies = self.env["res.company"].search(  # OF
+            ["|", ("chart_template_id", "!=", False), ("parent_id", "=", False)]
         )
         for company in companies:  # OF
             svl_vals_list = []
             company_id = company.id  # OF
             for product in self:
-                if product.cost_method not in ('standard', 'average'):
+                if product.cost_method not in ("standard", "average"):
                     continue
                 quantity_svl = product.sudo().quantity_svl
                 if float_compare(quantity_svl, 0.0, precision_rounding=product.uom_id.rounding) <= 0:
                     continue
-                digits = self.env['decimal.precision'].precision_get('Product Price')
+                digits = self.env["decimal.precision"].precision_get("Product Price")
                 rounded_new_price = float_round(new_price, precision_digits=digits)
                 diff = rounded_new_price - product.standard_price
                 value = company_id.currency_id.round(quantity_svl * diff)
@@ -105,15 +105,15 @@ class ProductProduct(models.Model):
                     continue
 
                 svl_vals = {
-                    'company_id': company_id.id,
-                    'product_id': product.id,
-                    'description': _('Product value manually modified (from %s to %s)')
+                    "company_id": company_id.id,
+                    "product_id": product.id,
+                    "description": _("Product value manually modified (from %s to %s)")
                     % (product.standard_price, rounded_new_price),
-                    'value': value,
-                    'quantity': 0,
+                    "value": value,
+                    "quantity": 0,
                 }
                 svl_vals_list.append(svl_vals)
-            stock_valuation_layers = self.env['stock.valuation.layer'].sudo().create(svl_vals_list)
+            stock_valuation_layers = self.env["stock.valuation.layer"].sudo().create(svl_vals_list)
 
             # Handle account moves.
             product_accounts = {product.id: product.product_tmpl_id.get_product_accounts() for product in self}
@@ -122,80 +122,80 @@ class ProductProduct(models.Model):
                 product = stock_valuation_layer.product_id
                 value = stock_valuation_layer.value
 
-                if product.type != 'product' or product.valuation != 'real_time':
+                if product.type != "product" or product.valuation != "real_time":
                     continue
 
                 # Sanity check.
-                if not product_accounts[product.id].get('expense'):
+                if not product_accounts[product.id].get("expense"):
                     raise UserError(_("You must set a counterpart account on your product category."))
-                if not product_accounts[product.id].get('stock_valuation'):
+                if not product_accounts[product.id].get("stock_valuation"):
                     raise UserError(
                         _(
-                            "You don\'t have any stock valuation account defined on your product category."
+                            "You don't have any stock valuation account defined on your product category."
                             "You must define one before processing this operation."
                         )
                     )
 
                 if value < 0:
-                    debit_account_id = product_accounts[product.id]['expense'].id
-                    credit_account_id = product_accounts[product.id]['stock_valuation'].id
+                    debit_account_id = product_accounts[product.id]["expense"].id
+                    credit_account_id = product_accounts[product.id]["stock_valuation"].id
                 else:
-                    debit_account_id = product_accounts[product.id]['stock_valuation'].id
-                    credit_account_id = product_accounts[product.id]['expense'].id
+                    debit_account_id = product_accounts[product.id]["stock_valuation"].id
+                    credit_account_id = product_accounts[product.id]["expense"].id
 
                 move_vals = {
-                    'journal_id': product_accounts[product.id]['stock_journal'].id,
-                    'company_id': company_id.id,
-                    'ref': product.default_code,
-                    'stock_valuation_layer_ids': [(6, None, [stock_valuation_layer.id])],
-                    'move_type': 'entry',
-                    'line_ids': [
+                    "journal_id": product_accounts[product.id]["stock_journal"].id,
+                    "company_id": company_id.id,
+                    "ref": product.default_code,
+                    "stock_valuation_layer_ids": [(6, None, [stock_valuation_layer.id])],
+                    "move_type": "entry",
+                    "line_ids": [
                         (
                             0,
                             0,
                             {
-                                'name': _(
-                                    '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
+                                "name": _(
+                                    "%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s",
                                     user=self.env.user.name,
                                     previous=product.standard_price,
                                     new_price=new_price,
                                     product=product.display_name,
                                 ),
-                                'account_id': debit_account_id,
-                                'debit': abs(value),
-                                'credit': 0,
-                                'product_id': product.id,
+                                "account_id": debit_account_id,
+                                "debit": abs(value),
+                                "credit": 0,
+                                "product_id": product.id,
                             },
                         ),
                         (
                             0,
                             0,
                             {
-                                'name': _(
-                                    '%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s',
+                                "name": _(
+                                    "%(user)s changed cost from %(previous)s to %(new_price)s - %(product)s",
                                     user=self.env.user.name,
                                     previous=product.standard_price,
                                     new_price=new_price,
                                     product=product.display_name,
                                 ),
-                                'account_id': credit_account_id,
-                                'debit': 0,
-                                'credit': abs(value),
-                                'product_id': product.id,
+                                "account_id": credit_account_id,
+                                "debit": 0,
+                                "credit": abs(value),
+                                "product_id": product.id,
                             },
                         ),
                     ],
                 }
                 am_vals_list.append(move_vals)
 
-            if account_moves := self.env['account.move'].sudo().create(am_vals_list):
+            if account_moves := self.env["account.move"].sudo().create(am_vals_list):
                 account_moves._post()
 
     def get_cost(self):
         if not self:
             return 0
         self.ensure_one()
-        if self.cost_method == 'standard' or self.categ_id.of_sale_cost == 'standard':
+        if self.cost_method == "standard" or self.categ_id.of_sale_cost == "standard":
             return self.standard_price
         else:
             return self.of_theoretical_cost

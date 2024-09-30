@@ -5,14 +5,14 @@ from odoo.exceptions import UserError
 
 
 class ProductCategory(models.Model):
-    _inherit = 'product.category'
+    _inherit = "product.category"
 
     of_margin_rate = fields.Integer(
         string="Margin rate",
         help="Minimum recommended % margin rate when the main product of a quote is in the category.",
     )
 
-    @api.constrains('of_margin_rate')
+    @api.constrains("of_margin_rate")
     def _constraint_of_margin_rate(self):
         for category in self:
             if category.of_margin_rate < 0 or category.of_margin_rate > 100:

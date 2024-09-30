@@ -23,101 +23,101 @@ class OFServiceRequest(models.Model):
         - recurrent: a series of interventions
     """
 
-    _name = 'of.service.request'
-    _inherit = 'mail.thread'
+    _name = "of.service.request"
+    _inherit = "mail.thread"
     _description = "Service Request"
 
     def _default_days(self):
         """Returns the days of the week from Monday to Friday as default"""
-        days = self.env['of.days'].search([('number', 'in', (1, 2, 3, 4, 5))], order="number")
+        days = self.env["of.days"].search([("number", "in", (1, 2, 3, 4, 5))], order="number")
         return [day.id for day in days]
 
     @api.model
     def _domain_employee_ids(self):
-        return ['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]
+        return ["|", ("of_is_operator", "=", True), ("of_is_salesperson", "=", True)]
 
     # ===== Service request fields =====
     active = fields.Boolean(default=True)
-    name = fields.Char(compute='_compute_name', store=True)
+    name = fields.Char(compute="_compute_name", store=True)
     origin = fields.Char()
     number = fields.Char(copy=False)
     title = fields.Char()
     priority = fields.Selection(
         selection=[
-            ('0', "Low"),
-            ('1', "Normal"),
-            ('2', "High"),
-            ('3', "Very High"),
+            ("0", "Low"),
+            ("1", "Normal"),
+            ("2", "High"),
+            ("3", "Very High"),
         ],
         index=True,
-        default='0',
+        default="0",
     )
-    request_label_date = fields.Char(string="Date", compute='_compute_request_label_date')
+    request_label_date = fields.Char(string="Date", compute="_compute_request_label_date")
 
     # States
     state = fields.Selection(
         selection=[
-            ('draft', "Draft"),
-            ('nothing_to_plan', "Nothing To plan"),
-            ('to_plan', "To plan"),
-            ('to_plan_quickly', "To Plan Quickly"),
-            ('planned', "Planned"),
-            ('late', "Late for planning"),
-            ('part_planned', "Partially planned"),
-            ('all_planned', "All planned"),
-            ('done', "Done"),
-            ('cancel', "Cancelled"),
+            ("draft", "Draft"),
+            ("nothing_to_plan", "Nothing To plan"),
+            ("to_plan", "To plan"),
+            ("to_plan_quickly", "To Plan Quickly"),
+            ("planned", "Planned"),
+            ("late", "Late for planning"),
+            ("part_planned", "Partially planned"),
+            ("all_planned", "All planned"),
+            ("done", "Done"),
+            ("cancel", "Cancelled"),
         ],
         string="Planning status",
-        compute='_compute_state',
+        compute="_compute_state",
         store=True,
         help="Main state of the request. If the request is recurrent, the state is calculated from the interventions.",
     )
     base_state = fields.Selection(
         selection=[
-            ('draft', "Draft"),
-            ('calculated', "Calculated"),
-            ('cancel', "Cancelled"),
+            ("draft", "Draft"),
+            ("calculated", "Calculated"),
+            ("cancel", "Cancelled"),
         ],
         string="Calculation status",
-        default='draft',
+        default="draft",
         required=True,
         copy=False,
         help="This field is used to determine whether the request has been calculated or not.",
     )
     state_punctual = fields.Selection(
         selection=[
-            ('null', "Null"),
-            ('draft', "Draft"),
-            ('to_plan', "To plan"),
-            ('ongoing', "Ongoing intervention"),
-            ('late', "Late for planning"),
-            ('part_planned', "Partially planned"),
-            ('all_planned', "All planned"),
-            ('done', "Done"),
-            ('cancel', "Cancelled"),
+            ("null", "Null"),
+            ("draft", "Draft"),
+            ("to_plan", "To plan"),
+            ("ongoing", "Ongoing intervention"),
+            ("late", "Late for planning"),
+            ("part_planned", "Partially planned"),
+            ("all_planned", "All planned"),
+            ("done", "Done"),
+            ("cancel", "Cancelled"),
         ],
-        compute='_compute_state_punctual',
+        compute="_compute_state_punctual",
         store=True,
         help="State for non recurrent request. If the request is recurrent, the punctual state is null.",
     )
 
     # Interventions
     intervention_ids = fields.One2many(
-        comodel_name='calendar.event', inverse_name='of_request_id', string="Interventions"
+        comodel_name="calendar.event", inverse_name="of_request_id", string="Interventions"
     )
-    intervention_count = fields.Integer(string="# Interventions", compute='_compute_intervention_count')
+    intervention_count = fields.Integer(string="# Interventions", compute="_compute_intervention_count")
     template_id = fields.Many2one(
-        comodel_name='of.planning.intervention.template',
+        comodel_name="of.planning.intervention.template",
         string="Intervention Template",
         help="Pre-fill your intervention with a pre-configured intervention template.",
     )
 
     # Type, tags and stage
     type_id = fields.Many2one(
-        comodel_name='of.service.request.type',
+        comodel_name="of.service.request.type",
         string="Type",
-        compute='_compute_template_related_fields',
+        compute="_compute_template_related_fields",
         store=True,
         readonly=False,
         required=True,
@@ -129,19 +129,19 @@ class OFServiceRequest(models.Model):
     )
     tag_ids = fields.Many2many(
         string="Tags",
-        comodel_name='of.planning.tag',
-        relation='of_service_request_planning_tag_rel',
-        column1='request_id',
-        column2='tag_id',
+        comodel_name="of.planning.tag",
+        relation="of_service_request_planning_tag_rel",
+        column1="request_id",
+        column2="tag_id",
     )
 
     # History
     history_intervention_ids = fields.Many2many(
-        comodel_name='calendar.event',
-        column1='request_id',
-        column2='event_id',
-        relation='of_service_history_intervention_rel',
-        compute='_compute_history_intervention_ids',
+        comodel_name="calendar.event",
+        column1="request_id",
+        column2="event_id",
+        relation="of_service_history_intervention_rel",
+        compute="_compute_history_intervention_ids",
         string="History",
         help="Intervention history of the installed products. If no installed products, address history",
         store=True,
@@ -149,83 +149,83 @@ class OFServiceRequest(models.Model):
 
     # Other linked resources
     task_id = fields.Many2one(
-        comodel_name='of.planning.task',
+        comodel_name="of.planning.task",
         string="Task",
-        compute='_compute_template_related_fields',
+        compute="_compute_template_related_fields",
         store=True,
         readonly=False,
         required=True,
         help="Task to be carried out during the operation.",
     )
     company_id = fields.Many2one(
-        comodel_name='res.company',
+        comodel_name="res.company",
         string="Company",
         required=True,
-        compute='_compute_company_id',
+        compute="_compute_company_id",
         store=True,
         readonly=False,
         help="Select the intervention company: in the intervention configurations, "
         "you can define whether the intervention company "
         "will be the user's or the customer's company by default.",
     )
-    user_id = fields.Many2one(comodel_name='res.users', string="User", default=lambda r: r.env.user)
+    user_id = fields.Many2one(comodel_name="res.users", string="User", default=lambda r: r.env.user)
     stage_id = fields.Many2one(
-        comodel_name='of.service.request.stage',
+        comodel_name="of.service.request.stage",
         string="Stage",
         domain="[('type_ids','=',type_id)]",
-        compute='_compute_stage_id',
+        compute="_compute_stage_id",
         store=True,
         readonly=False,
-        group_expand='_read_group_stage_ids',
+        group_expand="_read_group_stage_ids",
     )
     employee_ids = fields.Many2many(
-        comodel_name='hr.employee',
+        comodel_name="hr.employee",
         string="Operators",
         domain=lambda self: self._domain_employee_ids(),
         help="Select the interventionists who will be "
         "defined by default in the interventions of the intervention request.",
     )
     last_attachment_id = fields.Many2one(
-        comodel_name='ir.attachment', string="Last report", compute='_compute_last_attachment_id'
+        comodel_name="ir.attachment", string="Last report", compute="_compute_last_attachment_id"
     )
     line_ids = fields.One2many(
-        comodel_name='of.service.request.line', inverse_name='request_id', string="Invoice Lines"
+        comodel_name="of.service.request.line", inverse_name="request_id", string="Invoice Lines"
     )
 
     # ===== Customer and address fields =====
     # Customer
-    partner_id = fields.Many2one(comodel_name='res.partner', string="Partner", required=True, ondelete='restrict')
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner", required=True, ondelete="restrict")
 
     # Address
     address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Intervention Address",
-        ondelete='restrict',
-        compute='_compute_address_id',
+        ondelete="restrict",
+        compute="_compute_address_id",
         store=True,
         readonly=False,
         help="Define the address of the intervention site; by default, the customer's address will be used.",
     )
-    address_address = fields.Char(string="Address", related='address_id.contact_address', readonly=True)
-    address_street = fields.Char(string="Street", related='address_id.street', readonly=True)
-    address_street2 = fields.Char(string="Street 2", related='address_id.street2', readonly=True)
-    address_zip = fields.Char(string="Zip", related='address_id.zip', readonly=True)
-    address_city = fields.Char(string="City", related='address_id.city', readonly=True)
-    address_phone = fields.Char(string="Phone", related='address_id.phone', readonly=True)
-    address_mobile = fields.Char(string="Mobile", related='address_id.mobile', readonly=True)
-    address_email = fields.Char(string="Email", related='address_id.email', readonly=True)
+    address_address = fields.Char(string="Address", related="address_id.contact_address", readonly=True)
+    address_street = fields.Char(string="Street", related="address_id.street", readonly=True)
+    address_street2 = fields.Char(string="Street 2", related="address_id.street2", readonly=True)
+    address_zip = fields.Char(string="Zip", related="address_id.zip", readonly=True)
+    address_city = fields.Char(string="City", related="address_id.city", readonly=True)
+    address_phone = fields.Char(string="Phone", related="address_id.phone", readonly=True)
+    address_mobile = fields.Char(string="Mobile", related="address_id.mobile", readonly=True)
+    address_email = fields.Char(string="Email", related="address_id.email", readonly=True)
     tech_sector_id = fields.Many2one(
         string="Tech Sector",
-        related='address_id.of_tech_sector_id',
+        related="address_id.of_tech_sector_id",
         readonly=True,
         store=True,
         help="Assigns the customer's technical area according to their zip code. "
-        "Automatically filled in if the \"Auto. sector assignment\" option is activated in the service configuration.",
+        'Automatically filled in if the "Auto. sector assignment" option is activated in the service configuration.',
     )
     department_id = fields.Many2one(
-        comodel_name='res.country.department',
+        comodel_name="res.country.department",
         string="Department",
-        compute='_compute_department_id',
+        compute="_compute_department_id",
         readonly=True,
         store=True,
         compute_sudo=True,
@@ -236,24 +236,24 @@ class OFServiceRequest(models.Model):
     next_date = fields.Date(
         string="Next planning",
         help="Planning start date of the service request.\n"
-        "Date from which the service request becomes \"To be planned quickly\".\n"
+        'Date from which the service request becomes "To be planned quickly".\n'
         "This date is used as the default start date in the service request planning tool.",
     )
     last_next_date = fields.Date(help="Field to keep rollback capability")
     end_date = fields.Date(
         string="Planning end date",
-        compute='_compute_end_date',
+        compute="_compute_end_date",
         store=True,
         readonly=False,
         help="Planning end date of service request.\n"
-        "After this date, the service request changes status to \"In planning delay\".\n"
+        'After this date, the service request changes status to "In planning delay".\n'
         "This date is used as the default end date in the service request planning tool.",
     )
     contract_end_date = fields.Date(string="Contract end date")
     # Duration
     duration = fields.Float(
         string="Estimated Duration",
-        compute='_compute_duration',
+        compute="_compute_duration",
         store=True,
         readonly=False,
         help="Estimate of the duration of the intervention(s) to be carried out as part of the service request.\n"
@@ -263,8 +263,8 @@ class OFServiceRequest(models.Model):
         "* Partially planned if the remaining duration is greater than 0\n"
         "* Planned if remaining duration is equal to 0",
     )
-    planned_duration = fields.Float(compute='_compute_durations', store=True)
-    remaining_duration = fields.Float(compute='_compute_durations', store=True)
+    planned_duration = fields.Float(compute="_compute_durations", store=True)
+    remaining_duration = fields.Float(compute="_compute_durations", store=True)
 
     # Recurrency
     recurrency = fields.Boolean(
@@ -273,10 +273,10 @@ class OFServiceRequest(models.Model):
         help="Enable this option to configure the recurrence of the intervention.",
     )
     recurring_rule_type = fields.Selection(
-        selection=[('monthly', "Monthly"), ('yearly', "Yearly")],
+        selection=[("monthly", "Monthly"), ("yearly", "Yearly")],
         string="Recurrency",
-        default='yearly',
-        compute='_compute_recurring_rule_type',
+        default="yearly",
+        compute="_compute_recurring_rule_type",
         store=True,
         readonly=False,
         help="Specify the interval for automatic calculation of the next planning date for interventions.",
@@ -285,74 +285,74 @@ class OFServiceRequest(models.Model):
         string="Repeat Every",
         help="Repeat (Months/Years)",
         default=1,
-        compute='_compute_recurring_interval',
+        compute="_compute_recurring_interval",
         store=True,
         readonly=False,
     )
 
     # Days and months
     day_ids = fields.Many2many(
-        comodel_name='of.days',
-        relation='of_service_request_days',
-        column1='request_id',
-        column2='day_id',
+        comodel_name="of.days",
+        relation="of_service_request_days",
+        column1="request_id",
+        column2="day_id",
         string="Days",
         default=lambda self: self._default_days(),
         help="Days of the week on which to schedule service calls. "
         "These days are used by default in the service request planning tool.",
     )
     month_ids = fields.Many2many(
-        comodel_name='of.months',
-        relation='of_service_request_months',
-        column1='request_id',
-        column2='month_id',
+        comodel_name="of.months",
+        relation="of_service_request_months",
+        column1="request_id",
+        column2="month_id",
         string="Months",
         help="Planning reference months.",
     )
 
     # partner_id.category_id is a M2M field
     partner_tag_ids = fields.Many2many(
-        string="Partner Tags", related='partner_id.category_id', readonly=True, help="Customer's tags"
+        string="Partner Tags", related="partner_id.category_id", readonly=True, help="Customer's tags"
     )
 
     # ===== Order fields =====
     order_id = fields.Many2one(
-        comodel_name='sale.order',
+        comodel_name="sale.order",
         string="Order",
         domain="['|', ('partner_id', 'child_of', partner_id), ('partner_id', 'parent_of', partner_id)]",
         help="Link order to task allows you to display the order in the task. "
         "This field is automatically filled in when the intervention is created from an order.",
     )
-    order_ids = fields.Many2many(comodel_name='sale.order', compute='_compute_order_ids', string="Orders", store=True)
-    order_count = fields.Integer(string="# Orders", compute='_compute_order_ids', compute_sudo=True)
+    order_ids = fields.Many2many(comodel_name="sale.order", compute="_compute_order_ids", string="Orders", store=True)
+    order_count = fields.Integer(string="# Orders", compute="_compute_order_ids", compute_sudo=True)
 
     # ===== Invoice and invoicing fields =====
-    invoice_ids = fields.One2many(comodel_name='account.move', compute='_compute_invoice_ids', string="Invoices")
-    invoice_count = fields.Integer(string="# Invoices", compute='_compute_invoice_ids')
+    invoice_ids = fields.One2many(comodel_name="account.move", compute="_compute_invoice_ids", string="Invoices")
+    invoice_count = fields.Integer(string="# Invoices", compute="_compute_invoice_ids")
 
     # ===== Currency and Pricing fields =====
     fiscal_position_id = fields.Many2one(
-        comodel_name='account.fiscal.position',
+        comodel_name="account.fiscal.position",
         string="Fiscal Position",
         domain="[('tax_ids.tax_src_id.type_tax_use','=','sale')]",
     )
     currency_id = fields.Many2one(
-        comodel_name='res.currency', string="Currency", readonly=True, related='company_id.currency_id'
+        comodel_name="res.currency", string="Currency", readonly=True, related="company_id.currency_id"
     )
-    price_subtotal = fields.Monetary(compute='_compute_amounts', string="Subtotal", readonly=True, store=True)
-    price_tax = fields.Monetary(compute='_compute_amounts', string="Taxes", readonly=True, store=True)
-    price_total = fields.Monetary(compute='_compute_amounts', string="Total", readonly=True, store=True)
+    price_subtotal = fields.Monetary(compute="_compute_amounts", string="Subtotal", readonly=True, store=True)
+    price_tax = fields.Monetary(compute="_compute_amounts", string="Taxes", readonly=True, store=True)
+    price_total = fields.Monetary(compute="_compute_amounts", string="Total", readonly=True, store=True)
 
     # ===== Description and notes fields =====
     note = fields.Text(string="Notes")
     map_view_display_note = fields.Text(
-        string="Notes (displayed in Map view)", compute='_compute_map_view_display_note'
+        string="Notes (displayed in Map view)", compute="_compute_map_view_display_note"
     )
 
     # ===== Misc. fields =====
     # Alerts
-    is_recurring_task = fields.Boolean(string="Recurring Task", related='task_id.is_recurring', readonly=True)
-    alert_dates = fields.Boolean(string="Inconsistent dates", compute='_compute_alert_dates')
+    is_recurring_task = fields.Boolean(string="Recurring Task", related="task_id.is_recurring", readonly=True)
+    alert_dates = fields.Boolean(string="Inconsistent dates", compute="_compute_alert_dates")
 
     # Searching
     end_date_min = fields.Date(string="Min due date", compute=lambda *a, **k: {})
@@ -360,18 +360,18 @@ class OFServiceRequest(models.Model):
     control_date = fields.Date(compute=lambda *a, **k: {})
 
     # Helper fields for views : tree, kanban, calendar, map
-    partner_latitude = fields.Float(related='address_id.partner_latitude')
-    partner_longitude = fields.Float(related='address_id.partner_longitude')
-    precision = fields.Selection(related='address_id.of_precision')
-    partner_name = fields.Char(related='partner_id.name', string="Partner Name")
-    partner_mobile = fields.Char(related='partner_id.mobile', string="Partner Mobile")
-    partner_phone = fields.Char(related='partner_id.phone', string="Partner Phone")
-    partner_email = fields.Char(related='partner_id.email', string="Partner Email")
-    task_name = fields.Char(related='task_id.name', readonly=True, string="Task Name")
-    color = fields.Char(compute='_compute_color', help="Color of the request in the views")
+    partner_latitude = fields.Float(related="address_id.partner_latitude")
+    partner_longitude = fields.Float(related="address_id.partner_longitude")
+    precision = fields.Selection(related="address_id.of_precision")
+    partner_name = fields.Char(related="partner_id.name", string="Partner Name")
+    partner_mobile = fields.Char(related="partner_id.mobile", string="Partner Mobile")
+    partner_phone = fields.Char(related="partner_id.phone", string="Partner Phone")
+    partner_email = fields.Char(related="partner_id.email", string="Partner Email")
+    task_name = fields.Char(related="task_id.name", readonly=True, string="Task Name")
+    color = fields.Char(compute="_compute_color", help="Color of the request in the views")
     last_intervention_date = fields.Date(
         string="Last intervention Date",
-        compute='_compute_last_intervention_date',
+        compute="_compute_last_intervention_date",
         store=True,
         help="Date of last appointment. Does not include cancelled or rescheduled appointments.",
     )
@@ -383,7 +383,7 @@ class OFServiceRequest(models.Model):
     # Constrains methods
     # --------------------------------------------------------------------------
 
-    @api.constrains('next_date', 'end_date')
+    @api.constrains("next_date", "end_date")
     def check_alert_dates(self):
         for request in self:
             if request.alert_dates:
@@ -391,8 +391,8 @@ class OFServiceRequest(models.Model):
 
     _sql_constraints = [
         (
-            'duration_not_null_constraint',
-            'CHECK ( duration > 0 )',
+            "duration_not_null_constraint",
+            "CHECK ( duration > 0 )",
             _("Intervention duration must be greater than 0!"),
         ),
     ]
@@ -401,7 +401,7 @@ class OFServiceRequest(models.Model):
     # Compute methods
     # --------------------------------------------------------------------------
 
-    @api.depends('address_id', 'partner_id', 'task_id')
+    @api.depends("address_id", "partner_id", "task_id")
     def _compute_name(self):
         for request in self:
             partner_name = request.partner_id.name or ""
@@ -410,22 +410,22 @@ class OFServiceRequest(models.Model):
             request.name = f"{task_name} {partner_name} {address_zip}"
 
     @api.depends(
-        'base_state',
-        'duration',
-        'remaining_duration',
-        'next_date',
-        'last_next_date',
-        'end_date',
-        'contract_end_date',
-        'recurrency',
-        'intervention_ids',
-        'intervention_ids.of_state',
+        "base_state",
+        "duration",
+        "remaining_duration",
+        "next_date",
+        "last_next_date",
+        "end_date",
+        "contract_end_date",
+        "recurrency",
+        "intervention_ids",
+        "intervention_ids.of_state",
     )
     def _compute_state(self):
         for request in self:
             if not request.next_date and not request.end_date:
-                request.state = 'nothing_to_plan'
-            elif request.base_state != 'calculated':
+                request.state = "nothing_to_plan"
+            elif request.base_state != "calculated":
                 request.state = request.base_state
             else:
                 # self.base_state = 'cancelled' and self.base_state = 'draft' states are triggered manually.
@@ -434,86 +434,86 @@ class OFServiceRequest(models.Model):
                     request.state = state
 
     @api.depends(
-        'base_state',
-        'duration',
-        'remaining_duration',
-        'next_date',
-        'last_next_date',
-        'end_date',
-        'contract_end_date',
-        'recurrency',
-        'intervention_ids',
-        'intervention_ids.of_state',
+        "base_state",
+        "duration",
+        "remaining_duration",
+        "next_date",
+        "last_next_date",
+        "end_date",
+        "contract_end_date",
+        "recurrency",
+        "intervention_ids",
+        "intervention_ids.of_state",
     )
     def _compute_state_punctual(self):
         for request in self:
             if request.recurrency:
-                request.state_punctual = 'null'
-            elif request.base_state != 'calculated':
+                request.state_punctual = "null"
+            elif request.base_state != "calculated":
                 request.state_punctual = self.base_state
             else:
                 state = request._get_state_punctual_from_date(fields.Date.context_today(self), to_plan_advance=True)
                 if request.state_punctual != state:
                     request.state_punctual = state
 
-    @api.depends('intervention_ids', 'intervention_ids.of_state')
+    @api.depends("intervention_ids", "intervention_ids.of_state")
     def _compute_intervention_count(self):
         for request in self:
             request.intervention_count = len(
-                request.intervention_ids.filtered(lambda r: r.of_state not in ('cancel', 'postponed'))
+                request.intervention_ids.filtered(lambda r: r.of_state not in ("cancel", "postponed"))
             )
 
     @api.depends(
-        'intervention_ids',
-        'intervention_ids.of_state',
-        'intervention_ids.start_date',
+        "intervention_ids",
+        "intervention_ids.of_state",
+        "intervention_ids.start_date",
     )
     def _compute_last_intervention_date(self):
         for request in self:
             old_intervention_date = request.last_intervention_date
 
             # do not take cancelled / postponed interventions
-            interventions = request.intervention_ids.filtered(lambda i: i.of_state not in ('cancel', 'postponed'))
-            last_intervention_date = interventions and interventions.sorted('start', reverse=True)[0].start or False
+            interventions = request.intervention_ids.filtered(lambda i: i.of_state not in ("cancel", "postponed"))
+            last_intervention_date = interventions and interventions.sorted("start", reverse=True)[0].start or False
             if last_intervention_date != old_intervention_date:
                 request.last_intervention_date = last_intervention_date
 
-    @api.depends('task_id')
+    @api.depends("task_id")
     def _compute_recurring_rule_type(self):
         for request in self:
             if request.task_id and request.task_id.is_recurring == request.recurrency:
                 request.recurring_rule_type = request.task_id.recurring_rule_type
 
-    @api.depends('task_id')
+    @api.depends("task_id")
     def _compute_recurring_interval(self):
         for request in self:
             if request.task_id and request.task_id.is_recurring == request.recurrency:
                 request.recurring_interval = request.task_id.recurring_interval
 
-    @api.depends('task_id')
+    @api.depends("task_id")
     def _compute_duration(self):
         for request in self:
             if request.task_id and not request.duration:
                 request.duration = request.task_id.duration
 
-    @api.depends('task_id', 'next_date')
+    @api.depends("task_id", "next_date")
     def _compute_end_date(self):
         for request in self:
             request.end_date = self._get_end_date()
 
     @api.depends(
-        'duration',
-        'intervention_ids',
-        'recurrency',
-        'intervention_ids.of_state',
-        'next_date',
-        'month_ids',
-        'task_id',
-        'intervention_ids.start_date',
+        "duration",
+        "intervention_ids",
+        "recurrency",
+        "intervention_ids.of_state",
+        "next_date",
+        "month_ids",
+        "task_id",
+        "intervention_ids.start_date",
     )
     def _compute_durations(self):
         for request in self:
-            events = request.intervention_ids.filtered(lambda p: p.of_state not in ('cancel', 'postponed'))
+            events = request.intervention_ids.filtered(lambda p: p.of_state not in ("cancel", "postponed"))
 
             if request.recurrency and request.next_date:
                 # On cherche la durée planifiée pour l'occurrence en cours.
@@ -540,15 +540,15 @@ class OFServiceRequest(models.Model):
                 # Sélection des RDVs de l'occurrence en cours
                 events = events.filtered(lambda p: date_advance <= p.start.date() < date_late)
 
-            request.planned_duration = sum(events.mapped('duration'))
+            request.planned_duration = sum(events.mapped("duration"))
             request.remaining_duration = (
                 request.duration > request.planned_duration and request.duration - request.planned_duration or 0
             )
 
-    @api.depends('template_id', 'base_state')
+    @api.depends("template_id", "base_state")
     def _compute_template_related_fields(self):
         """Compute the fields related to the template."""
-        for request in self.filtered(lambda r: r.base_state == 'draft' and r.template_id):
+        for request in self.filtered(lambda r: r.base_state == "draft" and r.template_id):
             lines_to_create = []
             request.task_id = request.template_id.task_id
             request.type_id = request.template_id.type_id
@@ -564,16 +564,16 @@ class OFServiceRequest(models.Model):
     def _search_remaining_duration(self, operator, operand):
         requests = self.search([])
         res = safe_eval(
-            "requests.filtered(lambda s: s.remaining_duration %s %.2f)" % (operator, operand), {'requests': requests}
+            "requests.filtered(lambda s: s.remaining_duration %s %.2f)" % (operator, operand), {"requests": requests}
         )
-        return [('id', 'in', res.ids)]
+        return [("id", "in", res.ids)]
 
-    @api.depends('next_date', 'end_date')
+    @api.depends("next_date", "end_date")
     def _compute_alert_dates(self):
         for request in self:
             request.alert_dates = request.next_date and request.end_date and request.next_date > request.end_date
 
-    @api.depends('state')
+    @api.depends("state")
     def _compute_color(self):
         """Color of Request in the views. Color is based on the request's state.
         Colors description and meaning:
@@ -582,47 +582,47 @@ class OFServiceRequest(models.Model):
             - red : request late for planning
             - black  : other requests"""
         for request in self:
-            if request.state in ('to_plan', 'planned', 'done', 'part_planned', 'all_planned'):
-                request.color = 'black'
-            elif request.state in ('to_plan_quickly'):
-                request.color = 'orange'
-            elif request.state == 'late':
-                request.color = 'red'
+            if request.state in ("to_plan", "planned", "done", "part_planned", "all_planned"):
+                request.color = "black"
+            elif request.state in ("to_plan_quickly"):
+                request.color = "orange"
+            elif request.state == "late":
+                request.color = "red"
             else:
-                request.color = 'grey'
+                request.color = "grey"
 
-    @api.depends('line_ids', 'line_ids.order_line_id')
+    @api.depends("line_ids", "line_ids.order_line_id")
     def _compute_order_ids(self):
         for request in self:
-            request.order_ids = request.mapped('line_ids.order_line_id.order_id')
+            request.order_ids = request.mapped("line_ids.order_line_id.order_id")
             request.order_count = len(request.order_ids)
 
     @api.depends(
-        'line_ids',
-        'line_ids.invoice_line_ids',
-        'order_ids',
-        'order_ids.invoice_ids',
-        'line_ids.invoice_line_ids.move_id',
+        "line_ids",
+        "line_ids.invoice_line_ids",
+        "order_ids",
+        "order_ids.invoice_ids",
+        "line_ids.invoice_line_ids.move_id",
     )
     def _compute_invoice_ids(self):
         for request in self:
-            invoices = request.mapped('line_ids.invoice_line_ids.move_id')
-            invoices |= request.mapped('order_ids.invoice_ids')
+            invoices = request.mapped("line_ids.invoice_line_ids.move_id")
+            invoices |= request.mapped("order_ids.invoice_ids")
             request.invoice_count = len(invoices)
             request.invoice_ids = invoices
 
-    @api.depends('address_id.of_intervention_address_ids', 'partner_id.of_intervention_address_ids')
+    @api.depends("address_id.of_intervention_address_ids", "partner_id.of_intervention_address_ids")
     def _compute_history_intervention_ids(self):
-        event_obj = self.env['calendar.event']
+        event_obj = self.env["calendar.event"]
         for request in self:
             if partner := request.address_id or request.partner_id:
-                history_interventions = event_obj.search([('of_address_id', '=', partner.id)])
+                history_interventions = event_obj.search([("of_address_id", "=", partner.id)])
                 request.history_intervention_ids = history_interventions
 
     def _compute_request_label_date(self):
         for request in self:
-            interventions = request.intervention_ids.filtered(lambda i: i.of_state not in ('cancel', 'postponed'))
-            if request.state == 'done' and interventions:
+            interventions = request.intervention_ids.filtered(lambda i: i.of_state not in ("cancel", "postponed"))
+            if request.state == "done" and interventions:
                 request.request_label_date = _("Completed on %s") % format_date(
                     self.env, request.intervention_ids[-1].start_date
                 )
@@ -638,29 +638,29 @@ class OFServiceRequest(models.Model):
 
     def _compute_last_attachment_id(self):
         """Retrieves the Intervention sheet report of the last intervention having said report in attachments"."""
-        attachment_obj = self.env['ir.attachment']
+        attachment_obj = self.env["ir.attachment"]
         for request in self:
-            if request.intervention_ids.filtered(lambda i: i.state not in ('cancel', 'postponed')):
+            if request.intervention_ids.filtered(lambda i: i.state not in ("cancel", "postponed")):
                 for i in range(1, len(request.intervention_ids) + 1):
                     current_intervention = request.intervention_ids[-i]
                     if attachment := attachment_obj.search(
                         [
-                            ('res_model', '=', 'calendar.event'),
-                            ('res_id', '=', current_intervention.id),
-                            ('of_intervention_report', '=', True),
+                            ("res_model", "=", "calendar.event"),
+                            ("res_id", "=", current_intervention.id),
+                            ("of_intervention_report", "=", True),
                         ]
                     ):
                         request.last_attachment_id = attachment[-1]
                         break
 
-    @api.depends('line_ids', 'line_ids.price_subtotal', 'line_ids.price_tax', 'line_ids.price_total')
+    @api.depends("line_ids", "line_ids.price_subtotal", "line_ids.price_tax", "line_ids.price_total")
     def _compute_amounts(self):
         for request in self:
-            request.price_subtotal = sum(request.line_ids.mapped('price_subtotal'))
-            request.price_tax = sum(request.line_ids.mapped('price_tax'))
-            request.price_total = sum(request.line_ids.mapped('price_total'))
+            request.price_subtotal = sum(request.line_ids.mapped("price_subtotal"))
+            request.price_tax = sum(request.line_ids.mapped("price_tax"))
+            request.price_total = sum(request.line_ids.mapped("price_total"))
 
-    @api.depends('partner_id.country_department_id', 'address_id.country_department_id')
+    @api.depends("partner_id.country_department_id", "address_id.country_department_id")
     def _compute_department_id(self):
         for request in self:
             if request.address_id:
@@ -672,26 +672,26 @@ class OFServiceRequest(models.Model):
         for rec in self:
             rec.map_view_display_note = rec.note and rec.note[:300] or ""
 
-    @api.depends('partner_id')
+    @api.depends("partner_id")
     def _compute_address_id(self):
         for request in self:
             if request.partner_id and not request.address_id:
-                addresses = request.partner_id.address_get(['delivery'])
-                request.address_id = addresses['delivery']
+                addresses = request.partner_id.address_get(["delivery"])
+                request.address_id = addresses["delivery"]
 
-    @api.depends('type_id')
+    @api.depends("type_id")
     def _compute_stage_id(self):
         for request in self:
             if request.type_id and request.type_id.stage_ids:
                 request.stage_id = request.type_id.stage_ids[0]
 
-    @api.depends('partner_id', 'user_id')
+    @api.depends("partner_id", "user_id")
     def _compute_company_id(self):
         for request in self:
-            company_choice = self.env.user.company_id.of_company_choice or 'contact'
+            company_choice = self.env.user.company_id.of_company_choice or "contact"
             company = (
                 self.env.user.company_id
-                if company_choice == 'user'
+                if company_choice == "user"
                 else request.partner_id.company_id or self.user_id.company_id
             )
             request.company_id = company or False
@@ -700,14 +700,14 @@ class OFServiceRequest(models.Model):
     # Onchange methods
     # --------------------------------------------------------------------------
 
-    @api.onchange('fiscal_position_id')
+    @api.onchange("fiscal_position_id")
     def _onchange_fpos_id_show_update_fpos(self):
         if self.line_ids and (
             not self.fiscal_position_id or self._origin.fiscal_position_id != self.fiscal_position_id
         ):
             self.show_update_fpos = True
 
-    @api.onchange('type_id')
+    @api.onchange("type_id")
     def _onchange_type_id(self):
         if self.type_id and self.type_id != self.template_id.type_id:
             self.template_id = False
@@ -719,30 +719,30 @@ class OFServiceRequest(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('address_id') and not vals.get('partner_id'):
-                address = self.env['res.partner'].browse(vals['address_id'])
+            if vals.get("address_id") and not vals.get("partner_id"):
+                address = self.env["res.partner"].browse(vals["address_id"])
                 partner = address.parent_id or address
-                vals['partner_id'] = partner.id
+                vals["partner_id"] = partner.id
         return super().create(vals_list)
 
     def write(self, vals):
         res = super().write(vals)
-        if vals.get('base_state') == 'calculated':
+        if vals.get("base_state") == "calculated":
             self._affect_service_request_number()
         return res
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         res = stages.search([], order=order)
-        if self._context.get('of_kanban_steps') == "Maintenance":
+        if self._context.get("of_kanban_steps") == "Maintenance":
             if maintenance_type := self.env.ref(
-                'of_service.of_service_request_type_maintenance', raise_if_not_found=False
+                "of_service.of_service_request_type_maintenance", raise_if_not_found=False
             ):
                 return res.filtered(lambda s: maintenance_type.id in s.type_ids.ids)
         return res
 
     def name_get(self):
-        if not self._context.get('service_request_extended_name_display'):
+        if not self._context.get("service_request_extended_name_display"):
             return super().name_get()
         return [
             (
@@ -757,93 +757,93 @@ class OFServiceRequest(models.Model):
     # --------------------------------------------------------------------------
 
     def action_button_create_intervention(self):
-        wizard = self.env['of.service.request.create.intervention.wizard'].create(
-            {'line_ids': [Command.create({'request_id': request.id}) for request in self]}
+        wizard = self.env["of.service.request.create.intervention.wizard"].create(
+            {"line_ids": [Command.create({"request_id": request.id}) for request in self]}
         )
         return {
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'of.service.request.create.intervention.wizard',
-            'res_id': wizard.id,
-            'target': 'new',
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "of.service.request.create.intervention.wizard",
+            "res_id": wizard.id,
+            "target": "new",
         }
 
     def action_button_view_intervention(self):
-        action = self.env.ref('of_planning.action_calendar_event').sudo().read()[0]
+        action = self.env.ref("of_planning.action_calendar_event").sudo().read()[0]
         if len(self.ids) == 1:
-            action['context'] = self._get_action_view_intervention_context(safe_eval(action['context']))
+            action["context"] = self._get_action_view_intervention_context(safe_eval(action["context"]))
         if len(self.intervention_ids) == 1:
-            action['res_id'] = self.intervention_ids.ids[0]
-        return self.mapped('intervention_ids')._get_calendar_event_action_views(action)
+            action["res_id"] = self.intervention_ids.ids[0]
+        return self.mapped("intervention_ids")._get_calendar_event_action_views(action)
 
     def action_button_view_order(self):
         self.ensure_one()
         orders = self.order_ids
-        action = self.env.ref('sale.action_orders').read()[0]
+        action = self.env.ref("sale.action_orders").read()[0]
         if len(orders) > 1:
-            action['domain'] = [('id', 'in', orders.ids)]
+            action["domain"] = [("id", "in", orders.ids)]
         elif len(orders) == 1:
-            action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
-            action['res_id'] = orders.ids[0]
+            action["views"] = [(self.env.ref("sale.view_order_form").id, "form")]
+            action["res_id"] = orders.ids[0]
         else:
-            action = {'type': 'ir.actions.act_window_close'}
+            action = {"type": "ir.actions.act_window_close"}
         return action
 
     def action_button_view_invoice(self):
         self.ensure_one()
         invoices = self.invoice_ids
-        action = self.env.ref('account.view_out_invoice_tree').read()[0]
+        action = self.env.ref("account.view_out_invoice_tree").read()[0]
         if len(invoices) > 1:
-            action['domain'] = [('id', 'in', invoices.ids)]
+            action["domain"] = [("id", "in", invoices.ids)]
         elif len(invoices) == 1:
-            action['views'] = [(self.env.ref('account.view_move_form').id, 'form')]
-            action['res_id'] = invoices.ids[0]
+            action["views"] = [(self.env.ref("account.view_move_form").id, "form")]
+            action["res_id"] = invoices.ids[0]
         else:
-            action = {'type': 'ir.actions.act_window_close'}
+            action = {"type": "ir.actions.act_window_close"}
         return action
 
     def action_button_request_send_mail(self):
         self.ensure_one()
-        compose_form = self.env.ref('mail.email_compose_message_wizard_form')
+        compose_form = self.env.ref("mail.email_compose_message_wizard_form")
         ctx = dict(
-            default_model='of.service.request',
+            default_model="of.service.request",
             default_res_id=self.id,
-            default_composition_mode='comment',
+            default_composition_mode="comment",
         )
         # add mail template if exists
-        if template := self.env.ref('of_service.email_template_of_service_request', raise_if_not_found=False):
-            ctx['default_template_id'] = template.id
-            ctx['default_use_template'] = bool(template.id)
+        if template := self.env.ref("of_service.email_template_of_service_request", raise_if_not_found=False):
+            ctx["default_template_id"] = template.id
+            ctx["default_use_template"] = bool(template.id)
         return {
-            'name': _("Compose Email"),
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'mail.compose.message',
-            'views': [(compose_form.id, 'form')],
-            'view_id': compose_form.id,
-            'target': 'new',
-            'context': ctx,
+            "name": _("Compose Email"),
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": "mail.compose.message",
+            "views": [(compose_form.id, "form")],
+            "view_id": compose_form.id,
+            "target": "new",
+            "context": ctx,
         }
 
     def action_button_open_intervention(self):
         self.ensure_one()
-        action = self.env.ref('of_planning.action_calendar_event').read()[0]
+        action = self.env.ref("of_planning.action_calendar_event").read()[0]
         interventions = self.intervention_ids
         if len(interventions) > 1:
-            action['context'] = {'search_default_of_request_id': self.id}
+            action["context"] = {"search_default_of_request_id": self.id}
         elif len(interventions) == 1:
-            action['views'] = [(self.env.ref('of_planning.calendar_event_view_form').id, 'form')]
-            action['res_id'] = interventions.ids[0]
+            action["views"] = [(self.env.ref("of_planning.calendar_event_view_form").id, "form")]
+            action["res_id"] = interventions.ids[0]
         return action
 
     def action_button_validate(self):
-        self.write({'base_state': 'calculated'})
+        self.write({"base_state": "calculated"})
 
     def action_button_cancel(self):
-        self.write({'base_state': 'cancel'})
+        self.write({"base_state": "cancel"})
 
     def action_button_draft(self):
-        self.write({'base_state': 'draft'})
+        self.write({"base_state": "draft"})
 
     def action_button_update_taxes(self):
         self.ensure_one()
@@ -863,9 +863,9 @@ class OFServiceRequest(models.Model):
 
     @api.model
     def _get_relative_delta(self, recurring_rule_type, interval):
-        if recurring_rule_type == 'weekly':
+        if recurring_rule_type == "weekly":
             return relativedelta(weeks=interval)
-        elif recurring_rule_type == 'monthly':
+        elif recurring_rule_type == "monthly":
             return relativedelta(months=interval, day=1)  # 1er du mois
         else:
             return relativedelta(years=interval, day=1)  # 1er du mois
@@ -881,7 +881,7 @@ class OFServiceRequest(models.Model):
         if not self.recurrency:
             return
 
-        month_ints = self.mapped('month_ids.number') or range(1, 13)
+        month_ints = self.mapped("month_ids.number") or range(1, 13)
 
         date_eval_month_int = date_eval.month
         if date_eval_month_int in month_ints:  # la date est déjà sur un mois autorisé
@@ -928,7 +928,7 @@ class OFServiceRequest(models.Model):
         if not self.recurrency:
             return False
 
-        month_ints = self.mapped('month_ids.number') or range(1, 13)
+        month_ints = self.mapped("month_ids.number") or range(1, 13)
 
         if forward:
             # si mode forward, l'occurence par défaut à étudier est dernière
@@ -978,11 +978,11 @@ class OFServiceRequest(models.Model):
 
         end_date = next_date
         if self.template_id and self.template_id.planning_granularity:
-            if self.template_id.planning_granularity == 'weekly':
+            if self.template_id.planning_granularity == "weekly":
                 end_date += relativedelta(weeks=1)
-            elif self.template_id.planning_granularity == 'fortnightly':
+            elif self.template_id.planning_granularity == "fortnightly":
                 end_date += relativedelta(weeks=2)
-            elif self.template_id.planning_granularity == 'monthly':
+            elif self.template_id.planning_granularity == "monthly":
                 end_date += relativedelta(months=1)
         elif self.recurrency:
             end_date += relativedelta(months=1)  # one month for recurring task (as sweeping/maintenance task)
@@ -994,10 +994,10 @@ class OFServiceRequest(models.Model):
     def _prepare_sale_order_values(self):
         self.ensure_one()
         return {
-            'partner_id': self.partner_id.id,
-            'origin': self.number,
-            'fiscal_position_id': self.fiscal_position_id.id,
-            'order_line': [Command.create(line._prepare_so_line_vals()) for line in self._get_orderable_lines()],
+            "partner_id": self.partner_id.id,
+            "origin": self.number,
+            "fiscal_position_id": self.fiscal_position_id.id,
+            "order_line": [Command.create(line._prepare_so_line_vals()) for line in self._get_orderable_lines()],
         }
 
     def _make_sale_order(self):
@@ -1007,49 +1007,49 @@ class OFServiceRequest(models.Model):
         """
         self.ensure_one()
 
-        order_obj = self.env['sale.order']
-        order_line_obj = self.env['sale.order.line']
+        order_obj = self.env["sale.order"]
+        order_line_obj = self.env["sale.order.line"]
 
         # Do not create an order if the Service Request is not validated
-        if self.base_state != 'calculated':
-            return self.env['of.popup.wizard'].popup_return(message=_("This service request is not validated."))
+        if self.base_state != "calculated":
+            return self.env["of.popup.wizard"].popup_return(message=_("This service request is not validated."))
 
         # Do not create order if no lines
         if not self.line_ids:
-            return self.env['of.popup.wizard'].popup_return(message=_("This service request has no lines."))
+            return self.env["of.popup.wizard"].popup_return(message=_("This service request has no lines."))
 
         # Do not create an order if all lines are already associated with an order
         if not self.line_ids.filtered(lambda li: not li.order_line_id):
-            return self.env['of.popup.wizard'].popup_return(
+            return self.env["of.popup.wizard"].popup_return(
                 message=_("All lines are already associated with an order.")
             )
 
         # Do not create an order if all lines are already associated with one or more invoices.
         if not self.line_ids.filtered(lambda li: not li.invoice_line_ids):
-            return self.env['of.popup.wizard'].popup_return(
+            return self.env["of.popup.wizard"].popup_return(
                 message=_("All lines are already associated with one or more invoices.")
             )
 
         # Do not create an order if the fiscal position is not filled in.
         if not self.fiscal_position_id:
-            return self.env['of.popup.wizard'].popup_return(message=_("Please enter a fiscal position."))
+            return self.env["of.popup.wizard"].popup_return(message=_("Please enter a fiscal position."))
 
         # Create sale order
         order = order_obj.create(self._prepare_sale_order_values())
 
         # Connect lines to their corresponding order line
         request_lines = self.line_ids.filtered(lambda li: not li.order_line_id and not li.invoice_line_ids)
-        created_order_lines = order_line_obj.search([('of_request_line_id', 'in', request_lines.mapped('id'))])
+        created_order_lines = order_line_obj.search([("of_request_line_id", "in", request_lines.mapped("id"))])
         for line in request_lines:
             order_lines = created_order_lines.filtered(lambda order_line: order_line.of_request_line_id == line)
             line.order_line_id = order_lines and order_lines[0].id or False
         return {
-            'name': _("Order"),
-            'view_mode': 'form',
-            'res_model': 'sale.order',
-            'type': 'ir.actions.act_window',
-            'target': 'current',
-            'res_id': order.id,
+            "name": _("Order"),
+            "view_mode": "form",
+            "res_model": "sale.order",
+            "type": "ir.actions.act_window",
+            "target": "current",
+            "res_id": order.id,
         }
 
     def _get_orderable_lines(self):
@@ -1081,18 +1081,18 @@ class OFServiceRequest(models.Model):
         end_to_plan = to_plan_advance and in_one_month or date_eval
         contract_end_date = self.contract_end_date or False
         if contract_end_date and (contract_end_date < next_date or contract_end_date < date_eval):
-            return 'done'
+            return "done"
         elif intervals_overlap(next_date, end_date, date_eval, end_to_plan, strict=False) and (
             not last_next_date or last_next_date < one_month_ago
         ):
-            return 'to_plan'
+            return "to_plan"
         elif last_next_date and (date_eval < last_next_date <= in_one_month):
-            return 'to_plan_quickly'
+            return "to_plan_quickly"
         elif last_next_date and (one_month_ago <= last_next_date <= date_eval):
-            return 'planned'
+            return "planned"
         elif end_date < date_eval:
-            return 'late'
-        return 'to_plan'
+            return "late"
+        return "to_plan"
 
     def _compute_state_from_date(self, date_eval, next_date, end_date, last_next_date):
         """
@@ -1114,24 +1114,24 @@ class OFServiceRequest(models.Model):
         if (
             self.intervention_ids
             and self.remaining_duration == 0
-            and all(state == 'done' for state in self.mapped('intervention_ids.of_state'))
+            and all(state == "done" for state in self.mapped("intervention_ids.of_state"))
         ):
-            return 'done'
+            return "done"
         elif (
             self.intervention_ids
             and self.remaining_duration == 0
-            and any(state != 'done' for state in self.mapped('intervention_ids.of_state'))
+            and any(state != "done" for state in self.mapped("intervention_ids.of_state"))
         ):
-            return 'all_planned'
+            return "all_planned"
         elif self.intervention_ids and self.remaining_duration != 0:
-            return 'part_planned'
+            return "part_planned"
         elif end_date < date_eval:
-            return 'late'
+            return "late"
         elif date_eval <= end_date <= (date_eval + relativedelta(months=1)):
-            return 'to_plan_quickly'
+            return "to_plan_quickly"
         elif next_date and next_date > (date_eval + relativedelta(months=1)):
-            return 'to_plan'
-        return 'to_plan'
+            return "to_plan"
+        return "to_plan"
 
     def _compute_state_punctual_from_date(self, date_eval, end_date, last_next_date):
         """
@@ -1150,15 +1150,15 @@ class OFServiceRequest(models.Model):
         :rtype: str
         """
         if end_date < date_eval and self.remaining_duration != 0:
-            return 'late'
+            return "late"
         elif not last_next_date:
             # remaining_duration == 0 and the last scheduled intervention has passed: 'done'
-            return 'to_plan'
+            return "to_plan"
         elif self.remaining_duration == 0 and last_next_date < date_eval:
-            return 'done'
+            return "done"
         elif self.remaining_duration == 0 and self.duration:
-            return 'all_planned'
-        return 'part_planned'
+            return "all_planned"
+        return "part_planned"
 
     def _get_state_from_date(self, date_eval=fields.Date.today(), to_plan_advance=False):
         """Calculates the status of an intervention at a given date, intended to be used for non passed dates.
@@ -1201,7 +1201,7 @@ class OFServiceRequest(models.Model):
             last_next_date = self.last_next_date or False
             end_date = self.end_date or self.next_date + relativedelta(days=13)
             return self._compute_state_punctual_from_date(date_eval, end_date, last_next_date)
-        return 'null'
+        return "null"
 
     def _get_action_view_intervention_context(self, action_context=None):
         """Returns the context to open the intervention view from the service request.
@@ -1214,47 +1214,47 @@ class OFServiceRequest(models.Model):
 
         action_context.update(
             {
-                'default_of_partner_id': self.partner_id.id,
-                'default_of_address_id': self.address_id and self.address_id.id or self.partner_id.id,
-                'default_of_task_id': self.task_id and self.task_id.id or False,
-                'default_start': False,
-                'default_stop': False,
-                'default_duration': self.duration,
-                'default_of_tag_ids': [Command.set([tag.id for tag in self.tag_ids])],
-                'default_of_internal_description': self.note,
-                'default_of_request_id': self.id,
-                'search_default_of_request_id': self.id,
-                'create': self.base_state == 'calculated',
-                'edit': self.base_state == 'calculated',
-                'default_of_order_id': self.order_id and self.order_id.id or False,
-                'default_of_fiscal_position_id': self.fiscal_position_id and self.fiscal_position_id.id or False,
-                'default_of_template_id': self.template_id and self.template_id.id or False,
-                'default_of_employee_ids': [Command.set([employee.id for employee in self.employee_ids])],
+                "default_of_partner_id": self.partner_id.id,
+                "default_of_address_id": self.address_id and self.address_id.id or self.partner_id.id,
+                "default_of_task_id": self.task_id and self.task_id.id or False,
+                "default_start": False,
+                "default_stop": False,
+                "default_duration": self.duration,
+                "default_of_tag_ids": [Command.set([tag.id for tag in self.tag_ids])],
+                "default_of_internal_description": self.note,
+                "default_of_request_id": self.id,
+                "search_default_of_request_id": self.id,
+                "create": self.base_state == "calculated",
+                "edit": self.base_state == "calculated",
+                "default_of_order_id": self.order_id and self.order_id.id or False,
+                "default_of_fiscal_position_id": self.fiscal_position_id and self.fiscal_position_id.id or False,
+                "default_of_template_id": self.template_id and self.template_id.id or False,
+                "default_of_employee_ids": [Command.set([employee.id for employee in self.employee_ids])],
             }
         )
-        if self.base_state != 'calculated' or self.state == 'done':
+        if self.base_state != "calculated" or self.state == "done":
             # Inhibit creation in calendar view if the job cannot be scheduled (draft, cancelled, completed)
-            action_context['inhibit_create'] = True
+            action_context["inhibit_create"] = True
             message_detail = (
                 _("an intervention who is done")
-                if self.state == 'done'
+                if self.state == "done"
                 else (
-                    self.base_state == 'cancel'
+                    self.base_state == "cancel"
                     and _("an intervention who is cancelled")
                     or _("an intervention who is not confirmed")
                 )
             )
-            action_context['inhibit_create'] = _("You cannot create an appointment for %s.") % message_detail
+            action_context["inhibit_create"] = _("You cannot create an appointment for %s.") % message_detail
         if self.line_ids:
             # Generating the lines here did not work, so we indicate in the context that they should be generated.
             # They will then be generated in the onchange_request_id
-            action_context['of_import_request_lines'] = True
+            action_context["of_import_request_lines"] = True
 
         return action_context
 
     def _affect_service_request_number(self):
-        for request in self.filtered(lambda r: r.base_state == 'calculated' and not r.number):
-            request.write({'number': self.env['ir.sequence'].next_by_code('of.service.request')})
+        for request in self.filtered(lambda r: r.base_state == "calculated" and not r.number):
+            request.write({"number": self.env["ir.sequence"].next_by_code("of.service.request")})
 
     def _recompute_taxes(self):
         self.ensure_one()
@@ -1267,13 +1267,13 @@ class OFServiceRequest(models.Model):
         """
         request_count = len(self)
         if request_count == 1:
-            views = [(self.env.ref('of_service_request_view_form', raise_if_not_found=False).id, 'form')]
-            views.extend(view for view in action['views'] if view[1] != 'form')
-            action['views'] = views
+            views = [(self.env.ref("of_service_request_view_form", raise_if_not_found=False).id, "form")]
+            views.extend(view for view in action["views"] if view[1] != "form")
+            action["views"] = views
             return action
         else:
-            if tree_view := self.env.ref('of_service_request_view_tree', raise_if_not_found=False):
-                views = [(tree_view.id, 'tree')]
-                views.extend(view for view in action['views'] if view[1] != 'tree')
-                action['views'] = views
+            if tree_view := self.env.ref("of_service_request_view_tree", raise_if_not_found=False):
+                views = [(tree_view.id, "tree")]
+                views.extend(view for view in action["views"] if view[1] != "tree")
+                action["views"] = views
         return action

@@ -8,7 +8,7 @@ from .employee_type import Employee
 
 
 class EmployeeCreate(graphene.Mutation):
-    _name = 'EmployeeCreate'
+    _name = "EmployeeCreate"
 
     class Arguments:
         name = graphene.String()
@@ -19,13 +19,13 @@ class EmployeeCreate(graphene.Mutation):
     Output = Employee
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['hr.employee']._prepare_mutation_values(**args)
-        return env['hr.employee'].create(values)
+        env = info.context["env"]
+        values = env["hr.employee"]._prepare_mutation_values(**args)
+        return env["hr.employee"].create(values)
 
 
 class EmployeeUpdate(graphene.Mutation):
-    _name = 'EmployeeUpdate'
+    _name = "EmployeeUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -37,15 +37,15 @@ class EmployeeUpdate(graphene.Mutation):
     Output = Employee
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['hr.employee']._prepare_mutation_values(**args)
-        employee = env['hr.employee'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["hr.employee"]._prepare_mutation_values(**args)
+        employee = env["hr.employee"].search([("id", "=", id)])
         employee.write(values)
         return employee
 
 
 class EmployeeDelete(graphene.Mutation):
-    _name = 'EmployeeDelete'
+    _name = "EmployeeDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -53,13 +53,13 @@ class EmployeeDelete(graphene.Mutation):
     Output = Employee
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'hr.employee', id)
+        env = info.context["env"]
+        return lazy_delete(env, "hr.employee", id)
 
 
 class EmployeeMutation(graphene.ObjectType):
-    _name = 'EmployeeMutation'
-    _type = 'mutation'
+    _name = "EmployeeMutation"
+    _type = "mutation"
 
     employee_create = EmployeeCreate.Field()
     employee_update = EmployeeUpdate.Field()

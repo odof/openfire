@@ -6,12 +6,12 @@ from odoo import api, fields, models
 class OFSaleOrderVerification(models.TransientModel):
     """Base Transient model to do specific verifications on Sale Order confirmation."""
 
-    _name = 'of.sale.order.verification'
+    _name = "of.sale.order.verification"
     _description = __doc__
 
     message = fields.Text()
     type = fields.Selection(selection=[])
-    order_id = fields.Many2one(comodel_name='sale.order', string="Sale order")
+    order_id = fields.Many2one(comodel_name="sale.order", string="Sale order")
 
     @api.model
     def do_verification(self, order):
@@ -55,13 +55,13 @@ class OFSaleOrderVerification(models.TransientModel):
         """
         context = self.env.context.copy()
         return {
-            'type': 'ir.actions.act_window',
-            'name': title,
-            'res_model': 'of.sale.order.verification',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': context,
+            "type": "ir.actions.act_window",
+            "name": title,
+            "res_model": "of.sale.order.verification",
+            "view_type": "form",
+            "view_mode": "form",
+            "target": "new",
+            "context": context,
         }
 
     def validate_step(self):

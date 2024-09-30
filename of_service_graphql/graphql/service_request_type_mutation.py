@@ -9,7 +9,7 @@ from .service_request_type_type import ServiceRequestType
 
 
 class ServiceRequestTypeCreate(graphene.Mutation):
-    _name = 'ServiceRequestTypeCreate'
+    _name = "ServiceRequestTypeCreate"
 
     class Arguments:
         name = graphene.String()
@@ -18,13 +18,13 @@ class ServiceRequestTypeCreate(graphene.Mutation):
     Output = ServiceRequestType
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.service.request.type']._prepare_mutation_values(**args)
-        return env['of.service.request.type'].create(values)
+        env = info.context["env"]
+        values = env["of.service.request.type"]._prepare_mutation_values(**args)
+        return env["of.service.request.type"].create(values)
 
 
 class ServiceRequestTypeUpdate(graphene.Mutation):
-    _name = 'ServiceRequestTypeUpdate'
+    _name = "ServiceRequestTypeUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -34,15 +34,15 @@ class ServiceRequestTypeUpdate(graphene.Mutation):
     Output = ServiceRequestType
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.service.request.type']._prepare_mutation_values(**args)
-        request_type = env['of.service.request.type'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.service.request.type"]._prepare_mutation_values(**args)
+        request_type = env["of.service.request.type"].search([("id", "=", id)])
         request_type.write(values)
         return request_type
 
 
 class ServiceRequestTypeDelete(graphene.Mutation):
-    _name = 'ServiceRequestTypeDelete'
+    _name = "ServiceRequestTypeDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -50,13 +50,13 @@ class ServiceRequestTypeDelete(graphene.Mutation):
     Output = ServiceRequestType
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.service.request.type', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.service.request.type", id)
 
 
 class ServiceRequestTypeMutation(graphene.ObjectType):
-    _name = 'ServiceRequestTypeMutation'
-    _type = 'mutation'
+    _name = "ServiceRequestTypeMutation"
+    _type = "mutation"
 
     service_request_type_create = ServiceRequestTypeCreate.Field()
     service_request_type_update = ServiceRequestTypeUpdate.Field()

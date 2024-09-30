@@ -4,20 +4,20 @@ from odoo import api, fields, models
 
 
 class OFResPartnerCheckDuplications(models.TransientModel):
-    _name = 'of.res.partner.check.duplications'
+    _name = "of.res.partner.check.duplications"
     _description = "Check Partner Duplications"
 
     @api.model
     def default_get(self, fields_list):
         result = super(OFResPartnerCheckDuplications, self).default_get(fields_list)
-        if 'duplication_ids' in result:
+        if "duplication_ids" in result:
             info_txt = ""
-            duplications = self.env['res.partner'].sudo().browse(result['duplication_ids'][0][2])
+            duplications = self.env["res.partner"].sudo().browse(result["duplication_ids"][0][2])
             for partner in duplications:
                 forbidden_access = False
                 try:
-                    partner.sudo(self._uid).check_access_rights('read')
-                    partner.sudo(self._uid).check_access_rule('read')
+                    partner.sudo(self._uid).check_access_rights("read")
+                    partner.sudo(self._uid).check_access_rule("read")
                 except Exception:
                     forbidden_access = True
                 if forbidden_access:
@@ -28,23 +28,23 @@ class OFResPartnerCheckDuplications(models.TransientModel):
                             "Please contact your manager about this:\n"
                         )
                     info_txt += "- %s\n" % partner.sudo().name
-            result['duplication_ids'] = duplications.ids
-            result['info_txt'] = info_txt
-            result['display_list'] = bool(duplications)
+            result["duplication_ids"] = duplications.ids
+            result["info_txt"] = info_txt
+            result["display_list"] = bool(duplications)
         return result
 
-    new_partner_id = fields.Many2one(comodel_name='res.partner', string="New partner")
-    duplication_ids = fields.Many2many(comodel_name='res.partner', string="Potential duplicates")
+    new_partner_id = fields.Many2one(comodel_name="res.partner", string="New partner")
+    duplication_ids = fields.Many2many(comodel_name="res.partner", string="Potential duplicates")
     info_txt = fields.Text(string="Info text")
     display_list = fields.Boolean(string="Display list")
 
     def action_merge_partners(self):
         self.ensure_one()
         return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'base.partner.merge.automatic.wizard',
-            'context': {'active_ids': (self.duplication_ids + self.new_partner_id).ids},
-            'target': 'new',
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "base.partner.merge.automatic.wizard",
+            "context": {"active_ids": (self.duplication_ids + self.new_partner_id).ids},
+            "target": "new",
         }

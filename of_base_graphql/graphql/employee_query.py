@@ -8,8 +8,8 @@ from .employee_type import Employee, EmployeeFilterInput
 
 
 class EmployeeQuery(graphene.ObjectType):
-    _name = 'EmployeeQuery'
-    _type = 'query'
+    _name = "EmployeeQuery"
+    _type = "query"
 
     employees = graphene.List(
         graphene.NonNull(Employee),
@@ -21,8 +21,8 @@ class EmployeeQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_employees(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['hr.employee']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["hr.employee"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['hr.employee'].search(odoo_domain, offset=offset, limit=limit)
+        return env["hr.employee"].search(odoo_domain, offset=offset, limit=limit)

@@ -9,7 +9,7 @@ from .stock_warehouse_type import StockWarehouse
 
 
 class StockWarehouseCreate(graphene.Mutation):
-    _name = 'StockWarehouseCreate'
+    _name = "StockWarehouseCreate"
 
     class Arguments:
         name = graphene.String()
@@ -18,13 +18,13 @@ class StockWarehouseCreate(graphene.Mutation):
     Output = StockWarehouse
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['stock.warehouse']._prepare_mutation_values(**args)
-        return env['stock.warehouse'].create(values)
+        env = info.context["env"]
+        values = env["stock.warehouse"]._prepare_mutation_values(**args)
+        return env["stock.warehouse"].create(values)
 
 
 class StockWarehouseUpdate(graphene.Mutation):
-    _name = 'StockWarehouseUpdate'
+    _name = "StockWarehouseUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -34,15 +34,15 @@ class StockWarehouseUpdate(graphene.Mutation):
     Output = StockWarehouse
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['stock.warehouse']._prepare_mutation_values(**args)
-        warehouse = env['stock.warehouse'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["stock.warehouse"]._prepare_mutation_values(**args)
+        warehouse = env["stock.warehouse"].search([("id", "=", id)])
         warehouse.write(values)
         return warehouse
 
 
 class StockWarehouseDelete(graphene.Mutation):
-    _name = 'StockWarehouseDelete'
+    _name = "StockWarehouseDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -50,13 +50,13 @@ class StockWarehouseDelete(graphene.Mutation):
     Output = StockWarehouse
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'stock.warehouse', id)
+        env = info.context["env"]
+        return lazy_delete(env, "stock.warehouse", id)
 
 
 class StockWarehouseMutation(graphene.ObjectType):
-    _name = 'StockWarehouseMutation'
-    _type = 'mutation'
+    _name = "StockWarehouseMutation"
+    _type = "mutation"
 
     stock_warehouse_create = StockWarehouseCreate.Field()
     stock_warehouse_update = StockWarehouseUpdate.Field()

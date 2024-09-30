@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFProductBrand(models.Model):
-    _inherit = 'of.product.brand'
+    _inherit = "of.product.brand"
 
     of_mobile_available = fields.Boolean(string="Mobile Brand")
 

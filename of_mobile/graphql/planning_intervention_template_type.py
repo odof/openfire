@@ -12,20 +12,20 @@ from .planning_intervention_template_additional_line_type import (
 
 
 class PlanningInterventionTemplate(OdooObjectType):
-    _name = 'PlanningInterventionTemplate'
-    _type = 'types'
+    _name = "PlanningInterventionTemplate"
+    _type = "types"
 
     additional_line_ids = graphene.List(graphene.NonNull(PlanningInterventionTemplateAdditionalLine))
     send_reports = graphene.String(required=True)
     mobile_payment = graphene.Boolean()
-    payment_mode_ids = graphene.List(graphene.NonNull(PaymentMode), name='paymentModes')
+    payment_mode_ids = graphene.List(graphene.NonNull(PaymentMode), name="paymentModes")
     auto_confirm_invoice = graphene.Boolean()
     mobile = graphene.Boolean()
 
 
 class PlanningInterventionTemplateInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionTemplateInput'
-    _type = 'types'
+    _name = "PlanningInterventionTemplateInput"
+    _type = "types"
 
     additional_lines = graphene.List(graphene.NonNull(PlanningInterventionTemplateAdditionalLineInput))
     send_reports = graphene.String()
@@ -36,4 +36,4 @@ class PlanningInterventionTemplateInput(graphene.InputObjectType):
 
 
 class PlanningInterventionTemplateFilterInput(PlanningInterventionTemplateInput):
-    _name = 'PlanningInterventionTemplateFilterInput'
+    _name = "PlanningInterventionTemplateFilterInput"

@@ -4,10 +4,10 @@ from odoo import fields, models
 
 
 class AccountTax(models.Model):
-    _inherit = 'account.tax'
+    _inherit = "account.tax"
 
     of_account_ids = fields.One2many(
-        comodel_name='of.account.tax.account', inverse_name='tax_id', string="Account matching", copy=True
+        comodel_name="of.account.tax.account", inverse_name="tax_id", string="Account matching", copy=True
     )
 
     def map_account(self, account):

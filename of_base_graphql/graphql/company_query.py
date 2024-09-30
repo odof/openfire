@@ -9,8 +9,8 @@ from .company_type import CompanyFilterInput
 
 
 class CompanyQuery(graphene.ObjectType):
-    _name = 'CompanyQuery'
-    _type = 'query'
+    _name = "CompanyQuery"
+    _type = "query"
 
     companies = graphene.List(
         graphene.NonNull(Company),
@@ -22,8 +22,8 @@ class CompanyQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_companies(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['res.company']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["res.company"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['res.company'].search(odoo_domain, offset=offset, limit=limit)
+        return env["res.company"].search(odoo_domain, offset=offset, limit=limit)

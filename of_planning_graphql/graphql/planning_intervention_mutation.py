@@ -23,7 +23,7 @@ from .planning_intervention_type import PlanningIntervention
 
 
 class PlanningInterventionCreate(graphene.Mutation):
-    _name = 'PlanningInterventionCreate'
+    _name = "PlanningInterventionCreate"
 
     class Arguments:
         name = graphene.String()
@@ -65,16 +65,16 @@ class PlanningInterventionCreate(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, **args):
-        env = info.context['env']
+        env = info.context["env"]
         # ici on met origin=WEB par défaut
-        if not args.get('origin', False):
-            args['origin'] = 'WEB'
-        values = env['calendar.event']._prepare_mutation_values(**args)
-        return env['calendar.event'].create(values)
+        if not args.get("origin", False):
+            args["origin"] = "WEB"
+        values = env["calendar.event"]._prepare_mutation_values(**args)
+        return env["calendar.event"].create(values)
 
 
 class PlanningInterventionUpdate(graphene.Mutation):
-    _name = 'PlanningInterventionUpdate'
+    _name = "PlanningInterventionUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -117,17 +117,17 @@ class PlanningInterventionUpdate(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        if not args.get('origin', False):  # ici on met origin=WEB par défaut
-            args['origin'] = 'WEB'
-        values = env['calendar.event']._prepare_mutation_values(**args)
-        intervention = env['calendar.event'].search([('id', '=', id)])
+        env = info.context["env"]
+        if not args.get("origin", False):  # ici on met origin=WEB par défaut
+            args["origin"] = "WEB"
+        values = env["calendar.event"]._prepare_mutation_values(**args)
+        intervention = env["calendar.event"].search([("id", "=", id)])
         intervention.write(values)
         return intervention
 
 
 class PlanningInterventionDelete(graphene.Mutation):
-    _name = 'PlanningInterventionDelete'
+    _name = "PlanningInterventionDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -135,14 +135,14 @@ class PlanningInterventionDelete(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'calendar.event', id)
+        return lazy_delete(env, "calendar.event", id)
 
 
 class PlanningInterventionMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionMutation"
+    _type = "mutation"
 
     planning_intervention_update = PlanningInterventionUpdate.Field()
     planning_intervention_create = PlanningInterventionCreate.Field()

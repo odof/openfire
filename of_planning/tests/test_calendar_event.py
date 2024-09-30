@@ -9,47 +9,47 @@ from odoo.tests import Form, tagged
 from odoo.addons.of_planning.tests.common import TestOFPlanningCommon
 
 
-@tagged('openfire_planning')
+@tagged("openfire_planning")
 class TestCalendarEvent(TestOFPlanningCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.event = cls.env['calendar.event'].create(
+        cls.event = cls.env["calendar.event"].create(
             {
-                'name': 'Test Event',
-                'of_type': 'intervention',
-                'start': fields.Datetime.now(),
-                'of_company_id': cls.company_fr.id,
-                'of_employee_ids': [Command.set([cls.employee_tech_johnny.id])],
-                'of_partner_id': cls.customer_a.id,
+                "name": "Test Event",
+                "of_type": "intervention",
+                "start": fields.Datetime.now(),
+                "of_company_id": cls.company_fr.id,
+                "of_employee_ids": [Command.set([cls.employee_tech_johnny.id])],
+                "of_partner_id": cls.customer_a.id,
             }
         )
-        cls.warehouse_1 = cls.env['stock.warehouse'].search([('company_id', '=', cls.company_fr.id)], limit=1)
+        cls.warehouse_1 = cls.env["stock.warehouse"].search([("company_id", "=", cls.company_fr.id)], limit=1)
 
     def test_01_employees_capabilities_nok(self):
         dt_now = fields.Datetime.now()
         with self.assertRaises(ValidationError):  # Jean does not know how to install a stove
             with Form(
-                self.env['calendar.event'].with_context(
-                    default_of_type='intervention',
+                self.env["calendar.event"].with_context(
+                    default_of_type="intervention",
                     default_start=dt_now,
                     default_of_company_id=self.company_fr.id,
                 )
             ) as event_form:
-                event_form.name = 'Test Event'
+                event_form.name = "Test Event"
                 event_form.of_template_id = self.template_installation
                 event_form.of_employee_ids.add(self.employee_tech_jean)
 
     def test_02_employees_capabilities_ok(self):
         dt_now = fields.Datetime.now()
         with Form(
-            self.env['calendar.event'].with_context(
-                default_of_type='intervention',
+            self.env["calendar.event"].with_context(
+                default_of_type="intervention",
                 default_start=dt_now,
                 default_of_company_id=self.company_fr.id,
             )
         ) as event_form:
-            event_form.name = 'Test Event'
+            event_form.name = "Test Event"
             event_form.of_template_id = self.template_installation
             event_form.of_employee_ids.add(self.employee_tech_bruce)
             event_form.save()
@@ -60,13 +60,13 @@ class TestCalendarEvent(TestOFPlanningCommon):
     def test_03_employees_capabilities_both_one_is_ok(self):
         dt_now = fields.Datetime.now()
         with Form(
-            self.env['calendar.event'].with_context(
-                default_of_type='intervention',
+            self.env["calendar.event"].with_context(
+                default_of_type="intervention",
                 default_start=dt_now,
                 default_of_company_id=self.company_fr.id,
             )
         ) as event_form:
-            event_form.name = 'Test Event'
+            event_form.name = "Test Event"
             event_form.of_template_id = self.template_installation
             event_form.of_employee_ids.add(self.employee_tech_jean)
             event_form.of_employee_ids.add(self.employee_tech_bruce)
@@ -88,29 +88,29 @@ class TestCalendarEvent(TestOFPlanningCommon):
         to generate stock picking for both events. It expects a UserError to be raised
         with the message "Aucun produit à livrer dans les interventions sélectionnées."
         """
-        event1 = self.env['calendar.event'].create(
+        event1 = self.env["calendar.event"].create(
             {
-                'name': 'Event 1',
-                'of_type': 'intervention',
-                'start': fields.Datetime.now(),
-                'stop': fields.Datetime.now() + timedelta(hours=1),
-                'of_company_id': self.company_fr.id,
-                'of_partner_id': self.customer_a.id,
+                "name": "Event 1",
+                "of_type": "intervention",
+                "start": fields.Datetime.now(),
+                "stop": fields.Datetime.now() + timedelta(hours=1),
+                "of_company_id": self.company_fr.id,
+                "of_partner_id": self.customer_a.id,
             }
         )
-        event2 = self.env['calendar.event'].create(
+        event2 = self.env["calendar.event"].create(
             {
-                'name': 'Event 2',
-                'of_type': 'intervention',
-                'start': fields.Datetime.now(),
-                'stop': fields.Datetime.now() + timedelta(hours=1),
-                'of_company_id': self.company_fr.id,
-                'of_partner_id': self.customer_a.id,
+                "name": "Event 2",
+                "of_type": "intervention",
+                "start": fields.Datetime.now(),
+                "stop": fields.Datetime.now() + timedelta(hours=1),
+                "of_company_id": self.company_fr.id,
+                "of_partner_id": self.customer_a.id,
             }
         )
 
         with self.assertRaises(UserError) as error:
-            self.env['calendar.event'].browse([event1.id, event2.id]).action_generate_stock_picking()
+            self.env["calendar.event"].browse([event1.id, event2.id]).action_generate_stock_picking()
         self.assertEqual(error.exception.args[0], "Aucun produit à livrer dans les interventions sélectionnées.")
 
     def test_06_action_generate_stock_picking_with_product(self):
@@ -122,19 +122,19 @@ class TestCalendarEvent(TestOFPlanningCommon):
         It checks that a stock picking is generated, the picking's state is confirmed, and the correct product is
         included in the picking.
         """
-        self.env['res.config.settings'].create(
+        self.env["res.config.settings"].create(
             {
-                'group_intervention_use_deliveries': True,
+                "group_intervention_use_deliveries": True,
             }
         ).execute()
 
         # On ajoute une ligne de facturation
-        self.event.of_invoice_policy = 'delivery'
-        self.env['of.planning.intervention.line'].create(
+        self.event.of_invoice_policy = "delivery"
+        self.env["of.planning.intervention.line"].create(
             {
-                'intervention_id': self.event.id,
-                'product_id': self.product_ash_vacuum_cleaner.id,
-                'qty': 1,
+                "intervention_id": self.event.id,
+                "product_id": self.product_ash_vacuum_cleaner.id,
+                "qty": 1,
             }
         )
 
@@ -151,24 +151,24 @@ class TestCalendarEvent(TestOFPlanningCommon):
         # Un premier BL est généré
         self.event.action_generate_stock_picking()
         self.assertEqual(len(self.event.of_picking_ids), 1)
-        self.assertEqual(self.event.of_picking_ids[0].state, 'confirmed')
+        self.assertEqual(self.event.of_picking_ids[0].state, "confirmed")
         self.assertEqual(len(self.event.of_picking_ids[0].move_ids_without_package), 1)
         self.assertEqual(
             self.event.of_picking_ids[0].move_ids_without_package[0].product_id, self.product_ash_vacuum_cleaner
         )
 
-        self.env['of.planning.intervention.line'].create(
+        self.env["of.planning.intervention.line"].create(
             {
-                'intervention_id': self.event.id,
-                'product_id': self.product_wood_stove.id,
-                'qty': 1,
+                "intervention_id": self.event.id,
+                "product_id": self.product_wood_stove.id,
+                "qty": 1,
             }
         )
 
         # Une ligne est ajouté au premier BL
         self.event.action_generate_stock_picking()
         self.assertEqual(len(self.event.of_picking_ids), 1)
-        self.assertEqual(self.event.of_picking_ids[0].state, 'confirmed')
+        self.assertEqual(self.event.of_picking_ids[0].state, "confirmed")
         self.assertEqual(len(self.event.of_picking_ids[0].move_ids_without_package), 2)
         self.assertEqual(self.event.of_picking_ids[0].move_ids_without_package[1].product_id, self.product_wood_stove)
 
@@ -184,20 +184,20 @@ class TestCalendarEvent(TestOFPlanningCommon):
         self.event.of_picking_ids[0].move_ids_without_package[0].quantity_done = 1
         self.event.of_picking_ids[0].move_ids_without_package[1].quantity_done = 1
         self.event.of_picking_ids[0].button_validate()
-        self.assertEqual(self.event.of_picking_ids[0].state, 'done')
+        self.assertEqual(self.event.of_picking_ids[0].state, "done")
 
         # On rajoute une ligne de facturation, on regénère un BL.
         # Un nouveau BL doit être généré car le premier est confirmé
-        self.env['of.planning.intervention.line'].create(
+        self.env["of.planning.intervention.line"].create(
             {
-                'intervention_id': self.event.id,
-                'product_id': self.product_wood_stove.id,
-                'qty': 1,
+                "intervention_id": self.event.id,
+                "product_id": self.product_wood_stove.id,
+                "qty": 1,
             }
         )
         self.event.action_generate_stock_picking()
         self.assertEqual(len(self.event.of_picking_ids), 2)
-        self.assertEqual(self.event.of_picking_ids[1].state, 'confirmed')
+        self.assertEqual(self.event.of_picking_ids[1].state, "confirmed")
         self.assertEqual(len(self.event.of_picking_ids[1].move_ids_without_package), 1)
         self.assertEqual(self.event.of_picking_ids[1].move_ids_without_package[0].product_uom_qty, 1)
 
@@ -257,12 +257,12 @@ class TestCalendarEvent(TestOFPlanningCommon):
         self.assertEqual(len(self.event.of_invoice_ids), 1)
         self.assertRecordValues(
             self.event.of_invoice_ids,
-            [{'state': 'draft', 'amount_untaxed': 125.0, 'amount_tax': 25.0, 'amount_total': 150.0}],
+            [{"state": "draft", "amount_untaxed": 125.0, "amount_tax": 25.0, "amount_total": 150.0}],
         )
         self.assertEqual(len(self.event.of_invoice_ids.invoice_line_ids), 1)
         self.assertRecordValues(
             self.event.of_invoice_ids.invoice_line_ids,
-            [{'product_id': self.product_ash_vacuum_cleaner.id, 'quantity': 1, 'price_unit': 125.0}],
+            [{"product_id": self.product_ash_vacuum_cleaner.id, "quantity": 1, "price_unit": 125.0}],
         )
         self._assert_invoice_create_result(
             "<p>La facturation n'a pas pu être complétée car :<br/><ul><li>Il n'y a pas de ligne de facturation "
@@ -270,16 +270,16 @@ class TestCalendarEvent(TestOFPlanningCommon):
         )
 
         # Add a new line falsy linked to a sale order line that should not be invoiced
-        false_order = self.env['sale.order'].create(
+        false_order = self.env["sale.order"].create(
             {
-                'partner_id': self.customer_a.id,
-                'fiscal_position_id': self.fiscal_pos_20.id,
-                'order_line': [
+                "partner_id": self.customer_a.id,
+                "fiscal_position_id": self.fiscal_pos_20.id,
+                "order_line": [
                     Command.create(
                         {
-                            'product_id': self.product_wood_stove.id,
-                            'product_uom_qty': 1,
-                            'price_unit': 125.0,
+                            "product_id": self.product_wood_stove.id,
+                            "product_uom_qty": 1,
+                            "price_unit": 125.0,
                         },
                     )
                 ],
@@ -287,13 +287,13 @@ class TestCalendarEvent(TestOFPlanningCommon):
         )
         self.event.write(
             {
-                'of_line_ids': [
+                "of_line_ids": [
                     Command.create(
                         {
-                            'product_id': self.product_ash_vacuum_cleaner.id,
-                            'qty': 1,
-                            'price_unit': 125.0,
-                            'order_line_id': false_order.order_line[0].id,
+                            "product_id": self.product_ash_vacuum_cleaner.id,
+                            "qty": 1,
+                            "price_unit": 125.0,
+                            "order_line_id": false_order.order_line[0].id,
                         }
                     )
                 ]
@@ -316,8 +316,8 @@ class TestCalendarEvent(TestOFPlanningCommon):
         self.assertRecordValues(
             self.event.of_invoice_ids,
             [
-                {'state': 'draft', 'amount_untaxed': 125.0, 'amount_tax': 25.0, 'amount_total': 150.0},
-                {'state': 'draft', 'amount_untaxed': 125.0, 'amount_tax': 25.0, 'amount_total': 150.0},
+                {"state": "draft", "amount_untaxed": 125.0, "amount_tax": 25.0, "amount_total": 150.0},
+                {"state": "draft", "amount_untaxed": 125.0, "amount_tax": 25.0, "amount_total": 150.0},
             ],
         )
         self.assertEqual(len(self.event.of_invoice_ids.invoice_line_ids), 2)
@@ -325,19 +325,19 @@ class TestCalendarEvent(TestOFPlanningCommon):
     def _assert_invoice_create_result(self, message):
         result = self.event.action_create_invoice()
         self.assertIsInstance(result, dict)
-        self.assertEqual(result['res_model'], 'of.popup.wizard')
-        self.assertEqual(result['context']['default_message_html'], message)
+        self.assertEqual(result["res_model"], "of.popup.wizard")
+        self.assertEqual(result["context"]["default_message_html"], message)
 
     def test_08_set_employee_ids(self):
         dt_now = fields.Datetime.now()
         with Form(
-            self.env['calendar.event'].with_context(
-                default_of_type='intervention',
+            self.env["calendar.event"].with_context(
+                default_of_type="intervention",
                 default_start=dt_now,
                 default_of_company_id=self.company_fr.id,
             )
         ) as event_form:
-            event_form.name = 'Test Event'
+            event_form.name = "Test Event"
             event_form.of_template_id = self.template_installation
             event_form.of_employee_ids.add(self.employee_tech_bruce)
             event_form.save()

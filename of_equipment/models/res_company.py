@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     of_equipment_auto_create = fields.Boolean(
         string="(OF) Automatic creation of equipment",

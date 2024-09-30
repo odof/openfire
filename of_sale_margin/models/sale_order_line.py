@@ -4,18 +4,18 @@ from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    _inherit = "sale.order.line"
 
     of_seller_price = fields.Float(
         string="Purchase price",
-        compute='_compute_of_seller_price',
+        compute="_compute_of_seller_price",
         store=True,
-        digits='Product Price',
+        digits="Product Price",
         readonly=False,
         precompute=True,
     )
 
-    @api.depends('product_id', 'company_id', 'currency_id', 'product_uom')
+    @api.depends("product_id", "company_id", "currency_id", "product_uom")
     def _compute_purchase_price(self):
         """Override to use the theoretical cost instead of the standard cost price when the cost method is not set to
         'standard'
@@ -28,7 +28,7 @@ class SaleOrderLine(models.Model):
             product_cost = line.product_id.get_cost()
             line.purchase_price = line._convert_price(product_cost, line.product_id.uom_id)
 
-    @api.depends('product_id', 'company_id', 'currency_id', 'product_uom')
+    @api.depends("product_id", "company_id", "currency_id", "product_uom")
     def _compute_of_seller_price(self):
         for line in self:
             if line.product_id:
@@ -70,25 +70,25 @@ class SaleOrderLine(models.Model):
         The default behavior displays the margin as a float <= 1.0, which is not very user-friendly.
         This method displays the margin as a percentage instead.
         """
-        fname = 'margin_percent'
+        fname = "margin_percent"
         field = self._fields.get(fname)
         func = field and field.group_operator  # default is `sum`
-        if f'{fname}:{func}' in fields:
-            for depends_field in ('margin', 'price_subtotal'):
-                if f'{depends_field}:{func}' not in fields:
-                    fields.append(f'{depends_field}:{func}')
+        if f"{fname}:{func}" in fields:  # noqa
+            for depends_field in ("margin", "price_subtotal"):
+                if f"{depends_field}:{func}" not in fields:  # noqa
+                    fields.append(f"{depends_field}:{func}")  # noqa
 
         res = super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
 
-        if f'{fname}:{func}' in fields:
+        if f"{fname}:{func}" in fields:  # noqa
             for line in res:
                 if (
-                    'margin' in line
-                    and line['margin'] is not None
-                    and 'price_subtotal' in line
-                    and line['price_subtotal']
+                    "margin" in line
+                    and line["margin"] is not None
+                    and "price_subtotal" in line
+                    and line["price_subtotal"]
                 ):
-                    line['margin_percent'] = round(100.0 * line['margin'] / line['price_subtotal'], 2)
+                    line["margin_percent"] = round(100.0 * line["margin"] / line["price_subtotal"], 2)
                 else:
-                    line['margin_percent'] = 0.0
+                    line["margin_percent"] = 0.0
         return res

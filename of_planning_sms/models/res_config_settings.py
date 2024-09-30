@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFSMSConfiguration(models.TransientModel):
-    _inherit = 'res.config.settings'
+    _inherit = "res.config.settings"
 
     of_team_alert_intervention_sms = fields.Boolean(
         string="Teams alert",

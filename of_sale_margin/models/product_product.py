@@ -4,7 +4,7 @@ from odoo import models
 
 
 class ProductProduct(models.Model):
-    _inherit = 'product.product'
+    _inherit = "product.product"
 
     def get_cost(self):
         """Get the cost price of the product. This method is used in the _compute_purchase_price method of

@@ -4,17 +4,17 @@ from odoo import Command, models
 
 
 class ResGroups(models.Model):
-    _inherit = 'res.groups'
+    _inherit = "res.groups"
 
     def write(self, vals):
-        if 'users' in vals and not self.env.context.get('of_avoid_check_tours_groups'):
-            tour_groups = self.env.ref('of_planning_tour.group_of_planning_tour_manual_creation') | self.env.ref(
-                'of_planning_tour.group_of_planning_tour_no_manual_creation'
+        if "users" in vals and not self.env.context.get("of_avoid_check_tours_groups"):
+            tour_groups = self.env.ref("of_planning_tour.group_of_planning_tour_manual_creation") | self.env.ref(
+                "of_planning_tour.group_of_planning_tour_no_manual_creation"
             )
             saved_users_data = {group.id: group.users.ids for group in self.filtered(lambda g: g in tour_groups)}
         res = super().write(vals)
 
-        if 'users' in vals and not self.env.context.get('of_avoid_check_tours_groups'):
+        if "users" in vals and not self.env.context.get("of_avoid_check_tours_groups"):
             self._handle_tour_group_update(saved_users_data)
         return res
 
@@ -32,8 +32,8 @@ class ResGroups(models.Model):
         Returns:
             None
         """
-        group_tour_manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_manual_creation')
-        group_tour_no_manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_no_manual_creation')
+        group_tour_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
+        group_tour_no_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
         for group in self:
             added_users_ids = set(group.users.ids) - set(saved_vals.get(group.id, []))
             removed_users_ids = set(saved_vals.get(group.id, [])) - set(group.users.ids)
@@ -43,7 +43,7 @@ class ResGroups(models.Model):
             if added_users_ids or removed_users_ids:
                 inverse_group.with_context(of_avoid_check_tours_groups=True).write(
                     {
-                        'users': [
+                        "users": [
                             Command.unlink(user_id) for user_id in added_users_ids if user_id in inverse_group.users.ids
                         ]
                         + [

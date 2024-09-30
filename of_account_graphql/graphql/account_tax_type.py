@@ -6,14 +6,14 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class AccountTaxType(graphene.Enum):
-    SALE = 'sale'
-    PURCHASE = 'purchase'
-    NONE = 'none'
+    SALE = "sale"
+    PURCHASE = "purchase"
+    NONE = "none"
 
 
 class AccountTax(OdooObjectType):
-    _name = 'AccountTax'
-    _type = 'types'
+    _name = "AccountTax"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -23,8 +23,8 @@ class AccountTax(OdooObjectType):
 
 
 class AccountTaxInput(graphene.InputObjectType):
-    _name = 'AccountInput'
-    _type = 'types'
+    _name = "AccountInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -33,4 +33,4 @@ class AccountTaxInput(graphene.InputObjectType):
 
 
 class AccountTaxFilterInput(AccountTaxInput):
-    _name = 'AccountFilterInput'
+    _name = "AccountFilterInput"

@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class PurchaseReport(models.Model):
-    _inherit = 'purchase.report'
+    _inherit = "purchase.report"
 
-    of_brand_id = fields.Many2one(comodel_name='of.product.brand', string="Brand", readonly=True)
+    of_brand_id = fields.Many2one(comodel_name="of.product.brand", string="Brand", readonly=True)
 
     def _select(self):
         select_str = super()._select()

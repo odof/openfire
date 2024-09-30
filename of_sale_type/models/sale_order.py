@@ -4,9 +4,9 @@ from odoo import api, models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
-    @api.onchange('sale_order_template_id')
+    @api.onchange("sale_order_template_id")
     def _onchange_sale_order_template_id(self):
         res = super()._onchange_sale_order_template_id()
         sale_order_template = self.sale_order_template_id.with_context(lang=self.partner_id.lang)

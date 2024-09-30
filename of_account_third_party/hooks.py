@@ -15,29 +15,29 @@ def configure_codes_for_partners(env):
     """
     company = env.user.company_id
 
-    xml_obj = env['ir.model.data']
-    sequence_obj = env['ir.sequence']
+    xml_obj = env["ir.model.data"]
+    sequence_obj = env["ir.sequence"]
 
     vals = {}
 
-    customer_seq = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_customer_account')]).res_id)
+    customer_seq = sequence_obj.browse(xml_obj.search([("name", "like", "sequence_customer_account")]).res_id)
     if customer_seq and customer_seq.active:
         code = "'%s%%0%si%s' %% partner.id" % (
-            customer_seq.prefix or '',
+            customer_seq.prefix or "",
             customer_seq.padding,
-            customer_seq.suffix or '',
+            customer_seq.suffix or "",
         )
-        vals['of_customer_code'] = (code, 'partner.name')
+        vals["of_customer_code"] = (code, "partner.name")
         customer_seq.active = False
 
-    supplier_seq = sequence_obj.browse(xml_obj.search([('name', 'like', 'sequence_supplier_account')]).res_id)
+    supplier_seq = sequence_obj.browse(xml_obj.search([("name", "like", "sequence_supplier_account")]).res_id)
     if supplier_seq and supplier_seq.active:
         code = "'%s%%0%si%s' %% partner.id" % (
-            supplier_seq.prefix or '',
+            supplier_seq.prefix or "",
             supplier_seq.padding,
-            supplier_seq.suffix or '',
+            supplier_seq.suffix or "",
         )
-        vals['of_supplier_code'] = (code, 'partner.name')
+        vals["of_supplier_code"] = (code, "partner.name")
         supplier_seq.active = False
 
     company.write(vals)

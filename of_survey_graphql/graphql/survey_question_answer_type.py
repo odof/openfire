@@ -7,8 +7,8 @@ from odoo.addons.of_base_graphql.graphql.image_type import Image
 
 
 class SurveyQuestionAnswer(OdooObjectType):
-    _name = 'SurveyQuestionAnswer'
-    _type = 'types'
+    _name = "SurveyQuestionAnswer"
+    _type = "types"
 
     id = graphene.Int(required=True)
     value = graphene.String()
@@ -23,8 +23,8 @@ class SurveyQuestionAnswer(OdooObjectType):
 
 
 class SurveyQuestionAnswerInput(graphene.InputObjectType):
-    _name = 'SurveyQuestionAnswerInput'
-    _type = 'types'
+    _name = "SurveyQuestionAnswerInput"
+    _type = "types"
 
     id = graphene.Int()
     value = graphene.String()
@@ -34,4 +34,4 @@ class SurveyQuestionAnswerInput(graphene.InputObjectType):
 
 
 class SurveyQuestionAnswerFilterInput(SurveyQuestionAnswerInput):
-    _name = 'SurveyQuestionAnswerFilterInput'
+    _name = "SurveyQuestionAnswerFilterInput"

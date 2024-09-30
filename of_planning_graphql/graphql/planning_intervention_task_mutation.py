@@ -8,7 +8,7 @@ from .planning_intervention_task_type import PlanningInterventionTask
 
 
 class PlanningInterventionTaskCreate(graphene.Mutation):
-    _name = 'PlanningInterventionTaskCreate'
+    _name = "PlanningInterventionTaskCreate"
 
     class Arguments:
         name = graphene.String()
@@ -18,13 +18,13 @@ class PlanningInterventionTaskCreate(graphene.Mutation):
     Output = PlanningInterventionTask
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.planning.task']._prepare_mutation_values(**args)
-        return env['of.planning.task'].create(values)
+        env = info.context["env"]
+        values = env["of.planning.task"]._prepare_mutation_values(**args)
+        return env["of.planning.task"].create(values)
 
 
 class PlanningInterventionTaskUpdate(graphene.Mutation):
-    _name = 'PlanningInterventionTaskUpdate'
+    _name = "PlanningInterventionTaskUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -35,15 +35,15 @@ class PlanningInterventionTaskUpdate(graphene.Mutation):
     Output = PlanningInterventionTask
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.planning.task']._prepare_mutation_values(**args)
-        task = env['of.planning.task'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.planning.task"]._prepare_mutation_values(**args)
+        task = env["of.planning.task"].search([("id", "=", id)])
         task.write(values)
         return task
 
 
 class PlanningInterventionTaskDelete(graphene.Mutation):
-    _name = 'PlanningInterventionTaskDelete'
+    _name = "PlanningInterventionTaskDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -51,14 +51,14 @@ class PlanningInterventionTaskDelete(graphene.Mutation):
     Output = PlanningInterventionTask
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'of.planning.task', id)
+        return lazy_delete(env, "of.planning.task", id)
 
 
 class PlanningInterventionTaskMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionTaskMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionTaskMutation"
+    _type = "mutation"
 
     planning_intervention_task_create = PlanningInterventionTaskCreate.Field()
     planning_intervention_task_update = PlanningInterventionTaskUpdate.Field()

@@ -15,13 +15,13 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
 
         cls.product_standard_test = cls.create_product(
             {
-                'name': 'Product Standard Test',
-                'standard_price': 40,
-                'list_price': 100,
-                'brand_id': cls.product_brand_c.id,  # brand with show_in_sales set to False
-                'default_code': f'{cls.product_brand_c.code}_PST_123',
-                'of_manufacturer_description': False,
-                'of_standard_id': cls.product_standard.id,
+                "name": "Product Standard Test",
+                "standard_price": 40,
+                "list_price": 100,
+                "brand_id": cls.product_brand_c.id,  # brand with show_in_sales set to False
+                "default_code": f"{cls.product_brand_c.code}_PST_123",
+                "of_manufacturer_description": False,
+                "of_standard_id": cls.product_standard.id,
             }
         )
 
@@ -31,8 +31,8 @@ class TestOFProductStandardMoveLineName(TestOFProductStandardCommon):
     def test_01_account_move_line_compute_name(self):
         """Test that the name of the account move line is correctly computed when the product has a standard"""
         with Form(
-            self.env['account.move'].with_context(
-                default_move_type='out_invoice', default_journal_id=self.journal_sale.id
+            self.env["account.move"].with_context(
+                default_move_type="out_invoice", default_journal_id=self.journal_sale.id
             )
         ) as move_form:
             with move_form.invoice_line_ids.new() as line_form:

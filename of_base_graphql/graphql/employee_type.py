@@ -6,8 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class Employee(OdooObjectType):
-    _name = 'Employee'
-    _type = 'types'
+    _name = "Employee"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -17,8 +17,8 @@ class Employee(OdooObjectType):
 
 
 class EmployeeInput(graphene.InputObjectType):
-    _name = 'EmployeeInput'
-    _type = 'types'
+    _name = "EmployeeInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -28,4 +28,4 @@ class EmployeeInput(graphene.InputObjectType):
 
 
 class EmployeeFilterInput(EmployeeInput):
-    _name = 'EmployeeFilterInput'
+    _name = "EmployeeFilterInput"

@@ -4,18 +4,18 @@ from odoo import Command, api, fields, models
 
 
 class CalendarEvent(models.Model):
-    _inherit = 'calendar.event'
+    _inherit = "calendar.event"
 
     of_request_id = fields.Many2one(
-        comodel_name='of.service.request',
+        comodel_name="of.service.request",
         string="Service Request",
         domain="of_address_id and ['|', ('address_id', '=', of_address_id), ('partner_id', '=', of_address_id)] or []",
         help="Link a service request to your service to link these two objects.",
     )
     of_type_id = fields.Many2one(
-        comodel_name='of.service.request.type',
+        comodel_name="of.service.request.type",
         string="Type",
-        compute='_compute_of_type_id',
+        compute="_compute_of_type_id",
         store=True,
         readonly=False,
         help="The type of intervention allows you to categorize it:\n"
@@ -26,12 +26,12 @@ class CalendarEvent(models.Model):
         "* Technical visit\n",
     )
 
-    @api.depends('of_state', 'of_template_id')
+    @api.depends("of_state", "of_template_id")
     def _compute_of_type_id(self):
-        for event in self.filtered(lambda e: e.of_state == 'draft' and e.of_template_id and e.of_template_id.type_id):
+        for event in self.filtered(lambda e: e.of_state == "draft" and e.of_template_id and e.of_template_id.type_id):
             event.of_type_id = event.of_template_id.type_id
 
-    @api.onchange('of_request_id')
+    @api.onchange("of_request_id")
     def _onchange_of_request_id(self):
         if not self.of_request_id:
             return
@@ -46,7 +46,7 @@ class CalendarEvent(models.Model):
             # When the intervention has a request associated to it, the type is readonly in the XML and is
             # therefore not written. The type assignment is merely cosmetic here
             self.of_type_id = self.of_request_id.type_id
-        if self._context.get('of_import_request_lines'):
+        if self._context.get("of_import_request_lines"):
             self.of_fiscal_position_id = self.of_request_id.fiscal_position_id
             line_vals = [Command.clear()]
             line_vals.extend(
@@ -54,7 +54,7 @@ class CalendarEvent(models.Model):
             )
             self.of_line_ids = line_vals
         if (  # self._origin contains the values of the DB record
-            hasattr(self, '_origin')
+            hasattr(self, "_origin")
             and self._origin.of_request_id.note
             and self._origin.of_request_id.note in (self._origin.of_internal_description or "")
         ):

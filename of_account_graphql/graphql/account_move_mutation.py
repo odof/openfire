@@ -11,7 +11,7 @@ from .account_move_type import AccountMove
 
 
 class AccountMoveCreate(graphene.Mutation):
-    _name = 'AccountMoveCreate'
+    _name = "AccountMoveCreate"
 
     class Arguments:
         name = graphene.String()
@@ -22,13 +22,13 @@ class AccountMoveCreate(graphene.Mutation):
     Output = AccountMove
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        value = env['account.move']._prepare_mutation(**args)
-        return env['account.move'].create(value)
+        env = info.context["env"]
+        value = env["account.move"]._prepare_mutation(**args)
+        return env["account.move"].create(value)
 
 
 class AccountMoveUpdate(graphene.Mutation):
-    _name = 'AccountMoveUpdate'
+    _name = "AccountMoveUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -40,15 +40,15 @@ class AccountMoveUpdate(graphene.Mutation):
     Output = AccountMove
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        value = env['account.move']._prepare_mutation(**args)
-        account_move = env['account.move'].search([('id', '=', id)])
+        env = info.context["env"]
+        value = env["account.move"]._prepare_mutation(**args)
+        account_move = env["account.move"].search([("id", "=", id)])
         account_move.write(value)
         return account_move
 
 
 class AccountMoveDelete(graphene.Mutation):
-    _name = 'AccountMoveDelete'
+    _name = "AccountMoveDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -56,14 +56,14 @@ class AccountMoveDelete(graphene.Mutation):
     Output = AccountMove
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'account.move', id)
+        return lazy_delete(env, "account.move", id)
 
 
 class AccountMoveMutation(graphene.ObjectType):
-    _name = 'AccountMoveMutation'
-    _type = 'mutation'
+    _name = "AccountMoveMutation"
+    _type = "mutation"
 
     account_move_create = AccountMoveCreate.Field()
     account_move_update = AccountMoveUpdate.Field()

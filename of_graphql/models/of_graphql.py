@@ -22,7 +22,7 @@ class OFGraphql(models.AbstractModel):
     It allow us to use GraphQL with a similar inheritance system as Odoo models.
     """
 
-    _name = 'of.graphql'
+    _name = "of.graphql"
     _description = "OF Graphql Abstract Model"
 
     def _register_hook(self):
@@ -84,7 +84,7 @@ class OFGraphql(models.AbstractModel):
         arguments = self._prepare_arguments()
 
         # Patch the mutation classes with the arguments
-        for mutation in pool['mutation']:
+        for mutation in pool["mutation"]:
             if mutation._name in arguments.keys():
                 patch_arguments = arguments[mutation._name]
                 for prop in patch_arguments.keys():

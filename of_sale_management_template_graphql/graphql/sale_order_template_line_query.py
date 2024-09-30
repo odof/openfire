@@ -8,8 +8,8 @@ from .sale_order_template_line_type import SaleOrderTemplateLine, SaleOrderTempl
 
 
 class SaleOrderTemplateLineQuery(graphene.ObjectType):
-    _name = 'SaleOrderTemplateLineQuery'
-    _type = 'query'
+    _name = "SaleOrderTemplateLineQuery"
+    _type = "query"
 
     sale_template_lines = graphene.List(
         graphene.NonNull(SaleOrderTemplateLine),
@@ -21,7 +21,7 @@ class SaleOrderTemplateLineQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_sale_template_lines(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['sale.order.template.line']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["sale.order.template.line"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['sale.order.template.line'].search(odoo_domain, offset=offset, limit=limit)
+        return env["sale.order.template.line"].search(odoo_domain, offset=offset, limit=limit)

@@ -7,8 +7,8 @@ from odoo.addons.of_account_graphql.graphql.account_tax_type import AccountTax
 
 
 class AccountFiscalPosition(OdooObjectType):
-    _name = 'AccountFiscalPosition'
-    _type = 'types'
+    _name = "AccountFiscalPosition"
+    _type = "types"
 
     default_taxes = graphene.List(graphene.NonNull(AccountTax), required=True)
 

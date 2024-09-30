@@ -4,11 +4,11 @@ from odoo import _, models
 
 
 class ProductCategory(models.Model):
-    _inherit = 'product.category'
+    _inherit = "product.category"
 
     def copy_data(self, default=None):
         new_defaults = {
-            'name': _("%s (copy)") % (self.name),
+            "name": _("%s (copy)") % (self.name),
         }
         default = dict(new_defaults, **(default or {}))
         return super().copy_data(default)

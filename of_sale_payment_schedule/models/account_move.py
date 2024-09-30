@@ -4,7 +4,7 @@ from odoo import models
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     # TODO: Uncomment me and continue the migration when `of_account` module is migrated
     # def action_post(self):

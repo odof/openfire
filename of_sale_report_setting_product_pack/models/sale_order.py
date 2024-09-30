@@ -4,15 +4,15 @@ from odoo import fields, models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     of_pack_report_type = fields.Selection(
         selection=[
-            ('pack_only', "Pack Only"),
-            ('pack_components', "Pack and Components"),
-            ('pack_components_details', "Pack and Components with prices details"),
+            ("pack_only", "Pack Only"),
+            ("pack_components", "Pack and Components"),
+            ("pack_components_details", "Pack and Components with prices details"),
         ],
-        default='pack_components',
+        default="pack_components",
         string="Pack print configuration",
     )
 

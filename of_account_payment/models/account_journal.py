@@ -4,15 +4,15 @@ from odoo import api, models
 
 
 class AccountJournal(models.Model):
-    _inherit = 'account.journal'
+    _inherit = "account.journal"
 
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-        self.env['of.payment.mode'].action_update_mode_payment()
+        self.env["of.payment.mode"].action_update_mode_payment()
         return records
 
     def write(self, vals):
         res = super().write(vals)
-        self.env['of.payment.mode'].action_update_mode_payment()
+        self.env["of.payment.mode"].action_update_mode_payment()
         return res

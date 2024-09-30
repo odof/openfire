@@ -8,8 +8,8 @@ from .user_type import User, UserFilterInput
 
 
 class UserQuery(graphene.ObjectType):
-    _name = 'UserQuery'
-    _type = 'query'
+    _name = "UserQuery"
+    _type = "query"
 
     users = graphene.List(
         graphene.NonNull(User),
@@ -23,13 +23,13 @@ class UserQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_users(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['res.users']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["res.users"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['res.users'].search(odoo_domain, offset=offset, limit=limit)
+        return env["res.users"].search(odoo_domain, offset=offset, limit=limit)
 
     @staticmethod
     def resolve_current_user(root, info):
-        env = info.context['env']
+        env = info.context["env"]
         return env["res.users"].search([("id", "=", env.uid)])

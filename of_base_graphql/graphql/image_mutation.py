@@ -9,7 +9,7 @@ from .image_type import Image
 
 
 class ImageCreate(graphene.Mutation):
-    _name = 'ImageCreate'
+    _name = "ImageCreate"
 
     class Arguments:
         name = graphene.String()
@@ -21,13 +21,13 @@ class ImageCreate(graphene.Mutation):
     Output = Image
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.image']._prepare_mutation_values(**args)
-        return env['of.image'].create(values)
+        env = info.context["env"]
+        values = env["of.image"]._prepare_mutation_values(**args)
+        return env["of.image"].create(values)
 
 
 class ImageUpdate(graphene.Mutation):
-    _name = 'ImageUpdate'
+    _name = "ImageUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -40,15 +40,15 @@ class ImageUpdate(graphene.Mutation):
     Output = Image
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.image']._prepare_mutation_values(**args)
-        image = env['of.image'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.image"]._prepare_mutation_values(**args)
+        image = env["of.image"].search([("id", "=", id)])
         image.write(values)
         return image
 
 
 class ImageDelete(graphene.Mutation):
-    _name = 'ImageDelete'
+    _name = "ImageDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -56,13 +56,13 @@ class ImageDelete(graphene.Mutation):
     Output = Image
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.image', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.image", id)
 
 
 class ImageMutation(graphene.ObjectType):
-    _name = 'ImageMutation'
-    _type = 'mutation'
+    _name = "ImageMutation"
+    _type = "mutation"
 
     image_create = ImageCreate.Field()
     image_update = ImageUpdate.Field()

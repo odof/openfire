@@ -11,7 +11,7 @@ from .of_payment_mode_type import PaymentModeInput
 
 
 class AccountPaymentCreate(graphene.Mutation):
-    _name = 'AccountPaymentCreate'
+    _name = "AccountPaymentCreate"
 
     class Arguments:
         name = graphene.String()
@@ -24,9 +24,9 @@ class AccountPaymentCreate(graphene.Mutation):
     Output = AccountPayment
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['account.payment']._prepare_mutation_values(**args)
-        payment = env['account.payment'].create(values)
+        env = info.context["env"]
+        values = env["account.payment"]._prepare_mutation_values(**args)
+        payment = env["account.payment"].create(values)
         payment.action_post()
         if invoice := payment.of_intervention_invoice_id:
             invoice.payment_id = payment.id
@@ -34,7 +34,7 @@ class AccountPaymentCreate(graphene.Mutation):
 
 
 class AccountPaymentUpdate(graphene.Mutation):
-    _name = 'AccountPaymentUpdate'
+    _name = "AccountPaymentUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -48,15 +48,15 @@ class AccountPaymentUpdate(graphene.Mutation):
     Output = AccountPayment
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['account.payment']._prepare_mutation_values(**args)
-        account_payment = env['account.payment'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["account.payment"]._prepare_mutation_values(**args)
+        account_payment = env["account.payment"].search([("id", "=", id)])
         account_payment.write(values)
         return account_payment
 
 
 class AccountPaymentDelete(graphene.Mutation):
-    _name = 'AccountPaymentDelete'
+    _name = "AccountPaymentDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -64,13 +64,13 @@ class AccountPaymentDelete(graphene.Mutation):
     Output = AccountPayment
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'account.payment', id)
+        env = info.context["env"]
+        return lazy_delete(env, "account.payment", id)
 
 
 class AccountPaymentMutation(graphene.ObjectType):
-    _name = 'AccountPaymentMutation'
-    _type = 'mutation'
+    _name = "AccountPaymentMutation"
+    _type = "mutation"
 
     account_payment_create = AccountPaymentCreate.Field()
     account_payment_update = AccountPaymentUpdate.Field()

@@ -8,8 +8,8 @@ from .account_payment_term_type import AccountPaymentTerm, AccountPaymentTermFil
 
 
 class AccountPaymentTermQuery(graphene.ObjectType):
-    _name = 'AccountPaymentTermQuery'
-    _type = 'query'
+    _name = "AccountPaymentTermQuery"
+    _type = "query"
 
     account_payment_terms = graphene.List(
         graphene.NonNull(AccountPaymentTerm),
@@ -21,7 +21,7 @@ class AccountPaymentTermQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_account_payment_terms(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['account.payment.term']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["account.payment.term"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['account.payment.term'].search(odoo_domain, offset=offset, limit=limit)
+        return env["account.payment.term"].search(odoo_domain, offset=offset, limit=limit)

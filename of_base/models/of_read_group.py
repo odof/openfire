@@ -20,28 +20,28 @@ class OfReadGroup(models.AbstractModel):
     éléments nécessaire à son interprétation.
     """
 
-    _name = 'of.readgroup'
+    _name = "of.readgroup"
     _description = "Read Group Customization"
 
     @api.model
     def _read_group_raw(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        self.check_access_rights('read')
+        self.check_access_rights("read")
         query = self._where_calc(domain)
         fields = fields or [f.name for f in self._fields.values() if f.store]
 
         groupby = [groupby] if isinstance(groupby, str) else list(OrderedSet(groupby))
         groupby_list = groupby[:1] if lazy else groupby
         annotated_groupbys = [self._read_group_process_groupby(gb, query) for gb in groupby_list]
-        groupby_fields = [g['field'] for g in annotated_groupbys]
-        order = orderby or ','.join([g for g in groupby_list])
-        groupby_dict = {gb['groupby']: gb for gb in annotated_groupbys}
+        groupby_fields = [g["field"] for g in annotated_groupbys]
+        order = orderby or ",".join([g for g in groupby_list])
+        groupby_dict = {gb["groupby"]: gb for gb in annotated_groupbys}
 
-        self._apply_ir_rules(query, 'read')
+        self._apply_ir_rules(query, "read")
         for gb in groupby_fields:
             if gb not in self._fields:
                 raise UserError(_("Unknown field %r in 'groupby'", gb))
             gb_field = self._fields[gb].base_field
-            if not getattr(gb_field, 'of_custom_groupby', False) and not gb_field.groupable:
+            if not getattr(gb_field, "of_custom_groupby", False) and not gb_field.groupable:
                 raise UserError(
                     _(
                         "Field %s is not a stored field, only stored fields (regular or "
@@ -55,9 +55,9 @@ class OfReadGroup(models.AbstractModel):
         fnames = []  # list of fields to flush
 
         for fspec in fields:
-            if fspec == 'sequence':
+            if fspec == "sequence":
                 continue
-            if fspec == '__count':
+            if fspec == "__count":
                 # the web client sometimes adds this pseudo-field in the list
                 continue
 
@@ -94,27 +94,27 @@ class OfReadGroup(models.AbstractModel):
             aggregated_fields.append(name)
 
             expr = self._inherits_join_calc(self._table, fname, query)
-            if func.lower() == 'count_distinct':
+            if func.lower() == "count_distinct":
                 term = 'COUNT(DISTINCT %s) AS "%s"' % (expr, name)
             else:
                 term = '%s(%s) AS "%s"' % (func, expr, name)
             select_terms.append(term)
 
         for gb in annotated_groupbys:
-            select_terms.append('%s as "%s" ' % (gb['qualified_field'], gb['groupby']))
+            select_terms.append('%s as "%s" ' % (gb["qualified_field"], gb["groupby"]))
 
         self._flush_search(domain, fields=fnames + groupby_fields)
 
         groupby_terms, orderby_terms = self._read_group_prepare(order, aggregated_fields, annotated_groupbys, query)
         from_clause, where_clause, where_clause_params = query.get_sql()
-        if lazy and (len(groupby_fields) >= 2 or not self._context.get('group_by_no_leaf')):
-            count_field = groupby_fields[0] if len(groupby_fields) >= 1 else '_'
+        if lazy and (len(groupby_fields) >= 2 or not self._context.get("group_by_no_leaf")):
+            count_field = groupby_fields[0] if len(groupby_fields) >= 1 else "_"
         else:
-            count_field = '_'
-        count_field += '_count'
+            count_field = "_"
+        count_field += "_count"
 
-        prefix_terms = lambda prefix, terms: (prefix + " " + ",".join(terms)) if terms else ''  # noqa: E731
-        prefix_term = lambda prefix, term: ('%s %s' % (prefix, term)) if term else ''  # noqa: E731
+        prefix_terms = lambda prefix, terms: (prefix + " " + ",".join(terms)) if terms else ""  # noqa: E731
+        prefix_term = lambda prefix, term: ("%s %s" % (prefix, term)) if term else ""  # noqa: E731
 
         query = """
             SELECT min("%(table)s".id) AS id, count("%(table)s".id) AS "%(count_field)s" %(extra_fields)s
@@ -125,15 +125,15 @@ class OfReadGroup(models.AbstractModel):
             %(limit)s
             %(offset)s
         """ % {  # nosec B608
-            'table': self._table,
-            'count_field': count_field,
-            'extra_fields': prefix_terms(',', select_terms),
-            'from': from_clause,
-            'where': prefix_term('WHERE', where_clause),
-            'groupby': prefix_terms('GROUP BY', groupby_terms),
-            'orderby': prefix_terms('ORDER BY', orderby_terms),
-            'limit': prefix_term('LIMIT', int(limit) if limit else None),
-            'offset': prefix_term('OFFSET', int(offset) if limit else None),
+            "table": self._table,
+            "count_field": count_field,
+            "extra_fields": prefix_terms(",", select_terms),
+            "from": from_clause,
+            "where": prefix_term("WHERE", where_clause),
+            "groupby": prefix_terms("GROUP BY", groupby_terms),
+            "orderby": prefix_terms("ORDER BY", orderby_terms),
+            "limit": prefix_term("LIMIT", int(limit) if limit else None),
+            "offset": prefix_term("OFFSET", int(offset) if limit else None),
         }
         self._cr.execute(query, where_clause_params)
         fetched_data = self._cr.dictfetchall()
@@ -145,7 +145,7 @@ class OfReadGroup(models.AbstractModel):
 
         data = [{k: self._read_group_prepare_data(k, v, groupby_dict) for k, v in r.items()} for r in fetched_data]
 
-        fill_temporal = self.env.context.get('fill_temporal')
+        fill_temporal = self.env.context.get("fill_temporal")
         if (data and fill_temporal) or isinstance(fill_temporal, dict):
             # fill_temporal = {} is equivalent to fill_temporal = True
             # if fill_temporal is a dictionary and there is no data, there is a chance that we
@@ -184,35 +184,35 @@ class OfReadGroup(models.AbstractModel):
         self._check_qorder(order_spec)
 
         order_by_elements = []
-        for order_part in order_spec.split(','):
-            order_split = order_part.strip().split(' ')
+        for order_part in order_spec.split(","):
+            order_split = order_part.strip().split(" ")
             order_field = order_split[0].strip()
-            order_direction = order_split[1].strip().upper() if len(order_split) == 2 else ''
+            order_direction = order_split[1].strip().upper() if len(order_split) == 2 else ""
             if reverse_direction:
-                order_direction = 'ASC' if order_direction == 'DESC' else 'DESC'
-            do_reverse = order_direction == 'DESC'
+                order_direction = "ASC" if order_direction == "DESC" else "DESC"
+            do_reverse = order_direction == "DESC"
 
             field = self._fields.get(order_field)
             if not field:
                 raise ValueError("Invalid field %r on model %r" % (order_field, self._name))
 
-            if order_field == 'id':
+            if order_field == "id":
                 order_by_elements.append(f'"{alias}"."{order_field}" {order_direction}')
             else:
                 if field.inherited:
                     field = field.base_field
-                if field.store and field.type == 'many2one':
+                if field.store and field.type == "many2one":
                     key = (field.model_name, field.comodel_name, order_field)
                     if key not in seen:
                         seen.add(key)
                         order_by_elements += self._generate_m2o_order_by(alias, order_field, query, do_reverse, seen)
                 elif field.store and field.column_type:
                     qualifield_name = self._inherits_join_calc(alias, order_field, query)
-                    if field.type == 'boolean':
+                    if field.type == "boolean":
                         qualifield_name = f"COALESCE({qualifield_name}, false)"
                     order_by_elements.append(f"{qualifield_name} {order_direction}")
                 # OF Modification OpenFire
-                elif getattr(field, 'of_custom_groupby', False):
+                elif getattr(field, "of_custom_groupby", False):
                     key = (field.model_name, field.comodel_name, order_field)
                     if key not in seen:
                         seen.add(key)

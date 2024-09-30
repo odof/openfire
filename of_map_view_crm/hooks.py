@@ -6,8 +6,8 @@ from odoo import SUPERUSER_ID, api
 def _uninstall_hook(cr, registry):
     """Remove map from modified action"""
     env = api.Environment(cr, SUPERUSER_ID, {})
-    action = env.ref('crm.crm_lead_action_pipeline')
-    view_modes = action.view_mode.split(',')
-    if 'map' in view_modes:
-        view_modes.remove('map')
-        action.view_mode = ','.join(view_modes)
+    action = env.ref("crm.crm_lead_action_pipeline")
+    view_modes = action.view_mode.split(",")
+    if "map" in view_modes:
+        view_modes.remove("map")
+        action.view_mode = ",".join(view_modes)

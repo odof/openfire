@@ -8,8 +8,8 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInp
 
 
 class StockMove(OdooObjectType):
-    _name = 'StockMove'
-    _type = 'types'
+    _name = "StockMove"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -26,8 +26,8 @@ class StockMove(OdooObjectType):
 
 
 class StockMoveInput(graphene.InputObjectType):
-    _name = 'StockMoveInput'
-    _type = 'types'
+    _name = "StockMoveInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -36,4 +36,4 @@ class StockMoveInput(graphene.InputObjectType):
 
 
 class StockMoveFilterInput(StockMoveInput):
-    _name = 'StockMoveFilterInput'
+    _name = "StockMoveFilterInput"

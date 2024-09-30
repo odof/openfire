@@ -8,8 +8,8 @@ from .utm_source_type import UtmSource
 
 
 class Partner(OdooObjectType):
-    _name = 'Partner'
-    _type = 'types'
+    _name = "Partner"
+    _type = "types"
 
     lead_source = graphene.Field(UtmSource)
 

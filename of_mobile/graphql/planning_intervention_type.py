@@ -12,8 +12,8 @@ from .planning_intervention_section_type import PlanningInterventionSection
 
 
 class PlanningIntervention(OdooObjectType):
-    _name = 'PlanningIntervention'
-    _type = 'types'
+    _name = "PlanningIntervention"
+    _type = "types"
 
     update_date = graphene.DateTime()
     equipments = graphene.NonNull(graphene.List(graphene.NonNull(Equipment)))
@@ -21,9 +21,9 @@ class PlanningIntervention(OdooObjectType):
     comings = graphene.NonNull(graphene.List(graphene.NonNull(lambda: PlanningIntervention)))
     survey_user_input = graphene.Field(SurveyUserInput)
     of_section_to_display_ids = graphene.NonNull(
-        graphene.List(graphene.NonNull(lambda: PlanningInterventionSection)), name='sections'
+        graphene.List(graphene.NonNull(lambda: PlanningInterventionSection)), name="sections"
     )
-    of_report_send_date = graphene.DateTime(name='mobileReportSendDate')
+    of_report_send_date = graphene.DateTime(name="mobileReportSendDate")
     payment_intervention = graphene.Field(AccountPayment)
     additional_sale = graphene.Field(SaleOrder)
     payment_sale = graphene.Field(AccountPayment)
@@ -66,15 +66,15 @@ class PlanningIntervention(OdooObjectType):
 
 
 class PlanningInterventionInput(graphene.ObjectType):
-    _name = 'PlanningInterventionInput'
-    _type = 'types'
+    _name = "PlanningInterventionInput"
+    _type = "types"
 
     additional_sale = graphene.Field(SaleOrderInput)
 
 
 class PlanningInterventionsOffline(graphene.ObjectType):
-    _name = 'PlanningInterventionsOffline'
-    _type = 'types'
+    _name = "PlanningInterventionsOffline"
+    _type = "types"
 
     interventions = graphene.List(
         graphene.NonNull(PlanningIntervention),
