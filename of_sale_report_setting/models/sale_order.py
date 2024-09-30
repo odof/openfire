@@ -129,3 +129,6 @@ class SaleOrder(models.Model):
 
     def pdf_signature_text_label(self):
         return self.company_id.pdf_signature_text_label
+
+    def pdf_product_reference(self):
+        return self.company_id.pdf_product_reference
