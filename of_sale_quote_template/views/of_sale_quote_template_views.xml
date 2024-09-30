@@ -269,6 +269,7 @@
                     <field name="order_line_without_child_ids" nolabel="1" class="of_disable_list_editor"
                            context="{'default_order_id': order_id, 'default_of_layout_category_id': id}">
                         <tree editable="bottom">
+                            <field name="sequence" widget="handle"/>
                             <field name="of_product_forbidden_discount" invisible="1"/>
                             <field name="order_id" invisible="1"/>
                             <field name="of_client_view" invisible="1"/>
@@ -280,6 +281,7 @@
                                    groups="of_sale.of_group_sale_marge_manager"
                                    attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                             <field name="price_unit"/>
+                            <field name="of_discount_formula" groups="sale.group_discount_per_so_line"/>
                             <field name="price_subtotal" widget="monetary" groups="sale.group_show_price_subtotal"/>
                             <field name="price_total" widget="monetary" groups="sale.group_show_price_total"/>
                         </tree>
