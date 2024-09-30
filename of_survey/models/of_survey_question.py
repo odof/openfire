@@ -386,7 +386,7 @@ class OFSurveyQuestion(models.Model):
     def _process_of_image_delete(self):
         """As we also create a `of.image` record for each image, we need to delete it as well."""
         for record in self:
-            if images := record.suggested_answer_ids.mapped('value_of_image_id'):
+            if images := record.suggested_answer_ids.mapped("value_of_image_id"):
                 images.unlink()
 
     # ------------------------------------------------------------
