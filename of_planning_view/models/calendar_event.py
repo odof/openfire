@@ -20,7 +20,6 @@ class CalendarEvent(models.Model):
         readonly=True,
         store=True,
     )
-    of_trip_duration = fields.Float(string="Trip duration")
 
     # Popover fields
     of_partner_address = fields.Char(

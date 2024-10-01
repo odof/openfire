@@ -851,7 +851,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_tag_ids": tag_ids,
             "start": self.selected_datetime + timedelta(hours=useful_duration),
             "stop": self.selected_datetime + timedelta(hours=(self.duration + useful_duration)),
-            "of_trip_duration": self.selected_line_id.useful_duration / 60,
+            "of_travel_duration": self.selected_line_id.useful_duration / 60,
             "user_id": self._uid,
             "of_company_id": self.company_id.id,
             "name": name,
