@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Questionnaires intervention",
-    'version': '16.0.1.6.0',
+    'version': '16.0.1.6.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",

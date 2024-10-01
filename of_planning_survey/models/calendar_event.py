@@ -232,7 +232,6 @@ class CalendarEvent(models.Model):
             page (of.survey.answers): Section to filter on.
             report (bool): True if we are in the intervention report.
         """
-
         self.ensure_one()
         page_answers = self.of_answers_ids
 
@@ -258,7 +257,7 @@ class CalendarEvent(models.Model):
         # For a question of type image, this corresponds to whether it has images.
         # If it is for the intervention report, we check if the question should be displayed.
         return answer_input_line and not (
-            (report and answer_input_line.question_id.constr_no_report_display)
-            or answer_input_line.skipped
-            or (answer_input_line.answer_type == 'multi_image' and len(answer_input_line.value_image_ids) == 0)
+            (report and answer.question_id.constr_no_report_display)
+            or all(answer_input_line.mapped('skipped'))
+            or (answer.question_type == 'multi_image' and len(answer_input_line.mapped('value_image_ids')) == 0)
         )
