@@ -168,11 +168,6 @@ msgid "This Progress Bar is not implemented."
 msgstr "Cette barre de progression n'est pas implémentée."
 
 #. module: of_planning_view
-#: model:ir.model.fields,field_description:of_planning_view.field_calendar_event__of_trip_duration
-msgid "Trip duration"
-msgstr "Durée du trajet"
-
-#. module: of_planning_view
 #: model_terms:ir.ui.view,arch_db:of_planning_view.of_planning_intervention_view_planning
 msgid "Warning, this intervention is in conflict with another one."
 msgstr "Attention, cette intervention est en conflit avec une autre."
