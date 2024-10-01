@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Web Planning view",
-    'version': '16.0.1.0.3',
+    'version': '16.0.1.0.4',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",

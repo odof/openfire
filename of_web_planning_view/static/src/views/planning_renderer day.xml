@@ -32,7 +32,7 @@
                         </t>
                     </div>
                 </t>
-                <div t-ref="cellContainer" class="o_planning_cells o_planning_grid_rows o_planning_grid_columns position-relative">
+                <div t-ref="cellContainer" class="o_planning_cells o_planning_grid_rows o_planning_grid_columns position-relative" t-attf-style="max-width: calc({{ gridTemplate.columns }} * 5px);">
                     <t t-foreach="visibleRows" t-as="row" t-key="row.id">
                         <t t-call="{{ constructor.rowContentTemplate }}">
                             <t t-set="display_cell_action_buttons" t-value="'1'"/>
