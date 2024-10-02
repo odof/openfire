@@ -847,6 +847,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_task_id": self.task_id.id,
             "of_template_id": template.id,
             "of_request_id": request.id,
+            "of_employee_id": self.employee_id.id,
             "of_employee_ids": [Command.link(self.employee_id.id)],
             "of_tag_ids": tag_ids,
             "start": self.selected_datetime + timedelta(hours=useful_duration),
