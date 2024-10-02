@@ -7,6 +7,7 @@ import pytz
 
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
+from odoo.tools import format_datetime
 
 
 class CalendarEvent(models.Model):
@@ -324,8 +325,10 @@ class CalendarEvent(models.Model):
     )
 
     # ===== Duration & time fields =====
-    start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0))
-    stop = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1))
+    start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0), copy=False)
+    stop = fields.Datetime(
+        default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1), copy=False
+    )
     start_time_local_str = fields.Char(string="Start time", compute="_compute_local_times_str")
     end_time_local_str = fields.Char(string="End time", compute="_compute_local_times_str")
     of_real_start = fields.Datetime(
@@ -459,7 +462,7 @@ class CalendarEvent(models.Model):
                                 "\n %(start)s: %(partner)s %(zip)s"
                             ) % {
                                 "employee": employee.name,
-                                "start": conflicts.start,
+                                "start": format_datetime(self.env, conflicts.start, dt_format=False),
                                 "partner": conflicts.of_partner_id.name if conflicts.of_partner_id else _("No partner"),
                                 "zip": conflicts.of_address_id.zip if conflicts.of_address_id else "",
                             }
@@ -969,6 +972,28 @@ class CalendarEvent(models.Model):
             ):
                 intervention.action_generate_stock_picking()
         return res
+
+    def copy(self, default=None):
+        """When copying a intervention, we change the start and stop by the next available datetimes."""
+        self.ensure_one()
+        events = self.env["calendar.event"].search(
+            [
+                ("of_type", "=", "intervention"),
+                ("of_employee_id", "=", self.of_employee_id.id),
+                ("stop", ">=", fields.datetime.now()),
+            ],
+            order="start",
+        )
+        for index, event in enumerate(events):
+            if index == len(events) - 1 or event.stop + timedelta(hours=self.duration) < events[index + 1].start:
+                default.update(
+                    {
+                        "start": event.stop,
+                        "stop": event.stop + timedelta(hours=self.duration),
+                    }
+                )
+                break
+        return super().copy(default)
 
     def check_access_rule(self, operation):
         """Override to allow access to interventions with a specific context"""
