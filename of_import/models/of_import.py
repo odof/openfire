@@ -1490,7 +1490,7 @@ class OfImport(models.Model):
         libelle_ref = u"réf. " + ligne['res_model'] + u" : " + ligne['res_id'] + u" - " + ligne['name']
 
         attachment = False
-        if len(res_obj) == 1 and not res_field:
+        if res_obj and len(res_obj) == 1 and not res_field:
             attachment = attachment_obj.search(
                 [('name', '=', ligne['name']),
                  ('res_model', '=', res_model),
