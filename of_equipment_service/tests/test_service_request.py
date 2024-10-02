@@ -381,6 +381,11 @@ class TestOFServiceRequest(TestOFEquipmentServiceCommon):
         # Check the intervention lines of the service request
         self.assertEqual(len(self.service_request_with_equipments.equipment_intervention_ids), 5)
 
+        # All equipment_intervention_ids should have a non-empty operator_id."
+        self.assertTrue(
+            all(line.operator_id for line in self.service_request_with_equipments.equipment_intervention_ids),
+        )
+
         # Remove one equipment from the service request and check the intervention lines again
         self.service_request_with_equipments.equipment_ids -= self.equipment_wood_stove_jc_apt
 

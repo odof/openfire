@@ -200,7 +200,8 @@ class OFServiceRequest(models.Model):
                         "equipment_id": equipment.id,
                         "event_id": intervention.id,
                         "start": intervention.start,
-                        "operator_id": intervention.of_employee_id.id,
+                        "operator_id": intervention.of_employee_id.id
+                        or (intervention.of_employee_ids and intervention.of_employee_ids[0].id),
                     }
                     for equipment in intervention_equipments
                     if (request.id, equipment.id, intervention.id) not in current_values
