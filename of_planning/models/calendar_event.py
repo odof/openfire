@@ -57,6 +57,7 @@ class CalendarEvent(models.Model):
         readonly=True,
         default="draft",
         tracking=True,
+        copy=False,
     )
     of_type = fields.Selection(
         selection=[
@@ -101,6 +102,7 @@ class CalendarEvent(models.Model):
         compute="_compute_of_line_ids",
         store=True,
         readonly=False,
+        copy=True,
     )
 
     # ===== Team, Operators, Employees, Resource fields =====
@@ -258,6 +260,7 @@ class CalendarEvent(models.Model):
         relation="of_planning_intervention_picking_manual_rel",
         column1="intervention_id",
         column2="picking_id",
+        copy=False,
         help="By associating a delivery note with the intervention, you can display them in the mobile intervention.\n"
         "This field is automatically filled in when the intervention is created from an order for which one or more "
         "delivery notes have been generated.",
