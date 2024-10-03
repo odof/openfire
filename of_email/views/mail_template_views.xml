@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="email_template_form" model="ir.ui.view">
+        <field name="name">of.email.template.form</field>
+        <field name="model">mail.template</field>
+        <field name="inherit_id" ref="mail.email_template_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='reply_to']" position="after">
+                <field
+                    name="of_reply_to"
+                    placeholder="Force the email address to which replies will be redirected when sending emails with Mail Composer. Warning: this will override the 'Reply-To' header."/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
