@@ -22,7 +22,7 @@ class TestOFBaseResGroups(TestOFBaseCommon):
                 }
             )
         self.assertEqual(
-            'Only the admin account can belong to group "Admin only".', create_user_error.exception.args[0]
+            'Seul le compte administrateur peut appartenir au groupe "Admin only".', create_user_error.exception.args[0]
         )
 
     def test_02_check_admin_only_group_write(self):
@@ -41,4 +41,6 @@ class TestOFBaseResGroups(TestOFBaseCommon):
 
         with self.assertRaises(UserError) as write_user_error:
             user.write({"groups_id": [Command.link(group_root.id)]})
-        self.assertEqual('Only the admin account can belong to group "Admin only".', write_user_error.exception.args[0])
+        self.assertEqual(
+            'Seul le compte administrateur peut appartenir au groupe "Admin only".', write_user_error.exception.args[0]
+        )

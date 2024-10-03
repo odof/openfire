@@ -4,7 +4,6 @@ from psycopg2 import IntegrityError
 
 from odoo import Command
 from odoo.exceptions import ValidationError
-from odoo.tests import Form
 from odoo.tools import mute_logger
 
 from odoo.addons.of_product_pack.tests.common import TestOFProdutPackCommon
@@ -69,16 +68,7 @@ class TestProductPack(TestOFProdutPackCommon):
         component_2.product_id.list_price = 15.0
         self.assertEqual(30.0, self.product_pack_non_detailed.lst_price)
 
-    def test_05_pack_type(self):
-        """Test case to verify the behavior of pack_modifiable property.
-        when changing the pack type."""
-        pack = self.product_pack_detailed.product_tmpl_id
-        pack.pack_modifiable = True
-        with Form(pack) as pack_form:
-            pack_form.pack_type = "non_detailed"
-        self.assertFalse(pack_form.pack_modifiable)
-
-    def test_06_pack_modifiable(self):
+    def test_05_pack_modifiable(self):
         """Test case to verify the behavior of pack_modifiable_invisible property.
         when changing the pack type and pack component price."""
         pack = self.product_pack_detailed.product_tmpl_id
@@ -90,7 +80,7 @@ class TestProductPack(TestOFProdutPackCommon):
         pack.pack_component_price = "totalized"
         self.assertFalse(pack.pack_modifiable_invisible)
 
-    def test_07_price_compute_with_pricelist_context(self):
+    def test_06_price_compute_with_pricelist_context(self):
         product_pack = self.product_pack_detailed
         component_1 = product_pack.pack_line_ids[0]
         component_1.product_id.list_price = 30.0

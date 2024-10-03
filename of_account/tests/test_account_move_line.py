@@ -19,7 +19,6 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
                 # Theses groups are required to create a new account.move to avoid the error:
                 #  AssertionError: line_ids was not found in the view
                 "groups_id": [
-                    (6, 0, cls.env.user.groups_id.ids),
                     (4, cls.env.ref("account.group_account_manager").id),
                     (4, cls.env.ref("account.group_account_user").id),
                 ],
