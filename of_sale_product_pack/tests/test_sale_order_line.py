@@ -188,7 +188,6 @@ class TestSaleOrderLine(TestOFProdutPackCommon, TestOFSaleCommon):
         # Set it back to 'detailed' and check if the pack components are added back
         pack_order_line.of_pack_type = 'detailed'
         self.assertEqual(len(order.order_line), 4)  # 4 because the pack has 2 components (2 original + 1 new)
-        print(order.order_line.mapped(lambda line: (line.product_id, line.product_id.name)))
 
         # Remove on item from the pack in sale order line
         removed_line = pack_order_line.of_pack_line_ids.filtered(lambda line: line.product_id == self.product_2)

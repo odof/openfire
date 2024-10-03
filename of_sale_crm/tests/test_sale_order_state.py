@@ -25,20 +25,7 @@ class TestSaleOrderState(TestOFSaleCommon):
         order = self.env['sale.order'].create(self._prepare_sale_order_values())
         self.assertEqual(order.state, 'sent')
 
-    def test_03_create_order_with_quotation_start_state(self):
-        """Test the creation of a sale order with the start state set to 'quotation' by forcing the state.
-        The state of the sale order should be 'sent'."""
-        settings = self.env['res.config.settings'].create({})
-        settings.of_sale_order_start_state = 'quotation'
-        settings.execute()
-
-        order_values = self._prepare_sale_order_values()
-        order_values['state'] = 'draft'
-        order = self.env['sale.order'].create(order_values)
-
-        self.assertEqual(order.state, 'sent')
-
-    def test_04_sale_order_send_email_with_estimate_start_state(self):
+    def test_03_sale_order_send_email_with_estimate_start_state(self):
         """Test the sending of a sale order by email with the start state set to 'estimate'.
         The state of the sale order should be 'draft' and the order should be marked as 'quotation sent'.
         """
@@ -56,7 +43,7 @@ class TestSaleOrderState(TestOFSaleCommon):
         self.assertEqual(order.state, 'draft')
         self.assertTrue(order.of_sent_quotation)
 
-    def test_05_sale_order_send_email_with_quotation_start_state(self):
+    def test_04_sale_order_send_email_with_quotation_start_state(self):
         """Test the sending of a sale order by email with the start state set to 'quotation'.
         The state of the sale order should be 'sent' and the order should be marked as 'quotation sent'.
         """

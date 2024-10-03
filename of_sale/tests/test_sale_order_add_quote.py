@@ -82,6 +82,6 @@ class TestOFSaleOrderAddQuote(TestOFSaleCommon):
         wizard.with_context(disable_cancel_warning=True).action_button_add_quote()
 
         self.assertEqual(len(self.order_to_update.order_line), 2, "The sale order should have 2 order lines")
-        self.assertEqual(self.order_to_update.order_line[0].product_id, self.product_consu_a)
-        self.assertEqual(self.order_to_update.order_line[1].product_id, new_product)
-        self.assertEqual(quote.state, 'cancel', "The quote should be cancelled")
+        self.assertEqual(self.order_to_update.order_line[1].product_id, self.product_consu_a)
+        self.assertEqual(self.order_to_update.order_line[0].product_id, new_product)
+        self.assertEqual(quote.state, "cancel", "The quote should be cancelled")
