@@ -26,6 +26,9 @@
                     <field name="invoice_warn" invisible="1"/>
                 </group>
             </xpath>
+            <xpath expr="//field[@name='property_account_position_id']" position="after">
+                <xpath expr="//field[@name='vat']" position="move"/>
+            </xpath>
         </field>
     </record>
 
