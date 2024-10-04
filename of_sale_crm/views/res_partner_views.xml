@@ -21,6 +21,10 @@
         <field name="arch" type="xml">
             <xpath expr="//form//field[@id='individual']" position="attributes">
                 <attribute name="class">text-break d-inline</attribute>
+                <div class="text-inline prospect_tag" attrs="{'invisible': ['|', ('of_customer_state', '!=', 'lead'), ('company_type', '=', 'company')]}">Prospect</div>
+            </xpath>
+            <xpath expr="//form//field[@id='individual']" position="after">
+                <div class="ms-2 d-inline prospect_tag p-1 fs-5" attrs="{'invisible': ['|', ('of_customer_state', '!=', 'lead'), ('company_type', '=', 'company')]}">Prospect</div>
             </xpath>
             <xpath expr="//form//field[@id='individual']" position="after">
                 <div class="d-inline prospect_tag ms-2 p-1 px-2 fs-6" attrs="{'invisible': ['|', ('of_customer_state', '!=', 'lead'), ('company_type', '=', 'company')]}">Prospect</div>            </xpath>
