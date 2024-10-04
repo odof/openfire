@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+of_migration.access_migration_authentication,access_migration_authentication,of_migration.model_migration_authentication,base.group_user,1,1,1,1
+of_migration.access_migration_database,access_migration_database,of_migration.model_migration_database,base.group_user,1,1,1,1
+of_migration.access_migration_migration,access_migration_migration,of_migration.model_migration_migration,base.group_user,1,1,1,1
+of_migration.access_migration_server,access_migration_server,of_migration.model_migration_server,base.group_user,1,1,1,1
+of_migration.access_migration_sql,access_migration_sql,of_migration.model_migration_sql,base.group_user,1,1,1,1
+of_migration.access_create_migration_wizard,access_create_migration_wizard,of_migration.model_create_migration_wizard,base.group_user,1,1,1,1

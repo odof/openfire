@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="migration_menu" name="Migrations" sequence="10">
+        <menuitem id="migration_partner_menu" name="Partners" action="migration_partner_action" sequence="9"/>
+        <menuitem id="migration_database_menu" name="Databases" action="migration_database_action" sequence="10"/>
+        <menuitem id="migration_migration_menu" name="Migrations" action="migration_migration_action" sequence="11"/>
+        <menuitem id="migration_sql_menu" name="SQL" action="migration_sql_action" sequence="12"/>
+        <menuitem id="configuration_menu" name="Configuration" sequence="50">
+            <menuitem id="configuration_server" name="Server" action="migration_server_action" sequence="1"/>
+            <menuitem id="configuration_authentication" name="Authentication" action="migration_authentication_action" sequence="2"/>
+        </menuitem>
+    </menuitem>
+</odoo>

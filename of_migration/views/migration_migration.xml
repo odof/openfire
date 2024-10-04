@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="migration_migration_view_form" model="ir.ui.view">
+        <field name="name">migration.migration.view.form</field>
+        <field name="model">migration.migration</field>
+        <field name="arch" type="xml">
+            <form string="migrations">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="database_id"/>
+                            <field name="partner_id"/>
+                            <field name="start_version"/>
+                            <field name="end_version"/>
+                            <field name="clean_all"/>
+                            <field name="ttype" help="choose demo if you want an anomysation of the database"/>
+                        </group>
+                        <group>
+                            <field name="planning_date"/>
+                            <field name="state" readonly="1"/>
+                            <field name="current_version" readonly="1"/>
+                            <field name="uid" readonly="1"/>
+                            <field name="server_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="info">
+                            <field name="log_info"
+                        </page>
+                        <page string="warning">
+                            <field name="log_warning"
+                        </page>
+                        <page string="error">
+                            <field name="log_error"
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="migration_migration_view_tree" model="ir.ui.view">
+        <field name="name">migration.migration.view.tree</field>
+        <field name="model">migration.migration</field>
+        <field name="arch" type="xml">
+            <tree string="migration">
+                <field name="database_id"/>
+                <field name="partner_id"/>
+                <field name="start_version"/>
+                <field name="end_version"/>
+                <field name="planning_date"/>
+                <field name="state" readonly="1"/>
+                <field name="current_version" readonly="1"/>
+                <field name="server_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="migration_migration_action" model="ir.actions.act_window">
+        <field name="name">migration</field>
+        <field name="res_model">migration.migration</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
