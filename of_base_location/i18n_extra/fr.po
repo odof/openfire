@@ -1,0 +1,4 @@
+#. module: of_base_location
+#: model_terms:ir.ui.view,arch_db:base_location.view_partner_form
+msgid "Location completion"
+msgstr "Autocomplétion par ville ou code postal"
