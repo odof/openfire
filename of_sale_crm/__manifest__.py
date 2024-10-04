@@ -28,8 +28,8 @@
     "assets": {
         "web.assets_backend": ["of_sale_crm/static/src/scss/prospect_tag.scss"],
     },
-    "installable": True,
-    "application": False,
-    "auto_install": False,
-    "post_init_hook": "post_init_hook",
+    'installable': True,
+    'application': False,
+    'auto_install': False,
+    'post_init_hook': 'post_init_hook',
 }

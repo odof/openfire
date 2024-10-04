@@ -1,5 +1,11 @@
 .prospect_tag {
-    color: white;
+    height: 25px;
+    width: 15px;
+    max-width : 65px;
+    color: black;
+    display: flex;
     background-color: rgb(48,195,129);
-    border-radius: 15px;
+    border-radius: 13px;
+    justify-content: center;
+    align-items: center;
 }
