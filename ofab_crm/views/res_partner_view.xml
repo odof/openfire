@@ -6,9 +6,10 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-            <field name="vat" position="before">
-                <field name="of_brand_distributor_ids" widget="many2many_tags"/>
-            </field>
+            <div class="o_address_format" position="after">
+                <field name="company_type" invisible="1"/>
+                <field name="of_brand_distributor_ids" widget="many2many_tags" attrs="{'invisible': [('company_type', '=', 'person')]}"/>
+            </div>
         </field>
     </record>
 
@@ -18,7 +19,8 @@
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
             <field name="category_id" position="before">
-                <field name="of_brand_distributor_ids" widget="many2one"/>
+                <field name="company_type" invisible="1"/>
+                <field name="of_brand_distributor_ids" widget="many2one" attrs="{'invisible': [('company_type', '=', 'person')]}"/>
             </field>
             <group name="group_by" position="inside">
                 <filter name="tag" string="Distributed brand" context="{'group_by' : 'of_brand_distributor_ids'}"/>
