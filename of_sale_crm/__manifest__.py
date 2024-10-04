@@ -25,6 +25,9 @@
         'reports/sale_report_views.xml',
         'reports/account_invoice_report_views.xml',
     ],
+    "assets": {
+        "web.assets_backend": ["of_sale_crm/static/src/scss/prospect_tag.scss"],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
