@@ -1,0 +1,15 @@
+#. module: of_base
+#: model:ir.model.fields,field_description:base.field_res_partner__title
+#: model:ir.model.fields,field_description:base.field_res_partner_title__name
+#: model:ir.model.fields,field_description:base.field_res_users__title
+msgid "Title"
+msgstr "Civilité"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:base.res_partner_view_form_private
+#: model_terms:ir.ui.view,arch_db:base.view_company_form
+#: model_terms:ir.ui.view,arch_db:base.view_partner_address_form
+#: model_terms:ir.ui.view,arch_db:base.view_partner_form
+#: model_terms:ir.ui.view,arch_db:base.view_res_bank_form
+msgid "Street 2..."
+msgstr "Complément d'adresse..."
