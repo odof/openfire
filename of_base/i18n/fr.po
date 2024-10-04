@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-27 11:17+0000\n"
-"PO-Revision-Date: 2024-12-27 11:17+0000\n"
+"POT-Creation-Date: 2024-10-17 13:47+0000\n"
+"PO-Revision-Date: 2024-10-17 13:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -73,6 +73,11 @@ msgid ""
 msgstr ""
 "* Les données saisies dans ce champ seront affichées sous la rubrique 'Notes"
 " clients' dans le devis et le planning d'intervention."
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "<b>Address</b>"
+msgstr "<b>Adresse</b>"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
@@ -298,8 +303,25 @@ msgid "Company"
 msgstr "Société"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_currency_id
+msgid "Company Currency"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_informations
+msgid "Company Informations"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_name
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Company Name"
+msgstr "Nom de la société"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_company_name
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_company_name
+msgid "Company name"
 msgstr "Nom de la société"
 
 #. module: of_base
@@ -1367,6 +1389,28 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Title"
 msgstr "Civilité"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_product_expiry
+msgid ""
+"Track following dates on lots & serial numbers: best before, removal, end of life, alert. \n"
+" Such dates are set automatically at lot/serial number creation based on values set on the product (in days)."
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__module_base_gengo
+msgid "Translate Your Website with Gengo"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__twilio_account_token
+msgid "Twilio Account Auth Token"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__twilio_account_sid
+msgid "Twilio Account SID"
+msgstr ""
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form

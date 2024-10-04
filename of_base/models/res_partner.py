@@ -81,7 +81,6 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     of_company_name = fields.Char(string="Company name")
-    company_type = fields.Selection(default="person")
     name = fields.Char(tracking=True)
     street = fields.Char(tracking=True)
     street2 = fields.Char(tracking=True)
@@ -178,123 +177,6 @@ class ResPartner(models.Model):
         partners = self.env["of.res.partner.phone"].search([("is_valid", operator, not value)]).mapped("partner_id")
         return [("id", "in", partners.ids)]
 
-    # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
-    def _display_address(self, without_company=False):
-        """
-        The purpose of this function is to build and return an address formatted accordingly to the
-        standards of the country where it belongs.
-
-        :param address: browse record of the res.partner to format
-        :returns: the address formatted in a display that fit its country habits (or the default ones
-            if not country is specified)
-        :rtype: string
-        """
-        # get the information that will be injected into the display format
-        # get the address format
-        address_format = (
-            self.country_id.address_format or "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"
-        )  # Ligne changée par OpenFire
-        args = {
-            "state_code": self.state_id.code or "",
-            "state_name": self.state_id.name or "",
-            "country_code": self.country_id.code or "",
-            "country_name": self.country_id.name or "",
-            "company_name": self.commercial_company_name or "",
-        }
-        for field in self._address_fields():
-            args[field] = getattr(self, field) or ""
-        if without_company:
-            args["company_name"] = ""
-        elif self.commercial_company_name:
-            address_format = "%(company_name)s\n" + address_format
-        return address_format % args
-
-    # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
-    @api.model
-    def name_search(self, name="", args=None, operator="ilike", limit=100):
-        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(
-            name=name, args=args, operator=operator, limit=limit
-        )
-
-    def _get_name(self):
-        """Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent"""
-        name = super()._get_name()
-        if (
-            not self._context.get("show_address")
-            and self._context.get("of_show_address_line")
-            and self.env["ir.config_parameter"].sudo().get_param("of.partner.display_city")
-            and self.city
-        ):
-            name = "%s (%s)" % (name, self.city)
-        return name.strip()
-
-    @api.model
-    def _get_default_image(self, partner_type, is_company, parent_id):
-        # Réécriture de la fonction Odoo pour retirer la couleur de fond aléatoire
-        # Ainsi, chaque nouveau partenaire a les mêmes image/image_medium/image_small
-        # Ce qui évite de surcharger le filestore
-        if getattr(threading.currentThread(), "testing", False) or self._context.get("install_mode"):
-            return False
-
-        colorize, img_path, image = False, False, False
-
-        if partner_type in ["other"] and parent_id:
-            parent_image = self.browse(parent_id).image
-            image = parent_image and parent_image.decode("base64") or None
-
-        if not image:
-            if partner_type == "invoice":
-                img_path = get_module_resource("base", "static/src/img", "money.png")
-            elif partner_type == "delivery":
-                img_path = get_module_resource("base", "static/src/img", "truck.png")
-            elif is_company:
-                img_path = get_module_resource("base", "static/src/img", "company_image.png")
-            else:
-                img_path = get_module_resource("base", "static/src/img", "avatar.png")
-                colorize = True
-
-        if img_path:
-            with open(img_path, "rb") as f:
-                image = f.read()
-        if image and colorize:
-            # Un rouge orange, censé rappeler la douce chaleur de la flamme
-            # Dans l'âtre, les soirs d'hiver, quand le vent glacial rugit au-dehors
-            image = tools.image_colorize(image, False, (250, 150, 0))
-
-        return tools.image_resize_image_big(image.encode("base64"))
-
-    @api.model
-    def _add_missing_default_values(self, values):
-        # La référence par défaut est celle du parent.
-        parent_id = values.get("parent_id")
-        if parent_id and isinstance(parent_id, int) and not values.get("ref") and "default_ref" not in self._context:
-            values["ref"] = self.browse(parent_id).ref
-        return super()._add_missing_default_values(values)
-
-    @api.model
-    def _check_no_ref_duplicate(self, ref):
-        if not ref:
-            return True
-        parent_id = False
-        cr = self._cr
-        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = %s", (ref,))
-        while True:
-            ids = set()
-            for iid, pid in cr.fetchall():
-                if pid:
-                    ids.add(pid)
-                elif parent_id:
-                    if iid != parent_id:
-                        raise ValidationError(
-                            _("The customer account number is already in use and must be unique (%s).") % (ref,)
-                        )
-                else:
-                    parent_id = iid
-            if not ids:
-                break
-            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
-        return True
-
     def _compute_of_potential_duplication(self):
         # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
         self = self.sudo()
@@ -346,7 +228,7 @@ class ResPartner(models.Model):
             and self.env["ir.config_parameter"].sudo().get_param("of.partner.display_city")
             and self.city
         ):
-            name = f"{name} ({self.city})"
+            name = "%s (%s)" % (name, self.city)
         return name.strip()
 
     @api.model
