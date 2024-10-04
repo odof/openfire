@@ -5,12 +5,12 @@
         <field name="name">of.base.partner.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="99"/>
         <field name="arch" type="xml">
             <!-- Ajout header de vue form pour captain hook -->
             <xpath expr="//sheet" position="before">
                 <header/>
             </xpath>
-
 
             <!-- Hide standard fields to manage their positions -->
             <xpath expr="//group//field[@name='title']" position="attributes">
@@ -38,10 +38,16 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
 
+            <xpath expr="//field[@name='website']" position="attributes">
+                <attribute name="attrs">{'invisible': [('is_company', '=', False)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_type']" position="before">
+                <xpath expr="//h1" position="move"/>
+            </xpath>
+
             <!-- Permet de voir les catégories du parent -->
             <xpath expr="//field[@name='category_id']" position="before">
-                <field name="of_parent_category_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"
-                        attrs="{'invisible': [('parent_id', '=', False)]}"/>
+                <field name="of_parent_category_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" attrs="{'invisible': [('parent_id', '=', False)]}"/>
             </xpath>
 
             <!-- Default address -->
@@ -50,25 +56,43 @@
             </xpath>
             <xpath expr="//field[@name='child_ids']/kanban/templates/t//div[hasclass('oe_kanban_details')]/field[@name='name']" position="after">
                 <t t-if="record.type.raw_value"> (<field name="type"/>)</t>
-                <t t-if="record.of_default_address.raw_value"> <span class="fa fa-star">&amp;nbsp;</span></t>
+                <t t-if="record.of_default_address.raw_value">
+                    <span class="fa fa-star">&amp;nbsp;</span>
+                </t>
             </xpath>
             <xpath expr="//field[@name='child_ids']/form/sheet//div[@name='div_address']/parent::node()" position="after">
                 <field name="of_default_address" attrs="{'invisible': [('type', 'not in', ('invoice', 'delivery'))]}"/>
             </xpath>
 
-            <!-- Move City after Zip -->
-            <xpath expr="//field[@name='zip']" position="after">
-                <field name="city" placeholder="City" class="o_address_city"
-                        attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            <xpath expr="//span[@name='address_name']" position="replace">
+                <field name="type" attrs="{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)], 'readonly': [('user_ids', '!=', [])]}" class="fw-bold"/>
+                <b>Address</b>
             </xpath>
 
-            <!-- Move Contact's title after Form title part -->
-            <xpath expr="//div[hasclass('oe_title')]" position="after">
+            <!-- Move City after Zip -->
+            <xpath expr="//field[@name='zip']" position="after">
+                <field name="city" placeholder="City" class="o_address_city" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+            </xpath>
+
+            <!-- Move Contact's title after Company's type -->
+            <xpath expr="//field[@name='company_type']" position="after">
                 <group>
                     <group>
-                        <field name="title" options='{"no_open": True}' placeholder="e.g. Mister" attrs="{'invisible': [('is_company', '=', True)]}"/>
+                        <field name="title" options='{"no_open": True}' placeholder="e.g. Mister" attrs="{'invisible': [('is_company', '=', True)]}" style="width: 150%;"/>
                     </group>
                 </group>
+            </xpath>
+            <xpath expr="//field[@id='individual']" position="attributes">
+                <attribute name="attrs">{'invisible':[('is_company','=',True)], 'readonly': [('is_company', '=', False)], 'required': [('type', '=', 'contact'), ('is_company', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@id='company']" position="attributes">
+                <attribute name="attrs"> {'invisible':[('is_company','=',False)], 'readonly': [('is_company', '=', False)], 'required': [('type', '=', 'contact'), ('is_company', '=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='parent_id']" position="before">
+                <label for="parent_id" string="Company Name" attrs="{'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='parent_id']" position="attributes">
+                <attribute name="style" add="max-width: 55%;"/>
             </xpath>
 
             <!-- Ajout aide du champ comment (notes internes / notes client) -->
@@ -84,11 +108,11 @@
 
             <!-- Gestion des numéros de téléphone -->
             <xpath expr="//group//field[@name='function']" position="after">
-                <field name="of_phone_number_ids" string="Phones" class="of_phone_table" widget="of_light_x2many">
+                <field name="of_phone_number_ids" string="Phones" class="of_phone_table custom_field" widget="of_light_x2many">
                     <tree editable="bottom" decoration-danger="not is_valid">
-                        <field name="type" string="Type"/>
-                        <field name="title_id" string="Title" options="{'no_open': True, 'no_create_edit': True}"/>
+                        <field name="type" string="Type" class="oe_label oe_align_right custom_selection"/>
                         <field name="number_display" string="Number" placeholder="Number" required="True"/>
+                        <field name="title_id" string="Title" options="{'no_open': True, 'no_create_edit': True}"/>
                         <field name="number" invisible="1" readonly="1"/>
                         <field name="is_valid" invisible="1"/>
                     </tree>
@@ -124,12 +148,37 @@
                 <field name="is_blacklisted" invisible="1"/>
                 <label for="email" class="oe_inline"/>
                 <div class="o_row o_row_readonly">
-                    <button name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
-                        title="This email is blacklisted for mass mailings. Click to unblacklist."
-                        type="object" context="{'default_email': email}" groups="base.group_user"
+                    <button
+                        name="mail_action_blacklist_remove" class="fa fa-ban text-danger"
+                        title="This email is blacklisted for mass mailings. Click to unblacklist." type="object"
+                        context="{'default_email': email}" groups="base.group_user"
                         attrs="{'invisible': [('is_blacklisted', '=', False)]}"/>
                     <field name="email" widget="email" context="{'gravatar_image': True}" attrs="{'required': [('user_ids','!=', [])]}"/>
                 </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">of.base.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="partner_firstname.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h1//field[@id='company']/.." position="before">
+                <group attrs="{'invisible': [('is_company', '=', False)]}" style="padding-top: 15px;">
+                    <field name="of_company_name" attrs="{'required': [
+                        ('is_company', '=', True),
+                        ('type', '=', 'contact')]}" />
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='name']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lastname']" position="attributes">
+                <attribute name="style" add="width: 65%;"/>
+            </xpath>
+            <xpath expr="//field[@name='firstname']" position="attributes">
+                <attribute name="style" add="width: 65%;"/>
             </xpath>
         </field>
     </record>
@@ -206,7 +255,7 @@
     </record>
 
     <!-- Ajouter type adresse (livraison, facture, ...) dans vue kanban quand est un contact -->
-    <record id="of_res_partner_kanban" model="ir.ui.view" >
+    <record id="of_res_partner_kanban" model="ir.ui.view">
         <field name="name">of.res.partner.kanban</field>
         <field name="inherit_id" ref="base.res_partner_kanban_view"/>
         <field name="model">res.partner</field>
