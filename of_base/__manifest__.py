@@ -1,25 +1,25 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    "name": "OpenFire / Base",
-    "version": "16.0.1.3.1",
-    "license": "AGPL-3",
-    "author": "OpenFire",
-    "category": "OpenFire",
-    "sequence": 15,
-    "summary": "Base module for OpenFire",
-    "website": "https://www.openfire.fr",
-    "depends": [
-        "base",
-        "base_iban",
-        "base_vat",
-        "crm",
-        "product",
-        "mail",
-        "contacts",
-        "base_view_inheritance_extension",
-        "partner_firstname",  # OCA/partner-contact
-        "of_web_widgets",
+    'name': "OpenFire / Base",
+    'version': '16.0.1.2.0',
+    'license': 'AGPL-3',
+    'author': "OpenFire",
+    'category': 'OpenFire',
+    'sequence': 15,
+    'summary': "Base module for OpenFire",
+    'website': 'https://www.openfire.fr',
+    'depends': [
+        'base',
+        'base_iban',
+        'base_vat',
+        'crm',
+        'product',
+        'mail',
+        'contacts',
+        'base_view_inheritance_extension',
+        'partner_firstname',  # OCA/partner-contact
+        'of_web_widgets',
     ],
     "data": [
         "data/ir_cron.xml",
