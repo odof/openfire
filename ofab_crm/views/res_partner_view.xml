@@ -18,10 +18,10 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='category_id']" position="before">
+            <field name="category_id" position="before">
                 <field name="company_type" invisible="1"/>
                 <field name="of_brand_distributor_ids" widget="many2one" attrs="{'invisible': [('company_type', '=', 'person')]}"/>
-            </xpath>
+            </field>
             <group name="group_by" position="inside">
                 <filter name="tag" string="Distributed brand" context="{'group_by' : 'of_brand_distributor_ids'}"/>
             </group>
