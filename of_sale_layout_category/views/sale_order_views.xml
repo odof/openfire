@@ -19,7 +19,7 @@
                 <div class="row mb-2">
                     <div class="col-3">
                         <label for="of_layout_category_active">Layout Category</label>
-                        <field name="of_layout_category_active" widget="boolean_toggle"/>
+                        <field name="of_layout_category_active" widget="boolean_toggle" class="ms-2"/>
                     </div>
                     <div class="col-2 offset-7" attrs="{'invisible': [('of_layout_category_active','=',False)]}">
                         <button class="btn btn-md btn-primary float-right" name="action_button_show_summary" type="object" string="Show Summary"/>
