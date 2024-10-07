@@ -42,7 +42,7 @@ odoo.define("of_survey.form", function (require) {
         });
 
         self.$("a.edit").on("click", function () {
-            var id = $(self).find("i").attr("id");
+            var id = $(this).find("i").attr("id");
             // on ouvre la modal avec les données pré-remplies
             $("#addAttachment #title").val(
                 self.images[self.current_question_id][id]["title"]
