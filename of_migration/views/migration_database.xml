@@ -20,11 +20,14 @@
                             <field name="date_database"/>
                         </group>
                         <group>
-                            <field name="backup_file"/>
+                            <field name="backup_type"/>
+                            <field name="backup_file" attrs="{'invisible': [('backup_type','!=','file')]}"/>
+                            <field name="backup_server" attrs="{'invisible': [('backup_type','!=','distant')]}"/>
+                            <field name="backup_filename" attrs="{'invisible': [('backup_type','!=','distant')]}"/>
                         </group>
-                        <group>
-                            <field name="script_ids"/>
-                        </group>
+                    </group>
+                    <group>
+                        <field name="script_ids"/>
                     </group>
                 </sheet>
             </form>

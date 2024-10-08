@@ -10,6 +10,8 @@
                     <group>
                         <field name="name"/>
                         <field name="host"/>
+                        <field name="port"/>
+                        <field name="ttype"/>
                         <field name="state"/>
                         <field name="authentication_id"/>
                     </group>
@@ -25,6 +27,8 @@
             <tree string="Server">
                 <field name="name"/>
                 <field name="host"/>
+                <field name="port"/>
+                <field name="ttype"/>
                 <field name="state"/>
                 <field name="authentication_id"/>
             </tree>

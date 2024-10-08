@@ -11,7 +11,10 @@ class MigrationDatabase(models.Model):
     version = fields.Integer()
     status = fields.Selection([('ok', 'OK'), ('ko', 'KO')], default='ok')
     date_database = fields.Date(default=fields.Date.today)
-    backup_file = fields.Binary()
+    backup_type = fields.Selection([('file', 'File'), ('distant', 'Distant')])
+    backup_file = fields.Binary(attachment=True)
+    backup_server = fields.Many2one(comodel_name='migration.server', domain=[('ttype', '=', 'backup')])
+    backup_filename = fields.Char()
     script_ids = fields.Many2many(comodel_name='migration.sql', string="Scripts")
 
     def button_action_create_migration(self):

@@ -12,8 +12,10 @@
     'depends': [
         'base',
     ],
+    "external_dependencies": {"python": ["pysftp"]},
     'data': [
         'security/ir.model.access.csv',
+        'data/ir_cron.xml',
         'views/migration_database.xml',
         'views/migration_migration.xml',
         'views/migration_server.xml',

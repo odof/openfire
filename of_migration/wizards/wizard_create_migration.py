@@ -10,10 +10,10 @@ class WizardCreateMigration(models.TransientModel):
     start_version = fields.Integer()
     end_version = fields.Integer()
     database_id = fields.Many2one(comodel_name='migration.database', string="Database")
-    server_id = fields.Many2one(comodel_name='migration.server', string="Server")
+    server_id = fields.Many2one(comodel_name='migration.server', string="Server", domain=[('ttype', '=', 'migration')])
     planning_date = fields.Datetime()
     clean_all = fields.Boolean()
-    ttype = fields.Selection([('demo', 'Demo'), ('prod', 'Production')], string="Type")
+    ttype = fields.Selection([('demo', 'Demo'), ('prod', 'Production')], string="Type", default='demo')
 
     def action_create_migration(self):
         if self.end_version <= self.start_version:
@@ -37,6 +37,7 @@ class WizardCreateMigration(models.TransientModel):
             'planning_date': planning_date,
             'clean_all': self.clean_all,
             'ttype': self.ttype,
+            'state': 'todo',
         }
 
         migration = self.env['migration.migration'].create(value)

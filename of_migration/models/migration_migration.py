@@ -1,6 +1,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
+
 from odoo import api, fields, models
+
+logger = logging.getLogger(__name__)
 
 
 class MigrationMigration(models.Model):
@@ -12,7 +16,7 @@ class MigrationMigration(models.Model):
     current_version = fields.Integer()
     database_id = fields.Many2one(comodel_name='migration.database', string="Database")
     state = fields.Selection([('todo', 'To Do'), ('running', 'Running'), ('done', 'Done'), ('failed', 'Failed')])
-    server_id = fields.Many2one(comodel_name='migration.server', string="Server")
+    server_id = fields.Many2one(comodel_name='migration.server', string="Server", domain=[('ttype', '=', 'migration')])
     planning_date = fields.Datetime()
     partner_id = fields.Many2one(comodel_name='res.partner', related='database_id.partner_id', string="Partner")
     uid = fields.Char()
@@ -25,7 +29,8 @@ class MigrationMigration(models.Model):
     @api.model
     def cron_launch_migration(self):
         # on va chercher les migrations qui doivent être lancées et on envoie la demande au serveur
-        migrations = self.search([('state', '=', 'todo'), ('planning_date', '>=', fields.Datetime.now())])
+        migrations = self.search([('state', '=', 'todo'), ('planning_date', '<=', fields.Datetime.now())])
+        logger.info(f"Lancement des migrations : {migrations}")
         migrations.action_start_migration()
 
     @api.model
@@ -46,13 +51,22 @@ class MigrationMigration(models.Model):
         self.action_get_logs()
         self.action_get_dump()
 
+    def button_action_start_migration(self):
+        self.server_id.action_start_migration(self)
+
     def action_start_migration(self):
         for record in self:
             record.server_id.action_start_migration(record)
 
+    def button_action_status_migration(self):
+        self.server_id.action_status_migration(self)
+
     def action_status_migration(self):
         for record in self:
-            record.server_id.action_statut_migration(record)
+            record.server_id.action_status_migration(record)
+
+    def button_action_get_logs(self):
+        self.server_id.action_get_logs(self)
 
     def action_get_logs(self):
         for record in self:

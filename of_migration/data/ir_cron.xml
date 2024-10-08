@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="migration_migration_cron" model="ir.cron">
+    <record id="migration_migration_launch_cron" model="ir.cron">
         <field name="name">Launch Migrations</field>
         <field name="model_id" ref="model_migration_migration"/>
         <field name="interval_number">1</field>
@@ -11,7 +11,7 @@
         <field name="code">model.cron_launch_migration()</field>
     </record>
 
-    <record id="migration_migration_cron" model="ir.cron">
+    <record id="migration_migration_status_cron" model="ir.cron">
         <field name="name">Get status migrations</field>
         <field name="model_id" ref="model_migration_migration"/>
         <field name="interval_number">1</field>
