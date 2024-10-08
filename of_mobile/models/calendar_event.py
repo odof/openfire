@@ -103,13 +103,17 @@ class CalendarEvent(models.Model):
             ).sorted(key=lambda x: x.start)
 
     def _compute_of_payment(self):
+        payment_obj = self.env["account.payment"]
         for event in self:
-            payment_intervention = self.env["account.payment"].search([("of_intervention_id", "=", event.id)], limit=1)
+            payment_intervention = payment_obj.search(
+                [("of_intervention_id", "=", event.id), ("of_sale_id", "=", False)], limit=1
+            )
             event.of_payment_intervention = payment_intervention.id
 
             if event.of_additional_sale_order_id:
-                payment_sale = self.env["account.payment"].search(
-                    [("of_sale_id", "=", event.of_additional_sale_order_id.id)], limit=1
+                payment_sale = payment_obj.search(
+                    [("of_intervention_id", "=", event.id), ("of_sale_id", "=", event.of_additional_sale_order_id.id)],
+                    limit=1,
                 )
                 event.of_payment_sale = payment_sale.id
             else:
