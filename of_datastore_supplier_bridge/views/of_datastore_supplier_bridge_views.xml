@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Marque -->
-    <record id="of_datastore_supplier_bridge_brand_view_form" model="ir.ui.view">
+    <record id="of_datastore_product_brand_view_form" model="ir.ui.view">
         <field name="name">of.datastore.supplier.bridge.brand.form.view</field>
         <field name="model">of.product.brand</field>
         <field name="inherit_id" ref="of_datastore_product.of_datastore_product_brand_view_form"/>
@@ -13,8 +12,8 @@
         </field>
     </record>
 
-    <!-- Archivage de vue redondante entre les deux modules of_datastore_product et of_datastore_supplier -->
-    <record id="of_datastore_product.of_datastore_product_of_product_template_form_view" model="ir.ui.view">
+    <!-- We archive a redundant view between the two modules `of_datastore_product` and `of_datastore_supplier` -->
+    <record id="of_datastore_product.of_datastore_product_template_form_view" model="ir.ui.view">
         <field name="active">False</field>
     </record>
 </odoo>
