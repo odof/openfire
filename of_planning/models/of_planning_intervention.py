@@ -1438,7 +1438,7 @@ class OfPlanningIntervention(models.Model):
 
         # Si BL associés, on met à jour la date des BL en fonction de la date d'intervention
         if 'picking_manual_ids' in vals or 'date' in vals:
-            for rdv in self:
+            for rdv in self.sudo():
                 if rdv.picking_manual_ids:
                     rdv.picking_manual_ids.write({'min_date': rdv.date})
 
