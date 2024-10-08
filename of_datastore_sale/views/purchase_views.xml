@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_purchase_configuration" model="ir.ui.view">
+        <field name="name">view.purchase.configuration</field>
+        <field name="model">purchase.config.settings</field>
+        <field name="inherit_id" ref="purchase.view_purchase_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form//field[@name='module_stock_dropshipping']" position="after">
+                <label for="group_of_group_datastore_brand_dropshipping"/>
+                <div name="group_of_group_datastore_brand_dropshipping">
+                    <field name="group_of_group_datastore_brand_dropshipping" class="oe_inline"/>
+                    <span>Autoriser l'utilisation de la livraison directe sur les marques.</span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
