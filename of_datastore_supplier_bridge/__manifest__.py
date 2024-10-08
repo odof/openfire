@@ -1,23 +1,22 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 
 {
     'name': "OpenFire / Base centrale intermédiaire des articles",
-    'version': "10.0.1.0.0",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "http://www.openfire.fr",
+    'website': "https://www.openfire.fr",
     'category': "OpenFire",
-    'description': u"""
-Module OpenFire pour bases de centralisation intermédiaires des tarifs.
-=======================================================================
-
-Module destiné aux bases qui sont à la fois fournisseur et récupèrent leurs tarifs d'une autre base centrale.
-
-- Rend disponible le bouton "Importer tous les articles" depuis la marque aux utilisateurs non admin.
-""",
-    'depends': ['of_datastore_product', 'of_datastore_supplier'],
+    'summary': "Base centrale intermédiaire des articles",
+    'depends': [
+        'of_datastore_product',
+        'of_datastore_supplier'
+    ],
     'data': [
         'views/of_datastore_supplier_bridge_views.xml',
     ],
     'installable': True,
+    'application': False,
     'auto_install': True,
 }
