@@ -24,6 +24,7 @@
                             <field name="backup_file" attrs="{'invisible': [('backup_type','!=','file')]}"/>
                             <field name="backup_server" attrs="{'invisible': [('backup_type','!=','distant')]}"/>
                             <field name="backup_filename" attrs="{'invisible': [('backup_type','!=','distant')]}"/>
+                            <field name="backup_uuid" attrs="{'invisible': [('backup_type','!=','uuid')]}"/>
                         </group>
                     </group>
                     <group>

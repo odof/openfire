@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import base64
 import logging
 
 import pysftp
@@ -34,7 +35,7 @@ class MigrationServer(models.Model):
             if migration.database_id.backup_type == 'file':
                 res = requests.post(
                     f"{self.host}:{self.port}/api/uploads",
-                    files={'file': ('backup.dump', migration.database_id.backup_file, 'application/octet-stream')},
+                    data=base64.b64decode(migration.database_id.backup_file),
                 )
                 res_file = res.json()
             elif migration.database_id.backup_type == 'distant':
@@ -48,12 +49,15 @@ class MigrationServer(models.Model):
                     cnopts=cnopts,
                 )
                 connection.get(f"/upload/{migration.database_id.backup_filename}", f"/tmp/backup{migration.id}")
-                files = {'file': ('backup.dump', open(f"/tmp/backup{migration.id}", 'rb'))}
                 res = requests.post(
                     f"{self.host}:{self.port}/api/uploads",
-                    files=files,
+                    data=open(f"/tmp/backup{migration.id}", 'rb'),
                 )
                 res_file = res.json()
+            elif migration.database_id.backup_type == 'uuid':
+                res_file = {'uid': migration.database_id.backup_uuid}
+
+            migration.database_id.backup_uuid = res_file.get('uid')
             # on envoie les scripts s'ils n'y sont pas déjà
             for script in migration.database_id.script_ids:
                 value_script = {
