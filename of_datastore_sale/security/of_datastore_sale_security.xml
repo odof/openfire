@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="of_group_datastore_brand_dropshipping" model="res.groups">
-        <field name="name">(OF) Autoriser la livraison directe</field>
+        <field name="name">(OF) Allows drop-shipment</field>
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
