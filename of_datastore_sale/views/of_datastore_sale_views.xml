@@ -21,7 +21,7 @@
                             <field name="login"/>
                             <field name="new_password" password="True" placeholder="***"/>
                             <field name="password" invisible="1"/>
-                            <button name="button_dummy" string="Test connexion" type="object"/>
+                            <button name="action_button_dummy" string="Test connection" type="object"/>
                         </group>
                         <field name="error_msg" colspan="4"/>
                     </group>
@@ -35,7 +35,7 @@
         <field name="model">of.datastore.sale</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-            <tree colors="gray:active == False">
+            <tree decoration-muted="active==False">
                 <field name="active" invisible="1"/>
                 <field name="partner_ids" widget="many2many_tags"/>
                 <field name="db_name"/>
@@ -44,14 +44,12 @@
     </record>
 
     <record id="of_datastore_sale_action" model="ir.actions.act_window">
-        <field name="name">Connecteurs Vente</field>
+        <field name="name">Sales Connector</field>
         <field name="res_model">of.datastore.sale</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="of_datastore_sale_tree_view"/>
         <field name="context">{'active_test': False}</field>
     </record>
 
-    <menuitem name="Connecteurs vente" id="of_datastore_sale_menu" parent="of_base.of_connector_menu" sequence="10" action="of_datastore_sale_action"/>
 
 </odoo>
