@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
-
 from of_datastore_product import DATASTORE_IND
+
+from odoo import api, fields, models
 
 
 # Création/édition d'objets incluant un article centralisé
@@ -179,6 +179,15 @@ class AccountInvoiceLineComp(models.Model):
 class PurchaseOrderLine(models.Model):
     _name = 'purchase.order.line'
     _inherit = ['purchase.order.line', 'of.datastore.product.reference']
+
+    @api.onchange('product_qty', 'product_uom')
+    def _onchange_quantity(self):
+        res = super(PurchaseOrderLine, self)._onchange_quantity()
+        if self.product_id.id < 0:
+            self.price_unit = self.product_id.of_seller_price
+            if self.product_uom != self.product_id.uom_id:
+                self.price_unit = self.product_id.uom_id._compute_price(self.price_unit, self.product_uom)
+        return res
 
 
 class StockInventoryLine(models.Model):
