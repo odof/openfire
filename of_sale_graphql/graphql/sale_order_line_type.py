@@ -13,7 +13,7 @@ class SaleOrderLine(OdooObjectType):
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
-    product = graphene.Field(Product, required=True)
+    product = graphene.Field(Product)
     tax_id = graphene.List(graphene.NonNull(AccountTax), name="taxes")
     product_uom_qty = graphene.Float(required=True)
     price_unit = graphene.Float(required=True)
