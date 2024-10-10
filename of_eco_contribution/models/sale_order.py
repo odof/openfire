@@ -78,6 +78,10 @@ class SaleOrderLine(models.Model):
     of_unit_eco_contribution = fields.Float(
         string=u"Montant unitaire éco-contribution", compute='_compute_of_total_eco_contribution', store=True)
 
+    @api.depends('of_total_eco_contribution')
+    def _product_margin(self):
+        super(SaleOrderLine, self)._product_margin()
+
     @api.onchange('product_id')
     def product_id_change(self):
         result = super(SaleOrderLine, self).product_id_change()
@@ -98,17 +102,6 @@ class SaleOrderLine(models.Model):
                 price_unit += self.of_unit_eco_contribution
             self.price_unit = price_unit
         return result
-
-    @api.depends(
-        'product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'price_subtotal', 'of_total_eco_contribution'
-    )
-    def _product_margin(self):
-        for line in self:
-            currency = line.order_id.pricelist_id.currency_id
-            price = line.purchase_price
-            line.margin = currency.round(
-                line.price_subtotal - line.of_total_eco_contribution - (price * line.product_uom_qty)
-            )
 
     @api.depends('product_id', 'product_uom_qty', 'product_uom', 'kit_id.of_total_eco_contribution', 'of_is_kit',
                  'of_product_qty_brut')
@@ -141,6 +134,11 @@ class SaleOrderLine(models.Model):
     def _subtract_of_unit_eco_contribution(self):
         for record in self.filtered(lambda r: r.of_unit_eco_contribution):
             record.price_unit = record.price_unit - record.of_unit_eco_contribution
+
+    @api.multi
+    def _get_cost(self):
+        res = super(SaleOrderLine, self)._get_cost()
+        return res + self.of_total_eco_contribution
 
 
 class OfSaleOrderKit(models.Model):

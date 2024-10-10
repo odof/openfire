@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
-import odoo.addons.decimal_precision as dp
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+
+import odoo.addons.decimal_precision as dp
 
 
 class OFSaleOrderBudget(models.Model):
@@ -287,6 +288,10 @@ class SaleOrderLine(models.Model):
         string=u"Coefficient total théorique", digits=dp.get_precision('Product Price'),
         compute='_compute_of_theorical_prices', store=True)
 
+    @api.depends('of_labor_cost')
+    def _product_margin(self):
+        super(SaleOrderLine, self)._product_margin()
+
     @api.depends('of_hour_worksite_id', 'of_hour_worksite_id.hourly_cost',
                  'of_duration_total', 'purchase_price', 'product_uom_qty')
     def _compute_of_labor_cost(self):
@@ -334,6 +339,11 @@ class SaleOrderLine(models.Model):
             self.mapped('order_id').update_sale_order_labor_cost()
 
         return res
+
+    @api.multi
+    def _get_cost(self):
+        res = super(SaleOrderLine, self)._get_cost()
+        return res + self.of_labor_cost
 
 
 class OFSaleOrderLayoutCategory(models.Model):
