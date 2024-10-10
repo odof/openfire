@@ -14,7 +14,7 @@ class SaleOrderTemplateLine(OdooObjectType):
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
-    product = graphene.Field(Product, required=True)
+    product = graphene.Field(Product)
     product_uom_qty = graphene.Float(required=True)
     company = graphene.Field(Company)
 

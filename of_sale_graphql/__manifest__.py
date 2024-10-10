@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / OF Sale GraphQL",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
