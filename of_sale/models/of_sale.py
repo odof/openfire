@@ -4,14 +4,13 @@
 import itertools
 import json
 
-from odoo import models, fields, api, _
-from odoo.addons.sale.models.sale import SaleOrderLine as SOL
-from odoo.addons.sale.models.sale import SaleOrder as SO
-from odoo.tools import float_compare, float_is_zero, DEFAULT_SERVER_DATE_FORMAT
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.models import regex_order, NewId
-from odoo.addons.of_utils.models.of_utils import get_selection_label
+from odoo.models import NewId, regex_order
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, float_compare, float_is_zero
 
+from odoo.addons.of_utils.models.of_utils import get_selection_label
+from odoo.addons.sale.models.sale import SaleOrder as SO, SaleOrderLine as SOL
 
 NEGATIVE_TERM_OPERATORS = ('!=', 'not like', 'not ilike', 'not in')
 
@@ -1019,6 +1018,12 @@ class SaleOrderLine(models.Model):
              u" + remise standard sur ligne de commande"
     )
 
+    @api.depends('product_id', 'purchase_price', 'product_uom_qty', 'price_unit', 'price_subtotal')
+    def _product_margin(self):
+        for line in self:
+            currency = line.order_id.pricelist_id.currency_id
+            line.margin = currency.round(line.price_subtotal - line._get_cost())
+
     @api.depends('price_subtotal', 'margin')
     def _compute_of_marge(self):
         for line in self:
@@ -1471,6 +1476,11 @@ class SaleOrderLine(models.Model):
                 else:
                     line['of_marge_pc'] = 0.0
         return res
+
+    @api.multi
+    def _get_cost(self):
+        self.ensure_one()
+        return self.purchase_price * self.product_uom_qty
 
 
 class SaleLayoutCategory(models.Model):
