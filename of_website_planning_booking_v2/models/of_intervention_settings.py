@@ -43,8 +43,6 @@ class OFInterventionSettings(models.TransientModel):
             self.env['ir.values'].set_default('of.intervention.settings', 'booking_display_price', True)
         if self.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit') is None:
             self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 14)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 14)
         if self.env['ir.values'].get_default('of.intervention.settings', 'booking_morning_hours_label') is None:
             self.env['ir.values'].set_default(
                 'of.intervention.settings', 'booking_morning_hours_label', u"8h00 - 13h00")
