@@ -33,7 +33,7 @@ class User(OdooObjectType):
     def resolve_sales_access_right(root, info):
         if root.has_group("sales_team.group_sale_manager"):
             return "manager"
-        elif root.has_group("of_access_control.of_group_sale_responsible"):
+        elif root.has_group("of_sale.of_group_sale_responsible"):
             return "responsible"
         elif root.has_group("sales_team.group_sale_salesman_all_leads"):
             return "salesman_all_leads"
