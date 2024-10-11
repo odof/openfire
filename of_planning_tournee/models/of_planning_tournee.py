@@ -649,7 +649,7 @@ class OFPlanningTournee(models.Model):
         # we want to return a list of tuples (start, end) of working hours, so we need to manage the case where
         # the employee has only one or more than two slots of working hours
         if len(hours) == 1:
-            half_day = hours[0][1] - hours[0][0]
+            half_day = hours[0][0] + (hours[0][1] - hours[0][0]) / 2
             just_before_half_day = half_day - 0.01
             hours = [[(hours[0][0], just_before_half_day)], [(half_day, hours[0][1])]]
         elif len(hours) > 2:
