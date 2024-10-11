@@ -8,8 +8,8 @@ from .equipment_type import Equipment, EquipmentFilterInput
 
 
 class EquipmentQuery(graphene.ObjectType):
-    _name = 'EquipmentQuery'
-    _type = 'query'
+    _name = "EquipmentQuery"
+    _type = "query"
 
     equipments = graphene.List(
         graphene.NonNull(Equipment),
@@ -21,7 +21,7 @@ class EquipmentQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_equipments(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.equipment']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.equipment"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.equipment'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.equipment"].search(odoo_domain, offset=offset, limit=limit)

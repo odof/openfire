@@ -7,8 +7,8 @@ from odoo.addons.of_survey_graphql.graphql.survey_type import Survey, SurveyInpu
 
 
 class PlanningInterventionTemplate(OdooObjectType):
-    _name = 'PlanningInterventionTemplate'
-    _type = 'types'
+    _name = "PlanningInterventionTemplate"
+    _type = "types"
 
     survey = graphene.Field(Survey)
 
@@ -17,7 +17,7 @@ class PlanningInterventionTemplate(OdooObjectType):
 
 
 class PlanningInterventionTemplateInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionTemplateInput'
-    _type = 'types'
+    _name = "PlanningInterventionTemplateInput"
+    _type = "types"
 
     survey = graphene.Field(SurveyInput)

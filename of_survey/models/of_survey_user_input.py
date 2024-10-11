@@ -10,30 +10,30 @@ from odoo.tools.safe_eval import safe_eval
 class OFSurveyUserInput(models.Model):
     """Metadata for a set of one user's answers to a particular survey"""
 
-    _name = 'of.survey.user_input'
+    _name = "of.survey.user_input"
     _description = "Survey User Input"
     _rec_name = "survey_id"
     _order = "create_date desc"
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     # answer description
     survey_id = fields.Many2one(
-        comodel_name='of.survey.survey', string="Survey", required=True, readonly=True, ondelete='cascade'
+        comodel_name="of.survey.survey", string="Survey", required=True, readonly=True, ondelete="cascade"
     )
     start_datetime = fields.Datetime(string="Start date and time", readonly=True)
     end_datetime = fields.Datetime(string="End date and time", readonly=True)
     state = fields.Selection(
         selection=[
-            ('new', "Not started yet"),
-            ('in_progress', "In Progress"),
-            ('done', "Completed"),
+            ("new", "Not started yet"),
+            ("in_progress", "In Progress"),
+            ("done", "Completed"),
         ],
         string="Status",
-        default='new',
+        default="new",
         readonly=True,
     )
     test_entry = fields.Boolean(readonly=True)
-    last_displayed_page_id = fields.Many2one(comodel_name='of.survey.question', string="Last displayed question/page")
+    last_displayed_page_id = fields.Many2one(comodel_name="of.survey.question", string="Last displayed question/page")
     # identification / access
     access_token = fields.Char(
         string="Identification token", default=lambda self: str(uuid.uuid4()), readonly=True, required=True, copy=False
@@ -41,15 +41,15 @@ class OFSurveyUserInput(models.Model):
     invite_token = fields.Char(
         string="Invite token", readonly=True, copy=False
     )  # no unique constraint, as it identifies a pool of attempts
-    partner_id = fields.Many2one(comodel_name='res.partner', string="Contact", readonly=True)
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Contact", readonly=True)
     email = fields.Char(readonly=True)
     nickname = fields.Char(help="Attendee nickname, mainly used to identify them in the survey session leaderboard.")
     # questions / answers
     user_input_line_ids = fields.One2many(
-        comodel_name='of.survey.user_input.line', inverse_name='user_input_id', string="Answers", copy=True
+        comodel_name="of.survey.user_input.line", inverse_name="user_input_id", string="Answers", copy=True
     )
     predefined_question_ids = fields.Many2many(
-        comodel_name='of.survey.question', string="Predefined Questions", readonly=True
+        comodel_name="of.survey.question", string="Predefined Questions", readonly=True
     )
     # live sessions
     is_session_answer = fields.Boolean(
@@ -59,23 +59,23 @@ class OFSurveyUserInput(models.Model):
     res_model = fields.Char(string="Related Document Model", help="Model of the related document.")
     res_id = fields.Integer(string="Related Document ID", help="ID of the related document.")
     redirect_action_id = fields.Many2one(
-        comodel_name='ir.actions.act_window',
+        comodel_name="ir.actions.act_window",
         string="Redirect Action",
         help="Action to redirect to the related document.",
     )
-    menu_id = fields.Many2one(comodel_name='ir.ui.menu', string="Menu")
+    menu_id = fields.Many2one(comodel_name="ir.ui.menu", string="Menu")
 
     _sql_constraints = [
-        ('unique_token', 'UNIQUE (access_token)', "An access token must be unique!"),
+        ("unique_token", "UNIQUE (access_token)", "An access token must be unique!"),
     ]
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if 'predefined_question_ids' not in vals:
-                suvey_id = vals.get('survey_id', self.env.context.get('default_survey_id'))
-                survey = self.env['of.survey.survey'].browse(suvey_id)
-                vals['predefined_question_ids'] = [(6, 0, survey._prepare_user_input_predefined_questions().ids)]
+            if "predefined_question_ids" not in vals:
+                suvey_id = vals.get("survey_id", self.env.context.get("default_survey_id"))
+                survey = self.env["of.survey.survey"].browse(suvey_id)
+                vals["predefined_question_ids"] = [(6, 0, survey._prepare_user_input_predefined_questions().ids)]
         return super().create(vals_list)
 
     # ------------------------------------------------------------
@@ -86,27 +86,27 @@ class OFSurveyUserInput(models.Model):
         """Open the website page with the survey form"""
         self.ensure_one()
         return {
-            'type': 'ir.actions.act_url',
-            'name': "View Answers",
-            'target': 'self',
-            'url': f'/of_survey/print/{self.survey_id.access_token}?answer_token={self.access_token}',
+            "type": "ir.actions.act_url",
+            "name": "View Answers",
+            "target": "self",
+            "url": f"/of_survey/print/{self.survey_id.access_token}?answer_token={self.access_token}",
         }
 
     def action_redirect_to_attempts(self):
         self.ensure_one()
 
-        action = self.env['ir.actions.act_window']._for_xml_id('of_survey.action_survey_user_input')
+        action = self.env["ir.actions.act_window"]._for_xml_id("of_survey.action_survey_user_input")
         context = dict(self.env.context or {})
 
-        context['create'] = False
-        context['search_default_survey_id'] = self.survey_id.id
-        context['search_default_group_by_survey'] = False
+        context["create"] = False
+        context["search_default_survey_id"] = self.survey_id.id
+        context["search_default_group_by_survey"] = False
         if self.partner_id:
-            context['search_default_partner_id'] = self.partner_id.id
+            context["search_default_partner_id"] = self.partner_id.id
         elif self.email:
-            context['search_default_email'] = self.email
+            context["search_default_email"] = self.email
 
-        action['context'] = context
+        action["context"] = context
         return action
 
     @api.model
@@ -115,17 +115,17 @@ class OFSurveyUserInput(models.Model):
 
     def _mark_in_progress(self):
         """marks the state as 'in_progress' and updates the start_datetime accordingly."""
-        self.write({'start_datetime': fields.Datetime.now(), 'state': 'in_progress'})
+        self.write({"start_datetime": fields.Datetime.now(), "state": "in_progress"})
         for user_input in self:
             user_input.predefined_question_ids = user_input.survey_id._prepare_user_input_predefined_questions()
 
     def get_start_url(self):
         self.ensure_one()
-        return f'{self.survey_id.get_start_url()}?answer_token={self.access_token}'
+        return f"{self.survey_id.get_start_url()}?answer_token={self.access_token}"
 
     def get_print_url(self):
         self.ensure_one()
-        return f'{self.survey_id.get_print_url()}?answer_token={self.access_token}'
+        return f"{self.survey_id.get_print_url()}?answer_token={self.access_token}"
 
     def _mark_done(self):
         """This method will:
@@ -137,8 +137,8 @@ class OFSurveyUserInput(models.Model):
         Will also run challenge Cron to give the certification badge if any."""
         self.write(
             {
-                'end_datetime': fields.Datetime.now(),
-                'state': 'done',
+                "end_datetime": fields.Datetime.now(),
+                "state": "done",
             }
         )
 
@@ -159,20 +159,20 @@ class OFSurveyUserInput(models.Model):
         if attachments is None:
             attachments = []
 
-        old_answers = self.env['of.survey.user_input.line'].search(
-            [('user_input_id', '=', self.id), ('question_id', '=', question.id)]
+        old_answers = self.env["of.survey.user_input.line"].search(
+            [("user_input_id", "=", self.id), ("question_id", "=", question.id)]
         )
-        if question.question_type in ['char_box', 'text_box', 'date', 'numerical_box']:
+        if question.question_type in ["char_box", "text_box", "date", "numerical_box"]:
             if answer in ("[]", "") and len(attachments) > 0:
                 answer = _("See file(s) for the answer")
             self._save_line_simple_answer(question, old_answers, answer, attachments)
             if question.save_as_email and answer:
-                self.write({'email': answer})
-        elif question.question_type == 'multi_image':
+                self.write({"email": answer})
+        elif question.question_type == "multi_image":
             self._save_line_file(question, old_answers, answer)
-        elif question.question_type in ['simple_choice', 'multiple_choice']:
+        elif question.question_type in ["simple_choice", "multiple_choice"]:
             self._save_line_choice(question, old_answers, answer, comment, attachments)
-        elif question.question_type == 'form':
+        elif question.question_type == "form":
             self._save_line_pdf(question, old_answers, answer)
         else:
             raise AttributeError(f"{question.question_type}: This type of question has no saving function")
@@ -180,18 +180,18 @@ class OFSurveyUserInput(models.Model):
     def _save_line_simple_answer(self, question, old_answers, answer, attachments):
         vals = self._get_line_answer_values(question, answer, question.question_type, attachments)
         if not old_answers:
-            return self.env['of.survey.user_input.line'].create(vals)
+            return self.env["of.survey.user_input.line"].create(vals)
         old_answers.write(vals)
 
         return old_answers
 
     def _save_line_file(self, question, old_answers, answer):
         """Save the user's file upload answer for the given question."""
-        vals = self._get_line_answer_file_upload_values(question, 'multi_image', answer)
+        vals = self._get_line_answer_file_upload_values(question, "multi_image", answer)
         if old_answers:
             old_answers.write(vals)
         else:
-            old_answers = self.env['of.survey.user_input.line'].create(vals)
+            old_answers = self.env["of.survey.user_input.line"].create(vals)
 
         return old_answers
 
@@ -199,11 +199,11 @@ class OFSurveyUserInput(models.Model):
         if answer:
             datas = answer.split(",")
             datas = datas[1] if len(datas) > 1 else datas[0]
-            answer = bytes(datas, 'utf-8')
+            answer = bytes(datas, "utf-8")
 
         vals = self._get_line_answer_values(question, answer, question.question_type)
         if not old_answers:
-            return self.env['of.survey.user_input.line'].create(vals)
+            return self.env["of.survey.user_input.line"].create(vals)
         old_answers.write(vals)
         return old_answers
 
@@ -218,28 +218,28 @@ class OFSurveyUserInput(models.Model):
 
         vals_list = []
 
-        if question.question_type == 'simple_choice':
+        if question.question_type == "simple_choice":
             if not question.comment_count_as_answer or not question.comments_allowed or not comment:
                 vals_list = [
-                    self._get_line_answer_values(question, answer, 'suggestion', attachments) for answer in answers
+                    self._get_line_answer_values(question, answer, "suggestion", attachments) for answer in answers
                 ]
-        elif question.question_type == 'multiple_choice':
+        elif question.question_type == "multiple_choice":
             vals_list = [
-                self._get_line_answer_values(question, answer, 'suggestion', attachments) for answer in answers
+                self._get_line_answer_values(question, answer, "suggestion", attachments) for answer in answers
             ]
 
         if comment:
             vals_list.append(self._get_line_comment_values(question, comment, attachments))
 
         old_answers.sudo().unlink()
-        return self.env['of.survey.user_input.line'].create(vals_list)
+        return self.env["of.survey.user_input.line"].create(vals_list)
 
     def _get_line_answer_values(self, question, answer, answer_type, attachments=None):
         vals = {
-            'user_input_id': self.id,
-            'question_id': question.id,
-            'skipped': False,
-            'answer_type': answer_type,
+            "user_input_id": self.id,
+            "question_id": question.id,
+            "skipped": False,
+            "answer_type": answer_type,
         }
 
         if not answer or (isinstance(answer, str) and not answer.strip()):
@@ -247,41 +247,41 @@ class OFSurveyUserInput(models.Model):
                 vals.update(answer_type=None, skipped=True)
                 return vals
 
-        if answer_type == 'suggestion':
+        if answer_type == "suggestion":
             if not answer or (isinstance(answer, str) and not answer.strip()):
-                vals['suggested_answer_id'] = False
+                vals["suggested_answer_id"] = False
             else:
-                vals['suggested_answer_id'] = int(answer)
-        elif answer_type == 'numerical_box':
-            vals['value_numerical_box'] = float(answer)
+                vals["suggested_answer_id"] = int(answer)
+        elif answer_type == "numerical_box":
+            vals["value_numerical_box"] = float(answer)
         else:
             if not answer or (isinstance(answer, str) and not answer.strip()):
                 if len(attachments) > 0:
                     answer = _("See file(s) for the answer")
 
-            vals[f'value_{answer_type}'] = answer
+            vals[f"value_{answer_type}"] = answer
 
         # si la question permet d'ajouter des images, il faut aussi les mettre
         if question.add_pictures:
             attachment_ids = []
-            image_obj = self.env['of.image']
+            image_obj = self.env["of.image"]
             for attachment in attachments:
-                name = attachment.get('title')
-                if name == '':
-                    name = attachment.get('filename')
+                name = attachment.get("title")
+                if name == "":
+                    name = attachment.get("filename")
                 # on regarde dans la data si on a l'information que c'est une image ou pas
                 # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
-                datas = attachment['src'].split(',')
+                datas = attachment["src"].split(",")
                 if len(datas) > 1:
                     datas = datas[1]
                 else:
                     datas = datas[0]
-                datas = bytes(datas, 'utf-8')
+                datas = bytes(datas, "utf-8")
 
                 att = image_obj.search(
                     [
-                        ('name', '=', name),
-                        ('caption', '=', attachment.get('legend', '')),
+                        ("name", "=", name),
+                        ("caption", "=", attachment.get("legend", "")),
                     ],
                     limit=1,
                 )
@@ -289,89 +289,89 @@ class OFSurveyUserInput(models.Model):
                 if not att:
                     att = image_obj.create(
                         {
-                            'name': name,
-                            'caption': attachment.get('legend', ''),
-                            'image_1920': datas,
+                            "name": name,
+                            "caption": attachment.get("legend", ""),
+                            "image_1920": datas,
                         }
                     )
                 attachment_ids.append(att.id)
-            vals['value_image_ids'] = attachment_ids
+            vals["value_image_ids"] = attachment_ids
         return vals
 
     def _get_line_comment_values(self, question, comment, attachments):
         vals = {
-            'user_input_id': self.id,
-            'question_id': question.id,
-            'skipped': False,
-            'answer_type': 'char_box',
-            'value_char_box': comment,
+            "user_input_id": self.id,
+            "question_id": question.id,
+            "skipped": False,
+            "answer_type": "char_box",
+            "value_char_box": comment,
         }
 
         # si la question permet d'ajouter des images, il faut aussi les mettre
         if question.add_pictures:
             attachment_ids = []
             for attachment in attachments:
-                name = attachment.get('title')
-                if name == '':
-                    name = attachment.get('filename')
+                name = attachment.get("title")
+                if name == "":
+                    name = attachment.get("filename")
                 # on regarde dans la data si on a l'information que c'est une image ou pas
                 # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
-                datas = attachment['src'].split(',')
+                datas = attachment["src"].split(",")
                 if len(datas) > 0:
                     datas = datas[1]
                 else:
                     datas = datas[0]
-                datas = bytes(datas, 'utf-8')
+                datas = bytes(datas, "utf-8")
 
-                attachment = self.env['of.image'].create(
+                attachment = self.env["of.image"].create(
                     {
-                        'name': name,
-                        'caption': attachment.get('legend', ''),
-                        'image_1920': datas,
+                        "name": name,
+                        "caption": attachment.get("legend", ""),
+                        "image_1920": datas,
                     }
                 )
                 attachment_ids.append(attachment.id)
-            vals['value_image_ids'] = attachment_ids
+            vals["value_image_ids"] = attachment_ids
         return vals
 
     def _get_line_answer_file_upload_values(self, question, answer_type, answer):
         """Get the values to use when creating or updating a user input line
         for a file upload answer."""
         vals = {
-            'user_input_id': self.id,
-            'question_id': question.id,
-            'skipped': False,
-            'answer_type': answer_type,
+            "user_input_id": self.id,
+            "question_id": question.id,
+            "skipped": False,
+            "answer_type": answer_type,
         }
-        if answer_type == 'multi_image':
+        if answer_type == "multi_image":
             if len(answer) > 0:
                 attachment_ids = []
 
                 for file in answer[0]:
-                    name = file.get('title')
-                    if name == '':
-                        name = file.get('filename')
+                    name = file.get("title")
+                    if name == "":
+                        name = file.get("filename")
 
                     # on regarde dans la data si on a l'information que c'est une image ou pas
                     # si c'est le cas, on prends la deuxième partie du contenu qui est l'image en elle même
-                    datas = file['src'].split(',')
+                    datas = file["src"].split(",")
                     if len(datas) > 0:
                         datas = datas[1]
                     else:
                         datas = datas[0]
-                    datas = bytes(datas, 'utf-8')
+                    datas = bytes(datas, "utf-8")
 
-                    attachment = self.env['of.image'].create(
+                    attachment = self.env["of.image"].create(
                         {
-                            'name': name,
-                            'caption': file.get('legend', ''),
-                            'image_1920': datas,
+                            "name": name,
+                            "caption": file.get("legend", ""),
+                            "image_1920": datas,
                         }
                     )
                     attachment_ids.append(attachment.id)
-                vals['value_image_ids'] = attachment_ids
+                vals["value_image_ids"] = attachment_ids
             else:
-                vals['skipped'] = True
+                vals["skipped"] = True
         return vals
 
     # ------------------------------------------------------------
@@ -386,7 +386,7 @@ class OFSurveyUserInput(models.Model):
         stack = []
         domain = reversed(safe_eval(question.conditional_domain))
         for leaf in domain:
-            if leaf in ['|', '&']:
+            if leaf in ["|", "&"]:
                 if len(res) > 1:
                     res = [leaf] + res
                     if len(self.user_input_line_ids.filtered_domain(res)) > 0:
@@ -410,7 +410,7 @@ class OFSurveyUserInput(models.Model):
         return self.filtered_conditional(question)
 
     def _get_selected_suggested_answers(self):
-        return self.mapped('user_input_line_ids.suggested_answer_id')
+        return self.mapped("user_input_line_ids.suggested_answer_id")
 
     def _clear_inactive_conditional_answers(self):
         """
@@ -437,7 +437,7 @@ class OFSurveyUserInput(models.Model):
 
     def _get_inactive_conditional_questions(self):
         """Return the questions that should not be answered"""
-        inactive_questions = self.env['of.survey.question']
+        inactive_questions = self.env["of.survey.question"]
         for question in self.survey_id.question_ids:
             if not self.is_valid_question(question):
                 inactive_questions |= question
@@ -465,6 +465,6 @@ class OFSurveyUserInput(models.Model):
         for user_input in self:
             if user_input.partner_id:
                 user_input._message_add_suggested_recipient(
-                    recipients, partner=user_input.partner_id, reason=_('Survey Participant')
+                    recipients, partner=user_input.partner_id, reason=_("Survey Participant")
                 )
         return recipients

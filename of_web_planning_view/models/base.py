@@ -5,7 +5,7 @@ from odoo.tools.misc import OrderedSet, unique
 
 
 class Base(models.AbstractModel):
-    _inherit = 'base'
+    _inherit = "base"
 
     @api.model
     def get_planning_data(
@@ -42,14 +42,14 @@ class Base(models.AbstractModel):
         # Because there is no limit by group, we can fetch record_ids as aggregate
         final_result = self.web_read_group(
             domain,
-            ['__record_ids:array_agg(id)'],
+            ["__record_ids:array_agg(id)"],
             groupby,
             limit=limit,
             offset=offset,
             lazy=lazy,
         )
         all_record_ids = self._planning_get_all_record_ids(final_result)
-        all_records, final_result['records'] = self._planning_get_all_records(all_record_ids, read_specification)
+        all_records, final_result["records"] = self._planning_get_all_records(all_record_ids, read_specification)
 
         # Add other groups for which there is no record
         self._planning_add_empty_records(final_result, groupby)
@@ -61,7 +61,7 @@ class Base(models.AbstractModel):
     def _planning_get_all_record_ids(self, final_result):
         """Get all record ids from the result of a read_group"""
         return tuple(
-            unique(record_id for one_group in final_result['groups'] for record_id in one_group['__record_ids'])
+            unique(record_id for one_group in final_result["groups"] for record_id in one_group["__record_ids"])
         )
 
     def _transform_all_records(self, all_records):
@@ -70,8 +70,8 @@ class Base(models.AbstractModel):
         for record in all_records:
             record_new = dict(record)
             for key, value in record_new.items():
-                if key.endswith('_id') and isinstance(value, tuple) and len(value) == 2:
-                    record_new[key] = {'id': value[0], 'display_name': value[1]}
+                if key.endswith("_id") and isinstance(value, tuple) and len(value) == 2:
+                    record_new[key] = {"id": value[0], "display_name": value[1]}
             all_records_transformed.append(record_new)
         return all_records_transformed
 
@@ -81,7 +81,7 @@ class Base(models.AbstractModel):
         # FIXME : specific function available in master (Odoo 17 and above)
         # all_records = self.search_fetch([('id', 'in', all_record_ids)], read_specification.keys())
         # final_result['records'] = all_records.web_read(read_specification)
-        all_records = self.search([('id', 'in', all_record_ids)])
+        all_records = self.search([("id", "in", all_record_ids)])
         all_records_values = all_records.read(read_specification)
         # Transform records to be able to use them in the PlanningView (made records's M2O object friendly)
         all_records_transformed = self._transform_all_records(all_records_values)
@@ -90,9 +90,9 @@ class Base(models.AbstractModel):
     def _planning_update_groups(self, all_records, final_result, groupby, lazy):
         """Update groups to sort keys and remove useless keys"""
         ordered_set_ids = OrderedSet(all_records._ids)
-        keys_to_delete = ['__domain', f'{groupby[0]}_count' if lazy else '__count', '__fold']
-        for group in final_result['groups']:
-            group['__record_ids'] = list(ordered_set_ids & OrderedSet(group['__record_ids']))
+        keys_to_delete = ["__domain", f"{groupby[0]}_count" if lazy else "__count", "__fold"]
+        for group in final_result["groups"]:
+            group["__record_ids"] = list(ordered_set_ids & OrderedSet(group["__record_ids"]))
             for key in keys_to_delete:
                 group.pop(key, None)
 
@@ -100,18 +100,18 @@ class Base(models.AbstractModel):
         """Add empty records for groups without record.
         That allows to display empty rows for Resource that have no record in the view.
         """
-        res_ids = [group[groupby[0]] for group in final_result['groups']]
+        res_ids = [group[groupby[0]] for group in final_result["groups"]]
         res_ids = list(map(lambda x: x and x[0], res_ids))
-        field_id = self.env['ir.model.fields'].sudo().search([('name', '=', groupby[0]), ('model_id', '=', self._name)])
+        field_id = self.env["ir.model.fields"].sudo().search([("name", "=", groupby[0]), ("model_id", "=", self._name)])
         domain = self._planning_add_empty_records_domain(res_ids, field_id)
         for res_id in self.env[field_id.relation].search(domain):
-            record = {groupby[0]: (res_id.id, res_id.name), '__record_ids': [], f'{groupby[0]}_count': 0}
-            final_result['groups'].append(record)
+            record = {groupby[0]: (res_id.id, res_id.name), "__record_ids": [], f"{groupby[0]}_count": 0}
+            final_result["groups"].append(record)
 
     def _planning_add_empty_records_domain(self, res_ids, field_id):
-        if field_id.relation == 'resource.resource':
-            return [('resource_type', '=', 'user'), ('id', 'not in', res_ids)]
-        return [('id', 'not in', res_ids)]
+        if field_id.relation == "resource.resource":
+            return [("resource_type", "=", "user"), ("id", "not in", res_ids)]
+        return [("id", "not in", res_ids)]
 
     @api.model
     def planning_unavailability(self, start_date, end_date, scale, group_bys=None, rows=None):

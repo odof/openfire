@@ -8,8 +8,8 @@ from . import survey_question_page_type
 
 
 class SurveyConditionalQuestionQuery(graphene.ObjectType):
-    _name = 'SurveyConditionalQuestionQuery'
-    _type = 'query'
+    _name = "SurveyConditionalQuestionQuery"
+    _type = "query"
 
     survey_conditional_questions = graphene.List(
         graphene.NonNull(survey_question_page_type.SurveyConditionalQuestion),
@@ -21,15 +21,15 @@ class SurveyConditionalQuestionQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_survey_conditional_questions(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.survey.conditional.question']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.survey.conditional.question"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.survey.conditional.question'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.survey.conditional.question"].search(odoo_domain, offset=offset, limit=limit)
 
 
 class SurveyQuestionPageQuery(graphene.ObjectType):
-    _name = 'SurveyQuestionPageQuery'
-    _type = 'query'
+    _name = "SurveyQuestionPageQuery"
+    _type = "query"
 
     survey_question_pages = graphene.List(
         graphene.NonNull(survey_question_page_type.SurveyQuestionPage),
@@ -41,7 +41,7 @@ class SurveyQuestionPageQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_survey_question_pages(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.survey.question']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.survey.question"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.survey.question'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.survey.question"].search(odoo_domain, offset=offset, limit=limit)

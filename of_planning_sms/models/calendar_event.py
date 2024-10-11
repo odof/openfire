@@ -11,16 +11,16 @@ _logger = logging.getLogger(__name__)
 
 
 class CalendarEvent(models.Model):
-    _inherit = 'calendar.event'
+    _inherit = "calendar.event"
 
     of_is_customer_sms_sent = fields.Boolean(string="Customer SMS sent ?", default=False)
-    of_customer_sms_number = fields.Char(string="Mobile number", compute='_compute_of_customer_sms_number')
+    of_customer_sms_number = fields.Char(string="Mobile number", compute="_compute_of_customer_sms_number")
 
     # -------------------------------------------------------------------------
     # Compute methods
     # -------------------------------------------------------------------------
 
-    @api.depends('of_address_id', 'of_partner_id')
+    @api.depends("of_address_id", "of_partner_id")
     def _compute_of_customer_sms_number(self):
         for record in self:
             if not (mobile_numbers := record.of_address_id.get_mobile_numbers()):
@@ -33,7 +33,7 @@ class CalendarEvent(models.Model):
 
     def action_send_sms(self):
         """Send an SMS to the customer. Used in the calendar event form view. (hidden button)"""
-        return self.env['of.sms'].action_send_sms(self.id, 'calendar.event', self.of_address_id)
+        return self.env["of.sms"].action_send_sms(self.id, "calendar.event", self.of_address_id)
 
     # -------------------------------------------------------------------------
     # Business methods
@@ -41,22 +41,22 @@ class CalendarEvent(models.Model):
 
     def _sms_get_number_fields(self):
         """Get the fields that contain the customer's mobile number for the SMS."""
-        return ['of_customer_sms_number']
+        return ["of_customer_sms_number"]
 
     def _sms_get_partner_fields(self):
         """Get the fields that contain the partner for the SMS."""
         fields = super()._sms_get_partner_fields()
-        if self.of_type == 'intervention':
-            fields = ['of_address_id']
+        if self.of_type == "intervention":
+            fields = ["of_address_id"]
         return fields
 
     def _sms_get_default_partners(self):
-        if self.of_type == 'event':
+        if self.of_type == "event":
             # this method is overidden in `calendar_sms` module, and we don't want to call it when the event is
             # an intervention
             return super()._sms_get_default_partners()
 
-        partners = self.env['res.partner']
+        partners = self.env["res.partner"]
         for fname in self._sms_get_partner_fields():
             partners = partners.union(*self.mapped(fname))  # ensure ordering
         return partners
@@ -71,19 +71,19 @@ class CalendarEvent(models.Model):
             reminder_start_date (datetime): The start date of the reminder (tomorrow, or Monday if today is Saturday).
             reminder_stop_date (datetime): The stop date of the reminder (tomorrow, or Monday if today is Saturday).
         """
-        intervention_obj = self.env['calendar.event']
+        intervention_obj = self.env["calendar.event"]
 
-        for company in self.env['res.company'].sudo().search([('of_team_alert_intervention_sms', '=', True)]):
-            for employee in self.env['hr.employee'].search([('company_id', '=', company.id)]):
+        for company in self.env["res.company"].sudo().search([("of_team_alert_intervention_sms", "=", True)]):
+            for employee in self.env["hr.employee"].search([("company_id", "=", company.id)]):
                 interventions = intervention_obj.search(
                     [
-                        ('of_employee_ids', 'in', [employee.id]),
-                        ('start', '>=', reminder_start_date),
-                        ('start', '<=', reminder_stop_date),
-                        ('of_state', '=', 'confirmed'),
-                        ('of_company_id', '=', company.id),
+                        ("of_employee_ids", "in", [employee.id]),
+                        ("start", ">=", reminder_start_date),
+                        ("start", "<=", reminder_stop_date),
+                        ("of_state", "=", "confirmed"),
+                        ("of_company_id", "=", company.id),
                     ],
-                    order='start',
+                    order="start",
                 )
                 if not interventions:
                     continue
@@ -107,20 +107,20 @@ class CalendarEvent(models.Model):
             reminder_start_date (datetime): The start date of the reminder (tomorrow, or Monday if today is Saturday).
             reminder_stop_date (datetime): The stop date of the reminder (tomorrow, or Monday if today is Saturday).
         """
-        intervention_obj = self.env['calendar.event']
-        sms_template = self.env.ref('of_planning_sms.of_sms_planning_customer_appointment_reminder')
+        intervention_obj = self.env["calendar.event"]
+        sms_template = self.env.ref("of_planning_sms.of_sms_planning_customer_appointment_reminder")
 
-        for company in self.env['res.company'].sudo().search([('of_customer_alert_intervention_sms', '=', True)]):
+        for company in self.env["res.company"].sudo().search([("of_customer_alert_intervention_sms", "=", True)]):
             # We retrieve the next day's interventions that have not already been recalled.
             interventions = intervention_obj.search(
                 [
-                    ('start', '>=', reminder_start_date),
-                    ('start', '<=', reminder_stop_date),
-                    ('of_state', '=', 'confirmed'),
-                    ('of_is_customer_sms_sent', '=', False),
-                    ('of_company_id', '=', company.id),
+                    ("start", ">=", reminder_start_date),
+                    ("start", "<=", reminder_stop_date),
+                    ("of_state", "=", "confirmed"),
+                    ("of_is_customer_sms_sent", "=", False),
+                    ("of_company_id", "=", company.id),
                 ],
-                order='start',
+                order="start",
             )
             for intervention in interventions:
                 intervention._message_sms_with_template(template=sms_template)
@@ -145,10 +145,10 @@ class CalendarEvent(models.Model):
             reminder_stop_date = tomorrow_end_date
 
         # Get the SMS sender.
-        if model := self.env['ir.model'].search([('model', '=', 'calendar.event')], limit=1):
-            sender = self.env['of.sms.sender'].search([('model', '=', model.name)], limit=1)
+        if model := self.env["ir.model"].search([("model", "=", "calendar.event")], limit=1):
+            sender = self.env["of.sms.sender"].search([("model", "=", model.name)], limit=1)
         else:
-            sender = self.env['of.sms.sender'].search([('model', '=', '')], limit=1)
+            sender = self.env["of.sms.sender"].search([("model", "=", "")], limit=1)
 
         if not sender:
             _logger.error(f"No SMS sender found for model '{model.name}'.")

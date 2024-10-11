@@ -4,17 +4,17 @@ from odoo import api, models
 
 
 class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
     @api.model
     def _get_invoice_line_account(self, move_type=False, product=False, fiscal_position=False, company=False):
         product = product.with_company(company or self.env.company)
-        is_sale_document = move_type in self.env['account.move'].get_sale_types(include_receipts=True)
+        is_sale_document = move_type in self.env["account.move"].get_sale_types(include_receipts=True)
 
         accounts = product.product_tmpl_id.get_product_accounts(fiscal_pos=fiscal_position)
-        return accounts['income'] if is_sale_document else accounts['expense']
+        return accounts["income"] if is_sale_document else accounts["expense"]
 
-    @api.depends('display_type', 'company_id', 'tax_ids')
+    @api.depends("display_type", "company_id", "tax_ids")
     def _compute_account_id(self):
         super()._compute_account_id()
         for line in self:

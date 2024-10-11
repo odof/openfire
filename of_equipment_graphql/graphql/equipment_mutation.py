@@ -14,7 +14,7 @@ from .equipment_type import Equipment
 
 
 class EquipmentCreate(graphene.Mutation):
-    _name = 'EquipmentCreate'
+    _name = "EquipmentCreate"
 
     class Arguments:
         name = graphene.String()
@@ -41,13 +41,13 @@ class EquipmentCreate(graphene.Mutation):
     Output = Equipment
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.equipment']._prepare_mutation_values(**args)
-        return env['of.equipment'].create(values)
+        env = info.context["env"]
+        values = env["of.equipment"]._prepare_mutation_values(**args)
+        return env["of.equipment"].create(values)
 
 
 class EquipmentUpdate(graphene.Mutation):
-    _name = 'EquipmentUpdate'
+    _name = "EquipmentUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -75,15 +75,15 @@ class EquipmentUpdate(graphene.Mutation):
     Output = Equipment
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.equipment']._prepare_mutation_values(**args)
-        equipment = env['of.equipment'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.equipment"]._prepare_mutation_values(**args)
+        equipment = env["of.equipment"].search([("id", "=", id)])
         equipment.write(values)
         return equipment
 
 
 class EquipmentDelete(graphene.Mutation):
-    _name = 'EquipmentDelete'
+    _name = "EquipmentDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -91,21 +91,21 @@ class EquipmentDelete(graphene.Mutation):
     Output = Equipment
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
         # On va vérifier dans chaque intervention sur cet équipement, s'il n'y a pas d'autres équipements
         # alors on passe le champ use_equipment à False
-        if equipment := env['calendar.event'].browse(id):
+        if equipment := env["calendar.event"].browse(id):
             for intervention in equipment.intervention_ids:
                 if len(intervention.of_equipment_ids.filtered(lambda r: r.id != equipment.id)) == 0:
                     intervention.of_use_equipment = False
 
-        return lazy_delete(env, 'of.equipment', id)
+        return lazy_delete(env, "of.equipment", id)
 
 
 class EquipmentMutation(graphene.ObjectType):
-    _name = 'EquipmentMutation'
-    _type = 'mutation'
+    _name = "EquipmentMutation"
+    _type = "mutation"
 
     equipment_create = EquipmentCreate.Field()
     equipment_update = EquipmentUpdate.Field()

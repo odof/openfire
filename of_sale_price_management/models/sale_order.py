@@ -4,26 +4,26 @@ from odoo import Command, models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     def action_button_price_management(self):
         self.ensure_one()
 
-        price_management_obj = self.env['of.sale.price.management.wizard']
+        price_management_obj = self.env["of.sale.price.management.wizard"]
         line_vals = [Command.create(line._prepare_price_management_line_values()) for line in self.order_line]
         price_management = price_management_obj.create(
             {
-                'order_id': self.id,
-                'line_ids': line_vals,
+                "order_id": self.id,
+                "line_ids": line_vals,
             }
         )
 
         return {
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': price_management_obj._name,
-            'res_id': price_management.id,
-            'target': 'current',
-            'flags': {'initial_mode': 'edit', 'form': {'action_buttons': True, 'options': {'mode': 'edit'}}},
-            'context': {'invoice_status': self.invoice_status},
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            "res_model": price_management_obj._name,
+            "res_id": price_management.id,
+            "target": "current",
+            "flags": {"initial_mode": "edit", "form": {"action_buttons": True, "options": {"mode": "edit"}}},
+            "context": {"invoice_status": self.invoice_status},
         }

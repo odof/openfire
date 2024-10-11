@@ -6,8 +6,8 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class PartnerTitle(OdooObjectType):
-    _name = 'PartnerTitle'
-    _type = 'types'
+    _name = "PartnerTitle"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -19,13 +19,13 @@ class PartnerTitle(OdooObjectType):
 
 
 class PartnerTitleInput(graphene.InputObjectType):
-    _name = 'PartnerTitleInput'
-    _type = 'types'
+    _name = "PartnerTitleInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
-    of_used_for_phone = graphene.Boolean(name='usedForPhone')
+    of_used_for_phone = graphene.Boolean(name="usedForPhone")
 
 
 class PartnerTitleFilterInput(PartnerTitleInput):
-    _name = 'PartnerTitleFilterInput'
+    _name = "PartnerTitleFilterInput"

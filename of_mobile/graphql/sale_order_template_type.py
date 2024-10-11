@@ -6,18 +6,18 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class SaleOrderTemplate(OdooObjectType):
-    _name = 'SaleOrderTemplate'
-    _type = 'types'
+    _name = "SaleOrderTemplate"
+    _type = "types"
 
     mobile = graphene.Boolean()
 
 
 class SaleOrderTemplateInput(graphene.InputObjectType):
-    _name = 'SaleOrderTemplateInput'
-    _type = 'types'
+    _name = "SaleOrderTemplateInput"
+    _type = "types"
 
     mobile = graphene.Boolean()
 
 
 class SaleOrderTemplateFilterInput(SaleOrderTemplateInput):
-    _name = 'SaleOrderTemplateFilterInput'
+    _name = "SaleOrderTemplateFilterInput"

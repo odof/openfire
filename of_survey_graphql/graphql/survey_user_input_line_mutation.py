@@ -9,7 +9,7 @@ from . import survey_question_answer_type, survey_question_page_type, survey_use
 
 
 class SurveyUserInputLineCreate(graphene.Mutation):
-    _name = 'SurveyUserInputLineCreate'
+    _name = "SurveyUserInputLineCreate"
 
     class Arguments:
         skipped = graphene.Boolean()
@@ -26,13 +26,13 @@ class SurveyUserInputLineCreate(graphene.Mutation):
     Output = survey_user_input_line_type.SurveyUserInputLine
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.survey.user_input.line']._prepare_mutation_values(**args)
-        return env['of.survey.user_input.line'].create(values)
+        env = info.context["env"]
+        values = env["of.survey.user_input.line"]._prepare_mutation_values(**args)
+        return env["of.survey.user_input.line"].create(values)
 
 
 class SurveyUserInputLineUpdate(graphene.Mutation):
-    _name = 'SurveyUserInputLineUpdate'
+    _name = "SurveyUserInputLineUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -50,15 +50,15 @@ class SurveyUserInputLineUpdate(graphene.Mutation):
     Output = survey_user_input_line_type.SurveyUserInputLine
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.survey.user_input.line']._prepare_mutation_values(**args)
-        user_input_line = env['of.survey.user_input.line'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.survey.user_input.line"]._prepare_mutation_values(**args)
+        user_input_line = env["of.survey.user_input.line"].search([("id", "=", id)])
         user_input_line.write(values)
         return user_input_line
 
 
 class SurveyUserInputLineDelete(graphene.Mutation):
-    _name = 'SurveyUserInputLineDelete'
+    _name = "SurveyUserInputLineDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -66,13 +66,13 @@ class SurveyUserInputLineDelete(graphene.Mutation):
     Output = survey_user_input_line_type.SurveyUserInputLine
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.survey.user_input.line', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.survey.user_input.line", id)
 
 
 class SurveyUserInputLineMutation(graphene.ObjectType):
-    _name = 'SurveyUserInputLineMutation'
-    _type = 'mutation'
+    _name = "SurveyUserInputLineMutation"
+    _type = "mutation"
 
     survey_user_input_line_create = SurveyUserInputLineCreate.Field()
     survey_user_input_line_update = SurveyUserInputLineUpdate.Field()

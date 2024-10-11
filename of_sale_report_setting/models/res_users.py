@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class ResUsers(models.Model):
-    _inherit = 'res.users'
+    _inherit = "res.users"
 
     of_vendor_signature = fields.Binary(string="Salesman signature in sales report")

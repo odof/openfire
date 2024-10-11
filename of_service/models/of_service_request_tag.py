@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class OFServiceRequestTag(models.Model):
-    _name = 'of.service.request.tag'
+    _name = "of.service.request.tag"
     _description = "Service Tag"
-    _order = 'name'
+    _order = "name"
 
     name = fields.Char(required=True)
     active = fields.Boolean(default=True)

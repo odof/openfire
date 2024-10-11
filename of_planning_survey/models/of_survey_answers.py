@@ -4,15 +4,15 @@ from odoo import fields, models
 
 
 class OFSurveyAnswers(models.Model):
-    _inherit = 'of.survey.answers'
+    _inherit = "of.survey.answers"
 
-    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervention")
+    intervention_id = fields.Many2one(comodel_name="calendar.event", string="Intervention")
 
     def unlink(self):
         # if a line is deleted, we must also delete the answers to this question
-        questions = self.mapped('question_id')
-        lines = self.env['of.survey.user_input.line'].search(
-            [('survey_id', '=', self.intervention_id.of_survey_id.id), ('question_id', 'in', questions.ids)]
+        questions = self.mapped("question_id")
+        lines = self.env["of.survey.user_input.line"].search(
+            [("survey_id", "=", self.intervention_id.of_survey_id.id), ("question_id", "in", questions.ids)]
         )
         lines and lines.unlink()
         return super().unlink()

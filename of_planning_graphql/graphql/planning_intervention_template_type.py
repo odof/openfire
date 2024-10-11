@@ -12,8 +12,8 @@ from .planning_intervention_task_type import PlanningInterventionTask, PlanningI
 
 
 class PlanningInterventionTemplate(OdooObjectType):
-    _name = 'PlanningInterventionTemplate'
-    _type = 'types'
+    _name = "PlanningInterventionTemplate"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -29,8 +29,8 @@ class PlanningInterventionTemplate(OdooObjectType):
 
 
 class PlanningInterventionTemplateInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionTemplateInput'
-    _type = 'types'
+    _name = "PlanningInterventionTemplateInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -40,4 +40,4 @@ class PlanningInterventionTemplateInput(graphene.InputObjectType):
 
 
 class PlanningInterventionTemplateFilterInput(PlanningInterventionTemplateInput):
-    _name = 'PlanningInterventionTemplateFilterInput'
+    _name = "PlanningInterventionTemplateFilterInput"

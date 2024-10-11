@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class OFSMSSender(models.Model):
-    _name = 'of.sms.sender'
+    _name = "of.sms.sender"
     _description = "SMS Sender"
 
     name = fields.Char()
     sender_name = fields.Char()
-    model = fields.Many2one(comodel_name='ir.model', help="Empty means all model")
+    model = fields.Many2one(comodel_name="ir.model", help="Empty means all model")

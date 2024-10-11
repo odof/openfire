@@ -42,8 +42,8 @@ def _transfer_leads_tags_to_partners(cr):
 
 def _create_partners_from_leads_without_partners(cr, env):
     """Create partners from leads without partners then assign them to the leads."""
-    lead_obj = env['crm.lead']
-    partner_obj = env['res.partner']
+    lead_obj = env["crm.lead"]
+    partner_obj = env["res.partner"]
 
     # get data for partners to create from leads
     cr.execute(
@@ -56,14 +56,14 @@ def _create_partners_from_leads_without_partners(cr, env):
     partners_to_create = []
     for partner_data in partner_data_list:
         tmp_data = partner_data.copy()
-        tmp_data.pop('id')
+        tmp_data.pop("id")
         partners_to_create.append(tmp_data)
     # create partners in batch
     partners = partner_obj.create(partners_to_create)
 
     # assign partners to leads
     for partner, partner_data in zip(partners, partner_data_list):
-        lead = lead_obj.browse(partner_data.pop('id'))
+        lead = lead_obj.browse(partner_data.pop("id"))
         lead.partner_id = partner
 
 

@@ -9,7 +9,7 @@ from .account_move_line_type import AccountMoveLine
 
 
 class AccountMoveLineCreate(graphene.Mutation):
-    _name = 'AccountMoveLineCreate'
+    _name = "AccountMoveLineCreate"
 
     class Arguments:
         name = graphene.String()
@@ -20,13 +20,13 @@ class AccountMoveLineCreate(graphene.Mutation):
     Output = AccountMoveLine
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        value = env['account.move.line']._prepare_mutation(**args)
-        return env['account.move.line'].create(value)
+        env = info.context["env"]
+        value = env["account.move.line"]._prepare_mutation(**args)
+        return env["account.move.line"].create(value)
 
 
 class AccountMoveLineUpdate(graphene.Mutation):
-    _name = 'AccountMoveLineUpdate'
+    _name = "AccountMoveLineUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -38,15 +38,15 @@ class AccountMoveLineUpdate(graphene.Mutation):
     Output = AccountMoveLine
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['account.move.line']._prepare_mutation_values(**args)
-        move_lines = env['account.move.line'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["account.move.line"]._prepare_mutation_values(**args)
+        move_lines = env["account.move.line"].search([("id", "=", id)])
         move_lines.write(values)
         return move_lines
 
 
 class AccountMoveLineDelete(graphene.Mutation):
-    _name = 'AccountMoveLineDelete'
+    _name = "AccountMoveLineDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -54,14 +54,14 @@ class AccountMoveLineDelete(graphene.Mutation):
     Output = AccountMoveLine
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'account.move.line', id)
+        return lazy_delete(env, "account.move.line", id)
 
 
 class AccountMoveLineMutation(graphene.ObjectType):
-    _name = 'AccountMoveLineMutation'
-    _type = 'mutation'
+    _name = "AccountMoveLineMutation"
+    _type = "mutation"
 
     account_move_line_create = AccountMoveLineCreate.Field()
     account_move_line_update = AccountMoveLineUpdate.Field()

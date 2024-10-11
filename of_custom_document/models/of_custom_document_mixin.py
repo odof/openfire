@@ -16,11 +16,11 @@ class OFCustomDocumentMixin(models.AbstractModel):
     sur laquelle on veut ajouter la fonctionnalité.
     """
 
-    _name = 'of.custom.document.mixin'
+    _name = "of.custom.document.mixin"
     _description = "Custom document mixin"
 
     of_custom_document_ids = fields.Many2many(
-        comodel_name='of.custom.document', string="Custom documents", help="Documents to include into pdf reports."
+        comodel_name="of.custom.document", string="Custom documents", help="Documents to include into pdf reports."
     )
 
     @api.model
@@ -38,12 +38,12 @@ class OFCustomDocumentMixin(models.AbstractModel):
         self.ensure_one()
         if not self.of_custom_document_ids:
             return pdf_content
-        if self._name != 'ir.actions.report':
+        if self._name != "ir.actions.report":
             record = self
         streams_to_merge = [io.BytesIO(pdf_content)]
         for document in self.of_custom_document_ids:
             if rendered_file := document.render_file(record.ids):
                 streams_to_merge.append(io.BytesIO(rendered_file[0]))
-        with self.env['ir.actions.report']._merge_pdfs(streams_to_merge) as pdf_merged_stream:
+        with self.env["ir.actions.report"]._merge_pdfs(streams_to_merge) as pdf_merged_stream:
             pdf_content = pdf_merged_stream.getvalue()
         return pdf_content

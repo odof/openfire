@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ProductTemplateTag(models.Model):
-    _inherit = 'product.tag'
+    _inherit = "product.tag"
 
     active = fields.Boolean(default=True)
     description = fields.Text()

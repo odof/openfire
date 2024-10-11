@@ -9,8 +9,8 @@ from . import survey_question_answer_type
 
 
 class SurveyUserInputLine(OdooObjectType):
-    _name = 'SurveyUserInputLine'
-    _type = 'types'
+    _name = "SurveyUserInputLine"
+    _type = "types"
 
     id = graphene.Int(required=True)
     skipped = graphene.Boolean()
@@ -34,10 +34,10 @@ class SurveyUserInputLine(OdooObjectType):
 
     @staticmethod
     def resolve_comment(root, info):
-        env = info.context['env']
-        if question := env['of.survey.question'].browse(root.question_id.id):
+        env = info.context["env"]
+        if question := env["of.survey.question"].browse(root.question_id.id):
             # Resolving comment only for simple_choice, multiple_choice questions with answer_type = 'char_box'
-            if question.question_type in ['simple_choice', 'multiple_choice'] and root.answer_type == 'char_box':
+            if question.question_type in ["simple_choice", "multiple_choice"] and root.answer_type == "char_box":
                 return root.value_char_box
             else:
                 return None
@@ -46,8 +46,8 @@ class SurveyUserInputLine(OdooObjectType):
 
 
 class SurveyUserInputLineInput(graphene.InputObjectType):
-    _name = 'SurveyUserInputLineInput'
-    _type = 'types'
+    _name = "SurveyUserInputLineInput"
+    _type = "types"
 
     id = graphene.Int()
     skipped = graphene.Boolean()
@@ -63,4 +63,4 @@ class SurveyUserInputLineInput(graphene.InputObjectType):
 
 
 class SurveyUserInputLineFilterInput(SurveyUserInputLineInput):
-    _name = 'SurveyUserInputLineFilterInput'
+    _name = "SurveyUserInputLineFilterInput"

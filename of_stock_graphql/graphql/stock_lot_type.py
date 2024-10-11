@@ -6,20 +6,20 @@ from odoo.addons.graphql_base import OdooObjectType
 
 
 class StockLot(OdooObjectType):
-    _name = 'StockLot'
-    _type = 'types'
+    _name = "StockLot"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
 
 
 class StockLotInput(graphene.InputObjectType):
-    _name = 'StockLotInput'
-    _type = 'types'
+    _name = "StockLotInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
 
 
 class StockLotFilterInput(StockLotInput):
-    _name = 'StockLotFilterInput'
+    _name = "StockLotFilterInput"

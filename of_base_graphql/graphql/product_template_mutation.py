@@ -8,7 +8,7 @@ from .product_template_type import ProductTemplate
 
 
 class ProductTemplateCreate(graphene.Mutation):
-    _name = 'ProductTemplateCreate'
+    _name = "ProductTemplateCreate"
 
     class Arguments:
         name = graphene.String()
@@ -17,13 +17,13 @@ class ProductTemplateCreate(graphene.Mutation):
     Output = ProductTemplate
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['product.template']._prepare_mutation_values(**args)
-        return env['product.template'].create(values)
+        env = info.context["env"]
+        values = env["product.template"]._prepare_mutation_values(**args)
+        return env["product.template"].create(values)
 
 
 class ProductTemplateUpdate(graphene.Mutation):
-    _name = 'ProductTemplateUpdate'
+    _name = "ProductTemplateUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -33,15 +33,15 @@ class ProductTemplateUpdate(graphene.Mutation):
     Output = ProductTemplate
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['product.template']._prepare_mutation_values(**args)
-        product = env['product.template'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["product.template"]._prepare_mutation_values(**args)
+        product = env["product.template"].search([("id", "=", id)])
         product.write(values)
         return product
 
 
 class ProductTemplateDelete(graphene.Mutation):
-    _name = 'ProductTemplateDelete'
+    _name = "ProductTemplateDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -49,13 +49,13 @@ class ProductTemplateDelete(graphene.Mutation):
     Output = ProductTemplate
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'product.template', id)
+        env = info.context["env"]
+        return lazy_delete(env, "product.template", id)
 
 
 class ProductTemplateMutation(graphene.ObjectType):
-    _name = 'ProductTemplateMutation'
-    _type = 'mutation'
+    _name = "ProductTemplateMutation"
+    _type = "mutation"
 
     product_template_create = ProductTemplateCreate.Field()
     product_template_update = ProductTemplateUpdate.Field()

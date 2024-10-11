@@ -15,13 +15,13 @@ except ImportError:
 
 
 class ResPartner(models.Model):
-    _inherit = 'res.partner'
+    _inherit = "res.partner"
 
     def get_mobile_numbers(self):
         mobile_numbers = []
         for partner in self:
-            for mobile in partner.of_phone_number_ids.filtered(lambda p: p.type == '03_mobile' and p.number):
-                if phone_number := convert_phone_number(mobile.number, new_format='e164', strict=True):
+            for mobile in partner.of_phone_number_ids.filtered(lambda p: p.type == "03_mobile" and p.number):
+                if phone_number := convert_phone_number(mobile.number, new_format="e164", strict=True):
                     mobile_numbers.append(phone_number)
                 else:
                     country_code = (

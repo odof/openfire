@@ -15,9 +15,9 @@ class TestProductBrandSupplier(TestOFProductCommon):
 
     def test_01_product_creation_is_supplier_ok(self):
         """Test that supplier data is correctly set on product creation"""
-        with Form(self.env['product.template']) as product_form:
+        with Form(self.env["product.template"]) as product_form:
             product_form.name = "Test Product Supplier"
-            product_form.categ_id = self.env.ref('product.product_category_all')
+            product_form.categ_id = self.env.ref("product.product_category_all")
             product_form.brand_id = self.product_brand_a
             product = product_form.save()
         self.assertEqual(len(product.seller_ids), 1)
@@ -25,9 +25,9 @@ class TestProductBrandSupplier(TestOFProductCommon):
 
     def test_02_product_brand_update_is_supplier_ok(self):
         """Test that supplier data is correctly set on product brand update"""
-        with Form(self.env['product.template']) as product_form:
+        with Form(self.env["product.template"]) as product_form:
             product_form.name = "Test Product Supplier"
-            product_form.categ_id = self.env.ref('product.product_category_all')
+            product_form.categ_id = self.env.ref("product.product_category_all")
             product_form.brand_id = self.product_brand_a
             product = product_form.save()
 

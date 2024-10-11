@@ -9,8 +9,8 @@ from . import survey_question_page_type, survey_user_input_line_type
 
 
 class SurveyUserInput(OdooObjectType):
-    _name = 'SurveyUserInput'
-    _type = 'types'
+    _name = "SurveyUserInput"
+    _type = "types"
 
     id = graphene.Int(required=True)
     state = graphene.String()
@@ -34,8 +34,8 @@ class SurveyUserInput(OdooObjectType):
 
 
 class SurveyUserInputInput(graphene.InputObjectType):
-    _name = 'SurveyUserInputInput'
-    _type = 'types'
+    _name = "SurveyUserInputInput"
+    _type = "types"
 
     id = graphene.Int()
     state = graphene.String()
@@ -51,4 +51,4 @@ class SurveyUserInputInput(graphene.InputObjectType):
 
 
 class SurveyUserInputFilterInput(SurveyUserInputInput):
-    _name = 'SurveyUserInputFilterInput'
+    _name = "SurveyUserInputFilterInput"

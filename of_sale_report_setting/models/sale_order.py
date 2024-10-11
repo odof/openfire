@@ -4,7 +4,7 @@ from odoo import models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     # ---------------------------------------------------------
     # Helper methods for QWeb reports
@@ -98,10 +98,10 @@ class SaleOrder(models.Model):
         return self.company_id.pdf_validity_info
 
     def get_color_section(self):
-        return self.company_id.pdf_section_bg_color or '#FFFFFF'
+        return self.company_id.pdf_section_bg_color or "#FFFFFF"
 
     def get_color_font(self):
-        return self.company_id.pdf_section_font_color or '#000000'
+        return self.company_id.pdf_section_font_color or "#000000"
 
     def pdf_price_taxexcl(self):
         return self.company_id.pdf_price_taxexcl
@@ -122,7 +122,7 @@ class SaleOrder(models.Model):
         return self.company_id.pdf_vendor_signature
 
     def pdf_prefill_vendor_signature(self):
-        return self.env.user.has_group('of_sale_report_setting.group_of_pdf_prefill_vendor_signature')
+        return self.env.user.has_group("of_sale_report_setting.group_of_pdf_prefill_vendor_signature")
 
     def pdf_signature_text(self):
         return self.company_id.pdf_signature_text

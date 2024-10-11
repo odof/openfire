@@ -9,7 +9,7 @@ _logger = logging.getLogger(__name__)
 
 
 class IrMailServer(models.Model):
-    _inherit = 'ir.mail_server'
+    _inherit = "ir.mail_server"
 
     @api.model
     def send_email(
@@ -29,29 +29,29 @@ class IrMailServer(models.Model):
         """Override to allow the possibility to disable email sending for testing purpose.
         Also, if no mail_server_id is given, we try to find the best one based on the email_from.
         """
-        if tools.config.get('of_disable_email_sending'):
-            _logger.warning('Email sending is disabled from the config file')
-            return message['Message-Id']
+        if tools.config.get("of_disable_email_sending"):
+            _logger.warning("Email sending is disabled from the config file")
+            return message["Message-Id"]
         if not mail_server_id and not smtp_server:
             # Recherche de serveur de mails par pertinence
-            email_from = dict(message._headers).get('From', False)
+            email_from = dict(message._headers).get("From", False)
             if email_from:
-                re_match = re.search(r' <(.*?)>', email_from)
+                re_match = re.search(r" <(.*?)>", email_from)
                 if re_match:
                     # email_from de la forme "nom <prefix@domain>". On extrait l'adresse.
                     email_from = re_match.groups()[0]
                 email_from = email_from.strip()
-                email_split = email_from.split('@')
+                email_split = email_from.split("@")
                 if len(email_split) == 2:
                     prefix, domain = email_split
-                    servers = self.sudo().search([('smtp_host', '=like', f'%{domain}')], order='sequence')
+                    servers = self.sudo().search([("smtp_host", "=like", f"%{domain}")], order="sequence")
                     if not servers:
-                        servers = self.sudo().search([], order='sequence')
+                        servers = self.sudo().search([], order="sequence")
                     if len(servers) > 1:
                         servers = (
                             self.sudo().search(
-                                [('id', 'in', servers.ids), ('smtp_user', 'in', (prefix, email_from))],
-                                order='sequence',
+                                [("id", "in", servers.ids), ("smtp_user", "in", (prefix, email_from))],
+                                order="sequence",
                                 limit=1,
                             )
                             or servers
@@ -84,16 +84,16 @@ class IrMailServer(models.Model):
         message_id=None,
         references=None,
         object_id=False,
-        subtype='plain',
+        subtype="plain",
         headers=None,
         body_alternative=None,
-        subtype_alternative='plain',
+        subtype_alternative="plain",
     ):
         """Override to allow the possibility to force the email_to in the headers for testing purpose."""
-        if tools.config.get('of_email_to'):
-            cfg_email_to = tools.config['of_email_to']
-            _logger.warning(f'email_to is forced to {cfg_email_to} from the config file')
-            email_to = tools.email_split_and_format(tools.config['of_email_to'])
+        if tools.config.get("of_email_to"):
+            cfg_email_to = tools.config["of_email_to"]
+            _logger.warning(f"email_to is forced to {cfg_email_to} from the config file")
+            email_to = tools.email_split_and_format(tools.config["of_email_to"])
             email_cc = None
             email_bcc = None
         return super(IrMailServer, self).build_email(

@@ -5,12 +5,12 @@ from odoo.fields import Command
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     def _prepare_invoice(self):
         values = super()._prepare_invoice()
         move_comment_ids = self._propagate_comments_from_sale_order_to_invoice()
-        values.update({'comment_template_ids': [Command.set(move_comment_ids)]})
+        values.update({"comment_template_ids": [Command.set(move_comment_ids)]})
         return values
 
     def _propagate_comments_from_sale_order_to_invoice(self):
@@ -18,13 +18,13 @@ class SaleOrder(models.Model):
         Returns a list of comment IDs to be set on the invoice.
         """
         propagate_comment_param = (
-            self.env['ir.config_parameter'].sudo().get_param('of.sale.comment.template.propagate_comments')
+            self.env["ir.config_parameter"].sudo().get_param("of.sale.comment.template.propagate_comments")
         )
-        if propagate_comment_param == 'keep_comments':
+        if propagate_comment_param == "keep_comments":
             return self._keep_all_comments()
-        if propagate_comment_param == 'keep_top_comment':
+        if propagate_comment_param == "keep_top_comment":
             return self._keep_top_comments()
-        return self._keep_bottom_comments() if propagate_comment_param == 'keep_bottom_comment' else []
+        return self._keep_bottom_comments() if propagate_comment_param == "keep_bottom_comment" else []
 
     def _keep_all_comments(self):
         """Return ids of comment templates to be set on the invoice.
@@ -36,10 +36,10 @@ class SaleOrder(models.Model):
         ]
 
     def _keep_top_comments(self):
-        return self._get_comment_ids_based_on_position('before_lines')
+        return self._get_comment_ids_based_on_position("before_lines")
 
     def _keep_bottom_comments(self):
-        return self._get_comment_ids_based_on_position('after_lines')
+        return self._get_comment_ids_based_on_position("after_lines")
 
     def _get_comment_ids_based_on_position(self, position):
         """Return ids of comment templates to be set on the invoice based on the given position.
@@ -52,7 +52,7 @@ class SaleOrder(models.Model):
         ]
 
     def _update_invoicing_comment_template(self, order_comment_template):
-        model_id = self.env['ir.model'].search([('model', '=', 'account.move')])
+        model_id = self.env["ir.model"].search([("model", "=", "account.move")])
         if model_id not in order_comment_template.model_ids:
             order_comment_template.model_ids = [Command.link(model_id.id)]
         return order_comment_template

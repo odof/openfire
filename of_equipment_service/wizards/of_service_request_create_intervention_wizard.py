@@ -4,9 +4,9 @@ from odoo import models
 
 
 class OFServiceRequestCreateInterventionWizard(models.TransientModel):
-    _inherit = 'of.service.request.create.intervention.wizard'
+    _inherit = "of.service.request.create.intervention.wizard"
 
     def _get_create_intervention_values(self, request):
         vals = super()._get_create_intervention_values(request)
-        vals.update({'of_use_equipment': request.use_equipment})
+        vals.update({"of_use_equipment": request.use_equipment})
         return vals

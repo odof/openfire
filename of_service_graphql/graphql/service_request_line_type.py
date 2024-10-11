@@ -11,8 +11,8 @@ from odoo.addons.of_sale_graphql.graphql.sale_order_line_type import SaleOrderLi
 
 
 class ServiceRequestLine(OdooObjectType):
-    _name = 'ServiceRequestLine'
-    _type = 'types'
+    _name = "ServiceRequestLine"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -27,7 +27,7 @@ class ServiceRequestLine(OdooObjectType):
     invoice_status = graphene.String()
     qty_invoiced = graphene.Float()
     qty_invoiceable = graphene.Float()
-    invoice_line_ids = graphene.List(graphene.NonNull(AccountMoveLine), name='invoiceLines')
+    invoice_line_ids = graphene.List(graphene.NonNull(AccountMoveLine), name="invoiceLines")
 
     @staticmethod
     def resolve_product(root, info):
@@ -43,8 +43,8 @@ class ServiceRequestLine(OdooObjectType):
 
 
 class ServiceRequestLineInput(graphene.InputObjectType):
-    _name = 'ServiceRequestLineInput'
-    _type = 'types'
+    _name = "ServiceRequestLineInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -63,4 +63,4 @@ class ServiceRequestLineInput(graphene.InputObjectType):
 
 
 class ServiceRequestLineFilterInput(ServiceRequestLineInput):
-    _name = 'ServiceRequestLineFilterInput'
+    _name = "ServiceRequestLineFilterInput"

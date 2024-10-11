@@ -6,10 +6,10 @@ from odoo import Command, fields, models
 class OFPlanningTourMassSectorAssignationWizard(models.TransientModel):
     """Tours Mass Sector Assignation Wizard"""
 
-    _name = 'of.planning.tour.mass.sector.assignation.wizard'
+    _name = "of.planning.tour.mass.sector.assignation.wizard"
     _description = __doc__
 
-    sector_id = fields.Many2one(comodel_name='of.sector', string="Sector to assign")
+    sector_id = fields.Many2one(comodel_name="of.sector", string="Sector to assign")
 
     def action_button_validate(self):
         """Assign a new sector to the tours.
@@ -17,7 +17,7 @@ class OFPlanningTourMassSectorAssignationWizard(models.TransientModel):
         """
         self.ensure_one()
 
-        tours = self.env['of.planning.tour'].browse(self._context.get('active_ids', []))
+        tours = self.env["of.planning.tour"].browse(self._context.get("active_ids", []))
         tours_wo_lines = tours.filtered(lambda t: not t.tour_line_ids)
         tours_w_lines = tours.filtered(lambda t: t.tour_line_ids)
         for tour in tours_w_lines:
@@ -31,4 +31,4 @@ class OFPlanningTourMassSectorAssignationWizard(models.TransientModel):
                 tours_w_lines -= tour
 
         tours_to_update = tours_wo_lines + tours_w_lines
-        tours_to_update.write({'sector_ids': [Command.link(self.sector_id.id)]})
+        tours_to_update.write({"sector_ids": [Command.link(self.sector_id.id)]})

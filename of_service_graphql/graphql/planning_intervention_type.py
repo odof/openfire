@@ -9,8 +9,8 @@ from .service_request_type_type import ServiceRequestType, ServiceRequestTypeInp
 
 
 class PlanningIntervention(OdooObjectType):
-    _name = 'PlanningIntervention'
-    _type = 'types'
+    _name = "PlanningIntervention"
+    _type = "types"
 
     ttype = graphene.Field(ServiceRequestType)
     request = graphene.Field(ServiceRequest)
@@ -25,8 +25,8 @@ class PlanningIntervention(OdooObjectType):
 
 
 class PlanningInterventionInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionInput'
-    _type = 'types'
+    _name = "PlanningInterventionInput"
+    _type = "types"
 
     ttype = graphene.Field(ServiceRequestTypeInput)
     request = graphene.Field(ServiceRequestInput)

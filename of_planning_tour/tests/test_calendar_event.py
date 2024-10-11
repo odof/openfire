@@ -19,16 +19,16 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
 
     def _get_event_default_values(self):
         return {
-            'name': 'Event',
-            'of_type': 'intervention',
-            'of_partner_id': self.partner_antoine.id,
-            'of_task_id': self.task_sweeping.id,
-            'of_company_id': self.company_fr.id,
-            'of_employee_id': self.employee_tech_johnny.id,
-            'of_employee_ids': [Command.set([self.employee_tech_johnny.id])],
-            'start': self.now_dt_8am,
-            'stop': self.now_dt_9am,
-            'duration': 1,
+            "name": "Event",
+            "of_type": "intervention",
+            "of_partner_id": self.partner_antoine.id,
+            "of_task_id": self.task_sweeping.id,
+            "of_company_id": self.company_fr.id,
+            "of_employee_id": self.employee_tech_johnny.id,
+            "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
+            "start": self.now_dt_8am,
+            "stop": self.now_dt_9am,
+            "duration": 1,
         }
 
     def test_01_get_events_geodata_updated(self):
@@ -38,18 +38,18 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Create events
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
-                default_event_values | {'name': 'Event 1'},
+                default_event_values | {"name": "Event 1"},
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt_9am,
-                    'stop': self.now_dt_10am,
+                    "name": "Event 2",
+                    "start": self.now_dt_9am,
+                    "stop": self.now_dt_10am,
                 },
                 default_event_values
                 | {
-                    'name': 'Event 3',
-                    'start': self.now_dt_11am,
-                    'stop': self.now_dt_11am + timedelta(hours=1),
+                    "name": "Event 3",
+                    "start": self.now_dt_11am,
+                    "stop": self.now_dt_11am + timedelta(hours=1),
                 },
             ]
         )
@@ -57,13 +57,13 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Simulate old saved values before the update
         saved_vals = {
             event1: {
-                'of_address_id': self.partner_hounaida.id,
+                "of_address_id": self.partner_hounaida.id,
             },
             event2: {
-                'of_address_id': self.partner_guillaume.id,
+                "of_address_id": self.partner_guillaume.id,
             },
             event3: {
-                'of_address_id': self.partner_antoine.id,
+                "of_address_id": self.partner_antoine.id,
             },
         }
         # Check if the events are correctly filtered
@@ -79,21 +79,21 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
             [
                 default_event_values
                 | {
-                    'name': 'Event 1',
-                    'start': self.now_dt,
-                    'stop': self.now_dt + timedelta(hours=1),
+                    "name": "Event 1",
+                    "start": self.now_dt,
+                    "stop": self.now_dt + timedelta(hours=1),
                 },
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt + timedelta(days=1),
-                    'stop': self.now_dt + timedelta(days=1, hours=1),
+                    "name": "Event 2",
+                    "start": self.now_dt + timedelta(days=1),
+                    "stop": self.now_dt + timedelta(days=1, hours=1),
                 },
                 default_event_values
                 | {
-                    'name': 'Event 3',
-                    'start': self.now_dt + timedelta(days=2),
-                    'stop': self.now_dt + timedelta(days=2, hours=1),
+                    "name": "Event 3",
+                    "start": self.now_dt + timedelta(days=2),
+                    "stop": self.now_dt + timedelta(days=2, hours=1),
                 },
             ]
         )
@@ -101,16 +101,16 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Simulate old saved values before the update
         saved_vals = {
             event1: {
-                'start': self.now_dt,
-                'stop': self.now_dt + timedelta(hours=1),
+                "start": self.now_dt,
+                "stop": self.now_dt + timedelta(hours=1),
             },
             event2: {
-                'start': self.now_dt + timedelta(days=1),
-                'stop': self.now_dt + timedelta(days=1, hours=1),
+                "start": self.now_dt + timedelta(days=1),
+                "stop": self.now_dt + timedelta(days=1, hours=1),
             },
             event3: {
-                'start': self.now_dt + timedelta(days=3),
-                'stop': self.now_dt + timedelta(days=3, hours=1),
+                "start": self.now_dt + timedelta(days=3),
+                "stop": self.now_dt + timedelta(days=3, hours=1),
             },
         }
         # Check if the events are correctly filtered
@@ -124,17 +124,17 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Create events (one of them is cancelled, to check if it is correctly filtered)
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
-                default_event_values | {'name': 'Event 1', 'of_state': 'cancel'},
-                default_event_values | {'name': 'Event 2', 'start': self.now_dt_9am, 'stop': self.now_dt_10am},
-                default_event_values | {'name': 'Event 3', 'start': self.now_dt_11am, 'stop': self.now_dt_12pm},
+                default_event_values | {"name": "Event 1", "of_state": "cancel"},
+                default_event_values | {"name": "Event 2", "start": self.now_dt_9am, "stop": self.now_dt_10am},
+                default_event_values | {"name": "Event 3", "start": self.now_dt_11am, "stop": self.now_dt_12pm},
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'of_state': 'draft'},
-            event2: {'of_state': 'draft'},
-            event3: {'of_state': 'draft'},
+            event1: {"of_state": "draft"},
+            event2: {"of_state": "draft"},
+            event3: {"of_state": "draft"},
         }
 
         # Check if the events are correctly filtered
@@ -148,17 +148,17 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Create events
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
-                default_event_values | {'name': 'Event 1'},
-                default_event_values | {'name': 'Event 2', 'start': self.now_dt_9am, 'stop': self.now_dt_10am},
-                default_event_values | {'name': 'Event 3', 'start': self.now_dt_11am, 'stop': self.now_dt_12pm},
+                default_event_values | {"name": "Event 1"},
+                default_event_values | {"name": "Event 2", "start": self.now_dt_9am, "stop": self.now_dt_10am},
+                default_event_values | {"name": "Event 3", "start": self.now_dt_11am, "stop": self.now_dt_12pm},
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'of_state': 'postponed'},
-            event2: {'of_state': 'draft'},
-            event3: {'of_state': 'cancel'},
+            event1: {"of_state": "postponed"},
+            event2: {"of_state": "draft"},
+            event3: {"of_state": "cancel"},
         }
 
         # Check if the events are correctly filtered
@@ -172,19 +172,19 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Create events (two of them is postponed, to check if it is correctly filtered)
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
-                default_event_values | {'name': 'Event 1'},
+                default_event_values | {"name": "Event 1"},
                 default_event_values
-                | {'name': 'Event 2', 'start': self.now_dt_9am, 'stop': self.now_dt_10am, 'of_state': 'postponed'},
+                | {"name": "Event 2", "start": self.now_dt_9am, "stop": self.now_dt_10am, "of_state": "postponed"},
                 default_event_values
-                | {'name': 'Event 3', 'start': self.now_dt_10am, 'stop': self.now_dt_11am, 'of_state': 'postponed'},
+                | {"name": "Event 3", "start": self.now_dt_10am, "stop": self.now_dt_11am, "of_state": "postponed"},
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'of_state': 'draft'},
-            event2: {'of_state': 'draft'},
-            event3: {'of_state': 'ongoing'},
+            event1: {"of_state": "draft"},
+            event2: {"of_state": "draft"},
+            event3: {"of_state": "ongoing"},
         }
 
         # Check if the events are correctly filtered
@@ -198,17 +198,17 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Create events
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
-                default_event_values | {'name': 'Event 1', 'start': self.now_dt_10am, 'stop': self.now_dt_11am},
-                default_event_values | {'name': 'Event 2', 'start': self.now_dt_9am, 'stop': self.now_dt_10am},
-                default_event_values | {'name': 'Event 3', 'start': self.now_dt_8am, 'stop': self.now_dt_9am},
+                default_event_values | {"name": "Event 1", "start": self.now_dt_10am, "stop": self.now_dt_11am},
+                default_event_values | {"name": "Event 2", "start": self.now_dt_9am, "stop": self.now_dt_10am},
+                default_event_values | {"name": "Event 3", "start": self.now_dt_8am, "stop": self.now_dt_9am},
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'start': self.now_dt_8am},
-            event2: {'start': self.now_dt_9am},
-            event3: {'start': self.now_dt_10am},
+            event1: {"start": self.now_dt_8am},
+            event2: {"start": self.now_dt_9am},
+            event3: {"start": self.now_dt_10am},
         }
 
         # Check if the events are correctly filtered
@@ -224,33 +224,33 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
             [
                 default_event_values
                 | {
-                    'name': 'Event 1',
-                    'start': self.now_dt.replace(hour=9),
-                    'stop': self.now_dt.replace(hour=11, minute=30),
-                    'duration': 2.5,
+                    "name": "Event 1",
+                    "start": self.now_dt.replace(hour=9),
+                    "stop": self.now_dt.replace(hour=11, minute=30),
+                    "duration": 2.5,
                 },
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt.replace(hour=11, minute=30),
-                    'stop': self.now_dt.replace(hour=12, minute=30),
-                    'duration': 1,
+                    "name": "Event 2",
+                    "start": self.now_dt.replace(hour=11, minute=30),
+                    "stop": self.now_dt.replace(hour=12, minute=30),
+                    "duration": 1,
                 },
                 default_event_values
                 | {
-                    'name': 'Event 3',
-                    'start': self.now_dt.replace(hour=13, minute=30),
-                    'stop': self.now_dt.replace(hour=15, minute=30),
-                    'duration': 2,
+                    "name": "Event 3",
+                    "start": self.now_dt.replace(hour=13, minute=30),
+                    "stop": self.now_dt.replace(hour=15, minute=30),
+                    "duration": 2,
                 },
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'duration': 2},
-            event2: {'duration': 4},
-            event3: {'duration': 3},
+            event1: {"duration": 2},
+            event2: {"duration": 4},
+            event3: {"duration": 3},
         }
 
         # Check if the events are correctly filtered
@@ -265,19 +265,19 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         event1, event2, event3 = self.calendar_obj.with_context(of_avoid_tour_process=True).create(
             [
                 default_event_values
-                | {'name': 'Event 1', 'start': self.now_dt_8am, 'stop': self.now_dt_9am, 'of_force_dates': False},
+                | {"name": "Event 1", "start": self.now_dt_8am, "stop": self.now_dt_9am, "of_force_dates": False},
                 default_event_values
-                | {'name': 'Event 2', 'start': self.now_dt_9am, 'stop': self.now_dt_10am, 'of_force_dates': True},
+                | {"name": "Event 2", "start": self.now_dt_9am, "stop": self.now_dt_10am, "of_force_dates": True},
                 default_event_values
-                | {'name': 'Event 3', 'start': self.now_dt_10am, 'stop': self.now_dt_11am, 'of_force_dates': False},
+                | {"name": "Event 3", "start": self.now_dt_10am, "stop": self.now_dt_11am, "of_force_dates": False},
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'of_force_dates': False},
-            event2: {'of_force_dates': False},
-            event3: {'of_force_dates': True},
+            event1: {"of_force_dates": False},
+            event2: {"of_force_dates": False},
+            event3: {"of_force_dates": True},
         }
 
         # Check if the events are correctly filtered
@@ -293,33 +293,33 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
             [
                 default_event_values
                 | {
-                    'name': 'Event 1',
-                    'start': self.now_dt_8am,
-                    'stop': self.now_dt_9am,
+                    "name": "Event 1",
+                    "start": self.now_dt_8am,
+                    "stop": self.now_dt_9am,
                 },
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt_9am,
-                    'stop': self.now_dt_10am,
-                    'of_employee_ids': [Command.set([self.employee_tech_johnny.id, self.employee_tech_bruce.id])],
+                    "name": "Event 2",
+                    "start": self.now_dt_9am,
+                    "stop": self.now_dt_10am,
+                    "of_employee_ids": [Command.set([self.employee_tech_johnny.id, self.employee_tech_bruce.id])],
                 },
                 default_event_values
                 | {
-                    'name': 'Event 3',
-                    'start': self.now_dt_10am,
-                    'stop': self.now_dt_11am,
-                    'of_employee_id': self.employee_tech_bruce.id,
-                    'of_employee_ids': [Command.set([self.employee_tech_bruce.id])],
+                    "name": "Event 3",
+                    "start": self.now_dt_10am,
+                    "stop": self.now_dt_11am,
+                    "of_employee_id": self.employee_tech_bruce.id,
+                    "of_employee_ids": [Command.set([self.employee_tech_bruce.id])],
                 },
             ]
         )
 
         # Simulate old saved values before the update
         saved_vals = {
-            event1: {'of_employee_ids': [self.employee_tech_johnny.id]},
-            event2: {'of_employee_ids': [self.employee_tech_johnny.id]},
-            event3: {'of_employee_ids': [self.employee_tech_johnny.id]},
+            event1: {"of_employee_ids": [self.employee_tech_johnny.id]},
+            event2: {"of_employee_ids": [self.employee_tech_johnny.id]},
+            event3: {"of_employee_ids": [self.employee_tech_johnny.id]},
         }
 
         # Check if the events are correctly filtered
@@ -331,7 +331,7 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         Test case for creating a tour when an event is created.
         """
         tour = self.planning_tour_obj.search(
-            [('date', '=', self.now_dt.date()), ('employee_id', '=', self.employee_tech_johnny.id)]
+            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_johnny.id)]
         )
         self.assertEqual(tour, self.planning_tour_obj.browse())
 
@@ -341,7 +341,7 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         event._compute_of_tour_ids()
 
         tour = self.planning_tour_obj.search(
-            [('date', '=', self.now_dt.date()), ('employee_id', '=', self.employee_tech_johnny.id)]
+            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_johnny.id)]
         )
 
         self.assertEqual(len(tour), 1)
@@ -364,11 +364,11 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         partner_longitude = float(SAINT_GREGOIRE_VICTORIA_LAT_LNG[1])
         self.partner_antoine.write(
             {
-                'street': '1 Rue de la Terre Victoria',
-                'zip': '35760',
-                'city': 'Saint-Grégoire',
-                'partner_latitude': partner_latitude,
-                'partner_longitude': partner_longitude,
+                "street": "1 Rue de la Terre Victoria",
+                "zip": "35760",
+                "city": "Saint-Grégoire",
+                "partner_latitude": partner_latitude,
+                "partner_longitude": partner_longitude,
             }
         )
 
@@ -380,13 +380,13 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         default_event_values = self._get_event_default_values()
         event1, event2 = self.calendar_obj.create(
             [
-                default_event_values | {'name': 'Event 1'},
+                default_event_values | {"name": "Event 1"},
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt.replace(hour=11, minute=0),
-                    'stop': self.now_dt.replace(hour=12, minute=30),
-                    'of_partner_id': self.partner_guillaume.id,
+                    "name": "Event 2",
+                    "start": self.now_dt.replace(hour=11, minute=0),
+                    "stop": self.now_dt.replace(hour=12, minute=30),
+                    "of_partner_id": self.partner_guillaume.id,
                 },
             ]
         )
@@ -403,7 +403,7 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         self.assertEqual(tour.tour_line_ids[1].sequence, 2)
 
         # Change the hours of the first event
-        event1.write({'start': self.now_dt.replace(hour=13, minute=0)})
+        event1.write({"start": self.now_dt.replace(hour=13, minute=0)})
 
         # First event should be the second in the tour
         self.assertEqual(len(tour.tour_line_ids), 2)
@@ -420,18 +420,18 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
             [
                 default_event_values
                 | {
-                    'name': 'Event 1',
-                    'stop': self.now_dt.replace(hour=11, minute=30),
-                    'duration': 3.5,
-                    'of_partner_id': self.partner_guillaume.id,
+                    "name": "Event 1",
+                    "stop": self.now_dt.replace(hour=11, minute=30),
+                    "duration": 3.5,
+                    "of_partner_id": self.partner_guillaume.id,
                 },
                 default_event_values
                 | {
-                    'name': 'Event 2',
-                    'start': self.now_dt.replace(hour=13, minute=0),
-                    'stop': self.now_dt.replace(hour=15, minute=30),
-                    'duration': 2.5,
-                    'of_partner_id': self.partner_hounaida.id,
+                    "name": "Event 2",
+                    "start": self.now_dt.replace(hour=13, minute=0),
+                    "stop": self.now_dt.replace(hour=15, minute=30),
+                    "duration": 2.5,
+                    "of_partner_id": self.partner_hounaida.id,
                 },
             ]
         )
@@ -442,16 +442,16 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
 
         # Change start date of the second event
         new_start = self.now_dt_10am + timedelta(days=1)
-        event2.write({'start': new_start})
+        event2.write({"start": new_start})
         event2._compute_of_tour_ids()
 
         self.assertEqual(len(tour.tour_line_ids), 1)
         self.assertNotEqual(event2.of_tour_ids, event1.of_tour_ids)
 
-        tours = self.planning_tour_obj.search([('employee_id', '=', self.employee_tech_johnny.id)], order='date desc')
+        tours = self.planning_tour_obj.search([("employee_id", "=", self.employee_tech_johnny.id)], order="date desc")
         self.assertEqual(len(tours), 2)
         self.assertEqual(
-            tours.mapped('date'),
+            tours.mapped("date"),
             [
                 new_start.date(),
                 self.now_dt.date(),
@@ -505,7 +505,7 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         """Checks that the tour line is removed from the previous tour and added to the new one when the
         employee is changed."""
         bruce_tour = self.planning_tour_obj.search(
-            [('date', '=', self.now_dt.date()), ('employee_id', '=', self.employee_tech_bruce.id)]
+            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_bruce.id)]
         )
         self.assertEqual(bruce_tour, self.planning_tour_obj.browse())
         event = self.calendar_obj.create(self._get_event_default_values())
@@ -517,15 +517,15 @@ class TestOFPlanningTourCalendarEvent(TestOFPlanningTourCommon):
         # Change the employee of the event
         event.write(
             {
-                'of_employee_id': self.employee_tech_bruce.id,
-                'of_employee_ids': [Command.set([self.employee_tech_bruce.id])],
+                "of_employee_id": self.employee_tech_bruce.id,
+                "of_employee_ids": [Command.set([self.employee_tech_bruce.id])],
             }
         )
 
         self.assertEqual(len(tour.tour_line_ids), 0)
 
         bruce_tour = self.planning_tour_obj.search(
-            [('date', '=', self.now_dt.date()), ('employee_id', '=', self.employee_tech_bruce.id)]
+            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_bruce.id)]
         )
         self.assertEqual(len(bruce_tour), 1)
         self.assertEqual(len(bruce_tour.tour_line_ids), 1)

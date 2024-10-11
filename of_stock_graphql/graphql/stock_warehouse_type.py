@@ -7,8 +7,8 @@ from odoo.addons.of_base_graphql.graphql.partner_type import Partner, PartnerInp
 
 
 class StockWarehouse(OdooObjectType):
-    _name = 'StockWarehouse'
-    _type = 'types'
+    _name = "StockWarehouse"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -20,8 +20,8 @@ class StockWarehouse(OdooObjectType):
 
 
 class StockWarehouseInput(graphene.InputObjectType):
-    _name = 'StockWarehouseInput'
-    _type = 'types'
+    _name = "StockWarehouseInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -29,4 +29,4 @@ class StockWarehouseInput(graphene.InputObjectType):
 
 
 class StockWarehouseFilterInput(StockWarehouseInput):
-    _name = 'StockWarehouseFilterInput'
+    _name = "StockWarehouseFilterInput"

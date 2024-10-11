@@ -5,11 +5,11 @@ from odoo import SUPERUSER_ID, api
 
 def _set_account_journal_restrict_mode_hash_table(env):
     # Set the value of `restrict_mode_hash_table` field on account.journal depending on the type of the journal.
-    journal_sale = env['account.journal'].search([('type', 'in', ['sale', 'bank', 'cash'])])
-    journal_sale.write({'restrict_mode_hash_table': True})
+    journal_sale = env["account.journal"].search([("type", "in", ["sale", "bank", "cash"])])
+    journal_sale.write({"restrict_mode_hash_table": True})
     # Ensure that the value is False for the other types
-    journal_purchase = env['account.journal'].search([('type', 'in', ['purchase', 'general'])])
-    journal_purchase.write({'restrict_mode_hash_table': False})
+    journal_purchase = env["account.journal"].search([("type", "in", ["purchase", "general"])])
+    journal_purchase.write({"restrict_mode_hash_table": False})
 
 
 def _update_sales_warnings(cr, env):

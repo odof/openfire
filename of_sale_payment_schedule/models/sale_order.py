@@ -5,29 +5,29 @@ from odoo.tools import float_compare
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     of_payment_schedule_ids = fields.One2many(
-        comodel_name='of.sale.payment.schedule',
-        inverse_name='order_id',
+        comodel_name="of.sale.payment.schedule",
+        inverse_name="order_id",
         string="Payment schedule",
-        compute='_compute_of_payment_schedule_ids',
+        compute="_compute_of_payment_schedule_ids",
         store=True,
         readonly=False,
     )
     of_show_update_payment_schedule = fields.Boolean(
-        string="Payment schedule needs to be updated", compute='_compute_of_show_update_payment_schedule'
+        string="Payment schedule needs to be updated", compute="_compute_of_show_update_payment_schedule"
     )
 
     # ----------------------------------------------------------
     # Compute methods
     # ----------------------------------------------------------
 
-    @api.depends('payment_term_id', 'order_line.price_total', 'amount_total')
+    @api.depends("payment_term_id", "order_line.price_total", "amount_total")
     def _compute_of_show_update_payment_schedule(self):
         for order in self:
             of_show_update_payment_schedule = False
-            if order.state in ('draft', 'sent') and (
+            if order.state in ("draft", "sent") and (
                 not order.of_payment_schedule_ids
                 or order.of_payment_schedule_ids
                 and order._get_payment_schedule_needs_recompute()
@@ -35,7 +35,7 @@ class SaleOrder(models.Model):
                 of_show_update_payment_schedule = True
             order.of_show_update_payment_schedule = of_show_update_payment_schedule
 
-    @api.depends('payment_term_id')
+    @api.depends("payment_term_id")
     def _compute_of_payment_schedule_ids(self):
         if self.payment_term_id:
             self.of_payment_schedule_ids = self._of_compute_payment_schedule()
@@ -44,11 +44,11 @@ class SaleOrder(models.Model):
     # Onchange methods
     # ----------------------------------------------------------
 
-    @api.onchange('order_line')
+    @api.onchange("order_line")
     def _onchange_order_line(self):
         self.of_recompute_last_payment_schedule()
 
-    @api.onchange('amount_total')
+    @api.onchange("amount_total")
     def _onchange_amount_total(self):
         self._compute_of_payment_schedule_ids()
 
@@ -103,19 +103,19 @@ class SaleOrder(models.Model):
         pct = 0
         result = [Command.clear()]
         for i, line in enumerate(payment_terms, 1):
-            pct_left -= pct if self.amount_untaxed > 0 else line['value_amount']
-            amount = line['company_amount']
+            pct_left -= pct if self.amount_untaxed > 0 else line["value_amount"]
+            amount = line["company_amount"]
             pct = round(100 * amount / amount_total, 2) if amount_total else 0
 
             line_vals = {
-                'name': line['name'],
-                'percent': pct if self.amount_untaxed > 0 else line['value_amount'],
-                'amount': amount,
-                'date': line['date'],
+                "name": line["name"],
+                "percent": pct if self.amount_untaxed > 0 else line["value_amount"],
+                "amount": amount,
+                "date": line["date"],
             }
             result.append(Command.create(line_vals))
         if len(result) > 1:
-            result[-1][2]['percent'] = pct_left
+            result[-1][2]["percent"] = pct_left
         return result
 
     def of_update_payment_schedule_dates(self):
@@ -138,13 +138,13 @@ class SaleOrder(models.Model):
                 continue
 
             for payment_schedule, payment_term in zip(order.of_payment_schedule_ids, payment_terms):
-                if payment_term['date'] and not payment_schedule.date or payment_term['date'] != payment_schedule.date:
-                    payment_schedule.date = payment_term['date']
+                if payment_term["date"] and not payment_schedule.date or payment_term["date"] != payment_schedule.date:
+                    payment_schedule.date = payment_term["date"]
 
     def of_recompute_last_payment_schedule(self):
         for order in self:
             # Only draft and sent orders can have their payment schedule recomputed totally
-            if order.state in ('draft', 'sent') and order._get_payment_schedule_needs_recompute():
+            if order.state in ("draft", "sent") and order._get_payment_schedule_needs_recompute():
                 order.of_payment_schedule_ids = order._of_compute_payment_schedule()
                 continue
 
@@ -154,8 +154,8 @@ class SaleOrder(models.Model):
                 if payment.is_last:
                     payment.write(
                         {
-                            'percent': percent,
-                            'amount': amount,
+                            "percent": percent,
+                            "amount": amount,
                         }
                     )
                 else:
@@ -174,7 +174,7 @@ class SaleOrder(models.Model):
                 (order.payment_term_id and not order.of_payment_schedule_ids)
                 or order.of_payment_schedule_ids
                 and float_compare(
-                    order.amount_total, sum(order.of_payment_schedule_ids.mapped('amount')), precision_rounding=0.01
+                    order.amount_total, sum(order.of_payment_schedule_ids.mapped("amount")), precision_rounding=0.01
                 )
             )
 

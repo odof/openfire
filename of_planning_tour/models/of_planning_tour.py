@@ -15,7 +15,7 @@ from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
 
-TZ_EUROPE_PARIS = 'Europe/Paris'
+TZ_EUROPE_PARIS = "Europe/Paris"
 
 AM_LIMIT_FLOAT = 12.0  # Define the limit between AM and PM
 DEFAULT_MIN_DURATION_IN_HOURS = 0.5  # Default minimum duration between two interventions in hours
@@ -24,24 +24,24 @@ SECURITY_MARGIN_IN_DAYS = 10  # Security margin in minutes to add to the duratio
 
 # Mapping dictionary to translate the weekday name to the short version
 WEEKDAYS_STR_TR = {
-    'Monday': 'mon',
-    'Tuesday': 'tue',
-    'Wednesday': 'wed',
-    'Thursday': 'thu',
-    'Friday': 'fri',
-    'Saturday': 'sat',
-    'Sunday': 'sun',
+    "Monday": "mon",
+    "Tuesday": "tue",
+    "Wednesday": "wed",
+    "Thursday": "thu",
+    "Friday": "fri",
+    "Saturday": "sat",
+    "Sunday": "sun",
     # also add french keys to avoid error on servers with french language (s-hotel)
-    'Lundi': 'mon',
-    'Mardi': 'tue',
-    'Mercredi': 'wed',
-    'Jeudi': 'thu',
-    'Vendredi': 'fri',
-    'Samedi': 'sat',
-    'Dimanche': 'sun',
+    "Lundi": "mon",
+    "Mardi": "tue",
+    "Mercredi": "wed",
+    "Jeudi": "thu",
+    "Vendredi": "fri",
+    "Samedi": "sat",
+    "Dimanche": "sun",
 }
-OPENFIRE_LAT = '48.152344'
-OPENFIRE_LNG = '-1.7008439'
+OPENFIRE_LAT = "48.152344"
+OPENFIRE_LNG = "-1.7008439"
 
 DEFAULT_TIMEOUT = 10  # Default timeout for requests to the OSRM server
 
@@ -49,17 +49,17 @@ DEFAULT_TIMEOUT = 10  # Default timeout for requests to the OSRM server
 class OFPlanningTour(models.Model):
     """Tour"""
 
-    _name = 'of.planning.tour'
-    _inherit = ['of.readgroup', 'mail.thread']
+    _name = "of.planning.tour"
+    _inherit = ["of.readgroup", "mail.thread"]
     _description = __doc__
-    _order = 'date DESC'
+    _order = "date DESC"
 
-    name = fields.Char(compute='_compute_tour_name', store=True)
+    name = fields.Char(compute="_compute_tour_name", store=True)
     state = fields.Selection(
-        selection=[('1-draft', "Draft"), ('2-full', "Full"), ('3-confirmed', "Confirmed")],
+        selection=[("1-draft", "Draft"), ("2-full", "Full"), ("3-confirmed", "Confirmed")],
         index=True,
         readonly=True,
-        default='1-draft',
+        default="1-draft",
         tracking=True,
         copy=False,
         help=" * 'Draft' : With remaining available slots, unconfirmed.\n"
@@ -69,32 +69,32 @@ class OFPlanningTour(models.Model):
 
     # Dates and weekdays
     date = fields.Date(required=True, default=fields.Date.today())
-    date_min = fields.Date(related='date', string="Date min", help="Technical field used to filter the tours")
-    date_max = fields.Date(related='date', string="Date max", help="Technical field used to filter the tours")
+    date_min = fields.Date(related="date", string="Date min", help="Technical field used to filter the tours")
+    date_max = fields.Date(related="date", string="Date max", help="Technical field used to filter the tours")
     weekday = fields.Selection(
         selection=[
-            ('mon', "Monday"),
-            ('tue', "Tuesday"),
-            ('wed', "Wednesday"),
-            ('thu', "Thursday"),
-            ('fri', "Friday"),
-            ('sat', "Saturday"),
-            ('sun', "Sunday"),
+            ("mon", "Monday"),
+            ("tue", "Tuesday"),
+            ("wed", "Wednesday"),
+            ("thu", "Thursday"),
+            ("fri", "Friday"),
+            ("sat", "Saturday"),
+            ("sun", "Sunday"),
         ],
-        compute='_compute_date_weekday',
+        compute="_compute_date_weekday",
         store=True,
     )
     week_type = fields.Selection(
-        selection=[('1', 'Second'), ('0', 'First')], string='Week Number', compute='_compute_week_type', store=True
+        selection=[("1", "Second"), ("0", "First")], string="Week Number", compute="_compute_week_type", store=True
     )
 
     # Employee
-    employee_id = fields.Many2one(comodel_name='hr.employee', string="Operators", required=True, ondelete='cascade')
+    employee_id = fields.Many2one(comodel_name="hr.employee", string="Operators", required=True, ondelete="cascade")
     employee_other_ids = fields.Many2many(
-        comodel_name='hr.employee',
-        relation='tour_employee_other_rel',
-        column1='tour_id',
-        column2='employee_id',
+        comodel_name="hr.employee",
+        relation="tour_employee_other_rel",
+        column1="tour_id",
+        column2="employee_id",
         string="Team members",
         domain="['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]",
         copy=False,
@@ -102,39 +102,39 @@ class OFPlanningTour(models.Model):
 
     # Address data
     start_address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Start address",
         help="Start address of the tour",
-        compute='_compute_address_data',
+        compute="_compute_address_data",
         store=True,
         readonly=False,
     )
     return_address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Return address",
         help="Return address of the tour",
-        compute='_compute_address_data',
+        compute="_compute_address_data",
         store=True,
         readonly=False,
     )
 
     # Sectors
     sector_ids = fields.Many2many(
-        comodel_name='of.sector',
-        relation='tour_sector_rel',
-        column1='tour_id',
-        column2='sector_id',
+        comodel_name="of.sector",
+        relation="tour_sector_rel",
+        column1="tour_id",
+        column2="sector_id",
         string="Sectors",
         domain="[('type', 'in', ['technical', 'technical_commercial'])]",
         copy=False,
     )
-    sector_kanban_names = fields.Text(string="Sector names", compute='_compute_sector_kanban_names')
+    sector_kanban_names = fields.Text(string="Sector names", compute="_compute_sector_kanban_names")
 
     # Distance and duration
     total_distance = fields.Float(
         string="Total distance (km)",
         readonly=True,
-        compute='_compute_total_distance_and_duration',
+        compute="_compute_total_distance_and_duration",
         store=True,
         help="Total distance of the tour, that includes the distance to go from the start address and to the stop"
         " address (km)",
@@ -143,7 +143,7 @@ class OFPlanningTour(models.Model):
     total_duration = fields.Float(
         string="Total duration (h)",
         readonly=True,
-        compute='_compute_total_distance_and_duration',
+        compute="_compute_total_distance_and_duration",
         store=True,
         help="Total duration of the tour, that includes the distance to go from the start address and to the stop"
         " address (h)",
@@ -152,34 +152,34 @@ class OFPlanningTour(models.Model):
 
     # Interventions, lines and available slots
     intervention_ids = fields.Many2many(
-        comodel_name='calendar.event',
-        relation='calendar_event_of_planning_tour_rel',
-        column1='tour_id',
-        column2='event_id',
+        comodel_name="calendar.event",
+        relation="calendar_event_of_planning_tour_rel",
+        column1="tour_id",
+        column2="event_id",
         string="Interventions",
         copy=False,
     )
-    intervention_count = fields.Integer(string="# Interventions", compute='_compute_count_interventions', store=True)
+    intervention_count = fields.Integer(string="# Interventions", compute="_compute_count_interventions", store=True)
     tour_line_ids = fields.One2many(
-        comodel_name='of.planning.tour.line', inverse_name='tour_id', string="Tour lines", copy=False
+        comodel_name="of.planning.tour.line", inverse_name="tour_id", string="Tour lines", copy=False
     )
     available_slot_ids = fields.One2many(
-        comodel_name='of.planning.available.slot', inverse_name='tour_id', string="Available Slots", copy=False
+        comodel_name="of.planning.available.slot", inverse_name="tour_id", string="Available Slots", copy=False
     )
-    max_line_sequence = fields.Integer(string="Max sequence in lines", compute='_compute_max_line_sequence', store=True)
+    max_line_sequence = fields.Integer(string="Max sequence in lines", compute="_compute_max_line_sequence", store=True)
 
     # Helpers
-    is_full = fields.Boolean(compute='_compute_is_full', string="Full", store=True)
+    is_full = fields.Boolean(compute="_compute_is_full", string="Full", store=True)
     is_optimized = fields.Boolean(string="Optimized", help="Is the tour is optimized by the OSRM server ?")
     last_modification_date = fields.Datetime(
         string="Last modification date",
-        compute='_compute_last_modification_date',
+        compute="_compute_last_modification_date",
         help="Technical field used to store the max date of the last modification of the tour lines",
         store=True,
     )
     need_optimization_update = fields.Boolean(
         string="Need new optimization",
-        compute='_compute_need_new_optimization',
+        compute="_compute_need_new_optimization",
         help="Technical field used to alert Users that geodata have changed since the last optimization."
         "If True, the tour needs to be optimized again",
         store=True,
@@ -187,40 +187,40 @@ class OFPlanningTour(models.Model):
     ignore_alert_optimization_update = fields.Boolean(string="Ignore alert for optimization update")
     hide_action_buttons = fields.Boolean(
         string="Hide action buttons",
-        compute='_compute_hide_action_buttons',
+        compute="_compute_hide_action_buttons",
         help="Technical field used to hide the wizard actions buttons",
     )
 
     # Map and OSRM routes fields
-    additional_records = fields.Text(compute='_compute_additional_records')
+    additional_records = fields.Text(compute="_compute_additional_records")
     map_tour_line_ids = fields.One2many(
-        comodel_name='of.planning.tour.line', compute='_compute_map_tour_line_ids', string="Tour lines (map)"
+        comodel_name="of.planning.tour.line", compute="_compute_map_tour_line_ids", string="Tour lines (map)"
     )
     map_latitude = fields.Text(
         string="Latitude (map)",
         help="Technical field user to center the map on the tour",
-        compute='_compute_map_tour_line_ids',
+        compute="_compute_map_tour_line_ids",
     )
     map_longitude = fields.Text(
         string="Longitude (map)",
         help="Technical field user to center the map on the tour",
-        compute='_compute_map_tour_line_ids',
+        compute="_compute_map_tour_line_ids",
     )
-    map_tour_line_coordinates = fields.Char(string="Tour Coordinates", compute='_compute_map_tour_line_coordinates')
+    map_tour_line_coordinates = fields.Char(string="Tour Coordinates", compute="_compute_map_tour_line_coordinates")
 
     # Search fields
     gb_sector_id = fields.Many2one(
-        comodel_name='of.sector',
+        comodel_name="of.sector",
         compute=lambda *a, **k: {},
-        search='_search_gb_sector_id',
+        search="_search_gb_sector_id",
         string="Sector",
         of_custom_groupby=True,
     )
 
     _sql_constraints = [
         (
-            'date_employee_uniq',
-            'unique (date, employee_id)',
+            "date_employee_uniq",
+            "unique (date, employee_id)",
             "A tour already exists for this employee on this date.",
         )
     ]
@@ -229,33 +229,33 @@ class OFPlanningTour(models.Model):
     # Compute methods
     # ---------------------------------------------------------
 
-    @api.depends('date', 'employee_id')
+    @api.depends("date", "employee_id")
     def _compute_tour_name(self):
         for record in self:
             date_str = False
             if record.date:
-                date_str = record.date.strftime('%d/%m/%Y')
+                date_str = record.date.strftime("%d/%m/%Y")
             record.name = f"{record.employee_id.name}{f' - {date_str}' or ''}"
 
-    @api.depends('date')
+    @api.depends("date")
     def _compute_date_weekday(self):
-        if not self.env.context.get('tz'):
+        if not self.env.context.get("tz"):
             self = self.with_context(tz=TZ_EUROPE_PARIS)
         for tour in self:
             day_value = False
             if tour.date:
                 tour_date_dt = fields.Datetime.to_datetime(tour.date)
                 local_date = fields.Datetime.context_timestamp(self, tour_date_dt)
-                day_value = WEEKDAYS_STR_TR[local_date.strftime('%A').capitalize()]
+                day_value = WEEKDAYS_STR_TR[local_date.strftime("%A").capitalize()]
             tour.weekday = day_value
 
-    @api.depends('date')
+    @api.depends("date")
     def _compute_week_type(self):
-        attendance_obj = self.env['resource.calendar.attendance']
+        attendance_obj = self.env["resource.calendar.attendance"]
         for tour in self:
             tour.week_type = str(attendance_obj.get_week_type(tour.date))
 
-    @api.depends('employee_id')
+    @api.depends("employee_id")
     def _compute_address_data(self):
         for tour in self:
             if tour.employee_id:
@@ -268,15 +268,15 @@ class OFPlanningTour(models.Model):
             start_marker, end_marker = tour._get_start_stop_markers_data_for_tour()
             tour.additional_records = json.dumps([start_marker, end_marker])
 
-    @api.depends('tour_line_ids')
+    @api.depends("tour_line_ids")
     def _compute_count_interventions(self):
         for tour in self:
-            tour.intervention_count = len(tour.mapped('tour_line_ids.intervention_id'))
+            tour.intervention_count = len(tour.mapped("tour_line_ids.intervention_id"))
 
-    @api.depends('tour_line_ids.geodata_update_date', 'last_modification_date', 'ignore_alert_optimization_update')
+    @api.depends("tour_line_ids.geodata_update_date", "last_modification_date", "ignore_alert_optimization_update")
     def _compute_need_new_optimization(self):
         for tour in self:
-            max_date = max(tour.mapped('tour_line_ids.geodata_update_date')) if tour.tour_line_ids else False
+            max_date = max(tour.mapped("tour_line_ids.geodata_update_date")) if tour.tour_line_ids else False
             tour.need_optimization_update = (
                 max_date > tour.last_modification_date
                 if tour.date >= fields.Date.today()  # we don't need to optimize past tours
@@ -286,13 +286,13 @@ class OFPlanningTour(models.Model):
                 else False
             )
 
-    @api.depends('tour_line_ids', 'tour_line_ids.sequence')
+    @api.depends("tour_line_ids", "tour_line_ids.sequence")
     def _compute_map_tour_line_ids(self):
         for tour in self:
-            tour.map_tour_line_ids = tour.tour_line_ids.sorted('sequence')
+            tour.map_tour_line_ids = tour.tour_line_ids.sorted("sequence")
             tour.map_latitude, tour.map_longitude = tour._get_center_map_coordinates()
 
-    @api.depends('map_tour_line_ids')
+    @api.depends("map_tour_line_ids")
     def _compute_map_tour_line_coordinates(self):
         """Prepare the coordinates of the tour for the OSRM"""
         for tour in self:
@@ -306,7 +306,7 @@ class OFPlanningTour(models.Model):
             )
             tour_lines.append(f"{round(arrival.partner_longitude, 7)},{round(arrival.partner_latitude, 7)}")  # noqa
 
-            tour.map_tour_line_coordinates = ';'.join(tour_lines)
+            tour.map_tour_line_coordinates = ";".join(tour_lines)
 
     def _compute_hide_action_buttons(self):
         """Hide wizard action buttons (Optimization/Reorganization) if it has no lines or if it is in the past."""
@@ -314,11 +314,11 @@ class OFPlanningTour(models.Model):
             tour.hide_action_buttons = not tour.tour_line_ids or tour.date < fields.Date.today()
 
     @api.depends(
-        'tour_line_ids.duration_one_way',
-        'tour_line_ids.distance_one_way',
-        'tour_line_ids.endpoint_distance',
-        'tour_line_ids.endpoint_duration',
-        'tour_line_ids.is_last_line_of_tour',
+        "tour_line_ids.duration_one_way",
+        "tour_line_ids.distance_one_way",
+        "tour_line_ids.endpoint_distance",
+        "tour_line_ids.endpoint_duration",
+        "tour_line_ids.is_last_line_of_tour",
     )
     def _compute_total_distance_and_duration(self):
         for tour in self:
@@ -332,27 +332,27 @@ class OFPlanningTour(models.Model):
             tour.total_distance = total_distance
             tour.total_duration = total_duration
 
-    @api.depends('tour_line_ids.last_modification_date')
+    @api.depends("tour_line_ids.last_modification_date")
     def _compute_last_modification_date(self):
         """Get the last modification date of the tour lines."""
         for tour in self:
             tour.last_modification_date = max(
-                (d for d in tour.mapped('tour_line_ids.last_modification_date') if d), default=False
+                (d for d in tour.mapped("tour_line_ids.last_modification_date") if d), default=False
             )
 
     @api.depends(
-        'employee_id',
-        'date',
-        'employee_id.tz',
-        'tour_line_ids',
-        'tour_line_ids.intervention_id',
+        "employee_id",
+        "date",
+        "employee_id.tz",
+        "tour_line_ids",
+        "tour_line_ids.intervention_id",
     )
     def _compute_is_full(self):
         """A tour full is a tour that is in the past or that has no more available slots."""
-        if not self.env.context.get('tz'):
+        if not self.env.context.get("tz"):
             self = self.with_context(tz=TZ_EUROPE_PARIS)
 
-        event_obj = self.env['calendar.event']
+        event_obj = self.env["calendar.event"]
         today = fields.Date.today()
         for tour in self:
             if tour.date < today:
@@ -365,13 +365,13 @@ class OFPlanningTour(models.Model):
 
             interventions = event_obj.search(
                 [
-                    ('of_type', '=', 'intervention'),
-                    ('of_employee_ids', 'in', tour.employee_id.id),
-                    ('start_date', '<=', tour.date),
-                    ('stop_date', '>=', tour.date),
-                    ('of_state', 'in', ('draft', 'confirmed')),
+                    ("of_type", "=", "intervention"),
+                    ("of_employee_ids", "in", tour.employee_id.id),
+                    ("start_date", "<=", tour.date),
+                    ("stop_date", ">=", tour.date),
+                    ("of_state", "in", ("draft", "confirmed")),
                 ],
-                order='start',
+                order="start",
             )
             if not interventions or not tour.tour_line_ids:
                 tour.is_full = False
@@ -385,7 +385,7 @@ class OFPlanningTour(models.Model):
 
             # build the timeline for occupied timeslots of the day for the employee and check if it is full
             min_duration = float(
-                self.env['ir.config_parameter'].sudo().get_param('of.planning.tour.available_slot_min_duration_hours')
+                self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.available_slot_min_duration_hours")
                 or DEFAULT_MIN_DURATION_IN_HOURS
             )
             day_timeline = self._get_employee_day_unavailability_timeline(tour.date, interventions, employee_wh)
@@ -401,19 +401,19 @@ class OFPlanningTour(models.Model):
                     last_end = end
             tour.is_full = is_full
 
-    @api.depends('tour_line_ids', 'tour_line_ids.sequence')
+    @api.depends("tour_line_ids", "tour_line_ids.sequence")
     def _compute_max_line_sequence(self):
         for tour in self:
-            lines = tour.mapped('tour_line_ids.sequence')
+            lines = tour.mapped("tour_line_ids.sequence")
             tour.max_line_sequence = lines and max(lines) or 0
 
-    @api.depends('sector_ids')
+    @api.depends("sector_ids")
     def _compute_sector_kanban_names(self):
         for tour in self:
             tour.sector_kanban_names = " - ".join([sector.name for sector in tour.sector_ids])
 
     def _search_gb_sector_id(self, operator, value):
-        return [('sector_ids', operator, value)]
+        return [("sector_ids", operator, value)]
 
     # ---------------------------------------------------------
     # ORM methods
@@ -421,7 +421,7 @@ class OFPlanningTour(models.Model):
 
     def _valid_field_parameter(self, field, name):
         # EXTENDS models
-        return name == 'of_custom_groupby' or super()._valid_field_parameter(field, name)
+        return name == "of_custom_groupby" or super()._valid_field_parameter(field, name)
 
     def copy(self, default=None):
         default = dict(default or {}, date=fields.Date.today())
@@ -434,16 +434,16 @@ class OFPlanningTour(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
-        if ('start_address_id' in vals and not vals['start_address_id']) or (
-            'return_address_id' in vals and not vals['return_address_id']
+        if ("start_address_id" in vals and not vals["start_address_id"]) or (
+            "return_address_id" in vals and not vals["return_address_id"]
         ):
             # avoid setting the start or return address to False
-            for k in ['start_address_id', 'return_address_id']:
+            for k in ["start_address_id", "return_address_id"]:
                 if k in vals:
                     del vals[k]
 
         result = super().write(vals)
-        if self.env.context.get('reset_sequence'):
+        if self.env.context.get("reset_sequence"):
             self._reset_sequence()
         return result
 
@@ -451,7 +451,7 @@ class OFPlanningTour(models.Model):
         """Low level implementation of the write method to ensure that we will update the tour state after computing
         fields."""
         saved_values = {
-            tour.id: {'start_address_id': tour.start_address_id, 'return_address_id': tour.return_address_id}
+            tour.id: {"start_address_id": tour.start_address_id, "return_address_id": tour.return_address_id}
             for tour in self
         }
 
@@ -464,19 +464,19 @@ class OFPlanningTour(models.Model):
     @api.model
     def _read_group_process_groupby(self, gb, query):
         # Ajout de la possibilité de regrouper par employé
-        if gb != 'gb_sector_id':
+        if gb != "gb_sector_id":
             return super()._read_group_process_groupby(gb, query)
 
-        alias = query.left_join(self._table, 'id', 'tour_sector_rel', 'tour_id', 'sector_ids')
+        alias = query.left_join(self._table, "id", "tour_sector_rel", "tour_id", "sector_ids")
 
         return {
-            'field': gb,
-            'groupby': gb,
-            'type': 'many2one',
-            'display_format': None,
-            'interval': None,
-            'tz_convert': False,
-            'qualified_field': f'"{alias}".sector_id',
+            "field": gb,
+            "groupby": gb,
+            "type": "many2one",
+            "display_format": None,
+            "interval": None,
+            "tz_convert": False,
+            "qualified_field": f'"{alias}".sector_id',
         }
 
     # ---------------------------------------------------------
@@ -488,40 +488,40 @@ class OFPlanningTour(models.Model):
         Returns an action to view the interventions associated with the tour (linked to tour lines).
         """
         return {
-            'name': _("Interventions"),
-            'type': 'ir.actions.act_window',
-            'res_model': 'calendar.event',
-            'view_mode': 'tree,form',
-            'domain': [('id', 'in', self.mapped('tour_line_ids.intervention_id').ids)],
+            "name": _("Interventions"),
+            "type": "ir.actions.act_window",
+            "res_model": "calendar.event",
+            "view_mode": "tree,form",
+            "domain": [("id", "in", self.mapped("tour_line_ids.intervention_id").ids)],
         }
 
     def action_button_confirm_tour(self):
         """Confirm the tour."""
         self.ensure_one()
-        self.write({'state': '3-confirmed'})
+        self.write({"state": "3-confirmed"})
 
     def action_button_set_back_draft(self):
         """Set the tour as draft."""
         self.ensure_one()
-        self.write({'state': '1-draft'})
+        self.write({"state": "1-draft"})
 
     def action_button_set_back_full(self):
         """Set the tour as full."""
         self.ensure_one()
-        self.write({'state': '2-full'})
+        self.write({"state": "2-full"})
 
     def action_button_ignore_alert_optimization_update(self):
         """Ignore the alert about tour optimization until the next tour modification."""
         self.ensure_one()
-        self.write({'ignore_alert_optimization_update': True})
+        self.write({"ignore_alert_optimization_update": True})
 
     def action_button_update_map_and_reload(self):
         """Update the osrm data for the tour and reload the page."""
         self.ensure_one()
         self.action_compute_osrm_data()
         return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
+            "type": "ir.actions.client",
+            "tag": "reload",
         }
 
     def action_compute_osrm_data(self, reload=False):
@@ -541,7 +541,7 @@ class OFPlanningTour(models.Model):
                 # force the recomputation of the line data (previous/next geo_lat, geo_lng etc.)
                 line._compute_line_data()
                 line._osrm_update_line_data()
-        self._fields['map_tour_line_ids'].compute_value(self)
+        self._fields["map_tour_line_ids"].compute_value(self)
 
     def action_button_restore_tour(self):
         """
@@ -551,21 +551,21 @@ class OFPlanningTour(models.Model):
 
         # save the current state of the interventions to restore it after the tour restoration
         current_states = {
-            intervention: intervention.of_state for intervention in self.mapped('tour_line_ids.intervention_id')
+            intervention: intervention.of_state for intervention in self.mapped("tour_line_ids.intervention_id")
         }
-        self.mapped('tour_line_ids.intervention_id').with_context(of_avoid_tour_process=True).write(
-            {'of_state': 'being_optimized'}
+        self.mapped("tour_line_ids.intervention_id").with_context(of_avoid_tour_process=True).write(
+            {"of_state": "being_optimized"}
         )
 
         # restore last saved values
         for line in self.tour_line_ids:
             line.action_restore_intervention_date()
 
-        self.tour_line_ids.write({'last_modification_date': False})
+        self.tour_line_ids.write({"last_modification_date": False})
 
         # restore the state of the interventions
         for intervention, state in current_states.items():
-            intervention.with_context(of_avoid_tour_process=True).write({'of_state': state})
+            intervention.with_context(of_avoid_tour_process=True).write({"of_state": state})
 
         # reset sequence of lines and then recompute the OSRM data
         self._reset_sequence()
@@ -576,7 +576,7 @@ class OFPlanningTour(models.Model):
         Open the wizard to optimize the tour.
         """
         optimization_wizard = self._handle_wizard_opening(
-            wizard_model='of.planning.tour.optimization.wizard',
+            wizard_model="of.planning.tour.optimization.wizard",
             error_message=_("You must set the start and return addresses before optimizing the tour."),
         )
         return optimization_wizard.action_button_open(custom_title=self.name)
@@ -587,7 +587,7 @@ class OFPlanningTour(models.Model):
         :return: the action to open the wizard
         """
         reorganization_wizard = self._handle_wizard_opening(
-            wizard_model='of.planning.tour.reorganization.wizard',
+            wizard_model="of.planning.tour.reorganization.wizard",
             error_message=_("You must set the start and return addresses before reorganizing the tour."),
         )
 
@@ -612,14 +612,14 @@ class OFPlanningTour(models.Model):
             return False
         self_sudo = self.sudo()  # to avoid access rights issues if this method is not called from a cron
 
-        tour = self_sudo.search([('date', '=', date), ('employee_id', '=', employee.id)], limit=1)
+        tour = self_sudo.search([("date", "=", date), ("employee_id", "=", employee.id)], limit=1)
         if tour:
             return tour
 
         tour = self_sudo.create(
             {
-                'employee_id': employee.id,
-                'date': date,
+                "employee_id": employee.id,
+                "date": date,
             }
         )
         if tour.intervention_ids and not tour.tour_line_ids:
@@ -639,28 +639,28 @@ class OFPlanningTour(models.Model):
 
     def action_mass_tour_route_update(self):
         return {
-            'name': _("Mass route update"),
-            'res_model': 'of.planning.tour.mass.route.update.wizard',
-            'view_mode': 'form',
-            'context': {
-                'active_id': self.ids[0],
-                'active_ids': self.ids,
+            "name": _("Mass route update"),
+            "res_model": "of.planning.tour.mass.route.update.wizard",
+            "view_mode": "form",
+            "context": {
+                "active_id": self.ids[0],
+                "active_ids": self.ids,
             },
-            'target': 'new',
-            'type': 'ir.actions.act_window',
+            "target": "new",
+            "type": "ir.actions.act_window",
         }
 
     def action_mass_sector_assignation(self):
         return {
-            'name': _("Mass sector assignation"),
-            'res_model': 'of.planning.tour.mass.sector.assignation.wizard',
-            'view_mode': 'form',
-            'context': {
-                'active_id': self.ids[0],
-                'active_ids': self.ids,
+            "name": _("Mass sector assignation"),
+            "res_model": "of.planning.tour.mass.sector.assignation.wizard",
+            "view_mode": "form",
+            "context": {
+                "active_id": self.ids[0],
+                "active_ids": self.ids,
             },
-            'target': 'new',
-            'type': 'ir.actions.act_window',
+            "target": "new",
+            "type": "ir.actions.act_window",
         }
 
     # ---------------------------------------------------------
@@ -691,15 +691,15 @@ class OFPlanningTour(models.Model):
         geo_lng = intervention.of_partner_longitude
         address_city = intervention.of_address_city
         return {
-            'sequence': idx,
-            'tour_id': self.id,
-            'intervention_id': intervention.id,
-            'geo_lat': geo_lat,
-            'geo_lng': geo_lng,
-            'address_city': address_city,
-            'geodata_update_date': fields.Datetime.now(),
-            'duration_one_way': False,
-            'distance_one_way': False,
+            "sequence": idx,
+            "tour_id": self.id,
+            "intervention_id": intervention.id,
+            "geo_lat": geo_lat,
+            "geo_lng": geo_lng,
+            "address_city": address_city,
+            "geodata_update_date": fields.Datetime.now(),
+            "duration_one_way": False,
+            "distance_one_way": False,
         }
 
     def _reorder_tour_lines(self):
@@ -714,7 +714,7 @@ class OFPlanningTour(models.Model):
     def _reset_sequence(self):
         """Reset the tour lines sequence depending on each line date_start."""
         for tour in self:
-            for current_sequence, line in enumerate(tour.tour_line_ids.sorted('date_start'), start=1):
+            for current_sequence, line in enumerate(tour.tour_line_ids.sorted("date_start"), start=1):
                 line.sequence = current_sequence
 
     def _set_tours_to_draft(self):
@@ -724,8 +724,8 @@ class OFPlanningTour(models.Model):
         This method filters the tours based on the conditions mentioned above and updates their state to '1-draft'
         using the `write` method.
         """
-        tours = self.filtered(lambda t: not t.is_full and t.state == '2-full')
-        tours and tours.write({'state': '1-draft'})
+        tours = self.filtered(lambda t: not t.is_full and t.state == "2-full")
+        tours and tours.write({"state": "1-draft"})
 
     def _set_tours_to_full(self):
         """
@@ -734,8 +734,8 @@ class OFPlanningTour(models.Model):
         This method filters the tours based on the conditions mentioned above and updates their state to '2-full'
         using the `write` method.
         """
-        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == '1-draft')
-        tours and tours.write({'state': '2-full'})
+        tours = self.filtered(lambda t: t.is_full and t.tour_line_ids and t.state == "1-draft")
+        tours and tours.write({"state": "2-full"})
 
     def _delete_tour_lines(self):
         """Delete all the tour lines of the tour."""
@@ -762,31 +762,31 @@ class OFPlanningTour(models.Model):
             if (
                 (interventions := tour._get_interventions_to_add())
                 and tour.date >= fields.Date.today()
-                or self.env.context.get('of_tour_force_restore')
+                or self.env.context.get("of_tour_force_restore")
             ):
                 index = tour.max_line_sequence + 1 if tour.tour_line_ids else 1
                 if lines := [
                     Command.create(tour._prepare_tour_line_values(idx, intervention))
                     for idx, intervention in enumerate(interventions, index)
                 ]:
-                    tour.write({'tour_line_ids': lines})
+                    tour.write({"tour_line_ids": lines})
                     tour._reorganize_available_slot()
                     tour._reset_sequence()
 
     def _get_interventions_to_add(self):
         """Get the interventions that are not already in the tour to add them if needed."""
         self.ensure_one()
-        interventions = self.env['calendar.event'].search(
+        interventions = self.env["calendar.event"].search(
             [
-                ('of_type', '=', 'intervention'),
-                ('of_employee_ids', 'in', [self.employee_id.id]),
-                ('start_date', '<=', self.date),
-                ('stop_date', '>=', self.date),
-                ('of_state', 'in', ('draft', 'confirmed', 'ongoing')),
+                ("of_type", "=", "intervention"),
+                ("of_employee_ids", "in", [self.employee_id.id]),
+                ("start_date", "<=", self.date),
+                ("stop_date", ">=", self.date),
+                ("of_state", "in", ("draft", "confirmed", "ongoing")),
             ],
-            order='start',
+            order="start",
         )
-        return interventions - self.tour_line_ids.mapped('intervention_id')
+        return interventions - self.tour_line_ids.mapped("intervention_id")
 
     def _write_update_states(self, values):
         """
@@ -799,7 +799,7 @@ class OFPlanningTour(models.Model):
         Returns:
             None
         """
-        if any(field in values for field in ('is_full', 'state')):
+        if any(field in values for field in ("is_full", "state")):
             self._set_tours_to_draft()
             self._set_tours_to_full()
 
@@ -815,15 +815,15 @@ class OFPlanningTour(models.Model):
         Returns:
             None
         """
-        if any(field in values for field in ('start_address_id', 'return_address_id')) and not self.env.context.get(
-            'of_skip_osrm_data_compute'
+        if any(field in values for field in ("start_address_id", "return_address_id")) and not self.env.context.get(
+            "of_skip_osrm_data_compute"
         ):
-            tours_to_compute = self.env['of.planning.tour']
+            tours_to_compute = self.env["of.planning.tour"]
             for tour in self:
                 old_values = saved_values[tour.id]
                 if (
-                    tour.start_address_id != old_values['start_address_id']
-                    or tour.return_address_id != old_values['return_address_id']
+                    tour.start_address_id != old_values["start_address_id"]
+                    or tour.return_address_id != old_values["return_address_id"]
                 ):
                     tours_to_compute |= tour
             tours_to_compute and tours_to_compute.action_compute_osrm_data()
@@ -846,7 +846,7 @@ class OFPlanningTour(models.Model):
         self._check_interventions_addresses()
         self._osrm_recompute_data_if_needed()
 
-        if wizard_model == 'of.planning.tour.optimization.wizard':
+        if wizard_model == "of.planning.tour.optimization.wizard":
             lines_values = [
                 Command.create(tour_line._prepare_optimization_line_values()) for tour_line in self.tour_line_ids
             ]
@@ -857,8 +857,8 @@ class OFPlanningTour(models.Model):
 
         return self.env[wizard_model].create(
             {
-                'tour_id': self.id,
-                'line_ids': lines_values,
+                "tour_id": self.id,
+                "line_ids": lines_values,
             }
         )
 
@@ -882,13 +882,13 @@ class OFPlanningTour(models.Model):
         tours = self.browse()
         for employee in employees:
             for date_eval in dates_eval:
-                tour = self.search([('date', '=', date_eval), ('employee_id', '=', employee.id)], limit=1)
+                tour = self.search([("date", "=", date_eval), ("employee_id", "=", employee.id)], limit=1)
                 if not tour:
                     tour = self.create(
                         {
-                            'date': date_eval,
-                            'employee_id': employee.id,
-                            'sector_ids': [Command.set([address_sector.id])] if address_sector else False,
+                            "date": date_eval,
+                            "employee_id": employee.id,
+                            "sector_ids": [Command.set([address_sector.id])] if address_sector else False,
                         }
                     )
                 elif not tour.sector_ids and address_sector:
@@ -913,50 +913,50 @@ class OFPlanningTour(models.Model):
         Returns:
             bool: True if the generation of tours is successful.
         """
-        icp_obj = self.env['ir.config_parameter']
-        employee_obj = self.env['hr.employee']
-        days_obj = self.env['of.days']
-        icp_obj = self.env['ir.config_parameter']
+        icp_obj = self.env["ir.config_parameter"]
+        employee_obj = self.env["hr.employee"]
+        days_obj = self.env["of.days"]
+        icp_obj = self.env["ir.config_parameter"]
 
         new_employees = employee_obj
-        today = datetime.strptime(force_date, '%Y-%m-%d').date() if force_date else datetime.now().date()
+        today = datetime.strptime(force_date, "%Y-%m-%d").date() if force_date else datetime.now().date()
 
         # we are using config parameters here to avoid cron autolock during job processing
         cron_lastcreation = icp_obj.get_param(
-            'of.planning.tour.cron_generate_lastcreation', datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            "of.planning.tour.cron_generate_lastcreation", datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         )
-        lastcreation_d = datetime.strptime(cron_lastcreation, '%Y-%m-%d %H:%M:%S').date()
+        lastcreation_d = datetime.strptime(cron_lastcreation, "%Y-%m-%d %H:%M:%S").date()
 
         # checking if cron has to do someting by comparing nextcall date with today
-        cron_nextcall = icp_obj.get_param('of.planning.tour.cron_generate_nextcall', False)
-        cron_nextcall_dt = datetime.strptime(cron_nextcall, '%Y-%m-%d %H:%M:%S') if cron_nextcall else False
-        if cron_nextcall_dt and cron_nextcall_dt.strftime('%Y-%m-%d') > today.strftime('%Y-%m-%d'):
+        cron_nextcall = icp_obj.get_param("of.planning.tour.cron_generate_nextcall", False)
+        cron_nextcall_dt = datetime.strptime(cron_nextcall, "%Y-%m-%d %H:%M:%S") if cron_nextcall else False
+        if cron_nextcall_dt and cron_nextcall_dt.strftime("%Y-%m-%d") > today.strftime("%Y-%m-%d"):
             # cron is not due to run today but if there is new created employees since the last execution we need to
             # generate tours for them
-            new_employees = employee_obj.search([('create_date', '>=', cron_lastcreation)])
+            new_employees = employee_obj.search([("create_date", ">=", cron_lastcreation)])
             if not new_employees:
                 _logger.info(f"Nothing todo. Cron generate tour is scheduled for {cron_nextcall}")
                 return True
 
         company_id = int(force_company_id) if force_company_id else False
-        employee_ids = icp_obj.get_param('of.planning.tour.tour_employee_ids', '[]')
-        day_ids = icp_obj.get_param('of.planning.tour.tour_day_ids', [])
-        period_in_days = int(icp_obj.get_param('of.planning.tour.nbr_days_tour_creation', DEFAULT_PERIOD_IN_DAYS))
+        employee_ids = icp_obj.get_param("of.planning.tour.tour_employee_ids", "[]")
+        day_ids = icp_obj.get_param("of.planning.tour.tour_day_ids", [])
+        period_in_days = int(icp_obj.get_param("of.planning.tour.nbr_days_tour_creation", DEFAULT_PERIOD_IN_DAYS))
         employee_ids = ast.literal_eval(employee_ids)
         day_ids = ast.literal_eval(day_ids)
 
         if not new_employees:
             # get employees to process from the settings if its set, search all employees otherwise
-            employee_domain = [('id', 'in', employee_ids)] if employee_ids else []
+            employee_domain = [("id", "in", employee_ids)] if employee_ids else []
             if company_id:
-                employee_domain.append('|', ('company_id', '=', company_id), ('company_id', '=', False))
+                employee_domain.append("|", ("company_id", "=", company_id), ("company_id", "=", False))
             employees = employee_obj.search(employee_domain)
         elif employee_ids:
             return True  # we don't need to generate tours for new employees if we have a list of employees
         else:
             employees = new_employees
 
-        days = days_obj.search([('id', 'in', day_ids)])
+        days = days_obj.search([("id", "in", day_ids)])
         days_number = [day.number for day in days] or range(1, 8)
 
         delta = timedelta(days=period_in_days)
@@ -964,12 +964,12 @@ class OFPlanningTour(models.Model):
         # generate the list of dates for which we need to generate tours on that period (with a security margin)
         tour_dates = []
         for date in [lastcreation_d + timedelta(days=i) for i in range(1, delta.days + 1 + SECURITY_MARGIN_IN_DAYS)]:
-            tour_dates.append(date.strftime('%Y-%m-%d')) if date.weekday() + 1 in days_number else None
+            tour_dates.append(date.strftime("%Y-%m-%d")) if date.weekday() + 1 in days_number else None
 
         # search existing tours for employees on this period
         if tour_dates:
             search_existing_tours = self.search(
-                [('date', '>=', tour_dates[0]), ('date', '<=', tour_dates[-1]), ('employee_id', 'in', employees.ids)]
+                [("date", ">=", tour_dates[0]), ("date", "<=", tour_dates[-1]), ("employee_id", "in", employees.ids)]
             )
             tour_by_employee = {}
             for tour in search_existing_tours:
@@ -985,13 +985,13 @@ class OFPlanningTour(models.Model):
                     self.action_generate_tour(date, employee)
 
         # set the nextcall date (in x days)
-        cron_nextcall_dt = datetime.strptime(cron_nextcall, '%Y-%m-%d %H:%M:%S') if cron_nextcall else datetime.now()
-        cron_generate_nextcall = (cron_nextcall_dt + timedelta(days=period_in_days)).strftime('%Y-%m-%d %H:%M:%S')
+        cron_nextcall_dt = datetime.strptime(cron_nextcall, "%Y-%m-%d %H:%M:%S") if cron_nextcall else datetime.now()
+        cron_generate_nextcall = (cron_nextcall_dt + timedelta(days=period_in_days)).strftime("%Y-%m-%d %H:%M:%S")
         if not new_employees:  # normal cron call
             icp_obj.set_param(
-                'of.planning.tour.cron_generate_lastcreation', datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                "of.planning.tour.cron_generate_lastcreation", datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
-            icp_obj.set_param('of.planning.tour.cron_generate_nextcall', cron_generate_nextcall)
+            icp_obj.set_param("of.planning.tour.cron_generate_nextcall", cron_generate_nextcall)
             _logger.info(f"Done. Cron generate tour is scheduled for {cron_generate_nextcall}")
         else:  # cron call for new employees
             _logger.info(
@@ -1010,32 +1010,32 @@ class OFPlanningTour(models.Model):
         """
         self.ensure_one()
         default_marker = {
-            'id': f'fake_record_{self.id}',
-            'partner_phone': False,
-            'partner_mobile': False,
-            'is_start_end_marker': True,
+            "id": f"fake_record_{self.id}",
+            "partner_phone": False,
+            "partner_mobile": False,
+            "is_start_end_marker": True,
         }
         same_start_return_address = (
             self.start_address_id.partner_longitude == self.return_address_id.partner_longitude
             and self.start_address_id.partner_latitude == self.return_address_id.partner_latitude
         )
         start_marker = default_marker | {
-            'tour_number': (_("Departure/Return") if same_start_return_address else _("Departure")),
-            'address_city': self.start_address_id.city,
-            'partner_name': self.start_address_id.name,
-            'geo_lng': self.start_address_id.partner_longitude,
-            'geo_lat': self.start_address_id.partner_latitude,
-            'address_zip': self.start_address_id.zip,
+            "tour_number": (_("Departure/Return") if same_start_return_address else _("Departure")),
+            "address_city": self.start_address_id.city,
+            "partner_name": self.start_address_id.name,
+            "geo_lng": self.start_address_id.partner_longitude,
+            "geo_lat": self.start_address_id.partner_latitude,
+            "address_zip": self.start_address_id.zip,
         }
 
         # End of the tour
         end_marker = default_marker | {
-            'id': start_marker['id'] if same_start_return_address else f'fake_record_{self.id}_end',
-            'tour_number': _("Departure/Return") if same_start_return_address else _("Return"),
-            'address_city': self.return_address_id.city,
-            'partner_name': self.return_address_id.name,
-            'geo_lng': self.return_address_id.partner_longitude,
-            'geo_lat': self.return_address_id.partner_latitude,
+            "id": start_marker["id"] if same_start_return_address else f"fake_record_{self.id}_end",
+            "tour_number": _("Departure/Return") if same_start_return_address else _("Return"),
+            "address_city": self.return_address_id.city,
+            "partner_name": self.return_address_id.name,
+            "geo_lng": self.return_address_id.partner_longitude,
+            "geo_lat": self.return_address_id.partner_latitude,
         }
         return start_marker, end_marker
 
@@ -1104,12 +1104,12 @@ class OFPlanningTour(models.Model):
         Args:
             vals (dict): The values to process.
         """
-        if not vals.get('employee_id'):
-            return {'start_address_id': vals.get('start_address_id'), 'return_address_id': vals.get('start_address_id')}
+        if not vals.get("employee_id"):
+            return {"start_address_id": vals.get("start_address_id"), "return_address_id": vals.get("start_address_id")}
 
-        employee = self.env['hr.employee'].sudo().browse(vals.get('employee_id'))
-        start_address = vals.get('start_address_id', employee.of_start_address_id.id or False)
-        return_address = vals.get('return_address_id', employee.of_return_address_id.id or False)
+        employee = self.env["hr.employee"].sudo().browse(vals.get("employee_id"))
+        start_address = vals.get("start_address_id", employee.of_start_address_id.id or False)
+        return_address = vals.get("return_address_id", employee.of_return_address_id.id or False)
         if not start_address:
             start_address = employee.company_id.partner_id.id or False
         if not return_address:
@@ -1119,8 +1119,8 @@ class OFPlanningTour(models.Model):
         if not return_address:
             return_address = self.env.user.company_id.partner_id.id or False
         return {
-            'start_address_id': start_address,
-            'return_address_id': return_address,
+            "start_address_id": start_address,
+            "return_address_id": return_address,
         }
 
     def _check_tour_addresses(self, error_message=None):
@@ -1284,7 +1284,7 @@ class OFPlanningTour(models.Model):
             return False, 0
 
         if not employee_wh:
-            raise UserError(_("Employee \"%s\" has no working hours for this day.\n") % self.employee_id.name)
+            raise UserError(_('Employee "%s" has no working hours for this day.\n') % self.employee_id.name)
 
         end_am = employee_wh[0][0][1]  # end of the morning
         start_pm = employee_wh[1][0][0]  # start of the afternoon
@@ -1403,19 +1403,19 @@ class OFPlanningTour(models.Model):
         """
         self.ensure_one()
 
-        employees = self.tour_line_ids.mapped('intervention_id.of_employee_ids')
+        employees = self.tour_line_ids.mapped("intervention_id.of_employee_ids")
         if employees_wo_working_hours := employees.filtered(
             lambda e: not e.resource_calendar_id or not e.resource_calendar_id.attendance_ids
         ):
             if len(employees_wo_working_hours) > 1:
                 message = _(
-                    "Employees \"%(employees)s\" have no working hours.\n"
+                    'Employees "%(employees)s" have no working hours.\n'
                     "Please set the working hours before optimizing/reorganizing the tour.",
-                    employees=', '.join(employees_wo_working_hours.mapped('name')),
+                    employees=", ".join(employees_wo_working_hours.mapped("name")),
                 )
             else:
                 message = _(
-                    "Employee \"%(employee)s\" has no working hours.\n"
+                    'Employee "%(employee)s" has no working hours.\n'
                     "Please set the working hours before optimizing/reorganizing the tour.",
                     employee=employees_wo_working_hours.name,
                 )
@@ -1438,7 +1438,7 @@ class OFPlanningTour(models.Model):
         available_slots = []
         if tour.date > fields.Date.today():
             user_tz = pytz.timezone(self.env.user.tz) if self.env.user.tz else pytz.utc
-            for attendance in tour.mapped('employee_id.resource_calendar_id.attendance_ids').filtered(
+            for attendance in tour.mapped("employee_id.resource_calendar_id.attendance_ids").filtered(
                 lambda a: a.dayofweek == str(tour.date.weekday()) and not a.week_type or a.week_type == tour.week_type
             ):
                 start_time = time(hour=int(attendance.hour_from), minute=int(attendance.hour_from % 1 * 60))
@@ -1448,8 +1448,8 @@ class OFPlanningTour(models.Model):
                 stop = user_tz.localize(datetime.combine(tour.date, stop_time))
                 available_slots.append(
                     {
-                        'start': start.astimezone(pytz.utc).replace(tzinfo=None),
-                        'stop': stop.astimezone(pytz.utc).replace(tzinfo=None),
+                        "start": start.astimezone(pytz.utc).replace(tzinfo=None),
+                        "stop": stop.astimezone(pytz.utc).replace(tzinfo=None),
                     }
                 )
         return available_slots
@@ -1469,31 +1469,31 @@ class OFPlanningTour(models.Model):
         if available_slots:
             res = []
             slot = available_slots[0]
-            if slot['start'] > line.date_stop or slot['stop'] < line.date_start:
+            if slot["start"] > line.date_stop or slot["stop"] < line.date_start:
                 res = [slot]
-            elif line.date_start <= slot['start'] and line.date_stop >= slot['stop']:
+            elif line.date_start <= slot["start"] and line.date_stop >= slot["stop"]:
                 # This tour line is superpozed with the entire available slot, so we delete it
                 pass
-            elif line.date_start <= slot['start']:
+            elif line.date_start <= slot["start"]:
                 # This tour line is superpozed with the start of the available slot
-                slot.update({'start': line.date_stop, 'previous_tour_line_id': line.id})
+                slot.update({"start": line.date_stop, "previous_tour_line_id": line.id})
                 res = [slot]
-            elif line.date_start > slot['start'] and line.date_stop < slot['stop']:
+            elif line.date_start > slot["start"] and line.date_stop < slot["stop"]:
                 # This tour line is inside of the available slot, a split is needed
                 available_slots.insert(
                     1,
                     {
-                        'start': line.date_stop,
-                        'stop': slot['stop'],
-                        'previous_tour_line_id': line.id,
-                        'next_tour_line_id': slot.get('next_tour_line_id', False),
+                        "start": line.date_stop,
+                        "stop": slot["stop"],
+                        "previous_tour_line_id": line.id,
+                        "next_tour_line_id": slot.get("next_tour_line_id", False),
                     },
                 )
-                slot.update({'stop': line.date_start, 'next_tour_line_id': line.id})
+                slot.update({"stop": line.date_start, "next_tour_line_id": line.id})
                 res = [slot]
-            elif line.date_stop >= slot['stop']:
+            elif line.date_stop >= slot["stop"]:
                 # This tour line is superpozed with the end of the available slot
-                slot.update({'stop': line.date_start, 'next_tour_line_id': line.id})
+                slot.update({"stop": line.date_start, "next_tour_line_id": line.id})
                 res = [slot]
 
             recursive = self._populate_available_slots_recursive(tour, available_slots[1:], line)
@@ -1531,12 +1531,12 @@ class OFPlanningTour(models.Model):
             return []
 
         slot_dict = available_slots[0]
-        task_obj = self.env['of.planning.task']
+        task_obj = self.env["of.planning.task"]
         min_duration = task_obj._get_minimal_task_duration()
 
-        duration = round(((slot_dict['stop'] - slot_dict['start']).total_seconds() / 3600.0), 2)
-        if slot_dict.get('next_tour_line_id'):
-            tour_line = self.env['of.planning.tour.line'].browse(slot_dict['next_tour_line_id'])
+        duration = round(((slot_dict["stop"] - slot_dict["start"]).total_seconds() / 3600.0), 2)
+        if slot_dict.get("next_tour_line_id"):
+            tour_line = self.env["of.planning.tour.line"].browse(slot_dict["next_tour_line_id"])
             duration -= tour_line.intervention_id.of_travel_duration
 
         # If the available slot is big enough, we keep it
@@ -1553,17 +1553,17 @@ class OFPlanningTour(models.Model):
         We update the existing available slots with the new info. If there is too much slots, we archive them.
         If there is not enough, we create them.
         """
-        available_slot_obj = self.env['of.planning.available.slot']
-        tour_available_slots = available_slot_obj.with_context(active_test=False).search([('tour_id', '=', tour.id)])
+        available_slot_obj = self.env["of.planning.available.slot"]
+        tour_available_slots = available_slot_obj.with_context(active_test=False).search([("tour_id", "=", tour.id)])
         for slot_dict in available_slots:
-            slot_dict.update({'active': True, 'tour_id': tour.id})
+            slot_dict.update({"active": True, "tour_id": tour.id})
             if tour_available_slots:
                 tour_available_slots[0].write(slot_dict)
                 tour_available_slots = tour_available_slots - tour_available_slots[0]
             else:
                 available_slot_obj.create(slot_dict)
         if tour_available_slots:
-            tour_available_slots.write({'active': False})
+            tour_available_slots.write({"active": False})
 
     def _reorganize_available_slot(self):
         """Reorganize available slots of the tour depending on each tour lines."""
@@ -1602,57 +1602,57 @@ class OFPlanningTour(models.Model):
             self._set_return_address(return_address)
 
         # Start point
-        coordinates_str = f'{start_address.partner_longitude},{start_address.partner_latitude}'  # noqa
+        coordinates_str = f"{start_address.partner_longitude},{start_address.partner_latitude}"  # noqa
         hint = self._osrm_get_nearest_point_hint(coordinates_str)
 
         tour_data_by_hint = {  # dict of a hint string of each coordinates associated to the tour line
             hint: [
                 {
-                    'tour': self,
-                    'line': False,
-                    'coordinates': (start_address.partner_longitude, start_address.partner_latitude),
-                    'intervention_id': False,
-                    'type': 'start',
+                    "tour": self,
+                    "line": False,
+                    "coordinates": (start_address.partner_longitude, start_address.partner_latitude),
+                    "intervention_id": False,
+                    "type": "start",
                 }
             ]
         }
 
         # Interventions lines
         for line in self.tour_line_ids:
-            coord_str = f'{line.geo_lng},{line.geo_lat}'  # noqa
-            coordinates_str += f';{coord_str}'  # noqa
+            coord_str = f"{line.geo_lng},{line.geo_lat}"  # noqa
+            coordinates_str += f";{coord_str}"  # noqa
 
             hint = self._osrm_get_nearest_point_hint(coord_str)
             if not tour_data_by_hint.get(hint):
                 tour_data_by_hint[hint] = []
             tour_data_by_hint[hint].append(
                 {
-                    'tour': self,
-                    'line': line,
-                    'coordinates': (line.geo_lng, line.geo_lat),
-                    'intervention_id': line.intervention_id.id,
-                    'type': 'intervention',
+                    "tour": self,
+                    "line": line,
+                    "coordinates": (line.geo_lng, line.geo_lat),
+                    "intervention_id": line.intervention_id.id,
+                    "type": "intervention",
                 }
             )
 
         # End point
-        coord_str = f'{return_address.partner_longitude},{return_address.partner_latitude}'  # noqa
+        coord_str = f"{return_address.partner_longitude},{return_address.partner_latitude}"  # noqa
         hint = self._osrm_get_nearest_point_hint(coord_str)
-        coordinates_str += f';{coord_str}'  # noqa
+        coordinates_str += f";{coord_str}"  # noqa
         tour_data_by_hint[hint] = [
             {
-                'tour': self,
-                'line': False,
-                'intervention_id': False,
-                'coordinates': (return_address.partner_longitude, return_address.partner_latitude),
-                'type': 'end',
+                "tour": self,
+                "line": False,
+                "intervention_id": False,
+                "coordinates": (return_address.partner_longitude, return_address.partner_latitude),
+                "type": "end",
             }
         ]
 
         return coordinates_str, tour_data_by_hint
 
     @api.model
-    def _osrm_get_base_url(self, mode='route'):
+    def _osrm_get_base_url(self, mode="route"):
         """
         Returns the base URL for the OSRM routing service.
 
@@ -1666,9 +1666,9 @@ class OFPlanningTour(models.Model):
             None
 
         """
-        routing_base_url = config.get('of_routing_base_url', '')
-        routing_version = config.get('of_routing_version', '')
-        routing_profile = config.get('of_routing_profile', '')
+        routing_base_url = config.get("of_routing_base_url", "")
+        routing_version = config.get("of_routing_version", "")
+        routing_profile = config.get("of_routing_profile", "")
         if not routing_base_url or not routing_version or not routing_profile:
             return False
 
@@ -1676,12 +1676,12 @@ class OFPlanningTour(models.Model):
         parsed_base_url = urlparse(routing_base_url)
         if not parsed_base_url.scheme or not parsed_base_url.netloc:
             raise ValueError(_("Invalid OSRM base URL"))
-        routing_base_url = parsed_base_url._replace(path='/').geturl()
+        routing_base_url = parsed_base_url._replace(path="/").geturl()
 
         # Remove trailing slashes from version and profile
-        routing_version = routing_version.rstrip('/')
-        routing_profile = routing_profile.rstrip('/')
-        full_url = f'{routing_base_url}{mode}/{routing_version}/{routing_profile}'
+        routing_version = routing_version.rstrip("/")
+        routing_profile = routing_profile.rstrip("/")
+        full_url = f"{routing_base_url}{mode}/{routing_version}/{routing_profile}"
 
         # Validate the constructed URL
         parsed_full_url = urlparse(full_url)
@@ -1733,7 +1733,7 @@ class OFPlanningTour(models.Model):
             res = req.json()
         except Exception:
             res = {}
-        return res.get('waypoints')[0].get('hint') if res.get('code') == 'Ok' else {}
+        return res.get("waypoints")[0].get("hint") if res.get("code") == "Ok" else {}
 
     def _osrm_send_trip_request(self, coordinates_str=None):
         """
@@ -1752,12 +1752,12 @@ class OFPlanningTour(models.Model):
         """
         self.ensure_one()
 
-        osrm_url = self._osrm_get_base_url('trip')
+        osrm_url = self._osrm_get_base_url("trip")
         if not osrm_url or not coordinates_str:
             return {}
 
-        full_query = f'{osrm_url}/{coordinates_str}'
-        full_query += '?geometries=geojson&overview=simplified&roundtrip=false&source=first&destination=last'
+        full_query = f"{osrm_url}/{coordinates_str}"
+        full_query += "?geometries=geojson&overview=simplified&roundtrip=false&source=first&destination=last"
         # roundtrip: return to the first location, default is true but we set it to false because in some cases
         # the start and end points could be different.
         # see http://project-osrm.org/docs/v5.24.0/api/#trip-service for more details

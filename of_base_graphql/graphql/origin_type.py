@@ -4,5 +4,5 @@ import graphene
 
 
 class Origin(graphene.Enum):
-    WEB = 'web'
-    MOBILE = 'mobile'
+    WEB = "web"
+    MOBILE = "mobile"

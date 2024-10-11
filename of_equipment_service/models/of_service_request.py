@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 
 
 class OFServiceRequest(models.Model):
-    _inherit = 'of.service.request'
+    _inherit = "of.service.request"
 
     # Equipment
     use_equipment = fields.Boolean(
@@ -13,20 +13,20 @@ class OFServiceRequest(models.Model):
         help="Activate this field to add one or more items of equipment to be worked on.",
     )
     equipment_ids = fields.Many2many(
-        comodel_name='of.equipment',
-        relation='of_service_request_equipment_rel',
-        column1='request_id',
-        column2='equipment_id',
+        comodel_name="of.equipment",
+        relation="of_service_request_equipment_rel",
+        column1="request_id",
+        column2="equipment_id",
         string="Equipments",
-        compute='_compute_equipment_ids',
+        compute="_compute_equipment_ids",
         store=True,
         readonly=False,
         domain="[('customer_id', '=', partner_id), '|', ('site_address_id', '=', address_id), "
         "('customer_id', '=', address_id)]",
     )
     equipment_intervention_ids = fields.One2many(
-        comodel_name='of.service.request.equipment.line',
-        inverse_name='request_id',
+        comodel_name="of.service.request.equipment.line",
+        inverse_name="request_id",
         string="Equipment Interventions",
         readonly=True,
     )
@@ -34,9 +34,9 @@ class OFServiceRequest(models.Model):
     # Payer
     payer_mode = fields.Selection(
         selection=[
-            ('customer', "Customer"),
-            ('reseller', "Reseller"),
-            ('manufacturer', "Manufacturer"),
+            ("customer", "Customer"),
+            ("reseller", "Reseller"),
+            ("manufacturer", "Manufacturer"),
         ],
         string="Payer",
     )
@@ -45,19 +45,19 @@ class OFServiceRequest(models.Model):
     service_start = fields.Datetime(copy=False)
     service_stop = fields.Datetime(copy=False)
     response_time = fields.Float(
-        string="Response time (hours)", compute='_compute_response_time', store=True, group_operator='avg'
+        string="Response time (hours)", compute="_compute_response_time", store=True, group_operator="avg"
     )
     service_time = fields.Float(
-        string="Service time (hours)", compute='_compute_service_time', store=True, group_operator='avg'
+        string="Service time (hours)", compute="_compute_service_time", store=True, group_operator="avg"
     )
 
     # --------------------------------------------------
     # Constraints
     # --------------------------------------------------
 
-    @api.constrains('equipment_ids', 'use_equipment')
+    @api.constrains("equipment_ids", "use_equipment")
     def _check_equipment_ids(self):
-        if self._context.get('ignore_equipment_ids_check'):
+        if self._context.get("ignore_equipment_ids_check"):
             return
         for request in self:
             if request.use_equipment:
@@ -71,17 +71,17 @@ class OFServiceRequest(models.Model):
     # --------------------------------------------------
 
     def _search_equipment_id(self, operator, value):
-        return [('id', operator, value)]
+        return [("id", operator, value)]
 
-    @api.depends('equipment_ids.intervention_ids')
+    @api.depends("equipment_ids.intervention_ids")
     def _compute_history_intervention_ids(self):
         """Compute the history interventions for the service request. Used in form view and Sheet/Report reports."""
         request_with_equipments = self.filtered(lambda r: r.equipment_ids)
         for request in request_with_equipments:
-            request.history_intervention_ids = request.mapped('equipment_ids.intervention_ids')
+            request.history_intervention_ids = request.mapped("equipment_ids.intervention_ids")
         super(OFServiceRequest, self - request_with_equipments)._compute_history_intervention_ids()
 
-    @api.depends('create_date', 'service_start')
+    @api.depends("create_date", "service_start")
     def _compute_response_time(self):
         for request in self:
             if request.create_date and request.service_start:
@@ -90,7 +90,7 @@ class OFServiceRequest(models.Model):
             else:
                 request.response_time = 0.0
 
-    @api.depends('create_date', 'service_stop')
+    @api.depends("create_date", "service_stop")
     def _compute_service_time(self):
         for request in self:
             if request.create_date and request.service_stop:
@@ -99,16 +99,16 @@ class OFServiceRequest(models.Model):
             else:
                 request.service_time = 0.0
 
-    @api.depends('use_equipment', 'address_id', 'partner_id')
+    @api.depends("use_equipment", "address_id", "partner_id")
     def _compute_equipment_ids(self):
-        equipment_obj = self.env['of.equipment']
-        requests_use_equipment = self.filtered('use_equipment')
+        equipment_obj = self.env["of.equipment"]
+        requests_use_equipment = self.filtered("use_equipment")
         for request in requests_use_equipment:
             equipments = equipment_obj.search(
-                [('site_address_id', '=', request.address_id.id)]
-            ) or equipment_obj.search([('customer_id', '=', request.address_id.id)])
+                [("site_address_id", "=", request.address_id.id)]
+            ) or equipment_obj.search([("customer_id", "=", request.address_id.id)])
             if not equipments and request.partner_id:
-                equipments = equipment_obj.search([('customer_id', '=', request.partner_id.id)])
+                equipments = equipment_obj.search([("customer_id", "=", request.partner_id.id)])
             if len(equipments) == 1:
                 request.equipment_ids = equipments
             else:
@@ -128,19 +128,19 @@ class OFServiceRequest(models.Model):
         return requests
 
     def write(self, vals):
-        if 'equipment_ids' in vals:
+        if "equipment_ids" in vals:
             equipments_by_request = {request.id: request.equipment_ids.ids for request in self}
         res = super().write(vals)
-        if vals.get('use_equipment'):
+        if vals.get("use_equipment"):
             self._populate_service_request_equipment_line()
-        if 'use_equipment' in vals and not vals['use_equipment']:
+        if "use_equipment" in vals and not vals["use_equipment"]:
             self.equipment_intervention_ids and self.equipment_intervention_ids.unlink()
-        if 'equipment_ids' in vals:
-            requests_to_updates = self.env['of.service.request'].browse(
+        if "equipment_ids" in vals:
+            requests_to_updates = self.env["of.service.request"].browse(
                 [
                     request_id
                     for request_id, equipment_ids in equipments_by_request.items()
-                    if equipment_ids != vals['equipment_ids'][0][2]
+                    if equipment_ids != vals["equipment_ids"][0][2]
                 ]
             )
             requests_to_updates._populate_service_request_equipment_line()
@@ -148,12 +148,12 @@ class OFServiceRequest(models.Model):
             # TODO: Should we unlink equipment on linked interventions? Or should we keep them and just unlink the
             # equipment intervention lines?
             # Also maybe just forbid to unlink equipment if there are linked interventions ?
-        if vals.get('stage_id'):
-            stage = self.env['of.service.request.stage'].browse(vals.get('stage_id'))
-            if stage and stage.state == 'open':
+        if vals.get("stage_id"):
+            stage = self.env["of.service.request.stage"].browse(vals.get("stage_id"))
+            if stage and stage.state == "open":
                 for request in self.filtered(lambda r: not r.service_start):
                     request.service_start = fields.Datetime.now()
-            if stage and stage.state == 'done':
+            if stage and stage.state == "done":
                 for request in self.filtered(lambda r: not r.service_stop):
                     request.service_stop = fields.Datetime.now()
         return res
@@ -161,9 +161,9 @@ class OFServiceRequest(models.Model):
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         res = super()._read_group_stage_ids(stages, domain, order)
-        if self._context.get('of_kanban_steps') == "After-Sales Service":
+        if self._context.get("of_kanban_steps") == "After-Sales Service":
             if after_sales_type := self.env.ref(
-                'of_equipment_service.of_service_request_type_after_sales',
+                "of_equipment_service.of_service_request_type_after_sales",
                 raise_if_not_found=False,
             ):
                 return res.filtered(lambda r: after_sales_type.id in r.type_ids.ids)
@@ -178,8 +178,8 @@ class OFServiceRequest(models.Model):
             context = {}
 
         context = super()._get_action_view_intervention_context(context)
-        context['default_of_use_equipment'] = self.equipment_ids and self.equipment_ids.ids or False
-        context['default_of_equipment_ids'] = [Command.set(self.equipment_ids and self.equipment_ids.ids or [])]
+        context["default_of_use_equipment"] = self.equipment_ids and self.equipment_ids.ids or False
+        context["default_of_equipment_ids"] = [Command.set(self.equipment_ids and self.equipment_ids.ids or [])]
 
         return context
 
@@ -196,15 +196,15 @@ class OFServiceRequest(models.Model):
                 intervention_equipments = intervention.of_equipment_ids.filtered(lambda e: e in request.equipment_ids)
                 values_list.extend(
                     {
-                        'request_id': request.id,
-                        'equipment_id': equipment.id,
-                        'event_id': intervention.id,
-                        'start': intervention.start,
+                        "request_id": request.id,
+                        "equipment_id": equipment.id,
+                        "event_id": intervention.id,
+                        "start": intervention.start,
                     }
                     for equipment in intervention_equipments
                     if (request.id, equipment.id, intervention.id) not in current_values
                 )
-        values_list and self.env['of.service.request.equipment.line'].create(values_list)
+        values_list and self.env["of.service.request.equipment.line"].create(values_list)
 
     def _unlink_service_request_equipment_line(self, requests_data=None):
         """Unlink the equipment intervention lines of the service request.

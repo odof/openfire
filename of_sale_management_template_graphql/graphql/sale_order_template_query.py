@@ -8,8 +8,8 @@ from .sale_order_template_type import SaleOrderTemplate, SaleOrderTemplateFilter
 
 
 class SaleOrderTemplateQuery(graphene.ObjectType):
-    _name = 'SaleOrderTemplateQuery'
-    _type = 'query'
+    _name = "SaleOrderTemplateQuery"
+    _type = "query"
 
     sale_templates = graphene.List(
         graphene.NonNull(SaleOrderTemplate),
@@ -21,7 +21,7 @@ class SaleOrderTemplateQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_sale_templates(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['sale.order.template']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["sale.order.template"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['sale.order.template'].search(odoo_domain, offset=offset, limit=limit)
+        return env["sale.order.template"].search(odoo_domain, offset=offset, limit=limit)

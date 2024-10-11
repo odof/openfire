@@ -11,36 +11,36 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user_accountant_2 = cls.env['res.users'].create(
+        cls.user_accountant_2 = cls.env["res.users"].create(
             {
-                'name': 'user_accountant_2',
-                'login': 'user_accountant_2',
-                'email': 'user_accountant_2@openfire.fr',
+                "name": "user_accountant_2",
+                "login": "user_accountant_2",
+                "email": "user_accountant_2@openfire.fr",
                 # Theses groups are required to create a new account.move to avoid the error:
                 #  AssertionError: line_ids was not found in the view
                 "groups_id": [
                     (4, cls.env.ref("account.group_account_manager").id),
                     (4, cls.env.ref("account.group_account_user").id),
                 ],
-                'company_id': cls.company_fr.id,
+                "company_id": cls.company_fr.id,
             }
         )
 
         # Accounts
-        cls.account_customer_a_recivable = cls.env['account.account'].create(
+        cls.account_customer_a_recivable = cls.env["account.account"].create(
             {
-                'name': 'Customer A Recivable',
-                'code': '411CUSTOMERA',
-                'account_type': 'asset_receivable',
-                'company_id': cls.company_fr.id,
+                "name": "Customer A Recivable",
+                "code": "411CUSTOMERA",
+                "account_type": "asset_receivable",
+                "company_id": cls.company_fr.id,
             }
         )
-        cls.account_supplier_a_payable = cls.env['account.account'].create(
+        cls.account_supplier_a_payable = cls.env["account.account"].create(
             {
-                'name': 'Supplier A Payable',
-                'code': '401SUPPLIERA',
-                'account_type': 'liability_payable',
-                'company_id': cls.company_fr.id,
+                "name": "Supplier A Payable",
+                "code": "401SUPPLIERA",
+                "account_type": "liability_payable",
+                "company_id": cls.company_fr.id,
             }
         )
         cls.customer_a.property_account_receivable_id = cls.account_customer_a_recivable
@@ -52,26 +52,26 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
         """
 
         move = (
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
             .create(
                 {
-                    'move_type': 'entry',
-                    'journal_id': self.journal_purchase.id,
+                    "move_type": "entry",
+                    "journal_id": self.journal_purchase.id,
                 }
             )
         )
         move.with_context(line_ids=move.line_ids).line_ids.create(
             [
                 {
-                    'move_id': move.id,
-                    'partner_id': self.supplier_a.id,
-                    'debit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.supplier_a.id,
+                    "debit": 150,
                 },
                 {
-                    'move_id': move.id,
-                    'partner_id': self.supplier_a.id,
-                    'credit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.supplier_a.id,
+                    "credit": 150,
                 },
             ]
         )
@@ -82,26 +82,26 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
         partner is a supplier. Account should be the payable account of the partner.
         """
         move = (
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
             .create(
                 {
-                    'move_type': 'entry',
-                    'journal_id': self.journal_bank.id,
+                    "move_type": "entry",
+                    "journal_id": self.journal_bank.id,
                 }
             )
         )
         move.with_context(line_ids=move.line_ids).line_ids.create(
             [
                 {
-                    'move_id': move.id,
-                    'partner_id': self.supplier_a.id,
-                    'debit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.supplier_a.id,
+                    "debit": 150,
                 },
                 {
-                    'move_id': move.id,
-                    'partner_id': self.supplier_a.id,
-                    'credit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.supplier_a.id,
+                    "credit": 150,
                 },
             ]
         )
@@ -112,26 +112,26 @@ class TestOFAccountMoveLine(TestOFAccountCommon):
         partner is a customer. Account should be the receivable account of the partner.
         """
         move = (
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
             .create(
                 {
-                    'move_type': 'entry',
-                    'journal_id': self.journal_bank.id,
+                    "move_type": "entry",
+                    "journal_id": self.journal_bank.id,
                 }
             )
         )
         move.with_context(line_ids=move.line_ids).line_ids.create(
             [
                 {
-                    'move_id': move.id,
-                    'partner_id': self.customer_a.id,
-                    'debit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.customer_a.id,
+                    "debit": 150,
                 },
                 {
-                    'move_id': move.id,
-                    'partner_id': self.customer_a.id,
-                    'credit': 150,
+                    "move_id": move.id,
+                    "partner_id": self.customer_a.id,
+                    "credit": 150,
                 },
             ]
         )

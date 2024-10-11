@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     of_team_alert_intervention_sms = fields.Boolean(
         string="Teams alert",

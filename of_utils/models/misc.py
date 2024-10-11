@@ -20,7 +20,7 @@ def get_selection_label(self, res_model, field_name, field_value):
     Returns:
         The translated string value of the selection field if the translation exist (else the original value)
     """
-    return _(dict(self.env[res_model].fields_get(allfields=[field_name])[field_name]['selection'])[field_value])
+    return _(dict(self.env[res_model].fields_get(allfields=[field_name])[field_name]["selection"])[field_value])
 
 
 def ceil_to_multiple(val, mult):
@@ -74,9 +74,9 @@ def hours_to_strs(*args):
         mode = args[0]
         hours = args[1:]
     else:
-        mode = 'default'
+        mode = "default"
         hours = args
-    if mode == 'time':
+    if mode == "time":
         return tuple("%02d:%02d" % (hour, round((hour % 1) * 60)) for hour in hours)
     return tuple("%dh%02d" % (hour, round((hour % 1) * 60)) if hour % 1 else "%dh" % hour for hour in hours)
 
@@ -99,13 +99,13 @@ def compare_date(date1, date2, compare="==", isdatetime=False):
     return safe_eval(
         f"date1 {compare} date2",
         {
-            'date1': date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
-            'date2': date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y"),
+            "date1": date1.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date1.strftime("%d/%m/%Y"),
+            "date2": date2.strftime("%d/%m/%Y %H:%M:%S") if isdatetime else date2.strftime("%d/%m/%Y"),
         },
     )
 
 
-def sanitize_text(text, allowed=''):
+def sanitize_text(text, allowed=""):
     """This function cleans a text by replacing non-ascii characters.
 
     Characters will be replaced by an equivalent if possible (e.g. accented letters) or removed otherwise.
@@ -118,19 +118,19 @@ def sanitize_text(text, allowed=''):
     Returns:
         Cleaned text.
     """
-    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii')
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
     allowed = re.escape(allowed)
-    return re.sub(f'[^0-9A-Za-z{allowed}]', '', text)
+    return re.sub(f"[^0-9A-Za-z{allowed}]", "", text)
 
 
 def is_valid_url(of_url):
     regex = re.compile(
-        r'^https?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$',
+        r"^https?://"  # http:// or https://
+        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|"  # domain...
+        r"localhost|"  # localhost...
+        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+        r"(?::\d+)?"  # optional port
+        r"(?:/?|[/?]\S+)$",
         re.IGNORECASE,
     )
     return of_url is not None and regex.search(of_url)

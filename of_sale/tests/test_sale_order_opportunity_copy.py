@@ -12,16 +12,16 @@ class TestOFSaleOrderOpportunityCopy(TestOFSaleCommon):
         This test checks that the opportunity is correctly copied when the sale order is copied.
         """
         # Change the value of the parameter
-        self.env['res.config.settings'].create(
+        self.env["res.config.settings"].create(
             {
-                'of_copy_opportunity_with_sale_order': True,
+                "of_copy_opportunity_with_sale_order": True,
             }
         ).execute()
 
         # Create a sale order with an opportunity
         order_values = self._prepare_empty_sale_order_values()
-        order_values['opportunity_id'] = self.env['crm.lead'].create({'name': 'Test Opportunity'}).id
-        sale_order = self.env['sale.order'].create(order_values)
+        order_values["opportunity_id"] = self.env["crm.lead"].create({"name": "Test Opportunity"}).id
+        sale_order = self.env["sale.order"].create(order_values)
 
         # Copy the sale order
         copied_sale_order = sale_order.copy()
@@ -38,15 +38,15 @@ class TestOFSaleOrderOpportunityCopy(TestOFSaleCommon):
         This test checks that the opportunity is not copied when the sale order is copied.
         """
         # Change the value of the parameter
-        self.env['res.config.settings'].create(
+        self.env["res.config.settings"].create(
             {
-                'of_copy_opportunity_with_sale_order': False,
+                "of_copy_opportunity_with_sale_order": False,
             }
         ).execute()
         # Create a sale order without an opportunity
         order_values = self._prepare_empty_sale_order_values()
-        order_values['opportunity_id'] = self.env['crm.lead'].create({'name': 'Test Opportunity'}).id
-        sale_order = self.env['sale.order'].create(order_values)
+        order_values["opportunity_id"] = self.env["crm.lead"].create({"name": "Test Opportunity"}).id
+        sale_order = self.env["sale.order"].create(order_values)
 
         # Copy the sale order
         copied_sale_order = sale_order.copy()

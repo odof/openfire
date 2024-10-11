@@ -20,29 +20,29 @@ _logger = logging.getLogger(__name__)
 
 
 class OFTourAppointmentWizard(models.TransientModel):
-    _name = 'of.tour.appointment.wizard'
+    _name = "of.tour.appointment.wizard"
     _description = "Appointment scheduling for tours"
 
     @api.model
     def default_get(self, field_list=None):
         default_values = super().default_get(field_list)
-        active_model = self.env.context.get('active_model', '')
+        active_model = self.env.context.get("active_model", "")
         context = self.env.context
-        if active_model == 'res.partner':
+        if active_model == "res.partner":
             self._handle_default_get_res_partner(context, default_values)
-        elif active_model == 'calendar.event':
+        elif active_model == "calendar.event":
             self._handle_default_get_calendar_event(context, default_values)
-        elif active_model == 'of.service.request':
+        elif active_model == "of.service.request":
             self._handle_default_get_service_request(context, default_values)
-        elif active_model == 'sale.order':
+        elif active_model == "sale.order":
             self._handle_default_get_sale_order(context, default_values)
-        elif context.get('of_default_partner_id'):
+        elif context.get("of_default_partner_id"):
             self._handle_default_get_default_partner(context, default_values)
 
         self._default_get_update_address_if_needed(default_values)
         self._default_get_set_start_stop_dates(default_values)
 
-        if context.get('of_from_portal'):
+        if context.get("of_from_portal"):
             return default_values
 
         self._default_get_apply_search_template(default_values)
@@ -52,90 +52,90 @@ class OFTourAppointmentWizard(models.TransientModel):
     @api.model
     def _default_day_ids(self):
         # added sudo() to avoid access rights issues from the website (no access for of.planning.tour)
-        days = self.env['of.days'].sudo().search([('number', 'in', (1, 2, 3, 4, 5))], order='number')
+        days = self.env["of.days"].sudo().search([("number", "in", (1, 2, 3, 4, 5))], order="number")
         return [day.id for day in days]
 
     @api.model
     def _default_search_mode(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of.planning.tour.search_mode') or 'oneway_or_return'
+        return self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.search_mode") or "oneway_or_return"
 
     @api.model
     def _default_search_type(self):
-        return self.env['ir.config_parameter'].sudo().get_param('of.planning.tour.search_type') or 'duration'
+        return self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.search_type") or "duration"
 
     @api.model
     def _default_planning_intervention_template(self):
         return (
-            self.env['ir.config_parameter']
+            self.env["ir.config_parameter"]
             .sudo()
-            .get_param('of.planning.tour.default_planning_intervention_template_id')
+            .get_param("of.planning.tour.default_planning_intervention_template_id")
         )
 
     @api.model
     def _get_domain_search_template_id(self):
-        return ['|', ('access_user_ids', '=', False), ('access_user_ids', 'in', self._uid)]
+        return ["|", ("access_user_ids", "=", False), ("access_user_ids", "in", self._uid)]
 
     @api.model
     def _get_domain_pre_employee_ids(self):
-        return ['|', ('access_user_ids', '=', False), ('access_user_ids', 'in', self._uid)]
+        return ["|", ("access_user_ids", "=", False), ("access_user_ids", "in", self._uid)]
 
     source_model = fields.Char(readonly=True)
 
     # == Search fields ==
     search_template_id = fields.Many2one(
-        comodel_name='of.tour.appointment.template',
+        comodel_name="of.tour.appointment.template",
         string="Search Template",
         domain=lambda self: self._get_domain_search_template_id(),
     )
-    partner_id = fields.Many2one(comodel_name='res.partner', string="Customer", required=True, readonly=True)
-    partner_email = fields.Char(related='partner_id.email')
-    partner_mobile = fields.Char(related='partner_id.mobile')
-    partner_phone = fields.Char(related='partner_id.phone')
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Customer", required=True, readonly=True)
+    partner_email = fields.Char(related="partner_id.email")
+    partner_mobile = fields.Char(related="partner_id.mobile")
+    partner_phone = fields.Char(related="partner_id.phone")
     partner_address_id = fields.Many2one(
-        comodel_name='res.partner',
+        comodel_name="res.partner",
         string="Intervention Address",
         required=True,
         domain="['|', ('id', '=', partner_id), ('parent_id', '=', partner_id)]",
     )
-    geo_lat = fields.Float(related='partner_address_id.partner_latitude', readonly=True)
-    geo_lng = fields.Float(related='partner_address_id.partner_longitude', readonly=True)
+    geo_lat = fields.Float(related="partner_address_id.partner_latitude", readonly=True)
+    geo_lng = fields.Float(related="partner_address_id.partner_longitude", readonly=True)
     ignore_geodata = fields.Boolean()
-    partner_address_street = fields.Char(related='partner_address_id.street', readonly=True)
-    partner_address_street2 = fields.Char(related='partner_address_id.street2', readonly=True)
-    partner_address_city = fields.Char(related='partner_address_id.city', readonly=True)
-    partner_address_state_id = fields.Many2one(related='partner_address_id.state_id', readonly=True)
-    partner_address_zip = fields.Char(related='partner_address_id.zip', readonly=True)
-    partner_address_country_id = fields.Many2one(related='partner_address_id.country_id', readonly=True)
+    partner_address_street = fields.Char(related="partner_address_id.street", readonly=True)
+    partner_address_street2 = fields.Char(related="partner_address_id.street2", readonly=True)
+    partner_address_city = fields.Char(related="partner_address_id.city", readonly=True)
+    partner_address_state_id = fields.Many2one(related="partner_address_id.state_id", readonly=True)
+    partner_address_zip = fields.Char(related="partner_address_id.zip", readonly=True)
+    partner_address_country_id = fields.Many2one(related="partner_address_id.country_id", readonly=True)
     company_id = fields.Many2one(
-        comodel_name='res.company',
+        comodel_name="res.company",
         string="Company",
-        compute='_compute_company_id',
+        compute="_compute_company_id",
         required=True,
         store=True,
         readonly=False,
     )
     request_id = fields.Many2one(
-        comodel_name='of.service.request', string="Service Request", domain="[('partner_id', '=', partner_id)]"
+        comodel_name="of.service.request", string="Service Request", domain="[('partner_id', '=', partner_id)]"
     )
-    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervention")
+    intervention_id = fields.Many2one(comodel_name="calendar.event", string="Intervention")
     task_id = fields.Many2one(
-        comodel_name='of.planning.task', string="Task", compute='_compute_task_id', store=True, readonly=False
+        comodel_name="of.planning.task", string="Task", compute="_compute_task_id", store=True, readonly=False
     )
     template_id = fields.Many2one(
-        comodel_name='of.planning.intervention.template',
+        comodel_name="of.planning.intervention.template",
         string="Intervention Template",
         default=lambda s: s._default_planning_intervention_template(),
     )
-    duration = fields.Float(compute='_compute_duration', store=True, readonly=False)
+    duration = fields.Float(compute="_compute_duration", store=True, readonly=False)
     pre_employee_ids = fields.Many2many(
-        comodel_name='hr.employee',
+        comodel_name="hr.employee",
         string="Operator(s)",
         domain="""['&', '|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True),
          '|', ('of_task_ids', 'in', task_id), ('of_all_tasks', '=', True)]""",
         help="Pre-select operators",
     )
     start_date_search = fields.Date(string="From", required=True, default=lambda *a: (date.today() + timedelta(days=1)))
-    stop_date_search = fields.Date(string="To", compute='_compute_stop_date_search')
+    stop_date_search = fields.Date(string="To", compute="_compute_stop_date_search")
     search_type = fields.Selection(
         selection=SELECTION_SEARCH_TYPES,
         required=True,
@@ -148,39 +148,39 @@ class OFTourAppointmentWizard(models.TransientModel):
     )
     search_period_in_days = fields.Integer(string="Search period (in days)", default=30, required=True)
     day_ids = fields.Many2many(
-        comodel_name='of.days',
-        relation='wizard_plan_intervention_days_rel',
-        column1='wizard_id',
-        column2='day_id',
+        comodel_name="of.days",
+        relation="wizard_plan_intervention_days_rel",
+        column1="wizard_id",
+        column2="day_id",
         string="Days",
         required=True,
         default=lambda s: s._default_day_ids(),
     )
-    day_period = fields.Selection(selection=SELECTION_DAY_PERIOD, default='both', required=True)
+    day_period = fields.Selection(selection=SELECTION_DAY_PERIOD, default="both", required=True)
     orthodromic = fields.Boolean(string="Distance as the crow flies")
 
     # == Results fields ==
     line_ids = fields.One2many(
-        comodel_name='of.tour.appointment.line.wizard', inverse_name='wizard_id', string="Slots Proposals"
+        comodel_name="of.tour.appointment.line.wizard", inverse_name="wizard_id", string="Slots Proposals"
     )
     by_distance_line_ids = fields.One2many(
-        comodel_name='of.tour.appointment.line.wizard',
-        compute='_compute_by_distance_line_ids',
+        comodel_name="of.tour.appointment.line.wizard",
+        compute="_compute_by_distance_line_ids",
         string="Slots by distance",
     )
     by_duration_line_ids = fields.One2many(
-        comodel_name='of.tour.appointment.line.wizard',
-        compute='_compute_by_duration_line_ids',
+        comodel_name="of.tour.appointment.line.wizard",
+        compute="_compute_by_duration_line_ids",
         string="Slots by duration",
     )
     by_date_line_ids = fields.One2many(
-        comodel_name='of.tour.appointment.line.wizard', compute='_compute_by_date_line_ids', string="Slots by date"
+        comodel_name="of.tour.appointment.line.wizard", compute="_compute_by_date_line_ids", string="Slots by date"
     )
-    selected_line_id = fields.Many2one(comodel_name='of.tour.appointment.line.wizard', string="Selected Slot")
+    selected_line_id = fields.Many2one(comodel_name="of.tour.appointment.line.wizard", string="Selected Slot")
 
     name = fields.Char(size=64, required=False)
     description = fields.Text()
-    employee_id = fields.Many2one(comodel_name='hr.employee', string="Operator")
+    employee_id = fields.Many2one(comodel_name="hr.employee", string="Operator")
     selected_datetime = fields.Datetime()
     # fields for creation/update of recurrent interventions
     next_date = fields.Date(string="Next intervention", help="Date from which to schedule next service")
@@ -189,31 +189,31 @@ class OFTourAppointmentWizard(models.TransientModel):
 
     # == Maps fields ==
     map_line_id = fields.Many2one(
-        comodel_name='of.tour.appointment.line.wizard', string="Line selected for the map preview"
+        comodel_name="of.tour.appointment.line.wizard", string="Line selected for the map preview"
     )
-    map_tour_id = fields.Many2one(comodel_name='of.planning.tour', string="Tour")
+    map_tour_id = fields.Many2one(comodel_name="of.planning.tour", string="Tour")
     additional_records = fields.Char(
-        string="Data for displaying additional records", compute='_compute_additional_records_data'
+        string="Data for displaying additional records", compute="_compute_additional_records_data"
     )
     additional_record_geometry_data = fields.Text(
         string="Geojson data",
-        compute='_compute_additional_records_data',
+        compute="_compute_additional_records_data",
         help="Geojson data used to draw the route on the map between the meeting we are trying to plan and "
         "the previous/next coordinates",
     )
     map_tour_line_ids = fields.One2many(
-        comodel_name='of.planning.tour.line', string="Tour lines", compute='_compute_map_data'
+        comodel_name="of.planning.tour.line", string="Tour lines", compute="_compute_map_data"
     )
-    start_address_id = fields.Many2one(comodel_name='res.partner', compute='_compute_map_data')
-    return_address_id = fields.Many2one(comodel_name='res.partner', compute='_compute_map_data')
-    map_latitude = fields.Text(compute='_compute_map_data')
-    map_longitude = fields.Text(compute='_compute_map_data')
+    start_address_id = fields.Many2one(comodel_name="res.partner", compute="_compute_map_data")
+    return_address_id = fields.Many2one(comodel_name="res.partner", compute="_compute_map_data")
+    map_latitude = fields.Text(compute="_compute_map_data")
+    map_longitude = fields.Text(compute="_compute_map_data")
 
     # --------------------------------------------------------------------------
     # Constraints methods
     # --------------------------------------------------------------------------
 
-    @api.constrains('search_period_in_days')
+    @api.constrains("search_period_in_days")
     def _check_search_period_in_days(self):
         if self.search_period_in_days < 1 or self.search_period_in_days > 45:
             raise ValidationError(_("The value of 'Search period (in days)' must be between 1 and 45."))
@@ -222,7 +222,7 @@ class OFTourAppointmentWizard(models.TransientModel):
     # Compute methods
     # --------------------------------------------------------------------------
 
-    @api.depends('partner_address_id')
+    @api.depends("partner_address_id")
     def _compute_company_id(self):
         for wizard in self:
             if wizard.request_id:
@@ -230,39 +230,39 @@ class OFTourAppointmentWizard(models.TransientModel):
             elif wizard.intervention_id:
                 wizard.company_id = wizard.intervention_id.company_id
             else:
-                company_choice = self.env.user.company_id.of_company_choice or 'contact'  # 'user' or 'contact'
+                company_choice = self.env.user.company_id.of_company_choice or "contact"  # 'user' or 'contact'
                 wizard.company_id = (
                     wizard.partner_address_id.company_id
-                    if company_choice == 'contact' and wizard.partner_address_id.company_id
+                    if company_choice == "contact" and wizard.partner_address_id.company_id
                     else self.env.user.company_id
                 )
 
-    @api.depends('line_ids', 'line_ids.useful_distance')
+    @api.depends("line_ids", "line_ids.useful_distance")
     def _compute_by_distance_line_ids(self):
         for wizard in self:
-            wizard.by_distance_line_ids = wizard.line_ids.sorted('useful_distance')
+            wizard.by_distance_line_ids = wizard.line_ids.sorted("useful_distance")
 
-    @api.depends('line_ids', 'line_ids.useful_duration')
+    @api.depends("line_ids", "line_ids.useful_duration")
     def _compute_by_duration_line_ids(self):
         for wizard in self:
-            wizard.by_duration_line_ids = wizard.line_ids.sorted('useful_duration')
+            wizard.by_duration_line_ids = wizard.line_ids.sorted("useful_duration")
 
-    @api.depends('line_ids', 'line_ids.start')
+    @api.depends("line_ids", "line_ids.start")
     def _compute_by_date_line_ids(self):
         for wizard in self:
-            wizard.by_date_line_ids = wizard.line_ids.sorted('start')
+            wizard.by_date_line_ids = wizard.line_ids.sorted("start")
 
     @api.depends(
-        'map_line_id',
-        'geo_lat',
-        'geo_lng',
-        'partner_id',
-        'request_id',
-        'request_id.partner_latitude',
-        'request_id.partner_longitude',
-        'intervention_id',
-        'intervention_id.of_partner_latitude',
-        'intervention_id.of_partner_longitude',
+        "map_line_id",
+        "geo_lat",
+        "geo_lng",
+        "partner_id",
+        "request_id",
+        "request_id.partner_latitude",
+        "request_id.partner_longitude",
+        "intervention_id",
+        "intervention_id.of_partner_latitude",
+        "intervention_id.of_partner_longitude",
     )
     def _compute_additional_records_data(self):
         """Builds a list of dict to display additional records on the map, containing information about the field
@@ -283,41 +283,41 @@ class OFTourAppointmentWizard(models.TransientModel):
             date_preview = wizard.map_line_id.start or False
             records.append(
                 {
-                    'id': f'fake_record_{additionnal_record.id}',
-                    'is_service_request': True,
-                    'address_city': wizard.partner_address_city,
-                    'partner_name': wizard.partner_id.name,
-                    'tour_number': _("SR"),
-                    'geo_lng': wizard.geo_lng,
-                    'geo_lat': wizard.geo_lat,
-                    'partner_phone': wizard.partner_id.phone,
-                    'partner_mobile': wizard.partner_id.mobile,
-                    'task_name': wizard.task_id.name,
-                    'date': str(date_preview),
-                    'address_zip': wizard.partner_address_zip,
+                    "id": f"fake_record_{additionnal_record.id}",
+                    "is_service_request": True,
+                    "address_city": wizard.partner_address_city,
+                    "partner_name": wizard.partner_id.name,
+                    "tour_number": _("SR"),
+                    "geo_lng": wizard.geo_lng,
+                    "geo_lat": wizard.geo_lat,
+                    "partner_phone": wizard.partner_id.phone,
+                    "partner_mobile": wizard.partner_id.mobile,
+                    "task_name": wizard.task_id.name,
+                    "date": str(date_preview),
+                    "address_zip": wizard.partner_address_zip,
                 }
             )
             wizard.additional_records = json.dumps(records)
             wizard.additional_record_geometry_data = self._get_additional_record_geometry_data(wizard.map_line_id)
 
-    @api.depends('selected_line_id', 'map_tour_id', 'map_line_id')
+    @api.depends("selected_line_id", "map_tour_id", "map_line_id")
     def _compute_map_data(self):
         for wizard in self:
             tour = wizard.map_tour_id
-            addresses_values = self.env['of.planning.tour']._process_address_values(
+            addresses_values = self.env["of.planning.tour"]._process_address_values(
                 {
-                    'employee_id': wizard.selected_line_id.employee_id.id,
-                    'start_address_id': tour.start_address_id.id or False,
-                    'return_address_id': tour.return_address_id.id or False,
+                    "employee_id": wizard.selected_line_id.employee_id.id,
+                    "start_address_id": tour.start_address_id.id or False,
+                    "return_address_id": tour.return_address_id.id or False,
                 }
             )
-            wizard.start_address_id = addresses_values.get('start_address_id')
-            wizard.return_address_id = addresses_values.get('return_address_id')
+            wizard.start_address_id = addresses_values.get("start_address_id")
+            wizard.return_address_id = addresses_values.get("return_address_id")
             wizard.map_latitude = tour.map_latitude if tour else wizard.start_address_id.partner_latitude
             wizard.map_longitude = tour.map_longitude if tour else wizard.return_address_id.partner_longitude
             wizard.map_tour_line_ids = tour.tour_line_ids if tour else False
 
-    @api.depends('start_date_search', 'search_period_in_days')
+    @api.depends("start_date_search", "search_period_in_days")
     def _compute_stop_date_search(self):
         for wizard in self:
             if wizard.start_date_search:
@@ -326,12 +326,12 @@ class OFTourAppointmentWizard(models.TransientModel):
             else:
                 wizard.stop_date_search = False
 
-    @api.depends('template_id')
+    @api.depends("template_id")
     def _compute_task_id(self):
         for wizard in self:
             wizard.task_id = wizard.template_id.task_id if wizard.template_id else False
 
-    @api.depends('task_id')
+    @api.depends("task_id")
     def _compute_duration(self):
         for wizard in self:
             wizard.duration = wizard.task_id.duration if wizard.task_id else 0.0
@@ -340,22 +340,22 @@ class OFTourAppointmentWizard(models.TransientModel):
     # Onchange methods
     # --------------------------------------------------------------------------
 
-    @api.onchange('search_template_id')
+    @api.onchange("search_template_id")
     def _onchange_search_template_id(self):
         if not self.search_template_id:
             return
 
         vals = {}
         if self.search_template_id.employee_ids:
-            vals['pre_employee_ids'] = [Command.set([emp.id for emp in self.search_template_id.employee_ids])]
+            vals["pre_employee_ids"] = [Command.set([emp.id for emp in self.search_template_id.employee_ids])]
         if self.search_template_id.task_id and not self.task_id:
-            vals['task_id'] = self.search_template_id.task_id.id
+            vals["task_id"] = self.search_template_id.task_id.id
         if self.search_template_id.template_id and not self.template_id:
-            vals['template_id'] = self.search_template_id.template_id.id
+            vals["template_id"] = self.search_template_id.template_id.id
         if self.search_template_id.search_mode:
-            vals['search_mode'] = self.search_template_id.search_mode
+            vals["search_mode"] = self.search_template_id.search_mode
         if self.search_template_id.search_type:
-            vals['search_type'] = self.search_template_id.search_type
+            vals["search_type"] = self.search_template_id.search_type
 
         self.update(vals)
 
@@ -366,7 +366,7 @@ class OFTourAppointmentWizard(models.TransientModel):
     def action_button_search(self):
         """Launch the search for available slots"""
         self.ensure_one()
-        if self.partner_address_id.of_geocoding_state in ['not_tried', 'failure', 'no_address']:
+        if self.partner_address_id.of_geocoding_state in ["not_tried", "failure", "no_address"]:
             raise UserError(_("Intervention address is not geolocated."))
         if not self.template_id:
             raise UserError(_("Please enter an intervention template to start the slot search."))
@@ -382,7 +382,7 @@ class OFTourAppointmentWizard(models.TransientModel):
         """Create intervention and open it in form view. Also create a recurrent intervention if needed."""
         self.ensure_one()
         context = self.env.context.copy()
-        event_obj = self.env['calendar.event']
+        event_obj = self.env["calendar.event"]
 
         self.update(self.selected_line_id._prepare_wizard_values())
 
@@ -391,17 +391,17 @@ class OFTourAppointmentWizard(models.TransientModel):
         event._compute_of_employee_ids()
 
         if self.request_id and self.next_date:
-            self.request_id.write({'next_date': self.next_date, 'end_date': self.planning_end_date})
+            self.request_id.write({"next_date": self.next_date, "end_date": self.planning_end_date})
         return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'calendar.event',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'views': [(False, 'form')],
-            'res_id': event.id,
-            'target': 'current',
-            'context': context,
-            'flags': {'initial_mode': 'edit', 'form': {'options': {'mode': 'edit'}}},
+            "type": "ir.actions.act_window",
+            "res_model": "calendar.event",
+            "view_type": "form",
+            "view_mode": "form",
+            "views": [(False, "form")],
+            "res_id": event.id,
+            "target": "current",
+            "context": context,
+            "flags": {"initial_mode": "edit", "form": {"options": {"mode": "edit"}}},
         }
 
     # --------------------------------------------------------------------------
@@ -419,14 +419,14 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        partner_obj = self.env['res.partner']
-        partner_id = context['active_ids'][0]
+        partner_obj = self.env["res.partner"]
+        partner_id = context["active_ids"][0]
         partner = partner_obj.browse(partner_id)
-        request = self.env['of.service.request'].search(
-            [('partner_id', '=', partner.id), ('recurrency', '=', True)], limit=1
+        request = self.env["of.service.request"].search(
+            [("partner_id", "=", partner.id), ("recurrency", "=", True)], limit=1
         )
-        address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
-        self._default_get_update_default_values(default_values, 'res.partner', partner, address, request)
+        address = partner_obj.browse(partner.address_get(["delivery"])["delivery"])
+        self._default_get_update_default_values(default_values, "res.partner", partner, address, request)
 
     def _handle_default_get_calendar_event(self, context, default_values):
         """
@@ -439,14 +439,14 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        active_model = 'calendar.event'
-        active_record_id = context['active_ids'][0]
+        active_model = "calendar.event"
+        active_record_id = context["active_ids"][0]
         active_record = self.env[active_model].browse(active_record_id)
         partner = active_record.of_partner_id
         address = active_record.of_address_id
         event = active_record
         request = event.of_request_id
-        default_values['pre_employee_ids'] = [Command.set([emp.id for emp in active_record.of_employee_ids])]
+        default_values["pre_employee_ids"] = [Command.set([emp.id for emp in active_record.of_employee_ids])]
         self._default_get_update_default_values(default_values, active_model, partner, address, request, event)
 
     def _handle_default_get_service_request(self, context, default_values):
@@ -460,13 +460,13 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        active_model = 'of.service.request'
-        active_record_id = context['active_ids'][0]
+        active_model = "of.service.request"
+        active_record_id = context["active_ids"][0]
         active_record = self.env[active_model].browse(active_record_id)
         partner = active_record.partner_id
         address = active_record.address_id
         request = active_record
-        default_values['pre_employee_ids'] = [Command.set([emp.id for emp in active_record.employee_ids])]
+        default_values["pre_employee_ids"] = [Command.set([emp.id for emp in active_record.employee_ids])]
         self._default_get_update_default_values(default_values, active_model, partner, address, request)
 
     def _handle_default_get_sale_order(self, context, default_values):
@@ -480,13 +480,13 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        active_model = 'sale.order'
-        order_id = context['active_ids'][0]
+        active_model = "sale.order"
+        order_id = context["active_ids"][0]
         order = self.env[active_model].browse(order_id)
         partner = order.partner_id
-        request = self.env['of.service.request'].search([('order_id', '=', order_id)], limit=1) or self.env[
-            'of.service.request'
-        ].search([('partner_id', '=', partner.id)], limit=1)
+        request = self.env["of.service.request"].search([("order_id", "=", order_id)], limit=1) or self.env[
+            "of.service.request"
+        ].search([("partner_id", "=", partner.id)], limit=1)
         address = order.partner_shipping_id or order.partner_id
         self._default_get_update_default_values(default_values, active_model, partner, address, request)
 
@@ -501,28 +501,28 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        active_model = 'res.partner'
+        active_model = "res.partner"
         partner_obj = self.env[active_model]
-        partner_id = context.get('of_default_partner_id')
+        partner_id = context.get("of_default_partner_id")
         partner = partner_obj.browse(partner_id)
-        request = self.env['of.service.request'].search(
-            [('partner_id', '=', partner.id), ('recurrency', '=', True)], limit=1
+        request = self.env["of.service.request"].search(
+            [("partner_id", "=", partner.id), ("recurrency", "=", True)], limit=1
         )
-        address = partner_obj.browse(partner.address_get(['delivery'])['delivery'])
+        address = partner_obj.browse(partner.address_get(["delivery"])["delivery"])
         self._default_get_update_default_values(default_values, active_model, partner, address, request)
 
     def _default_get_update_default_values(self, default_values, active_model, partner, address, request, event=False):
         default_values.update(
             {
-                'source_model': active_model,
-                'partner_id': partner.id or False,
-                'partner_address_id': address and address.id or partner.id or False,
-                'request_id': request and request.id or False,
-                'intervention_id': event and event.id or False,
+                "source_model": active_model,
+                "partner_id": partner.id or False,
+                "partner_address_id": address and address.id or partner.id or False,
+                "request_id": request and request.id or False,
+                "intervention_id": event and event.id or False,
             }
         )
         if request:
-            default_values['day_ids'] = [Command.set(request.day_ids.ids)]
+            default_values["day_ids"] = [Command.set(request.day_ids.ids)]
 
     def _default_get_update_address_if_needed(self, default_values):
         """
@@ -534,25 +534,25 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        partner_obj = self.env['res.partner']
-        address = partner_obj.browse(default_values.get('partner_address_id'))
-        partner = partner_obj.browse(default_values.get('partner_id'))
+        partner_obj = self.env["res.partner"]
+        address = partner_obj.browse(default_values.get("partner_address_id"))
+        partner = partner_obj.browse(default_values.get("partner_id"))
         if address and not address.partner_latitude and not address.partner_longitude:
             address = (
                 partner_obj.search(
                     [
-                        '|',
-                        ('id', '=', partner.id),
-                        ('parent_id', '=', partner.id),
-                        '|',
-                        ('geo_lat', '!=', 0),
-                        ('geo_lng', '!=', 0),
+                        "|",
+                        ("id", "=", partner.id),
+                        ("parent_id", "=", partner.id),
+                        "|",
+                        ("geo_lat", "!=", 0),
+                        ("geo_lng", "!=", 0),
                     ],
                     limit=1,
                 )
                 or address
             )
-            default_values['partner_address_id'] = address.id
+            default_values["partner_address_id"] = address.id
 
     def _default_get_set_start_stop_dates(self, default_values):
         """
@@ -564,12 +564,12 @@ class OFTourAppointmentWizard(models.TransientModel):
         Returns:
             None
         """
-        request = self.env['of.service.request'].browse(default_values.get('request_id'))
-        if self.env['calendar.event'].browse(default_values.get('intervention_id')):
-            default_values['start_date_search'] = fields.Date.today()
+        request = self.env["of.service.request"].browse(default_values.get("request_id"))
+        if self.env["calendar.event"].browse(default_values.get("intervention_id")):
+            default_values["start_date_search"] = fields.Date.today()
         elif request and request.next_date and request.next_date >= fields.Date.today():
-            default_values['start_date_search'] = request.next_date
-            default_values['stop_date_search'] = request.end_date
+            default_values["start_date_search"] = request.next_date
+            default_values["stop_date_search"] = request.end_date
 
     def _default_get_apply_search_template(self, default_values):
         """
@@ -582,22 +582,22 @@ class OFTourAppointmentWizard(models.TransientModel):
             None
         """
         if not (
-            search_template := self.env['of.tour.appointment.template'].search(
-                [('default_user_ids', 'in', self._uid)], limit=1
+            search_template := self.env["of.tour.appointment.template"].search(
+                [("default_user_ids", "in", self._uid)], limit=1
             )
         ):
             return
-        if search_template.employee_ids and 'pre_employee_ids' not in default_values:
-            default_values['pre_employee_ids'] = [Command.set([emp.id for emp in search_template.employee_ids])]
+        if search_template.employee_ids and "pre_employee_ids" not in default_values:
+            default_values["pre_employee_ids"] = [Command.set([emp.id for emp in search_template.employee_ids])]
         if search_template.task_id:
-            default_values['task_id'] = search_template.task_id.id
+            default_values["task_id"] = search_template.task_id.id
         if search_template.template_id:
-            default_values['template_id'] = search_template.template_id.id
+            default_values["template_id"] = search_template.template_id.id
         if search_template.search_mode:
-            default_values['search_mode'] = search_template.search_mode
+            default_values["search_mode"] = search_template.search_mode
         if search_template.search_type:
-            default_values['search_type'] = search_template.search_type
-        default_values['search_template_id'] = search_template.id
+            default_values["search_type"] = search_template.search_type
+        default_values["search_template_id"] = search_template.id
 
     @api.model
     def _get_additional_record_geometry_data(self, line):
@@ -627,9 +627,9 @@ class OFTourAppointmentWizard(models.TransientModel):
             f"{line.previous_geo_lng},{line.previous_geo_lat};{line.wizard_id.geo_lng},"  # noqa
             f"{line.wizard_id.geo_lat};{line.next_geo_lng},{line.next_geo_lat}"  # noqa
         )
-        full_query = f'{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false'
-        steps, _null, _null = self.env['of.planning.tour.line']._osrm_get_steps_data(full_query)
-        geometry_data = [step['geometry'] for step in steps]
+        full_query = f"{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false"
+        steps, _null, _null = self.env["of.planning.tour.line"]._osrm_get_steps_data(full_query)
+        geometry_data = [step["geometry"] for step in steps]
         geometry_data = geometry_data and json.dumps(geometry_data)
         return geometry_data
 
@@ -668,7 +668,7 @@ class OFTourAppointmentWizard(models.TransientModel):
 
         return [fields.Date.to_string(date) for date in res]
 
-    def _populate_line_ids(self, sudo=False, mode='new', sector_id=False):
+    def _populate_line_ids(self, sudo=False, mode="new", sector_id=False):
         """
         Remplit le champ line_ids avec les créneaux disponibles.
         Lance le calcul des distances et sélectionne un résultat si il y en a
@@ -676,11 +676,11 @@ class OFTourAppointmentWizard(models.TransientModel):
         """
         self.ensure_one()
 
-        tour_obj = self.env['of.planning.tour']
-        employee_obj = self.env['hr.employee']
-        wizard_line_obj = self.env['of.tour.appointment.line.wizard']
-        available_slot_obj = self.env['of.planning.available.slot']
-        event_obj = self.with_context(force_read=True).env['calendar.event']
+        tour_obj = self.env["of.planning.tour"]
+        employee_obj = self.env["hr.employee"]
+        wizard_line_obj = self.env["of.tour.appointment.line.wizard"]
+        available_slot_obj = self.env["of.planning.available.slot"]
+        event_obj = self.with_context(force_read=True).env["calendar.event"]
 
         # To avoid an access error from the website
         company = self.company_id.sudo() if sudo else self.company_id
@@ -713,7 +713,7 @@ class OFTourAppointmentWizard(models.TransientModel):
                 f"Unsuccessful attempt to find a slot for the task '{task_id.name}': no one can carry it out."
             )
             return
-        capable_employees = employee_obj.search(['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)])
+        capable_employees = employee_obj.search(["|", ("of_is_operator", "=", True), ("of_is_salesperson", "=", True)])
         # Filter employees by ability
         if task_id:
             capable_employees &= task_id.employee_ids
@@ -726,21 +726,21 @@ class OFTourAppointmentWizard(models.TransientModel):
         tours._reorganize_available_slot()
 
         # Delete old lines
-        if mode == 'new':
+        if mode == "new":
             self.line_ids.unlink()
 
         # The basic search domain
-        search_domain = [('date', 'in', dates_eval)]
+        search_domain = [("date", "in", dates_eval)]
 
-        search_domain += [('employee_id', 'in', capable_employees.ids)]
+        search_domain += [("employee_id", "in", capable_employees.ids)]
 
         # If there is a duration  provided
         if self.duration:
-            search_domain += [('duration', '>=', self.duration)]
+            search_domain += [("duration", ">=", self.duration)]
 
         # If there is a period of the day provided
-        if self.day_period != 'both':
-            search_domain += [('day_period', '=', self.day_period)]
+        if self.day_period != "both":
+            search_domain += [("day_period", "=", self.day_period)]
 
         # Get the employees' availability
         available_slots = available_slot_obj.search(search_domain)
@@ -748,9 +748,9 @@ class OFTourAppointmentWizard(models.TransientModel):
         for slot in available_slots:
             wizard_line_obj.create(
                 {
-                    'available_slot_id': slot.id,
-                    'wizard_id': self.id,
-                    'template_id': self.template_id.id,
+                    "available_slot_id": slot.id,
+                    "wizard_id": self.id,
+                    "template_id": self.template_id.id,
                 }
             )
 
@@ -776,7 +776,7 @@ class OFTourAppointmentWizard(models.TransientModel):
 
     def _select_first_line(self):
         """Mark the first line as the best line"""
-        if lines := self.line_ids.sorted('useful_distance'):
+        if lines := self.line_ids.sorted("useful_distance"):
             lines[0].best = True
             lines[0].selected = True
             lines[0].wizard_id.selected_line_id = lines[0]
@@ -801,19 +801,19 @@ class OFTourAppointmentWizard(models.TransientModel):
             dict: The values for creating a service request.
         """
         return {
-            'partner_id': self.partner_id.id,
-            'address_id': self.partner_address_id.id,
-            'company_id': self.company_id.id,
-            'task_id': self.task_id.id,
-            'type_id': self.env.ref('of_service.of_service_request_type_maintenance').id,
-            'month_ids': [Command.link(month)],
-            'next_date': self.next_date,
-            'end_date': self.planning_end_date,
-            'note': self.description or '',
-            'base_state': 'draft',
-            'duration': self.duration,
-            'recurrency': True,
-            'template_id': self.template_id.id,
+            "partner_id": self.partner_id.id,
+            "address_id": self.partner_address_id.id,
+            "company_id": self.company_id.id,
+            "task_id": self.task_id.id,
+            "type_id": self.env.ref("of_service.of_service_request_type_maintenance").id,
+            "month_ids": [Command.link(month)],
+            "next_date": self.next_date,
+            "end_date": self.planning_end_date,
+            "note": self.description or "",
+            "base_state": "draft",
+            "duration": self.duration,
+            "recurrency": True,
+            "template_id": self.template_id.id,
         }
 
     def _prepare_calendar_event_values(self):
@@ -842,48 +842,48 @@ class OFTourAppointmentWizard(models.TransientModel):
         name = self.intervention_id.name if self.intervention_id else self.name
         useful_duration = self.selected_line_id.useful_duration / 60
         values = {
-            'of_partner_id': self.partner_id.id,
-            'of_address_id': self.partner_address_id.id,
-            'of_task_id': self.task_id.id,
-            'of_template_id': template.id,
-            'of_request_id': request.id,
-            'of_employee_ids': [Command.link(self.employee_id.id)],
-            'of_tag_ids': tag_ids,
-            'start': self.selected_datetime + timedelta(hours=useful_duration),
-            'stop': self.selected_datetime + timedelta(hours=(self.duration + useful_duration)),
-            'of_travel_duration': self.selected_line_id.useful_duration / 60,
-            'user_id': self._uid,
-            'of_company_id': self.company_id.id,
-            'name': name,
-            'description': self.description or '',
-            'of_state': 'confirmed',
-            'of_order_id': order_id,
-            'of_picking_manual_ids': len(picking_list) == 1 and picking_list[0] or False,
-            'of_type': 'intervention',
+            "of_partner_id": self.partner_id.id,
+            "of_address_id": self.partner_address_id.id,
+            "of_task_id": self.task_id.id,
+            "of_template_id": template.id,
+            "of_request_id": request.id,
+            "of_employee_ids": [Command.link(self.employee_id.id)],
+            "of_tag_ids": tag_ids,
+            "start": self.selected_datetime + timedelta(hours=useful_duration),
+            "stop": self.selected_datetime + timedelta(hours=(self.duration + useful_duration)),
+            "of_travel_duration": self.selected_line_id.useful_duration / 60,
+            "user_id": self._uid,
+            "of_company_id": self.company_id.id,
+            "name": name,
+            "description": self.description or "",
+            "of_state": "confirmed",
+            "of_order_id": order_id,
+            "of_picking_manual_ids": len(picking_list) == 1 and picking_list[0] or False,
+            "of_type": "intervention",
         }
         if self.intervention_id:
             copied_lines = []
             for line in self.intervention_id.of_line_ids:
                 line_values = line.copy_data()[0]
-                line_values.update({'intervention_id': False})
+                line_values.update({"intervention_id": False})
                 copied_lines.append(Command.create(line_values))
 
             copied_questions = []
             for question in self.intervention_id.of_question_ids:
                 question_values = question.copy_data()[0]
-                question_values.update({'intervention_id': False})
+                question_values.update({"intervention_id": False})
                 copied_questions.append(Command.create(question_values))
 
             values |= {
-                'of_line_ids': copied_lines,
-                'of_question_ids': copied_questions,
-                'of_team_id': self.intervention_id.of_team_id.id,
-                'of_type_id': self.intervention_id.of_type_id.id,
-                'of_equipment_ids': self.intervention_id.of_equipment_ids.ids,
-                'of_picking_manual_ids': [Command.set(self.intervention_id.of_picking_manual_ids.ids)],
-                'of_invoice_policy': self.intervention_id.of_invoice_policy,
-                'of_fiscal_position_id': self.intervention_id.of_fiscal_position_id.id,
-                'of_internal_description': self.intervention_id.of_internal_description or '',
+                "of_line_ids": copied_lines,
+                "of_question_ids": copied_questions,
+                "of_team_id": self.intervention_id.of_team_id.id,
+                "of_type_id": self.intervention_id.of_type_id.id,
+                "of_equipment_ids": self.intervention_id.of_equipment_ids.ids,
+                "of_picking_manual_ids": [Command.set(self.intervention_id.of_picking_manual_ids.ids)],
+                "of_invoice_policy": self.intervention_id.of_invoice_policy,
+                "of_fiscal_position_id": self.intervention_id.of_fiscal_position_id.id,
+                "of_internal_description": self.intervention_id.of_internal_description or "",
             }
 
         return values
@@ -894,10 +894,10 @@ class OFTourAppointmentWizard(models.TransientModel):
         by calling the OSRM openfire server.
         """
         self.ensure_one()
-        wizard_line_obj = self.env['of.tour.appointment.line.wizard']
-        tour_obj = self.env['of.planning.tour']
+        wizard_line_obj = self.env["of.tour.appointment.line.wizard"]
+        tour_obj = self.env["of.planning.tour"]
 
-        lines = wizard_line_obj.search([('wizard_id', '=', self.id)], order='start')
+        lines = wizard_line_obj.search([("wizard_id", "=", self.id)], order="start")
         for line in lines:
             tour = line.tour_id
             employee = line.employee_id
@@ -905,19 +905,19 @@ class OFTourAppointmentWizard(models.TransientModel):
             arrival = tour.return_address_id
             # Pas d'origine ni pour la tournée ni pour l'employé
             if not origin:
-                raise UserError(_("The operator \"%(name)s\" has no starting address."), name=employee.name)
+                raise UserError(_('The operator "%(name)s" has no starting address.'), name=employee.name)
             # Pas d'arrivée ni pour la tournée ni pour l'employé
             elif not arrival:
-                raise UserError(_("The operator \"%(name)s\" has no return address."), name=employee.name)
+                raise UserError(_('The operator "%(name)s" has no return address.'), name=employee.name)
             elif origin.partner_latitude == origin.partner_longitude == 0:
                 raise UserError(
-                    _("Operator's starting address \"%(name)s\" is not geolocated.\nDate : %(date)s"),
+                    _('Operator\'s starting address "%(name)s" is not geolocated.\nDate : %(date)s'),
                     name=employee.name,
                     date=line.date,
                 )
             elif arrival.partner_latitude == arrival.partner_longitude == 0:
                 raise UserError(
-                    _("Operator's return address \"%(name)s\" is not geolocated.\nDate : %(date)s"),
+                    _('Operator\'s return address "%(name)s" is not geolocated.\nDate : %(date)s'),
                     name=employee.name,
                     date=line.date,
                 )
@@ -931,56 +931,56 @@ class OFTourAppointmentWizard(models.TransientModel):
                 )
                 line.update(
                     {
-                        'distance': (previous_dist + next_dist),
-                        'previous_distance': previous_dist,
-                        'next_distance': next_dist,
-                        'duration': -1,
+                        "distance": (previous_dist + next_dist),
+                        "previous_distance": previous_dist,
+                        "next_distance": next_dist,
+                        "duration": -1,
                     }
                 )
                 continue
             else:
                 try:
                     osrm_url = tour_obj._osrm_get_base_url()
-                    full_query = f'{osrm_url}/{line.map_tour_line_coordinates}?'
+                    full_query = f"{osrm_url}/{line.map_tour_line_coordinates}?"
                     req = requests.get(full_query, timeout=10)
                     res = req.json()
                 except Exception:
                     res = {}
 
-            if not res or not res.get('routes'):
+            if not res or not res.get("routes"):
                 raise UserWarning(_("Unexpected routing error"))
 
             # a leg is a route between two waypoints.
-            legs = res['routes'][0]['legs']
+            legs = res["routes"][0]["legs"]
             if len(line.tour_id.tour_line_ids) + 1 == len(legs) - 1:  # departure -> slot -> arrival : 2 routes 1 slot
                 leg = legs[line.previous_sequence]
                 next_leg = legs[line.previous_sequence + 1]
                 # Route : A ---> B ---> C ---> D
                 # leg 0 : A ---> B, leg 1 : B ---> C, ...
-                previous_distance = leg['distance'] / 1000
-                previous_duration = leg['duration'] / 60
-                next_distance = next_leg['distance'] / 1000
-                next_duration = next_leg['duration'] / 60
+                previous_distance = leg["distance"] / 1000
+                previous_duration = leg["duration"] / 60
+                next_distance = next_leg["distance"] / 1000
+                next_duration = next_leg["duration"] / 60
                 line.update(
                     {
-                        'previous_distance': previous_distance,
-                        'previous_duration': previous_duration,
-                        'next_distance': next_distance,
-                        'next_duration': next_duration,
-                        'distance': previous_distance + next_distance,
-                        'duration': previous_duration + next_duration,
+                        "previous_distance": previous_distance,
+                        "previous_duration": previous_duration,
+                        "next_distance": next_distance,
+                        "next_duration": next_duration,
+                        "distance": previous_distance + next_distance,
+                        "duration": previous_duration + next_duration,
                     }
                 )
 
 
 class OFTourAppointmentLineMixin(models.AbstractModel):
-    _name = 'of.tour.appointment.line.mixin'
+    _name = "of.tour.appointment.line.mixin"
     _description = "Appointment Line Mixin"
 
     def toggle_selected(self):
         """Helper to set a decoration style on the line that was clicked"""
         self.ensure_one()
-        self.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)]).write({'selected': False})
+        self.search([("wizard_id", "=", self.wizard_id.id), ("selected", "=", True)]).write({"selected": False})
         self.selected = True
 
     def action_button_view_tour(self):
@@ -1004,8 +1004,8 @@ class OFTourAppointmentLineMixin(models.AbstractModel):
     def action_select(self, sudo=False):
         """Sélectionne ce créneau en tant que résultat. Appelé depuis la vue form du créneau"""
         self.ensure_one()
-        selected_line = self.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])
-        selected_line.write({'selected': False})
+        selected_line = self.search([("wizard_id", "=", self.wizard_id.id), ("selected", "=", True)])
+        selected_line.write({"selected": False})
         self.selected = True
 
         vals = self._prepare_wizard_values(sudo)
@@ -1014,58 +1014,58 @@ class OFTourAppointmentLineMixin(models.AbstractModel):
     def _prepare_wizard_values(self, sudo=False):
         if sudo:
             address = self.wizard_id.partner_address_id.sudo()
-            name = address.name or (address.parent_id and address.parent_id.sudo().name) or ''
+            name = address.name or (address.parent_id and address.parent_id.sudo().name) or ""
         else:
             address = self.wizard_id.partner_address_id
-            name = address.name or (address.parent_id and address.parent_id.name) or ''
+            name = address.name or (address.parent_id and address.parent_id.name) or ""
         name += address.zip and f" {address.zip}" or ""
         name += address.city and f" {address.city}" or ""
         # if we are on the delegated object we must use the id of the parent object
         selected_line_id = self.id
         return {
-            'name': name,
-            'employee_id': self.employee_id.id,
-            'selected_datetime': self.start,
-            'selected_line_id': selected_line_id,
-            'map_line_id': selected_line_id,
-            'map_tour_id': self.tour_id.id or False,
+            "name": name,
+            "employee_id": self.employee_id.id,
+            "selected_datetime": self.start,
+            "selected_line_id": selected_line_id,
+            "map_line_id": selected_line_id,
+            "map_tour_id": self.tour_id.id or False,
         }
 
 
 class OFTourAppointmentLine(models.TransientModel):
-    _name = 'of.tour.appointment.line.wizard'
+    _name = "of.tour.appointment.line.wizard"
     _description = "Appointment Proposals"
-    _inherit = ['of.tour.appointment.line.mixin']
+    _inherit = ["of.tour.appointment.line.mixin"]
 
-    available_slot_id = fields.Many2one(comodel_name='of.planning.available.slot', string="Available Slot")
+    available_slot_id = fields.Many2one(comodel_name="of.planning.available.slot", string="Available Slot")
     tour_id = fields.Many2one(
-        comodel_name='of.planning.tour', string="Tour", related='available_slot_id.tour_id', required=True
+        comodel_name="of.planning.tour", string="Tour", related="available_slot_id.tour_id", required=True
     )
     map_tour_line_coordinates = fields.Char(
-        string="Wizard Line Coordinates", compute='_compute_map_tour_line_coordinates'
+        string="Wizard Line Coordinates", compute="_compute_map_tour_line_coordinates"
     )
-    date = fields.Date(related='tour_id.date', store=True)
-    date_str = fields.Char(string="Date (str)", compute='_compute_date_str')
-    weekday = fields.Selection(related='tour_id.weekday')
-    start = fields.Datetime(related='available_slot_id.start', store=True)
-    time_slot = fields.Char(related='available_slot_id.time_slot', store=True)
-    employee_id = fields.Many2one(related='tour_id.employee_id', store=True)
+    date = fields.Date(related="tour_id.date", store=True)
+    date_str = fields.Char(string="Date (str)", compute="_compute_date_str")
+    weekday = fields.Selection(related="tour_id.weekday")
+    start = fields.Datetime(related="available_slot_id.start", store=True)
+    time_slot = fields.Char(related="available_slot_id.time_slot", store=True)
+    employee_id = fields.Many2one(related="tour_id.employee_id", store=True)
     wizard_id = fields.Many2one(
-        comodel_name='of.tour.appointment.wizard', string="Wizard", required=True, ondelete='cascade', index=True
+        comodel_name="of.tour.appointment.wizard", string="Wizard", required=True, ondelete="cascade", index=True
     )
-    template_id = fields.Many2one(string="Intervention Template", comodel_name='of.planning.intervention.template')
-    search_mode = fields.Selection(related='wizard_id.search_mode', store=True)
-    previous_sequence = fields.Integer(compute='_compute_previous_sequence')
-    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervention", index=True)
+    template_id = fields.Many2one(string="Intervention Template", comodel_name="of.planning.intervention.template")
+    search_mode = fields.Selection(related="wizard_id.search_mode", store=True)
+    previous_sequence = fields.Integer(compute="_compute_previous_sequence")
+    intervention_id = fields.Many2one(comodel_name="calendar.event", string="Intervention", index=True)
 
     previous_geo_lat = fields.Float(
-        string="Latitude of the previous intervention", compute='_compute_previous_geo', store=True
+        string="Latitude of the previous intervention", compute="_compute_previous_geo", store=True
     )
     previous_geo_lng = fields.Float(
-        string="Longitude of the previous intervention", compute='_compute_previous_geo', store=True
+        string="Longitude of the previous intervention", compute="_compute_previous_geo", store=True
     )
-    next_geo_lat = fields.Float(string="Latitude of the next intervention", compute='_compute_next_geo', store=True)
-    next_geo_lng = fields.Float(string="Longitude of the next intervention", compute='_compute_next_geo', store=True)
+    next_geo_lat = fields.Float(string="Latitude of the next intervention", compute="_compute_next_geo", store=True)
+    next_geo_lng = fields.Float(string="Longitude of the next intervention", compute="_compute_next_geo", store=True)
 
     distance = fields.Float(
         string="Total Distance",
@@ -1082,31 +1082,31 @@ class OFTourAppointmentLine(models.TransientModel):
         help="Total duration in minutes. Is the sum of the previous duration and the next duration.",
     )
     previous_duration = fields.Float(digits=(12, 0), help="Previous Duration in minutes")
-    previous_duration_str = fields.Char(string="Previous Duration (str)", compute='_compute_previous_duration_str')
+    previous_duration_str = fields.Char(string="Previous Duration (str)", compute="_compute_previous_duration_str")
     next_duration = fields.Float(digits=(12, 0), help="Next Duration in minutes")
-    next_duration_str = fields.Char(string="Next Duration (str)", compute='_compute_next_duration_str')
+    next_duration_str = fields.Char(string="Next Duration (str)", compute="_compute_next_duration_str")
 
     useful_distance = fields.Float(
         digits=(12, 0),
-        compute='_compute_useful_distance',
+        compute="_compute_useful_distance",
         store=True,
         help="Useful Distance in km",
     )
     useful_duration = fields.Float(
-        digits=(12, 0), compute='_compute_useful_duration', help="Useful Duration in minutes"
+        digits=(12, 0), compute="_compute_useful_duration", help="Useful Duration in minutes"
     )
 
     best = fields.Boolean(string="Best slot")
     selected = fields.Boolean(string="Selected Slot")
-    description = fields.Text(string="Description", related='wizard_id.description')
+    description = fields.Text(string="Description", related="wizard_id.description")
 
-    @api.depends('date')
+    @api.depends("date")
     def _compute_date_str(self):
         for line in self:
-            user_lang = self.env.user.lang or 'en_US'
-            line.date_str = format_date(line.date, format='full', locale=user_lang).capitalize() if line.date else False
+            user_lang = self.env.user.lang or "en_US"
+            line.date_str = format_date(line.date, format="full", locale=user_lang).capitalize() if line.date else False
 
-    @api.depends('next_duration')
+    @api.depends("next_duration")
     def _compute_next_duration_str(self):
         """Compute the string of the duration to display in the kanban view (// operator doesn't work in qweb)"""
         for line in self:
@@ -1117,7 +1117,7 @@ class OFTourAppointmentLine(models.TransientModel):
             else:
                 line.next_duration_str = "00:00"
 
-    @api.depends('previous_duration')
+    @api.depends("previous_duration")
     def _compute_previous_duration_str(self):
         """Compute the string of the duration to display in the kanban view (// operator doesn't work in qweb)"""
         for line in self:
@@ -1128,83 +1128,83 @@ class OFTourAppointmentLine(models.TransientModel):
             else:
                 line.previous_duration_str = "00:00"
 
-    @api.depends('available_slot_id', 'available_slot_id.previous_tour_line_id')
+    @api.depends("available_slot_id", "available_slot_id.previous_tour_line_id")
     def _compute_previous_geo(self):
         """Compute the coordinates of the previous intervention"""
         for line in self:
             if previous_tour_line := line.available_slot_id.previous_tour_line_id:
                 line.write(
                     {
-                        'previous_geo_lat': previous_tour_line.geo_lat,
-                        'previous_geo_lng': previous_tour_line.geo_lng,
+                        "previous_geo_lat": previous_tour_line.geo_lat,
+                        "previous_geo_lng": previous_tour_line.geo_lng,
                     }
                 )
             else:
                 line.write(
                     {
-                        'previous_geo_lat': line.tour_id.start_address_id.partner_latitude,
-                        'previous_geo_lng': line.tour_id.start_address_id.partner_longitude,
+                        "previous_geo_lat": line.tour_id.start_address_id.partner_latitude,
+                        "previous_geo_lng": line.tour_id.start_address_id.partner_longitude,
                     }
                 )
 
-    @api.depends('available_slot_id', 'available_slot_id.next_tour_line_id')
+    @api.depends("available_slot_id", "available_slot_id.next_tour_line_id")
     def _compute_next_geo(self):
         """Compute the coordinates of the next intervention"""
         for line in self:
             if next_tour_line := line.available_slot_id.next_tour_line_id:
                 line.write(
                     {
-                        'next_geo_lat': next_tour_line.geo_lat,
-                        'next_geo_lng': next_tour_line.geo_lng,
+                        "next_geo_lat": next_tour_line.geo_lat,
+                        "next_geo_lng": next_tour_line.geo_lng,
                     }
                 )
             else:
                 line.write(
                     {
-                        'next_geo_lat': line.tour_id.return_address_id.partner_latitude,
-                        'next_geo_lng': line.tour_id.return_address_id.partner_longitude,
+                        "next_geo_lat": line.tour_id.return_address_id.partner_latitude,
+                        "next_geo_lng": line.tour_id.return_address_id.partner_longitude,
                     }
                 )
 
-    @api.depends('search_mode')
+    @api.depends("search_mode")
     def _compute_useful_distance(self):
         for line in self:
             search_mode = line.search_mode
-            if search_mode == 'oneway':
+            if search_mode == "oneway":
                 line.useful_distance = line.previous_distance
-            elif search_mode == 'oneway_am_return_pm':
+            elif search_mode == "oneway_am_return_pm":
                 line.useful_distance = (
                     line.previous_distance
                     if line.available_slot_id.start.hour <= AM_LIMIT_FLOAT  # one way, if morning
                     else line.next_distance  # return, if afternoon
                 )
-            elif search_mode == 'oneway_or_return':
+            elif search_mode == "oneway_or_return":
                 line.useful_distance = min(line.previous_distance, line.next_distance)
-            elif search_mode == 'return':
+            elif search_mode == "return":
                 line.useful_distance = line.next_distance
-            elif search_mode == 'round_trip':
+            elif search_mode == "round_trip":
                 line.useful_distance = line.distance
 
-    @api.depends('search_mode')
+    @api.depends("search_mode")
     def _compute_useful_duration(self):
         for line in self:
             search_mode = line.search_mode
-            if search_mode == 'oneway':
+            if search_mode == "oneway":
                 line.useful_duration = line.previous_duration
-            elif search_mode == 'oneway_am_return_pm':
+            elif search_mode == "oneway_am_return_pm":
                 line.useful_duration = (
                     line.previous_duration
                     if line.available_slot_id.start.hour <= AM_LIMIT_FLOAT
                     else line.next_duration
                 )
-            elif search_mode == 'oneway_or_return':
+            elif search_mode == "oneway_or_return":
                 line.useful_duration = min(line.previous_duration, line.next_duration)
-            elif search_mode == 'return':
+            elif search_mode == "return":
                 line.useful_duration = line.next_duration
-            elif search_mode == 'round_trip':
+            elif search_mode == "round_trip":
                 line.useful_duration = line.duration
 
-    @api.depends('available_slot_id', 'available_slot_id.previous_tour_line_id')
+    @api.depends("available_slot_id", "available_slot_id.previous_tour_line_id")
     def _compute_previous_sequence(self):
         """
         Compute the sequence of the previous intervention.
@@ -1217,16 +1217,16 @@ class OFTourAppointmentLine(models.TransientModel):
                 else 0
             )
 
-    @api.depends('tour_id.map_tour_line_coordinates', 'previous_sequence')
+    @api.depends("tour_id.map_tour_line_coordinates", "previous_sequence")
     def _compute_map_tour_line_coordinates(self):
         """Take the coordinates of the tour and insert the coordinates of the wizard"""
         for line in self:
             wizard = line.wizard_id
             geo_data = (
-                line.tour_id.map_tour_line_coordinates.split(';') if line.tour_id.map_tour_line_coordinates else []
+                line.tour_id.map_tour_line_coordinates.split(";") if line.tour_id.map_tour_line_coordinates else []
             )
             geo_data.insert(
                 line.previous_sequence + 1,
                 f"{round(wizard.geo_lng, 7)},{round(wizard.geo_lat, 7)}",  # noqa
             )
-            line.map_tour_line_coordinates = ';'.join(geo_data)
+            line.map_tour_line_coordinates = ";".join(geo_data)

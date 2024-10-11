@@ -15,28 +15,28 @@ class TestProductPack(TestOFProdutPackCommon):
         with self.assertRaises(ValidationError):
             self.product_pack_non_detailed.write(
                 {
-                    'pack_line_ids': [
+                    "pack_line_ids": [
                         Command.create(
                             {
-                                'product_id': self.product_pack_non_detailed.id,
-                                'quantity': 1.0,
+                                "product_id": self.product_pack_non_detailed.id,
+                                "quantity": 1.0,
                             },
                         )
                     ]
                 }
             )
 
-    @mute_logger('odoo.sql_db')
+    @mute_logger("odoo.sql_db")
     def test_02_product_in_pack_unique(self):
         """Test that adding a product that is already in the concerned pack raises an error."""
         with self.assertRaises(IntegrityError):
             self.product_pack_non_detailed.write(
                 {
-                    'pack_line_ids': [
+                    "pack_line_ids": [
                         Command.create(
                             {
-                                'product_id': self.product_1.id,
-                                'quantity': 1.0,
+                                "product_id": self.product_1.id,
+                                "quantity": 1.0,
                             },
                         )
                     ]
@@ -72,12 +72,12 @@ class TestProductPack(TestOFProdutPackCommon):
         """Test case to verify the behavior of pack_modifiable_invisible property.
         when changing the pack type and pack component price."""
         pack = self.product_pack_detailed.product_tmpl_id
-        pack.pack_type = 'detailed'
+        pack.pack_type = "detailed"
         self.assertFalse(pack.pack_modifiable_invisible)
-        pack.pack_type = 'non_detailed'
+        pack.pack_type = "non_detailed"
         self.assertTrue(pack.pack_modifiable_invisible)
-        pack.pack_type = 'detailed'
-        pack.pack_component_price = 'totalized'
+        pack.pack_type = "detailed"
+        pack.pack_component_price = "totalized"
         self.assertFalse(pack.pack_modifiable_invisible)
 
     def test_06_price_compute_with_pricelist_context(self):
@@ -86,5 +86,5 @@ class TestProductPack(TestOFProdutPackCommon):
         component_1.product_id.list_price = 30.0
         component_2 = product_pack.pack_line_ids[1]
         component_2.product_id.list_price = 15.0
-        price = product_pack.with_context(pricelist='pricelist test').price_compute('list_price').get(product_pack.id)
+        price = product_pack.with_context(pricelist="pricelist test").price_compute("list_price").get(product_pack.id)
         self.assertEqual(price, 40.0)

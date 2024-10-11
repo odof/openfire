@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class UtmCampaign(models.Model):
-    _inherit = 'utm.campaign'
+    _inherit = "utm.campaign"
 
     active = fields.Boolean(default=True)
     name = fields.Char(translate=True)

@@ -6,88 +6,88 @@ from odoo import _, fields, models
 
 PLANNING_VALID_ATTRIBUTES = set(
     [
-        '__validate__',  # ir.ui.view implementation detail
-        'date_start',
-        'date_stop',
-        'duration',
-        'default_scale',
-        'class',
-        'js_class',
-        'form_view_id',
-        'progress',
-        'consolidation',
-        'consolidation_max',
-        'consolidation_exclude',
-        'string',
-        'create',
-        'on_create',
-        'cell_create',
-        'edit',
-        'delete',
-        'plan',
-        'default_group_by',
-        'dynamic_range',
-        'display_unavailability',
-        'disable_drag_drop',
-        'total_row',
-        'collapse_first_level',
-        'offset',
-        'scales',
-        'thumbnails',
-        'precision',
-        'color',
-        'decoration-secondary',
-        'decoration-success',
-        'decoration-info',
-        'decoration-warning',
-        'decoration-danger',
-        'conflict-warning',
-        'geolocalize-warning',
-        'sample',
-        'progress_bar',
-        'trip_bar',
-        'dependency_field',
-        'dependency_inverted_field',
-        'pill_label',
-        'groups_limit',
+        "__validate__",  # ir.ui.view implementation detail
+        "date_start",
+        "date_stop",
+        "duration",
+        "default_scale",
+        "class",
+        "js_class",
+        "form_view_id",
+        "progress",
+        "consolidation",
+        "consolidation_max",
+        "consolidation_exclude",
+        "string",
+        "create",
+        "on_create",
+        "cell_create",
+        "edit",
+        "delete",
+        "plan",
+        "default_group_by",
+        "dynamic_range",
+        "display_unavailability",
+        "disable_drag_drop",
+        "total_row",
+        "collapse_first_level",
+        "offset",
+        "scales",
+        "thumbnails",
+        "precision",
+        "color",
+        "decoration-secondary",
+        "decoration-success",
+        "decoration-info",
+        "decoration-warning",
+        "decoration-danger",
+        "conflict-warning",
+        "geolocalize-warning",
+        "sample",
+        "progress_bar",
+        "trip_bar",
+        "dependency_field",
+        "dependency_inverted_field",
+        "pill_label",
+        "groups_limit",
     ]
 )
 
 
 class View(models.Model):
-    _inherit = 'ir.ui.view'
+    _inherit = "ir.ui.view"
 
-    type = fields.Selection(selection_add=[('planning', "Planning")])
+    type = fields.Selection(selection_add=[("planning", "Planning")])
 
     def _validate_tag_planning(self, node, name_manager, node_info):
-        if not node_info['validate']:
+        if not node_info["validate"]:
             return
 
         templates_count = 0
         for child in node.iterchildren(tag=etree.Element):
-            if child.tag == 'templates':
+            if child.tag == "templates":
                 if not templates_count:
                     templates_count += 1
                 else:
-                    msg = _('Planning view can contain only one templates tag')
+                    msg = _("Planning view can contain only one templates tag")
                     self._raise_view_error(msg, child)
-            elif child.tag != 'field':
-                msg = _('Planning child can only be field or template, got %s', child.tag)
+            elif child.tag != "field":
+                msg = _("Planning child can only be field or template, got %s", child.tag)
                 self._raise_view_error(msg, child)
 
-        if default_scale := node.get('default_scale'):
-            if default_scale not in ('day', 'week'):
+        if default_scale := node.get("default_scale"):
+            if default_scale not in ("day", "week"):
                 self._raise_view_error(_("Invalid default_scale '%s' in planning", default_scale), node)
         attrs = set(node.attrib)
-        if 'date_start' not in attrs:
+        if "date_start" not in attrs:
             msg = _("Planning must have a 'date_start' attribute")
             self._raise_view_error(msg, node)
 
-        if 'date_stop' not in attrs:
+        if "date_stop" not in attrs:
             msg = _("Planning must have a 'date_stop' attribute")
             self._raise_view_error(msg, node)
 
-        if 'dependency_field' in attrs and 'dependency_inverted_field' not in attrs:
+        if "dependency_field" in attrs and "dependency_inverted_field" not in attrs:
             msg = _(
                 "Planning must have a 'dependency_inverted_field' attribute once the 'dependency_field' is specified"
             )
@@ -96,7 +96,7 @@ class View(models.Model):
         if remaining := attrs - PLANNING_VALID_ATTRIBUTES:
             msg = _(
                 "Invalid attributes (%s) in planning view. Attributes must be in (%s)",
-                ','.join(remaining),
-                ','.join(PLANNING_VALID_ATTRIBUTES),
+                ",".join(remaining),
+                ",".join(PLANNING_VALID_ATTRIBUTES),
             )
             self._raise_view_error(msg, node)

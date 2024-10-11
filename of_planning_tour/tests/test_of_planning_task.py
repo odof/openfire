@@ -9,7 +9,7 @@ class TestOFPlanningTask(TestOFPlanningTourCommon):
 
     def test_01_get_minimal_task_duration(self):
         """Check that the minimal task duration is correct."""
-        task_obj = self.env['of.planning.task']
+        task_obj = self.env["of.planning.task"]
         self.task_sweeping.unlink()
         self.task_installation.unlink()
 
@@ -17,8 +17,8 @@ class TestOFPlanningTask(TestOFPlanningTourCommon):
 
         self.task_1 = task_obj.create(
             {
-                'name': 'Task 1',
-                'duration': 1,
+                "name": "Task 1",
+                "duration": 1,
             }
         )
 
@@ -26,8 +26,8 @@ class TestOFPlanningTask(TestOFPlanningTourCommon):
 
         self.task_2 = task_obj.create(
             {
-                'name': 'Task 2',
-                'duration': 2,
+                "name": "Task 2",
+                "duration": 2,
             }
         )
 

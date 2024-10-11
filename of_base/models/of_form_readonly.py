@@ -20,31 +20,31 @@ class OFFormReadonly(models.AbstractModel):
         ```
     """
 
-    _name = 'of.form.readonly'
+    _name = "of.form.readonly"
     _description = "OF Form Readonly Abstract Model"
 
     def process_modifiers_or_attrs(self, node, key, read_only_domain):
         """Process modifiers or attrs of a node to set readonly domain in it."""
         value = node.get(key, {})
         if isinstance(value, str):
-            value = safe_eval(value) if key == 'attrs' else json.loads(value)
+            value = safe_eval(value) if key == "attrs" else json.loads(value)
         if not isinstance(value, dict):
             return
 
-        if (ro_val := value.get('readonly')) and isinstance(ro_val, bool) and ro_val:
+        if (ro_val := value.get("readonly")) and isinstance(ro_val, bool) and ro_val:
             # already readonly nothing to do
             return
-        elif (ro_val := value.get('readonly')) and isinstance(ro_val, list):
+        elif (ro_val := value.get("readonly")) and isinstance(ro_val, list):
             # already a domain, we add the read_only_domain
-            value['readonly'] = ['|'] + ro_val + safe_eval(read_only_domain)
-        elif (ro_val := value.get('readonly')) and isinstance(ro_val, int):
+            value["readonly"] = ["|"] + ro_val + safe_eval(read_only_domain)
+        elif (ro_val := value.get("readonly")) and isinstance(ro_val, int):
             # readonly="{'readonly': 0}" so we apply the domain
-            value['readonly'] = safe_eval(read_only_domain)
+            value["readonly"] = safe_eval(read_only_domain)
         else:
             # apply the domain
-            value['readonly'] = safe_eval(read_only_domain)
+            value["readonly"] = safe_eval(read_only_domain)
 
-        if key == 'attrs' and value.get('form_readonly_exception', False):
+        if key == "attrs" and value.get("form_readonly_exception", False):
             return
         return value
 
@@ -54,12 +54,12 @@ class OFFormReadonly(models.AbstractModel):
 
         if (
             arch is not None
-            and view_type == 'form'
-            and (read_only_domain := self.env.context.get('form_readonly', False))
+            and view_type == "form"
+            and (read_only_domain := self.env.context.get("form_readonly", False))
         ):
             for node in arch.xpath("//field"):
-                if modifiers := self.process_modifiers_or_attrs(node, 'modifiers', read_only_domain):
-                    node.set('modifiers', f'{modifiers}')
-                if attrs := self.process_modifiers_or_attrs(node, 'attrs', read_only_domain):
-                    node.set('attrs', f'{attrs}')
+                if modifiers := self.process_modifiers_or_attrs(node, "modifiers", read_only_domain):
+                    node.set("modifiers", f"{modifiers}")
+                if attrs := self.process_modifiers_or_attrs(node, "attrs", read_only_domain):
+                    node.set("attrs", f"{attrs}")
         return arch, view

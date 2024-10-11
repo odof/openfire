@@ -4,4 +4,4 @@ from odoo import fields
 
 
 class BigInteger(fields.Integer):
-    column_type = ('int8', 'int8')
+    column_type = ("int8", "int8")

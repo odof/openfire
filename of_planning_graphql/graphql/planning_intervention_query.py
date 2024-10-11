@@ -8,8 +8,8 @@ from .planning_intervention_type import PlanningIntervention, PlanningInterventi
 
 
 class PlanningInterventionQuery(graphene.ObjectType):
-    _name = 'PlanningInterventionQuery'
-    _type = 'query'
+    _name = "PlanningInterventionQuery"
+    _type = "query"
 
     planning_interventions = graphene.List(
         graphene.NonNull(PlanningIntervention),
@@ -21,8 +21,8 @@ class PlanningInterventionQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_planning_interventions(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['calendar.event']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["calendar.event"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['calendar.event'].search(odoo_domain, offset=offset, limit=limit)
+        return env["calendar.event"].search(odoo_domain, offset=offset, limit=limit)

@@ -8,8 +8,8 @@ from .of_payment_mode_type import PaymentMode, PaymentModeFilterInput
 
 
 class PaymentModeQuery(graphene.ObjectType):
-    _name = 'PaymentModeQuery'
-    _type = 'query'
+    _name = "PaymentModeQuery"
+    _type = "query"
 
     payment_modes = graphene.List(
         graphene.NonNull(PaymentMode),
@@ -21,8 +21,8 @@ class PaymentModeQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_payment_modes(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['of.payment.mode']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["of.payment.mode"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.payment.mode'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.payment.mode"].search(odoo_domain, offset=offset, limit=limit)

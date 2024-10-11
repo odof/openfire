@@ -19,16 +19,16 @@ class TestOFEquipmentWizard(TestOFEquipmentCommon):
         has one equipment after creating and validating the wizard. It also checks that the
         equipment has the correct data.
         """
-        order = self.env['sale.order'].create(
+        order = self.env["sale.order"].create(
             {
-                'partner_id': self.customer_a.id,
-                'company_id': self.company_fr.id,
-                'order_line': [
+                "partner_id": self.customer_a.id,
+                "company_id": self.company_fr.id,
+                "order_line": [
                     Command.create(
                         {
-                            'product_id': self.product_wood_stove.id,
-                            'product_uom_qty': 1,
-                            'price_unit': 1000,
+                            "product_id": self.product_wood_stove.id,
+                            "product_uom_qty": 1,
+                            "price_unit": 1000,
                         }
                     )
                 ],
@@ -39,7 +39,7 @@ class TestOFEquipmentWizard(TestOFEquipmentCommon):
         self.assertEqual(len(order.of_equipment_ids), 0)
         # Create a new equipment wizard
         with Form(
-            self.env['of.create.equipment.wizard'].with_context(active_id=order.id, active_model='sale.order')
+            self.env["of.create.equipment.wizard"].with_context(active_id=order.id, active_model="sale.order")
         ) as wizard_form:
             wizard_form.name = "CA/WS00001"
             wizard_form.product_id = self.product_wood_stove
@@ -64,16 +64,16 @@ class TestOFEquipmentWizard(TestOFEquipmentCommon):
         has one equipment after creating and validating the wizard. It also checks that the
         equipment has the correct data.
         """
-        move = self.env['account.move'].create(
+        move = self.env["account.move"].create(
             {
-                'partner_id': self.customer_a.id,
-                'company_id': self.company_fr.id,
-                'invoice_line_ids': [
+                "partner_id": self.customer_a.id,
+                "company_id": self.company_fr.id,
+                "invoice_line_ids": [
                     Command.create(
                         {
-                            'product_id': self.product_wood_stove.id,
-                            'quantity': 1,
-                            'price_unit': 1000,
+                            "product_id": self.product_wood_stove.id,
+                            "quantity": 1,
+                            "price_unit": 1000,
                         }
                     )
                 ],
@@ -84,7 +84,7 @@ class TestOFEquipmentWizard(TestOFEquipmentCommon):
         self.assertEqual(len(move.of_equipment_ids), 0)
         # Create a new equipment wizard
         with Form(
-            self.env['of.create.equipment.wizard'].with_context(active_id=move.id, active_model='account.move')
+            self.env["of.create.equipment.wizard"].with_context(active_id=move.id, active_model="account.move")
         ) as wizard_form:
             wizard_form.name = "CA/WS00001"
             wizard_form.product_id = self.product_wood_stove

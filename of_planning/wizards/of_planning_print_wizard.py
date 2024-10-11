@@ -10,67 +10,67 @@ from odoo.tools.misc import groupby
 
 
 class PlanningImpressionWizard(models.TransientModel):
-    _name = 'of.planning.print.wizard'
+    _name = "of.planning.print.wizard"
     _description = "Print Intervention Planning Wizard"
 
     report_type = fields.Selection(
         selection=[
-            ('day', "Day"),
-            ('week', "Week"),
-            ('general_week', "General week"),
+            ("day", "Day"),
+            ("week", "Week"),
+            ("general_week", "General week"),
         ],
         string="Type",
         required=True,
-        default='day',
+        default="day",
     )
     start_date = fields.Date(required=True, default=fields.Date.today())
-    stop_date = fields.Date(compute='_compute_stop_date')
+    stop_date = fields.Date(compute="_compute_stop_date")
     employee_ids = fields.Many2many(
-        comodel_name='hr.employee',
+        comodel_name="hr.employee",
         string="Employees",
         domain="['|', ('of_is_operator', '=', True), ('of_is_salesperson', '=', True)]",
     )
-    lang = fields.Char(compute='_compute_lang', store=True, default='fr_FR')
+    lang = fields.Char(compute="_compute_lang", store=True, default="fr_FR")
 
-    @api.depends('employee_ids')
+    @api.depends("employee_ids")
     def _compute_lang(self):
         for wizard in self:
-            wizard.lang = wizard.mapped('employee_ids.lang') and wizard.mapped('employee_ids.lang')[0] or 'fr_FR'
+            wizard.lang = wizard.mapped("employee_ids.lang") and wizard.mapped("employee_ids.lang")[0] or "fr_FR"
 
-    @api.depends('report_type', 'start_date')
+    @api.depends("report_type", "start_date")
     def _compute_stop_date(self):
         for wizard in self:
-            if wizard.report_type == 'day':
+            if wizard.report_type == "day":
                 wizard.stop_date = wizard.start_date
             else:
                 wizard.stop_date = wizard.start_date + timedelta(days=6)
 
     def action_button_print(self):
         self.ensure_one()
-        if self.report_type == 'day':
-            return self.env.ref('of_planning.action_report_planning_day').report_action(self.id)
-        elif self.report_type == 'week':
-            return self.env.ref('of_planning.action_report_planning_week').report_action(self.id)
+        if self.report_type == "day":
+            return self.env.ref("of_planning.action_report_planning_day").report_action(self.id)
+        elif self.report_type == "week":
+            return self.env.ref("of_planning.action_report_planning_week").report_action(self.id)
         else:
-            return self.env.ref('of_planning.action_report_planning_general_week').report_action(self.id)
+            return self.env.ref("of_planning.action_report_planning_general_week").report_action(self.id)
 
     def _get_report_title(self, employee_id=False):
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env["hr.employee"].sudo().browse(employee_id)
         self._set_locale()
         title = ""
-        if self.report_type == 'day':
+        if self.report_type == "day":
             title = _("%s - Intervention Planning for %s") % (
                 employee.name,
                 self.start_date.strftime("%d %B %Y"),
             )
-        elif self.report_type == 'week':
+        elif self.report_type == "week":
             title = _("Intervention Planning - %s<br/>Week %s from %s to %s") % (
                 employee.name,
                 self.start_date.strftime("%W"),
                 self.start_date.strftime("%d %B"),
                 self.stop_date.strftime("%d %B %Y"),
             )
-        elif self.report_type == 'general_week':
+        elif self.report_type == "general_week":
             title = _("Intervention Planning - Week %s from %s to %s") % (
                 self.start_date.strftime("%W"),
                 self.start_date.strftime("%d %B"),
@@ -83,15 +83,15 @@ class PlanningImpressionWizard(models.TransientModel):
         if not employee_id:
             return []
 
-        intervention_obj = self.env['calendar.event']
+        intervention_obj = self.env["calendar.event"]
         return intervention_obj.search(
             [
-                ('stop', '>=', self.start_date),
-                ('start', '<=', self.stop_date),
-                ('of_employee_ids', 'in', employee_id),
-                ('of_state', 'not in', ('cancel', 'postponed')),
+                ("stop", ">=", self.start_date),
+                ("start", "<=", self.stop_date),
+                ("of_employee_ids", "in", employee_id),
+                ("of_state", "not in", ("cancel", "postponed")),
             ],
-            order='start',
+            order="start",
         )
 
     def _get_interventions_by_employee(self):
@@ -99,17 +99,17 @@ class PlanningImpressionWizard(models.TransientModel):
 
         :return: dict of dict of list of interventions
         """
-        intervention_obj = self.env['calendar.event']
+        intervention_obj = self.env["calendar.event"]
         res = {}
         interventions = intervention_obj.search(
             [
-                ('start', '>=', self.start_date),
-                ('stop', '<=', self.stop_date),
-                ('of_state', 'not in', ('cancel', 'postponed')),
+                ("start", ">=", self.start_date),
+                ("stop", "<=", self.stop_date),
+                ("of_state", "not in", ("cancel", "postponed")),
             ],
-            order='start',
+            order="start",
         )
-        for employee in interventions.mapped('of_employee_ids'):
+        for employee in interventions.mapped("of_employee_ids"):
             employee_interventions = interventions.filtered(lambda interv: employee in interv.of_employee_ids)
             res[employee] = dict(groupby(employee_interventions, key=lambda interv: interv.start.date()))
         return res
@@ -125,17 +125,17 @@ class PlanningImpressionWizard(models.TransientModel):
         return (
             Markup(_("from %s %s<br/>to %s %s"))
             % (
-                intervention.start.strftime('%a %d/%m'),
-                intervention.start.strftime('%H:%M'),
-                intervention.stop.strftime('%a %d/%m'),
-                intervention.stop.strftime('%H:%M'),
+                intervention.start.strftime("%a %d/%m"),
+                intervention.start.strftime("%H:%M"),
+                intervention.stop.strftime("%a %d/%m"),
+                intervention.stop.strftime("%H:%M"),
             )
             if intervention.start_date != intervention.stop_date
             else Markup(_("%s<br/>from %s to %s"))
             % (
-                intervention.start.strftime('%a %d/%m'),
-                intervention.start.strftime('%H:%M'),
-                intervention.stop.strftime('%H:%M'),
+                intervention.start.strftime("%a %d/%m"),
+                intervention.start.strftime("%H:%M"),
+                intervention.stop.strftime("%H:%M"),
             )
         )
 
@@ -144,4 +144,4 @@ class PlanningImpressionWizard(models.TransientModel):
         try:
             locale.setlocale(locale.LC_TIME, self.lang)
         except locale.Error:
-            locale.setlocale(locale.LC_TIME, f'{self.lang}.utf8')
+            locale.setlocale(locale.LC_TIME, f"{self.lang}.utf8")

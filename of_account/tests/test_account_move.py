@@ -14,31 +14,31 @@ class TestOFAccountMove(TestOFAccountCommon):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.user_accountant_2 = cls.env['res.users'].create(
+        cls.user_accountant_2 = cls.env["res.users"].create(
             {
-                'name': 'user_accountant_2',
-                'login': 'user_accountant_2',
-                'email': 'user_accountant_2@openfire.fr',
+                "name": "user_accountant_2",
+                "login": "user_accountant_2",
+                "email": "user_accountant_2@openfire.fr",
                 # Theses groups are required to create a new account.move to avoid the error:
                 #  AssertionError: line_ids was not found in the view
                 "groups_id": [
                     (4, cls.env.ref("account.group_account_manager").id),
                     (4, cls.env.ref("account.group_account_user").id),
                 ],
-                'company_id': cls.company_fr.id,
+                "company_id": cls.company_fr.id,
             }
         )
 
-        cls.journal_purchase = cls.env['account.journal'].search(
-            [('type', '=', 'purchase'), ('company_id', '=', cls.company_fr.id)], limit=1
+        cls.journal_purchase = cls.env["account.journal"].search(
+            [("type", "=", "purchase"), ("company_id", "=", cls.company_fr.id)], limit=1
         )
-        cls.account_607100 = cls.env['account.account'].search(
-            [('code', '=', '607100'), ('company_id', '=', cls.company_fr.id)], limit=1
+        cls.account_607100 = cls.env["account.account"].search(
+            [("code", "=", "607100"), ("company_id", "=", cls.company_fr.id)], limit=1
         )
-        cls.account_401100 = cls.env['account.account'].search(
-            [('code', '=', '401100'), ('company_id', '=', cls.company_fr.id)], limit=1
+        cls.account_401100 = cls.env["account.account"].search(
+            [("code", "=", "401100"), ("company_id", "=", cls.company_fr.id)], limit=1
         )
-        cls.account_607100.write({'of_account_counterpart_id': cls.account_401100.id})
+        cls.account_607100.write({"of_account_counterpart_id": cls.account_401100.id})
 
     def test_01_entry_move_default_values_move_lines(self):
         """Test that the default values of move lines are correct when creating a new Entry move from scratch with the
@@ -49,9 +49,9 @@ class TestOFAccountMove(TestOFAccountCommon):
         """
 
         with Form(
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
-            .with_context(default_move_type='entry', default_journal_id=self.journal_purchase.id)
+            .with_context(default_move_type="entry", default_journal_id=self.journal_purchase.id)
         ) as move_form:
             with move_form.line_ids.new() as line_form1:
                 line_form1.account_id = self.account_607100
@@ -60,7 +60,7 @@ class TestOFAccountMove(TestOFAccountCommon):
                 line_form1.date_maturity = fields.Date.today()
 
             with move_form.line_ids.new() as line_form2:
-                line_form2.name = 'Test'
+                line_form2.name = "Test"
 
             self.assertEqual(line_form2.account_id, self.account_401100)
             self.assertEqual(line_form2.credit, 1500)
@@ -73,9 +73,9 @@ class TestOFAccountMove(TestOFAccountCommon):
         """
 
         with Form(
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
-            .with_context(default_move_type='entry', default_journal_id=self.journal_purchase.id)
+            .with_context(default_move_type="entry", default_journal_id=self.journal_purchase.id)
         ) as move_form:
             with move_form.line_ids.new() as line_form:
                 line_form.account_id = self.account_607100
@@ -84,7 +84,7 @@ class TestOFAccountMove(TestOFAccountCommon):
                 line_form.date_maturity = fields.Date.today()
 
             with move_form.line_ids.new() as line_form:
-                line_form.name = 'Test'
+                line_form.name = "Test"
 
             self.assertEqual(move_form.commercial_partner_id, self.customer_a.commercial_partner_id)
 
@@ -95,20 +95,20 @@ class TestOFAccountMove(TestOFAccountCommon):
         """Test that the suitable journal ids are correctly computed when creating a new Entry move from scratch."""
 
         move1 = (
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
-            .with_context(default_move_type='entry')
+            .with_context(default_move_type="entry")
             .create({})
         )
         self.assertIn(self.journal_purchase, move1.suitable_journal_ids)
 
-        suitable_default_type_domain = self.env.ref('of_account.of_account_suitable_default_type_domain')
-        suitable_default_type_domain.write({'value': 'general,bank'})
+        suitable_default_type_domain = self.env.ref("of_account.of_account_suitable_default_type_domain")
+        suitable_default_type_domain.write({"value": "general,bank"})
 
         move2 = (
-            self.env['account.move']
+            self.env["account.move"]
             .with_user(self.user_accountant_2)
-            .with_context(default_move_type='entry')
+            .with_context(default_move_type="entry")
             .create({})
         )
         self.assertNotIn(self.journal_purchase, move2.suitable_journal_ids)

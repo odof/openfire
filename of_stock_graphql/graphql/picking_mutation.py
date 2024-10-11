@@ -11,7 +11,7 @@ from .stock_move_type import StockMoveInput
 
 
 class PickingCreate(graphene.Mutation):
-    _name = 'PickingCreate'
+    _name = "PickingCreate"
 
     class Arguments:
         name = graphene.String()
@@ -22,13 +22,13 @@ class PickingCreate(graphene.Mutation):
     Output = Picking
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['stock.picking']._prepare_mutation_values(**args)
-        return env['stock.picking'].create(values)
+        env = info.context["env"]
+        values = env["stock.picking"]._prepare_mutation_values(**args)
+        return env["stock.picking"].create(values)
 
 
 class PickingUpdate(graphene.Mutation):
-    _name = 'PickingUpdate'
+    _name = "PickingUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -40,15 +40,15 @@ class PickingUpdate(graphene.Mutation):
     Output = Picking
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['stock.picking']._prepare_mutation_values(**args)
-        picking = env['stock.picking'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["stock.picking"]._prepare_mutation_values(**args)
+        picking = env["stock.picking"].search([("id", "=", id)])
         picking.write(values)
         return picking
 
 
 class PickingDelete(graphene.Mutation):
-    _name = 'PickingDelete'
+    _name = "PickingDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -56,14 +56,14 @@ class PickingDelete(graphene.Mutation):
     Output = Picking
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'stock.picking', id)
+        return lazy_delete(env, "stock.picking", id)
 
 
 class PickingMutation(graphene.ObjectType):
-    _name = 'PickingMutation'
-    _type = 'mutation'
+    _name = "PickingMutation"
+    _type = "mutation"
 
     picking_create = PickingCreate.Field()
     picking_update = PickingUpdate.Field()

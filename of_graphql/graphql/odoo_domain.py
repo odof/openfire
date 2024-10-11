@@ -4,15 +4,15 @@ import graphene
 
 
 class OdooOperator(graphene.Enum):
-    EQ = '='
-    LIKE = 'ilike'
-    GT = '>'
-    GT_EQ = '>='
-    LT = '<'
-    LT_EQ = '<='
-    NOT = '!='
-    IN = 'in'
-    NOT_IN = 'not in'
+    EQ = "="
+    LIKE = "ilike"
+    GT = ">"
+    GT_EQ = ">="
+    LT = "<"
+    LT_EQ = "<="
+    NOT = "!="
+    IN = "in"
+    NOT_IN = "not in"
 
 
 class OdooFields(graphene.Scalar):

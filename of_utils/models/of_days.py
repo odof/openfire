@@ -4,11 +4,11 @@ from odoo import fields, models
 
 
 class OFDays(models.Model):
-    _name = 'of.days'
+    _name = "of.days"
     _description = "Week days"
 
     name = fields.Char(string="Day", size=16)
     abbreviation = fields.Char(size=16)
     number = fields.Integer(readonly=True)
 
-    _sql_constraints = [('days_number_uniq', 'unique(number)', "Two days cannot have the same number")]
+    _sql_constraints = [("days_number_uniq", "unique(number)", "Two days cannot have the same number")]

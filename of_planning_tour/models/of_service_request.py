@@ -5,7 +5,7 @@ from odoo.exceptions import UserError
 
 
 class OFServiceRequest(models.Model):
-    _inherit = 'of.service.request'
+    _inherit = "of.service.request"
 
     def action_button_open_tour_appointment_wizard(self):
         """
@@ -29,12 +29,12 @@ class OFServiceRequest(models.Model):
         if not self.next_date or not self.end_date:
             raise UserError(_("Please enter planning dates."))
 
-        tour_appointment_obj = self.env['of.tour.appointment.wizard']
-        icp_obj = self.env['ir.config_parameter']
+        tour_appointment_obj = self.env["of.tour.appointment.wizard"]
+        icp_obj = self.env["ir.config_parameter"]
         context = self.env.context.copy()
 
         default_planning_intervention_template = icp_obj.sudo().get_param(
-            'of.planning.tour.default_planning_intervention_template_id'
+            "of.planning.tour.default_planning_intervention_template_id"
         )
         default_values = tour_appointment_obj.with_context(
             active_model=self._name,
@@ -44,11 +44,11 @@ class OFServiceRequest(models.Model):
         next_date = today if self.next_date < today else self.next_date
         default_values.update(
             {
-                'company_id': self.company_id.id,
-                'partner_id': self.partner_id.id,
-                'start_date_search': next_date,
-                'search_period_in_days': 30 if self.end_date < today else (self.end_date - next_date).days + 1,
-                'template_id': self.template_id.id or int(default_planning_intervention_template),
+                "company_id": self.company_id.id,
+                "partner_id": self.partner_id.id,
+                "start_date_search": next_date,
+                "search_period_in_days": 30 if self.end_date < today else (self.end_date - next_date).days + 1,
+                "template_id": self.template_id.id or int(default_planning_intervention_template),
             }
         )
 
@@ -58,15 +58,15 @@ class OFServiceRequest(models.Model):
 
         # start time slots computing
         tour_appointment_wizard._populate_line_ids()
-        form_view_id = self.env.ref('of_planning_tour.of_tour_appointment_wizard_view_form').id
+        form_view_id = self.env.ref("of_planning_tour.of_tour_appointment_wizard_view_form").id
         return {
-            'name': _("Plan intervention"),
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'of.tour.appointment.wizard',
-            'views': [(form_view_id, 'form')],
-            'res_id': tour_appointment_wizard.id,
-            'target': 'current',
-            'context': context,
+            "name": _("Plan intervention"),
+            "type": "ir.actions.act_window",
+            "view_type": "form",
+            "view_mode": "form",
+            "res_model": "of.tour.appointment.wizard",
+            "views": [(form_view_id, "form")],
+            "res_id": tour_appointment_wizard.id,
+            "target": "current",
+            "context": context,
         }

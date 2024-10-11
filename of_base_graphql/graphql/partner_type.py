@@ -9,13 +9,13 @@ from .partner_title_type import PartnerTitle, PartnerTitleInput
 
 
 class CompanyType(graphene.Enum):
-    PERSON = 'person'
-    COMPANY = 'company'
+    PERSON = "person"
+    COMPANY = "company"
 
 
 class Partner(OdooObjectType):
-    _name = 'Partner'
-    _type = 'types'
+    _name = "Partner"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
@@ -26,7 +26,7 @@ class Partner(OdooObjectType):
     city = graphene.String()
     zip = graphene.String()
     email = graphene.String()
-    of_phone_number_ids = graphene.List(graphene.NonNull(PartnerPhone), required=True, name='phoneNumbers')
+    of_phone_number_ids = graphene.List(graphene.NonNull(PartnerPhone), required=True, name="phoneNumbers")
     write_date = graphene.DateTime()
     create_date = graphene.DateTime()
     company_type = graphene.Field(CompanyType, required=True)
@@ -44,8 +44,8 @@ class Partner(OdooObjectType):
 
 
 class PartnerInput(graphene.InputObjectType):
-    _name = 'PartnerInput'
-    _type = 'types'
+    _name = "PartnerInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -56,7 +56,7 @@ class PartnerInput(graphene.InputObjectType):
     city = graphene.String()
     zip = graphene.String()
     email = graphene.String()
-    of_phone_number_ids = graphene.List(graphene.NonNull(PartnerPhoneInput), name='phoneNumbers')
+    of_phone_number_ids = graphene.List(graphene.NonNull(PartnerPhoneInput), name="phoneNumbers")
     write_date = graphene.DateTime()
     create_date = graphene.DateTime()
     company_type = graphene.Field(CompanyType)
@@ -67,4 +67,4 @@ class PartnerInput(graphene.InputObjectType):
 
 
 class PartnerFilterInput(PartnerInput):
-    _name = 'PartnerFilterInput'
+    _name = "PartnerFilterInput"

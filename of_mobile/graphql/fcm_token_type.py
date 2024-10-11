@@ -7,8 +7,8 @@ from odoo.addons.of_graphql.graphql.user_type import User
 
 
 class FCMToken(OdooObjectType):
-    _name = 'FCMToken'
-    _type = 'types'
+    _name = "FCMToken"
+    _type = "types"
 
     id = graphene.Int(required=True)
     token = graphene.String()
@@ -16,8 +16,8 @@ class FCMToken(OdooObjectType):
 
 
 class FCMTokenInput(graphene.InputObjectType):
-    _name = 'FCMTokenInput'
-    _type = 'types'
+    _name = "FCMTokenInput"
+    _type = "types"
 
     id = graphene.Int()
     token = graphene.String(required=True)

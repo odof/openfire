@@ -38,7 +38,7 @@ from ..graphql.survey_user_input_type import SurveyUserInput, SurveyUserInputFil
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_survey_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

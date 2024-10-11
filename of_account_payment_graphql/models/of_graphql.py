@@ -12,7 +12,7 @@ from ..graphql.of_payment_mode_type import PaymentMode, PaymentModeInput
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_account_payment_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

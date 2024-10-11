@@ -4,17 +4,17 @@ from odoo import fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    _inherit = 'res.config.settings'
+    _inherit = "res.config.settings"
 
     geocoding_on_write = fields.Selection(
         selection=[
             (
-                'no',
+                "no",
                 "Do not recalculate geocoding values automatically "
                 "(GPS coordinates are reset to zero if not entered at the same time.)",
             ),
             (
-                'yes',
+                "yes",
                 "Recalculate geocoding values (Geocoding is attempted if GPS coordinates \
                     are not entered at the same time.)",
             ),
@@ -26,8 +26,8 @@ class ResConfigSettings(models.TransientModel):
 
     geocoding_on_create = fields.Selection(
         selection=[
-            ('no', "Do not calculate geocoding values " "(recommended when a large number of partners are imported)"),
-            ('yes', "Calculate geocoding values automatically"),
+            ("no", "Do not calculate geocoding values " "(recommended when a large number of partners are imported)"),
+            ("yes", "Calculate geocoding values automatically"),
         ],
         config_parameter="of.geolocalize.geocoding_on_create",
         string="If a partner is added",

@@ -10,7 +10,7 @@ from .planning_intervention_line import PlanningInterventionLine
 
 
 class PlanningInterventionLineCreate(graphene.Mutation):
-    _name = 'PlanningInterventionLineCreate'
+    _name = "PlanningInterventionLineCreate"
 
     class Arguments:
         price_unit = graphene.NonNull(graphene.Float)
@@ -27,13 +27,13 @@ class PlanningInterventionLineCreate(graphene.Mutation):
         info,
         **args,
     ):
-        env = info.context['env']
-        values = env['of.planning.intervention.line']._prepare_mutation_values(**args)
-        return env['of.planning.intervention.line'].create(values)
+        env = info.context["env"]
+        values = env["of.planning.intervention.line"]._prepare_mutation_values(**args)
+        return env["of.planning.intervention.line"].create(values)
 
 
 class PlanningInterventionLineUpdate(graphene.Mutation):
-    _name = 'PlanningInterventionLineUpdate'
+    _name = "PlanningInterventionLineUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -47,15 +47,15 @@ class PlanningInterventionLineUpdate(graphene.Mutation):
     Output = PlanningInterventionLine
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.planning.intervention.line']._prepare_mutation_values(**args)
-        intervention = env['of.planning.intervention.line'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.planning.intervention.line"]._prepare_mutation_values(**args)
+        intervention = env["of.planning.intervention.line"].search([("id", "=", id)])
         intervention.write(values)
         return intervention
 
 
 class PlanningInterventionLineDelete(graphene.Mutation):
-    _name = 'PlanningInterventionLineDelete'
+    _name = "PlanningInterventionLineDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -63,14 +63,14 @@ class PlanningInterventionLineDelete(graphene.Mutation):
     Output = PlanningInterventionLine
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'of.plannoing.intervention.line', id)
+        return lazy_delete(env, "of.plannoing.intervention.line", id)
 
 
 class PlanningInterventionLineMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionLineMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionLineMutation"
+    _type = "mutation"
 
     planning_intervention_line_update = PlanningInterventionLineUpdate.Field()
     planning_intervention_line_create = PlanningInterventionLineCreate.Field()

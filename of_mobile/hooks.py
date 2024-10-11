@@ -4,7 +4,7 @@ from odoo import SUPERUSER_ID, api
 
 
 def _set_default_of_mobile_auto_publish_service(env):
-    settings = env['res.config.settings'].create({'of_mobile_auto_publish_service': True})
+    settings = env["res.config.settings"].create({"of_mobile_auto_publish_service": True})
     settings.execute()
 
 

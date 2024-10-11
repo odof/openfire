@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFSaleFollowupTag(models.Model):
-    _name = 'of.sale.followup.tag'
+    _name = "of.sale.followup.tag"
     _description = "Order tracking label"
 
     sequence = fields.Integer(required=True, default=1)
@@ -12,5 +12,5 @@ class OFSaleFollowupTag(models.Model):
     color = fields.Integer()
 
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'This tag name already exists'),
+        ("name_uniq", "unique (name)", "This tag name already exists"),
     ]

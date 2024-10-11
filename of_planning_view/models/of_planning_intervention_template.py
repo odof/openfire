@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class OFPlanningInterventionTemplate(models.Model):
-    _inherit = 'of.planning.intervention.template'
+    _inherit = "of.planning.intervention.template"
 
     planning_color = fields.Integer(
         string="Planning color",

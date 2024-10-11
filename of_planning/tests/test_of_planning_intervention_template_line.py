@@ -34,4 +34,4 @@ class TestPlanningInterventionTemplateLine(TestOFPlanningCommon):
 
         self.assertEqual(self.template_line.qty, 1)
         self.assertEqual(self.template_line.price_unit, 0.0)
-        self.assertEqual(self.template_line.name, '')
+        self.assertEqual(self.template_line.name, "")

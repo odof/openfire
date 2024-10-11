@@ -24,58 +24,58 @@ from .planning_intervention_template_type import PlanningInterventionTemplate, P
 
 
 class PlanningIntervention(OdooObjectType):
-    _name = 'PlanningIntervention'
-    _type = 'types'
+    _name = "PlanningIntervention"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String(required=True)
     duration = graphene.Float(required=True)
     start = graphene.DateTime(required=True)
     stop = graphene.DateTime(required=True)
-    of_total_duration = graphene.Float(name='totalDuration')
-    of_break_duration = graphene.Float(name='breakDuration')
-    of_travel_duration = graphene.Float(name='travelDuration')
-    of_real_duration = graphene.Float(name='realDuration')
-    of_real_start = graphene.DateTime(name='realStart')
-    of_real_stop = graphene.DateTime(name='realStop')
+    of_total_duration = graphene.Float(name="totalDuration")
+    of_break_duration = graphene.Float(name="breakDuration")
+    of_travel_duration = graphene.Float(name="travelDuration")
+    of_real_duration = graphene.Float(name="realDuration")
+    of_real_start = graphene.DateTime(name="realStart")
+    of_real_stop = graphene.DateTime(name="realStop")
 
     of_employee_ids = graphene.List(
         graphene.NonNull(Employee),
         required=True,
         description="Liste des intervenants sur l'intervention",
-        name='employees',
+        name="employees",
     )
-    of_is_closed = graphene.NonNull(graphene.Boolean, name='isClosed')
+    of_is_closed = graphene.NonNull(graphene.Boolean, name="isClosed")
     company = graphene.Field(Company, required=True)
-    of_state = graphene.String(required=True, name='state')
-    of_picking_ids = graphene.List(graphene.NonNull(Picking), name='pickings')
-    of_picking_manual_ids = graphene.List(graphene.NonNull(Picking), name='manualPickings')
+    of_state = graphene.String(required=True, name="state")
+    of_picking_ids = graphene.List(graphene.NonNull(Picking), name="pickings")
+    of_picking_manual_ids = graphene.List(graphene.NonNull(Picking), name="manualPickings")
     order = graphene.List(graphene.NonNull(SaleOrder))
     task = graphene.Field(PlanningInterventionTask, required=True)
     partner = graphene.Field(Partner, description="Client de l'intervention")
     address = graphene.Field(Partner, description="Adresse de l'intervention")
     attachments = graphene.List(graphene.NonNull(Attachment))
     template = graphene.Field(PlanningInterventionTemplate)
-    of_internal_description = graphene.String(name='internalDescription')
-    of_minutes = graphene.String(description="Compte rendu de l'intervention", name='minutes')
+    of_internal_description = graphene.String(name="internalDescription")
+    of_minutes = graphene.String(description="Compte rendu de l'intervention", name="minutes")
     description = graphene.String()
-    of_customer_signature = OdooImage(name='customerSignature')
-    of_operator_signature = OdooImage(name='operatorSignature')
-    of_tag_ids = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTag)), name='tags')
-    of_line_ids = graphene.List(graphene.NonNull(PlanningInterventionLine), name='invoiceLines')
+    of_customer_signature = OdooImage(name="customerSignature")
+    of_operator_signature = OdooImage(name="operatorSignature")
+    of_tag_ids = graphene.NonNull(graphene.List(graphene.NonNull(PlanningInterventionTag)), name="tags")
+    of_line_ids = graphene.List(graphene.NonNull(PlanningInterventionLine), name="invoiceLines")
     fiscal_position = graphene.Field(AccountFiscalPosition)
     images = graphene.NonNull(graphene.List(graphene.NonNull(Image)))
-    description = graphene.String(name='externalDescription')
-    of_internal_description = graphene.String(name='internalDescription')
+    description = graphene.String(name="externalDescription")
+    of_internal_description = graphene.String(name="internalDescription")
 
     @staticmethod
     def resolve_attachments(root, info):
-        env = info.context['env']
-        attachments = env['ir.attachment'].search(
+        env = info.context["env"]
+        attachments = env["ir.attachment"].search(
             [
-                ('res_model', '=', 'calendar.event'),
-                ('res_id', '=', root.id),
-                ('mimetype', 'in', ['image/jpeg', 'image/png', 'application/pdf']),
+                ("res_model", "=", "calendar.event"),
+                ("res_id", "=", root.id),
+                ("mimetype", "in", ["image/jpeg", "image/png", "application/pdf"]),
             ]
         )
         return attachments or []
@@ -114,8 +114,8 @@ class PlanningIntervention(OdooObjectType):
 
 
 class PlanningInterventionInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionInput'
-    _type = 'types'
+    _name = "PlanningInterventionInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -157,4 +157,4 @@ class PlanningInterventionInput(graphene.InputObjectType):
 
 
 class PlanningInterventionFilterInput(PlanningInterventionInput):
-    _name = 'PlanningInterventionFilterInput'
+    _name = "PlanningInterventionFilterInput"

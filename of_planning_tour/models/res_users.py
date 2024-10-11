@@ -4,7 +4,7 @@ from odoo import Command, api, models
 
 
 class ResUsers(models.Model):
-    _inherit = 'res.users'
+    _inherit = "res.users"
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -14,12 +14,12 @@ class ResUsers(models.Model):
 
     def write(self, vals):
         vals = self._remove_reified_groups(vals)
-        if 'groups_id' in vals and not self.env.context.get('of_avoid_check_tours_groups'):
+        if "groups_id" in vals and not self.env.context.get("of_avoid_check_tours_groups"):
             users_saved_groups = {user: user.groups_id for user in self}
 
         result = super().write(vals)
 
-        if 'groups_id' in vals and not self.env.context.get('of_avoid_check_tours_groups'):
+        if "groups_id" in vals and not self.env.context.get("of_avoid_check_tours_groups"):
             self._handle_tour_groups_post_update(vals, users_saved_groups)
         return result
 
@@ -34,9 +34,9 @@ class ResUsers(models.Model):
         Returns:
             None
         """
-        manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_manual_creation')
-        no_manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_no_manual_creation')
-        groups_values = vals.get('groups_id', [])
+        manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
+        no_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
+        groups_values = vals.get("groups_id", [])
         for gval in groups_values:
             for user in self.with_context(of_avoid_check_tours_groups=True):
                 saved_user_groups = user_saved_groups[user]
@@ -62,8 +62,8 @@ class ResUsers(models.Model):
         If he is in both groups, remove him from the default one (no manual creation).
         If he is not in any group, add him to the default one (no manual creation).
         """
-        group_tour_manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_manual_creation')
-        group_tour_no_manual_creation = self.env.ref('of_planning_tour.group_of_planning_tour_no_manual_creation')
+        group_tour_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
+        group_tour_no_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
 
         for user in self.with_context(of_avoid_check_tours_groups=True):
             if group_tour_manual_creation in user.groups_id and group_tour_no_manual_creation in user.groups_id:

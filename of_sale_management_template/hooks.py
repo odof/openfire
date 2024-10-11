@@ -6,9 +6,9 @@ from odoo import SUPERUSER_ID, api
 def _post_init_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
 
-    env['res.config.settings'].create(
+    env["res.config.settings"].create(
         {
-            'group_sale_order_template': True,
+            "group_sale_order_template": True,
         }
     ).execute()
 
@@ -16,8 +16,8 @@ def _post_init_hook(cr, registry):
 def _uninstall_hook(cr, registry):
     env = api.Environment(cr, SUPERUSER_ID, {})
 
-    env['res.config.settings'].create(
+    env["res.config.settings"].create(
         {
-            'group_sale_order_template': False,
+            "group_sale_order_template": False,
         }
     ).execute()

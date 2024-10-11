@@ -8,8 +8,8 @@ from .planning_intervention_tag_type import PlanningInterventionTag, PlanningInt
 
 
 class PlanningInterventionTagQuery(graphene.ObjectType):
-    _name = 'PlanningInterventionTagQuery'
-    _type = 'query'
+    _name = "PlanningInterventionTagQuery"
+    _type = "query"
 
     planning_intervention_tags = graphene.List(
         graphene.NonNull(PlanningInterventionTag),
@@ -21,7 +21,7 @@ class PlanningInterventionTagQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_planning_intervention_tags(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.planning.tag']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.planning.tag"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.planning.tag'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.planning.tag"].search(odoo_domain, offset=offset, limit=limit)

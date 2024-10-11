@@ -10,7 +10,7 @@ from .planning_intervention_template_type import PlanningInterventionTemplate
 
 
 class PlanningInterventionTemplateCreate(graphene.Mutation):
-    _name = 'PlanningInterventionTemplateCreate'
+    _name = "PlanningInterventionTemplateCreate"
 
     class Arguments:
         name = graphene.String()
@@ -21,13 +21,13 @@ class PlanningInterventionTemplateCreate(graphene.Mutation):
     Output = PlanningInterventionTemplate
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.planning.intervention.template']._prepare_mutation_values(**args)
-        return env['of.planning.intervention.template'].create(values)
+        env = info.context["env"]
+        values = env["of.planning.intervention.template"]._prepare_mutation_values(**args)
+        return env["of.planning.intervention.template"].create(values)
 
 
 class PlanningInterventionTemplateUpdate(graphene.Mutation):
-    _name = 'PlanningInterventionTemplateUpdate'
+    _name = "PlanningInterventionTemplateUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -39,15 +39,15 @@ class PlanningInterventionTemplateUpdate(graphene.Mutation):
     Output = PlanningInterventionTemplate
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.planning.intervention.template']._prepare_mutation_values(**args)
-        template = env['of.planning.intervention.template'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.planning.intervention.template"]._prepare_mutation_values(**args)
+        template = env["of.planning.intervention.template"].search([("id", "=", id)])
         template.write(values)
         return template
 
 
 class PlanningInterventionTemplateDelete(graphene.Mutation):
-    _name = 'PlanningInterventionTemplateDelete'
+    _name = "PlanningInterventionTemplateDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -55,14 +55,14 @@ class PlanningInterventionTemplateDelete(graphene.Mutation):
     Output = PlanningInterventionTemplate
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'of.planning.intervention.template', id)
+        return lazy_delete(env, "of.planning.intervention.template", id)
 
 
 class PlanningInterventionTemplateMutation(graphene.ObjectType):
-    _name = 'PlanningInterventionTemplateMutation'
-    _type = 'mutation'
+    _name = "PlanningInterventionTemplateMutation"
+    _type = "mutation"
 
     planning_intervention_template_create = PlanningInterventionTemplateCreate.Field()
     planning_intervention_template_update = PlanningInterventionTemplateUpdate.Field()

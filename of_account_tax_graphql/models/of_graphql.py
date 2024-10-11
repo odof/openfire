@@ -8,7 +8,7 @@ from ..graphql.account_fiscal_position_type import AccountFiscalPosition
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_account_tax_graphql_register(self, dbname):
         # ici on charge le graphql de ce module

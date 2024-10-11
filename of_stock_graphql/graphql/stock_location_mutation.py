@@ -9,7 +9,7 @@ from .stock_warehouse_type import StockWarehouseInput
 
 
 class StockLocationCreate(graphene.Mutation):
-    _name = 'StockLocationCreate'
+    _name = "StockLocationCreate"
 
     class Arguments:
         name = graphene.String()
@@ -18,13 +18,13 @@ class StockLocationCreate(graphene.Mutation):
     Output = StockLocation
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['stock.location']._prepare_mutation_values(**args)
-        return env['stock.location'].create(values)
+        env = info.context["env"]
+        values = env["stock.location"]._prepare_mutation_values(**args)
+        return env["stock.location"].create(values)
 
 
 class StockLocationUpdate(graphene.Mutation):
-    _name = 'StockLocationUpdate'
+    _name = "StockLocationUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -34,15 +34,15 @@ class StockLocationUpdate(graphene.Mutation):
     Output = StockLocation
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['stock.location']._prepare_mutation_values(**args)
-        location = env['stock.location'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["stock.location"]._prepare_mutation_values(**args)
+        location = env["stock.location"].search([("id", "=", id)])
         location.write(values)
         return location
 
 
 class StockLocationDelete(graphene.Mutation):
-    _name = 'StockLocationDelete'
+    _name = "StockLocationDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -50,13 +50,13 @@ class StockLocationDelete(graphene.Mutation):
     Output = StockLocation
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'stock.location', id)
+        env = info.context["env"]
+        return lazy_delete(env, "stock.location", id)
 
 
 class StockLocationMutation(graphene.ObjectType):
-    _name = 'StockLocationMutation'
-    _type = 'mutation'
+    _name = "StockLocationMutation"
+    _type = "mutation"
 
     stock_location_create = StockLocationCreate.Field()
     stock_location_update = StockLocationUpdate.Field()

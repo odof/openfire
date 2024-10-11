@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def lazy_delete(env, model, id):
-    if record := env[model].search([('id', '=', id)]):
+    if record := env[model].search([("id", "=", id)]):
         record.unlink()
         return record
 
@@ -36,7 +36,7 @@ def many2one(self, model, input, context=None, user=None):
 
     obj_values = obj._prepare_mutation_values(**input)
     if input.id:
-        if not (record := obj.search([('id', '=', input.id)])):
+        if not (record := obj.search([("id", "=", input.id)])):
             raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
         if len(obj_values.keys()) > 0:
             record.write(obj_values)
@@ -79,9 +79,9 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
             record_value = default.copy()
             record_value.update(value)
             if record.id:
-                if not obj.search([('id', '=', record.id)]):
+                if not obj.search([("id", "=", record.id)]):
                     raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
-                record = obj.search([('id', '=', record.id)])
+                record = obj.search([("id", "=", record.id)])
                 if len(record_value.keys()) > 0:
                     record.write(record_value)
                 res_ids.append(record.id)
@@ -127,7 +127,7 @@ class OdooGraphql:
 
     @classmethod
     def clear_pool(cls, dbname):
-        cls.pool[dbname] = {'query': [], 'mutation': [], 'types': {}, 'subscription': [], 'schema': False}
+        cls.pool[dbname] = {"query": [], "mutation": [], "types": {}, "subscription": [], "schema": False}
 
     @classmethod
     def get_pool(cls, dbname):
@@ -137,43 +137,43 @@ class OdooGraphql:
     def add(cls, dbname, objs):
         if dbname not in cls.pool:
             cls.pool[dbname] = {
-                'query': [],
-                'mutation': [],
-                'types': {},
-                'subscription': [],
-                'schema': False,
+                "query": [],
+                "mutation": [],
+                "types": {},
+                "subscription": [],
+                "schema": False,
             }
 
         if not isinstance(objs, list):
             objs = [objs]
 
         for obj in objs:
-            if obj._type == 'types':
+            if obj._type == "types":
                 if obj._name:
-                    if obj._name in cls.pool[dbname]['types']:
-                        cls.pool[dbname]['types'][obj._name].append(obj)
+                    if obj._name in cls.pool[dbname]["types"]:
+                        cls.pool[dbname]["types"][obj._name].append(obj)
                     else:
-                        cls.pool[dbname]['types'][obj._name] = [obj]
+                        cls.pool[dbname]["types"][obj._name] = [obj]
             else:
                 OdooGraphql.pool[dbname][obj._type].append(obj)
 
     @classmethod
     def schema(cls, dbname):
         class_query = False
-        if cls.pool[dbname]['schema']:
-            return cls.pool[dbname]['schema']
+        if cls.pool[dbname]["schema"]:
+            return cls.pool[dbname]["schema"]
 
-        if len(cls.pool[dbname]['query']) > 0:
-            class_query = type('Query', tuple(cls.pool[dbname]['query']), {})
+        if len(cls.pool[dbname]["query"]) > 0:
+            class_query = type("Query", tuple(cls.pool[dbname]["query"]), {})
 
-        if len(cls.pool[dbname]['mutation']) > 0:
-            class_mutation = type('Mutation', tuple(cls.pool[dbname]['mutation']), {})
+        if len(cls.pool[dbname]["mutation"]) > 0:
+            class_mutation = type("Mutation", tuple(cls.pool[dbname]["mutation"]), {})
 
         types = []
 
-        if len(cls.pool[dbname]['types']) > 0:
-            for t in cls.pool[dbname]['types']:
-                class_type = type(t, tuple(cls.pool[dbname]['types'][t]), {})
+        if len(cls.pool[dbname]["types"]) > 0:
+            for t in cls.pool[dbname]["types"]:
+                class_type = type(t, tuple(cls.pool[dbname]["types"][t]), {})
                 types.append(class_type)
 
         if not types:
@@ -182,21 +182,21 @@ class OdooGraphql:
             schema = graphene.Schema(query=class_query, mutation=class_mutation, types=types)
         else:
             schema = graphene.Schema(mutation=class_mutation, types=types)
-        cls.pool[dbname]['schema'] = schema
+        cls.pool[dbname]["schema"] = schema
         return schema
 
     @classmethod
     def debug(cls, dbname):
         pool = cls.get_pool(dbname)
-        for mutation in pool['mutation']:
+        for mutation in pool["mutation"]:
             logger.info(f"mutation : {mutation._meta.class_type._name}")
             fields = mutation._meta.fields
             for field in fields.values():
                 logger.info(f"--> {field._type._name}")
                 for arg in field.args.values():
-                    if hasattr(arg._type, '_meta'):
+                    if hasattr(arg._type, "_meta"):
                         logger.info(f"---->{arg._type._meta.name}")
-                    elif hasattr(arg._type._of_type, '_meta'):
+                    elif hasattr(arg._type._of_type, "_meta"):
                         logger.info(f"---->{arg._type._of_type._meta}")
                     else:
                         logger.info(f"---->{arg._type.__dict__}")

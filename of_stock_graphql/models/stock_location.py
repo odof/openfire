@@ -7,17 +7,17 @@ from odoo.addons.of_graphql.graphql.odoo_type import graphqlOdooDomain
 
 
 class StockLocation(models.Model):
-    _inherit = 'stock.location'
+    _inherit = "stock.location"
 
     @api.model
     def _prepare_mutation_values(self, **args):
         mutation = {}
 
-        if name := args.get('name'):
-            mutation['name'] = name
+        if name := args.get("name"):
+            mutation["name"] = name
 
-        if warehouse := args.get('warehouse'):
-            mutation['warehouse_id'] = many2one(self=self, model='stock.warehouse', input=warehouse)
+        if warehouse := args.get("warehouse"):
+            mutation["warehouse_id"] = many2one(self=self, model="stock.warehouse", input=warehouse)
 
         return mutation
 
@@ -26,12 +26,12 @@ class StockLocation(models.Model):
         odoo_domain = []
 
         if domain:
-            odoo_domain = graphqlOdooDomain(self=self, model='stock.location', domain=domain)
+            odoo_domain = graphqlOdooDomain(self=self, model="stock.location", domain=domain)
 
         if select:
             if select.id:
-                odoo_domain += [('id', '=', select.id)]
+                odoo_domain += [("id", "=", select.id)]
             if select.name:
-                odoo_domain += [('name', 'like', select.name)]
+                odoo_domain += [("name", "like", select.name)]
 
         return odoo_domain

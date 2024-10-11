@@ -10,7 +10,7 @@ from .stock_move_type import StockMove
 
 
 class StockMoveCreate(graphene.Mutation):
-    _name = 'StockMoveCreate'
+    _name = "StockMoveCreate"
 
     class Arguments:
         name = graphene.String()
@@ -20,13 +20,13 @@ class StockMoveCreate(graphene.Mutation):
     Output = StockMove
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['stock.move']._prepare_mutation_values(**args)
-        return env['stock.move'].create(values)
+        env = info.context["env"]
+        values = env["stock.move"]._prepare_mutation_values(**args)
+        return env["stock.move"].create(values)
 
 
 class StockMoveUpdate(graphene.Mutation):
-    _name = 'StockMoveUpdate'
+    _name = "StockMoveUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -37,15 +37,15 @@ class StockMoveUpdate(graphene.Mutation):
     Output = StockMove
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['stock.move']._prepare_mutation_values(**args)
-        move = env['stock.move'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["stock.move"]._prepare_mutation_values(**args)
+        move = env["stock.move"].search([("id", "=", id)])
         move.write(values)
         return move
 
 
 class StockMoveDelete(graphene.Mutation):
-    _name = 'StockMoveDelete'
+    _name = "StockMoveDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -53,14 +53,14 @@ class StockMoveDelete(graphene.Mutation):
     Output = StockMove
 
     def mutate(self, info, id):
-        env = info.context['env']
+        env = info.context["env"]
 
-        return lazy_delete(env, 'stock.move', id)
+        return lazy_delete(env, "stock.move", id)
 
 
 class StockMoveMutation(graphene.ObjectType):
-    _name = 'StockMoveMutation'
-    _type = 'mutation'
+    _name = "StockMoveMutation"
+    _type = "mutation"
 
     stock_move_create = StockMoveCreate.Field()
     stock_move_update = StockMoveUpdate.Field()

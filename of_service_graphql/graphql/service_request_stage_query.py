@@ -8,8 +8,8 @@ from .service_request_stage_type import ServiceRequestStage, ServiceRequestStage
 
 
 class ServiceRequestStageQuery(graphene.ObjectType):
-    _name = 'ServiceRequestStageQuery'
-    _type = 'query'
+    _name = "ServiceRequestStageQuery"
+    _type = "query"
 
     service_request_stages = graphene.List(
         graphene.NonNull(ServiceRequestStage),
@@ -21,7 +21,7 @@ class ServiceRequestStageQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_service_request_stages(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
-        odoo_domain = env['of.service.request.stage']._prepare_graphql_domain(select=select, domain=domain)
+        env = info.context["env"]
+        odoo_domain = env["of.service.request.stage"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['of.service.request.stage'].search(odoo_domain, offset=offset, limit=limit)
+        return env["of.service.request.stage"].search(odoo_domain, offset=offset, limit=limit)

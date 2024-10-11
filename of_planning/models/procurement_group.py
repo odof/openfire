@@ -4,6 +4,6 @@ from odoo import fields, models
 
 
 class ProcurementGroup(models.Model):
-    _inherit = 'procurement.group'
+    _inherit = "procurement.group"
 
-    of_intervention_id = fields.Many2one(comodel_name='calendar.event', string="Intervention", readonly=True)
+    of_intervention_id = fields.Many2one(comodel_name="calendar.event", string="Intervention", readonly=True)

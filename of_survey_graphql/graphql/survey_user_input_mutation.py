@@ -9,7 +9,7 @@ from . import survey_question_page_type, survey_user_input_line_type, survey_use
 
 
 class SurveyUserInputCreate(graphene.Mutation):
-    _name = 'SurveyUserInputCreate'
+    _name = "SurveyUserInputCreate"
 
     class Arguments:
         state = graphene.String()
@@ -22,13 +22,13 @@ class SurveyUserInputCreate(graphene.Mutation):
     Output = survey_user_input_type.SurveyUserInput
 
     def mutate(self, info, **args):
-        env = info.context['env']
-        values = env['of.survey.user_input']._prepare_mutation_values(**args)
-        return env['of.survey.user_input'].create(values)
+        env = info.context["env"]
+        values = env["of.survey.user_input"]._prepare_mutation_values(**args)
+        return env["of.survey.user_input"].create(values)
 
 
 class SurveyUserInputUpdate(graphene.Mutation):
-    _name = 'SurveyUserInputUpdate'
+    _name = "SurveyUserInputUpdate"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -42,15 +42,15 @@ class SurveyUserInputUpdate(graphene.Mutation):
     Output = survey_user_input_type.SurveyUserInput
 
     def mutate(self, info, id, **args):
-        env = info.context['env']
-        values = env['of.survey.user_input']._prepare_mutation_values(**args)
-        user_input = env['of.survey.user_input'].search([('id', '=', id)])
+        env = info.context["env"]
+        values = env["of.survey.user_input"]._prepare_mutation_values(**args)
+        user_input = env["of.survey.user_input"].search([("id", "=", id)])
         user_input.write(values)
         return user_input
 
 
 class SurveyUserInputDelete(graphene.Mutation):
-    _name = 'SurveyUserInputDelete'
+    _name = "SurveyUserInputDelete"
 
     class Arguments:
         id = graphene.Int(required=True)
@@ -58,13 +58,13 @@ class SurveyUserInputDelete(graphene.Mutation):
     Output = survey_user_input_type.SurveyUserInput
 
     def mutate(self, info, id):
-        env = info.context['env']
-        return lazy_delete(env, 'of.survey.user_input', id)
+        env = info.context["env"]
+        return lazy_delete(env, "of.survey.user_input", id)
 
 
 class SurveyUserInputMutation(graphene.ObjectType):
-    _name = 'SurveyUserInputMutation'
-    _type = 'mutation'
+    _name = "SurveyUserInputMutation"
+    _type = "mutation"
 
     survey_user_input_create = SurveyUserInputCreate.Field()
     survey_user_input_update = SurveyUserInputUpdate.Field()

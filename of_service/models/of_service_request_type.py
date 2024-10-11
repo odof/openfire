@@ -4,9 +4,9 @@ from odoo import fields, models
 
 
 class OFServiceRequestType(models.Model):
-    _name = 'of.service.request.type'
+    _name = "of.service.request.type"
     _description = "Service Type"
-    _order = 'name'
+    _order = "name"
 
     name = fields.Char(required=True, translate=True)
-    stage_ids = fields.Many2many(comodel_name='of.service.request.stage', string="Authorized Stages")
+    stage_ids = fields.Many2many(comodel_name="of.service.request.stage", string="Authorized Stages")

@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
     of_section_name = fields.Char(string="Section name")
     of_node_id = fields.Integer(string="Node ID")

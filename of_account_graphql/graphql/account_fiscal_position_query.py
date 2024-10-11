@@ -8,8 +8,8 @@ from .account_fiscal_position_type import AccountFiscalPosition, AccountFiscalPo
 
 
 class AccountFiscalPositionQuery(graphene.ObjectType):
-    _name = 'AccountFiscalPositionQuery'
-    _type = 'query'
+    _name = "AccountFiscalPositionQuery"
+    _type = "query"
 
     fiscal_positions = graphene.List(
         graphene.NonNull(AccountFiscalPosition),
@@ -21,8 +21,8 @@ class AccountFiscalPositionQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_fiscal_positions(root, info, select=None, domain=None, offset=0, limit=10):
-        env = info.context['env']
+        env = info.context["env"]
 
-        odoo_domain = env['account.fiscal.position']._prepare_graphql_domain(select=select, domain=domain)
+        odoo_domain = env["account.fiscal.position"]._prepare_graphql_domain(select=select, domain=domain)
 
-        return env['account.fiscal.position'].search(odoo_domain, offset=offset, limit=limit)
+        return env["account.fiscal.position"].search(odoo_domain, offset=offset, limit=limit)

@@ -9,10 +9,10 @@ class TestResGroups(TestOFPlanningTourCommon):
     def test_01_check_tours_groups(self):
         """Checks that the user cannot be in both groups at the same time."""
 
-        test_user = self.env['res.users'].create(
+        test_user = self.env["res.users"].create(
             {
-                'name': 'Test User',
-                'login': 'test_user',
+                "name": "Test User",
+                "login": "test_user",
             }
         )
         self.assertTrue(self.group_tour_no_manual_creation in test_user.groups_id)

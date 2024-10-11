@@ -19,19 +19,19 @@ _logger = logging.getLogger(__name__)
 
 
 class OFDatabase(Database):
-    @http.route('/web/database/duplicate', type='http', auth="none", methods=['POST'], csrf=False)
+    @http.route("/web/database/duplicate", type="http", auth="none", methods=["POST"], csrf=False)
     def duplicate(self, master_pwd, name, new_name, neutralize_database=False, sanitize=True, drop_existing=False):
-        insecure = odoo.tools.config.verify_admin_password('admin')
+        insecure = odoo.tools.config.verify_admin_password("admin")
         if insecure and master_pwd:
-            dispatch_rpc('db', 'change_admin_password', ["admin", master_pwd])
+            dispatch_rpc("db", "change_admin_password", ["admin", master_pwd])
         try:
             if not re.match(DBNAME_PATTERN, new_name):
                 raise Exception(
                     _("Invalid database name. Only alphanumerical characters, underscore, hyphen and dot are allowed.")
                 )
             dispatch_rpc(
-                'db',
-                'duplicate_database',
+                "db",
+                "duplicate_database",
                 [
                     master_pwd,
                     name,
@@ -43,19 +43,19 @@ class OFDatabase(Database):
             )
             if request.db == name:
                 request.env.cr.close()  # duplicating a database leads to an unusable cursor
-            return request.redirect('/web/database/manager')
+            return request.redirect("/web/database/manager")
         except Exception as e:
             _logger.exception("Database duplication error.")
             error = f"Database duplication error: {str(e) or repr(e)}"
             return self._render_template(error=error)
 
-    @http.route('/web/database/restore', type='http', auth="none", methods=['POST'], csrf=False)
+    @http.route("/web/database/restore", type="http", auth="none", methods=["POST"], csrf=False)
     def restore(
         self, master_pwd, backup_file, name, copy=False, neutralize_database=False, sanitize=True, drop_existing=False
     ):
-        insecure = odoo.tools.config.verify_admin_password('admin')
+        insecure = odoo.tools.config.verify_admin_password("admin")
         if insecure and master_pwd:
-            dispatch_rpc('db', 'change_admin_password', ["admin", master_pwd])
+            dispatch_rpc("db", "change_admin_password", ["admin", master_pwd])
         try:
             data_file = None
             db.check_super(master_pwd)
@@ -69,7 +69,7 @@ class OFDatabase(Database):
                 str2bool(sanitize),
                 str2bool(drop_existing),
             )
-            return request.redirect('/web/database/manager')
+            return request.redirect("/web/database/manager")
         except Exception as e:
             error = f"Database restore error: {str(e) or repr(e)}"
             return self._render_template(error=error)

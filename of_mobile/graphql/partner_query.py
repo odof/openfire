@@ -11,8 +11,8 @@ from .partner_type import PartnerCheckDuplications
 
 
 class PartnerQuery(graphene.ObjectType):
-    _name = 'PartnerQuery'
-    _type = 'query'
+    _name = "PartnerQuery"
+    _type = "query"
 
     search_partners = graphene.List(
         graphene.NonNull(Partner),
@@ -45,20 +45,20 @@ class PartnerQuery(graphene.ObjectType):
 
     @staticmethod
     def resolve_search_partners(root, info, query, filter_on_companies=False):
-        env = info.context['env']
+        env = info.context["env"]
         domain = [
-            '|',
-            '|',
-            '|',
-            ['name', 'ilike', query],
-            ['ref', '=', query],
-            ['email', 'ilike', query],
-            ['of_phone_number_ids.number', 'ilike', query],
+            "|",
+            "|",
+            "|",
+            ["name", "ilike", query],
+            ["ref", "=", query],
+            ["email", "ilike", query],
+            ["of_phone_number_ids.number", "ilike", query],
         ]
         if filter_on_companies:
-            domain = expression.AND([domain, [('is_company', '=', True)]])
+            domain = expression.AND([domain, [("is_company", "=", True)]])
 
-        return env['res.partner'].search(domain, limit=10) or []
+        return env["res.partner"].search(domain, limit=10) or []
 
     @staticmethod
     def resolve_refresh_partners(root, info, retrieve_ids=None, updated_since_ids=None, updated_since=None):
@@ -66,36 +66,36 @@ class PartnerQuery(graphene.ObjectType):
             retrieve_ids = []
         if updated_since_ids is None:
             updated_since_ids = []
-        env = info.context['env']
+        env = info.context["env"]
         domain = []
 
         if updated_since and updated_since_ids:
-            domain = expression.AND([domain, [('write_date', '>', updated_since)]])
-            domain = expression.AND([domain, [('id', 'in', updated_since_ids)]])
+            domain = expression.AND([domain, [("write_date", ">", updated_since)]])
+            domain = expression.AND([domain, [("id", "in", updated_since_ids)]])
 
         if retrieve_ids:
-            domain = expression.OR([domain, [('id', 'in', retrieve_ids)]])
+            domain = expression.OR([domain, [("id", "in", retrieve_ids)]])
 
-        return env['res.partner'].sudo().search(domain) if domain else []
+        return env["res.partner"].sudo().search(domain) if domain else []
 
     @staticmethod
     def resolve_partner_check_duplications(root, info, query):
-        env = info.context['env']
-        if query.email and env['res.partner'].sudo().search([('email', '=', query.email)]):
+        env = info.context["env"]
+        if query.email and env["res.partner"].sudo().search([("email", "=", query.email)]):
             return True
 
         if query.phone_numbers:
             user = env.user
             default_country = user.country_id or user.company_id.country_id
-            default_country_code = default_country and default_country.code or 'FR'
+            default_country_code = default_country and default_country.code or "FR"
 
             phone_numbers_normalized = [convert_phone_number(n, default_country_code) for n in query.phone_numbers]
 
             if (
-                env['of.res.partner.phone']
+                env["of.res.partner.phone"]
                 .sudo()
-                .search([('number', 'in', phone_numbers_normalized)])
-                .mapped('partner_id')
+                .search([("number", "in", phone_numbers_normalized)])
+                .mapped("partner_id")
             ):
                 return True
         return False

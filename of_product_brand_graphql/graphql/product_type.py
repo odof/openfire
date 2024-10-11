@@ -8,8 +8,8 @@ from .product_brand_type import ProductBrand
 
 
 class Product(OdooObjectType):
-    _name = 'Product'
-    _type = 'types'
+    _name = "Product"
+    _type = "types"
 
     brand = graphene.Field(ProductBrand)
 

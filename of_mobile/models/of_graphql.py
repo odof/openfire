@@ -50,7 +50,7 @@ from ..graphql.user_type import User, UserInput
 
 
 class OFGraphql(models.AbstractModel):
-    _inherit = 'of.graphql'
+    _inherit = "of.graphql"
 
     def _of_mobile_register(self, dbname):
         # ici on charge le graphql de ce module
@@ -106,17 +106,17 @@ class OFGraphql(models.AbstractModel):
         arguments = super()._prepare_arguments()
 
         new_arguments = {
-            'UserMutation': {
-                'user_update': {
-                    'fcm_tokens': FCMTokenInput,
+            "UserMutation": {
+                "user_update": {
+                    "fcm_tokens": FCMTokenInput,
                 },
             },
-            'PlanningInterventionMutation': {
-                'planning_intervention_create': {
-                    'additional_sale': SaleOrderInput,
+            "PlanningInterventionMutation": {
+                "planning_intervention_create": {
+                    "additional_sale": SaleOrderInput,
                 },
-                'planning_intervention_update': {
-                    'additional_sale': SaleOrderInput,
+                "planning_intervention_update": {
+                    "additional_sale": SaleOrderInput,
                 },
             },
         }

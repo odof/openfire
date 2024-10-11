@@ -15,46 +15,46 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         super().setUpClass()
 
         # Create accounts
-        cls.account_707022 = cls.env['account.account'].create(
+        cls.account_707022 = cls.env["account.account"].create(
             {
-                'name': 'Test Account 5.5%',
-                'code': '707022',
-                'account_type': 'income',
-                'company_id': cls.company_fr.id,
+                "name": "Test Account 5.5%",
+                "code": "707022",
+                "account_type": "income",
+                "company_id": cls.company_fr.id,
             }
         )
-        cls.account_707027 = cls.env['account.account'].create(
+        cls.account_707027 = cls.env["account.account"].create(
             {
-                'name': 'Test Account 20.0%',
-                'code': '707027',
-                'account_type': 'income',
-                'company_id': cls.company_fr.id,
+                "name": "Test Account 20.0%",
+                "code": "707027",
+                "account_type": "income",
+                "company_id": cls.company_fr.id,
             }
         )
 
         # Create category and product
-        cls.category_id = cls.env['product.category'].create(
+        cls.category_id = cls.env["product.category"].create(
             {
-                'name': 'Test Category 5.5%',
-                'property_account_income_categ_id': cls.account_707022.id,
+                "name": "Test Category 5.5%",
+                "property_account_income_categ_id": cls.account_707022.id,
             }
         )
-        cls.product_test_mapping = cls.env['product.product'].create(
+        cls.product_test_mapping = cls.env["product.product"].create(
             {
-                'name': 'Test Product Mapping',
-                'categ_id': cls.category_id.id,
-                'taxes_id': [Command.set([cls.tax_base.id])],
+                "name": "Test Product Mapping",
+                "categ_id": cls.category_id.id,
+                "taxes_id": [Command.set([cls.tax_base.id])],
             }
         )
 
         # Update taxes with account mapping
         cls.tax_5_5.write(
             {
-                'of_account_ids': [
+                "of_account_ids": [
                     Command.create(
                         {
-                            'account_src_id': cls.account_707027.id,
-                            'account_dest_id': cls.account_707022.id,
+                            "account_src_id": cls.account_707027.id,
+                            "account_dest_id": cls.account_707022.id,
                         }
                     )
                 ]
@@ -63,11 +63,11 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
 
         cls.tax_20.write(
             {
-                'of_account_ids': [
+                "of_account_ids": [
                     Command.create(
                         {
-                            'account_src_id': cls.account_707022.id,
-                            'account_dest_id': cls.account_707027.id,
+                            "account_src_id": cls.account_707022.id,
+                            "account_dest_id": cls.account_707027.id,
                         }
                     )
                 ]
@@ -81,8 +81,8 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         the account mapping defined on the tax.
         """
         with Form(
-            self.env['account.move']
-            .with_context(default_move_type='out_invoice')
+            self.env["account.move"]
+            .with_context(default_move_type="out_invoice")
             .with_context(default_company_id=self.company_fr.id)
         ) as move_form:
             move_form.partner_id = self.customer_a
@@ -98,7 +98,7 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         self.assertRecordValues(
             move.invoice_line_ids,
             [
-                {'tax_ids': [self.tax_20.id], 'account_id': self.account_707027.id},
+                {"tax_ids": [self.tax_20.id], "account_id": self.account_707027.id},
             ],
         )
 
@@ -113,7 +113,7 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         self.assertRecordValues(
             move.invoice_line_ids,
             [
-                {'tax_ids': [self.tax_5_5.id], 'account_id': self.account_707022.id},
+                {"tax_ids": [self.tax_5_5.id], "account_id": self.account_707022.id},
             ],
         )
 
@@ -124,8 +124,8 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         be applied with the new tax.
         """
         with Form(
-            self.env['account.move']
-            .with_context(default_move_type='out_invoice')
+            self.env["account.move"]
+            .with_context(default_move_type="out_invoice")
             .with_context(default_company_id=self.company_fr.id)
         ) as move_form:
             move_form.partner_id = self.customer_a
@@ -141,7 +141,7 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         self.assertRecordValues(
             move.invoice_line_ids,
             [
-                {'tax_ids': [self.tax_20.id], 'account_id': self.account_707027.id},
+                {"tax_ids": [self.tax_20.id], "account_id": self.account_707027.id},
             ],
         )
 
@@ -154,6 +154,6 @@ class TestOFAccountTaxMapping(TestOFAccountCommon):
         self.assertRecordValues(
             move.invoice_line_ids,
             [
-                {'tax_ids': [self.tax_5_5.id], 'account_id': self.account_707022.id},
+                {"tax_ids": [self.tax_5_5.id], "account_id": self.account_707022.id},
             ],
         )

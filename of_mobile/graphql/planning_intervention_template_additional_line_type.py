@@ -7,8 +7,8 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInp
 
 
 class PlanningInterventionTemplateAdditionalLine(OdooObjectType):
-    _name = 'PlanningInterventionTemplateAdditionalLine'
-    _type = 'types'
+    _name = "PlanningInterventionTemplateAdditionalLine"
+    _type = "types"
 
     product = graphene.Field(Product)
     price_unit = graphene.Float()
@@ -19,12 +19,12 @@ class PlanningInterventionTemplateAdditionalLine(OdooObjectType):
 
 
 class PlanningInterventionTemplateAdditionalLineInput(graphene.InputObjectType):
-    _name = 'PlanningInterventionTemplateAdditionalLineInput'
-    _type = 'types'
+    _name = "PlanningInterventionTemplateAdditionalLineInput"
+    _type = "types"
 
     product = graphene.Field(ProductInput)
     price_unit = graphene.Float()
 
 
 class PlanningInterventionTemplateAdditionalLineFilterInput(PlanningInterventionTemplateAdditionalLineInput):
-    _name = 'PlanningInterventionTemplateAdditionalLineFilterInput'
+    _name = "PlanningInterventionTemplateAdditionalLineFilterInput"

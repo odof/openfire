@@ -10,7 +10,7 @@ class TestOFSaleOrderAddQuote(TestOFSaleCommon):
     def setUp(self):
         super().setUp()
 
-        self.order_to_update = self.env['sale.order'].create(self._prepare_sale_order_values())
+        self.order_to_update = self.env["sale.order"].create(self._prepare_sale_order_values())
 
     @classmethod
     def setUpClass(cls):
@@ -30,21 +30,21 @@ class TestOFSaleOrderAddQuote(TestOFSaleCommon):
         self.order_to_update.action_verification_confirm()
 
         # Create a new quote with a different customer
-        new_customer = self.env['res.partner'].create(
+        new_customer = self.env["res.partner"].create(
             {
-                'name': 'New Customer',
+                "name": "New Customer",
             }
         )
         quote_values = self._prepare_sale_order_values()
-        quote_values['partner_id'] = new_customer.id
-        quote_values['partner_invoice_id'] = new_customer.id
-        quote_values['partner_shipping_id'] = new_customer.id
-        self.env['sale.order'].create(quote_values)
+        quote_values["partner_id"] = new_customer.id
+        quote_values["partner_invoice_id"] = new_customer.id
+        quote_values["partner_shipping_id"] = new_customer.id
+        self.env["sale.order"].create(quote_values)
 
         # Try to add the quote to the sale order
         wizard_action = self.order_to_update.action_button_add_quote()
         with self.assertRaises(AssertionError):
-            with Form(self.env[wizard_action['res_model']].browse(wizard_action['res_id'])) as wizard_form:
+            with Form(self.env[wizard_action["res_model"]].browse(wizard_action["res_id"])) as wizard_form:
                 self.assertEqual(
                     len(wizard_form.addable_quote_ids),
                     0,
@@ -60,20 +60,20 @@ class TestOFSaleOrderAddQuote(TestOFSaleCommon):
         # Create a new quote with same customer but a different product
         new_product = self.create_product(
             {
-                'name': 'New Product',
-                'default_code': 'BA_NP',
-                'standard_price': 45,
-                'list_price': 100,
+                "name": "New Product",
+                "default_code": "BA_NP",
+                "standard_price": 45,
+                "list_price": 100,
             }
         )
         quote_values = self._prepare_sale_order_values(dict(product=new_product))
-        quote = self.env['sale.order'].create(quote_values)
+        quote = self.env["sale.order"].create(quote_values)
 
         # Try to add the quote to the sale order
         wizard_action = self.order_to_update.action_button_add_quote()
         with Form(
-            self.env[wizard_action['res_model']].browse(wizard_action['res_id']),
-            view='of_sale.of_sale_order_add_quote_wizard_form_view',
+            self.env[wizard_action["res_model"]].browse(wizard_action["res_id"]),
+            view="of_sale.of_sale_order_add_quote_wizard_form_view",
         ) as wizard_form:
             self.assertEqual(len(wizard_form.addable_quote_ids), 1, "The quote should be addable to the sale order")
 

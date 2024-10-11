@@ -15,8 +15,8 @@ from odoo.addons.of_stock_graphql.graphql.stock_lot_type import StockLot, StockL
 
 
 class Equipment(OdooObjectType):
-    _name = 'Equipment'
-    _type = 'types'
+    _name = "Equipment"
+    _type = "types"
 
     id = graphene.Int(required=True)
     name = graphene.String()
@@ -75,13 +75,13 @@ class Equipment(OdooObjectType):
 
     @staticmethod
     def resolve_interventions(root, info):
-        env = info.context['env']
-        return env['calendar.event'].search([('of_equipment_ids', 'in', root.id)])
+        env = info.context["env"]
+        return env["calendar.event"].search([("of_equipment_ids", "in", root.id)])
 
 
 class EquipmentInput(graphene.InputObjectType):
-    _name = 'EquipmentInput'
-    _type = 'types'
+    _name = "EquipmentInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -107,4 +107,4 @@ class EquipmentInput(graphene.InputObjectType):
 
 
 class EquipmentFilterInput(EquipmentInput):
-    _name = 'EquipmentFilterInput'
+    _name = "EquipmentFilterInput"

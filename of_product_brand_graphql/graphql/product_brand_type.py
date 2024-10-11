@@ -9,23 +9,23 @@ from odoo.addons.of_base_graphql.graphql.product_type import Product, ProductInp
 
 
 class ProductBrand(OdooObjectType):
-    _name = 'ProductBrand'
-    _type = 'types'
+    _name = "ProductBrand"
+    _type = "types"
 
     id = graphene.Int(required=True)
     active = graphene.Boolean()
     code = graphene.String(required=True)
     name = graphene.String(required=True)
     use_prefix = graphene.Boolean()
-    partner_id = graphene.Field(Partner, name='partner')
+    partner_id = graphene.Field(Partner, name="partner")
     supplier_delay = graphene.Int()
-    product_ids = graphene.List(graphene.NonNull(ProductTemplate), name='productTemplates')
-    product_variant_ids = graphene.List(graphene.NonNull(Product, name='products'))
+    product_ids = graphene.List(graphene.NonNull(ProductTemplate), name="productTemplates")
+    product_variant_ids = graphene.List(graphene.NonNull(Product, name="products"))
 
 
 class ProductBrandInput(graphene.InputObjectType):
-    _name = 'ProductBrandInput'
-    _type = 'types'
+    _name = "ProductBrandInput"
+    _type = "types"
 
     id = graphene.Int()
     name = graphene.String()
@@ -38,4 +38,4 @@ class ProductBrandInput(graphene.InputObjectType):
 
 
 class ProductBrandFilterInput(ProductBrandInput):
-    _name = 'ProductBrandFilterInput'
+    _name = "ProductBrandFilterInput"

@@ -16,22 +16,22 @@ from ..models.of_planning_tour import TZ_EUROPE_PARIS
 class OFPlanningTourWizardMixin(models.AbstractModel):
     """Mixin class for the Tour Planning Wizard"""
 
-    _name = 'of.planning.tour.wizard.mixin'
+    _name = "of.planning.tour.wizard.mixin"
     _description = __doc__
 
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
         if (
-            not self.env.context.get('default_tour_id')
-            and self.env.context.get('active_model') == 'of.planning.tour'
-            and self.env.context.get('active_id')
+            not self.env.context.get("default_tour_id")
+            and self.env.context.get("active_model") == "of.planning.tour"
+            and self.env.context.get("active_id")
         ):
-            res['tour_id'] = self.env.context.get('active_id')
+            res["tour_id"] = self.env.context.get("active_id")
         return res
 
-    tour_id = fields.Many2one(comodel_name='of.planning.tour', string="Tour", required=True, ondelete='cascade')
-    name = fields.Char(compute='_compute_tour_name')
+    tour_id = fields.Many2one(comodel_name="of.planning.tour", string="Tour", required=True, ondelete="cascade")
+    name = fields.Char(compute="_compute_tour_name")
 
     # -------------------------------------------------------------------------
     # Compute methods
@@ -40,7 +40,7 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
     def _compute_tour_name(self):
         for wizard in self:
             wizard.name = (
-                _("Tour optimization") if hasattr(wizard, 'action_button_optimize') else _("Tour reorganization")
+                _("Tour optimization") if hasattr(wizard, "action_button_optimize") else _("Tour reorganization")
             )
 
     # -------------------------------------------------------------------------
@@ -48,21 +48,21 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
     # -------------------------------------------------------------------------
 
     def action_close_and_reload_tour(self):
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        return {"type": "ir.actions.client", "tag": "reload"}
 
     def action_open_form_view(self, title, form_view):
         self.ensure_one()
         context = self.env.context.copy()
         return {
-            'name': title,
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'view_mode': 'form',
-            'view_id': form_view.id,
-            'res_id': self.id,
-            'domain': [],
-            'target': 'new',
-            'context': context,
+            "name": title,
+            "type": "ir.actions.act_window",
+            "res_model": self._name,
+            "view_mode": "form",
+            "view_id": form_view.id,
+            "res_id": self.id,
+            "domain": [],
+            "target": "new",
+            "context": context,
         }
 
     # -------------------------------------------------------------------------
@@ -108,11 +108,11 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
 
             # Build the query string with the previous and current coordinates
             coords_str = f"{previous_geo_lng},{previous_geo_lat};{geo_lng},{geo_lat}"  # noqa
-            full_query = f'{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false'
+            full_query = f"{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false"
 
             # Get the OSRM data steps, distance and duration
             steps, distance, duration = ordered_line._osrm_get_steps_data(full_query)
-            geometry_data = [step['geometry'] for step in steps]
+            geometry_data = [step["geometry"] for step in steps]
             new_total_distance += distance
             new_total_duration += duration
 
@@ -123,11 +123,11 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
                     f"{geo_lng},{geo_lat};{self.tour_id.return_address_id.partner_longitude}"  # noqa
                     f",{self.tour_id.return_address_id.partner_latitude}"  # noqa
                 )
-                endpoint_full_query = f'{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false'
+                endpoint_full_query = f"{osrm_base_url}/{coords_str}?geometries=geojson&steps=true&overview=false"
                 endpoint_steps, endpoint_distance, endpoint_duration = ordered_line._osrm_get_steps_data(
                     endpoint_full_query
                 )
-                endpoint_geometry_data = [step['geometry'] for step in endpoint_steps]
+                endpoint_geometry_data = [step["geometry"] for step in endpoint_steps]
                 new_total_distance += endpoint_distance
                 new_total_duration += endpoint_duration
 
@@ -136,21 +136,21 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
             # Update the tour line with the new distance and geojson data
             wizard_line_mapping[ordered_line].write(
                 {
-                    'new_distance': distance,
-                    'new_duration': duration,
-                    'geometry_data': geometry_data,
-                    'endpoint_geometry_data': endpoint_geometry_data,
-                    'endpoint_distance': endpoint_distance,
-                    'endpoint_duration': endpoint_duration,
-                    'osrm_query': full_query,
+                    "new_distance": distance,
+                    "new_duration": duration,
+                    "geometry_data": geometry_data,
+                    "endpoint_geometry_data": endpoint_geometry_data,
+                    "endpoint_distance": endpoint_distance,
+                    "endpoint_duration": endpoint_duration,
+                    "osrm_query": full_query,
                 }
             )
         if update_totals:
             # Update the wizard the new total distance and duration
             self.write(
                 {
-                    'new_total_distance': new_total_distance,
-                    'new_total_duration': new_total_duration,
+                    "new_total_distance": new_total_distance,
+                    "new_total_duration": new_total_duration,
                 }
             )
 
@@ -206,7 +206,7 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
 
         # allow user to accept that an intervention can ends inside the lunch break time slot (count_wh_disrupted is
         # priority over this option). Reorganization wizard doesn't have this option (yet ?).
-        lunchbreak_overlapping = self.can_overlap_lunchbreak if hasattr(self, 'can_overlap_lunchbreak') else False
+        lunchbreak_overlapping = self.can_overlap_lunchbreak if hasattr(self, "can_overlap_lunchbreak") else False
         timeline = []
         result = {}
 
@@ -309,22 +309,22 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
 
             # update the tour line with the new time slot created by the optimization
             result[wizard_line_mapping[ordered_line]] = {
-                'could_overlap': could_overlap,
-                'avoid_check_overlap': hours_disrupted and count_wh_disrupted == 0,
-                'new_index': index,
-                'new_date_start': new_start_datetime_utc.strftime('%Y-%m-%d %H:%M:%S'),
-                'new_intervention_id': optz_intervention.id,
-                'is_first_line_of_tour': index == 1,
-                'is_last_line_of_tour': index == len_ordered_lines,
+                "could_overlap": could_overlap,
+                "avoid_check_overlap": hours_disrupted and count_wh_disrupted == 0,
+                "new_index": index,
+                "new_date_start": new_start_datetime_utc.strftime("%Y-%m-%d %H:%M:%S"),
+                "new_intervention_id": optz_intervention.id,
+                "is_first_line_of_tour": index == 1,
+                "is_last_line_of_tour": index == len_ordered_lines,
             }
             if time_slot_label:
                 # build the new time slot label
-                new_start_hour = new_start_datetime.strftime('%H:%M')
-                new_end_hour = new_end_datetime.strftime('%H:%M')
+                new_start_hour = new_start_datetime.strftime("%H:%M")
+                new_end_hour = new_end_datetime.strftime("%H:%M")
                 new_time_slot = ordered_line._get_time_slot_intervention_label(
                     force_start_hour=new_start_hour, force_end_hour=new_end_hour
                 )
-                result[wizard_line_mapping[ordered_line]]['new_time_slot'] = new_time_slot
+                result[wizard_line_mapping[ordered_line]]["new_time_slot"] = new_time_slot
         return result
 
     def _get_new_values_for_intervention(self, line):
@@ -338,25 +338,25 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
         Returns:
             dict: the new values for the intervention
         """
-        event_values = {'start': line.new_date_start}
+        event_values = {"start": line.new_date_start}
         if not line.could_overlap and line.avoid_check_overlap:
-            event_values['of_force_dates'] = True
+            event_values["of_force_dates"] = True
             hours, minutes = float_2_hours_minutes(line.intervention_id.duration)
             # we need to force the deadline date of the intervention to avoid an empty value for this field
-            event_values['stop'] = line.new_date_start + relativedelta(hours=hours, minutes=minutes)
+            event_values["stop"] = line.new_date_start + relativedelta(hours=hours, minutes=minutes)
         return event_values
 
 
 class OFTourPlanningWizardLineMixin(models.AbstractModel):
     "Mixin class for the Tour Planning Line Wizards"
-    _name = 'of.planning.tour.wizard.line.mixin'
+    _name = "of.planning.tour.wizard.line.mixin"
     _description = __doc__
 
-    tour_line_id = fields.Many2one(comodel_name='of.planning.tour.line', string="Tour Line", ondelete='cascade')
-    intervention_id = fields.Many2one(comodel_name='calendar.event', string="Event", ondelete='cascade')
+    tour_line_id = fields.Many2one(comodel_name="of.planning.tour.line", string="Tour Line", ondelete="cascade")
+    intervention_id = fields.Many2one(comodel_name="calendar.event", string="Event", ondelete="cascade")
     could_overlap = fields.Boolean(string="Could overlap", readonly=True)
     avoid_check_overlap = fields.Boolean(string="Avoid overlap check", readonly=True)
-    is_multi_employees = fields.Boolean(string="Multi-employees", compute='_compute_is_multi_employees')
+    is_multi_employees = fields.Boolean(string="Multi-employees", compute="_compute_is_multi_employees")
     new_distance = fields.Float(string="New Distance (km)")
     new_duration = fields.Float(string="New Duration (h)")
     new_date_start = fields.Datetime(string="New start date", readonly=True)

@@ -10,11 +10,11 @@ class TestOFProductCommon(TestOFBaseCommon):
 
         # Product data
         cls.product_category_a = (
-            cls.env['product.category']
+            cls.env["product.category"]
             .with_company(cls.company_fr)
             .create(
                 {
-                    'name': 'Category A',
+                    "name": "Category A",
                 }
             )
         )

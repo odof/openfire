@@ -8,20 +8,20 @@ from odoo import Command, api, fields, models
 
 
 class AccountMove(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     def _default_of_price_printing(self):
-        return self.env['sale.order']._default_of_price_printing()
+        return self.env["sale.order"]._default_of_price_printing()
 
-    of_is_locked = fields.Boolean(compute='_compute_of_is_locked', string="Locked")
+    of_is_locked = fields.Boolean(compute="_compute_of_is_locked", string="Locked")
     of_sale_order_ids = fields.Many2many(
-        comodel_name='sale.order', compute='_compute_of_sale_order_ids', string="Sale orders"
+        comodel_name="sale.order", compute="_compute_of_sale_order_ids", string="Sale orders"
     )
-    of_waiting_delivery = fields.Boolean(compute='_compute_of_picking_ids', string="Delivery on hold")
+    of_waiting_delivery = fields.Boolean(compute="_compute_of_picking_ids", string="Delivery on hold")
     of_picking_ids = fields.Many2many(
-        comodel_name='stock.picking', compute='_compute_of_picking_ids', string="Deliveries"
+        comodel_name="stock.picking", compute="_compute_of_picking_ids", string="Deliveries"
     )
-    of_picking_count = fields.Integer(compute='_compute_of_picking_ids', string="Nbr of deliveries")
+    of_picking_count = fields.Integer(compute="_compute_of_picking_ids", string="Nbr of deliveries")
     # TODO: Uncomment me and continue the migration when `of_account_invoice_report` module is migrated
     # of_residual = fields.Monetary(
     #     string="Sum of the unpaid amount of the deposit invoices and the final invoice",
@@ -31,7 +31,7 @@ class AccountMove(models.Model):
     # End of TODO: Migrate me when `of_account_invoice_report` module is migrated
     of_internal_followup = fields.Char(string="Internal follow-up")
     of_price_printing = fields.Selection(
-        selection='_get_selection_of_price_printing',
+        selection="_get_selection_of_price_printing",
         string="Price printing",
         default=lambda self: self._default_of_price_printing(),
         required=True,
@@ -39,13 +39,13 @@ class AccountMove(models.Model):
 
     def _get_selection_of_price_printing(self):
         """Return the same selection as in sale.order.of_price_printing"""
-        return self.env['sale.order'].fields_get(allfields=['of_price_printing'])['of_price_printing']['selection']
+        return self.env["sale.order"].fields_get(allfields=["of_price_printing"])["of_price_printing"]["selection"]
 
     # --------------------------------------------------------------------------
     # Compute methods
     # --------------------------------------------------------------------------
 
-    @api.depends('invoice_line_ids', 'invoice_line_ids.of_is_locked')
+    @api.depends("invoice_line_ids", "invoice_line_ids.of_is_locked")
     def _compute_of_is_locked(self):
         for move in self:
             of_is_locked = False
@@ -53,16 +53,16 @@ class AccountMove(models.Model):
                 of_is_locked = True
             move.of_is_locked = of_is_locked
 
-    @api.depends('invoice_line_ids')
+    @api.depends("invoice_line_ids")
     def _compute_of_sale_order_ids(self):
         for move in self:
-            move.of_sale_order_ids = move.invoice_line_ids.mapped('sale_line_ids').mapped('order_id')
+            move.of_sale_order_ids = move.invoice_line_ids.mapped("sale_line_ids").mapped("order_id")
 
     @api.depends(
-        'invoice_line_ids',
-        'invoice_line_ids.sale_line_ids',
-        'invoice_line_ids.sale_line_ids.order_id',
-        'invoice_line_ids.sale_line_ids.order_id.picking_ids',
+        "invoice_line_ids",
+        "invoice_line_ids.sale_line_ids",
+        "invoice_line_ids.sale_line_ids.order_id",
+        "invoice_line_ids.sale_line_ids.order_id.picking_ids",
     )
     def _compute_of_picking_ids(self):
         """Compute the number of pickings linked to the invoice and the pickings themselves"""
@@ -70,9 +70,9 @@ class AccountMove(models.Model):
             of_waiting_delivery = False
             of_picking_ids = False
             of_picking_count = False
-            if pickings := move.of_sale_order_ids.mapped('picking_ids'):
+            if pickings := move.of_sale_order_ids.mapped("picking_ids"):
                 of_waiting_delivery = (
-                    pickings.filtered(lambda p: p.state not in ['draft', 'cancel', 'done']) and True or False
+                    pickings.filtered(lambda p: p.state not in ["draft", "cancel", "done"]) and True or False
                 )
                 of_picking_ids = pickings
                 of_picking_count = len(pickings)
@@ -118,16 +118,16 @@ class AccountMove(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id("stock.action_picking_tree_all")
         pickings = self.of_picking_ids
         if len(pickings) > 1:
-            action['domain'] = [('id', 'in', pickings.ids)]
+            action["domain"] = [("id", "in", pickings.ids)]
         elif pickings:
-            form_view = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            if 'views' in action:
-                action['views'] = form_view + [(state, view) for state, view in action['views'] if view != 'form']
+            form_view = [(self.env.ref("stock.view_picking_form").id, "form")]
+            if "views" in action:
+                action["views"] = form_view + [(state, view) for state, view in action["views"] if view != "form"]
             else:
-                action['views'] = form_view
-            action['res_id'] = pickings.id
+                action["views"] = form_view
+            action["res_id"] = pickings.id
         picking_id = pickings and pickings[0] or False
-        action['context'] = dict(
+        action["context"] = dict(
             self._context,
             default_partner_id=self.partner_id.id,
             default_picking_type_id=picking_id.picking_type_id.id,
@@ -138,7 +138,7 @@ class AccountMove(models.Model):
 
     def action_button_validate_pickings(self):
         """Force the availability of the products in the pickings linked to the invoice and validate them"""
-        transfer_obj = self.env['stock.immediate.transfer']
+        transfer_obj = self.env["stock.immediate.transfer"]
         for move in self.filtered(lambda i: not i.of_is_locked):
             pickings = move.of_picking_ids
             pickings.action_clear_quantities_to_zero()
@@ -146,9 +146,9 @@ class AccountMove(models.Model):
             for picking in pickings:
                 new_transfer = transfer_obj.create(
                     {
-                        'pick_ids': [Command.link(picking.id)],
-                        'immediate_transfer_line_ids': [
-                            Command.create({'to_immediate': True, 'picking_id': picking.id})
+                        "pick_ids": [Command.link(picking.id)],
+                        "immediate_transfer_line_ids": [
+                            Command.create({"to_immediate": True, "picking_id": picking.id})
                         ],
                     }
                 )
@@ -157,7 +157,7 @@ class AccountMove(models.Model):
 
     def action_post(self):
         result = super().action_post()
-        if self.env['ir.config_parameter'].sudo().get_param('of.sale.of_validate_pickings_on_move') == 'validate':
+        if self.env["ir.config_parameter"].sudo().get_param("of.sale.of_validate_pickings_on_move") == "validate":
             self.action_button_validate_pickings()
         return result
 
@@ -167,13 +167,13 @@ class AccountMove(models.Model):
 
     def pdf_get_color_bg_section(self):
         return (
-            self.env['ir.config_parameter'].sudo().get_param('of.sale.report.account.move.of_color_bg_section')
+            self.env["ir.config_parameter"].sudo().get_param("of.sale.report.account.move.of_color_bg_section")
             or "#f0f0f0"
         )
 
     def pdf_get_color_font_section(self):
         return (
-            self.env['ir.config_parameter'].sudo().get_param('of.sale.report.account.move.of_color_font_section')
+            self.env["ir.config_parameter"].sudo().get_param("of.sale.report.account.move.of_color_font_section")
             or "#000000"
         )
 

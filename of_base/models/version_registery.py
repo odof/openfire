@@ -6,8 +6,8 @@ from .. import version_loader
 
 
 class VersionRegistry(models.AbstractModel):
-    _name = 'version.registry'
-    _description = 'Version Registry'
+    _name = "version.registry"
+    _description = "Version Registry"
 
     @api.model
     def _register_hook(self):
