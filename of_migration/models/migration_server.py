@@ -131,8 +131,24 @@ class MigrationServer(models.Model):
 
     def action_get_dump(self, migration):
         if self.connect():
-            res = requests.get(f"{self.host}:{self.port}/api/dump{migration.uid}")
+            res = requests.get(f"{self.host}:{self.port}/api/dump/{migration.uid}")
             database = migration.database_id.copy()
             database.version = migration.current_version
             database.status = migration.state == 'done' and 'ok' or 'ko'
-            database.backup_file = res.content
+            if database.backup_type == 'file':
+                database.backup_file = res.content
+            elif database.backup_type == 'distant':
+                database.backup_filename = f"{slugify(migration.partner_id.name)}-{database.version}.dump"
+                cnopts = pysftp.CnOpts()
+                cnopts.hostkeys = None
+                connection = pysftp.Connection(
+                    host=migration.database_id.backup_server.host.replace('https://', '').replace('http://', ''),
+                    username=migration.database_id.backup_server.authentication_id.name,
+                    password=migration.database_id.backup_server.authentication_id.password,
+                    port=migration.database_id.backup_server.port,
+                    cnopts=cnopts,
+                )
+                f = open(f"/tmp/{database.backup_filename}", "wb")
+                f.write(res.content)
+                f.close()
+                connection.put(f"/tmp/{database.backup_filename}", f"/upload/{database.backup_filename}")
