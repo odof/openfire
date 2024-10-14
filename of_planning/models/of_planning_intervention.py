@@ -819,7 +819,7 @@ class OfPlanningIntervention(models.Model):
             query_send = urllib.quote(query.strip().encode('utf8')).replace('%3A', ':')
             full_query = query_send + coords_str + "?"
             try:
-                req = requests.get(full_query)
+                req = requests.get(full_query, timeout=10)
                 res = req.json()
             except Exception:
                 interv.before_to_this = -1.0

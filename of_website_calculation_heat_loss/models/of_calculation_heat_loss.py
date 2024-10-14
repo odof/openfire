@@ -96,7 +96,9 @@ class OFCalculationHeatLoss(models.Model):
             return
         try:
             req = requests.get(
-                elevation_api_url, params={'locations': "%s,%s" % (self.partner_id.geo_lat, self.partner_id.geo_lng)}
+                elevation_api_url,
+                params={'locations': "%s,%s" % (self.partner_id.geo_lat, self.partner_id.geo_lng)},
+                timeout=10,
             )
             result = req.json()
             if result:

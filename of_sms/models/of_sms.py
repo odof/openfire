@@ -382,7 +382,7 @@ class OFSMSGatewayOVH(models.Model):
             if not is_commercial:
                 req = req + u"&noStop=1"
             query_send = req.encode("utf-8")
-            response = requests.get(query_send)
+            response = requests.get(query_send, timeout=60)
             response_json = response.json()
             response_string = response.text
             to_number_body = isinstance(to_number, basestring) and to_number or ','.join(to_number)

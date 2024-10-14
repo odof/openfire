@@ -51,7 +51,9 @@ class OFDatastoreBrand(models.Model):
         last_update = self.env['ir.config_parameter'].get_param('of.datastore.brand.last.update')
         response = requests.post(
             url=openfire_url + "/brand/list",
-            params={'dbname': self._cr.dbname, 'since_dt': last_update or ''})
+            params={'dbname': self._cr.dbname, 'since_dt': last_update or ''},
+            timeout=10,
+        )
         if response.status_code != requests.codes.ok:
             try:
                 message = response.json()

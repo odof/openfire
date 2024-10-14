@@ -34,7 +34,9 @@ class OFDatastoreBrandAskWizard(models.TransientModel):
         openfire_url = self.env['ir.config_parameter'].get_param('of.openfire.database.url')
         response = requests.post(
             url=openfire_url + "/brand/request",
-            params={'dbname': self._cr.dbname, 'request_id': self.id})
+            params={'dbname': self._cr.dbname, 'request_id': self.id},
+            timeout=10,
+        )
         if response.status_code != requests.codes.ok:
             try:
                 message = response.json()

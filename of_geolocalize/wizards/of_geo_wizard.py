@@ -124,7 +124,7 @@ class OFGeoWizardMono(models.TransientModel):
 
         # Server query and response
         try:
-            req = requests.get(API_URL, params=params)
+            req = requests.get(API_URL, params=params, timeout=10)
             result = req.json()
         except Exception as e:
             raise UserError((u"Impossible de contacter le serveur de géolocalisation. Assurez-vous que votre connexion Internet est opérationnelle (%s)") % e)
@@ -551,7 +551,7 @@ class OFGeoWizard(models.TransientModel):
 
             # Server query and response
             try:
-                req = requests.get(API_URL, params=params)
+                req = requests.get(API_URL, params=params, timeout=10)
                 res = req.json()
                 self.ban_try += 1
             except Exception:
