@@ -66,9 +66,8 @@ class SendSMS(models.TransientModel):
 
     def _prepare_mass_sms_values(self, records):
         results = super()._prepare_mass_sms_values(records)
-        for record in results:
-            record = dict(
-                record,
+        for record in records:
+            results[record.id].update(
                 of_sender_id=self.of_sender_id.id,
                 of_is_commercial=self.of_is_commercial,
                 of_date_to_send=self.of_send_date,
