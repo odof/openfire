@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
-
-import StringIO
 import base64
 
+import StringIO
+
+from odoo import _, api, fields, models
+
 try:
-    from pdfminer.pdfparser import PDFParser
-    from pdfminer.psparser import PSLiteral
     from pdfminer.pdfdocument import PDFDocument
+    from pdfminer.pdfparser import PDFParser
     from pdfminer.pdftypes import resolve1
+    from pdfminer.psparser import PSLiteral
     from pdfminer.utils import decode_text
 except ImportError:
     PDFParser = PSLiteral = PDFDocument = resolve1 = decode_text = None
@@ -224,8 +225,8 @@ class OfGesdocChp(models.Model):
     _name = 'of.gesdoc.chp'
     _description = 'Champs PDF'
 
-    name = fields.Char(string='Nom du champ PDF', size=256, required=True, readonly=True)
-    value_openfire = fields.Char(string='Valeur OpenFire', size=256)
+    name = fields.Char(string='Nom du champ PDF', required=True, readonly=True)
+    value_openfire = fields.Char(string='Valeur OpenFire')
     template_id = fields.Many2one('of.mail.template', string=u'Modèle Courrier')
     to_export = fields.Boolean(string='Export', default=True)
     to_import = fields.Boolean(string='Import')
