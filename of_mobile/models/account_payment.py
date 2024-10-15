@@ -18,7 +18,9 @@ class AccountPayment(models.Model):
     )
 
     @api.model
-    def create_payment_intervention(self, intervention, amount, ttype, mode, date=False, partner=False):
+    def create_payment_intervention(
+        self, intervention, amount, ttype, mode, date=False, partner=False, payment_reference=False
+    ):
         """
         Create a payment for an intervention.
 
@@ -80,6 +82,7 @@ class AccountPayment(models.Model):
                 "of_payment_mode_id": mode.id,
                 "of_intervention_id": intervention.id,
                 "of_type": ttype,
+                "payment_reference": payment_reference,
             }
             if intervention_invoice:
                 value_payment["of_intervention_invoice_id"] = intervention_invoice.id
