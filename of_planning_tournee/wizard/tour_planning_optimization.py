@@ -126,6 +126,23 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
         self.can_overlap_lunchbreak = True
         return self.action_button_validate()
 
+    @api.model
+    def _get_optimized_waypoints(self, tour, mode, afternoon_start_address=False):
+        coordinates = tour._get_tour_coordinates_data(mode, afternoon_start_address=afternoon_start_address)
+
+        # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
+        res = tour._send_osrm_trip_request(coordinates_str=';'.join(coord['coord_str'] for coord in coordinates))
+        waypoints = res.get('waypoints')
+        if not waypoints:
+            # we should always get a list of waypoints here
+            raise UserError(_("No optimized tour lines found."))
+        for index, waypoint in enumerate(waypoints):
+            waypoint['origin_line_id'] = coordinates[index]['origin_line_id']
+        # sort the waypoints by index to get the optimized tour lines in the right order
+        # OSRM will always return the data in the input order, so we need to sort them by index
+        waypoints = sorted(waypoints, key=lambda k: k['waypoint_index'])
+        return waypoints
+
     @api.multi
     def action_optimize(self):
         """Optimize the tour lines.
@@ -145,63 +162,27 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
         # get the the coordinates of the tour lines to optimize to send them to the OSRM server
         # and also get the tour lines data by hint to be able to retrieve them during the process
         if self.optim_mode != 'half':
-            coordinates_str, tour_data_by_hint = self.tour_id._get_tour_coordinates_data(self.optim_mode)
-
-            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
-            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
-            waypoints = res.get('waypoints')
-            if not waypoints:  # we should always get a list of waypoints here
-                raise UserError(_("No optimized tour lines found."))
+            ordered_waypoints = self._get_optimized_waypoints(self.tour_id, self.optim_mode)
         else:
-            coordinates_str, tour_data_by_hint1 = self.tour_id._get_tour_coordinates_data('morning')
-
-            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
-            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
-            waypoints_morning = res.get('waypoints')
-            waypoints_morning = sorted(waypoints_morning, key=lambda k: k['waypoint_index'])
+            waypoints_morning = self._get_optimized_waypoints(self.tour_id, 'morning')
             waypoints_morning.pop()
 
-            coordinates_str, tour_data_by_hint2 = self.tour_id._get_tour_coordinates_data('afternoon')
+            afternoon_start_address = waypoints_morning[-1]['origin_line_id'].intervention_id.address_id
 
-            # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
-            res = self.tour_id._send_osrm_trip_request(coordinates_str=coordinates_str)
-            waypoints_afternoon = res.get('waypoints')
-            waypoints_afternoon = sorted(waypoints_afternoon, key=lambda k: k['waypoint_index'])
+            waypoints_afternoon = self._get_optimized_waypoints(
+                self.tour_id, 'afternoon', afternoon_start_address=afternoon_start_address)
             waypoints_afternoon.pop(0)
             morning_pts_num = len(waypoints_morning)
             for waypoint in waypoints_afternoon:
                 waypoint['waypoint_index'] = waypoint['waypoint_index'] + morning_pts_num - 1
 
-            waypoints = waypoints_morning + waypoints_afternoon
-
-            tour_data_by_hint = {}
-
-            for hint, tour_data in tour_data_by_hint1.iteritems():
-                for tour_datum in tour_data:
-                    if tour_datum['type'] != 'end':
-                        if not tour_data_by_hint.get(hint):
-                            tour_data_by_hint[hint] = []
-                        tour_data_by_hint[hint].append(tour_datum)
-
-            for hint, tour_data in tour_data_by_hint2.iteritems():
-                for tour_datum in tour_data:
-                    if tour_datum['type'] != 'start':
-                        if not tour_data_by_hint.get(hint):
-                            tour_data_by_hint[hint] = []
-                        tour_data_by_hint[hint].append(tour_datum)
-
-            if not waypoints:  # we should always get a list of waypoints here
-                raise UserError(_("No optimized tour lines found."))
+            ordered_waypoints = waypoints_morning + waypoints_afternoon
 
         am_limit_float = self.env['ir.values'].get_default(
             'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         compare_precision = 5
 
-        # sort the waypoints by index to get the optimized tour lines in the right order
-        # OSRM will always return the data in the input order, so we need to sort them by index
-        ordered_waypoints = sorted(waypoints, key=lambda k: k['waypoint_index'])
         optimized_line_order = self.env['of.planning.tour.line']
-
         if self.optim_mode == 'afternoon':
             optimized_line_order |= self.tour_id.tour_line_ids.filtered(
                 lambda tl: float_compare(
@@ -209,10 +190,8 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
                     am_limit_float, compare_precision) < 0)
 
         for waypoint in ordered_waypoints:
-            for data in tour_data_by_hint.get(waypoint['hint']):
-                if data['type'] in ['start', 'end']:
-                    continue
-                optimized_line_order |= data['line']
+            if waypoint['origin_line_id'] != -1:
+                optimized_line_order += waypoint['origin_line_id']
 
         if self.optim_mode == 'morning':
             optimized_line_order |= self.tour_id.tour_line_ids.filtered(
@@ -281,7 +260,7 @@ class OFTourPlanningOptimizationWizard(models.TransientModel):
                     from_tour_wizard=True
                 ).write(self._get_new_values_for_intervention(line))
                 # update the line with the new sequence and the geojson data updated from the optimization
-                tour_line_values = self.tour_id._prepare_tour_line(int(line.new_index), line.intervention_id)
+                tour_line_values = self.tour_id._prepare_tour_line(line.new_index, line.intervention_id)
                 del tour_line_values['tour_id']
                 tour_line_values.update({
                     'last_modification_date': fields.Datetime.now(),
@@ -339,9 +318,9 @@ class OFTourPlanningOptimizationLineWizard(models.TransientModel):
         help="Technical field used by the map of the optimized tour lines to display data on the map")
     flexible = fields.Boolean(string="Flexible", related='intervention_id.flexible')
     workers_names = fields.Char(string="Workers", compute='_compute_workers_names')
-    old_index = fields.Char(string="Old index")
+    old_index = fields.Integer(string="Old index")
     old_time_slot = fields.Char(string="Old Time Slot")
-    new_index = fields.Char(string="New index")
+    new_index = fields.Integer(string="New index")
     new_time_slot = fields.Char(string="New Time Slot")
     old_duration = fields.Float(string="Duration (h)")
     old_distance = fields.Float(string="Distance (km)")
@@ -357,7 +336,7 @@ class OFTourPlanningOptimizationLineWizard(models.TransientModel):
     partner_phone = fields.Char(related='new_intervention_id.partner_id.phone', readonly=True)
     partner_mobile = fields.Char(related='new_intervention_id.partner_id.mobile', readonly=True)
     map_color_tour = fields.Char(related='new_intervention_id.map_color_tour', string="Color")
-    tour_number = fields.Char(related='new_index', string="Tour number", readonly=True)
+    tour_number = fields.Integer(related='new_index', string="Tour number", readonly=True)
     hexa_color = fields.Char(string="Hexa color", compute='_compute_hexa_color')
 
     @api.multi
@@ -376,7 +355,7 @@ class OFTourPlanningOptimizationLineWizard(models.TransientModel):
         last_index = 0
         for line in self.sorted(key=lambda l: l.new_index):
             color_padding = color_padding_by_tour[line.wizard_id.tour_id]
-            sequence = int(line.new_index) - 1 if int(line.new_index) > 0 else 0
+            sequence = line.new_index - 1 if line.new_index > 0 else 0
             color_index = last_index + color_padding if sequence > 0 else last_index
             last_index = color_index
             line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[min(color_index, len(AVAILABLE_COLORS_TOUR_LINES)-1)]

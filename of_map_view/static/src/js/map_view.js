@@ -1131,12 +1131,16 @@ MapView.LayerGroup = Widget.extend({
                 endpointGeojsonLines.push(JSON.parse(endpoint_geojson));
             }
             number = this.records[i][this.options.number_field] || false;
+            if (typeof number == "number") {
+                number = number.toString();
+            }
             manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options['number'] = number;
                 options['iconUrl'] = this.get_color_url(this.records[i]);
+                options['glyphSize'] = '18px';
                 if (number && !manyNumbers && parseInt(number) < 11) {
                     options['prefix'] = 'mdi';
                     options['glyph'] = options['glyphPrefix'] + '-' + number + '-' + options['glyphSuffix'];
@@ -1145,7 +1149,12 @@ MapView.LayerGroup = Widget.extend({
                     // we only display strings. Because we can't display more than 1 digit as a glyph.
                     // TODO: find a way to display more than 1 digit as a glyph (maybe try to combine 2 glyphs? Or don't use glyphs at all?)
                     options['prefix'] = '';
-                    options['glyph'] = number;
+                    if (!manyNumbers) {
+                        options['glyph'] = number;
+                    } else {
+                        options['glyph'] = number.split(',')[0] + '...';
+                        options['glyphSize'] = '14px';
+                    }
                 } else {
                     options['prefix'] = 'mdi';
                     options['glyph'] = 'radiobox-blank';
@@ -1195,12 +1204,16 @@ MapView.LayerGroup = Widget.extend({
                 endpointGeojsonLines.push(JSON.parse(endpoint_geojson));
             }
             number = this.records[i][this.options.number_field] || false;
+            if (typeof number == "number") {
+                number = number.toString();
+            }
             manyNumbers = number && number.split(',').length > 1 || false;
             if (this.options.custom_icon) {
                 var options = this.options.icon_options.unselected;
                 options['id'] = 'icon_'+this.records[i].id;
                 options['number'] = number;
                 options['iconUrl'] = this.get_color_url(this.records[i]);
+                options['glyphSize'] = '18px';
                 if (number && !manyNumbers && parseInt(number) < 11) {
                     options['prefix'] = 'mdi';
                     options['glyph'] = options['glyphPrefix'] + '-' + number + '-' + options['glyphSuffix'];
@@ -1209,7 +1222,13 @@ MapView.LayerGroup = Widget.extend({
                     // we only display strings. Because we can't display more than 1 digit as a glyph.
                     // TODO: find a way to display more than 1 digit as a glyph (maybe try to combine 2 glyphs? Or don't use glyphs at all?)
                     options['prefix'] = '';
-                    options['glyph'] = number;
+                    
+                    if (!manyNumbers) {
+                        options['glyph'] = number;
+                    } else {
+                        options['glyph'] = number.split(',')[0] + '...';
+                        options['glyphSize'] = '14px';
+                    }
                 } else {
                     options['prefix'] = 'mdi';
                     options['glyph'] = 'radiobox-blank';
