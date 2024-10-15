@@ -449,15 +449,14 @@ class OFPlanningTournee(models.Model):
         return start_marker, end_marker
 
     @api.multi
-    def _get_tour_coordinates_data(self, optim_mode='day'):
+    def _get_tour_coordinates_data(self, optim_mode='day', afternoon_start_address=False):
         """ Returns a string of coordinates as "longitude, latitude;..." of the tour.
         Also a dict of a hint string of each coordinates associated to the tour line.
         This dict will be used by wizards to be able to retrieve the tour line associated to the coordinates because
         OSRM will send us this hint string in the response.
 
         :returns:
-            - coordinates_str: String of coordinates as "longitude, latitude;..."
-            - tour_data_by_hint: Dict of a hint string of each coordinates associated to the tour line.
+            - coordinates: List of dict with string of coordinates as "longitude,latitude" and origin tour line
         :rtype: tuple
         """
         self.ensure_one()
@@ -489,45 +488,18 @@ class OFPlanningTournee(models.Model):
             morning_lines = self.tour_line_ids.sorted(key=lambda tl: tl.date_start).filtered(
                 lambda tl: float_compare(
                     self._get_float_intervention_start_hour(tl.intervention_id), am_limit_float, compare_precision) < 0)
-            start_address = morning_lines and morning_lines[-1].intervention_id.address_id or start_address
+            start_address = afternoon_start_address or \
+                morning_lines and morning_lines[-1].intervention_id.address_id or start_address
             tour_lines = self.tour_line_ids - morning_lines
 
-        coordinates_str = "%s,%s" % (start_address.geo_lng, start_address.geo_lat)
-        hint = self._get_nearest_point_hint(coordinates_str)
-        tour_data_by_hint = {
-            hint: [{
-                'tour': self,
-                'line': False,
-                'coordinates': (start_address.geo_lng, start_address.geo_lat),
-                'intervention_id': False,
-                'type': 'start'
-            }]
-        }
+        coordinates = [{'coord_str': "%s,%s" % (start_address.geo_lng, start_address.geo_lat), 'origin_line_id': -1}]
 
         for line in tour_lines:
-            coord_str = "%s,%s" % (line.geo_lng, line.geo_lat)
-            hint = self._get_nearest_point_hint(coord_str)
-            coordinates_str += ";%s" % coord_str
-            if not tour_data_by_hint.get(hint):
-                tour_data_by_hint[hint] = []
-            tour_data_by_hint[hint].append({
-                'tour': self,
-                'line': line,
-                'coordinates': (line.geo_lng, line.geo_lat),
-                'intervention_id': line.intervention_id.id,
-                'type': 'intervention'})
+            coordinates.append({'coord_str': "%s,%s" % (line.geo_lng, line.geo_lat), 'origin_line_id': line})
 
-        coord_str = "%s,%s" % (stop_address.geo_lng, stop_address.geo_lat)
-        hint = self._get_nearest_point_hint(coord_str)
-        coordinates_str += ";%s" % coord_str
-        tour_data_by_hint[hint] = [{
-            'tour': self,
-            'line': False,
-            'intervention_id': False,
-            'coordinates': (stop_address.geo_lng, stop_address.geo_lat),
-            'type': 'end'}]
+        coordinates.append({'coord_str': "%s,%s" % (stop_address.geo_lng, stop_address.geo_lat), 'origin_line_id': -1})
 
-        return coordinates_str, tour_data_by_hint
+        return coordinates
 
     @api.model
     def _get_osrm_base_url(self, mode='route'):
@@ -646,6 +618,10 @@ class OFPlanningTournee(models.Model):
         am_limit_float = self.env['ir.values'].get_default(
             'of.intervention.settings', 'tour_am_limit_float') or DEFAULT_AM_LIMIT_FLOAT
         hours = self.employee_id.get_horaires_date(self.date)[self.employee_id.id] if self.employee_id else []
+        if not hours:
+            raise UserError(
+                u"Aucun horaire n'est défini à cette date pour cet intervenant. "
+                u"La tournée ne peut donc pas être optimisée.")
         # we want to return a list of tuples (start, end) of working hours, so we need to manage the case where
         # the employee has only one or more than two slots of working hours
         if len(hours) == 1:

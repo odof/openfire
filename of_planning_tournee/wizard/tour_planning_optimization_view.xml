@@ -167,7 +167,7 @@
                                 <i class="of_map_record_close fa fa-lg fa-times"/>
                             </div>
                             <div name="content" class="of_map_record_content">
-                                <t t-if="record.tour_number.raw_value">
+                                <t t-if="record.tour_number.raw_value &gt; 0">
                                     <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
                                     <br/>
                                 </t>
@@ -195,7 +195,7 @@
                     </t>
                     <t t-name="of_map_marker_tooltip">
                         <div name="marker_tooltip">
-                            <t t-if="record.tour_number.raw_value">
+                            <t t-if="record.tour_number.raw_value &gt; 0">
                                 <i class="of_map_record_main fa fa-hashtag"/><span class="of_ws"/><strong><field name="tour_number"/></strong>
                                 <br/>
                             </t>
