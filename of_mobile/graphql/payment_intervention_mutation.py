@@ -19,6 +19,7 @@ class PaymentInterventionCreate(graphene.Mutation):
         partner = PartnerInput()
         ttype = PaymentType(required=True)
         mode = PaymentModeInput(required=True)
+        payment_reference = graphene.String()
 
     Output = AccountPayment
 
