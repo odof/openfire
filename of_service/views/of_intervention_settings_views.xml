@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_intervention_settings_view_form" model="ir.ui.view">
+        <field name="name">of.intervention.settings.view.form</field>
+        <field name="model">of.intervention.settings</field>
+        <field name="inherit_id" ref="of_planning.view_of_intervention_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='intervention']" position="inside">
+                <label for="auto_service_template_id"/>
+                <div name="auto_service_template_id">
+                    <field name="auto_service_template_id" class="oe_inline"/>
+                    <br/>
+                    <i class="oe_grey">/!\ ce paramètre est partagé entre toutes les sociétés</i>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

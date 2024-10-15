@@ -24,6 +24,7 @@
         'security/res_groups.xml',
         'wizards/of_service_create_intervention_wizard_views.xml',
         'views/of_service_view.xml',
+        'views/of_intervention_settings_views.xml',
     ],
     'installable': True,
 }
