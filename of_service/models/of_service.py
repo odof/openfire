@@ -4,6 +4,7 @@
 import math
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from bs4 import BeautifulSoup
 import odoo.addons.decimal_precision as dp
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
@@ -1389,6 +1390,53 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
             lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
             return "%s " % format_date(docs.date_next, lang)
         return ""
+
+    @api.model
+    def message_new(self, msg_dict, custom_values=None):
+        """ Overrides mail_thread message_new that is called by the mailgateway
+            through message_process.
+            This override updates the document according to the email.
+        """
+        # remove default author when going through the mail gateway. Indeed we
+        # do not want to explicitly set user_id to False; however we do not
+        # want the gateway user to be responsible if no other responsible is
+        # found.
+        self = self.with_context(default_user_id=False)
+
+        if custom_values is None:
+            custom_values = {}
+
+        template_id = self.env['ir.values'].get_default('of.intervention.settings', 'auto_service_template_id') or \
+            self.env.ref('of_planning.of_planning_default_intervention_template').id
+
+        body_html = msg_dict.get('body')
+        if body_html:
+            soup = BeautifulSoup(body_html, features="lxml")
+            body = '\n'.join([text for text in soup.stripped_strings])
+        else :
+            body = ""
+
+        new_service = self.env['of.service'].new({
+            'base_state': 'draft',
+            'template_id': template_id,
+            'company_id': self.env.ref('base.main_company').id,
+            'partner_id': msg_dict.get('author_id') or self.env.ref('base.partner_root').id,
+            'date_next': fields.Date.today(),
+            'note': "De : " + msg_dict.get('from') + '\n' +
+                    "Sujet : " + msg_dict.get('subject') + '\n' +
+                    "Corps : \n" + body,
+        })
+
+        new_service.onchange_template_id()
+        new_service.onchange_type_id()
+        new_service._onchange_tache_id()
+        new_service._onchange_date_next()
+        new_service._onchange_partner_id()
+        new_service._onchange_address_id()
+        service_vals = new_service._convert_to_write(new_service._cache)
+        service_vals.update(custom_values)
+
+        return super(OfService, self).message_new(msg_dict, custom_values=service_vals)
 
 
 class OfServiceLine(models.Model):
