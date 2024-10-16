@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -13,6 +13,13 @@ class OfInterventionSettings(models.TransientModel):
         res = super(OfInterventionSettings, self)._auto_init()
         if not self.env['ir.values'].get_default('of.intervention.settings', 'company_choice'):
             self.env['ir.values'].sudo().set_default('of.intervention.settings', 'company_choice', 'contact')
+        if not self.env['ir.values'].get_default('of.intervention.settings', 'deliveries_validation'):
+            do_deliveries = self.env['ir.values'].get_default('of.intervention.settings', 'do_deliveries')
+            self.env['ir.values'].sudo().set_default(
+                'of.intervention.settings',
+                'deliveries_validation',
+                do_deliveries and 'state_done' or 'no'
+            )
         return res
 
     company_id = fields.Many2one(
@@ -61,6 +68,16 @@ class OfInterventionSettings(models.TransientModel):
         (1, 'Utiliser les bons de livraisons depuis les RDV')], string="(OF) BL d'intervention")
     group_of_group_planning_intervention_flexibility = fields.Boolean(
         string=u"Flexibilité des RDV", implied_group='of_planning.of_group_planning_intervention_flexibility')
+    deliveries_validation = fields.Selection(
+        selection=[
+            ('no', u"Pas de validation automatique"),
+            ('state_done', u"validation automatique lorsque l'intervention passe à terminée")
+        ], string=u"Validation des BL")
+
+    @api.onchange('do_deliveries')
+    def _onchange_do_deliveries(self):
+        if not self.do_deliveries:
+            self.deliveries_validation = 'no'
 
     @api.multi
     def set_calendar_min_time_defaults(self):
@@ -130,3 +147,8 @@ class OfInterventionSettings(models.TransientModel):
     def set_areas_automatically(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'automatic_areas', self.automatic_areas)
+
+    @api.multi
+    def set_deliveries_validation_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'deliveries_validation', self.deliveries_validation)

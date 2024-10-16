@@ -1363,6 +1363,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def write(self, vals):
         ri_report = self.env.ref('of_planning.of_planning_raport_intervention_report', raise_if_not_found=False)
+        deliveries_validation = self.env['ir.values'].get_default('of.intervention.settings', 'deliveries_validation')
         default_template = self.env.ref(
             'of_planning.of_planning_default_intervention_template', raise_if_not_found=False)
         if 'default_date' in self._context:
@@ -1427,7 +1428,7 @@ class OfPlanningIntervention(models.Model):
                         default_template and default_template.attach_report):
                     self.env['report'].sudo().get_pdf(docids=record._ids, report_name=ri_report.report_name)
         # Validation auto des BL si l'intervention est passée à l'état "Réalisé"
-        if vals.get('state') == 'done':
+        if deliveries_validation == 'state_done' and vals.get('state') == 'done':
             for picking in self.sudo().mapped('picking_ids').filtered(
                     lambda p: p.state in ('partially_available', 'assigned')):
                 self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
@@ -1579,6 +1580,8 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def button_done(self):
         self.write({'state': 'done'})
+        if self.env['ir.values'].get_default('of.intervention.settings', 'deliveries_validation') != 'state_done':
+            return {'type': 'ir.actions.do_nothing'}
         for picking in self.mapped('picking_ids').filtered(lambda p: p.state in ('partially_available', 'assigned')):
             self.env['stock.immediate.transfer'].create({'pick_id': picking.id}).process()
         return {'type': 'ir.actions.do_nothing'}
