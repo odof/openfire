@@ -23,8 +23,6 @@ class ResPartner(models.Model):
         elif len(equipments) == 1:
             action["views"] = [(self.env.ref("of_equipment.of_equipment_view_form").id, "form")]
             action["res_id"] = equipments.ids[0]
-        else:
-            action = {"type": "ir.actions.act_window_close"}
         return action
 
     def name_get(self):
