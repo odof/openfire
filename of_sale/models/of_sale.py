@@ -554,25 +554,26 @@ class SaleOrder(models.Model):
         down = value - 0.005
         params = []
         request = "SELECT id FROM sale_order WHERE "
+        amount_untaxed = ' '.join(self._get_amount_untaxed_sql_fields())
         if operator == '=':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s AND " \
-                "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) >= %s AND " \
+                "(100 * (margin / NULLIF({amount_untaxed}, 0))) <= %s;".format(amount_untaxed=amount_untaxed)
             params = (down, top)
         elif operator == '!=':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s OR " \
-                "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) <= %s OR " \
+                "(100 * (margin / NULLIF({amount_untaxed}, 0))) >= %s;".format(amount_untaxed=amount_untaxed)
             params = (down, top)
         elif operator == '>=':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) >= %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) >= %s;".format(amount_untaxed=amount_untaxed)
             params = (down,)
         elif operator == '>':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) > %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) > %s;".format(amount_untaxed=amount_untaxed)
             params = (top,)
         elif operator == '<=':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) <= %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) <= %s;".format(amount_untaxed=amount_untaxed)
             params = (top,)
         elif operator == '<':
-            request += "(100 * (margin / NULLIF(amount_untaxed, 0))) < %s;"
+            request += "(100 * (margin / NULLIF({amount_untaxed}, 0))) < %s;".format(amount_untaxed=amount_untaxed)
             params = (down,)
         else:
             raise NotImplementedError(_("Search operator %s not implemented for value %s") % (operator, value))
@@ -596,9 +597,10 @@ class SaleOrder(models.Model):
     @api.depends('margin', 'amount_untaxed')
     def _compute_of_marge(self):
         for order in self:
-            cout = order.amount_untaxed - order.margin
+            amount_untaxed = self._get_amount_untaxed()
+            cout = amount_untaxed - order.margin
             order.of_total_cout = cout
-            order.of_marge_pc = 100 * (1 - cout / order.amount_untaxed) if order.amount_untaxed else -100
+            order.of_marge_pc = 100 * (1 - cout / amount_untaxed) if amount_untaxed else -100
 
     def toggle_view(self):
         """ Permet de basculer entre la vue vendeur/client
@@ -927,6 +929,14 @@ class SaleOrder(models.Model):
         if mail_subtype:
             action['ctx'].update({'default_subtype_id': mail_subtype.id})
         return action
+
+    @api.multi
+    def _get_amount_untaxed(self):
+        return self.amount_untaxed
+
+    @api.model
+    def _get_amount_untaxed_sql_fields(self):
+        return ['amount_untaxed']
 
 
 class SaleOrderLine(models.Model):

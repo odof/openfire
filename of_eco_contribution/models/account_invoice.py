@@ -4,7 +4,7 @@
 import itertools
 import math
 
-from odoo import api, models, fields, _
+from odoo import _, api, fields, models
 
 
 class AccountInvoice(models.Model):
@@ -122,6 +122,9 @@ class AccountInvoiceLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
+            else:
+                record.of_unit_eco_contribution = 0
+                record.of_total_eco_contribution = 0
 
     @api.depends('of_total_eco_contribution', 'product_id')
     def _compute_of_eco_contribution_id(self):
@@ -231,3 +234,6 @@ class OfAccountInvoiceKitLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
+            else:
+                record.of_unit_eco_contribution = 0
+                record.of_total_eco_contribution = 0
