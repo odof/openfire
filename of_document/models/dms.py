@@ -18,7 +18,7 @@ from odoo.addons.muk_dms.models import dms_base
 class Directory(dms_base.DMSModel):
     _inherit = 'muk_dms.directory'
 
-    of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire associé")
+    of_partner_id = fields.Many2one(comodel_name='res.partner', string=u"Partenaire associé", index=True)
     of_is_protected = fields.Boolean(string=u"Répertoire protégé")
     # Correction d'erreur sur le recalcul de relational_path sur plusieurs niveaux
     relational_path = fields.Text(recursive=True)
