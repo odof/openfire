@@ -26,12 +26,16 @@ class SaleOrder(models.Model):
         return res
 
     of_total_eco_contribution = fields.Float(
-        string=u"Dont éco-contribution PMCB", compute='_compute_of_total_eco_contribution')
+        string=u"Dont éco-contribution PMCB", compute='_compute_of_total_eco_contribution', store=True)
 
     @api.depends('order_line.of_total_eco_contribution')
     def _compute_of_total_eco_contribution(self):
         for record in self:
             record.of_total_eco_contribution = sum(record.mapped('order_line.of_total_eco_contribution'))
+
+    @api.depends('of_total_eco_contribution')
+    def _compute_of_marge(self):
+        super(SaleOrder, self)._compute_of_marge()
 
     @api.multi
     def recompute_eco_contribution(self):
@@ -50,6 +54,15 @@ class SaleOrder(models.Model):
                 'account.config.settings', 'of_eco_contribution_price_included'):
             # Après avoir soustrait l'ancienne éco contribution, on ajoute la nouvelle
             lines._add_of_unit_eco_contribution()
+
+    @api.multi
+    def _get_amount_untaxed(self):
+        res = super(SaleOrder, self)._get_amount_untaxed()
+        return res - self.of_total_eco_contribution
+
+    @api.model
+    def _get_amount_untaxed_sql_fields(self):
+        return super(SaleOrder, self)._get_amount_untaxed_sql_fields() + ['-', 'of_total_eco_contribution']
 
 
 class SaleOrderLine(models.Model):
@@ -124,6 +137,9 @@ class SaleOrderLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
+            else:
+                record.of_unit_eco_contribution = 0
+                record.of_total_eco_contribution = 0
 
     @api.multi
     def _add_of_unit_eco_contribution(self):
@@ -226,3 +242,6 @@ class OfSaleOrderKitLine(models.Model):
                     eco_contribution = contribution.price
                 record.of_unit_eco_contribution = eco_contribution
                 record.of_total_eco_contribution = qty * eco_contribution
+            else:
+                record.of_unit_eco_contribution = 0
+                record.of_total_eco_contribution = 0
