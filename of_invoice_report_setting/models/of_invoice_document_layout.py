@@ -148,6 +148,9 @@ class OFInvoiceDocumentLayout(models.TransientModel):
         string="Price Tax Incl.", related="company_id.pdf_invoice_price_taxinc", readonly=False
     )
 
+    # Summary invoice amounts
+    module_of_account_sale_report_totals = fields.Boolean(string="Invoice totals management")
+
     # ---------------------------------------------------------
     # Onchange methods
     # ---------------------------------------------------------
