@@ -5,28 +5,28 @@ from odoo.tools.float_utils import float_compare
 
 
 class OFInvoiceReportTotalGroup(models.Model):
-    _name = 'of.invoice.report.total.group'
+    _name = "of.invoice.report.total.group"
     _description = "Printing sales invoice totals"
-    _order = 'position, sequence'
+    _order = "position, sequence"
 
     name = fields.Char(translate=True)
     subtotal_name = fields.Char(translate=True)
     sequence = fields.Integer(default=10)
-    product_ids = fields.Many2many(comodel_name='product.product', string="Filter on products")
-    categ_ids = fields.Many2many(comodel_name='product.category', string="Filter on categories")
+    product_ids = fields.Many2many(comodel_name="product.product", string="Filter on products")
+    categ_ids = fields.Many2many(comodel_name="product.category", string="Filter on categories")
     is_affect_invoice = fields.Boolean(string="Affects invoices", default=True)
     is_affect_order = fields.Boolean(string="Affects sale orders")
     position = fields.Selection(
-        selection=[('0-pre-tax', "Untaxed"), ('1-post-tax', "Tax included")], required=True, default='1-post-tax'
+        selection=[("0-pre-tax", "Untaxed"), ("1-post-tax", "Tax included")], required=True, default="1-post-tax"
     )
 
     @api.model
     def get_payments_group(self):
-        return self.env.ref('of_account_sale_report_totals.of_invoice_report_total_group_payments')
+        return self.env.ref("of_account_sale_report_totals.of_invoice_report_total_group_payments")
 
     @api.model
     def get_taxes_group(self):
-        return self.env.ref('of_account_sale_report_totals.of_invoice_report_total_group_taxes')
+        return self.env.ref("of_account_sale_report_totals.of_invoice_report_total_group_taxes")
 
     def is_payments_group(self):
         return self == self.get_payments_group()
@@ -49,7 +49,7 @@ class OFInvoiceReportTotalGroup(models.Model):
         if self.is_payments_group():
             # We do not allow articles in payments. (See module `of_sale` for this possibility)
             return False
-        if self.position == '1-post-tax':
+        if self.position == "1-post-tax":
             # We do not allow lines with a tax amount in the "with tax" groups.
             lines = lines.filtered(hax_no_tax_amount)
         return lines.filtered(product_in_group)
