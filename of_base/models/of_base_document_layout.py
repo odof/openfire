@@ -11,7 +11,7 @@ class OFBaseDocumentLayout(models.AbstractModel):
     That model is meant to be inherited by the specific document layout configuration models.
     """
 
-    _name = 'of.base.document.layout'
+    _name = "of.base.document.layout"
     _description = "Base Document Layout"
 
     @api.model
@@ -22,14 +22,14 @@ class OFBaseDocumentLayout(models.AbstractModel):
         res = super().default_get(fields_list)
 
         # groups: which groups are implied by the group Employee
-        for name, groups, implied_group in classified_fields['group']:
+        for name, groups, implied_group in classified_fields["group"]:
             res[name] = all(implied_group in group.implied_ids for group in groups)
-            if self._fields[name].type == 'selection':
+            if self._fields[name].type == "selection":
                 res[name] = str(int(res[name]))  # True, False -> '1', '0'
 
         # modules: which modules are installed/to install
-        for module in classified_fields['module']:
-            res[f'module_{module.name}'] = module.state in ('installed', 'to install', 'to upgrade')
+        for module in classified_fields["module"]:
+            res[f"module_{module.name}"] = module.state in ("installed", "to install", "to upgrade")
         return res
 
     # ---------------------------------------------------------
@@ -38,9 +38,9 @@ class OFBaseDocumentLayout(models.AbstractModel):
 
     def action_validate_modules(self, modules_fields):
         """Install or uninstall the selected modules."""
-        to_install = modules_fields.filtered(lambda m: self[f'module_{m.name}'] and m.state != 'installed')
+        to_install = modules_fields.filtered(lambda m: self[f"module_{m.name}"] and m.state != "installed")
         to_uninstall = modules_fields.filtered(
-            lambda m: not self[f'module_{m.name}'] and m.state in ('installed', 'to upgrade')
+            lambda m: not self[f"module_{m.name}"] and m.state in ("installed", "to upgrade")
         )
 
         if to_install or to_uninstall:
@@ -75,14 +75,14 @@ class OFBaseDocumentLayout(models.AbstractModel):
     def action_button_document_layout_save(self):
         self.ensure_one()
         classified_fields = self._get_classified_fields()
-        self.action_validate_modules(classified_fields['module'])
-        self.action_validate_groups(classified_fields['group'])
-        return self.env.context.get('report_action') or {'type': 'ir.actions.act_window_close'}
+        self.action_validate_modules(classified_fields["module"])
+        self.action_validate_groups(classified_fields["group"])
+        return self.env.context.get("report_action") or {"type": "ir.actions.act_window_close"}
 
     def _valid_field_parameter(self, field, name):
         return (
-            field.type in ('boolean', 'selection')
-            and name in ('group', 'implied_group')
+            field.type in ("boolean", "selection")
+            and name in ("group", "implied_group")
             or super()._valid_field_parameter(field, name)
         )
 
@@ -99,9 +99,9 @@ class OFBaseDocumentLayout(models.AbstractModel):
             'other':   ['foo', 'qux'],
         }
         """
-        IrModule = self.env['ir.module.module']
-        IrModelData = self.env['ir.model.data']
-        Groups = self.env['res.groups']
+        IrModule = self.env["ir.module.module"]
+        IrModelData = self.env["ir.model.data"]
+        Groups = self.env["res.groups"]
 
         def ref(xml_id):
             res_model, res_id = IrModelData._xmlid_to_res_model_res_id(xml_id)
@@ -114,28 +114,28 @@ class OFBaseDocumentLayout(models.AbstractModel):
         modules = IrModule
         for name in fnames:
             field = self._fields[name]
-            if name.startswith('group_'):
-                if field.type not in ('boolean', 'selection'):
+            if name.startswith("group_"):
+                if field.type not in ("boolean", "selection"):
                     raise Exception("Field %s must have type 'boolean' or 'selection'" % field)
-                if not hasattr(field, 'implied_group'):
+                if not hasattr(field, "implied_group"):
                     raise Exception("Field %s without attribute 'implied_group'" % field)
-                field_group_xmlids = getattr(field, 'group', 'base.group_user').split(',')
+                field_group_xmlids = getattr(field, "group", "base.group_user").split(",")
                 field_groups = Groups.concat(*(ref(it) for it in field_group_xmlids))
                 groups.append((name, field_groups, ref(field.implied_group)))
-            elif name.startswith('module_'):
-                if field.type not in ('boolean', 'selection'):
+            elif name.startswith("module_"):
+                if field.type not in ("boolean", "selection"):
                     raise Exception("Field %s must have type 'boolean' or 'selection'" % field)
                 modules += IrModule._get(name[7:])
             else:
                 others.append(name)
 
-        return {'group': groups, 'module': modules, 'other': others}
+        return {"group": groups, "module": modules, "other": others}
 
     @api.model
     def _install_modules(self, modules):
         """Install the requested modules."""
         return (
             to_install_modules.button_immediate_install()
-            if (to_install_modules := modules.filtered(lambda module: module.state == 'uninstalled'))
+            if (to_install_modules := modules.filtered(lambda module: module.state == "uninstalled"))
             else None
         )
