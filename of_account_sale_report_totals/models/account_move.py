@@ -250,9 +250,9 @@ class AccountMove(models.Model):
             for line_vals in tax_totals["groups_by_subtotal"][subtotal["name"]]:
                 if tax_totals["display_tax_base"]:
                     line_name = _(
-                        "%(tax_group_name)s on %(tax_group_base_amount)s",
+                        "%(tax_group_name)s on %(formatted_tax_group_base_amount)s",
                         tax_group_name=line_vals["tax_group_name"],
-                        tax_group_base_amount=line_vals["tax_group_base_amount"],
+                        formatted_tax_group_base_amount=line_vals["formatted_tax_group_base_amount"],
                     )
                 else:
                     line_name = line_vals["tax_group_name"]
