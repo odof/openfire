@@ -4,7 +4,7 @@ from odoo import fields, models
 
 
 class ResCompany(models.Model):
-    _inherit = 'res.company'
+    _inherit = "res.company"
 
     # Address insert
     pdf_invoice_address_title = fields.Boolean(string="Address title (Invoice report settings)", default=True)
