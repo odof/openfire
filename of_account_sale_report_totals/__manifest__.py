@@ -17,7 +17,7 @@
         'report/of_invoice_report_templates.xml',
         'views/of_invoice_report_total_group_views.xml',
     ],
-    'installable': False,  # This module will be installable in a future commit.
+    'installable': True,
     'application': False,
     'auto_install': False,
 }

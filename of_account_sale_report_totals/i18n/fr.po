@@ -19,8 +19,8 @@ msgstr ""
 #. odoo-python
 #: code:addons/of_account_sale_report_totals/models/account_move.py:0
 #, python-format
-msgid "%(tax_group_name)s on %(tax_group_base_amount)s"
-msgstr "%(tax_group_name)s sur %(tax_group_base_amount)s"
+msgid "%(tax_group_name)s on %(formatted_tax_group_base_amount)s"
+msgstr "%(tax_group_name)s sur %(formatted_tax_group_base_amount)s"
 
 #. module: of_account_sale_report_totals
 #. odoo-python
