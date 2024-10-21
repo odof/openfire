@@ -31,7 +31,7 @@ class OFTourPlanningReorganizationWizard(models.TransientModel):
         # update the interventions with a temporary state to allow the start date update
         current_states = {
             intervention: intervention.state for intervention in self.line_ids.mapped('intervention_id')}
-        self.line_ids.mapped('intervention_id').write({'state': 'being_optimized'})
+        self.line_ids.mapped('intervention_id').with_context(from_tour_wizard=True).write({'state': 'being_optimized'})
 
         # build a mapping between tour lines and wizard lines to be able to retrieve them during the process
         wizard_line_mapping = dict(zip(self.line_ids.mapped('tour_line_id'), self.line_ids))
@@ -81,7 +81,7 @@ class OFTourPlanningReorganizationWizard(models.TransientModel):
         self.tour_id.recompute()
         # update the interventions with their old state
         for intervention, state in current_states.items():
-            intervention.write({'state': state})
+            intervention.with_context(from_tour_wizard=True).write({'state': state})
         return self.action_close_and_reload_tour()
 
     @api.multi
