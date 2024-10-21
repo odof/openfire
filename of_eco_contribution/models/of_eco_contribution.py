@@ -10,7 +10,7 @@ class OFEcoOrganism(models.Model):
 
     name = fields.Char(string=u"Nom de l'Éco-organisme", required=True)
     active = fields.Boolean(string=u"Actif", default=True)
-    account_id = fields.Many2one(comodel_name='account.account', string=u"Compte comptable")
+    account_id = fields.Many2one(comodel_name='account.account', string=u"Compte comptable", company_dependent=True)
     contribution_ids = fields.One2many(
         comodel_name='of.eco.contribution', inverse_name='organism_id', string=u"Éco-contributions")
 
