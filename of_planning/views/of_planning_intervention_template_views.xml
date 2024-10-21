@@ -1,215 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Adjust the form view of the intervention template from mixin (add specific `of.planning.intervention.template` fields -->
     <record id="of_planning_intervention_template_view_form" model="ir.ui.view">
         <field name="name">of.planning.intervention.template.view.form</field>
         <field name="model">of.planning.intervention.template</field>
+        <field name="mode">primary</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_mixin_view_form"/>
         <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <field name="active" invisible="1" />
-                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger"
-                        attrs="{'invisible': [('active', '=', True)]}" />
-                    <div class="oe_button_box" name="button_box" />
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" placeholder="Template name" />
-                        </h1>
-                    </div>
-                    <group name="general">
-                        <group name="general_one">
-                            <field name="code" />
-                            <field name="task_id" />
-                            <field name="is_default_template" invisible="1" />
-                        </group>
-                        <group name="general_two" />
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Intervention template</attribute>
+            </xpath>
+            <xpath expr="//field[@name='task_id']" position="before">
+                <field name="code" />
+            </xpath>
+            <xpath expr="//field[@name='task_id']" position="after">
+                <field name="is_default_template" invisible="1" />
+            </xpath>
+            <xpath expr="//page[@name='configuration']" position="inside">
+                <group col="4">
+                    <group name="general" string="General" colspan="2">
+                        <field name="sequence_id" string="Sequence" />
+                        <field name="send_reports" />
+                        <field name="attach_report" />
                     </group>
-                    <notebook>
-                        <page name="configuration" string="Configuration">
-                            <group>
-                                <field name="sequence_id" string="Sequence" colspan="2" />
-                                <field name="send_reports" colspan="2" />
-                                <field name="attach_report" colspan="2" />
-                            </group>
-                        </page>
-                        <page name="invoicing" string="Invoicing">
-                            <group>
-                                <group>
-                                    <field name="fiscal_position_id" />
-                                </group>
-                            </group>
-                            <field name="line_ids">
-                                <tree editable="bottom">
-                                    <field name="product_id" required="1"/>
-                                    <field name="name" required="1"/>
-                                    <field name="qty" />
-                                    <field name="price_unit" />
-                                </tree>
-                            </field>
-                        </page>
-                        <page name="legal" string="Legal notice">
-                            <field name="legal" nolabel="1" />
-                        </page>
-                        <page name="sheet" string="Intervention sheet">
-                            <group col="1" class="mb-4">
-                                <group>
-                                    <field name="sheet_use_default" string="Use default report" attrs="{'invisible':[('is_default_template','=',True)]}" />
-                                    <separator string="Displayed fields" />
-                                    <field name="sheet_title" string="Report title" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_partner_id" string="Customer" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_date" string="Date" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                </group>
-                            </group>
-                            <group col="8" class="mb-4">
-                                <group name="sheet_first">
-                                    <!-- Intervention sheet -->
-                                    <field name="sheet_intervention" string="INTERVENTION" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_intervention_partner_id" string="Customer" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_partner_code" string="Customer code" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_task_id" string="Task" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_task_description" string="Task description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_date" string="Start date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_duration" string="Duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_team_id" string="Team" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_employee_ids" string="Operator(s)" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_company_id" string="Company" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_label" string="Label" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_address" string="Address" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_contact" string="Contact" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_type" string="Intervention type" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_internal_description" string="Internal description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                    <field name="sheet_intervention_description" string="External description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
-                                </group>
-                                <group name="sheet_second">
-                                    <!-- Sheet - Installed equipment -->
-                                </group>
-                                <group name="sheet_third">
-                                    <!-- Sheet - History -->
-                                    <field name="sheet_history" string="HISTORY" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='report_use_default']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="attrs">{'invisible':[('is_default_template','=',True)]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='report_displayed_fields']//field[@name='report_title']" position="after">
+                <field name="report_partner_id" string="Customer" attrs="{'readonly':[('report_use_default','=',True)]}" />
+                <field name="report_date" string="Date" attrs="{'readonly':[('report_use_default','=',True)]}" />
+            </xpath>
+            <xpath expr="//field[@name='report_order']" position="before">
+                <!-- Intervention report: History -->
+                <field name="report_history" string="HISTORY" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='report_pickings']" position="after">
+                <!-- Intervention report: Invoicing -->
+                <field name="report_invoicing" string="INVOICING" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='report_minutes']" position="after">
+                <!-- Intervention report: Minutes details -->
+                <field name="report_minutes_real_dates" string="Real dates" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
+                <field name="report_minutes_real_duration" string="Real duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
+                <field name="report_minutes_description" string="Description" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
+            </xpath>
+            <!-- /Intervention report -->
 
-                                    <!-- Sheet - Order -->
-                                    <field name="sheet_order" string="ORDER" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_order_name" string="Number" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_order_confirmation_date" string="Confirmation date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
-                                    <field name="sheet_order_user_id" string="Vendor" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
-                                    <field name="sheet_order_inspection_visit_date" string="Inspection visit date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
-                                    <field name="sheet_order_totals" string="Totals" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
-                                    <field name="sheet_order_intervention_notes" string="Intervention notes" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
-                                </group>
-                                <group name="sheet_fourth">
-                                    <!-- Sheet - Products -->
-                                    <field name="sheet_products" string="PRODUCTS AND WORKS" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Pickings -->
-                                    <field name="sheet_pickings" string="DELIVERIES" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+            <!-- Invoicing -->
+            <xpath expr="//page[@name='invoicing']" position="after">
+                <page name="legal" string="Legal notice">
+                    <field name="legal" nolabel="1" />
+                </page>
+                <page name="sheet" string="Intervention sheet">
+                    <group col="1" class="mb-4">
+                        <group>
+                            <field name="sheet_use_default" string="Use default report" attrs="{'invisible':[('is_default_template','=',True)]}" />
+                            <separator string="Displayed fields" />
+                            <field name="sheet_title" string="Report title" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_partner_id" string="Customer" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_date" string="Date" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                        </group>
+                    </group>
+                    <group col="8" class="mb-4">
+                        <group name="sheet_first">
+                            <!-- Intervention sheet -->
+                            <field name="sheet_intervention" string="INTERVENTION" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_intervention_partner_id" string="Customer" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_partner_code" string="Customer code" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_task_id" string="Task" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_task_description" string="Task description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_date" string="Start date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_duration" string="Duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_team_id" string="Team" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_employee_ids" string="Operator(s)" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_company_id" string="Company" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_label" string="Label" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_address" string="Address" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_contact" string="Contact" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_type" string="Intervention type" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_internal_description" string="Internal description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                            <field name="sheet_intervention_description" string="External description" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_intervention', '=', False)]}" />
+                        </group>
+                        <group name="sheet_second">
+                            <!-- Sheet - Installed equipment -->
+                        </group>
+                        <group name="sheet_third">
+                            <!-- Sheet - History -->
+                            <field name="sheet_history" string="HISTORY" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Invoicing -->
-                                    <field name="sheet_invoicing" string="INVOICING" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <!-- Sheet - Order -->
+                            <field name="sheet_order" string="ORDER" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_order_name" string="Number" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_order_confirmation_date" string="Confirmation date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                            <field name="sheet_order_user_id" string="Vendor" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                            <field name="sheet_order_inspection_visit_date" string="Inspection visit date" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                            <field name="sheet_order_totals" string="Totals" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                            <field name="sheet_order_intervention_notes" string="Intervention notes" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_order', '=', False)]}" />
+                        </group>
+                        <group name="sheet_fourth">
+                            <!-- Sheet - Products -->
+                            <field name="sheet_products" string="PRODUCTS AND WORKS" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Survey -->
+                            <!-- Sheet - Pickings -->
+                            <field name="sheet_pickings" string="DELIVERIES" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Debriefing -->
+                            <!-- Sheet - Invoicing -->
+                            <field name="sheet_invoicing" string="INVOICING" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Legal notice -->
-                                    <field name="sheet_legal" string="LEGAL NOTICE" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <!-- Sheet - Survey -->
 
-                                    <!-- Sheet - Minutes -->
-                                    <field name="sheet_minutes" string="MINUTES" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
-                                    <field name="sheet_minutes_real_dates" string="Real dates" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
-                                    <field name="sheet_minutes_real_duration" string="Real duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
-                                    <field name="sheet_minutes_description" string="Description" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+                            <!-- Sheet - Debriefing -->
 
-                                    <!-- Report - Photos -->
-                                    <field name="sheet_photos" string="PHOTOS" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+                            <!-- Sheet - Legal notice -->
+                            <field name="sheet_legal" string="LEGAL NOTICE" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
 
-                                    <!-- Sheet - Signatures -->
-                                    <field name="sheet_signature" string="SIGNATURES" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
-                                    <field name="sheet_signature_date" string="Signature date" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_signature', '=', False)]}"/>
-                                </group>
-                            </group>
-                        </page>
-                        <page name="report" string="Intervention report">
-                            <group col="1" class="mb-4">
-                                <group>
-                                    <field name="report_use_default" string="Use default report" attrs="{'invisible':[('is_default_template','=',True)]}" />
-                                    <separator string="Displayed fields" />
-                                    <field name="report_title" string="Report title" attrs="{'readonly':[('report_use_default','=',True)]}" />
-                                    <field name="report_partner_id" string="Customer" attrs="{'readonly':[('report_use_default','=',True)]}" />
-                                    <field name="report_date" string="Date" attrs="{'readonly':[('report_use_default','=',True)]}" />
-                                </group>
-                            </group>
-                            <group col="8" class="mb-4">
-                                <group name="report_first">
-                                    <!-- Intervention report -->
-                                    <field name="report_intervention" string="INTERVENTION" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-                                    <field name="report_intervention_partner_id" string="Customer" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_partner_code" string="Customer code" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_task_id" string="Task" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_task_description" string="Task description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_date" string="Start date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_duration" string="Duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_team_id" string="Team" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_employee_ids" string="Operator(s)" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_company_id" string="Company" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_label" string="Label" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_address" string="Address" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_contact" string="Contact" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_type" string="Intervention type" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_internal_description" string="Internal description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                    <field name="report_intervention_description" string="External description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
-                                </group>
-                                <group name="report_second">
-                                    <!-- Report - Installed equipment -->
-                                </group>
-                                <group name="report_third">
-                                    <!-- Report - History -->
-                                    <field name="report_history" string="HISTORY" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                            <!-- Sheet - Minutes -->
+                            <field name="sheet_minutes" string="MINUTES" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
+                            <field name="sheet_minutes_real_dates" string="Real dates" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+                            <field name="sheet_minutes_real_duration" string="Real duration" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
+                            <field name="sheet_minutes_description" string="Description" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_minutes', '=', False)]}"/>
 
-                                    <!-- Report - Order -->
-                                    <field name="report_order" string="ORDER" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-                                    <field name="report_order_name" string="Number" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                    <field name="report_order_confirmation_date" string="Confirmation date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                    <field name="report_order_user_id" string="Vendor" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                    <field name="report_order_inspection_visit_date" string="Inspection visit date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                    <field name="report_order_totals" string="Totals" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                    <field name="report_order_intervention_notes" string="Intervention notes" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
-                                </group>
-                                <group name="report_fourth">
-                                    <!-- Report - Products -->
-                                    <field name="report_products" string="PRODUCTS AND WORKS" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                            <!-- Report - Photos -->
+                            <field name="sheet_photos" string="PHOTOS" class="mb-4" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
 
-                                    <!-- Report - Pickings -->
-                                    <field name="report_pickings" string="DELIVERIES" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-
-                                    <!-- Report - Invoicing -->
-                                    <field name="report_invoicing" string="INVOICING" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-
-                                    <!-- Report - Survey -->
-
-                                    <!-- Report - Debriefing -->
-
-                                    <!-- Report - Legal notice -->
-                                    <field name="report_legal" string="LEGAL NOTICE" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-
-                                    <!-- Report - Minutes -->
-                                    <field name="report_minutes" string="MINUTES" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-                                    <field name="report_minutes_real_dates" string="Real dates" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
-                                    <field name="report_minutes_real_duration" string="Real duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
-                                    <field name="report_minutes_description" string="Description" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_minutes', '=', False)]}"/>
-
-                                    <!-- Report - Photos -->
-                                    <field name="report_photos" string="PHOTOS" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-
-                                    <!-- Report - Signatures -->
-                                    <field name="report_signature" string="SIGNATURES" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-                                    <field name="report_signature_date" string="Signature date" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_signature', '=', False)]}"/>
-                                </group>
-                            </group>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-
+                            <!-- Sheet - Signatures -->
+                            <field name="sheet_signature" string="SIGNATURES" attrs="{'readonly':[('sheet_use_default','=',True)]}" />
+                            <field name="sheet_signature_date" string="Signature date" class="mb-4" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_signature', '=', False)]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='invoicing']//group[@name='invoicing_main']" position="after">
+                <field name="line_ids">
+                    <tree editable="bottom">
+                        <field name="product_id" required="1"/>
+                        <field name="name" required="1"/>
+                        <field name="qty" />
+                        <field name="price_unit" />
+                    </tree>
+                </field>
+            </xpath>
+            <xpath expr="//group[@name='report_displayed_fields']//field[@name='report_use_default']" position="attributes">
+                <attribute name="attrs">{'invisible':[('is_default_template','=',True)]}</attribute>
+                <attribute name="string">Use default report</attribute>
+            </xpath>
+            <!-- /Invoicing -->
         </field>
     </record>
 

@@ -16,14 +16,438 @@
     <template id="report_intervention_report">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="of_planning.report_intervention_report_document"
-                    t-lang="doc.of_partner_id.lang" />
+                <t t-call="of_planning.report_intervention_report_document" t-lang="doc.of_partner_id.lang" />
             </t>
         </t>
     </template>
 
+    <!-- Intervention general information -->
+    <template id="report_event_information_template">
+        <div t-if="template.report_intervention" class="row mb-4" name="report_event" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_intervention">
+                    <strong>Intervention</strong>
+                </h5>
+                <div class="border border-top-0 w-100 d-table">
+                    <div class="w-50 border-end d-table-cell">
+                        <div t-if="template.report_intervention_partner_id and (event.of_address_id.name or event.partner_id.name)" name="report_event_partner_id" class="border-top">
+                            <div class="m-2">
+                                <span>Customer&amp;nbsp;:</span>
+                                <t t-if="event.of_address_id.name">
+                                    <strong t-field="event.of_address_id.name" />
+                                </t>
+                                <t t-elif="event.partner_id.name">
+                                    <strong t-field="event.partner_id.name" />
+                                </t>
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_partner_code and event.partner_id.property_account_receivable_id and event.partner_id.property_account_receivable_id.code" name="report_event_partner_code" class="border-top">
+                            <div class="m-2">
+                                <span>Customer Code&amp;nbsp;:</span>
+                                <strong t-field="event.partner_id.property_account_receivable_id.code" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_task_id and event.of_task_id and event.of_task_id.name" name="report_event_task_id" class="border-top">
+                            <div class="m-2">
+                                <span>Task&amp;nbsp;:</span>
+                                <strong t-field="event.of_task_id.name" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_task_description and event.of_task_id and event.of_task_id.description" name="report_event_task_description" class="border-top">
+                            <div class="m-2">
+                                <span>Task Description&amp;nbsp;:</span>
+                                <strong t-field="event.of_task_id.description" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_date and event.start" name="report_event_date" class="border-top">
+                            <div class="m-2">
+                                <span>Intervention Date&amp;nbsp;:</span>
+                                <span t-field="event.start" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_duration and event.duration" name="report_event_duration" class="border-top">
+                            <div class="m-2">
+                                <span>Duration&amp;nbsp;:</span>
+                                <span t-field="event.duration" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_team_id and event.of_team_id" name="report_event_team_id" class="border-top">
+                            <div class="m-2">
+                                <span>Team&amp;nbsp;:</span>
+                                <span t-field="event.of_team_id.name" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_employee_ids and event.of_employee_ids" name="report_event_employee_ids" class="border-top">
+                            <div class="m-2">
+                                <span>Operators&amp;nbsp;:</span>
+                                <t t-foreach="event.of_employee_ids" t-as="employee">
+                                    <span t-out="employee_value.name" /> &amp;nbsp;
+                                </t>
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_type and event.of_type" name="report_event_type" class="border-top">
+                            <div class="m-2">
+                                <span>Intervention Type&amp;nbsp;:</span>
+                                <span t-field="event.of_type" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_company_id and event.of_company_id and event.of_company_id.name" name="report_event_company_id" class="border-top">
+                            <div class="m-2">
+                                <span>Company&amp;nbsp;:</span>
+                                <span t-field="event.of_company_id.name" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-50 d-table-cell">
+                        <div t-if="template.report_intervention_label and event.name" name="report_event_label" class="border-top">
+                            <div class="m-2">
+                                <span>Label&amp;nbsp;:</span>
+                                <span t-field="event.name" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_address" name="report_event_address" class="border-top">
+                            <div class="m-2">
+                                <div>
+                                    <strong>Intervention Address</strong>
+                                </div>
+                                <t t-if="event.of_address_id">
+                                    <div t-field="event.of_address_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
+                                </t>
+                                <t t-elif="order.partner_shipping_id">
+                                    <div t-field="order.partner_shipping_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
+                                </t>
+                                <t t-else="">
+                                    <div style="height: 35px;" />
+                                </t>
+                            </div>
+                        </div>
+                        <div t-if="template.report_intervention_contact and (event.of_address_id or order.partner_shipping_id)" name="report_event_contact" class="border-top">
+                            <div class="m-2">
+                                <div>
+                                    <strong>Contact</strong>
+                                </div>
+                                <t t-if="event.of_address_id">
+                                    <div t-field="event.of_address_id" t-options="{'widget': 'contact', 'fields': ['name', 'email']}" />
+                                </t>
+                                <t t-elif="order.partner_shipping_id">
+                                    <div t-field="order.partner_shipping_id" t-options="{'widget': 'contact', 'fields': ['name', 'email']}" />
+                                </t>
+                                <t t-set="contact_address" t-value="event.of_address_id or order.partner_shipping_id or False" />
+                                <div t-foreach="contact_address.of_phone_number_ids[:5]" t-as="phone_number">
+                                    <em>
+                                        <t t-if="phone_number.title_id">
+                                            <span
+                                                t-field="phone_number.title_id.name" />
+                                            - </t>
+                                        <span
+                                            t-field="phone_number.number_display" />
+                                    </em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Intervention descriptions -->
+    <template id="report_event_information_description_template">
+        <div t-if="template.report_intervention_description and event.description or template.report_intervention_internal_description and event.of_internal_description" class="row mb-4" name="report_event_desc" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_intervention_description">
+                    <strong>Description</strong>
+                </h5>
+                <div class="border border-top-0">
+                    <div t-if="template.report_intervention_internal_description and event.of_internal_description" name="report_event_of_internal_description" class="border-top">
+                        <div class="m-2" t-field="event.of_internal_description" />
+                    </div>
+                    <div t-if="template.report_intervention_description and event.description" name="report_event_description" class="border-top">
+                        <div class="m-2" t-field="event.description" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Intervention order -->
+    <template id="report_event_information_order_template">
+        <div t-if="template.report_order and order" class="row mb-4" name="report_order" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_order">
+                    <strong>Order</strong>
+                </h5>
+                <t t-set="report_order_name" t-value="template.report_order_name and order.name" />
+                <t t-set="report_order_confirmation_date" t-value="template.report_order_confirmation_date and order.of_date_order" />
+                <t t-set="report_order_user_id" t-value="template.report_order_user_id and order.user_id" />
+                <t t-set="report_order_inspection_visit_date" t-value="template.report_order_inspection_visit_date and order.of_technical_visit_date" />
+                <div class="border border-top-0 w-100 d-table" t-if="report_order_name or report_order_confirmation_date or report_order_user_id or report_order_inspection_visit_date">
+                    <div class="border-end w-50 d-table-cell">
+                        <div t-if="report_order_name" name="report_order_name" class="border-top">
+                            <div class="m-2">
+                                <span>Linked Order&amp;nbsp;:</span>
+                                <strong t-field="order.name" />
+                            </div>
+                        </div>
+                        <div t-if="template.report_order_confirmation_date and order.of_date_order" name="report_order_confirmation_date" class="border-top">
+                            <div class="m-2">
+                                <span>Confirmation Date&amp;nbsp;:</span>
+                                <strong t-field="order.of_date_order" />
+                            </div>
+                        </div>
+                        <div t-if="report_order_user_id" name="report_order_user_id" class="border-top">
+                            <div class="m-2">
+                                <span>Vendor&amp;nbsp;:</span>
+                                <strong t-field="order.user_id" />
+                            </div>
+                        </div>
+                        <div t-if="report_order_inspection_visit_date" name="report_order_inspection_visit_date" class="border-top">
+                            <div class="m-2">
+                                <span>Technical Visit Date&amp;nbsp;:</span>
+                                <strong t-field="order.of_technical_visit_date" />
+                            </div>
+                        </div>
+                    </div>
+                    <t t-if="template.report_order_totals">
+                        <div t-if="template.report_order_totals" class="w-25 d-table-cell">
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <strong>Total Without Taxes</strong>
+                                </div>
+                            </div>
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <strong>Taxes</strong>
+                                </div>
+                            </div>
+                            <div class="border-top">
+                                <div class="m-2">
+                                    <strong>Total</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div t-if="template.report_order_totals" class="w-25 d-table-cell">
+                            <div name="order_amounts">
+                                <div class="border-top">
+                                    <div class="m-2 text-end" t-field="order.amount_untaxed" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                </div>
+                                <div class="border-top">
+                                    <div class="m-2 text-end" t-field="order.amount_tax" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                </div>
+                                <div class="border-top">
+                                    <div class="m-2 text-end" t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+                <div class="d-table w-100 border border-top-0" t-if="template.report_order_intervention_notes and order.of_intervention_notes" name="report_order_intervention_notes">
+                    <div class="d-table-cell">
+                    <span class="m-2">Intervention notes&amp;nbsp;:</span>
+                    <div class="m-2 mb-0" t-field="order.of_intervention_notes" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Products & Works -->
+    <template id="report_event_information_products_works_template">
+        <div t-if="template.report_products and order" name="report_products" class="row mb-4" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_products">
+                    <strong>Products and works</strong>
+                </h5>
+                <div class="border border-bottom-0">
+
+                    <!-- Is there a discount on at least one line? -->
+                    <t t-set="lines_to_report" t-value="order._get_order_lines_to_report()" />
+                    <t t-set="display_discount" t-value="any(l.discount for l in lines_to_report)" />
+
+                    <table class="table table-sm o_main_table table-condensed mb-0">
+                        <thead>
+                            <tr>
+                                <th name="th_description" class="text-start">Description</th>
+                                <th name="th_quantity" class="text-end">Quantity</th>
+                                <th name="th_priceunit" class="text-end">Unit Price</th>
+                                <th name="th_discount" t-if="display_discount" class="text-end">
+                                    <span>Disc.%</span>
+                                </th>
+                                <th name="th_taxes" class="text-end">Taxes</th>
+                                <th name="th_subtotal" class="text-end">
+                                    <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
+                                    <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="current_subtotal" t-value="0" />
+                            <t t-foreach="lines_to_report" t-as="line">
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded" />
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included" />
+                                <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td name="td_name">
+                                            <span t-field="line.name" />
+                                        </td>
+                                        <td name="td_quantity" class="text-end">
+                                            <span t-field="line.product_uom_qty" />
+                                            <span t-field="line.product_uom" />
+                                        </td>
+                                        <td name="td_priceunit" class="text-end">
+                                            <span t-field="line.price_unit" />
+                                        </td>
+                                        <td t-if="display_discount"
+                                            class="text-end">
+                                            <span t-field="line.discount" />
+                                        </td>
+                                        <td name="td_taxes" class="text-end">
+                                            <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))" />
+                                        </td>
+                                        <td t-if="not line.is_downpayment" name="td_subtotal" class="text-end o_price_total">
+                                            <span t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded" />
+                                            <span t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included" />
+                                        </td>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_section'">
+                                        <td name="td_section_line" colspan="99">
+                                            <span t-field="line.name" />
+                                        </td>
+                                        <t t-set="current_section" t-value="line" />
+                                        <t t-set="current_subtotal" t-value="0" />
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <td name="td_note_line" colspan="99">
+                                            <span t-field="line.name" />
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="current_section and (line_last or order.order_line[line_index+1].display_type == 'line_section') and not line.is_downpayment">
+                                    <tr class="is-subtotal text-end">
+                                        <td name="td_section_subtotal" colspan="99">
+                                            <strong>Subtotal</strong>
+                                            <span t-out="current_subtotal" t-options='{"widget": "monetary", "display_currency": event.of_partner_pricelist_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Pickings -->
+    <template id="report_event_information_pickings_template">
+        <t t-set="pickings_layouted" t-value="event.pickings_layouted()" />
+        <div t-if="template.report_pickings and pickings_layouted" name="report_pickings" class="row mb-4" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_pickings">
+                    <strong>Pickings</strong>
+                </h5>
+                <div class="border border-bottom-0">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="text-start">Description</th>
+                                <th class="text-end">Reserved Qty</th>
+                                <th class="text-end">Qty Done</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-foreach="pickings_layouted" t-as="picking_layouted">
+                                <tr class="active">
+                                    <td class="bg-200" colspan="3">
+                                        <t t-esc="picking_layouted['name']" />
+                                    </td>
+                                </tr>
+                                <t t-foreach="picking_layouted['lines']" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span t-field="line.display_name" />
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.reserved_uom_qty" />
+                                            <span t-field="line.product_uom_id.name" groups="uom.group_uom" />
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.qty_done" />
+                                            <span t-field="line.product_uom_id.name" groups="uom.group_uom" />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Legal Notice -->
+    <template id="report_event_information_legal_notice_template">
+        <div t-if="template.report_legal and legal_notice" name="report_legal" style="page-break-inside: avoid;" class="row mb-4">
+            <div class="col">
+                <h5 name="title_legal">
+                    <strong>Legal Notice</strong>
+                </h5>
+                <div t-esc="legal_notice" />
+            </div>
+        </div>
+    </template>
+
+    <!-- Photos -->
+    <template id="report_event_information_photos_template">
+        <div t-if="template.report_photos and event.of_image_printable_ids" name="report_photos" class="row mb-4" style="page-break-inside: avoid;">
+            <div class="col">
+                <h5 name="title_photos">
+                    <strong>Photos</strong>
+                </h5>
+                <div class="border border-top-0">
+                    <t t-foreach="event.of_image_printable_ids" t-as="photo">
+                        <figure class="d-inline-block align-top w-25 overflow-hidden" style="max-width: 24.7%; max-height: 320px;">
+                            <span t-field="photo.image_1920" t-options="{'widget': 'image', 'class': 'mx-auto', 'style': 'max-height: 250px;'}" />
+                            <figcaption class="text-muted text-center mt-1" t-if="photo.caption" t-esc="photo.caption"/>
+                        </figure>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Signature -->
+    <template id="report_event_information_signatures_template">
+        <div t-if="template.report_signature" name="report_signature" style="page-break-inside: avoid;" class="row">
+            <div class="col-6" style="padding-right: 10px !important;">
+                <strong>Operator Signature</strong>
+                <div name="operator_signature" class="border" style="height: 180px;" align="center">
+                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
+                        signature when the report is called from the mobile API whereas field is containing the image -->
+                    <img t-if="event.of_operator_signature" t-att-src="image_data_uri(event.of_operator_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
+                </div>
+            </div>
+            <div class="col-6" style="padding-left: 10px !important;">
+                <strong>Customer Signature</strong>
+                <div name="customer_signature" class="border" style="height: 180px;" align="center">
+                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
+                        signature when the report is called from the mobile API whereas field is containing the image -->
+                    <img t-if="event.of_customer_signature" t-att-src="image_data_uri(event.of_customer_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2" t-if="template.report_signature and template.report_signature_date and event.of_signature_date">
+            <div class="col" >
+                <span>Signature date&amp;nbsp;:</span>
+                <span t-field="event.of_signature_date" t-options="{'widget': 'date'}"/>
+            </div>
+        </div>
+    </template>
+
     <template id="report_intervention_report_document">
         <t t-call="web.external_layout">
+
             <t t-if="docs._context.get('of_from_sale_order', False)">
                 <t t-set="documents"
                     t-value="[(i, o) for o in docs for i in (doc.of_intervention_ids or [doc.of_intervention_ids])]" />
@@ -31,8 +455,10 @@
             <t t-else="">
                 <t t-set="documents" t-value="[(o, doc.of_order_id) for o in docs]" />
             </t>
+
             <t t-foreach="documents" t-as="vals">
                 <t t-set="doc" t-value="vals[0]" />
+                <t t-set="event" t-value="doc"/>
                 <t t-set="order" t-value="vals[1]" />
                 <t t-set="template" t-value="doc._report_get_template()" name="get_template" />
                 <t t-set="doc" t-value="doc.with_context(of_report_name=template.report_title)" />
@@ -47,204 +473,15 @@
                         <h1>
                             <span t-field="template.report_title"/>
                         </h1>
-                        <!-- Intervention -->
-                        <div t-if="template.report_intervention" class="row mb-4"
-                            name="report_intervention" style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_intervention">
-                                    <strong>Intervention</strong>
-                                </h5>
-                                <div class="border border-top-0 w-100 d-table">
-                                    <div class="w-50 border-end d-table-cell">
-                                        <div
-                                            t-if="template.report_intervention_partner_id and (doc.of_address_id.name or doc.partner_id.name)"
-                                            name="report_intervention_partner_id"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Customer&amp;nbsp;:</span>
-                                                <t t-if="doc.of_address_id.name">
-                                                    <strong t-field="doc.of_address_id.name" />
-                                                </t>
-                                                <t t-elif="doc.partner_id.name">
-                                                    <strong t-field="doc.partner_id.name" />
-                                                </t>
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_partner_code and doc.partner_id and doc.partner_id.property_account_receivable_id and doc.partner_id.property_account_receivable_id.code"
-                                            name="report_intervention_partner_code"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Customer Code&amp;nbsp;:</span>
-                                                <strong
-                                                    t-field="doc.partner_id.property_account_receivable_id.code" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_task_id and doc.of_task_id and doc.of_task_id.name"
-                                            name="report_intervention_task_id" class="border-top">
-                                            <div class="m-2">
-                                                <span>Task&amp;nbsp;:</span>
-                                                <strong t-field="doc.of_task_id.name" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_task_description and doc.of_task_id and doc.of_task_id.description"
-                                            name="report_intervention_task_description"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Task Description&amp;nbsp;:</span>
-                                                <strong t-field="doc.of_task_id.description" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_date and doc.start"
-                                            name="report_intervention_date" class="border-top">
-                                            <div class="m-2">
-                                                <span>Intervention Date&amp;nbsp;:</span>
-                                                <span t-field="doc.start" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_duration and doc.duration"
-                                            name="report_intervention_duration"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Duration&amp;nbsp;:</span>
-                                                <span t-field="doc.duration" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_team_id and doc.of_team_id"
-                                            name="report_intervention_team_id" class="border-top">
-                                            <div class="m-2">
-                                                <span>Team&amp;nbsp;:</span>
-                                                <span t-field="doc.of_team_id.name" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_employee_ids and doc.of_employee_ids"
-                                            name="report_intervention_employee_ids"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Operators&amp;nbsp;:</span>
-                                                <t t-foreach="doc.of_employee_ids"
-                                                    t-as="employee">
-                                                    <span t-out="employee_value.name" /> &amp;nbsp; </t>
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_type and doc.of_type"
-                                            name="report_intervention_type" class="border-top">
-                                            <div class="m-2">
-                                                <span>Intervention Type&amp;nbsp;:</span>
-                                                <span t-field="doc.of_type" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_company_id and doc.of_company_id and doc.of_company_id.name"
-                                            name="report_intervention_company_id"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Company&amp;nbsp;:</span>
-                                                <span t-field="doc.of_company_id.name" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="w-50 d-table-cell">
-                                        <div
-                                            t-if="template.report_intervention_label and doc.name"
-                                            name="report_intervention_label" class="border-top">
-                                            <div class="m-2">
-                                                <span>Label&amp;nbsp;:</span>
-                                                <span t-field="doc.name" />
-                                            </div>
-                                        </div>
-                                        <div t-if="template.report_intervention_address"
-                                            name="report_intervention_address" class="border-top">
-                                            <div class="m-2">
-                                                <div>
-                                                    <strong>Intervention Address</strong>
-                                                </div>
-                                                <t t-if="doc.of_address_id">
-                                                    <div t-field="doc.of_address_id"
-                                                        t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
-                                                </t>
-                                                <t t-elif="order.partner_shipping_id">
-                                                    <div t-field="order.partner_shipping_id"
-                                                        t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': true }" />
-                                                </t>
-                                                <t t-else="">
-                                                    <div style="height: 35px;" />
-                                                </t>
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="template.report_intervention_contact and (doc.of_address_id or order.partner_shipping_id)"
-                                            name="report_intervention_contact" class="border-top">
-                                            <div class="m-2">
-                                                <div>
-                                                    <strong>Contact</strong>
-                                                </div>
-                                                <t t-if="doc.of_address_id">
-                                                    <div t-field="doc.of_address_id"
-                                                        t-options="{'widget': 'contact', 'fields': ['name', 'email']}" />
-                                                </t>
-                                                <t t-elif="order.partner_shipping_id">
-                                                    <div t-field="order.partner_shipping_id"
-                                                        t-options="{'widget': 'contact', 'fields': ['name', 'email']}" />
-                                                </t>
-                                                <t t-set="contact_address"
-                                                    t-value="doc.of_address_id or order.partner_shipping_id or False" />
-                                                <div
-                                                    t-foreach="contact_address.of_phone_number_ids[:5]"
-                                                    t-as="phone_number">
-                                                    <em>
-                                                        <t t-if="phone_number.title_id">
-                                                            <span
-                                                                t-field="phone_number.title_id.name" />
-                                                            - </t>
-                                                        <span
-                                                            t-field="phone_number.number_display" />
-                                                    </em>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Description -->
-                        <div
-                            t-if="template.report_intervention_description and doc.description or template.report_intervention_internal_description and doc.of_internal_description"
-                            class="row mb-4" name="report_intervention_desc"
-                            style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_intervention_description">
-                                    <strong>Description</strong>
-                                </h5>
-                                <div class="border border-top-0">
-                                    <div
-                                        t-if="template.report_intervention_internal_description and doc.of_internal_description"
-                                        name="report_intervention_of_internal_description"
-                                        class="border-top">
-                                        <div class="m-2" t-field="doc.of_internal_description" />
-                                    </div>
-                                    <div
-                                        t-if="template.report_intervention_description and doc.description"
-                                        name="report_intervention_description"
-                                        class="border-top">
-                                        <div class="m-2" t-field="doc.description" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Intervention informations -->
+                        <t t-call="of_planning.report_event_information_template"/>
+
+                        <!-- Intervention descriptions -->
+                        <t t-call="of_planning.report_event_information_description_template"/>
 
                         <!-- History -->
-                        <div t-if="template.report_history and doc.of_history_intervention_ids"
-                            class="row mb-4" name="report_history"
-                            style="page-break-inside: avoid;">
+                        <div t-if="template.report_history and doc.of_history_intervention_ids" class="row mb-4" name="report_history" style="page-break-inside: avoid;">
                             <div class="col">
                                 <h5 name="title_history">
                                     <strong>History</strong>
@@ -258,17 +495,16 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <t t-foreach="doc.of_history_intervention_ids"
-                                            t-as="interv">
+                                        <t t-foreach="doc.of_history_intervention_ids" t-as="event_history">
                                             <tr>
                                                 <td>
-                                                    <span t-field="interv.start" />
+                                                    <span t-field="event_history.start" />
                                                 </td>
                                                 <td class="text-center">
-                                                    <span t-field="interv.of_task_id.name" />
+                                                    <span t-field="event_history.of_task_id.name" />
                                                 </td>
                                                 <td class="text-center">
-                                                    <span t-field="interv.description" />
+                                                    <span t-field="event_history.description" />
                                                 </td>
                                             </tr>
                                         </t>
@@ -278,281 +514,18 @@
                         </div>
 
                         <!-- Order -->
-                        <div t-if="template.report_order and order" class="row mb-4"
-                            name="report_order" style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_order">
-                                    <strong>Order</strong>
-                                </h5>
-                                <t t-set="report_order_name"
-                                    t-value="template.report_order_name and order.name" />
-                                <t t-set="report_order_confirmation_date"
-                                    t-value="template.report_order_confirmation_date and order.of_date_order" />
-                                <t t-set="report_order_user_id"
-                                    t-value="template.report_order_user_id and order.user_id and order.user_id.name" />
-                                <t t-set="report_order_inspection_visit_date"
-                                    t-value="template.report_order_inspection_visit_date and order.of_technical_visit_date" />
-                                <div class="border border-top-0 w-100 d-table"
-                                    t-if="report_order_name or report_order_confirmation_date or report_order_user_id or report_order_inspection_visit_date">
-                                    <div class="border-end w-50 d-table-cell">
-                                        <div t-if="report_order_name" name="report_order_name"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Linked Order&amp;nbsp;:</span>
-                                                <span t-esc="report_order_name" />
-                                            </div>
-                                        </div>
-                                        <div t-if="report_order_confirmation_date"
-                                            name="report_order_confirmation_date"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <t t-set="pre_d" t-value="order.of_date_order" />
-                                                <t t-set="confirmation_date"
-                                                    t-value="pre_d[8:10] + '/' + pre_d[5:7] + '/' + pre_d[0:4]" />
-                                                <span>Confirmation Date&amp;nbsp;:</span>
-                                                <span t-esc="confirmation_date" />
-                                            </div>
-                                        </div>
-                                        <div t-if="report_order_user_id"
-                                            name="report_order_user_id"
-                                            class="border-top">
-                                            <div class="m-2">
-
-                                                <span>Vendor&amp;nbsp;:</span>
-                                                <span t-esc="report_order_user_id" />
-                                            </div>
-                                        </div>
-                                        <div
-                                            t-if="report_order_inspection_visit_date"
-                                            name="report_order_inspection_visit_date"
-                                            class="border-top">
-                                            <div class="m-2">
-                                                <span>Technical Visit Date&amp;nbsp;:</span>
-                                                <span t-esc="report_order_inspection_visit_date" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <t t-if="template.report_order_totals">
-                                        <div t-if="template.report_order_totals"
-                                            class="w-25 d-table-cell">
-                                            <div class="border-top">
-                                                <div class="m-2">
-                                                    <strong>Total Without Taxes</strong>
-                                                </div>
-                                            </div>
-                                            <div class="border-top">
-                                                <div class="m-2">
-                                                    <strong>Taxes</strong>
-                                                </div>
-                                            </div>
-                                            <div class="border-top">
-                                                <div class="m-2">
-                                                    <strong>Total</strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div t-if="template.report_order_totals"
-                                            class="w-25 d-table-cell">
-                                            <div name="order_amounts">
-                                                <div class="border-top">
-                                                    <div class="m-2 text-end"
-                                                        t-field="order.amount_untaxed"
-                                                        t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
-                                                </div>
-                                                <div class="border-top">
-                                                    <div class="m-2 text-end"
-                                                        t-field="order.amount_tax"
-                                                        t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
-                                                </div>
-                                                <div class="border-top">
-                                                    <div class="m-2 text-end"
-                                                        t-field="order.amount_total"
-                                                        t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </t>
-                                </div>
-                                <div class="d-table w-100 border border-top-0"
-                                    t-if="template.report_order_intervention_notes and order.of_intervention_notes"
-                                    name="report_order_intervention_notes">
-                                    <div class="d-table-cell">
-                                        <div class="m-2 mb-0"
-                                            t-field="order.of_intervention_notes" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_order_template"/>
 
                         <!-- Products and works -->
-                        <div t-if="template.report_products and order" name="report_products"
-                            class="row mb-4" style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_products">
-                                    <strong>Products and works</strong>
-                                </h5>
-                                <div class="border border-bottom-0">
-
-                                    <!-- Is there a discount on at least one line? -->
-                                    <t t-set="lines_to_report"
-                                        t-value="order._get_order_lines_to_report()" />
-                                    <t t-set="display_discount"
-                                        t-value="any(l.discount for l in lines_to_report)" />
-
-                                    <table
-                                        class="table table-sm o_main_table table-condensed mb-0">
-                                        <!-- In case we want to repeat the header, remove
-                                            "display:
-                                        table-row-group" -->
-                                        <thead>
-                                            <tr>
-                                                <th name="th_description" class="text-start">
-                                                    Description</th>
-                                                <th name="th_quantity" class="text-end">Quantity</th>
-                                                <th name="th_priceunit" class="text-end">Unit Price</th>
-                                                <th name="th_discount" t-if="display_discount"
-                                                    class="text-end">
-                                                    <span>Disc.%</span>
-                                                </th>
-                                                <th name="th_taxes" class="text-end">Taxes</th>
-                                                <th name="th_subtotal" class="text-end">
-                                                    <span
-                                                        groups="account.group_show_line_subtotals_tax_excluded">
-                                                        Amount</span>
-                                                    <span
-                                                        groups="account.group_show_line_subtotals_tax_included">Total
-                                                        Price</span>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="sale_tbody">
-                                            <t t-set="current_subtotal" t-value="0" />
-                                            <t t-foreach="lines_to_report" t-as="line">
-                                                <t t-set="current_subtotal"
-                                                    t-value="current_subtotal + line.price_subtotal"
-                                                    groups="account.group_show_line_subtotals_tax_excluded" />
-                                                <t t-set="current_subtotal"
-                                                    t-value="current_subtotal + line.price_total"
-                                                    groups="account.group_show_line_subtotals_tax_included" />
-                                                <tr
-                                                    t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
-                                                    <t t-if="not line.display_type">
-                                                        <td name="td_name">
-                                                            <span t-field="line.name" />
-                                                        </td>
-                                                        <td name="td_quantity" class="text-end">
-                                                            <span t-field="line.product_uom_qty" />
-                                                            <span t-field="line.product_uom" />
-                                                        </td>
-                                                        <td name="td_priceunit" class="text-end">
-                                                            <span t-field="line.price_unit" />
-                                                        </td>
-                                                        <td t-if="display_discount"
-                                                            class="text-end">
-                                                            <span t-field="line.discount" />
-                                                        </td>
-                                                        <td name="td_taxes" class="text-end">
-                                                            <span
-                                                                t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id))" />
-                                                        </td>
-                                                        <td t-if="not line.is_downpayment"
-                                                            name="td_subtotal"
-                                                            class="text-end o_price_total">
-                                                            <span t-field="line.price_subtotal"
-                                                                groups="account.group_show_line_subtotals_tax_excluded" />
-                                                            <span t-field="line.price_total"
-                                                                groups="account.group_show_line_subtotals_tax_included" />
-                                                        </td>
-                                                    </t>
-                                                    <t
-                                                        t-elif="line.display_type == 'line_section'">
-                                                        <td name="td_section_line" colspan="99">
-                                                            <span t-field="line.name" />
-                                                        </td>
-                                                        <t t-set="current_section"
-                                                            t-value="line" />
-                                                        <t t-set="current_subtotal" t-value="0" />
-                                                    </t>
-                                                    <t t-elif="line.display_type == 'line_note'">
-                                                        <td name="td_note_line" colspan="99">
-                                                            <span t-field="line.name" />
-                                                        </td>
-                                                    </t>
-                                                </tr>
-
-                                                <t
-                                                    t-if="current_section and (line_last or order.order_line[line_index+1].display_type == 'line_section') and not line.is_downpayment">
-                                                    <tr class="is-subtotal text-end">
-                                                        <td name="td_section_subtotal"
-                                                            colspan="99">
-                                                            <strong>Subtotal</strong>
-                                                            <span
-                                                                t-out="current_subtotal"
-                                                                t-options='{"widget": "monetary", "display_currency": doc.of_partner_pricelist_id.currency_id}'
-                                                            />
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                            </t>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_products_works_template">
+                            <t t-set="order" t-value="order"/>
+                        </t>
 
                         <!-- Pickings -->
-                        <t t-set="pickings_layouted" t-value="doc.pickings_layouted()" />
-                        <div t-if="template.report_pickings and pickings_layouted"
-                            name="report_pickings" class="row mb-4"
-                            style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_pickings">
-                                    <strong>Pickings</strong>
-                                </h5>
-                                <div class="border border-bottom-0">
-                                    <table class="table table-condensed">
-                                        <thead>
-                                            <tr>
-                                                <th class="text-start">Description</th>
-                                                <th class="text-end">Reserved Qty</th>
-                                                <th class="text-end">Qty Done</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="sale_tbody">
-                                            <t t-foreach="pickings_layouted"
-                                                t-as="picking_layouted">
-                                                <tr class="active">
-                                                    <td class="bg-200" colspan="3">
-                                                        <t t-esc="picking_layouted['name']" />
-                                                    </td>
-                                                </tr>
-                                                <t t-foreach="picking_layouted['lines']"
-                                                    t-as="line">
-                                                    <tr>
-                                                        <td>
-                                                            <span t-field="line.display_name" />
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <span t-field="line.reserved_uom_qty" />
-                                                            <span t-field="line.product_uom_id.name" groups="uom.group_uom" />
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <span t-field="line.qty_done" />
-                                                            <span t-field="line.product_uom_id.name" groups="uom.group_uom" />
-                                                        </td>
-                                                    </tr>
-                                                </t>
-                                            </t>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_pickings_template"/>
 
                         <!-- Invoicing -->
-                        <div t-if="template.report_invoicing and doc.of_line_ids"
-                            name="report_invoicing"
-                            class="row mb-4" style="page-break-inside: avoid;">
+                        <div t-if="template.report_invoicing and doc.of_line_ids" name="report_invoicing" class="row mb-4" style="page-break-inside: avoid;">
                             <div class="col">
                                 <h5 name="title_invoicing">
                                     <strong>Invoicing</strong>
@@ -597,8 +570,7 @@
                                             <strong>Total Without Taxes</strong>
                                         </td>
                                         <td class="text-end">
-                                            <span t-field="doc.of_price_subtotal"
-                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                            <span t-field="doc.of_price_subtotal" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
                                         </td>
                                     </tr>
                                     <tr name="invoicing_total_taxes">
@@ -606,8 +578,7 @@
                                             <strong>Taxes</strong>
                                         </td>
                                         <td class="text-end">
-                                            <span t-field="doc.of_price_tax"
-                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                            <span t-field="doc.of_price_tax" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
                                         </td>
                                     </tr>
                                     <tr name="invoicing_total">
@@ -615,8 +586,7 @@
                                             <strong>Total</strong>
                                         </td>
                                         <td class="text-end">
-                                            <span t-field="doc.of_price_total"
-                                                t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
+                                            <span t-field="doc.of_price_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}" />
                                         </td>
                                     </tr>
                                 </table>
@@ -624,100 +594,55 @@
                         </div>
 
                         <!-- Legal  Notice -->
-                        <div t-if="template.report_legal and template.legal" name="report_legal"
-                            style="page-break-inside: avoid;" class="row mb-4">
-                            <div class="col">
-                                <h5 name="title_legal">
-                                    <strong>Legal Notice</strong>
-                                </h5>
-                                <div t-field="template.legal" />
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_legal_notice_template">
+                            <t t-set="legal_notice" t-value="template.legal"/>
+                        </t>
 
                         <!-- Minutes -->
-                        <div name="report_minutes" class="mb-4" t-if="doc._report_should_display_minutes_report()" style="page-break-inside: avoid;">
-                            <div class="row">
-                                <div class="col mb-2">
-                                    <h5 name="title_minutes">
-                                        <strong>Minutes</strong>
-                                    </h5>
-                                </div>
-                            </div>
-                            <div class="border border-top-0">
-                                <div class="row border-top" t-if="doc._report_should_display_dates_and_duration_report()">
-                                    <!-- Dates and duration -->
-                                    <div class="col-4 p-2 border-end" t-if="template.report_minutes_real_dates and doc.of_real_start">
-                                        <div>
-                                            <span>Start&amp;nbsp;:</span>
-                                            <span t-field="doc.of_real_start" t-options="{'widget': 'datetime'}"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 p-2 border-end" t-if="template.report_minutes_real_dates and doc.of_real_stop">
-                                        <div>
-                                            <span>Stop&amp;nbsp;:</span>
-                                            <span t-field="doc.of_real_stop" t-options="{'widget': 'datetime'}"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-4 p-2" t-if="template.report_minutes_real_duration and doc.of_real_duration">
-                                        <div>
-                                            <span>Duration&amp;nbsp;:</span>
-                                            <span t-field="doc.of_real_duration" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row border-top" t-if="template.report_minutes_description and doc.of_minutes">
-                                    <!-- Description -->
-                                    <div name="report_minutes_description" class="col p-2">
-                                        <div class="">
-                                            <span t-field="doc.of_minutes"/>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div t-if="doc._report_should_display_minutes_report()" name="report_minutes" class="row mb-4" style="page-break-inside: avoid;">
+                            <div class="col">
+                                <h5 name="title_minutes">
+                                    <strong>Minutes</strong>
+                                </h5>
+                                <table class="table table-bordered w-100">
+                                    <tbody>
+                                        <!-- Dates and duration -->
+                                        <tr t-if="doc._report_should_display_dates_and_duration_report()">
+                                            <td t-if="template.report_minutes_real_dates and doc.of_real_start">
+                                                <div>
+                                                    <span>Start&amp;nbsp;:</span>
+                                                    <span t-field="doc.of_real_start" t-options="{'widget': 'datetime'}"/>
+                                                </div>
+                                            </td>
+                                            <td t-if="template.report_minutes_real_dates and doc.of_real_stop">
+                                                <div>
+                                                    <span>Stop&amp;nbsp;:</span>
+                                                    <span t-field="doc.of_real_stop" t-options="{'widget': 'datetime'}"/>
+                                                </div>
+                                            </td>
+                                            <td t-if="template.report_minutes_real_duration and doc.of_real_duration">
+                                                <div>
+                                                    <span>Duration&amp;nbsp;:</span>
+                                                    <span t-field="doc.of_real_duration" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}"/>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- Description -->
+                                        <tr t-if="template.report_minutes_description and doc.of_minutes">
+                                            <td colspan="3">
+                                                <span t-field="doc.of_minutes"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
                         <!-- Photos -->
-                        <div t-if="template.report_photos and doc.of_image_printable_ids" name="report_photos" class="row mb-4" style="page-break-inside: avoid;">
-                            <div class="col">
-                                <h5 name="title_photos">
-                                    <strong>Photos</strong>
-                                </h5>
-                                <div class="border border-top-0">
-                                    <t t-foreach="doc.of_image_printable_ids" t-as="photo">
-                                        <figure class="d-inline-block align-top w-25 overflow-hidden" style="max-width: 24.7%; max-height: 320px;">
-                                            <span t-field="photo.image_1920" t-options="{'widget': 'image', 'class': 'mx-auto', 'style': 'max-height: 250px;'}" />
-                                            <figcaption class="text-muted text-center mt-1" t-if="photo.caption" t-esc="photo.caption"/>
-                                        </figure>
-                                    </t>
-                                </div>
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_photos_template"/>
 
                         <!-- Signatures -->
-                        <div t-if="template.report_signature" name="report_signature" style="page-break-inside: avoid;" class="row">
-                            <div class="col-6" style="padding-right: 10px !important;">
-                                <strong>Operator Signature</strong>
-                                <div name="operator_signature" class="border" style="height: 180px;" align="center">
-                                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
-                                        signature when the report is called from the mobile API whereas field is containing the image -->
-                                    <img t-if="doc.of_operator_signature" t-att-src="image_data_uri(doc.of_operator_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
-                                </div>
-                            </div>
-                            <div class="col-6" style="padding-left: 10px !important;">
-                                <strong>Customer Signature</strong>
-                                <div name="customer_signature" class="border" style="height: 180px;" align="center">
-                                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
-                                        signature when the report is called from the mobile API whereas field is containing the image -->
-                                    <img t-if="doc.of_customer_signature" t-att-src="image_data_uri(doc.of_customer_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-2" t-if="template.report_signature and template.report_signature_date and doc.of_signature_date">
-                            <div class="col" >
-                                <span>Signature date&amp;nbsp;:</span>
-                                <span t-field="doc.of_signature_date" t-options="{'widget': 'date'}"/>
-                            </div>
-                        </div>
+                        <t t-call="of_planning.report_event_information_signatures_template"/>
                     </t>
                 </div>
             </t>

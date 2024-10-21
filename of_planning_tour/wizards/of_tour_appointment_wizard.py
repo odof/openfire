@@ -382,13 +382,10 @@ class OFTourAppointmentWizard(models.TransientModel):
         """Create intervention and open it in form view. Also create a recurrent intervention if needed."""
         self.ensure_one()
         context = self.env.context.copy()
-        event_obj = self.env["calendar.event"]
 
         self.update(self.selected_line_id._prepare_wizard_values())
 
-        values = self._prepare_calendar_event_values()
-        event = event_obj.create(values)
-        event._compute_of_employee_ids()
+        event = self.action_create_event()
 
         if self.request_id and self.next_date:
             self.request_id.write({"next_date": self.next_date, "end_date": self.planning_end_date})
@@ -403,6 +400,9 @@ class OFTourAppointmentWizard(models.TransientModel):
             "context": context,
             "flags": {"initial_mode": "edit", "form": {"options": {"mode": "edit"}}},
         }
+
+    def action_create_event(self):
+        return self.env["calendar.event"].create(self._prepare_calendar_event_values())
 
     # --------------------------------------------------------------------------
     # Business methods
@@ -899,7 +899,6 @@ class OFTourAppointmentWizard(models.TransientModel):
                 "of_question_ids": copied_questions,
                 "of_team_id": self.intervention_id.of_team_id.id,
                 "of_type_id": self.intervention_id.of_type_id.id,
-                "of_equipment_ids": self.intervention_id.of_equipment_ids.ids,
                 "of_picking_manual_ids": [Command.set(self.intervention_id.of_picking_manual_ids.ids)],
                 "of_invoice_policy": self.intervention_id.of_invoice_policy,
                 "of_fiscal_position_id": self.intervention_id.of_fiscal_position_id.id,

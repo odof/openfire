@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-08-29 08:57+0000\n"
-"PO-Revision-Date: 2024-08-29 08:57+0000\n"
+"POT-Creation-Date: 2024-11-27 21:10+0000\n"
+"PO-Revision-Date: 2024-11-27 21:10+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -29,8 +29,10 @@ msgid "<strong>Survey</strong>"
 msgstr "<strong>Questionnaire</strong>"
 
 #. module: of_planning_survey
+#: model:ir.model.fields,help:of_planning_survey.field_of_equipment_intervention_report_template__report_survey
 #: model:ir.model.fields,help:of_planning_survey.field_of_planning_intervention_template__report_survey
 #: model:ir.model.fields,help:of_planning_survey.field_of_planning_intervention_template__sheet_survey
+#: model:ir.model.fields,help:of_planning_survey.field_of_planning_intervention_template_mixin__report_survey
 msgid "Adds the survey and answers to questions to the PDF document."
 msgstr ""
 "Ajoute le questionnaire et les réponses aux questions dans le document PDF."
@@ -58,8 +60,12 @@ msgid "Edit Survey"
 msgstr "Éditer le questionnaire"
 
 #. module: of_planning_survey
-#: model_terms:ir.ui.view,arch_db:of_planning_survey.report_intervention_report_document
-#: model_terms:ir.ui.view,arch_db:of_planning_survey.report_intervention_sheet_document
+#: model:ir.model,name:of_planning_survey.model_of_equipment_report_mixin
+msgid "Equipment Report Mixin"
+msgstr "Mixin de rapport d'équipement"
+
+#. module: of_planning_survey
+#: model_terms:ir.ui.view,arch_db:of_planning_survey.answer_template
 msgid "Image"
 msgstr ""
 
@@ -79,6 +85,11 @@ msgid "Intervention template"
 msgstr "Modèle d'intervention"
 
 #. module: of_planning_survey
+#: model:ir.model,name:of_planning_survey.model_of_planning_intervention_template_mixin
+msgid "Intervention template mixin"
+msgstr "Mixin de modèle d'intervention"
+
+#. module: of_planning_survey
 #: model_terms:ir.actions.act_window,help:of_planning_survey.of_action_survey_form
 msgid "No Survey Found"
 msgstr "Aucun questionnaire trouvé"
@@ -90,7 +101,9 @@ msgstr "Questions et réponses"
 
 #. module: of_planning_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_calendar_event__of_question_ids
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_equipment_intervention_report_template__question_ids
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template__question_ids
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template_mixin__question_ids
 msgid "Questions"
 msgstr ""
 
@@ -105,7 +118,9 @@ msgid "SURVEY"
 msgstr "QUESTIONNAIRE"
 
 #. module: of_planning_survey
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_equipment_intervention_report_template__report_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template__report_survey
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template_mixin__report_survey
 msgid "SURVEY (report)"
 msgstr "QUESTIONNAIRE (rapport)"
 
@@ -122,7 +137,9 @@ msgstr ""
 "l'intervention"
 
 #. module: of_planning_survey
+#: model:ir.model.fields,help:of_planning_survey.field_of_equipment_intervention_report_template__survey_id
 #: model:ir.model.fields,help:of_planning_survey.field_of_planning_intervention_template__survey_id
+#: model:ir.model.fields,help:of_planning_survey.field_of_planning_intervention_template_mixin__survey_id
 msgid "Select the survey to be answered as part of the intervention."
 msgstr ""
 "Sélectionnez le questionnaire à répondre dans le cadre de l'intervention."
@@ -137,7 +154,9 @@ msgstr "Démarrer le questionnaire"
 #. module: of_planning_survey
 #: model:ir.model,name:of_planning_survey.model_of_survey_survey
 #: model:ir.model.fields,field_description:of_planning_survey.field_calendar_event__of_survey_id
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_equipment_intervention_report_template__survey_id
 #: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template__survey_id
+#: model:ir.model.fields,field_description:of_planning_survey.field_of_planning_intervention_template_mixin__survey_id
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_survey.of_survey_survey_view_search_intervention_menu
