@@ -12,6 +12,7 @@ from ..graphql.driving_route_query import DrivingRouteQuery
 from ..graphql.driving_route_type import DrivingRoute, DrivingRouteCoordinates, DrivingRoutePath, DrivingRouteStop
 from ..graphql.employee_query import EmployeeQuery
 from ..graphql.employee_type import Employee
+from ..graphql.equipment_query import EquipmentQuery
 from ..graphql.fcm_token_mutation import FCMTokenMutation
 from ..graphql.fcm_token_type import FCMToken, FCMTokenInput
 from ..graphql.geo_localize_address_query import GeoLocalizeAddressQuery
@@ -103,6 +104,7 @@ class OFGraphql(models.AbstractModel):
                 DrivingRoute,
                 GeoLocalizedAddress,
                 GeoLocalizeAddressQuery,
+                EquipmentQuery,
             ],
         )
 

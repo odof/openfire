@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-18 16:50+0000\n"
-"PO-Revision-Date: 2024-11-18 16:50+0000\n"
+"POT-Creation-Date: 2024-10-23 06:11+0000\n"
+"PO-Revision-Date: 2024-10-23 06:11+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,6 +47,7 @@ msgid ""
 msgstr ""
 
 #. module: of_mobile
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_equipment_intervention_report_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
 msgid ""
 "<span class=\"text-success\" attrs=\"{'invisible': [('mobile', '=', False)]}\">Mobile</span>\n"
@@ -76,12 +77,15 @@ msgid "Activate SR on mobile"
 msgstr "Activer les DI sur le mobile"
 
 #. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_equipment_intervention_report_template__additional_line_ids
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__additional_line_ids
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_mixin__additional_line_ids
 msgid "Additional Invoice lines"
 msgstr "lignes de facture supplémentaires"
 
 #. module: of_mobile
 #: model:ir.model,name:of_mobile.model_of_planning_intervention_template_additional_line
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_equipment_intervention_report_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
 msgid "Additional Products"
 msgstr "Articles supplémentaires"
@@ -359,6 +363,11 @@ msgid "Intervention template"
 msgstr "Modèle d'intervention"
 
 #. module: of_mobile
+#: model:ir.model,name:of_mobile.model_of_planning_intervention_template_mixin
+msgid "Intervention template mixin"
+msgstr "Mixin de modèle d'intervention"
+
+#. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Interventions synchronization"
 msgstr "Synchronization des interventions"
@@ -468,6 +477,7 @@ msgstr "Divers"
 
 #. module: of_mobile
 #: model_terms:ir.ui.view,arch_db:of_mobile.product_template_view_form
+#: model_terms:ir.ui.view,arch_db:of_mobile.of_planning_intervention_template_view_form
 #: model_terms:ir.ui.view,arch_db:of_mobile.res_config_settings_view_form
 msgid "Mobile"
 msgstr ""
@@ -484,7 +494,9 @@ msgid "Mobile Brand"
 msgstr ""
 
 #. module: of_mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_equipment_intervention_report_template__mobile
 #: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template__mobile
+#: model:ir.model.fields,field_description:of_mobile.field_of_planning_intervention_template_mixin__mobile
 msgid "Mobile Intervention Template"
 msgstr "Modèle d'intervention mobile"
 

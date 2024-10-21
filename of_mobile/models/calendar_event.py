@@ -126,6 +126,12 @@ class CalendarEvent(models.Model):
 
     @api.model_create_multi
     def create(self, list_vals):
+        for vals in list_vals:
+            if request_id := vals.get("of_request_id"):
+                service_request = self.env["of.service.request"].browse(request_id)
+                if service_request.use_equipment:
+                    vals["of_use_equipment"] = True
+
         results = super().create(list_vals)
         results._handle_create_events_notifications()
         return results

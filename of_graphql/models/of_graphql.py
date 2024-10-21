@@ -9,6 +9,7 @@ from odoo import api, models
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
 from ..graphql.company_type import Company
+from ..graphql.delete_result_type import DeleteResult
 from ..graphql.server_capability_query import ServerCapabilityQuery
 from ..graphql.server_capability_type import ServerCapability
 from ..graphql.user_mutation import UserMutation
@@ -57,6 +58,7 @@ class OFGraphql(models.AbstractModel):
                 UserMutation,
                 ServerCapability,
                 ServerCapabilityQuery,
+                DeleteResult,
             ],
         )
 

@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Équipements et demandes d'intervention",
-    "version": "16.0.1.1.0",
+    "version": "16.0.2.0.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "category": "OpenFire",
@@ -20,8 +20,8 @@
         "views/of_service_request_equipment_line_views.xml",
         "views/of_service_request_views.xml",
         "views/of_equipment_views.xml",
-        "views/calendar_event_views.xml",
         "views/menuitems.xml",
+        "wizards/of_equipment_link_create_wizard_views.xml",
         "reports/of_service_request_templates.xml",
     ],
     "qweb": [],

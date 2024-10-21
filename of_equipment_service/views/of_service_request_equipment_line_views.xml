@@ -30,6 +30,7 @@
                 <field name="name" />
                 <field name="operator_id" />
                 <field name="start" widget="date" />
+                <field name="link_task_id" />
                 <field name="state" />
             </tree>
         </field>
