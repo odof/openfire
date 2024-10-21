@@ -597,7 +597,7 @@ class SaleOrder(models.Model):
     @api.depends('margin', 'amount_untaxed')
     def _compute_of_marge(self):
         for order in self:
-            amount_untaxed = self._get_amount_untaxed()
+            amount_untaxed = order._get_amount_untaxed()
             cout = amount_untaxed - order.margin
             order.of_total_cout = cout
             order.of_marge_pc = 100 * (1 - cout / amount_untaxed) if amount_untaxed else -100
