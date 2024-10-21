@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_openfire_config_communication_sms_template" name="SMS Templates" parent="of_basic_interface.menu_openfire_config_communication" action="sms.sms_template_action" sequence="3"/>
+    <menuitem id="menu_openfire_config_communication_sms" name="SMS Sent" parent="of_basic_interface.menu_openfire_config_communication" action="sms.sms_sms_action" sequence="4"/>
+
+</odoo>
