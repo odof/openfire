@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_intervention_template_mixin_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.mixin.view.form</field>
+        <field name="model">of.planning.intervention.template.mixin</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_mixin_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='report']" position="inside">
+                <separator string="Joined documents" name="report_joined_documents"/>
+                <group col="8" name="report_joined_documents_fields">
+                    <h5 colspan="8">Internal documents</h5>
+                    <group colspan="2">
+                        <field name="report_order_pdf" string="Order" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                        <field name="report_picking_pdf" string="Delivery notes" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                    </group>
+                    <group colspan="2">
+                        <field name="report_invoice_pdf" string="Invoices" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                        <field name="report_purchase_pdf" string="Purchases" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

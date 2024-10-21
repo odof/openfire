@@ -6,6 +6,9 @@
         <field name="inherit_id" ref="of_planning.of_planning_intervention_template_view_form"/>
         <field name="model">of.planning.intervention.template</field>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='attach_report']" position="after">
+                <field name="default_equipment_report_tmpl_id" />
+            </xpath>
             <xpath expr="//group[@name='sheet_second']" position="inside">
                 <field name="sheet_equipment" string="EQUIPMENT" attrs="{'readonly':[('sheet_use_default','=',True)]}"/>
                 <field name="sheet_equipment_name" string="Serial Number" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
@@ -18,19 +21,6 @@
                 <field name="sheet_equipment_is_compliant" string="Compliant" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
                 <field name="sheet_equipment_installer_id" string="Installer" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
                 <field name="sheet_equipment_note" string="Note" attrs="{'readonly':['|', ('sheet_use_default','=',True), ('sheet_equipment', '=', False)]}"/>
-            </xpath>
-            <xpath expr="//group[@name='report_second']" position="inside">
-                <field name="report_equipment" string="EQUIPMENT" attrs="{'readonly':[('report_use_default','=',True)]}"/>
-                <field name="report_equipment_name" string="Serial Number" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_product_id" string="Product" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_model" string="Model" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_brand_id" string="Brand" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_product_category_id" string="Category" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_installation_date" string="Installation Date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_installation_type" string="Installation Type" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_is_compliant" string="Compliant" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_installer_id" string="Installer" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
-                <field name="report_equipment_note" string="Note" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_equipment', '=', False)]}"/>
             </xpath>
         </field>
     </record>

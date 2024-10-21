@@ -382,12 +382,10 @@ class OFTourAppointmentWizard(models.TransientModel):
         """Create intervention and open it in form view. Also create a recurrent intervention if needed."""
         self.ensure_one()
         context = self.env.context.copy()
-        event_obj = self.env["calendar.event"]
 
         self.update(self.selected_line_id._prepare_wizard_values())
 
-        values = self._prepare_calendar_event_values()
-        event = event_obj.create(values)
+        event = self.action_create_event()
         event._compute_of_employee_ids()
 
         if self.request_id and self.next_date:
@@ -403,6 +401,10 @@ class OFTourAppointmentWizard(models.TransientModel):
             "context": context,
             "flags": {"initial_mode": "edit", "form": {"options": {"mode": "edit"}}},
         }
+
+    def action_create_event(self):
+        values = self._prepare_calendar_event_values()
+        return self.env["calendar.event"].create(values)
 
     # --------------------------------------------------------------------------
     # Business methods

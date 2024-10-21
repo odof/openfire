@@ -78,7 +78,6 @@ class OFServiceRequestCreateInterventionWizard(models.TransientModel):
             vals.update({"name": name, "start": current_date, "stop": end_date})
 
             intervention = event_obj.create(vals)
-            intervention._onchange_of_task_id()
             created_interventions |= intervention
 
             current_date = end_date

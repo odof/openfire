@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calendar_event_equipment_link_view_form" model="ir.ui.view">
+        <field name="name">of.calendar.event.equipment.link.view.form</field>
+        <field name="model">of.calendar.event.equipment.link</field>
+        <field name="inherit_id" ref="of_equipment.of_calendar_event_equipment_link_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='report']" position="after">
+                <page name="survey" string="Survey">
+                    <field name="survey_user_input_line_ids" invisible="1" />
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="survey_id"/>
+                            <field name="survey_id" class="oe_inline" context="{'default_survey_type': 'intervention_survey'}" />
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary oe_right ms-2" name="action_button_open_survey" type="object" string="Reply" attrs="{'invisible': [('survey_user_input_line_ids','!=',[])]}" />
+                            <button class="btn btn-primary oe_right" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('survey_user_input_line_ids','=',[])]}"/>
+                        </div>
+                    </div>
+                    <field name="question_ids" nolabel="1" widget="of_question_page_one2many">
+                        <tree>
+                            <field name="title" />
+                            <field name="question_type"/>
+                            <field name="is_page" invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

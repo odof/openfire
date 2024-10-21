@@ -6,14 +6,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 06:43+0000\n"
-"PO-Revision-Date: 2024-07-11 06:43+0000\n"
+"POT-Creation-Date: 2024-11-19 09:50+0000\n"
+"PO-Revision-Date: 2024-11-19 09:50+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request.py:0
+#, python-format
+msgid ""
+"\n"
+"\n"
+"Linked interventions:\n"
+"%(events_message)s"
+msgstr ""
+"\n"
+"\n"
+"Interventions liées :\n"
+"%(events_message)s"
 
 #. module: of_equipment_service
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
@@ -89,6 +104,24 @@ msgstr ""
 "porter l'intervention."
 
 #. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request.py:0
+#, python-format
+msgid "Add Equipment to Service Request"
+msgstr "Ajouter un équipement à la demande d'intervention"
+
+#. module: of_equipment_service
+#: model:ir.actions.act_window,name:of_equipment_service.action_add_equipments_to_sr
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Add Equipments"
+msgstr "Ajouter des équipements"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__address_id
+msgid "Address"
+msgstr "Adresse"
+
+#. module: of_equipment_service
 #: model:ir.actions.act_window,name:of_equipment_service.action_of_service_request_after_sales
 #: model:ir.ui.menu,name:of_equipment_service.menu_of_service_after_sales
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_search
@@ -113,21 +146,29 @@ msgid "Calendar Event"
 msgstr "Calendrier de l'événement"
 
 #. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_calendar_event_equipment_link
+msgid "Calendar Event Equipment Link"
+msgstr "Lien d'équipement de l'intervention"
+
+#. module: of_equipment_service
 #: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__cancelled
 msgid "Cancelled"
 msgstr "Annulé"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__create_uid
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Créé par"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__create_date
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Créé le"
 
 #. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__partner_id
 #: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request__payer_mode__customer
 msgid "Customer"
 msgstr "Client"
@@ -138,12 +179,37 @@ msgid "Date"
 msgstr ""
 
 #. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_line__name
+msgid ""
+"Define a name for the intervention; by default, the name of the customer and"
+" the task will be used."
+msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_link__address_id
+msgid ""
+"Define the address of the intervention site; by default, the customer's "
+"address will be used."
+msgstr ""
+
+#. module: of_equipment_service
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
 msgid "Delays"
 msgstr "Délais"
 
 #. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Delete all Equipments"
+msgstr "Supprimer tous les équipements"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Delete all linked equipments"
+msgstr ""
+
+#. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__display_name
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__display_name
 msgid "Display Name"
 msgstr ""
 
@@ -158,8 +224,19 @@ msgid "Draft"
 msgstr "Brouillon"
 
 #. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__duration
+msgid "Duration"
+msgstr "Durée"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_link__duration
+msgid "Duration in hours"
+msgstr "Durée en heures"
+
+#. module: of_equipment_service
 #: model:ir.model,name:of_equipment_service.model_of_equipment
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__equipment_id
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__equipment_id
 msgid "Equipment"
 msgstr "Équipement"
 
@@ -169,7 +246,43 @@ msgid "Equipment Interventions"
 msgstr "Interventions sur équipements"
 
 #. module: of_equipment_service
-#: model:ir.model.fields,field_description:of_equipment_service.field_calendar_event__of_equipment_ids
+#: model:ir.model,name:of_equipment_service.model_of_equipment_link_create_wizard
+msgid "Equipment Link Create Wizard"
+msgstr "Assistant de création de lien d'équipement"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__equipment_address
+msgid "Equipment address"
+msgstr "Adresse de l'équipement"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request_equipment_link.py:0
+#, python-format
+msgid ""
+"Equipment details have been updated on the event for "
+"%(equipment)s.<br/>%(changes)s"
+msgstr ""
+"Les détails de l'équipement ont été mis à jour sur l'intervention pour "
+"%(equipment)s.<br/>%(changes)s"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_calendar_event_equipment_link.py:0
+#, python-format
+msgid ""
+"Equipment details have been updated on the service request for "
+"%(equipment)s.<br/>%(changes)s"
+msgstr ""
+"Les détails de l'équipement ont été mis à jour sur la demande d'intervention"
+" pour %(equipment)s.<br/>%(changes)s"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__equipment_report_tmpl_id
+msgid "Equipment report"
+msgstr "Rapport de l'équipement"
+
+#. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__equipment_ids
 msgid "Equipments"
 msgstr "Équipements"
@@ -180,7 +293,13 @@ msgid "Event"
 msgstr "Intervention"
 
 #. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__event_link_id
+msgid "Event Link"
+msgstr "Lien de l'événement"
+
+#. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__id
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__id
 msgid "ID"
 msgstr ""
 
@@ -191,18 +310,26 @@ msgstr ""
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line____last_update
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link____last_update
 msgid "Last Modified on"
 msgstr ""
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__write_uid
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__write_uid
 msgid "Last Updated by"
 msgstr ""
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__write_date
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__write_date
 msgid "Last Updated on"
 msgstr ""
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__linked_equipment_ids
+msgid "Linked Equipments"
+msgstr "Équipements liés"
 
 #. module: of_equipment_service
 #. odoo-python
@@ -219,7 +346,7 @@ msgstr "Fabricant"
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__name
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #. module: of_equipment_service
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
@@ -227,9 +354,15 @@ msgid "No"
 msgstr "Non"
 
 #. module: of_equipment_service
-#: model:ir.model.fields,field_description:of_equipment_service.field_calendar_event__of_equipment_ids_domain
-msgid "Of Equipment Ids Domain"
+#. odoo-python
+#: code:addons/of_equipment_service/models/calendar_event.py:0
+#, python-format
+msgid ""
+"One or more items of equipment have been added to this SR from the event "
+"%(event)s: %(equipments)s"
 msgstr ""
+"Un ou plusieurs équipements ont été ajoutés à cette DI depuis l'intervention"
+" %(event)s : %(equipments)s"
 
 #. module: of_equipment_service
 #: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__open
@@ -259,18 +392,9 @@ msgid "Plan an intervention"
 msgstr "Planifier une intervention"
 
 #. module: of_equipment_service
-#. odoo-python
-#: code:addons/of_equipment_service/models/of_service_request.py:0
-#, python-format
-msgid "Please add at least one equipment."
-msgstr "Veuillez ajouter au moins un équipement"
-
-#. module: of_equipment_service
-#. odoo-python
-#: code:addons/of_equipment_service/models/of_service_request.py:0
-#, python-format
-msgid "Please add only one equipment."
-msgstr "Veuillez n'ajouter au maximum qu'un équipement"
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_calendar_event_equipment_link__request_link_id
+msgid "Request Link"
+msgstr "Lien de la demande"
 
 #. module: of_equipment_service
 #: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request__payer_mode__reseller
@@ -291,7 +415,23 @@ msgstr ""
 "Voyez pour quel équipement d'une DI une intervention est planifiée/terminée"
 
 #. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid "Select Equipments to add to the service request"
+msgstr "Sélectionner les équipements à ajouter à la demande d'intervention"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_link_create_form_view
+msgid "Select the Equipments to add to the service request."
+msgstr "Sélectionner les équipements à ajouter à la demande d'intervention."
+
+#. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__sequence
+msgid "Sequence"
+msgstr "Séquence"
+
+#. module: of_equipment_service
 #: model:ir.model,name:of_equipment_service.model_of_service_request
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment_link_create_wizard__service_request_id
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__request_id
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.of_equipment_view_form
 msgid "Service Request"
@@ -300,19 +440,24 @@ msgstr "Demande d'intervention"
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_after_sales_count
 msgid "Service Request After Sales Count"
-msgstr ""
+msgstr "Nombre de DI SAV"
+
+#. module: of_equipment_service
+#: model:ir.model,name:of_equipment_service.model_of_service_request_equipment_link
+msgid "Service Request Equipment Link"
+msgstr "Lien équipement - demande d'intervention"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_maintenance_count
 msgid "Service Request Maintenance Count"
-msgstr ""
+msgstr "Nombre de DI Maintenance"
 
 #. module: of_equipment_service
 #. odoo-python
 #: code:addons/of_equipment_service/models/of_equipment.py:0
 #, python-format
 msgid "Service Request To Plan"
-msgstr ""
+msgstr "DI à planifier"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_equipment__service_request_to_plan_count
@@ -335,6 +480,11 @@ msgid "Service Stop"
 msgstr "Date de fin de prise en charge"
 
 #. module: of_equipment_service
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__service_request_id
+msgid "Service request"
+msgstr "Demande d'intervention"
+
+#. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__service_time
 msgid "Service time (hours)"
 msgstr "Temps de gestion (heures)"
@@ -343,6 +493,8 @@ msgstr "Temps de gestion (heures)"
 #: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_line__start
 msgid "Start date of an event, without time for full days events"
 msgstr ""
+"Date de début d'un événement, sans heure pour les événements sur une journée"
+" entière"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__state
@@ -351,13 +503,25 @@ msgid "State"
 msgstr "État"
 
 #. module: of_equipment_service
-#: model:ir.model.fields,help:of_equipment_service.field_calendar_event__of_equipment_ids_domain
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__link_task_id
+#: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_link__task_id
+msgid "Task"
+msgstr "Tâche"
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_calendar_event_equipment_link__request_link_id
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request_equipment_line__event_link_id
+msgid "Technical field to store link that created this line."
+msgstr "Champ technique pour stocker le lien qui a créé cette ligne."
+
+#. module: of_equipment_service
+#: model:ir.model.fields,help:of_equipment_service.field_of_service_request__equipment_ids
 msgid ""
-"Technical field to compute domain for equipment_ids field based on the "
-"related service request"
+"Technical field to store the equipment linked to the service request, to "
+"easier access them."
 msgstr ""
-"Champ technique pour calculer le domaine d'equipment_ids à partie de la "
-"demande d'intervention liée"
+"Champ technique pour stocker les équipements liés à la demande "
+"d'intervention, pour y accéder plus facilement."
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request__use_equipment
@@ -373,6 +537,53 @@ msgstr "Wizard de création d'intervention depuis les demandes d'intervention"
 #: model_terms:ir.ui.view,arch_db:of_equipment_service.report_service_request_document
 msgid "Yes"
 msgstr "Oui"
+
+#. module: of_equipment_service
+#: model_terms:ir.ui.view,arch_db:of_equipment_service.of_service_request_view_form
+msgid ""
+"You are about to remove all linked equipments. Are you sure you want to "
+"continue?"
+msgstr ""
+"Vous êtes sur le point de supprimer tous les équipements liés. Êtes-vous sûr"
+" de vouloir continuer ?"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request_equipment_link.py:0
+#, python-format
+msgid ""
+"You cannot change equipment links for done or cancelled service requests."
+msgstr ""
+"Vous ne pouvez pas changer l'équipement des demandes d'intervention terminées ou annulées."
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request_equipment_link.py:0
+#, python-format
+msgid ""
+"You cannot create equipment links for done or cancelled service requests."
+msgstr ""
+"Vous ne pouvez pas créer d'équipement des demandes d'intervention terminées ou annulées."
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request.py:0
+#, python-format
+msgid ""
+"You cannot delete equipment linked to one or more interventions.\n"
+"Please delete the equipment(s) for the concerned intervention(s).%(events_message)s"
+msgstr ""
+"Vous ne pouvez pas supprimer un équipement lié à une ou plusieurs interventions.\n"
+"Veuillez supprimer l'équipement pour les interventions concernées.%(events_message)s"
+
+#. module: of_equipment_service
+#. odoo-python
+#: code:addons/of_equipment_service/models/of_service_request_equipment_link.py:0
+#, python-format
+msgid ""
+"You cannot delete equipment links for done or cancelled service requests."
+msgstr ""
+"Vous ne pouvez pas supprimer les équipements des demandes d'intervention terminées ou annulées."
 
 #. module: of_equipment_service
 #. odoo-python

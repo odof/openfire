@@ -12,9 +12,10 @@
     'data': [
         'data/of_planning_intervention_template.xml',
         'views/calendar_event_views.xml',
+        'views/of_planning_intervention_template_mixin_views.xml',
         'views/of_planning_intervention_template_views.xml',
     ],
     'installable': True,
     'application': False,
-    'auto_install': False,
+    'auto_install': True,
 }

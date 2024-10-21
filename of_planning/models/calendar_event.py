@@ -333,6 +333,11 @@ class CalendarEvent(models.Model):
     )
 
     # ===== Duration & time fields =====
+    duration = fields.Float(
+        compute="_compute_duration",
+        store=True,
+        readonly=False,
+    )
     start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0), copy=False)
     stop = fields.Datetime(
         default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1), copy=False
@@ -488,6 +493,12 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Compute methods
     # --------------------------------------------------------------------------
+
+    @api.onchange("of_task_id")
+    def _compute_duration(self):
+        for event in self:
+            if event.of_task_id:
+                event.duration = event.of_task_id.duration
 
     def _inverse_dates(self):
         for meeting in self:
@@ -879,10 +890,6 @@ class CalendarEvent(models.Model):
                 event.of_employee_id = False
             else:
                 self._compute_of_employee_ids()
-
-    @api.onchange("of_task_id")
-    def _onchange_of_task_id(self):
-        self.duration = self.of_task_id.duration
 
     @api.onchange("of_team_id")
     def onchange_of_team_id(self):

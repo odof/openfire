@@ -12,8 +12,11 @@ from . import stock_picking
 from . import stock_move
 from . import stock_rule
 from . import procurement_group
+from . import of_planning_intervention_line_mixin
 from . import of_planning_intervention_line
+from . import of_planning_intervention_template_mixin
 from . import of_planning_intervention_template
+from . import of_planning_intervention_template_line_mixin
 from . import of_planning_intervention_template_line
 from . import of_planning_tag
 from . import of_planning_task

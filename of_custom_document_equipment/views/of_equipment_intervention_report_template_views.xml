@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_intervention_report_template_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.intervention.report.template.view.form</field>
+        <field name="model">of.equipment.intervention.report.template</field>
+        <field name="inherit_id" ref="of_equipment.of_equipment_intervention_report_template_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='report']//group[@name='report_joined_documents_fields']" position="after">
+                <group col="4">
+                    <h5 colspan="8">Appendices <i>(Mail templates)</i></h5>
+                    <group colspan="4">
+                        <field name="report_custom_document_ids" string="Joined documents" widget="many2many_tags" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

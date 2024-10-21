@@ -1,0 +1,45 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_custom_document_equipment
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-23 06:05+0000\n"
+"PO-Revision-Date: 2024-10-23 06:05+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_custom_document_equipment
+#: model:ir.model.fields,help:of_custom_document_equipment.field_of_equipment_intervention_report_template__report_custom_document_ids
+msgid ""
+"Adds customized documents selected in the equipment as an appendix to the"
+" PDF document."
+msgstr ""
+"Ajoute les documents personnalisés sélectionné dans l'équipement en annexe"
+" du document PDF."
+
+#. module: of_custom_document_equipment
+#: model_terms:ir.ui.view,arch_db:of_custom_document_equipment.of_equipment_intervention_report_template_view_form
+msgid "Appendices <i>(Mail templates)</i>"
+msgstr "Annexes <i>(Modèle de mail)</i>"
+
+#. module: of_custom_document_equipment
+#: model:ir.model,name:of_custom_document_equipment.model_of_equipment_intervention_report_template
+msgid "Equipment Intervention Report"
+msgstr "Rapport d'intervention sur équipement"
+
+#. module: of_custom_document_equipment
+#: model_terms:ir.ui.view,arch_db:of_custom_document_equipment.of_equipment_intervention_report_template_view_form
+msgid "Joined documents"
+msgstr "Documents joints"
+
+#. module: of_custom_document_equipment
+#: model:ir.model.fields,field_description:of_custom_document_equipment.field_of_equipment_intervention_report_template__report_custom_document_ids
+msgid "Joined documents (IR)"
+msgstr "Documents joints"

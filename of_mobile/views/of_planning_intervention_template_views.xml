@@ -17,13 +17,14 @@
                     </button>
                 </div>
             </xpath>
-            <xpath expr="//notebook/page[@name='configuration']/group" position="inside">
-                <field name="section_to_display_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
-                <field name="mobile_payment"/>
-                <field name="payment_mode_ids" widget="many2many_tags" attrs="{'invisible': [('mobile_payment','=',False)]}"/>
-                <field name="mobile_payment_fiscal_position_id" attrs="{'required': [('mobile_payment','=',True)], 'invisible': [('mobile_payment','=',False)]}"/>
-                <field name="auto_confirm_invoice" attrs="{'invisible': [('mobile_payment','=',False)]}"/>
-
+            <xpath expr="//page[@name='configuration']//group[@name='general']" position="after">
+                <group name="mobile" string="Mobile" colspan="2">
+                    <field name="section_to_display_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True, 'no_edit': True}"/>
+                    <field name="mobile_payment"/>
+                    <field name="payment_mode_ids" widget="many2many_tags" attrs="{'invisible': [('mobile_payment','=',False)]}"/>
+                    <field name="mobile_payment_fiscal_position_id" attrs="{'required': [('mobile_payment','=',True)], 'invisible': [('mobile_payment','=',False)]}"/>
+                    <field name="auto_confirm_invoice" attrs="{'invisible': [('mobile_payment','=',False)]}"/>
+                </group>
             </xpath>
             <field name="line_ids" position="after">
                 <separator string="Additional Products" />

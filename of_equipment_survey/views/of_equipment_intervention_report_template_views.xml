@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_intervention_report_template_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.intervention.report.template.view.form</field>
+        <field name="model">of.equipment.intervention.report.template</field>
+        <field name="inherit_id" ref="of_equipment.of_equipment_intervention_report_template_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[@name='invoicing']" position="after">
+                <page string="Survey">
+                    <group>
+                        <field name="survey_id" context="{'default_survey_type': 'equipment_survey'}"/>
+                    </group>
+                    <field name="question_ids" nolabel="1" widget="of_question_page_one2many">
+                        <tree>
+                            <field name="title" />
+                            <field name="question_type"/>
+                            <field name="is_page" invisible="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='report_invoicing']" position="after">
+                <!-- Report - Survey -->
+                <field name="report_survey" string="SURVEY" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

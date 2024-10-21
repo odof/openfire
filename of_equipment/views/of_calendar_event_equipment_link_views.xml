@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_calendar_event_equipment_link_view_form" model="ir.ui.view">
+        <field name="name">of.calendar.event.equipment.link.view.form</field>
+        <field name="model">of.calendar.event.equipment.link</field>
+        <field name="arch" type="xml">
+            <form string="Equipment Link">
+                <header>
+                    <button string="Back to Event" name="action_button_back_to_event" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="brand_id" readonly="1"/>
+                            <field name="equipment_id" readonly="1"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="model_name" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="note" readonly="1"/>
+                            <field name="site_address_id" readonly="1"/>
+                            <label for="site_street"/>
+                            <div class="o_address_format">
+                                <field name="site_street" class="o_address_street" nolabel="1"/>
+                                <field name="site_street2" class="o_address_street" nolabel="1"/>
+                                <field name="site_zip" class="o_address_zip" style="width: 20%" nolabel="1"/>
+                                <field name="site_city" class="o_address_city" style="width: 40%" nolabel="1"/>
+                                <field name="site_country_id" class="o_address_country" nolabel="1"/>
+                            </div>
+                        </group>
+                        <notebook>
+                            <page name="report" string="Report">
+                                <group>
+                                    <field name="report_text"/>
+                                    <field name="all_image_ids" mode="kanban" context="{'default_equipment_link_id': active_id}" string="Photos" />
+                                </group>
+                            </page>
+                            <page name="invoicing" string="Invoicing">
+                                <div class="alert alert-warning" role="alert" name="alert_event" attrs="{'invisible':[('fiscal_position_id', '!=', False)]}">
+                                    <p>The Event has no fiscal position set. Please set one to be able to invoice the equipment.</p>
+                                </div>
+                                <label for="fiscal_position_id" string="Fiscal Position" attrs="{'invisible': [('fiscal_position_id', '!=', False)]}"/>
+                                <field name="fiscal_position_id" class="oe_inline" attrs="{'invisible': [('fiscal_position_id', '!=', False)]}"/>
+                                <field name="line_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id" required="1"/>
+                                        <field name="name" required="1"/>
+                                        <field name="qty" />
+                                        <field name="price_unit" />
+                                        <field name="tax_ids" widget="many2many_tags" />
+                                        <field name="price_subtotal" readonly="1" />
+                                        <field name="price_total" readonly="1" />
+                                        <field name="currency_id" invisible="1"/>^
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_calendar_event_equipment_link_form_action" model="ir.actions.act_window">
+        <field name="name">Equipment Link</field>
+        <field name="res_model">of.calendar.event.equipment.link</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>

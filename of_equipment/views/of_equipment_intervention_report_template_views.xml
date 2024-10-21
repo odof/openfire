@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_intervention_report_template_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.intervention.report.template.view.form</field>
+        <field name="model">of.equipment.intervention.report.template</field>
+        <field name="inherit_id" ref="of_planning.of_planning_intervention_template_mixin_view_form"/>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="attributes">
+                <attribute name="string">Equipment report</attribute>
+            </xpath>
+            <xpath expr="//page[@name='configuration']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='invoicing']//group[@name='invoicing_main']" position="after">
+                <field name="line_ids">
+                    <tree editable="bottom">
+                        <field name="product_id" required="1"/>
+                        <field name="name" required="1"/>
+                        <field name="qty" />
+                        <field name="price_unit" />
+                    </tree>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_equipment_intervention_report_template_view_tree" model="ir.ui.view">
+        <field name="name">of.equipment.intervention.report.template.view.tree</field>
+        <field name="model">of.equipment.intervention.report.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_equipment_intervention_report_template_action" model="ir.actions.act_window">
+        <field name="name">Equipment report</field>
+        <field name="res_model">of.equipment.intervention.report.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to create a new equipment report template.
+            </p>
+        </field>
+    </record>
+
+</odoo>

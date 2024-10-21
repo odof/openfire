@@ -50,6 +50,7 @@
         'views/of_product_brand_views.xml',
         'views/calendar_event_views.xml',
         'views/of_planning_task_views.xml',
+        'views/of_planning_equipment_intervention_report_template_views.xml',
         'views/of_planning_intervention_template_views.xml',
         'views/res_users_views.xml',
         'views/account_payment_views.xml',
