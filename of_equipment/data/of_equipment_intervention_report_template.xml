@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo noupdate="1">
+
+    <record id="of_equipment_intervention_report_template_maintenance" model="of.equipment.intervention.report.template">
+        <field name="name">Maintenance</field>
+        <field name="active">True</field>
+        <field name="sequence">10</field>
+        <field name="task_id" ref="of_planning.of_planning_task_maintenance"/>
+        <field name="report_use_default" eval="False" />
+        <field name="report_title">Intervention report</field>
+        <field name="report_intervention" eval="True" />
+        <field name="report_intervention_partner_id" eval="True" />
+        <field name="report_intervention_partner_code" eval="True" />
+        <field name="report_intervention_task_id" eval="True" />
+        <field name="report_intervention_task_description" eval="False" />
+        <field name="report_intervention_duration" eval="True" />
+        <field name="report_intervention_team_id" eval="False" />
+        <field name="report_intervention_employee_ids" eval="True" />
+        <field name="report_intervention_company_id" eval="True" />
+        <field name="report_intervention_label" eval="True" />
+        <field name="report_intervention_address" eval="True" />
+        <field name="report_intervention_contact" eval="True" />
+        <field name="report_intervention_type" eval="True" />
+        <field name="report_intervention_description" eval="True" />
+        <field name="report_intervention_internal_description" eval="True" />
+        <field name="report_order" eval="False" />
+        <field name="report_order_name" eval="False" />
+        <field name="report_order_confirmation_date" eval="False" />
+        <field name="report_order_user_id" eval="False" />
+        <field name="report_order_inspection_visit_date" eval="False" />
+        <field name="report_order_totals" eval="False" />
+        <field name="report_order_intervention_notes" eval="False" />
+        <field name="report_products" eval="False" />
+        <field name="report_pickings" eval="False" />
+        <field name="report_legal" eval="True" />
+        <field name="report_minutes" eval="True" />
+        <field name="report_photos" eval="True" />
+        <field name="report_signature" eval="True" />
+        <field name="report_signature_date" eval="False" />
+        <field name="report_equipment">True</field>
+        <field name="report_equipment_name">True</field>
+        <field name="report_equipment_product_id">True</field>
+        <field name="report_equipment_model">True</field>
+        <field name="report_equipment_brand_id">True</field>
+        <field name="report_equipment_product_category_id">True</field>
+        <field name="report_equipment_installation_date">True</field>
+        <field name="report_equipment_installation_type">True</field>
+        <field name="report_equipment_is_compliant">True</field>
+        <field name="report_equipment_installer_id">True</field>
+        <field name="report_equipment_note">True</field>
+    </record>
+
+    <record id="of_equipment_intervention_report_template_aftersales" model="of.equipment.intervention.report.template">
+        <field name="name">After-sale services</field>
+        <field name="active">True</field>
+        <field name="sequence">20</field>
+        <field name="task_id" ref="of_planning.of_planning_task_aftersale_services"/>
+        <field name="report_use_default" eval="False" />
+        <field name="report_title">Intervention report</field>
+        <field name="report_intervention" eval="True" />
+        <field name="report_intervention_partner_id" eval="True" />
+        <field name="report_intervention_partner_code" eval="True" />
+        <field name="report_intervention_task_id" eval="True" />
+        <field name="report_intervention_task_description" eval="False" />
+        <field name="report_intervention_duration" eval="True" />
+        <field name="report_intervention_team_id" eval="False" />
+        <field name="report_intervention_employee_ids" eval="True" />
+        <field name="report_intervention_company_id" eval="True" />
+        <field name="report_intervention_label" eval="True" />
+        <field name="report_intervention_address" eval="True" />
+        <field name="report_intervention_contact" eval="True" />
+        <field name="report_intervention_type" eval="True" />
+        <field name="report_intervention_description" eval="True" />
+        <field name="report_intervention_internal_description" eval="True" />
+        <field name="report_order" eval="False" />
+        <field name="report_order_name" eval="False" />
+        <field name="report_order_confirmation_date" eval="False" />
+        <field name="report_order_user_id" eval="False" />
+        <field name="report_order_inspection_visit_date" eval="False" />
+        <field name="report_order_totals" eval="False" />
+        <field name="report_order_intervention_notes" eval="False" />
+        <field name="report_products" eval="False" />
+        <field name="report_pickings" eval="False" />
+        <field name="report_legal" eval="True" />
+        <field name="report_minutes" eval="True" />
+        <field name="report_photos" eval="True" />
+        <field name="report_signature" eval="True" />
+        <field name="report_signature_date" eval="False" />
+        <field name="report_equipment">True</field>
+        <field name="report_equipment_name">True</field>
+        <field name="report_equipment_product_id">True</field>
+        <field name="report_equipment_model">True</field>
+        <field name="report_equipment_brand_id">True</field>
+        <field name="report_equipment_product_category_id">True</field>
+        <field name="report_equipment_installation_date">True</field>
+        <field name="report_equipment_installation_type">True</field>
+        <field name="report_equipment_is_compliant">True</field>
+        <field name="report_equipment_installer_id">True</field>
+        <field name="report_equipment_note">True</field>
+    </record>
+
+</odoo>

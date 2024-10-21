@@ -24,6 +24,16 @@ class OFServiceRequestEquipmentLine(models.Model):
         required=True,
         ondelete="cascade",
     )
+    event_link_id = fields.Many2one(
+        comodel_name="of.calendar.event.equipment.link",
+        string="Event Link",
+        help="Technical field to store link that created this line.",
+    )
+    link_task_id = fields.Many2one(
+        comodel_name="of.planning.task",
+        string="Task",
+        related="event_link_id.task_id",
+    )
     name = fields.Char(string="Name", related="event_id.name")
     start = fields.Datetime(string="Date", related="event_id.start", store=True)
     state = fields.Selection(string="State", related="event_id.of_state")

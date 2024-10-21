@@ -335,6 +335,11 @@ class CalendarEvent(models.Model):
     )
 
     # ===== Duration & time fields =====
+    duration = fields.Float(
+        compute="_compute_duration",
+        store=True,
+        readonly=False,
+    )
     start = fields.Datetime(default=lambda self: fields.Datetime.now().replace(second=0), copy=False)
     stop = fields.Datetime(
         default=lambda self: fields.Datetime.now().replace(second=0) + timedelta(hours=1), copy=False
@@ -490,6 +495,17 @@ class CalendarEvent(models.Model):
     # --------------------------------------------------------------------------
     # Compute methods
     # --------------------------------------------------------------------------
+
+    @api.depends("of_task_id")
+    def _compute_duration(self):
+        for event in self:
+            if event.of_task_id:
+                event.duration = event.of_task_id.duration
+
+    def _inverse_dates(self):
+        for meeting in self:
+            if meeting.allday:
+                meeting._update_datetime_with_work_hours()
 
     @api.depends("of_resource_id")
     def _compute_of_employee_ids(self):
@@ -874,10 +890,6 @@ class CalendarEvent(models.Model):
             else:
                 self._compute_of_employee_ids()
 
-    @api.onchange("of_task_id")
-    def _onchange_of_task_id(self):
-        self.duration = self.of_task_id.duration
-
     @api.onchange("of_team_id")
     def onchange_of_team_id(self):
         self.of_employee_ids = self.of_team_id.employee_ids
@@ -1098,6 +1110,10 @@ class CalendarEvent(models.Model):
             "of_planning.email_template_of_planning_intervention_report", raise_if_not_found=False
         ):
             ctx["default_template_id"] = template_id.id
+
+        # Composer can be used in methods that inherit from this one
+        mail_composer = self.env["mail.compose.message"].with_context(**ctx).create({})
+        mail_composer._onchange_template_id_wrapper()
         return {
             "name": _("Compose Email"),
             "type": "ir.actions.act_window",
@@ -1105,6 +1121,7 @@ class CalendarEvent(models.Model):
             "res_model": "mail.compose.message",
             "views": [(compose_form.id, "form")],
             "view_id": compose_form.id,
+            "res_id": mail_composer.id,
             "target": "new",
             "context": ctx,
         }
@@ -1155,18 +1172,21 @@ class CalendarEvent(models.Model):
             except Exception as e:
                 raise AccessError(_("Unable to find email template")) from e
 
-            if self.env.user.email:
-                composer = self.env["mail.compose.message"].create(
-                    {
-                        "composition_mode": "comment",
-                        "model": "calendar.event",
-                        "res_id": event.id,
-                        "template_id": email_template.id,
-                    }
-                )
-                composer._onchange_template_id_wrapper()
-                composer.action_send_mail()
-                event.of_report_send_date = fields.Datetime.now()
+            if not self.env.user.email:
+                continue
+
+            composer = self.env["mail.compose.message"].create(
+                {
+                    "composition_mode": "comment",
+                    "model": "calendar.event",
+                    "res_id": event.id,
+                    "template_id": email_template.id,
+                }
+            )
+            composer._onchange_template_id_wrapper()
+            event._send_report_post_hook_composer_onchange_template(composer)
+            composer.action_send_mail()
+            event.of_report_send_date = fields.Datetime.now()
 
     def action_button_import_order_line(self):
         self.ensure_one()
@@ -1558,6 +1578,27 @@ class CalendarEvent(models.Model):
             if picking.move_line_ids
         ]
 
+    def cancel_deliveries(self):
+        """Cancel the stock pickings related to the calendar event."""
+        for picking in self.of_picking_ids:
+            picking.action_cancel()
+
+    def _send_report_post_hook_composer_onchange_template(self, composer):
+        """Hook method to modify the mail composer after the template is set.
+
+        This method is called after the template is set in the mail composer. It can be used to modify the mail
+        composer before sending the email.
+
+        Args:
+            composer (mail.compose.message): The mail composer to modify
+        """
+        self.ensure_one()
+        return True
+
+    # --------------------------------------------------------------------------
+    # Report methods
+    # --------------------------------------------------------------------------
+
     def _report_get_template(self):
         """Helper method to get the intervention template to use for the report."""
         return (
@@ -1648,8 +1689,3 @@ class CalendarEvent(models.Model):
         return (
             task_name + (task_name and partner_name and " - " or "") + f"{partner_name} {start_date}".replace("/", "-")
         ) or "report"
-
-    def cancel_deliveries(self):
-        """Cancel the stock pickings related to the calendar event."""
-        for picking in self.of_picking_ids:
-            picking.action_cancel()

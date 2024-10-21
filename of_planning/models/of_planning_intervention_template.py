@@ -6,6 +6,7 @@ from odoo.exceptions import UserError
 
 class OFPlanningInterventionTemplate(models.Model):
     _name = "of.planning.intervention.template"
+    _inherit = "of.planning.intervention.template.mixin"
     _description = "Intervention template"
     _order = "sequence"
 
@@ -50,15 +51,9 @@ class OFPlanningInterventionTemplate(models.Model):
     def default_get(self, fields_list):
         defaults = super().default_get(fields_list)
         if default_template_values := self._get_default_template_values():
-            if isinstance(defaults, dict):  # MJA: default_get renvoie toujours un dict non ?
-                defaults.update(default_template_values)
-            else:
-                defaults = default_template_values
+            defaults.update(default_template_values)
         return defaults
 
-    name = fields.Char(required=True, translate=True)
-    sequence = fields.Integer(default=1, help="Used to order templates. Lower is better.")
-    active = fields.Boolean(default=True)
     code = fields.Char(
         compute="_compute_code",
         inverse="_inverse_code",
@@ -66,15 +61,6 @@ class OFPlanningInterventionTemplate(models.Model):
         required=True,
     )
     sequence_id = fields.Many2one(comodel_name="ir.sequence", string="Template Sequence", readonly=True)
-    task_id = fields.Many2one(
-        comodel_name="of.planning.task", string="Task", help="Task to be carried out during the intervention."
-    )
-    fiscal_position_id = fields.Many2one(
-        comodel_name="account.fiscal.position", string="Fiscal position", company_dependent=True
-    )
-    line_ids = fields.One2many(
-        comodel_name="of.planning.intervention.template.line", inverse_name="template_id", string="Template lines"
-    )
     legal = fields.Text(string="Legal notice")
     send_reports = fields.Selection(
         selection=[("manual", "Manual dispatch"), ("auto_done", "Automatic dispatch when the intervention is done")],
@@ -90,8 +76,10 @@ class OFPlanningInterventionTemplate(models.Model):
         help="The intervention report will be automatically attached to the intervention.",
     )
     is_default_template = fields.Boolean(compute="_compute_is_default_template", store=True)
-
-    # INTERVENTION SHEET
+    line_ids = fields.One2many(
+        comodel_name="of.planning.intervention.template.line", inverse_name="template_id", string="Template lines"
+    )
+    # INTERVENTION SHEET (IS)
     sheet_use_default = fields.Boolean(
         string="Use default report (IS)",
         default=True,
@@ -219,133 +207,29 @@ class OFPlanningInterventionTemplate(models.Model):
     )
     sheet_signature_date = fields.Boolean(string="Signature date (IS)", help="Adds signature date to PDF document.")
 
-    # Intervention report
-    report_use_default = fields.Boolean(
-        string="Use default report (IR)", default=True, help="Use values set in the default template for the report."
-    )
-    report_title = fields.Char(
-        string="Report title (IR)",
-        translate=True,
-        help="Define a title for the PDF document of the intervention report.",
-    )
+    # INTERVENTION REPORT (IR)
+    # Add specifics fields for `of.planning.intervention.template`, other fields are defined in
+    # `of.planning.intervention.template.mixin` model.
+    report_use_default = fields.Boolean(default=True)
     report_partner_id = fields.Boolean(
         string="Customer in title (IR)", help="Adds the customer's name to the document title."
     )
     report_date = fields.Boolean(string="Date (IR)", help="Adds intervention date to document title.")
 
-    # Intervention
-    report_intervention = fields.Boolean(
-        string="INTERVENTION (IR)", help="Selects or deselects all items to be displayed related to the intervention."
-    )
-    report_intervention_partner_id = fields.Boolean(
-        string="Customer (IR)", help='Adds the customer to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_partner_code = fields.Boolean(
-        string="Customer code (IR)", help='Adds the customer code to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_task_id = fields.Boolean(
-        string="Task (IR)", help='Adds the task to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_task_description = fields.Boolean(
-        string="Task description (IR)",
-        help='Adds the task description to the "Intervention" section of the PDF document.',
-    )
-    report_intervention_date = fields.Boolean(
-        string="Start date (IR)", help='Adds the intervention date to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_duration = fields.Boolean(
-        string="Duration (IR)",
-        help='Adds the duration of the intervention in the "Intervention" section of the PDF document.',
-    )
-    report_intervention_team_id = fields.Boolean(
-        string="Team (IR)", help='Adds the selected team to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_employee_ids = fields.Boolean(
-        string="Operator(s) (IR)", help='Adds technicians to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_company_id = fields.Boolean(
-        string="Company (IR)", help='Adds the company to the "Intervention" section of the PDF document.'
-    )
-    report_intervention_label = fields.Boolean(string="Label (IR)")
-    report_intervention_address = fields.Boolean(string="Address (IR)")
-    report_intervention_contact = fields.Boolean(string="Contact (IR)")
-    report_intervention_type = fields.Boolean(string="Intervention type (IR)")
-    report_intervention_description = fields.Boolean(
-        string="External description (IR)",
-        help='Adds the external description to the "Intervention" section of the PDF document.',
-    )
-    report_intervention_internal_description = fields.Boolean(
-        string="Internal description (IR)",
-        help='Adds the internal description to the "Intervention" section of the PDF document.',
-    )
-
     # History
     report_history = fields.Boolean(string="HISTORY (IR)", help="Adds customer history to PDF document.")
-
-    # Order
-    report_order = fields.Boolean(
-        string="ORDER (IR)",
-        help="Allows you to select or deselect all the items to be displayed "
-        "linked to the order associated with the intervention.",
-    )
-    report_order_name = fields.Boolean(
-        string="Order number (IR)",
-        help='Adds the associated order number to the "Order" section of the PDF document.',
-    )
-    report_order_confirmation_date = fields.Boolean(
-        string="Confirmation date (IR)",
-        help='Adds the associated order confirmation date to the "Order" section of the PDF document.',
-    )
-    report_order_user_id = fields.Boolean(
-        string="Vendor (IR)",
-        help='Adds the seller of the associated order to the "Order" section of the PDF document.',
-    )
-    report_order_inspection_visit_date = fields.Boolean(
-        string="Inspection visit date (IR)",
-        help='Adds the technical inspection date of the associated order in the "Order" section of the PDF document.',
-    )
-    report_order_totals = fields.Boolean(
-        string="Totals (IR)", help='Adds the associated order total to the "Order" section of the PDF document.'
-    )
-    report_order_intervention_notes = fields.Boolean(
-        string="Intervention notes (IR)",
-        help='Adds the associated order notes to the "Order" section of the PDF document.',
-    )
-
-    # Produits et travaux (lignes de commande)
-    report_products = fields.Boolean(string="PRODUCTS AND WORKS (IR)")
-
-    # Deliveries
-    report_pickings = fields.Boolean(
-        string="DELIVERIES (IR)", help="Adds delivery notes related to the intervention to the PDF document."
-    )
 
     # Invoicing
     report_invoicing = fields.Boolean(
         string="INVOICING (IR)", help="Adds invoicing for the intervention to the PDF document."
     )
 
-    # Legal notice
-    report_legal = fields.Boolean(string="LEGAL NOTICE (IR)", help="Adds legal notices to the PDF document.")
-
     # Intervention's minutes
-    report_minutes = fields.Boolean(
-        string="MINUTES (IR)", help="Allows you to select or deselect all elements of the procedure report"
-    )
     report_minutes_real_dates = fields.Boolean(string="Real dates (IR)", help="Adds actual dates of intervention.")
     report_minutes_real_duration = fields.Boolean(
         string="Real duration (IR)", help="Adds actual duration of intervention."
     )
     report_minutes_description = fields.Boolean(string="Description (IR)", help="Add intervention report.")
-
-    # Photos
-    report_photos = fields.Boolean(string="PHOTOS (IR)", help="Adds photos of the operation to the PDF document.")
-
-    # Signatures
-    report_signature = fields.Boolean(
-        string="SIGNATURES (IR)", help="Adds the technician's and customer's signatures to the PDF document."
-    )
-    report_signature_date = fields.Boolean(string="Signature date (IR)", help="Adds signature date to PDF document.")
 
     # --------------------------------------------------------------------------
     # Compute methods

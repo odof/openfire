@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_link_create_form_view" model="ir.ui.view">
+        <field name="name">of.equipment.link.create.wizard.view.form.inherit</field>
+        <field name="model">of.equipment.link.create.wizard</field>
+        <field name="inherit_id" ref="of_equipment.of_equipment_link_create_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='alert_event']" position="after">
+                <div class="alert alert-info" role="alert" name="alert_reqeuest" attrs="{'invisible':[('service_request_id', '=', False)]}">
+                    Select the Equipments to add to the service request.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='event_id']" position="after">
+                <field name="service_request_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_add_equipments_to_sr" model="ir.actions.act_window">
+        <field name="name">Add Equipments</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">of.equipment.link.create.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_equipment_service.of_equipment_link_create_form_view" />
+        <field name="target">new</field>
+    </record>
+
+</odoo>
