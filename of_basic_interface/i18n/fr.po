@@ -1,0 +1,166 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_basic_interface
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-22 15:19+0000\n"
+"PO-Revision-Date: 2024-10-22 15:19+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_brand
+msgid "Brands"
+msgstr "Marques"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_communication
+msgid "Communication"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config
+msgid "Configuration"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_contact
+msgid "Contact"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_contact_tags
+msgid "Contact Tags"
+msgstr "Étiquettes de contact"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_contacts
+msgid "Contacts"
+msgstr "Mes contacts"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_communication_mail_mail
+msgid "Email Sent"
+msgstr "Email envoyés"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_communication_email_templates
+msgid "Email Templates"
+msgstr "Modèles d'email"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_employee
+msgid "Employees"
+msgstr "Employés"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_equipment
+msgid "Equipments"
+msgstr "Mes équipements installés"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_general_settings
+msgid "General Settings"
+msgstr "Paramètres généraux"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention
+msgid "Intervention"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions
+msgid "Interventions"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_move_out_invoice_type
+msgid "Invoices"
+msgstr "Mes factures"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_main
+msgid "Openfire"
+msgstr ""
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_account_payments_receivable
+msgid "Payments"
+msgstr "Mes paiements"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_planning
+msgid "Planning"
+msgstr "Mon planning"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_product_category
+msgid "Product Categories"
+msgstr "Catégories de produits"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_product_template
+msgid "Products"
+msgstr "Mes produits"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_template
+msgid "Quotation Templates"
+msgstr "Modèles de devis"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_quotations
+msgid "Quotations"
+msgstr "Mes devis"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_move_out_refund_type
+msgid "Refunds"
+msgstr "Mes avoirs"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale
+msgid "Sale"
+msgstr "Vente"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales
+msgid "Sales"
+msgstr "Ventes"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_service_request
+msgid "Service Requests"
+msgstr "Mes demandes d'intervention"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_survey
+msgid "Surveys"
+msgstr "Questionnaires"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_task
+msgid "Tasks"
+msgstr "Tâches"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_print_wizard
+msgid "Tour Printing"
+msgstr "Imprimer mes tournées"
+
+#. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_tour_create
+msgid "Tour optimization"
+msgstr "Optimiser mes tournées"
