@@ -5,3 +5,5 @@ from . import test_calendar_event
 from . import test_product_product
 from . import test_stock_picking
 from . import test_create_equipment_wizard
+from . import test_calendar_event_equipment_link
+from . import test_calendar_event_equipment_link_line

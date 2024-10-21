@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 06:36+0000\n"
-"PO-Revision-Date: 2024-07-11 06:36+0000\n"
+"POT-Creation-Date: 2024-10-22 13:51+0000\n"
+"PO-Revision-Date: 2024-10-22 13:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -80,12 +80,14 @@ msgid "Custom documents"
 msgstr "Documents personnalisés"
 
 #. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Delivery notes"
 msgstr "Bons de livraison"
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_picking_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template_mixin__report_picking_pdf
 msgid "Delivery notes (IR)"
 msgstr "Bons de livraison"
 
@@ -100,6 +102,7 @@ msgid "Documents to include into pdf reports."
 msgstr "Documents à inclure dans les rapports pdf"
 
 #. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Internal documents"
 msgstr "Documents internes"
@@ -110,12 +113,19 @@ msgid "Intervention template"
 msgstr "Modèle d'intervention"
 
 #. module: of_custom_document_planning
+#: model:ir.model,name:of_custom_document_planning.model_of_planning_intervention_template_mixin
+msgid "Intervention template mixin"
+msgstr "Mixin de modèle d'intervention"
+
+#. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Invoices"
 msgstr "Factures"
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_invoice_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template_mixin__report_invoice_pdf
 msgid "Invoices (IR)"
 msgstr "Factures"
 
@@ -125,6 +135,7 @@ msgid "Invoices (IS)"
 msgstr "Factures"
 
 #. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Joined documents"
 msgstr "Documents joints"
@@ -140,12 +151,14 @@ msgid "Joined documents (IS)"
 msgstr "Documents joints"
 
 #. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Order"
 msgstr "Commandes"
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_order_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template_mixin__report_order_pdf
 msgid "Order (IR)"
 msgstr "Commandes"
 
@@ -155,12 +168,14 @@ msgid "Order (IS)"
 msgstr "Commandes"
 
 #. module: of_custom_document_planning
+#: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_mixin_view_form
 #: model_terms:ir.ui.view,arch_db:of_custom_document_planning.of_planning_intervention_template_view_form
 msgid "Purchases"
 msgstr "Achats"
 
 #. module: of_custom_document_planning
 #: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template__report_purchase_pdf
+#: model:ir.model.fields,field_description:of_custom_document_planning.field_of_planning_intervention_template_mixin__report_purchase_pdf
 msgid "Purchases (IR)"
 msgstr "Achats"
 

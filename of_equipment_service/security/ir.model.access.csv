@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_of_of_service_request_equipment_line,of.service.request.equipment.line,model_of_service_request_equipment_line,base.group_user,1,1,1,1
+access_of_service_request_equipment_link,access_of_service_request_equipment_link,of_equipment_service.model_of_service_request_equipment_link,base.group_user,1,1,1,1

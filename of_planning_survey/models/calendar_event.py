@@ -4,7 +4,8 @@ from odoo import Command, _, api, fields, models
 
 
 class CalendarEvent(models.Model):
-    _inherit = "calendar.event"
+    _name = "calendar.event"
+    _inherit = ["calendar.event", "of.equipment.report.mixin"]
 
     of_survey_id = fields.Many2one(
         comodel_name="of.survey.survey",
@@ -137,8 +138,7 @@ class CalendarEvent(models.Model):
         self.ensure_one()
         default = dict(default or {}, name=_("%s (copy)") % self.name)
         new_record = super().copy(default)
-        # by doing this we keep we are resetting questions and user input to avoid having the same answers
-        # on the new record
+        # by doing this are resetting questions and user input to avoid having the same answers on the new record
         new_record.of_survey_id = self.of_survey_id
         return new_record
 
@@ -198,66 +198,7 @@ class CalendarEvent(models.Model):
     # Reports methods
     # --------------------------------------------------------------------------
 
-    def _report_of_get_pages_to_display(self):
-        """Get sections to display."""
-
-        self.ensure_one()
-        pages = self.of_answers_ids.filtered(lambda a: a.question_id.is_page)
-        return pages.filtered(lambda page: self._report_of_display_page(page))
-
-    def _report_of_display_page(self, page):
-        """Determine if a section should be displayed.
-
-        Args:
-            page (of.survey.answers): Section to check.
-        """
-
-        page_answers = self.of_answers_ids.filtered(lambda a: a.question_id in page.mapped("question_id.question_ids"))
-        page_input_lines = page_answers.mapped("user_input.user_input_line_ids").filtered(
-            lambda il: il.question_id in page.mapped("question_id.question_ids")
-        )
-
-        # We display a section only if all its questions have not been ignored.
-        # For a question of type image, this corresponds to whether it has images.
-        return not all(
-            page_input_lines.mapped(
-                lambda il: il.skipped or (il.answer_type == "multi_image" and len(il.value_image_ids) == 0)
-            )
-        )
-
-    def _report_of_get_answers_to_display(self, page=None, report=False):
-        """Get answers to display.
-
-        Args:
-            page (of.survey.answers): Section to filter on.
-            report (bool): True if we are in the intervention report.
-        """
-        self.ensure_one()
-        page_answers = self.of_answers_ids
-
-        # Si une section est renseignée, on filtre sur celle-ci.
-        if page:
-            page_answers = page_answers.filtered(lambda a: a.question_id in page.mapped("question_id.question_ids"))
-
-        return page_answers.filtered(lambda answer: self._report_of_display_answer(answer, report))
-
-    def _report_of_display_answer(self, answer, report):
-        """Determine if an answer should be displayed.
-
-        Args:
-            answer (of.survey.answers): Answer to check.
-            report (bool): True if we are in the intervention report.
-        """
-
-        answer_input_line = answer.mapped("user_input.user_input_line_ids").filtered(
-            lambda il: il.question_id in answer.question_id
-        )
-
-        # We display an answer only if it has not been ignored.
-        # For a question of type image, this corresponds to whether it has images.
-        # If it is for the intervention report, we check if the question should be displayed.
-        return answer_input_line and not (
-            (report and answer.question_id.constr_no_report_display)
-            or all(answer_input_line.mapped("skipped"))
-            or (answer.question_type == "multi_image" and len(answer_input_line.mapped("value_image_ids")) == 0)
-        )
+    @property
+    def _answer_field_name(self):
+        """Set the answer field name to be used in the report mixin."""
+        return "of_answers_ids"

@@ -6,7 +6,7 @@ from odoo import fields, models
 class OFPlanningInterventionTemplate(models.Model):
     _inherit = "of.planning.intervention.template"
 
-    # -- Intervention Sheet - Joined Documents
+    # INTERVENTION SHEET (IS)
     sheet_order_pdf = fields.Boolean(
         string="Order (IS)",
         help="Adds the PDF of the order associated with the intervention as an appendix to the PDF document.",
@@ -29,7 +29,7 @@ class OFPlanningInterventionTemplate(models.Model):
         help="Adds customized documents selected in the intervention as an appendix to the PDF document.",
     )
 
-    # -- Intervention Report - Joint Documents
+    # INTERVENTION REPORT (IR)
     report_order_pdf = fields.Boolean(
         string="Order (IR)",
         help="Adds the PDF of the order associated with the intervention as an appendix to the PDF document.",
