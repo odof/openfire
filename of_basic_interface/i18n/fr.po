@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-20 13:17+0000\n"
-"PO-Revision-Date: 2024-11-20 13:17+0000\n"
+"POT-Creation-Date: 2024-10-22 15:19+0000\n"
+"PO-Revision-Date: 2024-10-22 15:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,30 +16,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_basic_interface
-#: model:res.groups,name:of_basic_interface.of_group_basic_interface
-msgid "(OF) Basic Interface User"
-msgstr "(OF) Utilisateur interface simplifiée"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm_activity_types
-msgid "Activity Types"
-msgstr "Types d'activités"
-
-#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_brand
 msgid "Brands"
 msgstr "Marques"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_crm
-msgid "CRM"
-msgstr ""
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_links_campaign
-msgid "Campaigns"
-msgstr "Campagnes"
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_communication
@@ -63,8 +42,8 @@ msgstr "Étiquettes de contact"
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_contacts
-msgid "Customers"
-msgstr "Mes clients"
+msgid "Contacts"
+msgstr "Mes contacts"
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_communication_mail_mail
@@ -97,11 +76,6 @@ msgid "Intervention"
 msgstr ""
 
 #. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_planning
-msgid "Intervention Planning"
-msgstr "Mon planning d'intervention"
-
-#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_template
 msgid "Intervention template"
 msgstr "Modèle d'intervention"
@@ -117,36 +91,6 @@ msgid "Invoices"
 msgstr "Mes factures"
 
 #. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_crm_leads
-msgid "Leads"
-msgstr "Mes pistes"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_links
-msgid "Link Tracker"
-msgstr "Tracker de lien"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm_lost_reasons
-msgid "Lost Reasons"
-msgstr "Motifs de perte du pipeline"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_links_medium
-msgid "Mediums"
-msgstr "Canaux"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_crm_my_activities
-msgid "My Activities"
-msgstr "Mes activités"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_crm_my_pipeline
-msgid "My Pipeline"
-msgstr "Mon pipeline"
-
-#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_main
 msgid "Openfire"
 msgstr ""
@@ -157,6 +101,11 @@ msgid "Payments"
 msgstr "Mes paiements"
 
 #. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_planning
+msgid "Planning"
+msgstr "Mon planning"
+
+#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_product_category
 msgid "Product Categories"
 msgstr "Catégories de produits"
@@ -165,11 +114,6 @@ msgstr "Catégories de produits"
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_product_template
 msgid "Products"
 msgstr "Mes produits"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_crm_prospects
-msgid "Prospects"
-msgstr ""
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_template
@@ -197,39 +141,14 @@ msgid "Sales"
 msgstr "Ventes"
 
 #. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm_sales_teams
-msgid "Sales Teams"
-msgstr "Équipes commerciales"
-
-#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_service_request
 msgid "Service Requests"
 msgstr "Mes demandes d'intervention"
 
 #. module: of_basic_interface
-#: model:res.groups,comment:of_basic_interface.of_group_basic_interface
-msgid "Simplify the interface"
-msgstr "Simplifie l'interface"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_links_source
-msgid "Sources"
-msgstr ""
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm_stages
-msgid "Stages"
-msgstr "Étapes du pipeline"
-
-#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_survey
 msgid "Surveys"
 msgstr "Questionnaires"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_crm_tags
-msgid "Tags"
-msgstr "Étiquettes du pipeline"
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_task
