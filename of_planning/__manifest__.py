@@ -21,6 +21,7 @@
         "data/report_paperformat.xml",
         "data/cron_planning.xml",
         "data/email_planning.xml",
+        "data/of_planning_task.xml",
         "reports/report_intervention_report.xml",  # required before email_intervention.xml for email template
         "data/email_intervention.xml",
         "security/res_groups.xml",
@@ -28,6 +29,7 @@
         "security/ir.model.access.csv",
         "views/of_sector_views.xml",
         "views/of_planning_intervention_line_views.xml",
+        "views/of_planning_intervention_template_mixin_views.xml",
         "views/of_planning_intervention_template_views.xml",
         "views/of_planning_tag_views.xml",
         "views/of_planning_task_views.xml",

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_survey.of_action_survey_form" model="ir.actions.act_window">
+        <field name="domain">[('survey_type', 'in', ['intervention_survey', 'equipment_survey'])]</field>
+    </record>
+
+</odoo>

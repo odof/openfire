@@ -325,6 +325,7 @@
                     </group>
                     <field name="of_line_ids">
                         <tree editable="bottom" decoration-primary="invoice_status=='to invoice'">
+                            <field name="currency_id" invisible="1" />
                             <field name="sequence" widget="handle" />
                             <field name="order_line_id" invisible="1" />
                             <field name="invoice_status" invisible="1" />

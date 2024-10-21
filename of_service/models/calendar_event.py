@@ -11,6 +11,7 @@ class CalendarEvent(models.Model):
         string="Service Request",
         domain="of_address_id and ['|', ('address_id', '=', of_address_id), ('partner_id', '=', of_address_id)] or []",
         help="Link a service request to your service to link these two objects.",
+        tracking=True,
     )
     of_type_id = fields.Many2one(
         comodel_name="of.service.request.type",

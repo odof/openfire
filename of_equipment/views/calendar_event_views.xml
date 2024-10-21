@@ -8,16 +8,39 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='what']/group" position="before">
                 <group colspan="4">
-                    <field name="of_use_equipment" />
-                    <field name="of_equipment_ids" colspan="2" nolabel="1" context="{'default_customer_id': of_partner_id, 'default_site_address_id': of_address_id}"
-                            attrs="{'invisible': [('of_use_equipment', '=', False)], 'required': [('of_use_equipment', '=', True)]}">
-                        <tree>
-                            <field name="name" />
-                            <field name="site_address_id" />
-                            <field name="model_name" />
-                        </tree>
-                    </field>
+                    <group colspan="2">
+                        <field name="of_use_equipment" attrs="{'readonly': [('of_state', 'in', ('done', 'cancel'))]}"/>
+                    </group>
+                    <group colspan="2">
+                        <group attrs="{'invisible': ['|', ('of_use_equipment', '=', False), ('of_state', 'in', ('done', 'cancel'))]}">
+                            <div class="d-flex">
+                                <button name="action_button_add_equipments_to_event" class="btn btn-primary text-nowrap me-2" string="Add Equipments" icon="fa-plus-circle" help="Select Equipments to add to the event" type="object" attrs="{'invisible':[('of_use_equipment','=', False)]}" />
+                                <button name="action_button_remove_all_equipments" class="btn btn-secondary text-nowrap me-2" string="Delete all Equipments" icon="fa-trash-o" help="Delete all linked equipments" type="object" confirm="You are about to remove all linked equipments. Are you sure you want to continue?" attrs="{'invisible':['|', ('of_use_equipment','=', False), ('of_linked_equipment_ids', '=', [])]}" />
+                            </div>
+                        </group>
+                        <field name="of_default_equipment_report_tmpl_id" invisible="1"/>
+                        <field name="of_linked_equipment_ids" nolabel="1" options="{'always_reload': 1}"
+                                context="{'default_equipment_report_tmpl_id': of_default_equipment_report_tmpl_id}"
+                                attrs="{'invisible': [('of_use_equipment', '=', False)], 'required': [('of_use_equipment', '=', True)], 'readonly': [('of_state', 'in', ('done', 'cancel'))]}">
+                            <tree editable="bottom" no_open="True">
+                                <field name="equipment_id"/>
+                                <field name="equipment_address"/>
+                                <field name="equipment_report_tmpl_id"/>
+                                <field name="task_id" readonly="1" force_save="1"/>
+                                <field name="task_duration" widget="float_time"/>
+                                <button name="action_button_print_report" type="object" icon="fa-file-pdf-o" title="Print" attrs="{'invisible': [('equipment_report_tmpl_id', '=', False)]}"/>
+                                <button name="action_button_open_equipment_link" type="object" icon="fa-clipboard" title="Report" attrs="{'invisible': [('equipment_report_tmpl_id', '=', False)]}"/>
+                                <field name="partner_id" invisible="1"/>
+                                <field name="address_id" invisible="1"/>
+                            </tree>
+                        </field>
+                    </group>
                 </group>
+            </xpath>
+            <xpath expr="//field[@name='of_line_ids']/tree" position="inside">
+                <field name="equipment_id" optional="show"/>
+                <field name="equipment_link_id" optional="hide"/>
+                <field name="equipment_link_line_id" optional="hide"/>
             </xpath>
         </field>
     </record>

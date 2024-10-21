@@ -41,7 +41,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
                 },
                 {
                     "name": "Test Event 3",
@@ -52,7 +52,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_ash_vacuum_cleaner.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_ash_vacuum_cleaner.id})],
                 },
                 {
                     "name": "Test Event 4",
@@ -63,7 +63,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
                 },
             ]
         )
@@ -97,7 +97,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                 "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                 "of_partner_id": self.customer_a.id,
                 "of_use_equipment": True,
-                "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
             }
         )
 
@@ -113,7 +113,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
                 },
                 {
                     "name": "Test Event 3",
@@ -124,7 +124,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
                 },
                 {
                     "name": "Test Event 4",
@@ -135,7 +135,7 @@ class TestOFCalendarEvent(TestOFEquipmentCommon):
                     "of_employee_ids": [Command.set([self.employee_tech_johnny.id])],
                     "of_partner_id": self.customer_a.id,
                     "of_use_equipment": True,
-                    "of_equipment_ids": [Command.set([self.equipment_wood_stove.id])],
+                    "of_linked_equipment_ids": [Command.create({"equipment_id": self.equipment_wood_stove.id})],
                 },
             ]
         )
