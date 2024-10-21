@@ -183,7 +183,10 @@ class OFServiceRequest(models.Model):
             if select.latitude is not None and select.longitude is not None and select.max_distance is not None:
                 max_distance_converted = select.max_distance / 1000 * 0.621371
                 # premier filtre
-                domain_states = ["to_plan", "draft", "planned", "late"]
+                if select.state:
+                    domain_states = select.state
+                else:
+                    domain_states = ["to_plan", "draft", "to_plan_quickly", "late"]
                 self.env.cr.execute(
                     """select service.id
                         from of_service_request service
