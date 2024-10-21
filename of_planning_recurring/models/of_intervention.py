@@ -2,20 +2,25 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl)
 
 import collections
-from dateutil import parser
-from dateutil import rrule
-from operator import itemgetter
-from datetime import datetime, timedelta
-import pytz
 import re
+from datetime import datetime, timedelta
+from operator import itemgetter
 
-from odoo import api, models, fields, _
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+import pytz
+from dateutil import parser, rrule
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 
-from odoo.addons.calendar.models.calendar import VIRTUALID_DATETIME_FORMAT, calendar_id2real_id, get_real_ids, \
-    real_id2calendar_id, is_calendar_id
-from odoo.addons.of_utils.models.of_utils import heures_minutes_2_float, format_date
+from odoo.addons.calendar.models.calendar import (
+    VIRTUALID_DATETIME_FORMAT,
+    calendar_id2real_id,
+    get_real_ids,
+    is_calendar_id,
+    real_id2calendar_id,
+)
+from odoo.addons.of_utils.models.of_utils import format_date, heures_minutes_2_float
 
 
 class OFPlanningRecurringMixin(models.AbstractModel):
@@ -914,6 +919,22 @@ class OFPlanningIntervention(models.Model):
         self.ensure_one()
         default = default or {}
         return super(OFPlanningIntervention, self.browse(calendar_id2real_id(self.id))).copy(default)
+
+    @api.multi
+    def button_cancel(self):
+        result = super(OFPlanningIntervention, self).button_cancel()
+
+        if len(self) == 1 and self.recurrency:
+            # Si on annule un rdv récurrent, il se retrouve détaché, on doit donc récupérer son nouvel id
+            # virtual_id = False est important, sinon le paramètre "order" n'est pas conservé
+            new_id = self.with_context(virtual_id=False).search([], order="id DESC", limit=1).id
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'of.planning.intervention',
+                'res_id': new_id,
+                'view_mode': 'form',
+            }
+        return result
 
     @api.multi
     def get_date_tournees(self):
