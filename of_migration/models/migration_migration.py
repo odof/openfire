@@ -66,6 +66,9 @@ class MigrationMigration(models.Model):
             record.server_id.action_status_migration(record)
 
     def button_action_get_logs(self):
+        self.log_info = ""
+        self.log_warning = ""
+        self.log_error = ""
         self.server_id.action_get_logs(self)
 
     def action_get_logs(self):

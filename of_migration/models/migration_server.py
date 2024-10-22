@@ -2,6 +2,7 @@
 
 import base64
 import logging
+import tarfile
 
 import pysftp
 import requests
@@ -151,4 +152,5 @@ class MigrationServer(models.Model):
                 f = open(f"/tmp/{database.backup_filename}", "wb")
                 f.write(res.content)
                 f.close()
+
                 connection.put(f"/tmp/{database.backup_filename}", f"/upload/{database.backup_filename}")
