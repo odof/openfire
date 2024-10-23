@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_group_basic_interface" model="res.groups">
+        <field name="name">(OF) Basic Interface User</field>
+        <field name="comment">Simplify the interface</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+</odoo>

@@ -15,8 +15,10 @@
         "of_sale",
         "of_service",
         "of_survey",
+        "base_menu_visibility_restriction",
     ],
     "data": [
+        "security/of_basic_interface_security.xml",
         "views/ir_ui_menu.xml",
     ],
     "external_dependencies": {},
