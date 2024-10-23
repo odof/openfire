@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <!-- Désactivation du connecteur Poujoulat -->
+    <record id="sanitize_query_ir_values" model="of.sanitize.query">
+        <field name="query">DELETE FROM ir_values WHERE name IN ('of_poujoulat_host', 'of_poujoulat_redirect') AND model = 'of.connector.config.settings'</field>
+    </record>
+
+</odoo>

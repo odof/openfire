@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_connector_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.connecteur.config.settings.view.form</field>
+        <field name="model">of.connector.config.settings</field>
+        <field name="inherit_id" ref="of_base.of_connector_config_settings_view"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='purchase']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//group[@name='purchase']" position="inside">
+                <group name="poujoulat">
+                    <h4 colspan="2"><strong><u>Poujoulat</u></strong></h4>
+                    <field name="of_poujoulat_host"/>
+                    <field name="of_poujoulat_redirect"/>
+                    <field name="of_poujoulat_partner_ids"/>
+                    <field name="of_poujoulat_brand_ids"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_base.of_connector_config_settings_menu" model="ir.ui.menu">
+        <field name="active" eval="True"/>
+    </record>
+
+</odoo>
