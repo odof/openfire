@@ -1,0 +1,22 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_connector_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-18 14:50+0000\n"
+"PO-Revision-Date: 2024-11-18 14:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_connector_base
+#: model:ir.actions.act_window,name:of_connector_base.action_of_connector_base_res_config_settings
+#: model_terms:ir.ui.view,arch_db:of_connector_base.res_config_settings_view_form
+msgid "Connectors Settings"
+msgstr "Paramètres des connecteurs"
