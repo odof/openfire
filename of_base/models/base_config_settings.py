@@ -12,3 +12,6 @@ class ResConfigSettings(models.TransientModel):
         help="Displays the city in parentheses after the partner name when searching for a partner",
     )
     of_ref_mode = fields.Selection(related="company_id.of_ref_mode", readonly=False, string="(OF) Customer reference")
+    company_id = fields.Many2one(
+        comodel_name="res.company", string="Company", required=True, default=lambda self: self.env.user.company_id
+    )

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.connector.base.res.config.settings.view</field>
+        <field name="model">res.config.settings</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" data-string="Connectors" string="Connectors Settings" data-key="of_connector_base" data-force-icon="connector_base_settings" id="connector_base_settings">
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_of_connector_base_res_config_settings" model="ir.actions.act_window">
+        <field name="name">Connectors settings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_id" ref="res_config_settings_view_form" />
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module' : 'of_connector_base'}</field>
+    </record>
+
+</odoo>
