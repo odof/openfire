@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="purchase_order_view_form" model="ir.ui.view">
+        <field name="name">purchase.order.view.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_unlock']" position="after">
+                <field name="of_is_poujoulat_partner" invisible="1"/>
+                <button name="of_action_send_poujoulat_cart" string="Commande Poujoulat" type="object"
+                        attrs="{'invisible': [('of_is_poujoulat_partner', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='of_user_id']" position="after">
+                <field name="of_poujoulat_error" groups="base.group_no_one" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
