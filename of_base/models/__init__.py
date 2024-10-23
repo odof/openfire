@@ -23,7 +23,6 @@ from . import res_partner
 from . import product_product
 from . import product_template
 from . import res_bank
-from . import res_config
 from . import res_groups
 from . import res_partner_bank
 from . import res_partner_title

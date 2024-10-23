@@ -5,9 +5,8 @@
         <field name="name">product.template.view.form</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="of_product.of_product_template_form_view"/>
-        <field name="priority">10</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='of_seller_remise']" position="after">
+            <xpath expr="//group[@name='advanced_information']" position="before">
                 <field name="of_product_type" attrs="{'invisible': [('of_product_type', '=', False)]}" readonly="1"/>
             </xpath>
         </field>

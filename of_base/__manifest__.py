@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Base",
-    'version': '16.0.1.2.0',
+    'version': '16.0.1.3.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
@@ -33,7 +33,6 @@
         'views/mail_template_views.xml',
         'views/mail_views.xml',
         'views/menus_actions_views.xml',
-        'views/of_connector_config_settings_views.xml',
         'views/of_image_views.xml',
         'views/of_log_message_views.xml',
         'views/res_company_views.xml',
