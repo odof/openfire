@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_openfire_main" name="Openfire" sequence="10">
+    <menuitem id="menu_openfire_main" name="Openfire" groups="of_group_basic_interface" sequence="1">
 
         <menuitem id="menu_openfire_sales" name="Sales" sequence="10">
             <menuitem id="menu_openfire_sales_contacts" name="Contacts" action="of_planning.action_res_partner" sequence="1"/>
@@ -13,7 +13,7 @@
         </menuitem>
 
         <menuitem id="menu_openfire_interventions" name="Interventions" sequence="20">
-            <menuitem id="menu_openfire_interventions_planning" name="Planning" action="of_planning_view.action_calendar_event_planning" sequence="1"/>
+            <menuitem id="menu_openfire_interventions_planning" name="Intervention Planning" action="of_planning_view.action_calendar_event_calendar" sequence="1"/>
             <menuitem id="menu_openfire_interventions_service_request" name="Service Requests" action="of_service.action_of_service_request" sequence="2"/>
             <menuitem id="menu_openfire_interventions_equipment" name="Equipments" action="of_equipment.action_view_of_equipment" sequence="3"/>
             <menuitem id="menu_openfire_interventions_tour_create" name="Tour optimization" action="of_planning_tour.action_of_planning_tour_manual_create" groups="of_planning_tour.group_of_planning_tour_manual_creation" sequence="4"/>
@@ -47,5 +47,65 @@
             </menuitem>
         </menuitem>
     </menuitem>
+
+    <record id="mail.menu_root_discuss" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="calendar.mail_menu_calendar" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="spreadsheet_dashboard.spreadsheet_dashboard_menu_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="contacts.menu_contacts" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="crm.crm_menu_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="sale.sale_menu_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="of_planning.menu_of_planning_main" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="account.menu_finance" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="of_survey.menu_of_surveys_main" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="purchase.menu_purchase_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="stock.menu_stock_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="hr.menu_hr_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="base.menu_management" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="base.menu_administration" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
+
+    <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
+        <field name="excluded_group_ids"  eval="[Command.link(ref('of_basic_interface.of_group_basic_interface'))]" />
+    </record>
 
 </odoo>

@@ -118,4 +118,13 @@
             Command.create({'view_mode': 'calendar', 'view_id': ref('of_planning.calendar_event_view_calendar')})]"/>
     </record>
 
+    <record id="action_calendar_event_calendar" model="ir.actions.act_window">
+        <field name="name">Intervention Planning</field>
+        <field name="res_model">calendar.event</field>
+        <field name="view_mode">calendar,planning,tree,form,pivot</field>
+        <field name="view_id" ref="of_planning.calendar_event_view_calendar" />
+        <field name="target">current</field>
+        <field name="domain">[('of_type','=','intervention')]</field>
+    </record>
+
 </odoo>
