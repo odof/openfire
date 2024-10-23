@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_wizard_poujoulat_cart_view_form" model="ir.ui.view">
+        <field name="name">of.wizard.poujoulat.cart.view.form</field>
+        <field name="model">of.wizard.poujoulat.cart</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="message" nolabel="1"/>
+                <field name="sent" invisible="1"/>
+                <field name="has_error" invisible="1"/>
+                <field name="line_ids" nolabel="1" readonly="1">
+                    <tree>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="artas400"/>
+                        <field name="variante"/>
+                        <field name="cond"/>
+                    </tree>
+                </field>
+                <i attrs="{'invisible': [('sent', '=', False)]}" class="of_red">
+                    <i class="fa fa-lg fa-warning"/>
+                    Attention : Cette commande fournisseur a déjà été envoyée.<br/>
+                </i>
+                <i attrs="{'invisible': [('has_error', '=', False)]}" class="of_red">
+                    <i class="fa fa-lg fa-warning"/>
+                    Attention : Une erreur est survenue lors de l'envoi de cette commande.<br/>
+                </i>
+                <footer>
+                    <button name="action_send_cart" string="Envoyer" type="object" class="btn-primary" attrs="{'invisible': [('sent', '=', True)]}"/>
+                    <button name="action_send_cart" string="Envoyer" type="object" class="btn-default" attrs="{'invisible': [('sent', '=', False)]}"/>
+                    <button name="cancel" string="Fermer" class="btn-default" special="cancel" attrs="{'invisible': [('sent', '=', True)]}"/>
+                    <button name="cancel" string="Fermer" class="btn-primary" special="cancel" attrs="{'invisible': [('sent', '=', False)]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
