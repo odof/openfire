@@ -1,0 +1,2 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_sms_sms_basic_interface","of.basic.interface.sms.access.sms.sms","sms.model_sms_sms","of_basic_interface.of_group_basic_interface",1,1,1,1

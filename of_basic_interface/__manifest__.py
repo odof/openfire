@@ -19,6 +19,7 @@
     ],
     "data": [
         "security/of_basic_interface_security.xml",
+        "security/ir.model.access.csv",
         "views/ir_ui_menu.xml",
     ],
     "external_dependencies": {},

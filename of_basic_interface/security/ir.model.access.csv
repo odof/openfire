@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_mail_mail_basic_interface","of.basic.interface.mail.mail","mail.model_mail_mail","of_group_basic_interface",1,1,1,1
+"access_res_config_settings_basic_interface","of.basic.interface.access.res.config.settings","base.model_res_config_settings","of_group_basic_interface",1,1,1,0
+"access_ir_module_module_basic_interface","of.basic.interface.ir.module.module","base.model_ir_module_module","of_group_basic_interface",1,1,1,1
+"access_ir_config_parameter_basic_interface","of.basic.interface.ir.config.parameter","base.model_ir_config_parameter","of_group_basic_interface",1,1,1,1

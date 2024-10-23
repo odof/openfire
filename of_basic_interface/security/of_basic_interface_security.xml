@@ -5,6 +5,7 @@
         <field name="name">(OF) Basic Interface User</field>
         <field name="comment">Simplify the interface</field>
         <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="implied_ids" eval="[Command.link(ref('base.group_erp_manager'))]" />
     </record>
 
 </odoo>

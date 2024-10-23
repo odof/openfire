@@ -13,6 +13,7 @@
         "of_sms",
     ],
     "data": [
+        "security/ir.model.access.csv",
         "views/ir_ui_menu.xml",
     ],
     "external_dependencies": {},
