@@ -5,14 +5,14 @@
         <field name="name">of.wizville.history.search</field>
         <field name="model">of.wizville.history</field>
         <field name="arch" type="xml">
-            <search string="Historique des imports/exports">
+            <search string="Import/export history">
                 <field name="file_name_wizville"/>
                 <field name="date"/>
                 <separator/>
                 <filter string="Import" name="import" domain="[('type', '=', 'import')]"/>
                 <filter string="Export" name="export" domain="[('type', '=', 'export')]"/>
-                <filter string="Réalisé" name="done" domain="[('done', '=', True)]"/>
-                <filter string="Non réalisé" name="not_done" domain="[('done', '=', False)]"/>
+                <filter string="Realized" name="done" domain="[('done', '=', True)]"/>
+                <filter string="Not realised" name="not_done" domain="[('done', '=', False)]"/>
             </search>
         </field>
     </record>
@@ -23,9 +23,9 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button name="put_file_wizville" type="object" string="Envoyer vers wizville" class="oe_highlight"
+                    <button name="put_file_wizville" type="object" string="Send to wizville" class="oe_highlight"
                             attrs="{'invisible': [('type', '=', 'import')]}"/>
-                    <button name="integrate_wizville_file" type="object" string="Intégrer le fichier" class="oe_highlight"
+                    <button name="integrate_wizville_file" type="object" string="Integrate the file" class="oe_highlight"
                             attrs="{'invisible': [('type', '=', 'export')]}"/>
                 </header>
                 <sheet>
@@ -40,7 +40,7 @@
                         <label for="file_wizville"/>
                         <div name="file_wizville_div">
                             <span>
-                                Télécharger
+                                Upload
                                 <field name="file_wizville" filename="file_name_wizville"/>
                             </span>
                         </div>
@@ -65,13 +65,10 @@
     </record>
 
     <record id="of_wizville_history_action" model="ir.actions.act_window">
-        <field name="name">Historique des imports/exports</field>
+        <field name="name">Import/export history</field>
         <field name="res_model">of.wizville.history</field>
-        <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="of_wizville_parent_menu" parent="base.menu_administration" name="Wizville" sequence="2" groups="base.group_system"/>
-    <menuitem id="of_wizville_history_menu" name="Historique" parent="of_wizville_parent_menu" action="of_wizville_history_action" sequence="10"/>
 
 </odoo>

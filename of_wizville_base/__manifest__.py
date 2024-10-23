@@ -1,16 +1,10 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': u"OpenFire / module spécifique Wizville",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / module spécifique Wizville",
+    'version': "16.0.1.0.0",
     'author': "OpenFire",
-    'license': "",
     'category': "OpenFire",
-    'description': u"""
-Implémentation de l'api Wizville
-================================
-ssh-keyscan -t rsa sftp.wizville.fr >> ~/.ssh/known_hosts
 
-""",
     'website': "www.openfire.fr",
     'depends': [
         'of_sale',
@@ -24,9 +18,11 @@ ssh-keyscan -t rsa sftp.wizville.fr >> ~/.ssh/known_hosts
         'views/res_partner_views.xml',
         'views/product_template_views.xml',
         'views/of_wizville_history_views.xml',
+        'views/menuitems.xml',
         ],
     'qweb': [
     ],
+    # Ce module necessite à installer la biblio "paramiko"
     'installable': True,
     'application': False,
     'auto_install': False,

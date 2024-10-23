@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import fields, models
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
-    of_product_type = fields.Selection(
-        string=u"Type de l'appareil", related='seller_ids.of_product_type', readonly=False)
+    of_product_type = fields.Selection(string="Type of equipment", related="seller_ids.of_product_type", readonly=False)

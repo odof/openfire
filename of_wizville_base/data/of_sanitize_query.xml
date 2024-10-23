@@ -3,7 +3,7 @@
 
     <!-- Suppression de l'export' Wizville -->
     <record id="sanitize_query_ir_values" model="of.sanitize.query">
-        <field name="query">DELETE FROM ir_values WHERE name IN ('of_wizville_sftp_host', 'of_wizville_sftp_port', 'of_wizville_sftp_user', 'of_wizville_sftp_password', 'of_wizville_sftp_deposit_directory', 'of_wizville_sftp_pickup_directory') AND model = 'of.connector.config.settings'</field>
+        <field name="query">DELETE FROM ir_default WHERE name IN ('of_wizville_sftp_host', 'of_wizville_sftp_port', 'of_wizville_sftp_user', 'of_wizville_sftp_password', 'of_wizville_sftp_deposit_directory', 'of_wizville_sftp_pickup_directory') AND model = 'of.connector.config.settings'</field>
     </record>
 
 </odoo>

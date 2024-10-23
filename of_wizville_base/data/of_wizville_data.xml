@@ -7,27 +7,27 @@
     <data noupdate="1">
 
         <record id="of_wizville_export_files" model="ir.cron">
-            <field name="name">Génération des fichier à exporter vers Wizville</field>
-            <field name="model">of.wizville.history</field>
-            <field name="function">do_export_wizville</field>
+            <field name="name">Generation of files for export to Wizville</field>
+            <field name="model_id" ref="of_wizville_base.model_of_wizville_history"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_do_export_wizville()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
-            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 2:00:00')"/>
+            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=2,minute=0,second=0).strftime('%Y-%m-%d %H:%M:%S')"/>
             <field name="active">False</field>
-            <field name="args">()</field>
         </record>
 
         <record id="of_wizville_import_files" model="ir.cron">
-            <field name="name">Récupération de fichier wizville</field>
-            <field name="model">of.wizville.history</field>
-            <field name="function">do_import_wizville</field>
+            <field name="name">Recovery of wizville files</field>
+            <field name="model_id" ref="of_wizville_base.model_of_wizville_history"/>
+            <field name="code">model.cron_do_import_wizville()</field>
             <field name="interval_number">1</field>
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
-            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 3:00:00')"/>
+            <!-- <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 3:00:00')"/> -->
+            <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).replace(hour=3,minute=0,second=0).strftime('%Y-%m-%d %H:%M:%S')"/>
             <field name="active">False</field>
-            <field name="args">()</field>
         </record>
 
     </data>
