@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_connector_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="of_connector_base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='connector_base_settings']" position="inside">
+                <h2>Wizville</h2>
+                <div class="row mt16 o_settings_container" id="of_wizville_settings_sftp">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Connection information to the Wizville SFTP server.</span>
+                            <div class="content-group mt16">
+                                <label for="of_wizville_sftp_host"/>
+                                <field name="of_wizville_sftp_host" class="oe_inline" />
+                            </div>
+                            <div class="content-group">
+                                <label for="of_wizville_sftp_port"/>
+                                <field name="of_wizville_sftp_port" class="oe_inline" />
+                            </div>
+                            <div class="content-group">
+                                <label for="of_wizville_sftp_user"/>
+                                <field name="of_wizville_sftp_user" class="oe_inline" />
+                            </div>
+                            <div class="content-group">
+                                <label for="of_wizville_sftp_password"/>
+                                <field name="of_wizville_sftp_password" class="oe_inline" password="True" />
+                            </div>
+                            <div class="content-group">
+                                <label for="of_wizville_sftp_deposit_directory"/>
+                                <field name="of_wizville_sftp_deposit_directory" class="oe_inline"/>
+                            </div>
+                            <div class="content-group">
+                                <label for="of_wizville_sftp_pickup_directory"/>
+                                <field name="of_wizville_sftp_pickup_directory" class="oe_inline" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_wizville_settings_question">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Question</span>
+                            <div class="content-group mt16">
+                                <label for="of_wizville_satisfaction_question"/>
+                                <div>
+                                    <field name="of_wizville_satisfaction_question" class="oe_inline"/>
+                                </div>
+                                <label for="of_wizville_nps_score_question"/>
+                                <div>
+                                    <field name="of_wizville_nps_score_question" class="oe_inline"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_wizville_settings_import">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <span class="o_form_label">Import</span>
+                            <div class="content-group mt16">
+                                <label for="of_wizville_import_filename_prefix"/>
+                                <div>
+                                    <field name="of_wizville_import_filename_prefix" class="oe_inline" placeholder="Prefix of the filename to get from SFTP"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_wizville_settings_export">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+                            <label string="Export" for="of_wizville_export_filename"/>
+                            <div class="content-group mt16">
+                                <label for="of_wizville_export_filename"/>
+                                <div>
+                                    <field name="of_wizville_export_filename" class="oe_inline" placeholder="Filename to export to SFTP"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
