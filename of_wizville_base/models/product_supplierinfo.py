@@ -1,16 +1,17 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import fields, models
 
 
 class ProductSuppliferinfo(models.Model):
-    _inherit = 'product.supplierinfo'
+    _inherit = "product.supplierinfo"
 
     of_product_type = fields.Selection(
         selection=[
-                ('pellet', u"Pellet"),
-                ('bois', u"Bois"),
-                ('gaz', u"Gaz"),
-                ('mixte', u"Mixte"),
-            ],
-        string=u"Type de l'appareil")
+            ("pellet", "Pellet"),
+            ("wood", "Wood"),
+            ("gas", "Gas"),
+            ("mixed", "Mixed"),
+        ],
+        string="Type of equipment",
+    )

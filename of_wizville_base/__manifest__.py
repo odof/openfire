@@ -1,33 +1,35 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': u"OpenFire / module spécifique Wizville",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Wizville base",
+    'version': '16.0.1.0.0',
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'license': "",
+    'website': "https://www.openfire.fr",
     'category': "OpenFire",
-    'description': u"""
-Implémentation de l'api Wizville
-================================
-ssh-keyscan -t rsa sftp.wizville.fr >> ~/.ssh/known_hosts
-
-""",
-    'website': "www.openfire.fr",
-    'depends': [
-        'of_sale',
+    'summary': "Module de base pour l'implémentation de l'API Wizville",
+    "depends": [
+        "of_connector_base",
+        "of_sale",
     ],
-    'data': [
-        'security/ir.model.access.csv',
-        'data/of_sanitize_query.xml',
-        'data/of_wizville_data.xml',
-        'views/of_connector_config_settings_views.xml',
-        'views/res_company_views.xml',
-        'views/res_partner_views.xml',
-        'views/product_template_views.xml',
-        'views/of_wizville_history_views.xml',
+    "data": [
+        "data/ir_cron.xml",
+        "security/ir.model.access.csv",
+        "views/res_config_settings_views.xml",
+        "views/res_company_views.xml",
+        "views/res_partner_views.xml",
+        "views/product_template_views.xml",
+        "views/of_wizville_history_views.xml",
+        "views/menuitems.xml",
+    ],
+    "qweb": [
+    ],
+    "external_dependencies": {
+        "python": [
+            "paramiko",
         ],
-    'qweb': [
-    ],
-    'installable': True,
-    'application': False,
-    'auto_install': False,
+    },
+    "installable": True,
+    "application": False,
+    "auto_install": False,
+    "pre_init_hook": "pre_init_hook",
 }
