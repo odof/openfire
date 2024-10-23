@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="of_wizville_parent_menu" parent="base.menu_administration" name="Wizville" sequence="2" groups="base.group_system"/>
+    <menuitem id="of_wizville_history_menu" name="History" parent="of_wizville_parent_menu" action="of_wizville_history_action" sequence="10"/>
+
+</odoo>
