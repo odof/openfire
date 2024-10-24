@@ -104,10 +104,10 @@ class SaleOrder(models.Model):
     @api.depends("partner_id")
     def _compute_client_order_ref(self):
         for order in self:
-            if self.partner_id:
-                ref = self.partner_id.ref
-                if not ref and self.partner_id.parent_id:
-                    ref = self.partner_id.parent_id.ref
+            if order.partner_id:
+                ref = order.partner_id.ref
+                if not ref and order.partner_id.parent_id:
+                    ref = order.partner_id.parent_id.ref
                 order.client_order_ref = ref
 
     @api.depends("partner_id")
