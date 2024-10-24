@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_contract_duplication_view_form" model="ir.ui.view">
+        <field name="name">Dupliquer avec lignes du contrat</field>
+        <field name="model">of.contract.duplication.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Dupliquer avec lignes du contrat">
+                <group name="cancelled_duplicated_lines">
+                    <group>
+                        <field name="duplicated_lines"/>
+                    </group>
+                    <group>
+                        <field name="cancelled_lines"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="renewal"/>
+                </group>
+                <group col="2" colspan="2" name="validity">
+                    <label for="date_start" string="Période du contrat"/>
+                    <div name="dates">
+                        <i class="oe_grey oe_inline">Début : </i>
+                        <field name="date_start" nolabel="1" class="oe_inline"/>
+                        <i class="oe_grey oe_inline"> Fin : </i>
+                        <field name="date_end" nolabel="1" class="oe_inline"
+                               attrs="{'required':[('renewal','=', False)], 'readonly':[('renewal','=', True)]}"/>
+                    </div>
+                </group>
+                <footer>
+                    <button string="Dupliquer" name="button_duplicate_contract" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window id="action_duplicate_contract"
+            name="Dupliquer avec lignes du contrat"
+            res_model="of.contract.duplication.wizard"
+            src_model="of.contract"
+            view_mode="form"
+            view_type="form"
+            view_id="of_contract_duplication_view_form"
+            target="new"/>
+
+</odoo>
