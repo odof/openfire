@@ -450,7 +450,7 @@ class OFServiceRequest(models.Model):
             if request.recurrency:
                 request.state_punctual = "null"
             elif request.base_state != "calculated":
-                request.state_punctual = self.base_state
+                request.state_punctual = request.base_state
             else:
                 state = request._get_state_punctual_from_date(fields.Date.context_today(self), to_plan_advance=True)
                 if request.state_punctual != state:
