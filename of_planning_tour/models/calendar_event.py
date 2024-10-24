@@ -104,6 +104,7 @@ class CalendarEvent(models.Model):
                     "of_force_dates": event.of_force_dates,
                     "of_state": event.of_state,
                     "of_employee_ids": event.of_employee_ids.ids,
+                    "active": event.active,
                 }
                 for event in self
             }
@@ -368,7 +369,7 @@ class CalendarEvent(models.Model):
             None
         """
         # Get interventions that have changed their geodata, hours, duration, force_date or date
-        # or that have been cancelled, reoppened, postponed or have changed their employees assignments, to update tours
+        # or that have been cancelled, reopened, postponed or have changed their employees assignments, to update tours
         # accordingly
         events_geodata_changed = self._get_events_geodata_updated(saved_events_data)
         events_hours_changed = self._get_events_only_hours_changed(saved_events_data)
@@ -376,18 +377,23 @@ class CalendarEvent(models.Model):
         events_force_date_changed = self._get_events_force_date_changed(saved_events_data)
         events_start_date_changed = self._get_events_start_date_changed(saved_events_data)
         events_cancelled = self._get_cancelled_events(saved_events_data)
-        events_reoppened = self._get_reopened_events(saved_events_data)
+        events_reopened = self._get_reopened_events(saved_events_data)
         events_postponed = self._get_postponed_events(saved_events_data)
         events_employee_changed = self._get_events_employee_changed(saved_events_data)
+        events_archived = self._get_archived_events(saved_events_data)
+        events_unarchived = self._get_unarchived_events(saved_events_data)
 
         # Build dictionaries of interventions to move, remove with their dates before the update
         events_to_move = {
             event: saved_events_data[event]["dates"]
-            for event in events_duration_changed | events_force_date_changed | events_start_date_changed
+            for event in events_duration_changed
+            | events_force_date_changed
+            | events_start_date_changed
+            | events_unarchived
         }
         events_to_remove = {
             event: saved_events_data[event]["dates"]
-            for event in events_start_date_changed | events_cancelled | events_postponed
+            for event in events_start_date_changed | events_cancelled | events_postponed | events_archived
             if event not in events_to_move
         }
 
@@ -400,17 +406,30 @@ class CalendarEvent(models.Model):
         events_hours_changed and self.action_reorder_tours(events_hours_changed)
         events_geodata_changed and self.action_resync_and_update_tours(events_geodata_changed)
         events_to_transfert and self.action_transfert_events_between_tours(events_to_transfert)
-        events_reoppened and self.action_create_tours()
+        events_reopened and self.action_create_tours()
 
         # Reorganize available slot
         self.mapped("of_tour_ids")._reorganize_available_slot()
+
+    def _get_archived_events(self, saved_vals):
+        """
+        Filters and returns the events that have been archived.
+        """
+
+        return self.filtered(lambda ev: ev in saved_vals and saved_vals[ev]["active"] is True and ev.active is False)
+
+    def _get_unarchived_events(self, saved_vals):
+        """
+        Filters and returns the events that have been unarchived.
+        """
+        return self.filtered(lambda ev: ev in saved_vals and saved_vals[ev]["active"] is False and ev.active is True)
 
     @api.model
     def _get_fields_trigger_tour_compute(self):
         """
         Returns a list of fields that trigger the tour computation.
         """
-        return ["start", "of_employee_ids", "of_state", "duration", "of_address_id", "of_force_dates"]
+        return ["start", "of_employee_ids", "of_state", "duration", "of_address_id", "of_force_dates", "active"]
 
     def _get_events_geodata_updated(self, saved_vals):
         """
