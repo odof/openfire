@@ -18,6 +18,13 @@ class MigrationDatabase(models.Model):
     backup_uuid = fields.Char()
     script_ids = fields.Many2many(comodel_name='migration.sql', string="Scripts")
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('scripts_ids'):
+                vals['script_ids'] = self.env['res.partner'].browse(vals['partner_id']).script_ids
+        return super().create(vals_list)
+
     def button_action_create_migration(self):
         wz_value = {
             'database_id': self.id,

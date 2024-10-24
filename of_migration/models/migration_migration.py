@@ -26,6 +26,12 @@ class MigrationMigration(models.Model):
     log_warning = fields.Text()
     log_error = fields.Text()
 
+    def unlink(self):
+        if self.uuid:
+            self.server_id.action_delete_migration(self)
+
+        return super().unlink()
+
     @api.model
     def cron_launch_migration(self):
         # on va chercher les migrations qui doivent être lancées et on envoie la demande au serveur

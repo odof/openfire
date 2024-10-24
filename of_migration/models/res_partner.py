@@ -8,3 +8,4 @@ class ResPartner(models.Model):
 
     database_ids = fields.One2many(comodel_name='migration.database', inverse_name='partner_id', string="Databases")
     migration_ids = fields.One2many(comodel_name='migration.migration', inverse_name='partner_id', string="Migrations")
+    script_ids = fields.Many2many(comodel_name='migration.sql', string="Scripts")

@@ -154,3 +154,6 @@ class MigrationServer(models.Model):
                 f.close()
 
                 connection.put(f"/tmp/{database.backup_filename}", f"/upload/{database.backup_filename}")
+
+    def action_delete_migration(self, migration):
+        res = requests.delete(f"{self.host}:{self.port}/api/migration/{migration.uid}")

@@ -7,6 +7,9 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
+                <page string="Scripts">
+                    <field name="script_ids"/>
+                </page>
                 <page string="Databases">
                     <field name="database_ids" readonly="1"/>
                 </page>

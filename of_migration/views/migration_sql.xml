@@ -23,6 +23,7 @@
         <field name="model">migration.sql</field>
         <field name="arch" type="xml">
             <tree string="SQL">
+                <field name="sequence" widget="handle"/>
                 <field name="name" />
                 <field name="version" />
                 <field name="subversion"/>
