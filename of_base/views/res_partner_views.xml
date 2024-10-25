@@ -165,6 +165,7 @@
         <field name="name">of.base.partner.form</field>
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="partner_firstname.view_partner_form"/>
+        <field name="priority" eval="99"/>
         <field name="arch" type="xml">
             <xpath expr="//h1//field[@id='company']/.." position="before">
                 <group attrs="{'invisible': [('is_company', '=', False)]}" style="padding-top: 15px;">
