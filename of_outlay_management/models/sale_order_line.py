@@ -27,5 +27,5 @@ class SaleOrderLine(models.Model):
     @api.multi
     def _prepare_invoice_line(self, qty):
         res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
-        res['of_analytic_section_id'] = self.of_analytic_section_id
+        res['of_analytic_section_id'] = self.of_analytic_section_id.id
         return res

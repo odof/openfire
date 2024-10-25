@@ -14,5 +14,5 @@ class SaleOrder(models.Model):
 
     def _get_data_from_template(self, line, price, discount):
         data = super(SaleOrder, self)._get_data_from_template(line, price, discount)
-        data['of_analytic_section_id'] = line.of_analytic_section_id
+        data['of_analytic_section_id'] = line.of_analytic_section_id.id
         return data

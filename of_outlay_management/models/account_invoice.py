@@ -9,7 +9,7 @@ class AccountInvoice(models.Model):
 
     def _prepare_invoice_line_from_po_line(self, line):
         res = super(AccountInvoice, self)._prepare_invoice_line_from_po_line(line)
-        res['of_analytic_section_id'] = line.of_analytic_section_id
+        res['of_analytic_section_id'] = line.of_analytic_section_id.id
         return res
 
     @api.model

@@ -12,5 +12,5 @@ class OfPlanningInterventionLine(models.Model):
     @api.multi
     def _prepare_invoice_line(self):
         res = super(OfPlanningInterventionLine, self)._prepare_invoice_line()
-        res['of_analytic_section_id'] = self.analytic_section_id
+        res['of_analytic_section_id'] = self.analytic_section_id.id
         return res
