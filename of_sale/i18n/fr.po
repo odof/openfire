@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-03 07:27+0000\n"
-"PO-Revision-Date: 2024-09-03 07:27+0000\n"
+"POT-Creation-Date: 2024-11-21 13:05+0000\n"
+"PO-Revision-Date: 2024-11-21 13:05+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -508,7 +508,11 @@ msgid "Display Name"
 msgstr ""
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__group_of_display_tax_exclued_total_in_so_lines
+#: model:ir.model.fields,field_description:of_sale.field_sale_order__of_display_obsolete
+msgid "Display Obsolete Column"
+msgstr "Afficher colonne Obsolète"
+
+#. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_res_config_settings__group_of_display_tax_exclued_total_in_so_lines
 msgid "Display subtotals taxes excl. per order line"
 msgstr "Afficher les sous-totaux HT par ligne de commande"
@@ -636,10 +640,9 @@ msgid "Follow-up"
 msgstr "Suivi"
 
 #. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_color_font_section
-#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_color_font_section
-msgid "Font color of section headings"
-msgstr "Couleur de police des titres de section"
+#: model:ir.model.fields,help:of_sale.field_sale_order__of_display_obsolete
+msgid "For UX Purpose"
+msgstr "Pour les besoins de l'interface utilisateur"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_sale_order__of_force_invoice_status

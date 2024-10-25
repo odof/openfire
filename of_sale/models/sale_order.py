@@ -75,6 +75,9 @@ class SaleOrder(models.Model):
         string="Allows you to add additional quotes", compute="_compute_of_allow_quote_addition"
     )
     of_customer_view = fields.Boolean(string="Customer/Vendor view")
+    of_display_obsolete = fields.Boolean(
+        string="Display Obsolete Column", compute="_compute_of_display_obsolete", help="For UX Purpose"
+    )
 
     def _get_selection_of_price_printing(self):
         return [
@@ -216,6 +219,11 @@ class SaleOrder(models.Model):
                     break
             else:
                 order.of_is_delivered = True
+
+    @api.depends("order_line", "order_line.product_template_id")
+    def _compute_of_display_obsolete(self):
+        for order in self:
+            order.of_display_obsolete = any(line.of_obsolete for line in order.order_line)
 
     # --------------------------------------------------------------------------
     # Onchange methods
