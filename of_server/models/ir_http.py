@@ -50,10 +50,10 @@ def _dispatch(cls):
         # Génération de logs pour le débogage temps d'exécution
         global of_id
         of_base_url = request.httprequest.base_url
-        if of_base_url.find("/longpolling/poll") != -1:
-            longpolling = True
-        else:
-            longpolling = False
+        # On ne logge pas le longpolling
+        # On ne logge pas les appels jsonrpc, qui seront loggés dans la fonction dispatch_rpc
+        of_do_log = not (of_base_url.endswith("/longpolling/poll") or of_base_url.endswith("/jsonrpc"))
+        if of_do_log:
             of_id += 1
             of_compteur = of_id
             of_debut = time.time()
@@ -70,7 +70,7 @@ def _dispatch(cls):
         try:
             result = request.dispatch()
         finally:
-            if not longpolling:
+            if of_do_log:
                 of_temps = time.time() - of_debut
                 if of_temps >= 90:
                     signe = 9
