@@ -1,20 +1,26 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import api, fields, models
 
+from .tools import _get_list_from_parameter
+
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
-    of_is_pou_product = fields.Boolean(compute='_compute_of_is_pou_product')
-    of_pou_artas400 = fields.Char(string=u"Artas400")
-    of_pou_variante = fields.Integer(string=u"Variante d'article")
-    of_pou_cond = fields.Char(string=u"Unité de conditionnement")
+    of_is_poujoulat_product = fields.Boolean(compute="_compute_of_is_poujoulat_product", store=True)
+    of_poujoulat_artas400 = fields.Char(string="Artas400")
+    of_poujoulat_variant = fields.Integer(string="Item variant")
+    of_poujoulat_cond_unit = fields.Char(string="Conditioning unit")
 
-    @api.depends('brand_id')
-    def _compute_of_is_pou_product(self):
-        poujoulat_brand_ids = self.env['ir.values'].get_default(
-            'of.connector.config.settings', 'of_poujoulat_brand_ids') or []
-        for record in self:
-            if record.brand_id and record.brand_id.id in poujoulat_brand_ids:
-                record.of_is_pou_product = True
+    @api.depends("brand_id")
+    def _compute_of_is_poujoulat_product(self):
+        """
+        Sets 'of_is_poujoulat_product' to True if the product's brand is in the configured Poujoulat brand IDs.
+        """
+        brand_ids = _get_list_from_parameter(self, "of.connector.poujoulat.brand_ids")
+        filtered_produdcts = self.filtered(lambda p: p.brand_id and p.brand_id.id in brand_ids)
+        for record in filtered_produdcts:
+            record.of_is_poujoulat_product = True
+        for record in self - filtered_produdcts:
+            record.of_is_poujoulat_product = False
