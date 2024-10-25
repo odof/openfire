@@ -1,0 +1,288 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_connector_poujoulat
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-17 10:52+0000\n"
+"PO-Revision-Date: 2024-12-17 10:52+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.of_wizard_poujoulat_cart_view_form
+msgid ""
+"<i attrs=\"{'invisible': [('sent', '=', False)]}\" class=\"of_red\">\n"
+"                    <i class=\"fa fa-lg fa-warning\"/>\n"
+"                    Warning: This supplier order has already been sent.<br/>\n"
+"                </i>\n"
+"                <i attrs=\"{'invisible': [('has_error', '=', False)]}\" class=\"of_red\">\n"
+"                    <i class=\"fa fa-lg fa-warning\"/>\n"
+"                    Warning: An error has occurred while sending this order.<br/>\n"
+"                </i>"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__artas400
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_product__of_poujoulat_artas400
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_template__of_poujoulat_artas400
+msgid "Artas400"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_brand_ids
+msgid "Brands"
+msgstr "Marques"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_brand_ids_str
+msgid "Brands (string)"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.of_wizard_poujoulat_cart_view_form
+msgid "Cancel"
+msgstr "Fermer"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__conditioning_unit
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_product__of_poujoulat_cond_unit
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_template__of_poujoulat_cond_unit
+msgid "Conditioning unit"
+msgstr "Unité de conditionnement"
+
+#. module: of_connector_poujoulat
+#: model:ir.model,name:of_connector_poujoulat.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__create_uid
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__create_date
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__display_name
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid ""
+"Error code [%(code)s]\n"
+"%(text)s"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid "Error: %s"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__id
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.product_template_view_form
+msgid "Informations Poujoulat"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__variant
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_product__of_poujoulat_variant
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_template__of_poujoulat_variant
+msgid "Item variant"
+msgstr "Variante d'article"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard____last_update
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__write_uid
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__write_date
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__line_ids
+msgid "Line"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__message
+msgid "Message"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid "Missing data to send to the Poujoulat server."
+msgstr "Données manquantes à envoyer au serveur Poujoulat."
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid "No server address has been configured for the poujoulat connector."
+msgstr ""
+"Aucune adresse de serveur n'a été configurée pour le connecteur poujoulat."
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_product__of_is_poujoulat_product
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_product_template__of_is_poujoulat_product
+msgid "Of Is Poujoulat Product"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid ""
+"Only items from the configured brands will be sent. List of brands:\n"
+"%s\n"
+msgstr ""
+"Seuls les articles des marques configurées seront envoyés. Liste des marques:\n"
+"%s\n"
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/models/purchase_order.py:0
+#, python-format
+msgid "Ordering Poujoulat products"
+msgstr "Commander des produits Poujoulat"
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.res_config_settings_view_form
+msgid "Poujoulat"
+msgstr ""
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.purchase_order_view_form
+msgid "Poujoulat Order"
+msgstr "Commande Poujoulat"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_purchase_order__of_is_poujoulat_partner
+msgid "Poujoulat partner"
+msgstr "Partenaire Poujoulat"
+
+#. module: of_connector_poujoulat
+#: model:ir.model,name:of_connector_poujoulat.model_product_template
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__product_id
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__purchase_id
+msgid "Purchase"
+msgstr "Achat"
+
+#. module: of_connector_poujoulat
+#: model:ir.model,name:of_connector_poujoulat.model_purchase_order
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__quantity
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_redirect
+msgid "Redirection url"
+msgstr "URL de redirection"
+
+#. module: of_connector_poujoulat
+#: model_terms:ir.ui.view,arch_db:of_connector_poujoulat.of_wizard_poujoulat_cart_view_form
+msgid "Send"
+msgstr "Envoyer"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__has_error
+msgid "Sending error"
+msgstr "Erreur d'envoi"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_purchase_order__of_poujoulat_error
+msgid "Sending error Poujoulat"
+msgstr "Erreur d'envoi poujoulat"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_wizard__sent
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_purchase_order__of_poujoulat_sent
+msgid "Sent to CatEstimate"
+msgstr "Envoyée vers CatEstimate"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_host
+msgid "Server address"
+msgstr "Adresse de serveur"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_partner_ids
+msgid "Suppliers"
+msgstr "Fournisseurs"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_res_config_settings__of_poujoulat_partner_ids_str
+msgid "Suppliers (string)"
+msgstr "Fournisseurs (chaîne)"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,help:of_connector_poujoulat.field_res_config_settings__of_poujoulat_brand_ids_str
+#: model:ir.model.fields,help:of_connector_poujoulat.field_res_config_settings__of_poujoulat_partner_ids_str
+msgid ""
+"Technical field to store M2M fields into a config parameter. As "
+"`config_parameters` does not accept m2m field, we store the fields with a "
+"comma separated string into a Char config field."
+msgstr ""
+"Champ technique pour stocker les champs M2M dans un paramètre de "
+"configuration. Comme les paramètres de configuration n'acceptent pas les "
+"champs m2m, nous stockons les champs avec une chaîne séparée par des "
+"virgules dans un champ de configuration Char"
+
+#. module: of_connector_poujoulat
+#. odoo-python
+#: code:addons/of_connector_poujoulat/wizards/of_wizard_poujoulat_cart.py:0
+#, python-format
+msgid ""
+"The following items will not be sent because informations are missing :\n"
+"%s\n"
+msgstr ""
+"Les articles suivants ne seront pas envoyés car des informations sont manquantes :\n"
+"%s\n"
+
+#. module: of_connector_poujoulat
+#: model:ir.model.fields,field_description:of_connector_poujoulat.field_of_poujoulat_cart_item_wizard__wizard_id
+msgid "Wizard"
+msgstr ""
