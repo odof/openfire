@@ -8,10 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr="//button[@name='button_unlock']" position="after">
                 <field name="of_is_poujoulat_partner" invisible="1"/>
-                <button name="of_action_send_poujoulat_cart" string="Commande Poujoulat" type="object"
-                        attrs="{'invisible': [('of_is_poujoulat_partner', '=', False)]}"/>
+                <button name="action_button_send_poujoulat_cart" string="Poujoulat Order" type="object" attrs="{'invisible': [('of_is_poujoulat_partner', '=', False)]}"/>
             </xpath>
-            <xpath expr="//field[@name='of_user_id']" position="after">
+            <xpath expr="//field[@name='origin']" position="after">
                 <field name="of_poujoulat_error" groups="base.group_no_one" readonly="1"/>
             </xpath>
         </field>
