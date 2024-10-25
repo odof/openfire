@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
-from ..models.of_datastore_product import DATASTORE_IND
 import itertools
-from odoo.exceptions import ValidationError
 import logging
+
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
+
+from ..models.of_datastore_product import DATASTORE_IND
 
 _logger = logging.getLogger(__name__)
 
@@ -122,6 +124,7 @@ class OfDatastoreUpdateProduct(models.TransientModel):
         ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
         ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
 
+        locations = self.env['stock.location'].sudo().search([('usage', '=', 'internal')])
         for ds_product_data in itertools.chain(unmatched_ids, ds_products_data):
             if isinstance(ds_product_data, (int, long)):
                 product = product_obj.browse(ds_product_data)
@@ -143,7 +146,19 @@ class OfDatastoreUpdateProduct(models.TransientModel):
                 if product.active:
                     if product.purchase_ok:
                         ds_product_data['purchase_ok'] = False
-                    if product.virtual_available > 0:
+
+                    # On n'archive que les articles qui n'ont pas de stock ni de mouvement en cours
+                    quants = (
+                        self.env['stock.quant']
+                        .sudo()
+                        .search([('product_id', '=', product.id), ('location_id', 'in', locations.ids)], limit=1)
+                    )
+                    moves = (
+                        self.env['stock.move']
+                        .sudo()
+                        .search([('product_id', '=', product.id), ('state', 'not in', ('cancel', 'done'))], limit=1)
+                    )
+                    if quants or moves:
                         del ds_product_data['active']
 
             ds_product_data = {
