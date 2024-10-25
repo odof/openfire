@@ -6,8 +6,12 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale_margin.sale_margin_sale_order_line"/>
         <field name="arch" type="xml">
+
             <xpath expr="//field[@name='order_line']/form//field[@name='purchase_price']" position="after">
                 <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="of_display_reset_option" invisible ="1"/>
             </xpath>
         </field>
     </record>
@@ -35,7 +39,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="after">
                 <field name="of_order_line_option_id" options="{'no_create': True, 'no_open': True}"/>
-                <button name="action_button_reset_option" type="object" icon="fa-arrow-circle-left" title="Reset the option" attrs="{'invisible': [('of_order_line_option_id', '=', False)]}"/>
+                <button name="action_button_reset_option" type="object" icon="fa-arrow-circle-left" title="Reset the option" attrs="{'invisible': [('of_order_line_option_id', '=', False)], 'column_invisible': [('parent.of_display_reset_option', '=', False)]}" />
             </xpath>
         </field>
     </record>

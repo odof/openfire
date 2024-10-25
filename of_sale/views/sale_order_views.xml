@@ -70,6 +70,7 @@
                         <field name="of_partner_phone" style="margin-right:10px;" attrs="{'invisible': [('of_partner_phone', '=', False)]}"/>
                         <field name="of_partner_mobile" /><br/>
                         <field name="of_partner_email" />
+                        <field name="of_display_obsolete" invisible="1"/>
                     </div>
                 </xpath>
                 <!-- /Partner details -->
@@ -157,7 +158,7 @@
                        attrs="{'invisible': ['|', ('id', '=', False), ('state', 'in', ('done','cancel'))]}"/>
                     <field name="of_obsolete" invisible="1"/>
                     <button name="action_button_dummy" class="btn-outline-danger disabled" aria-label="Obsolete"
-                            type="object" icon="fa-clock-o" title="Obsolete" attrs="{'column_invisible': [('of_obsolete', '=', False)], 'invisible': [('of_obsolete', '=', False)]}"/>
+                            type="object" icon="fa-clock-o" title="Obsolete" attrs="{'column_invisible': [('parent.of_display_obsolete', '=', False)], 'invisible': [('of_obsolete', '=', False)]}"/>
                 </xpath>
 
                 <xpath expr="//field[@name='order_line']/tree/field[@name='company_id']" position="after">
