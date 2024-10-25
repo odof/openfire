@@ -2,8 +2,8 @@
 <odoo>
 
     <record id="of_wizard_poujoulat_cart_view_form" model="ir.ui.view">
-        <field name="name">of.wizard.poujoulat.cart.view.form</field>
-        <field name="model">of.wizard.poujoulat.cart</field>
+        <field name="name">of.poujoulat.cart.wizard.view.form</field>
+        <field name="model">of.poujoulat.cart.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <field name="message" nolabel="1"/>
@@ -14,23 +14,23 @@
                         <field name="product_id"/>
                         <field name="quantity"/>
                         <field name="artas400"/>
-                        <field name="variante"/>
-                        <field name="cond"/>
+                        <field name="variant"/>
+                        <field name="conditioning_unit"/>
                     </tree>
                 </field>
                 <i attrs="{'invisible': [('sent', '=', False)]}" class="of_red">
                     <i class="fa fa-lg fa-warning"/>
-                    Attention : Cette commande fournisseur a déjà été envoyée.<br/>
+                    Warning: This supplier order has already been sent.<br/>
                 </i>
                 <i attrs="{'invisible': [('has_error', '=', False)]}" class="of_red">
                     <i class="fa fa-lg fa-warning"/>
-                    Attention : Une erreur est survenue lors de l'envoi de cette commande.<br/>
+                    Warning: An error has occurred while sending this order.<br/>
                 </i>
                 <footer>
-                    <button name="action_send_cart" string="Envoyer" type="object" class="btn-primary" attrs="{'invisible': [('sent', '=', True)]}"/>
-                    <button name="action_send_cart" string="Envoyer" type="object" class="btn-default" attrs="{'invisible': [('sent', '=', False)]}"/>
-                    <button name="cancel" string="Fermer" class="btn-default" special="cancel" attrs="{'invisible': [('sent', '=', True)]}"/>
-                    <button name="cancel" string="Fermer" class="btn-primary" special="cancel" attrs="{'invisible': [('sent', '=', False)]}"/>
+                    <button name="action_button_send_cart" string="Send" type="object" class="btn-primary" attrs="{'invisible': [('sent', '=', True)]}"/>
+                    <button name="action_button_send_cart" string="Send" type="object" class="btn-default" attrs="{'invisible': [('sent', '=', False)]}"/>
+                    <button name="cancel" string="Cancel" class="btn-default" special="cancel" attrs="{'invisible': [('sent', '=', True)]}"/>
+                    <button name="cancel" string="Cancel" class="btn-primary" special="cancel" attrs="{'invisible': [('sent', '=', False)]}"/>
                 </footer>
             </form>
         </field>

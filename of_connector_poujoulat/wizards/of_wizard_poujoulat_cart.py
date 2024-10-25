@@ -1,113 +1,150 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import logging
-import requests
 import json
 
-from odoo import models, fields, api
+import requests
+
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
-_logger = logging.getLogger(__name__)
+from ..models.tools import _get_list_from_parameter
 
 
-class OFWizardPoujoulatCart(models.TransientModel):
-    _name = 'of.wizard.poujoulat.cart'
+class DisableIPv6Context:
+    """Poujoulat isn't IPV6 friendly so we are deactivating it for all requests we are sending to them"""
 
-    purchase_id = fields.Many2one(comodel_name='purchase.order')
-    line_ids = fields.One2many(comodel_name='of.wizard.poujoulat.cart.item', inverse_name='wizard_id')
-    message = fields.Text(string="Message", readonly=True, compute='_compute_message')
-    sent = fields.Boolean(string=u"Envoyée vers CatEstimate")
-    has_error = fields.Boolean(string=u"Erreur d'envoi")
+    def __enter__(self):
+        self.original_ipv6 = requests.packages.urllib3.util.connection.HAS_IPV6
+        requests.packages.urllib3.util.connection.HAS_IPV6 = False
 
-    @api.depends('line_ids')
+    def __exit__(self, *args):
+        requests.packages.urllib3.util.connection.HAS_IPV6 = self.original_ipv6
+
+
+class OFPoujoulatCartWizard(models.TransientModel):
+    _name = "of.poujoulat.cart.wizard"
+    _description = "Wizard to send PO cart to Poujoulat"
+
+    purchase_id = fields.Many2one(comodel_name="purchase.order")
+    line_ids = fields.One2many(comodel_name="of.poujoulat.cart.item.wizard", inverse_name="wizard_id")
+    message = fields.Text(readonly=True, compute="_compute_message")
+    sent = fields.Boolean(string="Sent to CatEstimate")
+    has_error = fields.Boolean(string="Sending error")
+
+    @api.depends("line_ids")
     def _compute_message(self):
-        poujoulat_brand_ids = self.env['ir.values'].get_default(
-            'of.connector.config.settings', 'of_poujoulat_brand_ids') or []
-        brands = self.env['of.product.brand'].browse(poujoulat_brand_ids).exists()
-        message = (
-            u"Seuls les articles des marques configurées seront envoyés. Liste des marques:\n%s"
-            % u"\n".join(brands.mapped('name'))
+        """Computes the message to be displayed about the
+        items . This message indicates which
+        brands have been configured and which items will not be sent due to missing information.
+        """
+
+        brand_ids = _get_list_from_parameter(self, "of.connector.poujoulat.brand_ids")
+
+        brands = self.env["of.product.brand"].browse(brand_ids).exists()
+        message = _("Only items from the configured brands will be sent. List of brands:\n%s\n") % "\n".join(
+            f"* {brand.name}" for brand in brands
         )
         for record in self:
             final_message = [message]
-            products = [
-                line.product_id
-                for line in record.line_ids
-                if not line._get_estimate_values()
-            ]
-            if products:
-                final_message += [
-                    u"Les articles suivants ne seront pas envoyés car des informations sont manquantes :",
-                    u"\n".join(product.display_name for product in products)
-                ]
-            record.message = u"\n".join(final_message)
+            if products := [line.product_id for line in record.line_ids if not line._get_estimate_values()]:
+                final_message.extend(
+                    [
+                        _("The following items will not be sent because informations are missing :\n%s\n")
+                        % "\n".join(f"* {product.display_name}" for product in products)
+                    ]
+                )
+            record.message = "\n".join(final_message)
 
-    @api.multi
-    def action_send_cart(self):
+    def action_button_send_cart(self):
+        """
+        Sends the cart's contents to the configured Poujoulat server.
+
+        Returns:
+            dict: A redirect action to a new URL if the server returns a `redirectionUrl`.
+                Otherwise, no action is taken.
+        """
         self.ensure_one()
-        ir_values_obj = self.env['ir.values']
-        poujoulat_url = ir_values_obj.get_default('of.connector.config.settings', 'of_poujoulat_host')
-        redirect_url = ir_values_obj.get_default('of.connector.config.settings', 'of_poujoulat_redirect') or ""
+        poujoulat_url, redirect_url = self._fetch_configuration()
+        values = self._prepare_data()
+        with DisableIPv6Context():
+            response_data = self._send_request(poujoulat_url, values)
+        return self._process_response(redirect_url, response_data)
+
+    def _fetch_configuration(self):
+        """
+        Retrieves the configured Poujoulat server address and redirect URL.
+
+        Returns:
+            tuple: Contains the Poujoulat server URL and redirect URL.
+        """
+        ir_config_parameter = self.env["ir.config_parameter"]
+        poujoulat_url = ir_config_parameter.get_param("of.connector.poujoulat.host")
+        redirect_url = ir_config_parameter.get_param("of.connector.poujoulat.url_redirect", default="")
+
         if not poujoulat_url:
-            raise ValidationError(u"Aucune adresse de serveur n'a été configurée pour le connecteur poujoulat.")
-        values = {'estimateLines': []}
-        headers = {'Content-Type': 'application/json'}
+            raise ValidationError(_("No server address has been configured for the poujoulat connector."))
+
+        return poujoulat_url, redirect_url
+
+    def _prepare_data(self):
+        """
+        Prepares the data to be sent to the Poujoulat server.
+
+        Returns:
+            dict: containing the estimate lines.
+        """
+        values = {"estimateLines": []}
         for line in self.line_ids:
             vals = line._get_estimate_values()
             if line.quantity and vals:
-                values['estimateLines'].append(vals)
-        has_ipv6 = requests.packages.urllib3.util.connection.HAS_IPV6
-        requests.packages.urllib3.util.connection.HAS_IPV6 = False
-        data = {}
+                values["estimateLines"].append(vals)
+
+        return values
+
+    def _send_request(self, poujoulat_url, values):
+        """
+        Sends a POST request to the Poujoulat server with the prepared payload.
+
+        Args:
+            poujoulat_url (str): The URL of the Poujoulat server.
+            values (dict): The payload containing the estimate lines.
+            redirect_url (str): The redirect URL to be used if a redirection is provided.
+
+        Returns:
+            dict: Response data
+        """
+
+        if not poujoulat_url or not values:
+            raise ValidationError(_("Missing data to send to the Poujoulat server."))
+
+        response = {}
         try:
-            response = requests.post(poujoulat_url, headers=headers, data=json.dumps(values), verify=False)
+            response = requests.post(
+                poujoulat_url, headers={"Content-Type": "application/json"}, data=json.dumps(values), timeout=20
+            )
             data = response.json()
+            # si l'envoi est réussi (c'est-à-dire que le serveur répond positivement),
+            # la fonction met à jour le statut de la commande d'achat pour indiquer qu'elle a été envoyée avec succès.
             if response.status_code == 200:
-                self.purchase_id.write({'of_poujoulat_sent': True, 'of_poujoulat_error': False})
+                self.purchase_id.write({"of_poujoulat_sent": True, "of_poujoulat_error": False})
                 self.sent = True
             else:
-                self.purchase_id.write({
-                    'of_poujoulat_error': u"Code erreur [%s]\n%s" % (response.status_code, response.text)
-                })
+                error_message = _("Error code [%(code)s]\n%(text)s", code=response.status_code, text=response.text)
+                self.purchase_id.write({"of_poujoulat_error": error_message})
                 self.has_error = True
-        except Exception:
-            self.purchase_id.write({
-                'of_poujoulat_error': u"Code erreur [%s]\n%s" % (response.status_code, response.text)
-            })
+        except Exception as e:
+            error_message = _("Error: %s") % str(e)
+            self.purchase_id.write({"of_poujoulat_error": error_message})
             self.has_error = True
-        finally:
-            requests.packages.urllib3.util.connection.HAS_IPV6 = has_ipv6
-        if 'redirectionUrl' not in data:
-            return {'type': 'ir.actions.do_nothing'}
-        return {
-            'type': 'ir.actions.act_url',
-            'url': redirect_url + data['redirectionUrl'],
-            'target': 'new'
-        }
+        return data
 
+    def _process_response(self, redirect_url=False, response_data=False):
+        if not redirect_url or not response_data:
+            return {"type": "ir.actions.act_window_close"}
 
-class OfWizardModinoxCartItem(models.TransientModel):
-    _name = 'of.wizard.poujoulat.cart.item'
-
-    wizard_id = fields.Many2one(comodel_name='of.wizard.poujoulat.cart', required=True, ondelete='cascade')
-    product_id = fields.Many2one(comodel_name='product.product', string=u"Article", required=True)
-    quantity = fields.Float(string=u"Quantité")
-    artas400 = fields.Char(string=u"Artas400", related='product_id.of_pou_artas400', readonly=True)
-    variante = fields.Integer(string=u"Variante d'article", related='product_id.of_pou_variante', readonly=True)
-    cond = fields.Char(string=u"Unité de conditionnement", related='product_id.of_pou_cond', readonly=True)
-
-    @api.multi
-    def _get_estimate_values(self):
-        self.ensure_one()
-        if (
-            not self.product_id.of_pou_artas400
-            or not self.product_id.of_pou_variante
-            or not self.product_id.of_pou_cond
-        ):
-            return {}
-        return {
-            'artas400': self.product_id.of_pou_artas400,
-            'qte': self.quantity,
-            'variante': self.product_id.of_pou_variante,
-            'unitCond': self.product_id.of_pou_cond,
-        }
+        if response_redirection_url := response_data["data"].get("redirectionUrl"):
+            if not redirect_url.endswith("/"):
+                redirect_url += "/"
+            final_url = f"{redirect_url}{response_redirection_url}"
+            return {"type": "ir.actions.act_url", "url": final_url, "target": "new"}
+        return {"type": "ir.actions.act_window_close"}
