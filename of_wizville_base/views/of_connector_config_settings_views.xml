@@ -9,24 +9,23 @@
             <xpath expr="//form" position="inside">
                 <group string="Wizville Integration" name="wizville">
                     <group name="general" string="General">
-                        <field name="of_wizville_sftp_host"/>
-                        <field name="of_wizville_sftp_port"/>
-                        <field name="of_wizville_sftp_user"/>
-                        <field name="of_wizville_sftp_password" password="True"/>
+                        <field name="wizville_sftp_host"/>
+                        <field name="wizville_sftp_port"/>
+                        <field name="wizville_sftp_user"/>
+                        <field name="wizville_sftp_password" password="True"/>
                         <separator string="Export" name="export" colspan="2"/>
-                        <field name="of_wizville_sftp_deposit_directory"/>
-                        <field name="of_wizville_export_filename"/>
+                        <field name="wizville_sftp_deposit_directory"/>
+                        <field name="wizville_export_filename"/>
                         <separator string="Import" name="import" colspan="2"/>
-                        <field name="of_wizville_sftp_pickup_directory"/>
-                        <field name="of_wizville_import_filename"/>
+                        <field name="wizville_sftp_pickup_directory"/>
+                        <field name="wizville_import_filename"/>
                         <separator string="Questions" name="questions" colspan="2"/>
-                        <field name="of_wizville_satisfaction_question"/>
-                        <field name="of_wizville_nps_pose_score_question"/>
+                        <field name="wizville_satisfaction_question"/>
+                        <field name="wizville_nps_score_question"/>
                     </group>
                 </group>
             </xpath>
         </field>
     </record>
-
 
 </odoo>

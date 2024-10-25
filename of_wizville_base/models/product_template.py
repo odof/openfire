@@ -5,4 +5,4 @@ from odoo import fields, models
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    of_product_type = fields.Selection(string="Type of equipment", related="seller_ids.of_product_type", readonly=False)
+    of_product_type = fields.Selection(string="Product type", related="seller_ids.of_product_type", readonly=False)

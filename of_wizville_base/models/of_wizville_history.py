@@ -1,4 +1,5 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 import base64
 import csv
 
@@ -25,11 +26,12 @@ import paramiko
 _logger = logging.getLogger(__name__)
 
 
-class OfWizvilleHistory(models.Model):
+class OFWizvilleHistory(models.Model):
     _name = "of.wizville.history"
+    _description = "Wizville History"
     _order = "date"
 
-    name = fields.Char(string="Name", related="file_name_wizville", readonly=True)
+    name = fields.Char(related="file_name_wizville", readonly=True)
     type = fields.Selection(
         [
             ("import", "Import"),
@@ -38,18 +40,19 @@ class OfWizvilleHistory(models.Model):
         string="Export/Import",
         required=True,
     )
-    file_name_wizville = fields.Char(string="Wizville file name", size=100)
-    file_wizville = fields.Binary(string="Wizville file", attachment=True)
-    done = fields.Boolean(string="Export achieved")
-    date = fields.Date(string="Export date", default=fields.Date.today())
+    file_name_wizville = fields.Char(string="Wizville File Name", size=100)
+    file_wizville = fields.Binary(string="Wizville File", attachment=True)
+    is_done = fields.Boolean(string="Export Done")
+    date = fields.Date(string="Export Date", default=fields.Date.today())
 
     def put_file_wizville(self):
         self.ensure_one()
         # Récupération des infos de connexion SFTP
-        sftp_host = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_host")
-        sftp_port = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_port")
-        sftp_user = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_user")
-        sftp_password = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_password")
+        ir_default_obj = self.env["ir.default"]
+        sftp_host = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_host")
+        sftp_port = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_port")
+        sftp_user = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_user")
+        sftp_password = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_password")
 
         if not sftp_host or not sftp_port or not sftp_user or not sftp_password:
             return
@@ -66,8 +69,8 @@ class OfWizvilleHistory(models.Model):
                 transport.connect(username=sftp_user, password=sftp_password)
                 with paramiko.SFTPClient.from_transport(transport) as sftp:
                     # Récupération du répertoire distant
-                    remote_file_path = self.env["ir.default"].get(
-                        "of.connector.config.settings", "of_wizville_sftp_deposit_directory"
+                    remote_file_path = ir_default_obj.get(
+                        "of.connector.config.settings", "wizville_sftp_deposit_directory"
                     )
                     if not remote_file_path:
                         sftp.close()
@@ -76,12 +79,12 @@ class OfWizvilleHistory(models.Model):
 
                     # Upload du fichier présent dans file_path vers remote_file_path
                     sftp.put(file_path, remote_file_path)
-                    self.write({"done": True})
+                    self.write({"is_done": True})
                     sftp.close()
 
     @api.model
     def cron_do_export_wizville(self):
-        files_to_deposit = self.search([("type", "=", "export"), ("done", "=", False)])
+        files_to_deposit = self.search([("type", "=", "export"), ("is_done", "=", False)])
         for file_to_integrate in files_to_deposit:
             file_to_integrate.put_file_wizville()
         return True
@@ -89,17 +92,18 @@ class OfWizvilleHistory(models.Model):
     @api.model
     def cron_do_import_wizville(self, rename_file=True):
         self.get_file_wizville(rename_file=rename_file)
-        files_to_integrate = self.search([("type", "=", "import"), ("done", "=", False)])
+        files_to_integrate = self.search([("type", "=", "import"), ("is_done", "=", False)])
         for file_to_integrate in files_to_integrate:
             file_to_integrate.integrate_wizville_file()
 
     @api.model
     def get_file_wizville(self, rename_file=True):
-        sftp_host = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_host")
-        sftp_port = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_port")
-        sftp_user = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_user")
-        sftp_password = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_sftp_password")
-        import_filename = self.env["ir.default"].get("of.connector.config.settings", "of_wizville_import_filename")
+        ir_default_obj = self.env["ir.default"]
+        sftp_host = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_host")
+        sftp_port = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_port")
+        sftp_user = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_user")
+        sftp_password = ir_default_obj.get("of.connector.config.settings", "wizville_sftp_password")
+        import_filename = ir_default_obj.get("of.connector.config.settings", "wizville_import_filename")
 
         if not sftp_host or not sftp_port or not sftp_user or not sftp_password:
             return
@@ -114,15 +118,13 @@ class OfWizvilleHistory(models.Model):
             filenames.append(safe_eval(import_filename))
         if not filenames:
             return
-        # cnopts = pysftp.CnOpts()
-        # cnopts.hostkeys = None  # for tests only
         new_history_vals = {"type": "import"}
         cr = self.env.cr
         with paramiko.Transport((sftp_host, int(sftp_port))) as transport:
             transport.connect(username=sftp_user, password=sftp_password)
             with paramiko.SFTPClient.from_transport(transport) as sftp:
-                remoteDirectoryPath = self.env["ir.default"].get(
-                    "of.connector.config.settings", "of_wizville_sftp_pickup_directory"
+                remoteDirectoryPath = ir_default_obj.get(
+                    "of.connector.config.settings", "wizville_sftp_pickup_directory"
                 )
                 if not remoteDirectoryPath:
                     sftp.close()
@@ -153,7 +155,7 @@ class OfWizvilleHistory(models.Model):
                             try:
                                 os.remove(path)
                             except Exception:
-                                pass
+                                _logger.exception("Error while removing file %s", path)
                         new_history_vals["file_name_wizville"] = filename
                         new_history_vals["file_wizville"] = encoded_file
                         self.create(new_history_vals)

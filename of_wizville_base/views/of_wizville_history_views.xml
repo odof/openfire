@@ -11,14 +11,14 @@
                 <separator/>
                 <filter string="Import" name="import" domain="[('type', '=', 'import')]"/>
                 <filter string="Export" name="export" domain="[('type', '=', 'export')]"/>
-                <filter string="Realized" name="done" domain="[('done', '=', True)]"/>
-                <filter string="Not realised" name="not_done" domain="[('done', '=', False)]"/>
+                <filter string="Realized" name="done" domain="[('is_done', '=', True)]"/>
+                <filter string="Not realised" name="not_done" domain="[('is_done', '=', False)]"/>
             </search>
         </field>
     </record>
 
     <record id="of_wizville_history_view_form" model="ir.ui.view">
-        <field name="name">Historique des imports/exports</field>
+        <field name="name">of.wizville.history.view.form</field>
         <field name="model">of.wizville.history</field>
         <field name="arch" type="xml">
             <form>
@@ -44,7 +44,7 @@
                                 <field name="file_wizville" filename="file_name_wizville"/>
                             </span>
                         </div>
-                        <field name="done"/>
+                        <field name="is_done"/>
                     </group>
                 </sheet>
             </form>
@@ -52,23 +52,22 @@
     </record>
 
     <record id="of_wizville_history_view_tree" model="ir.ui.view">
-        <field name="name">Historique des imports/exports</field>
+        <field name="name">of.wizville.history.view.tree</field>
         <field name="model">of.wizville.history</field>
         <field name="arch" type="xml">
             <tree>
                 <field name="date"/>
                 <field name="file_name_wizville"/>
                 <field name="type"/>
-                <field name="done"/>
+                <field name="is_done"/>
             </tree>
         </field>
     </record>
 
     <record id="of_wizville_history_action" model="ir.actions.act_window">
-        <field name="name">Import/export history</field>
+        <field name="name">of.wizville.history.action</field>
         <field name="res_model">of.wizville.history</field>
         <field name="view_mode">tree,form</field>
     </record>
-
 
 </odoo>

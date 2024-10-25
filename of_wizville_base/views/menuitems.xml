@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="of_wizville_parent_menu"
-        parent="base.menu_administration"
-        name="Wizville"
-        sequence="2"
-        groups="base.group_system"/>
+    <menuitem id="of_wizville_parent_menu" parent="base.menu_administration" name="Wizville" sequence="2" groups="base.group_system">
+        <menuitem id="of_wizville_history_menu" name="History" action="of_wizville_history_action" sequence="1"/>
+    </menuitem>
 
-    <menuitem id="of_wizville_history_menu"
-        name="History"
-        parent="of_wizville_parent_menu"
-        action="of_wizville_history_action"
-        sequence="10"/>
+    <record id="of_base.of_connector_config_settings_menu" model="ir.ui.menu">
+        <field name="active" eval="True"/>
+    </record>
 
-        <record id="of_base.of_connector_config_settings_menu" model="ir.ui.menu">
-            <field name="active" eval="True"/>
-        </record>
 </odoo>
