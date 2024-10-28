@@ -1,32 +1,33 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / SMS",
-    'version': "16.0.1.3.0",
-    'license': 'AGPL-3',
-    'author': "OpenFire",
-    'category': "OpenFire",
-    'summary': "Module de SMS OpenFire",
-    'website': "https://www.openfire.fr",
-    'depends': [
-        'sms_ovh_http',
-        'of_base',
-        'mail',
+    "name": "OpenFire / SMS",
+    "version": "16.0.1.3.1",
+    "license": "AGPL-3",
+    "author": "OpenFire",
+    "category": "OpenFire",
+    "summary": "Module de SMS OpenFire",
+    "website": "https://www.openfire.fr",
+    "depends": [
+        "sms_ovh_http",
+        "of_base",
+        "mail",
     ],
-    'data': [
-        'security/ir.model.access.csv',
-        'data/ir_cron.xml',
-        'data/of_sms_sender.xml',
-        'views/of_sms_sender_views.xml',
-        'views/sms_sms_views.xml',
-        'wizards/sms_composer_views.xml',
+    "data": [
+        "security/ir.model.access.csv",
+        "data/ir_cron.xml",
+        "data/of_sms_sender.xml",
+        "views/of_sms_sender_views.xml",
+        "views/sms_sms_views.xml",
+        "views/menuitems.xml",
+        "wizards/sms_composer_views.xml",
     ],
-    'assets': {
-        'web.assets_backend': [
-            'of_sms/static/src/components/*/*',
+    "assets": {
+        "web.assets_backend": [
+            "of_sms/static/src/components/*/*",
         ],
     },
-    'installable': True,
-    'application': False,
-    'auto_install': False,
+    "installable": True,
+    "application": False,
+    "auto_install": False,
 }
