@@ -19,6 +19,7 @@
         'data/of_sms_sender.xml',
         'views/of_sms_sender_views.xml',
         'views/sms_sms_views.xml',
+        'views/menuitems.xml',
         'wizards/sms_composer_views.xml',
     ],
     'assets': {

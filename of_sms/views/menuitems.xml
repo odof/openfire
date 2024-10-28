@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="of_sms_sender_menu" name="Senders" parent="phone_validation.phone_menu_main" action="of_sms_sender_action" sequence="20"/>
+
+</odoo>
