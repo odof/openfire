@@ -1,7 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class SendSMS(models.TransientModel):
@@ -15,22 +16,9 @@ class SendSMS(models.TransientModel):
     def default_get(self, fields):
         result = super().default_get(fields)
         model = result.get("res_model")
-        sender = self.env["of.sms.sender"]
-
-        if model and not result.get("of_sender_id"):
-            if ir_model := self.env["ir.model"].search([("model", "=", model)], limit=1):
-                sender = self.env["of.sms.sender"].search(
-                    [("model", "=", ir_model.id), ("by_default", "=", True)], limit=1
-                ) or self.env["of.sms.sender"].search([("model", "=", ir_model.id)], limit=1)
-
-        if not sender:
-            sender = self.env["of.sms.sender"].search([("by_default", "=", True), ("model", "=", False)], limit=1)
-        if not sender:
-            sender = self.env["of.sms.sender"].search([("by_default", "=", True)], limit=1)
-        if not sender:
-            sender = self.env["of.sms.sender"].search([("model", "=", False)], limit=1)
-
-        result["of_sender_id"] = sender.id
+        sender_id = result.get("of_sender_id")
+        if model and not sender_id:
+            result["of_sender_id"] = self._default_get_handle_sender_id(model)
 
         if model == "res.partner":
             if numbers := self.env["res.partner"].browse(result.get("res_id")).get_mobile_numbers():
@@ -41,6 +29,23 @@ class SendSMS(models.TransientModel):
                     result["numbers"] = ",".join(numbers)
 
         return result
+
+    def _default_get_handle_sender_id(self, model):
+        ir_model = self.env["ir.model"].search([("model", "=", model)], limit=1)
+        if ir_model:
+            sender = self.env["of.sms.sender"].search([("model", "=", ir_model.id)])
+            if default_for_model := sender.filtered(lambda s: s.by_default):
+                return default_for_model[0].id
+            if sender:
+                return sender[0].id
+            if not sender:
+                sender = self.env["of.sms.sender"].search([("by_default", "=", True)], limit=1)
+            if not sender:
+                sender = self.env["of.sms.sender"].search([], limit=1)
+            if not sender:
+                raise UserError(_("Error ! (#ED100)\n\nNo sender(s) found. Please configure it."))
+            return sender.id
+        return None
 
     def _action_send_sms_comment(self, records=None):
         kwargs = {
