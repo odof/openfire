@@ -3,9 +3,10 @@
 
 
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 
-from odoo import models, api, fields
+from odoo import api, fields, models
 
 
 class StockPicking(models.Model):
@@ -18,10 +19,9 @@ class StockPicking(models.Model):
 
     @api.model
     def validate_picking_from_carriers(self):
-        backorder_confirmation_obj = self.env['stock.backorder.confirmation']
         delay = self.env['ir.values'].sudo().get_default('website.config.settings', 'of_picking_rollback_delay')
         time_for_domain = fields.Datetime.to_string(datetime.now() - relativedelta(minutes=delay))
-        domain = [('state', 'not in',['done', 'cancel']), ('of_carrier_validation_date', '<=', time_for_domain)]
+        domain = [('state', 'not in', ('done', 'cancel')), ('of_carrier_validation_date', '<=', time_for_domain)]
         pickings_done = self
         pickings_to_validate = self.search(domain)
         for picking in pickings_to_validate:
@@ -29,13 +29,15 @@ class StockPicking(models.Model):
             try:
                 action = picking.do_new_transfer()
                 if action and action.get('res_id'):
-                    wizard = backorder_confirmation_obj.browse(action['res_id'])
-                    if picking.of_need_backorder:
+                    wizard = self.env[action['res_model']].browse(action['res_id'])
+                    if action['res_model'] != 'stock.backorder.confirmation' or picking.of_need_backorder:
                         wizard.process()
                     else:
                         wizard.process_cancel_backorder()
                 pickings_done += picking
+                self.env.cr.commit()
             except Exception as e:
+                self.env.cr.rollback()
                 continue
         if pickings_done:
             pickings_done.write({'of_validated_by_carrier': True})
