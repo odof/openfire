@@ -25,7 +25,11 @@
         'views/menus.xml',
         'wizards/wizard_create_migration.xml',
     ],
-    'assets': {},
+    'assets': {
+        'web.assets_backend': [
+            'of_migration/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,

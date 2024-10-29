@@ -40,6 +40,12 @@
                         <page string="error">
                             <field name="log_error"/>
                         </page>
+                        <page string="other">
+                            <field name="log_other"/>
+                        </page>
+                        <page string="Postgresql">
+                            <field name="log_postgresql"/>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

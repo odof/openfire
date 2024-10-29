@@ -110,7 +110,7 @@ class MigrationServer(models.Model):
     def action_get_logs(self, migration):
         logger.info("Appel get logs")
         if self.connect():
-            type_logs = ['INFO', 'WARNING', 'ERROR']
+            type_logs = ['INFO', 'WARNING', 'ERROR', 'OTHER']
             for ttype in type_logs:
                 data = {'uid': migration.uid, 'type': ttype}
                 res = requests.get(f"{self.host}:{self.port}/api/logs", json=data)
@@ -129,6 +129,17 @@ class MigrationServer(models.Model):
                     migration.log_error = ""
                     for log in res_logs.get('logs', []):
                         migration.log_error += str(log)
+                elif ttype == 'OTHER':
+                    migration.log_other = ""
+                    for log in res_logs.get('logs', []):
+                        migration.log_other += str(log)
+
+            data = {'uid': migration.uid}
+            res = requests.get(f"{self.host}:{self.port}/api/logs_postgresql", json=data)
+            res_logs = res.json()
+            migration.log_postgresql = ""
+            for log in res_logs.get('logs', []):
+                migration.log_postgresql += str(log)
 
     def action_get_dump(self, migration):
         if self.connect():

@@ -25,10 +25,13 @@ class MigrationMigration(models.Model):
     log_info = fields.Text()
     log_warning = fields.Text()
     log_error = fields.Text()
+    log_other = fields.Text()
+    log_postgresql = fields.Text()
 
     def unlink(self):
-        if self.uuid:
-            self.server_id.action_delete_migration(self)
+        for record in self:
+            if record.uid:
+                record.server_id.action_delete_migration(record)
 
         return super().unlink()
 
@@ -75,6 +78,8 @@ class MigrationMigration(models.Model):
         self.log_info = ""
         self.log_warning = ""
         self.log_error = ""
+        self.log_other = ""
+        self.log_postgresql = ""
         self.server_id.action_get_logs(self)
 
     def action_get_logs(self):
