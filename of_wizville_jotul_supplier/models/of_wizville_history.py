@@ -1,93 +1,128 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
 try:
-    from cStringIO import StringIO
+    from io import StringIO
 except ImportError:
-    from StringIO import StringIO
+    from io import StringIO
+
 import base64
+import csv
 import logging
-from collections import defaultdict
-import dateutil.parser as dparser
 import re
+from collections import defaultdict
+
+import dateutil.parser as dateutil_parser
 
 from odoo import api, fields, models
 from odoo.tools.safe_eval import safe_eval
-import csv
 
 _logger = logging.getLogger(__name__)
 
 
 class OFWizvilleHistory(models.Model):
-    _inherit = 'of.wizville.history'
+    _inherit = "of.wizville.history"
 
-    @api.multi
-    def integrate_wizville_file(self):
+    def action_button_integrate_wizville_file(self):
+        """Customize Wizville file integration for supplier Jotul."""
         self.ensure_one()
+
         try:
-            # export date is in the filename, trying to get it
-            possible_date = re.sub("[^0-9]", "", self.file_name_wizville)
-            possible_date = dparser.parse(possible_date)
-            date = fields.Date.to_string(possible_date)
+            possible_date = re.sub("[^0-9]", "", self.name)
+            possible_date = dateutil_parser.parse(possible_date)
+            date = possible_date.date()
         except ValueError:
             date = fields.Date.today()
+
         reader = self._read_csv()
-        column_names = reader.next()  # just to skip first line
-        company_column_name = 'Code_magasin'  # this should tell us which client the information goes to
+
+        company_column_name = "Code_magasin"
+        if company_column_name not in reader.fieldnames:
+            _logger.error(
+                "[WIZVILLE] : Missing required column '%s' in CSV file. Aborting import.", company_column_name
+            )
+            return
+
         files_to_create = defaultdict(list)
-        while True:
-            try:
-                line = reader.next()
-            except StopIteration:
-                break
+        for line in reader:
             try:
                 files_to_create[line[company_column_name]].append(line)
-            except ValueError:
-                _logger.error("[WIZVILLE] : Couldn't find company column. Aborting import.")
-                return
+            except KeyError:
+                _logger.error(
+                    "[WIZVILLE] : Couldn't find company column '%s' in row. Skipping row.", company_column_name
+                )
+                continue
+
         self._generate_new_exports_for_retailers(files_to_create, date)
-        self.write({'done': True})
+        self.write({"is_export_done": True})
 
     @api.model
     def _generate_new_exports_for_retailers(self, vals, date):
-        file_name_eval = self.env['ir.values'].get_default(
-            'of.connector.config.settings', 'of_wizville_export_filename')
-        for company_code, values in vals.iteritems():
+        """
+        Generates and encodes separate export files for each shop based on the parsed data.
+        The filenames are generated dynamically using a format stored in the configuration settings.
+        Args:
+            vals (dict)
+            date (datetime.date)
+        Returns:
+            dict
+        """
+
+        # Retrieve file naming format
+        export_filename = self.env["ir.config_parameter"].sudo().get_param("of.wizville.base.wizville_export_filename")
+        for company_code, values in vals.items():
             file_buffer = self._get_wizville_export_values(values)
-            file_buffer = base64.encodestring(file_buffer.encode('utf-8', 'ignore'))
-            name = safe_eval(file_name_eval, {'today': fields.Date.today(), 'company_code': company_code, 'date': date})
-            self.create({
-                'file_wizville': file_buffer,
-                'file_name_wizville': name,
-                'type': 'export',
-                'date': date,
-            })
+            encoded_file_buffer = base64.b64encode(file_buffer.encode("utf-8", "ignore"))
+
+            name = safe_eval(
+                export_filename,
+                {
+                    "today": fields.Date.today().strftime("%Y-%m-%d"),
+                    "company_code": company_code,
+                    "date": date.strftime("%Y-%m-%d"),
+                },
+            )
+            self.create(
+                {
+                    "file": encoded_file_buffer,
+                    "name": name,
+                    "type": "export",
+                    "export_date": date,
+                }
+            )
         return vals
 
     @api.model
     def _get_wizville_export_values(self, values):
-        # Colonnes obligatoires
+        """
+        Generates a CSV string from a list of dictionaries.
+        The columns are dynamically generated based on mandatory fields.
+
+        Args:
+            values (list): A list of dictionaries.
+
+        Returns:
+            str: A CSV-formatted string containing all rows of data, ready for encoding and exporting.
+        """
+        # Mandatory columns
         columns = [
-            u"Auteur",
-            u"ID_client",
-            u"Code_magasin",
-            u"Email",
-            u"Date_de_facturation",
-            u"Date",
+            "Auteur",
+            "ID_client",
+            "Code_magasin",
+            "Email",
+            "Date_de_facturation",
+            "Date",
         ]
-        # Ajout colonnes de questions
+        # Add question columns dynamically
         for line_value in values:
             for key in line_value:
                 if key not in columns:
                     columns.append(key)
         file = StringIO()
-        w = csv.writer(file, delimiter=';')
+        w = csv.writer(file, delimiter=";")
         w.writerow(columns)
+
         for line_value in values:
-            new_line = [
-                line_value.get(col, '').encode('utf-8')
-                for col in columns
-            ]
-            w.writerow(new_line)
-        value = file.getvalue()
-        return value
+            w.writerow([line_value.get(col, "") for col in columns])
+
+        return file.getvalue()
