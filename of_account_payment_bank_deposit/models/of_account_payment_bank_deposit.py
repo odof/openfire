@@ -316,7 +316,7 @@ class AccountJournal(models.Model):
                 elif self:
                     error = self.filtered(lambda o: not o.of_allow_bank_deposit)
                 else:
-                    error = not self.default_get(['of_allow_bank_deposit'])['of_allow_bank_deposit']
+                    error = not self.default_get(['of_allow_bank_deposit']).get('of_allow_bank_deposit')
         elif 'type' in vals:
             # Lors du changement de type d'un journal, le champ update_posted peut être à vrai
             #   et ne pas réussir à passer à faux car le champ est devenu readonly.
