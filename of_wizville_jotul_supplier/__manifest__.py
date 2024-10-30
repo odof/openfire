@@ -1,25 +1,18 @@
-# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': u"OpenFire / module Wizville - Jotul (fournisseur)",
-    'version': "10.0.1.0.0",
-    'author': "OpenFire",
-    'license': "",
-    'category': "OpenFire",
-    'description': u"""
-Implémentation de l'api Wizville spécifique Jotul (partie fournisseur)
-======================================================================
-
-""",
-    'website': "www.openfire.fr",
-    'depends': [
-        'of_wizville_base',
+    "name": "OpenFire / module Wizville - Jotul (fournisseur)",
+    "version": "16.0.1.0.0",
+    "license": "AGPL-3",
+    "author": "OpenFire",
+    "website": "https://www.openfire.fr",
+    "category": "OpenFire",
+    "depends": [
+        "of_wizville_base",
     ],
-    'data': [
-        'views/product_supplierinfo_views.xml',
-        ],
-    'qweb': [
+    "data": [
+        "views/product_supplierinfo_views.xml",
     ],
-    'installable': True,
-    'application': False,
-    'auto_install': False,
+    "installable": True,
+    "application": False,
+    "auto_install": False,
 }
