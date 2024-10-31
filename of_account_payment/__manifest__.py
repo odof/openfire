@@ -1,14 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': "OpenFire / Paiments",
-    'version': '16.0.1.0.0',
+    'name': "OpenFire / Paiements",
+    'version': '16.0.1.0.1',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
     'category': "OpenFire",
     'summary': "Personnalisation des paiements",
-    'description': "",
     'depends': [
         'account_payment',
         'of_account',
