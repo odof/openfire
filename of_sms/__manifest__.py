@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / SMS",
-    'version': "16.0.1.2.0",
+    'version': "16.0.1.3.0",
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': "OpenFire",
@@ -21,6 +21,11 @@
         'views/sms_sms_views.xml',
         'wizards/sms_composer_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_sms/static/src/components/*/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
