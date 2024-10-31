@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <t t-name="sms.SmsWidget" t-inherit="sms.SmsWidget" owl="1">
+        <xpath expr="//a[@href='https://iap-services.odoo.com/iap/sms/pricing']" position="attributes">
+            <attribute name="href">https://openfire.fr/logiciel-de-gestion-client/sms</attribute>
+        </xpath>
+    </t>
+
+</odoo>

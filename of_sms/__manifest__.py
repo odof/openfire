@@ -21,6 +21,11 @@
         'views/sms_sms_views.xml',
         'wizards/sms_composer_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_sms/static/src/components/*/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
