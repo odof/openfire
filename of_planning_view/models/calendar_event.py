@@ -6,6 +6,7 @@ from datetime import timedelta
 import pytz
 
 from odoo import _, api, fields, models
+from odoo.tools import html2plaintext
 
 from odoo.addons.resource.models.resource import Intervals, string_to_datetime, sum_intervals
 
@@ -39,6 +40,12 @@ class CalendarEvent(models.Model):
         store=True,
         help="Helper field, to display Allocated Time in the popover",
     )
+    of_tags_names = fields.Json(
+        string="Tags",
+        compute="_compute_popover_of_tags_names",
+        help="Helper field, to display tags in the popover",
+    )
+    of_plaintext_description = fields.Text(compute="_compute_of_plaintext_description", store=True)
 
     # Time allocation
     of_allocated_hours = fields.Float(
@@ -68,6 +75,16 @@ class CalendarEvent(models.Model):
     def _compute_popover_of_employees_names(self):
         for event in self:
             event.of_employees_names = ", ".join(event.of_employee_ids.mapped("name"))
+
+    @api.depends("of_tag_ids")
+    def _compute_popover_of_tags_names(self):
+        for event in self:
+            event.of_tags_names = {"tags": [{"name": tag.name, "color": tag.color} for tag in event.of_tag_ids]}
+
+    @api.depends("description")
+    def _compute_of_plaintext_description(self):
+        for record in self.filtered("description"):
+            record.of_plaintext_description = html2plaintext(record.description)
 
     @api.depends("duration")
     def _compute_popover_of_allocated_time(self):
