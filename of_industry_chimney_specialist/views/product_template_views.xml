@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="product_template_view_form" model="ir.ui.view">
+        <field name="name">product.template.view.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="of_industry.product_template_view_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='standard']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="attrs">{'invisible': [('of_code', '!=', 'chimney')]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='performance']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="attrs">{'invisible': [('of_code', '!=', 'chimney')]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='standard']" position="inside">
+                <field name="of_flamme_verte" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_flamme_verte_equivalence" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_eco_label" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_fonds_air_bois" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+            </xpath>
+            <xpath expr="//group[@name='performance']" position="inside">
+                <field name="of_power_rating" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_yield" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_co_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_co_mg_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_dust_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_nox_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_goc_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_voc_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_i_index" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+                <field name="of_season_efficiency" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
