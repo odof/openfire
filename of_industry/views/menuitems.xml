@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="action_of_industry" model="ir.actions.act_window">
+        <field name="name">Industry</field>
+        <field name="res_model">of.industry</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem id="menu_of_industry" name="Industry" parent="sale.prod_config_main" action="action_of_industry" sequence="100"/>
+
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="of_industry_view_form" model="ir.ui.view">
+        <field name="name">of.industry.view.form</field>
+        <field name="model">of.industry</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                        <h2>
+                            <field name="code" class="oe_inline"/>
+                        </h2>
+                    </div>
+                    <notebook>
+                        <page name="settings" string="Settings">
+                            <group>
+                                <field name="show_in_sales"/>
+                                <field name="is_custom" attrs="{'invisible': [('show_in_sales', '==', False)]}"/>
+                            </group>
+                            <group attrs="{'invisible': [('show_in_sales', '==', False)]}">
+                                <group string="Standard Content" attrs="{'invisible': [('is_custom', '==', True)]}">
+                                    <field name="content" nolabel="1" colspan="4"/>
+                                </group>
+                                <group string="Custom Content" attrs="{'invisible': [('is_custom', '==', False)]}">
+                                    <field name="custom_content" nolabel="1" colspan="4"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_industry_view_kanban" model="ir.ui.view">
+        <field name="name">of.industry.view.kanban</field>
+        <field name="model">of.industry</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_content oe_kanban_global_click">
+                            <div class="row">
+                                <div class="col">
+                                    <strong><field name="name"/></strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <field name="code"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="of_industry_view_tree" model="ir.ui.view">
+        <field name="name">of.industry.view.tree</field>
+        <field name="model">of.industry</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_industry_view_search" model="ir.ui.view">
+        <field name="name">of.industry.view.search</field>
+        <field name="model">of.industry</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>
