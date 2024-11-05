@@ -77,8 +77,8 @@ class OFDatastoreSupplier(models.Model):
         if fields and all(field in ("brand_ids", "db_name") for field in fields):
             # Un utilisateur non admin ne doit avoir accès qu'aux marques et db_name du connecteur TC
             # (surtout pas aux accès login/password)
-            self_sudo = self.sudo()
-        return super(OFDatastoreSupplier, self_sudo).read(fields, load=load)
+            self = self.sudo()
+        return super(OFDatastoreSupplier, self).read(fields, load=load)
 
     # -------------------------------------------------------------------------
     # Action methods

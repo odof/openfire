@@ -654,7 +654,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_supplier__login
 #: model_terms:ir.ui.view,arch_db:of_datastore_product.of_datastore_brand_view_form
 msgid "Login"
-msgstr "Se connecter"
+msgstr "Utilisateur"
 
 #. module: of_datastore_product
 #: model:ir.model.fields,field_description:of_datastore_product.field_of_datastore_brand__logo

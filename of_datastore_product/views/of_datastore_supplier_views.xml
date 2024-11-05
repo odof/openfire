@@ -9,18 +9,20 @@
             <form>
                 <header>
                     <button name="action_button_import_brands" string="Import brands" type="object" />
+                    <button name="action_button_dummy" string="Test connection" type="object" />
                 </header>
                 <sheet>
                     <group>
-                        <group colspan="2" col="4">
+                        <group>
                             <field name="db_name" />
                             <field name="server_address" />
+                        </group>
+                        <group>
                             <field name="login" />
                             <field name="new_password" password="True" placeholder="***" />
                             <field name="password" invisible="1" />
-                            <newline />
-                            <button name="action_button_dummy" string="Test connection" type="object" />
-                            <newline />
+                        </group>
+                        <group>
                             <field name="error_msg" colspan="4" />
                         </group>
 
