@@ -853,6 +853,7 @@ class OfImport(models.Model):
         """
         @param valeurs: Dictionnaire de valeurs pour l'import sur lequel cette fonction appliquera des modifications
         """
+        warnings = []
         if self.type_import == 'product.template':
             uom_obj = self.env['product.uom']
             brand_id = valeurs.get('brand_id')
@@ -867,6 +868,9 @@ class OfImport(models.Model):
                 'of_seller_product_category_name',
                 res_objet and res_objet.of_seller_product_category_name or '')
             if 'categ_id' in champs_fichier and 'categ_id' not in valeurs:
+                warnings.append(
+                    u"%s : Categorie interne non renseignée. Import avec categ_id par défaut."
+                    % valeurs['default_code'])
                 # Si la catégorie d'article n'est pas renseignée, on prend la catégorie par défaut de la marque
                 valeurs['categ_id'] = brand.compute_product_categ(supplier_categ, product=res_objet).id
 
@@ -897,7 +901,7 @@ class OfImport(models.Model):
                     product = product.browse(product_id)
                     # Si kit_id n'est pas défini, une exception sera automatiquement générée plus tard
                     valeurs['product_uom_id'] = product.uom_id.id
-
+        return warnings
     @api.multi
     def _importer_ligne(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
         """
@@ -923,6 +927,7 @@ class OfImport(models.Model):
         """
         import_error = []
         code = 0
+        warnings = []
 
         def erreur(msg):
             """
@@ -1345,7 +1350,7 @@ class OfImport(models.Model):
 
         try:
             # Champs à importer (pour envoi à fonction create ou write)
-            self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)
+            warnings = self._post_calcule_ligne(champs_fichier, ligne, model_data, res_objet, valeurs)
         except OfImportError, e:
             erreur(u"Ligne %s : %s %s non importé." % (i, e.name, model_data['nom_objet'].capitalize()))
 
@@ -1422,12 +1427,13 @@ class OfImport(models.Model):
                 self._cr.rollback()
             else:
                 self._cr.commit()
-        return code, message
+        return code, message, warnings
 
     @api.multi
     def _importer_ligne_attachment(self, ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler):
         attachment_obj = self.env['ir.attachment']
         import_error = []
+        warnings = []
         code = CODE_IMPORT_CREATION
 
         def erreur(msg):
@@ -1558,7 +1564,7 @@ class OfImport(models.Model):
                 self._cr.rollback()
             else:
                 self._cr.commit()
-        return code, message
+        return code, message, warnings
 
     @api.multi
     def importer(self, simuler=True):
@@ -1724,6 +1730,7 @@ class OfImport(models.Model):
             # On sauvegarde l'état actuel pour récupérer les lignes nouvellement créées
             product_categ_config_obj = self.env['of.import.product.categ.config']
             product_categ_config_ids = product_categ_config_obj.search([]).ids
+
         else:
             # Définition de l'ordre de lecture des champs. La marque doit être lue en premier
             champs_fichier = sorted(champs_fichier,
@@ -1739,6 +1746,15 @@ class OfImport(models.Model):
                                      'message': u"Le champ référence qui permet d'identifier un %s (%s) n'est pas dans "
                                                 u"le fichier d'import." %
                                                 (model_data['nom_objet'], model_data['champ_primaire'])})]
+
+        # Vérification si la colonne "catégorie interne" est présente dans le fichier d'import
+        if model == "product.template" and'categ_id' not in champs_fichier_racine:
+            import_warning += [(0, 0, {
+                'type': 'warning',
+                'message':
+                    u"Info : colonne categ_id dans le fichier d'import non présente. "
+                    u"Import avec valeur par défaut."
+            })]
 
         # Vérification si il y a des champs du fichier d'import qui sont en plusieurs exemplaires et détection
         # champ relation (id, id externe, nom)
@@ -1851,9 +1867,11 @@ class OfImport(models.Model):
             nb_total += 1
 
             try:
-                code, message = fct_importer_ligne(
+                code, message, warnings = fct_importer_ligne(
                     ligne, champs_fichier, champs_odoo, i, model_data, doublons, simuler)
 
+                for warning in warnings:
+                    import_warning += [(0, 0, {'type': 'warning', 'message': warning})]
                 if message:
                     if code == CODE_IMPORT_ERREUR:
                         import_error += message
