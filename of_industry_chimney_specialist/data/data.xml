@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo noupdate="1">
+
+    <record id="of_industry_chimney_specialist" model="of.industry">
+        <field name="name">Chimney Specialist</field>
+        <field name="code">chimney</field>
+    </record>
+
+</odoo>
