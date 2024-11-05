@@ -16,6 +16,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_industry
+#: model:ir.model.fields,help:of_industry.field_of_industry__show_in_sales
+msgid "Add technical information in sale line description"
+msgstr "Ajouter les informations techniques dans les descriptions de mes lignes de devis"
+
+#. module: of_industry
 #: model_terms:ir.ui.view,arch_db:of_industry.view_category_property_form
 msgid "Analytic"
 msgstr "Analytique"
@@ -28,6 +33,11 @@ msgid "Code"
 msgstr ""
 
 #. module: of_industry
+#: model:ir.model.fields,field_description:of_industry.field_of_industry__content
+msgid "Content"
+msgstr "Contenu"
+
+#. module: of_industry
 #: model:ir.model.fields,field_description:of_industry.field_of_industry__create_uid
 msgid "Created by"
 msgstr ""
@@ -36,6 +46,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_industry.field_of_industry__create_date
 msgid "Created on"
 msgstr ""
+
+#. module: of_industry
+#: model:ir.model.fields,field_description:of_industry.field_of_industry__custom_content
+#: model_terms:ir.ui.view,arch_db:of_industry.of_industry_view_form
+msgid "Custom Content"
+msgstr "Contenu personnalisé"
 
 #. module: of_industry
 #: model:ir.model.fields,field_description:of_industry.field_of_industry__display_name
@@ -48,12 +64,19 @@ msgid "ID"
 msgstr ""
 
 #. module: of_industry
+#: model:ir.actions.act_window,name:of_industry.action_of_industry
 #: model:ir.model,name:of_industry.model_of_industry
 #: model:ir.model.fields,field_description:of_industry.field_product_category__of_industry_id
 #: model:ir.model.fields,field_description:of_industry.field_product_product__of_industry_id
 #: model:ir.model.fields,field_description:of_industry.field_product_template__of_industry_id
+#: model:ir.ui.menu,name:of_industry.menu_of_industry
 msgid "Industry"
 msgstr "Secteur d'activité"
+
+#. module: of_industry
+#: model:ir.model.fields,field_description:of_industry.field_of_industry__is_custom
+msgid "Is Custom"
+msgstr "Est personnalisé"
 
 #. module: of_industry
 #: model:ir.model.fields,field_description:of_industry.field_of_industry____last_update
@@ -91,11 +114,31 @@ msgid "Product Category"
 msgstr "Catégorie de produit"
 
 #. module: of_industry
+#: model:ir.model,name:of_industry.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande"
+
+#. module: of_industry
+#: model_terms:ir.ui.view,arch_db:of_industry.of_industry_view_form
+msgid "Settings"
+msgstr "Paramètres"
+
+#. module: of_industry
 #: model_terms:ir.ui.view,arch_db:of_industry.product_template_view_form
 msgid "Standard & Qualification"
 msgstr "Norme et qualification"
 
 #. module: of_industry
+#: model_terms:ir.ui.view,arch_db:of_industry.of_industry_view_form
+msgid "Standard Content"
+msgstr "Contenu standard"
+
+#. module: of_industry
 #: model_terms:ir.ui.view,arch_db:of_industry.product_template_view_form
 msgid "Technical Data"
 msgstr "Données techniques"
+
+#. module: of_industry
+#: model:ir.model.fields,field_description:of_industry.field_of_industry__show_in_sales
+msgid "Show In Sales"
+msgstr "Afficher dans les ventes"
