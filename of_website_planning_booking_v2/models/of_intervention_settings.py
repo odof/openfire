@@ -16,39 +16,75 @@ class OFInterventionSettings(models.TransientModel):
     @api.model
     def _auto_init(self):
         super(OFInterventionSettings, self)._auto_init()
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_open_new_customer') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_open_new_customer', True)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_use_partner_company') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_use_partner_company', True)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_intervention_company_id') is None:
-            self.env['ir.values'].set_default(
-                'of.intervention.settings', 'booking_intervention_company_id',
-                self._default_booking_intervention_company_id())
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_opened_day_ids') is None:
-            self.env['ir.values'].set_default(
-                'of.intervention.settings', 'booking_opened_day_ids', self._default_opened_day_ids())
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_open_days_number') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_open_days_number', 60)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_search_mode') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_search_mode', 'oneway')
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_search_type') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_search_type', 'distance')
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_search_max_criteria') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_search_max_criteria', 20)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_allow_empty_days') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_allow_empty_days', True)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_intervention_state') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_intervention_state', 'draft')
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_display_price') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'booking_display_price', True)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'website_edit_days_limit') is None:
-            self.env['ir.values'].set_default('of.intervention.settings', 'website_edit_days_limit', 14)
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_morning_hours_label') is None:
-            self.env['ir.values'].set_default(
-                'of.intervention.settings', 'booking_morning_hours_label', u"8h00 - 13h00")
-        if self.env['ir.values'].get_default('of.intervention.settings', 'booking_afternoon_hours_label') is None:
-            self.env['ir.values'].set_default(
-                'of.intervention.settings', 'booking_afternoon_hours_label', u"14h00 - 18h00")
+        ir_values_obj = self.env['ir.values']
+        if ir_values_obj.get_default(self._name, 'booking_open_new_customer') is None:
+            ir_values_obj.set_default(self._name, 'booking_open_new_customer', True)
+        if ir_values_obj.get_default(self._name, 'booking_use_partner_company') is None:
+            ir_values_obj.set_default(self._name, 'booking_use_partner_company', True)
+        if ir_values_obj.get_default(self._name, 'booking_intervention_company_id') is None:
+            ir_values_obj.set_default(
+                self._name,
+                'booking_intervention_company_id',
+                self._default_booking_intervention_company_id(),
+            )
+        self._auto_init_booking_v2(False)
+        companies = self.env['res.company'].search([])
+        for company_id in companies.ids:
+            if ir_values_obj.get_default(self._name, 'booking_company_dependent', company_id=company_id):
+                self._auto_init_booking_v2(company_id)
+
+    @api.model
+    def _auto_init_booking_v2(self, company_id):
+        ir_values_obj = self.env['ir.values'].with_context(force_company=company_id)
+
+        search_type = ir_values_obj.get_default(self._name, 'booking_search_type')
+        search_criteria = ir_values_obj.get_default(self._name, 'booking_search_max_criteria')
+        if ir_values_obj.get_default(self._name, 'booking_opened_day_ids') is None:
+            ir_values_obj.set_default(
+                self._name,
+                'booking_opened_day_ids',
+                self._default_opened_day_ids(),
+                company_id=company_id
+            )
+        if ir_values_obj.get_default(self._name, 'booking_open_days_number') is None:
+            ir_values_obj.set_default(self._name, 'booking_open_days_number', 60, company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_search_mode') is None:
+            ir_values_obj.set_default(self._name, 'booking_search_mode', 'oneway', company_id=company_id)
+        if search_type is None:
+            ir_values_obj.set_default(self._name, 'booking_search_type', 'distance', company_id=company_id)
+        if search_criteria is None:
+            ir_values_obj.set_default(self._name, 'booking_search_max_criteria', 20, company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_allow_empty_days') is None:
+            ir_values_obj.set_default(self._name, 'booking_allow_empty_days', True, company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_empty_days_search_type') is None:
+            ir_values_obj.set_default(
+                self._name,
+                'booking_empty_days_search_type',
+                search_type or 'distance',
+                company_id=company_id
+            )
+        if ir_values_obj.get_default(self._name, 'booking_empty_days_search_max_criteria') is None:
+            ir_values_obj.set_default(
+                self._name,
+                'booking_empty_days_search_max_criteria',
+                search_criteria or 20,
+                company_id=company_id
+            )
+        if ir_values_obj.get_default(self._name, 'booking_intervention_state') is None:
+            ir_values_obj.set_default(self._name, 'booking_intervention_state', 'draft', company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_display_price') is None:
+            ir_values_obj.set_default(self._name, 'booking_display_price', True, company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'website_edit_days_limit') is None:
+            ir_values_obj.set_default(self._name, 'website_edit_days_limit', 14, company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_morning_hours_label') is None:
+            ir_values_obj.set_default(self._name, 'booking_morning_hours_label', u"8h00 - 13h00", company_id=company_id)
+        if ir_values_obj.get_default(self._name, 'booking_afternoon_hours_label') is None:
+            ir_values_obj.set_default(
+                self._name,
+                'booking_afternoon_hours_label',
+                u"14h00 - 18h00",
+                company_id=company_id
+            )
 
     def _default_website(self):
         return self.env['website'].search([], limit=1)
@@ -87,6 +123,10 @@ class OFInterventionSettings(models.TransientModel):
     booking_search_max_criteria = fields.Integer(string=u"Critère de recherche max", required=True)
     booking_allow_empty_days = fields.Boolean(
         string=u"Autorise la réservation de créneau sur des journées vierges", default=True)
+    booking_empty_days_search_type = fields.Selection(
+        selection=SELECTION_SEARCH_TYPES, string=u"Type de recherche pour journées vierges", required=True)
+    booking_empty_days_search_max_criteria = fields.Integer(
+        string=u"Critère de recherche max pour journées vierges", required=True)
     booking_intervention_state = fields.Selection(
         selection=[
             ('draft', u"Brouillon"),
@@ -158,6 +198,10 @@ class OFInterventionSettings(models.TransientModel):
                 'of.intervention.settings', 'booking_open_days_number', company_id=company_id),
             'booking_allow_empty_days': ir_values_obj.env['ir.values'].get_default(
                 'of.intervention.settings', 'booking_allow_empty_days', company_id=company_id),
+            'booking_empty_days_search_type': ir_values_obj.env['ir.values'].get_default(
+                'of.intervention.settings', 'booking_empty_days_search_type', company_id=company_id),
+            'booking_empty_days_search_max_criteria': ir_values_obj.env['ir.values'].get_default(
+                'of.intervention.settings', 'booking_empty_days_search_max_criteria', company_id=company_id),
             'booking_intervention_state': ir_values_obj.env['ir.values'].get_default(
                 'of.intervention.settings', 'booking_intervention_state', company_id=company_id),
             'booking_display_price': ir_values_obj.env['ir.values'].get_default(
@@ -230,6 +274,19 @@ class OFInterventionSettings(models.TransientModel):
             company_id=self.booking_company_dependent and self.env.user.company_id.id)
 
     @api.multi
+    def set_booking_empty_days_search_types_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'booking_empty_days_search_type', self.booking_empty_days_search_type,
+            company_id=self.booking_company_dependent and self.env.user.company_id.id)
+
+    @api.multi
+    def set_booking_empty_days_search_max_criteria_defaults(self):
+        return self.env['ir.values'].sudo().set_default(
+            'of.intervention.settings', 'booking_empty_days_search_max_criteria',
+            self.booking_empty_days_search_max_criteria,
+            company_id=self.booking_company_dependent and self.env.user.company_id.id)
+
+    @api.multi
     def set_booking_allow_empty_days_defaults(self):
         return self.env['ir.values'].sudo().set_default(
             'of.intervention.settings', 'booking_allow_empty_days', self.booking_allow_empty_days,
@@ -281,6 +338,8 @@ class OFInterventionSettings(models.TransientModel):
             'booking_search_max_criteria',
             'booking_open_days_number',
             'booking_allow_empty_days',
+            'booking_empty_days_search_type',
+            'booking_empty_days_search_max_criteria',
             'booking_intervention_state',
             'booking_display_price',
             'website_edit_days_limit',

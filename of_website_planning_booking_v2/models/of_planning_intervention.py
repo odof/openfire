@@ -8,3 +8,4 @@ class OFPlanningIntervention(models.Model):
     _inherit = 'of.planning.intervention'
 
     website_create = fields.Boolean(string=u"Créé par le site web")
+    potential_duplicated_partner = fields.Boolean(related='partner_id.of_potential_duplication')

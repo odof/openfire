@@ -325,6 +325,15 @@ class OFWebsitePlanningBooking(http.Controller):
             force_company=booking_company_id).get_default('of.intervention.settings', 'booking_search_max_criteria')
         allow_empty_days = request.env['ir.values'].sudo().with_context(
             force_company=booking_company_id).get_default('of.intervention.settings', 'booking_allow_empty_days')
+        if allow_empty_days:
+            empty_days_search_type = request.env['ir.values'].sudo().with_context(force_company=booking_company_id).\
+                get_default('of.intervention.settings', 'booking_empty_days_search_type')
+            empty_days_max_search_criteria = request.env['ir.values'].sudo().\
+                with_context(force_company=booking_company_id).\
+                get_default('of.intervention.settings', 'booking_empty_days_search_max_criteria')
+        else:
+            empty_days_search_type = False
+            empty_days_max_search_criteria = False
         if search_more and request.session.get('of_booking_wizard_id'):
             # Clic sur le bouton "Chercher plus"
             # Récupération du wizard existant
@@ -380,7 +389,8 @@ class OFWebsitePlanningBooking(http.Controller):
             wizard.compute(sudo=True, mode=compute)
 
         valid_lines = self._filter_slots(
-            wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, wizard.duree)
+            wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, empty_days_search_type,
+            empty_days_max_search_criteria, wizard.duree)
 
         # Tenter jusqu'à avoir au moins 10 résultats ou ne plus être dans les jours ouverts à la réservation
         while len(valid_lines) < request.session['search_slot_result_nb'] and \
@@ -391,7 +401,8 @@ class OFWebsitePlanningBooking(http.Controller):
             wizard.date_recherche_fin = min(new_search_end_date.strftime('%Y-%m-%d'), max_search_date)
             wizard.compute(sudo=True, mode='more')
             valid_lines = self._filter_slots(
-                wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, wizard.duree)
+                wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, empty_days_search_type, 
+                empty_days_max_search_criteria, wizard.duree)
 
         if valid_lines:
             web_slots = wizard.build_website_creneaux(valid_lines, mode='half_day')
@@ -408,18 +419,26 @@ class OFWebsitePlanningBooking(http.Controller):
 
         return [web_slots, not no_more_search]
 
-    def _filter_slots(self, rdv_lines, search_type, max_search_criteria, allow_empty_days, duration):
-        valid_lines = rdv_lines.filtered(lambda p: p.disponible)
+    def _filter_slots(
+            self, rdv_lines, search_type, max_search_criteria, allow_empty_days, empty_days_search_type,
+            empty_days_max_search_criteria, duration):
         tz = pytz.timezone(request._context.get('tz', "Europe/Paris"))
+        available_lines = rdv_lines.filtered(lambda p: p.disponible and not p.no_localized)
+
+        not_empty_lines = available_lines.filtered(lambda line: line.sudo().tour_id.intervention_ids)
 
         if search_type == 'duration':
-            valid_lines = valid_lines.filtered(lambda line: line.duree_utile <= max_search_criteria)
+            valid_lines = not_empty_lines.filtered(lambda line: line.duree_utile <= max_search_criteria)
         else:
-            valid_lines = valid_lines.filtered(lambda line: line.distance_utile <= max_search_criteria)
+            valid_lines = not_empty_lines.filtered(lambda line: line.distance_utile <= max_search_criteria)
 
-        if not allow_empty_days:
-            # Check that employee has at least one intervention on the same day
-            valid_lines = valid_lines.filtered(lambda line: line.sudo().tour_id.intervention_ids)
+        if allow_empty_days:
+            empty_lines = available_lines - not_empty_lines
+
+            if empty_days_search_type == 'duration':
+                valid_lines += empty_lines.filtered(lambda line: line.duree_utile <= empty_days_max_search_criteria)
+            else:
+                valid_lines += empty_lines.filtered(lambda line: line.distance_utile <= empty_days_max_search_criteria)
 
         # Check website hours
         for valid_line in valid_lines:

@@ -101,11 +101,13 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
             session_partner_id = sessionStorage.getItem('of_booking_partner_id');
         }
         else {
+            // On ne retire pas du cache of_booking_partner_id pour éviter la création de doublons de partenaire
             sessionStorage.removeItem('of_booking_mode');
             sessionStorage.removeItem('of_booking_service_id');
             sessionStorage.removeItem('of_booking_contract_id');
-            sessionStorage.removeItem('of_booking_partner_id');
-            sessionStorage.removeItem('of_booking_from_date');
+
+            session_partner_id = sessionStorage.getItem('of_booking_partner_id');
+            session_from_date = sessionStorage.getItem('of_booking_from_date');
         }
 
         if (session_mode == null || session_mode == undefined || session_mode == "") {
@@ -179,7 +181,7 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
             from_date_input.val(tomorrow_str);
         }
 
-        if (isValid(session_partner_id)) {
+        if ((isValid(session_service_id) || isValid(session_contract_id)) && isValid(session_partner_id)) {
             ajax.jsonRpc('/booking/get_partner', 'call', {
                 'partner_id': session_partner_id
             }).then(function (result) {
@@ -254,29 +256,7 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
                 address_panel.show();
                 address_panel.find('.panel-collapse').collapse('show');
 
-                if (!isValid(session_partner_id)) {
-                    if (logged_partner_id != 0) {
-                        ajax.jsonRpc('/booking/get_partner', 'call', {
-                            'partner_id': logged_partner_id
-                        }).then(function (result) {
-                            var partner = JSON.parse(result);
-                            name_input.val(partner.name);
-                            email_input.val(partner.email);
-                            phone_input.val(partner.phone);
-                            street_input.val(partner.street);
-                            street2_input.val(partner.street2 || "");
-                            zip_input.val(partner.zip);
-                            city_input.val(partner.city);
-
-                            address_selector.val(logged_partner_id);
-
-                            sessionStorage.setItem('of_booking_partner_id', logged_partner_id);
-                        }).fail(function() {
-                            window.location.href = "/booking/error";
-                        });
-                    }
-                }
-                else if (logged_partner_id != 0 && logged_partner_id != session_partner_id) {
+                if (!isValid(session_partner_id) && logged_partner_id != 0) {
                     ajax.jsonRpc('/booking/get_partner', 'call', {
                         'partner_id': logged_partner_id
                     }).then(function (result) {
@@ -292,6 +272,26 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
                         address_selector.val(logged_partner_id);
 
                         sessionStorage.setItem('of_booking_partner_id', logged_partner_id);
+                    }).fail(function() {
+                        window.location.href = "/booking/error";
+                    });
+                }
+                else if (isValid(session_partner_id)) {
+                    ajax.jsonRpc('/booking/get_partner', 'call', {
+                        'partner_id': session_partner_id
+                    }).then(function (result) {
+                        var partner = JSON.parse(result);
+                        name_input.val(partner.name);
+                        email_input.val(partner.email);
+                        phone_input.val(partner.phone);
+                        street_input.val(partner.street);
+                        street2_input.val(partner.street2 || "");
+                        zip_input.val(partner.zip);
+                        city_input.val(partner.city);
+
+                        address_selector.val(session_partner_id);
+
+                        sessionStorage.setItem('of_booking_partner_id', session_partner_id);
                     }).fail(function() {
                         window.location.href = "/booking/error";
                     });

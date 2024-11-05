@@ -29,6 +29,14 @@
                         <span attrs="{'invisible': [('booking_search_type', '!=', 'duration')]}">minutes max</span>
                     </div>
                     <field name="booking_allow_empty_days" class="oe_inline"/>
+                    <label for="booking_empty_days_search_type" string="Critère de recherche pour journées vierges"
+                        attrs="{'invisible': [('booking_allow_empty_days', '=', False)]}"/>
+                    <div name="booking_empty_days_search_type" attrs="{'invisible': [('booking_allow_empty_days', '=', False)]}">
+                        <field name="booking_empty_days_search_type" class="oe_inline" style="margin-right: 10px"/>
+                        <field name="booking_empty_days_search_max_criteria" class="oe_inline"/>
+                        <span attrs="{'invisible': [('booking_empty_days_search_type', '!=', 'distance')]}">km max</span>
+                        <span attrs="{'invisible': [('booking_empty_days_search_type', '!=', 'duration')]}">minutes max</span>
+                    </div>
                     <field name="booking_intervention_state" class="oe_inline"/>
                     <field name="booking_display_price" class="oe_inline"/>
                     <field name="website_edit_days_limit" class="oe_inline"/>

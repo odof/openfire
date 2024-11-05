@@ -1494,6 +1494,14 @@ class OfTourneeRdv(models.TransientModel):
                     coords_str += ";" + str(line_geo_lng) + "," + str(line_geo_lat)
                     coords.append({'lat': line_geo_lat, 'lng': line_geo_lng})
                 if non_loc:
+                    # On flaggue à non géolocalisé tous les créneaux dispo de ce jour
+                    free_slots = wizard_line_obj.search([
+                        ('wizard_id', '=', self.id),
+                        ('date', '=', date_courante),
+                        ('employee_id', '=', employee.id),
+                        ('allday', '=', False),
+                        ('intervention_id', '=', False)])
+                    free_slots.write({'no_localized': True})
                     continue
 
                 # Point d'arrivée
@@ -1747,6 +1755,7 @@ class OfTourneeRdvLine(models.TransientModel):
     selected = fields.Boolean(u'Créneau sélectionné', default=False)
     selected_hour = fields.Float(string='Heure du RDV', digits=(12, 5))
     selected_description = fields.Text(string="Description", related="wizard_id.description")
+    no_localized = fields.Boolean(string=u"Non géolocalisé")
 
     @api.multi
     @api.depends('date')
