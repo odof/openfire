@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_industry_responsible,access.of.industry.responsible,model_of_industry,of_sale.of_group_sale_responsible,1,1,0,0
 access_of_industry_user,access.of.industry.user,model_of_industry,base.group_user,1,0,0,0
