@@ -366,9 +366,10 @@ class ResPartner(models.Model):
             same_phone_ids = [x[0] for x in self._cr.fetchall()]
             return [('id', 'in', same_email_ids + same_phone_ids)]
 
-    @api.one
+    @api.multi
     def check_duplications(self):
         # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self.ensure_one()
         self = self.sudo()
         same_email_ids = self.env['res.partner']
         if self.email:

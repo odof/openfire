@@ -34,7 +34,7 @@ FormView.include({
                 // Contrôle des doublons potentiels lors de la création d'un nouveau contact
                 if (creation && self.model === 'res.partner' && typeof self.datarecord.id != "string") {
                     new Model('res.partner').call('check_duplications', [self.datarecord.id]).done(function (res) {
-                        if (res[0]) {
+                        if (res) {
                             self.do_action({
                                 type: 'ir.actions.act_window',
                                 name: 'ATTENTION',
@@ -43,7 +43,7 @@ FormView.include({
                                 view_type: 'form',
                                 views: [[false,'form']],
                                 target: 'new',
-                                context: {'default_duplication_ids': res[0],
+                                context: {'default_duplication_ids': res,
                                           'default_new_partner_id': self.datarecord.id},
                             });
                         }
@@ -52,7 +52,7 @@ FormView.include({
                 // Contrôle des doublons potentiels lors de la création d'une nouvelle opportunité
                 else if (creation && self.model === 'crm.lead' && self.datarecord.of_check_duplications && typeof self.datarecord.partner_id[0] != "string") {
                     new Model('res.partner').call('check_duplications', [self.datarecord.partner_id[0]]).done(function (res) {
-                        if (res[0]) {
+                        if (res) {
                             self.do_action({
                                 type: 'ir.actions.act_window',
                                 name: 'ATTENTION',
@@ -61,7 +61,7 @@ FormView.include({
                                 view_type: 'form',
                                 views: [[false,'form']],
                                 target: 'new',
-                                context: {'default_duplication_ids': res[0],
+                                context: {'default_duplication_ids': res,
                                           'default_new_partner_id': self.datarecord.partner_id[0]},
                             });
                         }
@@ -123,7 +123,7 @@ form_common.FormViewDialog.include({
                                     // Contrôle des doublons potentiels lors de la création d'un nouveau contact
                                     if (creation && self.view_form.model === 'res.partner' && typeof self.view_form.datarecord.id != "string") {
                                         new Model('res.partner').call('check_duplications', [self.view_form.datarecord.id]).done(function (res) {
-                                            if (res[0]) {
+                                            if (res) {
                                                 parent_view.do_action({
                                                     type: 'ir.actions.act_window',
                                                     name: 'ATTENTION',
@@ -132,7 +132,7 @@ form_common.FormViewDialog.include({
                                                     view_type: 'form',
                                                     views: [[false,'form']],
                                                     target: 'new',
-                                                    context: {'default_duplication_ids': res[0],
+                                                    context: {'default_duplication_ids': res,
                                                               'default_new_partner_id': self.view_form.datarecord.id},
                                                 });
                                             }
@@ -141,7 +141,7 @@ form_common.FormViewDialog.include({
                                     // Contrôle des doublons potentiels lors de la création d'une nouvelle opportunité
                                     else if (creation && self.view_form.model === 'crm.lead' && self.view_form.datarecord.of_check_duplications && typeof self.view_form.datarecord.partner_id[0] != "string") {
                                         new Model('res.partner').call('check_duplications', [self.view_form.datarecord.partner_id[0]]).done(function (res) {
-                                            if (res[0]) {
+                                            if (res) {
                                                 parent_view.do_action({
                                                     type: 'ir.actions.act_window',
                                                     name: 'ATTENTION',
@@ -150,7 +150,7 @@ form_common.FormViewDialog.include({
                                                     view_type: 'form',
                                                     views: [[false,'form']],
                                                     target: 'new',
-                                                    context: {'default_duplication_ids': res[0],
+                                                    context: {'default_duplication_ids': res,
                                                               'default_new_partner_id': self.view_form.datarecord.partner_id[0]},
                                                 });
                                             }
@@ -176,7 +176,7 @@ form_common.FormViewDialog.include({
                                 // Contrôle des doublons potentiels lors de la création d'un nouveau contact
                                 if (creation && self.view_form.model === 'res.partner' && typeof self.view_form.datarecord.id != "string") {
                                     new Model('res.partner').call('check_duplications', [self.view_form.datarecord.id]).done(function (res) {
-                                        if (res[0]) {
+                                        if (res) {
                                             self.view_form.do_action({
                                                 type: 'ir.actions.act_window',
                                                 name: 'ATTENTION',
@@ -185,7 +185,7 @@ form_common.FormViewDialog.include({
                                                 view_type: 'form',
                                                 views: [[false,'form']],
                                                 target: 'new',
-                                                context: {'default_duplication_ids': res[0],
+                                                context: {'default_duplication_ids': res,
                                                           'default_new_partner_id': self.view_form.datarecord.id},
                                             });
                                         }
@@ -194,7 +194,7 @@ form_common.FormViewDialog.include({
                                 // Contrôle des doublons potentiels lors de la création d'une nouvelle opportunité
                                 else if (creation && self.view_form.model === 'crm.lead' && self.view_form.datarecord.of_check_duplications && typeof self.view_form.datarecord.partner_id[0] != "string") {
                                     new Model('res.partner').call('check_duplications', [self.view_form.datarecord.partner_id[0]]).done(function (res) {
-                                        if (res[0]) {
+                                        if (res) {
                                             self.view_form.do_action({
                                                 type: 'ir.actions.act_window',
                                                 name: 'ATTENTION',
@@ -203,7 +203,7 @@ form_common.FormViewDialog.include({
                                                 view_type: 'form',
                                                 views: [[false,'form']],
                                                 target: 'new',
-                                                context: {'default_duplication_ids': res[0],
+                                                context: {'default_duplication_ids': res,
                                                           'default_new_partner_id': self.view_form.datarecord.partner_id[0]},
                                             });
                                         }
@@ -260,7 +260,7 @@ form_widgets.WidgetButton.include({
             // Contrôle des doublons potentiels lors de la création d'un nouveau contact
             if (creation && self.view.model === 'res.partner' && typeof self.view.datarecord.id != "string") {
                 new Model('res.partner').call('check_duplications', [self.view.datarecord.id]).done(function (res) {
-                    if (res[0]) {
+                    if (res) {
                         self.view.ViewManager.action_manager.do_action({
                             type: 'ir.actions.act_window',
                             name: 'ATTENTION',
@@ -269,7 +269,7 @@ form_widgets.WidgetButton.include({
                             view_type: 'form',
                             views: [[false,'form']],
                             target: 'new',
-                            context: {'default_duplication_ids': res[0],
+                            context: {'default_duplication_ids': res,
                                       'default_new_partner_id': self.view.datarecord.id},
                         });
                     }
@@ -278,7 +278,7 @@ form_widgets.WidgetButton.include({
             // Contrôle des doublons potentiels lors de la création d'une nouvelle opportunité
             else if (creation && self.view.model === 'crm.lead' && self.view.datarecord.of_check_duplications && typeof self.view.datarecord.partner_id[0] != "string") {
                 new Model('res.partner').call('check_duplications', [self.view.datarecord.partner_id[0]]).done(function (res) {
-                    if (res[0]) {
+                    if (res) {
                         self.view.ViewManager.action_manager.do_action({
                             type: 'ir.actions.act_window',
                             name: 'ATTENTION',
@@ -287,7 +287,7 @@ form_widgets.WidgetButton.include({
                             view_type: 'form',
                             views: [[false,'form']],
                             target: 'new',
-                            context: {'default_duplication_ids': res[0],
+                            context: {'default_duplication_ids': res,
                                       'default_new_partner_id': self.view.datarecord.partner_id[0]},
                         });
                     }
