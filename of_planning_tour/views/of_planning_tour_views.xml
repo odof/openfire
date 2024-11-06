@@ -236,7 +236,7 @@
                 <separator/>
                 <filter name="not_full" string="Not full" domain="[('is_full', '=', False)]"/>
                 <filter name="optimized" string="Optimized" domain="[('is_optimized', '=', True)]"/>
-                <filter name="not_empty" string="Not empty" domain="[('intervention_count', '>', 0)]"/>
+                <filter name="not_empty" string="Not empty" domain="[('tour_line_ids', '!=', False)]"/>
                 <!-- "ignore_alert_optimization_update" not in domain to be able to see the tours that need to be optimized even if the user ignored alert  -->
                 <filter name="need_optimization_update" string="Need optimization update" domain="[('need_optimization_update', '=', True)]"/>
                 <separator/>

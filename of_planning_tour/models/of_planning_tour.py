@@ -159,7 +159,7 @@ class OFPlanningTour(models.Model):
         string="Interventions",
         copy=False,
     )
-    intervention_count = fields.Integer(string="# Interventions", compute="_compute_count_interventions", store=True)
+    intervention_count = fields.Integer(string="# Interventions", compute="_compute_count_interventions")
     tour_line_ids = fields.One2many(
         comodel_name="of.planning.tour.line", inverse_name="tour_id", string="Tour lines", copy=False
     )

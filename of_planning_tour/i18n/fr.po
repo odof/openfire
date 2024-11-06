@@ -2729,3 +2729,20 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_optimization_wizard_view_form
 msgid "or"
 msgstr "ou"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_am_limit_float
+#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_am_limit_float
+msgid "(OF) Tours // Morning/Afternoon break hour"
+msgstr "(OF) Tournées // Heure de coupure matin/après-midi"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_am_limit_float
+#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_am_limit_float
+#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
+msgid ""
+"Defines the break hour between morning and afternoon. Interventions starting"
+" before this hour will be considered in the morning and vice versa."
+msgstr ""
+"Définit l'heure de coupure entre matin et après-midi. Les interventions commençant"
+" avant cette heure seront considérées du matin et inversement."

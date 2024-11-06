@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="booking_menu" model="website.menu">
+        <field name="name">Make an appointment</field>
+        <field name="url">/booking</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">60</field>
+        <field name="website_id" ref="website.default_website"/>
+    </record>
+
+</odoo>

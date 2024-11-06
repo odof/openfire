@@ -78,6 +78,13 @@ class ResConfigSettings(models.TransientModel):
         help="Technical field to store M2M fields into a config parameter. As config_parameters does not accept m2m "
         "field, we store the fields with a comma separated string into a Char config field.",
     )
+    tour_am_limit_float = fields.Float(
+        string="(OF) Tours // Morning/Afternoon break hour",
+        config_parameter="of.planning.tour.tour_am_limit_float",
+        default=13.0,
+        help="Defines the break hour between morning and afternoon. Interventions starting before this hour will be "
+        "considered in the morning and vice versa.",
+    )
     of_planning_tour_manual_creation = fields.Boolean(
         string="(OF) Manual tour creation authorized",
         help="Allows users to manually create tours.",
@@ -85,13 +92,16 @@ class ResConfigSettings(models.TransientModel):
 
     @api.constrains("nbr_days_tour_creation")
     def _check_nbr_days_tour_creation(self):
-        if 1 <= self.nbr_days_tour_creation > 180:
-            raise ValidationError(_("The number of days for the tours creation must be positive and can't exceed 180."))
+        for setting in self:
+            if setting.nbr_days_tour_creation <= 0 or setting.nbr_days_tour_creation > 180:
+                raise ValidationError(
+                    _("The number of days for the tours creation must be positive and can't exceed 180."))
 
     @api.constrains("tour_day_ids")
     def _check_tour_day_ids(self):
-        if not self.tour_day_ids:
-            raise ValidationError(_("You must select at least one day for the tours creation."))
+        for setting in self:
+            if not setting.tour_day_ids:
+                raise ValidationError(_("You must select at least one day for the tours creation."))
 
     @api.depends("tour_day_ids_str")
     def _compute_tour_day_ids(self):
