@@ -14,8 +14,11 @@ class AccountPayment(models.Model):
     def create(self, vals_list):
         payment_mode_obj = self.env["of.payment.mode"]
         for vals in vals_list:
-            if "of_payment_mode_id" in vals and not vals.get("payment_method_line_id"):
+            if "of_payment_mode_id" in vals:
                 payment_mode = payment_mode_obj.browse(vals.get("of_payment_mode_id"))
-                vals["payment_method_line_id"] = payment_mode and payment_mode.payment_method_line_id.id
+                if not vals.get("payment_method_line_id"):
+                    vals["payment_method_line_id"] = payment_mode and payment_mode.payment_method_line_id.id
+                if not vals.get("journal_id"):
+                    vals["journal_id"] = payment_mode and payment_mode.journal_id.id
 
         return super().create(vals_list)

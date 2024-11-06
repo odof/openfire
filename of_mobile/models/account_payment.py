@@ -77,6 +77,8 @@ class AccountPayment(models.Model):
                 "amount": amount,
                 "date": date,
                 "partner_id": partner.id,
+                "journal_id": mode.journal_id.id,
+                "payment_method_line_id": mode.payment_method_line_id.id,
                 "of_payment_mode_id": mode.id,
                 "of_intervention_id": intervention.id,
                 "of_type": ttype,
@@ -102,6 +104,7 @@ class AccountPayment(models.Model):
             .with_context(
                 active_model="account.move",
                 active_ids=invoices.ids,
+                default_of_payment_mode_id=mode.id,
                 default_journal_id=mode.journal_id.id,
                 default_partner_id=partner.id,
                 default_amount=amount,
