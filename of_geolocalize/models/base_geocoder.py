@@ -26,7 +26,7 @@ class GeoCoder(models.AbstractModel):
             return None
         url = "https://nominatim.openstreetmap.org/search"
         try:
-            headers = {"User-Agent": "Odoo (http://www.odoo.com/contactus)"}
+            headers = {"User-Agent": "OpenFire (https://openfire.fr/contact)"}
             response = requests.get(
                 url,
                 headers=headers,
