@@ -1382,8 +1382,20 @@ class SaleOrderLine(models.Model):
                 else:
                     sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)
                     vals['sequence'] = sequence + 1
-
-        return super(SaleOrderLine, self).write(vals)
+        res = super(SaleOrderLine, self).write(vals)
+        if 'product_id' in vals and 'purchase_price' not in vals:
+            has_group = self.env.user.has_group('of_sale.group_of_can_modify_sale_purchase_price')
+            if not has_group:
+                for order_line in self:
+                    order = order_line.order_id
+                    product = self.env['product.product'].browse(vals['product_id'])
+                    product_uom = (
+                        'product_uom' in vals
+                        and self.env['product.uom'].browse(vals['product_uom'])
+                        or order_line.product_uom
+                    )
+                    order_line.purchase_price = order_line._compute_margin(order, product, product_uom)
+        return res
 
     @api.multi
     def _additionnal_tax_verifications(self):
