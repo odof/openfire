@@ -201,7 +201,7 @@ class OFContractInvoicingWizard(models.TransientModel):
                 intervention_id = False
                 last_invoicing_date = line.last_invoicing_date
                 next_date = line.next_date
-                while next_date and next_date < date_stop:
+                while next_date and next_date <= date_stop:
                     if line.frequency_type == 'date':
                         intervention_id = self._get_intervention_from_last_invoicing_date_date(
                             line, last_invoicing_date)
