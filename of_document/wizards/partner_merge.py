@@ -19,11 +19,25 @@ class MergePartnerAutomatic(models.TransientModel):
                 src_partner_dir = dms_dir_obj.search([('of_partner_id', '=', src_partner.id)])
                 if src_partner_dir:
                     # Move DMS files into top dst partner DMS directory
-                    src_partner_dir.files.write({'directory': top_partner_dir.id,
-                                                 'of_attachment_partner_id': dst_partner.id})
+                    to_process = [(src_partner_dir, top_partner_dir)]
+                    to_unlink = dms_dir_obj
+                    while to_process:
+                        src_dir, dest_dir = to_process.pop(0)
+                        to_unlink += src_dir
+                        src_dir.files.write({
+                            'directory': dest_dir.id,
+                            'of_attachment_partner_id': dst_partner.id})
+                        for sub_src_dir in src_dir.child_directories:
+                            if not dms_file_obj.search([('directory', 'child_of', sub_src_dir.id)], limit=1):
+                                continue
+                            sub_dest_dir = dest_dir.child_directories.filtered(lambda d: d.name == sub_src_dir.name)
+                            if sub_dest_dir:
+                                to_process.append((sub_src_dir, sub_dest_dir))
+                            else:
+                                sub_src_dir.parent_directory = dest_dir
 
-                    # Delete src partner DMS directory
-                    src_partner_dir.unlink()
+                    # Delete src partner DMS directories
+                    to_unlink.unlink()
                 else:
                     dms_file_obj.search([('of_attachment_partner_id', '=', src_partner.id)])\
                         .write({'directory': top_partner_dir.id, 'of_attachment_partner_id': dst_partner.id})
