@@ -1552,18 +1552,24 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def action_intervention_send(self):
+        """ Open a window to compose an email, with the intervention report template
+            message loaded by default
+        """
         self.ensure_one()
         ir_model_data = self.env['ir.model.data']
         try:
             compose_form_id = ir_model_data.get_object_reference('mail', 'email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
+        template = self.env.ref('of_planning.email_template_of_planning_intervention_rapport_intervention', False)
         ctx = dict()
         ctx.update({
             'default_model': 'of.planning.intervention',
             'default_res_id': self.ids[0],
             'default_composition_mode': 'comment',
             'force_attachment': True,
+            'default_use_template': bool(template),
+            'default_template_id': template and template.id or False,
         })
         return {
             'type': 'ir.actions.act_window',
