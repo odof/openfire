@@ -53,7 +53,7 @@ class CalendarEvent(models.Model):
         comodel_name="account.payment", string="Intervention Payment", compute="_compute_of_payment"
     )
 
-    of_additional_sale_order_id = fields.Many2one(comodel_name="sale.order", string="Additional Sale")
+    of_additional_sale_order_id = fields.Many2one(comodel_name="sale.order", string="Additional Sale", copy=False)
     of_payment_sale = fields.Many2one(
         comodel_name="account.payment", string="Sale Payment", compute="_compute_of_payment"
     )
