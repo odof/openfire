@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
 from dateutil.relativedelta import relativedelta
+
+from odoo import api, fields, models
 
 
 class OfPlanningPlannification(models.AbstractModel):
@@ -19,7 +20,9 @@ class OfPlanningPlannification(models.AbstractModel):
     nbr_interv = fields.Integer(
         required=False, compute='_compute_nbr_interv', string="Nombre de visites",
         help=u"Nombre de RDV d'interventions dans l'année", store=True)
-    interv_frequency_nbr = fields.Integer(string=u"Interval de fréquence (RDV)", required=True)
+    interv_frequency_nbr = fields.Integer(
+        string=u"Interval de fréquence (RDV)", track_visibility='onchange', required=True
+    )
     interv_frequency = fields.Selection(selection=[
         ('month', 'Mois'),
         ('year', 'Ans'),

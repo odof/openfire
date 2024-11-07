@@ -81,7 +81,11 @@ class OfContract(models.Model):
         required=True
     )
     recurring_invoicing_payment_id = fields.Many2one(
-        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True)
+        'of.contract.recurring.invoicing.payment',
+        string="Type de facturation",
+        track_visibility='onchange',
+        required=True,
+    )
     journal_id = fields.Many2one(
         'account.journal', string='Journal', default=lambda s: s._default_journal(),
         domain="[('type', '=', 'sale'),('company_id', '=', company_id)]")
@@ -95,9 +99,11 @@ class OfContract(models.Model):
         'res.company', string=u'Société', required=True,
         default=lambda self: self.env.context.get('company_id', self.env.user.company_id.id))
     date_souscription = fields.Date(string=u'Date de souscription', default=fields.Date.context_today, required=True)
-    date_start = fields.Date(string=u'Date de début', default=fields.Date.context_today, required=True)
+    date_start = fields.Date(
+        string=u'Date de début', default=fields.Date.context_today, required=True, track_visibility='onchange'
+    )
     period = fields.Integer(string=u"Période d'activité", required=True, default=12, readonly=True)
-    date_end = fields.Date(string='Date de fin')
+    date_end = fields.Date(string='Date de fin', track_visibility='onchange')
     recurring_next_date = fields.Date(
         string='Date de la prochaine facture', compute='_compute_recurring_next_date',
         search='_search_recurring_next_date')
@@ -118,8 +124,12 @@ class OfContract(models.Model):
         comodel_name='of.planning.intervention', inverse_name='contract_id', string="RDV(s) d'intervention")
     is_invoiceable = fields.Boolean(compute="_compute_is_invoiceable")
     current_period_id = fields.Many2one(
-        comodel_name='of.contract.period', string=u"Période du contrat",
-        compute="_compute_current_period_id", store=True)
+        comodel_name='of.contract.period',
+        string=u"Période du contrat",
+        compute="_compute_current_period_id",
+        store=True,
+        track_visibility='onchange',
+    )
     type = fields.Selection([
             (0, 'Nouveau contrat'),
             (1, 'Renouvellement'),
@@ -135,7 +145,7 @@ class OfContract(models.Model):
         ('in_progress', 'En cours'),
         ('inactive', 'Inactif'),
     ], string=u"État", compute="_compute_state")
-    renewal = fields.Boolean(string="Renouvellement automatique", default=True)
+    renewal = fields.Boolean(string="Renouvellement automatique", track_visibility='onchange', default=True)
     commentaires = fields.Text(string="Commentaires")
     use_index = fields.Boolean(string="Indexer")
     period_ids = fields.One2many(
@@ -803,7 +813,7 @@ class OfContract(models.Model):
 
 class OfContractLine(models.Model):
     _name = 'of.contract.line'
-    _inherit = ["of.form.readonly", "of.planning.plannification"]
+    _inherit = ["mail.thread", "of.form.readonly", "of.planning.plannification"]
     _order = 'line_avenant_id ASC, code_de_ligne DESC'
 
     @api.model_cr_context
@@ -835,17 +845,28 @@ class OfContractLine(models.Model):
         ('initial', 'Initiale'),
         ('avenant', 'Avenant')
         ], string="Type", readonly=True, default='initial', required=True)
-    frequency_type = fields.Selection([
-        ('date', u'À la prestation'),
-        ('month', 'Mensuelle'),
-        ('trimester', u'Trimestrielle'),  # Tout les 3 mois
-        ('semester', u'Semestrielle'),  # 2 fois par ans
-        ('year', u'Annuelle'),
-        ], default='month', string=u"Fréquence de facturation", required=True)
+    frequency_type = fields.Selection(
+        [
+            ('date', u'À la prestation'),
+            ('month', 'Mensuelle'),
+            ('trimester', u'Trimestrielle'),  # Tout les 3 mois
+            ('semester', u'Semestrielle'),  # 2 fois par ans
+            ('year', u'Annuelle'),
+        ],
+        default='month',
+        string=u"Fréquence de facturation",
+        track_visibility='onchange',
+        required=True,
+    )
     recurring_invoicing_payment_id = fields.Many2one(
-        'of.contract.recurring.invoicing.payment', string="Type de facturation", required=True,
+        'of.contract.recurring.invoicing.payment',
+        string="Type de facturation",
+        track_visibility='onchange',
+        required=True,
         default=lambda s: s.env.ref(
-            'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False))
+            'of_contract_custom.of_contract_recurring_invoicing_payment_pre-paid', raise_if_not_found=False
+        ),
+    )
 
     next_date = fields.Date(string="Prochaine facturation", compute="_compute_dates", store=True, copy=False)
     old_next_date = fields.Date(string=u"Prochaine facturation (old)", copy=False)
@@ -878,11 +899,18 @@ class OfContractLine(models.Model):
         'res.partner', string=u"Adresse de pose", related="parc_installe_id.site_adresse_id", readonly=True)
     parc_installe_note = fields.Text(string=u"Note", related="parc_installe_id.note", readonly=True)
     recurring_interval = fields.Integer(string=u'Répéter chaque', default=1)
-    state = fields.Selection([
-        ('draft', 'Brouillon'),
-        ('validated', u'Validée'),
-        ('cancel', u'Annulée'),
-    ], string=u"État", copy=False, required=True, default='draft')
+    state = fields.Selection(
+        [
+            ('draft', 'Brouillon'),
+            ('validated', u'Validée'),
+            ('cancel', u'Annulée'),
+        ],
+        string=u"État",
+        copy=False,
+        track_visibility='onchange',
+        required=True,
+        default='draft',
+    )
 
     company_currency_id = fields.Many2one(
         'res.currency', related='contract_id.company_id.currency_id', string=u"Devise société", readonly=True)
@@ -1757,7 +1785,6 @@ class OfContractLine(models.Model):
                 if interventions:
                     return interventions.mapped('service_id')
         return False
-
 
 class OfContractProduct(models.Model):
     _name = 'of.contract.product'
