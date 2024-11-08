@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_picking_form_view" model="ir.ui.view">
+        <field name="name">stock.picking.form.view</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="before">
+                <button name="action_replenish_all" attrs="{'invisible': [('show_check_availability', '=', False)]}" string="Approvisionner" type="object" groups="base.group_user" confirm="Vous allez approvisionner toutes les lignes qui peuvent l'être. Êtes-vous certain ?"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']//field[@name='state']" position="replace"/>
+            <xpath expr="//button[@name='action_show_details']" position="before">
+                <field name="replenished" readonly="1"/>
+                <field name="state" readonly="1"  widget="badge" optional="show" decoration-danger="state=='cancel'" decoration-info="state== 'assigned'" decoration-muted="state == 'draft'" decoration-success="state == 'done'" decoration-warning="state not in ('draft','cancel','done','assigned')"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
