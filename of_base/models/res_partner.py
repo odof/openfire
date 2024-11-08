@@ -81,6 +81,7 @@ def convert_phone_number(value, default_country_code=None, new_format="e164", st
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
+    of_company_name = fields.Char(string="Company name")
     name = fields.Char(tracking=True)
     street = fields.Char(tracking=True)
     street2 = fields.Char(tracking=True)
@@ -106,6 +107,19 @@ class ResPartner(models.Model):
         compute="_compute_of_potential_duplication",
         search="_search_of_potential_duplication",
     )
+
+    # --------------------------------------------------------------------------
+    # Compute methods
+    # --------------------------------------------------------------------------
+
+    @api.depends("firstname", "lastname", "of_company_name", "is_company")
+    def _compute_name(self):
+        """Write the 'name' field according to splitted data."""
+        for record in self:
+            if record.is_company:
+                record.name = record.of_company_name
+            else:
+                record.name = record._get_computed_name(record.lastname, record.firstname)
 
     def _compute_old_phone_fields(self):
         default_country_code = self._get_default_country_code()
@@ -135,28 +149,6 @@ class ResPartner(models.Model):
             last_order = self.env["sale.order"].search([("partner_id", "=", partner.id)], order="id desc", limit=1)
             partner.of_last_order_date = last_order.date_order if last_order else False
 
-    def _get_default_country_code(self):
-        user = self.env.user
-        default_country = user.country_id or user.company_id.country_id
-        return default_country and default_country.code or "FR"
-
-    def _of_set_number(self, number_field, number_type):
-        default_country_code = self._get_default_country_code()
-        for rec in self:
-            number = convert_phone_number(rec[number_field], default_country_code, strict=True)
-            if not number:
-                country_code = rec.country_id and rec.country_id.code or default_country_code
-                number = convert_phone_number(rec[number_field], country_code)
-            # Ne rien faire si le numéro est déjà présent
-            if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
-                continue
-            # On remplace la valeur actuelle s'il y en a une
-            if number and (current_phone := rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)):
-                rec.of_phone_number_ids = [Command.update(current_phone[0].id, {"number": number})]
-            # Sinon on crée le nouveau numéro si la valeur est non vide
-            elif number:
-                rec.of_phone_number_ids = [Command.create({"number": number, "type": number_type})]
-
     def _inverse_phone(self):
         for rec in self:
             if rec.of_phone_number_ids.filtered(
@@ -185,139 +177,6 @@ class ResPartner(models.Model):
     def _search_of_phone_error(self, operator, value):
         partners = self.env["of.res.partner.phone"].search([("is_valid", operator, not value)]).mapped("partner_id")
         return [("id", "in", partners.ids)]
-
-    # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
-    def _display_address(self, without_company=False):
-        """
-        The purpose of this function is to build and return an address formatted accordingly to the
-        standards of the country where it belongs.
-
-        :param address: browse record of the res.partner to format
-        :returns: the address formatted in a display that fit its country habits (or the default ones
-            if not country is specified)
-        :rtype: string
-        """
-        # get the information that will be injected into the display format
-        # get the address format
-        address_format = (
-            self.country_id.address_format or "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"
-        )  # Ligne changée par OpenFire
-        args = {
-            "state_code": self.state_id.code or "",
-            "state_name": self.state_id.name or "",
-            "country_code": self.country_id.code or "",
-            "country_name": self.country_id.name or "",
-            "company_name": self.commercial_company_name or "",
-        }
-        for field in self._address_fields():
-            args[field] = getattr(self, field) or ""
-        if without_company:
-            args["company_name"] = ""
-        elif self.commercial_company_name:
-            address_format = "%(company_name)s\n" + address_format
-        return address_format % args
-
-    # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
-    @api.model
-    def name_search(self, name="", args=None, operator="ilike", limit=100):
-        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(
-            name=name, args=args, operator=operator, limit=limit
-        )
-
-    def name_get(self):
-        """Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent"""
-        name = self._rec_name
-        if (
-            self._context.get("of_show_address_line")
-            and name in self._fields
-            and self.env["ir.config_parameter"].sudo().get_param("of.partner.display_city")
-        ):
-            convert = self._fields[name].convert_to_display_name
-            result = [
-                (
-                    record.id,
-                    f"{convert(record[name], record)}{''.join([' (', record.city, ')']) if record.city else ''}",
-                )
-                for record in self
-            ]
-
-        elif self._context.get("show_email"):
-            result = []
-            for partner in self:
-                name = partner.name or ""
-                if partner.email:
-                    name = f"{partner.email} <{name}>"
-                result.append((partner.id, name))
-        else:
-            result = super().name_get()
-        return result
-
-    @api.model
-    def _get_default_image(self, partner_type, is_company, parent_id):
-        # Réécriture de la fonction Odoo pour retirer la couleur de fond aléatoire
-        # Ainsi, chaque nouveau partenaire a les mêmes image/image_medium/image_small
-        # Ce qui évite de surcharger le filestore
-        if getattr(threading.currentThread(), "testing", False) or self._context.get("install_mode"):
-            return False
-
-        colorize, img_path, image = False, False, False
-
-        if partner_type in ["other"] and parent_id:
-            parent_image = self.browse(parent_id).image
-            image = parent_image and parent_image.decode("base64") or None
-
-        if not image:
-            if partner_type == "invoice":
-                img_path = get_module_resource("base", "static/src/img", "money.png")
-            elif partner_type == "delivery":
-                img_path = get_module_resource("base", "static/src/img", "truck.png")
-            elif is_company:
-                img_path = get_module_resource("base", "static/src/img", "company_image.png")
-            else:
-                img_path = get_module_resource("base", "static/src/img", "avatar.png")
-                colorize = True
-
-        if img_path:
-            with open(img_path, "rb") as f:
-                image = f.read()
-        if image and colorize:
-            # Un rouge orange, censé rappeler la douce chaleur de la flamme
-            # Dans l'âtre, les soirs d'hiver, quand le vent glacial rugit au-dehors
-            image = tools.image_colorize(image, False, (250, 150, 0))
-
-        return tools.image_resize_image_big(image.encode("base64"))
-
-    @api.model
-    def _add_missing_default_values(self, values):
-        # La référence par défaut est celle du parent.
-        parent_id = values.get("parent_id")
-        if parent_id and isinstance(parent_id, int) and not values.get("ref") and "default_ref" not in self._context:
-            values["ref"] = self.browse(parent_id).ref
-        return super()._add_missing_default_values(values)
-
-    @api.model
-    def _check_no_ref_duplicate(self, ref):
-        if not ref:
-            return True
-        parent_id = False
-        cr = self._cr
-        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = %s", (ref,))
-        while True:
-            ids = set()
-            for iid, pid in cr.fetchall():
-                if pid:
-                    ids.add(pid)
-                elif parent_id:
-                    if iid != parent_id:
-                        raise ValidationError(
-                            _("The customer account number is already in use and must be unique (%s).") % (ref,)
-                        )
-                else:
-                    parent_id = iid
-            if not ids:
-                break
-            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
-        return True
 
     def _compute_of_potential_duplication(self):
         # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
@@ -350,23 +209,36 @@ class ResPartner(models.Model):
             same_phone_ids = [x[0] for x in self._cr.fetchall()]
             return [("id", "in", same_email_ids + same_phone_ids)]
 
-    def check_duplications(self):
-        self.ensure_one()
-        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
-        self = self.sudo()
-        same_email_ids = self.env["res.partner"]
-        if self.email:
-            same_email_ids = self.search([("email", "=", self.email), ("id", "!=", self.id)])
-        same_phone_ids = self.env["res.partner"]
-        if self.of_phone_number_ids:
-            numbers_list = self.of_phone_number_ids.mapped("number")
-            same_phone_ids = (
-                self.env["of.res.partner.phone"]
-                .search([("number", "in", numbers_list), ("partner_id", "!=", self.id)])
-                .mapped("partner_id")
-            )
-        duplication_ids = same_email_ids | same_phone_ids
-        return duplication_ids.ids if duplication_ids else False
+    # --------------------------------------------------------------------------
+    # ORM methods
+    # --------------------------------------------------------------------------
+
+    # Pour afficher dans le menu déroulant du choix de partenaire l'adresse du contact et pas que le nom.
+    @api.model
+    def name_search(self, name="", args=None, operator="ilike", limit=100):
+        return super(ResPartner, self.with_context(of_show_address_line=True)).name_search(
+            name=name, args=args, operator=operator, limit=limit
+        )
+
+    def _get_name(self):
+        """Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent"""
+        name = super()._get_name()
+        if (
+            not self._context.get("show_address")
+            and self._context.get("of_show_address_line")
+            and self.env["ir.config_parameter"].sudo().get_param("of.partner.display_city")
+            and self.city
+        ):
+            name = "%s (%s)" % (name, self.city)
+        return name.strip()
+
+    @api.model
+    def _add_missing_default_values(self, values):
+        # La référence par défaut est celle du parent.
+        parent_id = values.get("parent_id")
+        if parent_id and isinstance(parent_id, int) and not values.get("ref") and "default_ref" not in self._context:
+            values["ref"] = self.browse(parent_id).ref
+        return super()._add_missing_default_values(values)
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -398,25 +270,6 @@ class ResPartner(models.Model):
                 else:
                     partner.ref = str(partner.id)
         return partners
-
-    @api.model
-    def _update_refs(self, new_ref, partner_refs):
-        # Avant de mettre a jour les enfants, on vérifie que les partenaires avec cette référence ont bien tous
-        # un parent commun
-        self._check_no_ref_duplicate(new_ref)
-
-        to_update_ids = []
-        while partner_refs:
-            partner, old_ref = partner_refs.pop()
-            for child in partner.child_ids:
-                if child.ref == old_ref:
-                    # La reference du contact était la même que celle du parent, on met à jour et on continue
-                    # le parcours
-                    to_update_ids.append(child.id)
-                    partner_refs.append((child, old_ref))
-        if to_update_ids:
-            self.env["res.partner"].browse(to_update_ids).write({"ref": new_ref})
-        return True
 
     def write(self, vals):
         # Email field validation
@@ -468,13 +321,13 @@ class ResPartner(models.Model):
                 partner.ref = f"{str(partner.id)}-{i}"
         return res
 
-    # Permet à l'auteur du mail de le recevoir en copie.
     def _notify(self, message, force_send=False, send_after_commit=True, user_signature=True):
+        """`_notify` override to prevent the removal of the author of the mail as a recipient."""
         message_sudo = message.sudo()
         email_channels = message.channel_ids.filtered(lambda channel: channel.email_send)
         # Auparavant, Odoo éliminait l'auteur du mail comme destinataire.
         # On empêche cette éliminination et l'appel du super ajoute les autres destinataires.
-        if self._context.get("mail_notify_author"):
+        if self.env.context.get("mail_notify_author"):
             self.sudo().search(
                 [
                     "|",
@@ -487,3 +340,156 @@ class ResPartner(models.Model):
                 message, force_send=force_send, send_after_commit=send_after_commit, user_signature=user_signature
             )
         return super()._notify(message, force_send, send_after_commit, user_signature)
+
+    # --------------------------------------------------------------------------
+    # Business methods
+    # --------------------------------------------------------------------------
+
+    def _get_default_country_code(self):
+        user = self.env.user
+        default_country = user.country_id or user.company_id.country_id
+        return default_country and default_country.code or "FR"
+
+    def _of_set_number(self, number_field, number_type):
+        default_country_code = self._get_default_country_code()
+        for rec in self:
+            number = convert_phone_number(rec[number_field], default_country_code, strict=True)
+            if not number:
+                country_code = rec.country_id and rec.country_id.code or default_country_code
+                number = convert_phone_number(rec[number_field], country_code)
+            # Ne rien faire si le numéro est déjà présent
+            if rec.of_phone_number_ids.filtered(lambda p: p.number == number):
+                continue
+            # On remplace la valeur actuelle s'il y en a une
+            if number and (current_phone := rec.of_phone_number_ids.filtered(lambda p: p.type == number_type)):
+                rec.of_phone_number_ids = [Command.update(current_phone[0].id, {"number": number})]
+            # Sinon on crée le nouveau numéro si la valeur est non vide
+            elif number:
+                rec.of_phone_number_ids = [Command.create({"number": number, "type": number_type})]
+
+    # Pour afficher l'adresse au format français par défaut quand le pays n'est pas renseigné et non le format US
+    def _display_address(self, without_company=False):
+        """
+        The purpose of this function is to build and return an address formatted accordingly to the
+        standards of the country where it belongs.
+
+        :param address: browse record of the res.partner to format
+        :returns: the address formatted in a display that fit its country habits (or the default ones
+            if not country is specified)
+        :rtype: string
+        """
+        # get the information that will be injected into the display format
+        # get the address format
+        address_format = (
+            self.country_id.address_format or "%(street)s\n%(street2)s\n%(zip)s %(city)s\n%(country_name)s"
+        )  # Ligne changée par OpenFire
+        args = {
+            "state_code": self.state_id.code or "",
+            "state_name": self.state_id.name or "",
+            "country_code": self.country_id.code or "",
+            "country_name": self.country_id.name or "",
+            "company_name": self.commercial_company_name or "",
+        }
+        for field in self._address_fields():
+            args[field] = getattr(self, field) or ""
+        if without_company:
+            args["company_name"] = ""
+        elif self.commercial_company_name:
+            address_format = "%(company_name)s\n" + address_format
+        return address_format % args
+
+    @api.model
+    def _get_default_image(self, partner_type, is_company, parent_id):
+        # Réécriture de la fonction Odoo pour retirer la couleur de fond aléatoire
+        # Ainsi, chaque nouveau partenaire a les mêmes image/image_medium/image_small
+        # Ce qui évite de surcharger le filestore
+        if getattr(threading.currentThread(), "testing", False) or self._context.get("install_mode"):
+            return False
+
+        colorize, img_path, image = False, False, False
+
+        if partner_type in ["other"] and parent_id:
+            parent_image = self.browse(parent_id).image
+            image = parent_image and parent_image.decode("base64") or None
+
+        if not image:
+            if partner_type == "invoice":
+                img_path = get_module_resource("base", "static/src/img", "money.png")
+            elif partner_type == "delivery":
+                img_path = get_module_resource("base", "static/src/img", "truck.png")
+            elif is_company:
+                img_path = get_module_resource("base", "static/src/img", "company_image.png")
+            else:
+                img_path = get_module_resource("base", "static/src/img", "avatar.png")
+                colorize = True
+
+        if img_path:
+            with open(img_path, "rb") as f:
+                image = f.read()
+        if image and colorize:
+            # Un rouge orange, censé rappeler la douce chaleur de la flamme
+            # Dans l'âtre, les soirs d'hiver, quand le vent glacial rugit au-dehors
+            image = tools.image_colorize(image, False, (250, 150, 0))
+
+        return tools.image_resize_image_big(image.encode("base64"))
+
+    @api.model
+    def _check_no_ref_duplicate(self, ref):
+        if not ref:
+            return True
+        parent_id = False
+        cr = self._cr
+        cr.execute("SELECT id,parent_id FROM res_partner WHERE ref = %s", (ref,))
+        while True:
+            ids = set()
+            for iid, pid in cr.fetchall():
+                if pid:
+                    ids.add(pid)
+                elif parent_id:
+                    if iid != parent_id:
+                        raise ValidationError(
+                            _("The customer account number is already in use and must be unique (%s).") % (ref,)
+                        )
+                else:
+                    parent_id = iid
+            if not ids:
+                break
+            cr.execute("SELECT id,parent_id FROM res_partner WHERE id IN %s", (tuple(ids),))
+        return True
+
+    def check_duplications(self):
+        self.ensure_one()
+        # On teste l'existence de doublons potentiels basés sur l'email ou les numéros de téléphone
+        self = self.sudo()
+        same_email_ids = self.env["res.partner"]
+        if self.email:
+            same_email_ids = self.search([("email", "=", self.email), ("id", "!=", self.id)])
+        same_phone_ids = self.env["res.partner"]
+        if self.of_phone_number_ids:
+            numbers_list = self.of_phone_number_ids.mapped("number")
+            same_phone_ids = (
+                self.env["of.res.partner.phone"]
+                .search([("number", "in", numbers_list), ("partner_id", "!=", self.id)])
+                .mapped("partner_id")
+            )
+        duplication_ids = same_email_ids | same_phone_ids
+        return duplication_ids.ids if duplication_ids else False
+
+    @api.model
+    def _update_refs(self, new_ref, partner_refs):
+        # Avant de mettre a jour les enfants, on vérifie que les partenaires avec cette référence ont bien tous
+        # un parent commun
+        self._check_no_ref_duplicate(new_ref)
+
+        to_update_ids = []
+        while partner_refs:
+            partner, old_ref = partner_refs.pop()
+            for child in partner.child_ids:
+                if child.ref == old_ref:
+                    # La reference du contact était la même que celle du parent, on met à jour et on continue
+                    # le parcours
+                    to_update_ids.append(child.id)
+                    partner_refs.append((child, old_ref))
+        if to_update_ids:
+            self.env["res.partner"].browse(to_update_ids).write({"ref": new_ref})
+        return True

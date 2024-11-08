@@ -11,6 +11,7 @@
 
 .o_form_editable {
     .of_phone_table {
+        margin-top: -7px;
         .o_list_view.table {
             tbody > tr {
                 border-bottom: 1px solid;
@@ -26,4 +27,12 @@
             max-width: 90vw;
         }
     }
+}
+
+.o_list_renderer .o_list_table .o_data_row.o_selected_row .o_data_cell.custom_selection .o_field_widget:not(.o_readonly_modifier):not(.o_invisible_modifier) .o_input {
+    padding: 0 5px;
+}
+
+.custom_field .o_list_renderer .o_list_table > thead > tr > :last-child{
+    width: 0px !important;
 }
