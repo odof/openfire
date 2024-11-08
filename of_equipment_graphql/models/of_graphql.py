@@ -6,6 +6,12 @@ from odoo import models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
+from ..graphql.equipment_intervention_report_template_query import EquipmentInterventionReportTemplateQuery
+from ..graphql.equipment_intervention_report_template_type import (
+    EquipmentInterventionReportTemplate,
+    EquipmentInterventionReportTemplateFilterInput,
+    EquipmentInterventionReportTemplateInput,
+)
 from ..graphql.equipment_mutation import EquipmentMutation
 from ..graphql.equipment_query import EquipmentQuery
 from ..graphql.equipment_type import Equipment, EquipmentFilterInput, EquipmentInput
@@ -27,6 +33,10 @@ class OFGraphql(models.AbstractModel):
                 EquipmentMutation,
                 PlanningIntervention,
                 PlanningInterventionInput,
+                EquipmentInterventionReportTemplate,
+                EquipmentInterventionReportTemplateInput,
+                EquipmentInterventionReportTemplateFilterInput,
+                EquipmentInterventionReportTemplateQuery,
             ],
         )
 
