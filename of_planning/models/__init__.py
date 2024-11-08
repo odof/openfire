@@ -21,3 +21,4 @@ from . import of_planning_team
 from . import of_image
 from . import res_config_settings
 from . import mail_activity
+from . import crm_lead

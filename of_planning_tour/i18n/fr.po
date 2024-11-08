@@ -1585,6 +1585,7 @@ msgstr "Téléphone"
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_service_request_view_form_add_button
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.res_partner_view_form
+#: model_terms:ir.ui.view,arch_db:of_planning_tour.crm_lead_view_form
 msgid "Plan Intervention"
 msgstr "Planifier intervention"
 
@@ -1604,6 +1605,7 @@ msgstr "Planifier une intervention"
 #. odoo-python
 #: code:addons/of_planning_tour/models/of_service_request.py:0
 #: code:addons/of_planning_tour/models/res_partner.py:0
+#: code:addons/of_planning_tour/models/crm_lead.py:0
 #, python-format
 msgid "Plan intervention"
 msgstr "Planifier intervention"
