@@ -14,6 +14,7 @@
     ],
     'data': [
         'views/product_views.xml',
+        'views/stock_picking_views.xml',
         'reports/of_purchase_report_views.xml'
     ],
     'installable': True,
