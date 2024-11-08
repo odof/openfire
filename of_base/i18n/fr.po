@@ -72,8 +72,8 @@ msgstr ""
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
-msgid "<b>Address</b>"
-msgstr "<b>Adresse</b>"
+msgid "Address"
+msgstr "Adresse"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form

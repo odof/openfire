@@ -66,7 +66,7 @@
 
             <xpath expr="//span[@name='address_name']" position="replace">
                 <field name="type" attrs="{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)], 'readonly': [('user_ids', '!=', [])]}" class="fw-bold"/>
-                <b>Address</b>
+                <label for="street" string="Address"/>
             </xpath>
 
             <!-- Move City after Zip -->
@@ -76,7 +76,7 @@
 
             <!-- Move Contact's title after Company's type -->
             <xpath expr="//field[@name='company_type']" position="after">
-                <group>
+                <group class="mt-3">
                     <group>
                         <field name="title" options='{"no_open": True}' placeholder="e.g. Mister" attrs="{'invisible': [('is_company', '=', True)]}" style="width: 150%;"/>
                     </group>
