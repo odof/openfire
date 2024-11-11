@@ -282,6 +282,11 @@ msgstr ""
 " activé dans la configuration des interventions."
 
 #. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_sale_order_template__of_intervention_template_id
+msgid "Associated intervention template"
+msgstr "Modèle d'intervention associé"
+
+#. module: of_service
 #: model:ir.model,name:of_service.model_ir_attachment
 msgid "Attachment"
 msgstr "Pièce jointe"
@@ -395,6 +400,11 @@ msgstr "Date de fin de contrat"
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__control_date
 msgid "Control Date"
 msgstr "Date de contrôle"
+
+#. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__sale_order_template__of_service_mgmt__sale
+msgid "Create an SR by sale order"
+msgstr "Créer une DI par bon de commande"
 
 #. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_create_intervention_wizard_view_form
@@ -511,6 +521,11 @@ msgid "Display Name"
 msgstr "Nom affiché"
 
 #. module: of_service
+#: model:ir.model.fields.selection,name:of_service.selection__sale_order_template__of_service_mgmt__no
+msgid "Do not create SR"
+msgstr "Ne pas créer de DI"
+
+#. module: of_service
 #: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state__done
 #: model:ir.model.fields.selection,name:of_service.selection__of_service_request__state_punctual__done
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_search
@@ -594,6 +609,11 @@ msgstr "Champ pour conserver une possibilité de rollback"
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__fiscal_position_id
 msgid "Fiscal Position"
 msgstr "Position fiscale"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_sale_order_template__of_service_mgmt
+msgid "Follow-up of service requests"
+msgstr "Suivi des demandes d'intervention"
 
 #. module: of_service
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__message_follower_ids
@@ -1315,6 +1335,11 @@ msgid "Quantity"
 msgstr "Quantité"
 
 #. module: of_service
+#: model:ir.model,name:of_service.model_sale_order_template
+msgid "Quotation Template"
+msgstr "Modèle de devis"
+
+#. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
 msgid "Recompute all taxes based on this fiscal position"
 msgstr "Recalculer toutes les taxes en fonction de cette position fiscale"
@@ -1904,6 +1929,7 @@ msgstr "Code postal"
 
 #. module: of_service
 #. odoo-python
+#: code:addons/of_service/models/sale_order.py:0
 #: code:addons/of_service/models/sale_order.py:0
 #: code:addons/of_service/models/sale_order.py:0
 #, python-format

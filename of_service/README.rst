@@ -129,6 +129,16 @@ Tags (`of.service.request.tag`)
 * Les **tags** sont **utilisés** pour catégoriser les **interventions/demandes d'interventions**.
 
 
+Modèle de devis (`sale.order.template`)
+---------------------------------------
+
+* Ajout d'un champ **"Suivi des demandes d'intervention"** avec deux sélections possibles :
+    - "Non";
+    - "Créer une DI par bon de commande".
+
+* Ajout d'un champ "Modèle d'intervention associé" pour sélectionner le template à utiliser pour la création de la DI.
+
+
 Commandes
 ---------
 
