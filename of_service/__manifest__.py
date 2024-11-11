@@ -12,6 +12,7 @@
         'of_planning',
         'of_geolocalize',
         'sales_team',
+        'of_sale_management_template',
     ],
     'data': [
         'data/ir_sequence.xml',
@@ -27,6 +28,7 @@
         'views/of_planning_intervention_template_views.xml',
         'views/sale_order_views.xml',
         'views/res_partner_views.xml',
+        'views/sale_order_template_views.xml',
         'views/menuitems.xml',
         'reports/of_service_request_templates.xml',
         'data/mail_template.xml',
