@@ -697,7 +697,7 @@ class OFSurvey(http.Controller):
                 "is_html_empty": is_html_empty,
                 "review": review,
                 "survey": survey_sudo,
-                "answer": answer_sudo.browse(),
+                "answer": answer_sudo,
                 "questions_to_display": answer_sudo._get_print_questions(),
                 "format_datetime": lambda dt: format_datetime(request.env, dt, dt_format=False),
                 "format_date": lambda date: format_date(request.env, date),

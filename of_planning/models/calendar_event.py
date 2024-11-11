@@ -451,7 +451,7 @@ class CalendarEvent(models.Model):
         for event in self:
             if event.of_lead_id and event.of_lead_id.of_survey_user_input_line_ids:
                 web_base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", default="")
-                url = f"/of_survey/{event.of_lead_id.of_survey_id.access_token}/{event.of_lead_id.of_survey_user_input_id.access_token}"
+                url = f"/of_survey/print/{event.of_lead_id.of_survey_id.access_token}?answer_token={event.of_lead_id.of_survey_user_input_id.access_token}"
                 event.of_lead_survey_link = web_base_url + url
             else:
                 event.of_lead_survey_link = False
