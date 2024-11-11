@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="helpdesk_ticket_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.view.form</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='assign_to_me']" position="after">
+                <button name="action_create_lead" type="object" string="Créer Opportunité"/>
+                <button name="action_create_service_request" type="object" string="Créer SAV"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_button_view_lead" type="object" icon="fa-money">
+                    <field string="Opportunités" name="of_lead_count" widget="statinfo"/>
+                </button>
+                <button class="oe_stat_button" name="action_button_view_service_request" type="object" icon="fa-wrench">
+                    <field string="SAV" name="of_service_request_count" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='create_date']" position="before">
+                <field name="of_due_date"/>
+            </xpath>
+            <xpath expr="//field[@name='last_stage_update']" position="before">
+                <xpath expr="//field[@name='create_date']" position="move" />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
