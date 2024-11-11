@@ -47,13 +47,6 @@
                                                         </div>
                                                     </div>
                                                 </t>
-                                                <t t-elif="answer_line.survey_id.scoring_type != 'no_scoring' and question.question_type in = 'date'] and question['answer_%s' % question.question_type]">
-                                                    <div class="row g-0">
-                                                        <div t-attf-class="col-12 col-md-6 col-lg-4 rounded ps-4 'bg-success'">
-                                                            <t t-if="question.question_type == 'date'" t-call="of_survey.question_date"/>
-                                                        </div>
-                                                    </div>
-                                                </t>
                                                 <t t-else="">
                                                     <t t-if="question.question_type == 'text_box'" t-call="of_survey.question_text_box"/>
                                                     <t t-if="question.question_type == 'char_box'" t-call="of_survey.question_char_box"/>
