@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+from odoo import Command, _, api, fields, models, tools
 
 
 class SaleOrder(models.Model):
@@ -80,3 +80,39 @@ class SaleOrder(models.Model):
                 "default_type_id": self.env.ref("of_service.of_service_request_type_installation").id,
             },
         }
+
+    def action_confirm(self):
+        res = super().action_confirm()
+        for order in self:
+            order_template = order.sale_order_template_id
+            if order_template and order_template.of_service_mgmt == "sale":
+                service_request = self.env["of.service.request"].create(
+                    {
+                        "partner_id": order.partner_id.id,
+                        "address_id": order.partner_shipping_id.id,
+                        "template_id": order_template.of_intervention_template_id.id or False,
+                        "task_id": order_template.of_intervention_template_id.task_id.id or False,
+                        "type_id": order_template.of_intervention_template_id.type_id.id,
+                        "fiscal_position_id": order_template.of_intervention_template_id.fiscal_position_id.id
+                        or order.fiscal_position_id.id,
+                        "company_id": order.company_id.id,
+                        "user_id": False,
+                        "duration": order_template.of_intervention_template_id.task_id.duration,
+                        "recurrency": False,
+                        "next_date": order.commitment_date,
+                        "note": tools.html2plaintext(order.of_intervention_notes),
+                        "order_id": order.id,
+                        "origin": _("[Order] %s") % self.name,
+                        "stage_id": self.env.ref("of_service.of_service_request_stage_new").id,
+                    }
+                )
+                lines_to_create = []
+                lines_to_create.extend(
+                    Command.create(line._prepare_request_service_line_vals(service_request))
+                    for line in order_template.of_intervention_template_id.line_ids
+                )
+                if lines_to_create:
+                    service_request.line_ids = lines_to_create
+                    service_request._recompute_taxes()
+                service_request.end_date = service_request._get_end_date()
+        return res
