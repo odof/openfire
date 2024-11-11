@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_request_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.view.form</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='origin']" position="attributes">
+                <attribute name="attrs"/>
+            </xpath>
+            <xpath expr="//field[@name='order_id']" position="after">
+                <field name="ticket_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_service_request_view_search" model="ir.ui.view">
+        <field name="name">of.service.request.view.search</field>
+        <field name="model">of.service.request</field>
+        <field name="inherit_id" ref="of_service.of_service_request_view_search"/>
+        <field name="arch" type="xml">
+            <field name="note" position="after">
+                <field name="ticket_id"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
