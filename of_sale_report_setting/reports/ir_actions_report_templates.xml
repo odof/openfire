@@ -254,6 +254,9 @@
         <xpath expr="//th[@name='th_description']" position="before">
             <th name="th_image" class="text-end" t-if="pdf_print_image_level == 'line'">Image</th>
         </xpath>
+        <xpath expr="//th[@name='th_description']" position="attributes">
+            <attribute name="style">width: 50%;</attribute>
+        </xpath>
 
         <xpath expr="//td[@name='td_name']" position="before">
             <td name="td_image" class="text-center" t-if="pdf_print_image_level == 'line'" style="vertical-align: middle;">
@@ -282,7 +285,7 @@
         </xpath>
 
         <xpath expr="//td[@name='td_section_subtotal']" position="replace">
-            <td name="td_section_subtotal" colspan="99">
+            <!-- <td name="td_section_subtotal" colspan="99">
                 <strong class="mr16">Subtotal Tax Excl.</strong>
                 <span
                     t-out="current_subtotal_taxexcl"
@@ -293,7 +296,7 @@
                     t-out="current_subtotal_taxinc"
                     t-options='{"widget": "monetary", "display_currency": doc.pricelist_id.currency_id}'
                 />
-            </td>
+            </td> -->
         </xpath>
 
         <xpath expr="//td[@name='td_section_line']" position="attributes">
