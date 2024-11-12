@@ -8,6 +8,10 @@ from ..graphql.equipment_intervention_report_template_type import (
     EquipmentInterventionReportTemplate,
     EquipmentInterventionReportTemplateInput,
 )
+from ..graphql.planning_intervention_equipment_link_type import (
+    PlanningInterventionEquipmentLink,
+    PlanningInterventionEquipmentLinkInput,
+)
 
 
 class OFGraphql(models.AbstractModel):
@@ -20,5 +24,7 @@ class OFGraphql(models.AbstractModel):
             [
                 EquipmentInterventionReportTemplate,
                 EquipmentInterventionReportTemplateInput,
+                PlanningInterventionEquipmentLink,
+                PlanningInterventionEquipmentLinkInput,
             ],
         )

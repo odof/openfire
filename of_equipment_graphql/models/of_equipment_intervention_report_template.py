@@ -22,3 +22,8 @@ class OFEquipmentInterventionReportTemplate(models.Model):
                 odoo_domain += [("name", "like", select.name)]
 
         return odoo_domain
+
+    def _prepare_mutation_values(self, **args):
+        mutation = {}
+
+        return mutation
