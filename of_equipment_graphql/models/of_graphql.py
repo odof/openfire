@@ -15,6 +15,12 @@ from ..graphql.equipment_intervention_report_template_type import (
 from ..graphql.equipment_mutation import EquipmentMutation
 from ..graphql.equipment_query import EquipmentQuery
 from ..graphql.equipment_type import Equipment, EquipmentFilterInput, EquipmentInput
+from ..graphql.planning_intervention_equipment_link_mutation import PlanningInterventionEquipmentLinkMutation
+from ..graphql.planning_intervention_equipment_link_type import (
+    PlanningInterventionEquipmentLink,
+    PlanningInterventionEquipmentLinkFilterInput,
+    PlanningInterventionEquipmentLinkInput,
+)
 from ..graphql.planning_intervention_type import PlanningIntervention, PlanningInterventionInput
 
 
@@ -37,6 +43,10 @@ class OFGraphql(models.AbstractModel):
                 EquipmentInterventionReportTemplateInput,
                 EquipmentInterventionReportTemplateFilterInput,
                 EquipmentInterventionReportTemplateQuery,
+                PlanningInterventionEquipmentLink,
+                PlanningInterventionEquipmentLinkInput,
+                PlanningInterventionEquipmentLinkFilterInput,
+                PlanningInterventionEquipmentLinkMutation,
             ],
         )
 
@@ -47,9 +57,11 @@ class OFGraphql(models.AbstractModel):
             "PlanningInterventionMutation": {
                 "planning_intervention_create": {
                     "equipments": graphene.List(graphene.NonNull(EquipmentInput)),
+                    "linkedEquipments": graphene.List(PlanningInterventionEquipmentLinkInput),
                 },
                 "planning_intervention_update": {
                     "equipments": graphene.List(graphene.NonNull(EquipmentInput)),
+                    "linkedEquipments": graphene.List(PlanningInterventionEquipmentLinkInput),
                 },
             }
         }

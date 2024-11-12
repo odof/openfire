@@ -93,13 +93,6 @@ class EquipmentDelete(graphene.Mutation):
     def mutate(self, info, id):
         env = info.context["env"]
 
-        # On va vérifier dans chaque intervention sur cet équipement, s'il n'y a pas d'autres équipements
-        # alors on passe le champ use_equipment à False
-        if equipment := env["calendar.event"].browse(id):
-            for intervention in equipment.intervention_ids:
-                if len(intervention.of_equipment_ids.filtered(lambda r: r.id != equipment.id)) == 0:
-                    intervention.of_use_equipment = False
-
         return lazy_delete(env, "of.equipment", id)
 
 

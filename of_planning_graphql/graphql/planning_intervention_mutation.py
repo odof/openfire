@@ -66,11 +66,12 @@ class PlanningInterventionCreate(graphene.Mutation):
 
     def mutate(self, info, **args):
         env = info.context["env"]
+
         # ici on met origin=WEB par défaut
         if not args.get("origin", False):
             args["origin"] = "WEB"
         values = env["calendar.event"]._prepare_mutation_values(**args)
-        return env["calendar.event"].create(values)
+        return env["calendar.event"].with_context(of_ignore_event_state=True).create(values)
 
 
 class PlanningInterventionUpdate(graphene.Mutation):
@@ -113,16 +114,22 @@ class PlanningInterventionUpdate(graphene.Mutation):
         real_duration = graphene.Float()
         real_start = graphene.DateTime()
         real_stop = graphene.DateTime()
+        keep_relations = graphene.List(graphene.NonNull(graphene.String))
 
     Output = PlanningIntervention
 
     def mutate(self, info, id, **args):
         env = info.context["env"]
-        if not args.get("origin", False):  # ici on met origin=WEB par défaut
+        # on transforme keep_relations en set
+        keep_relations = set(args.get("keep_relations", []))
+        args["keep_relations"] = keep_relations
+
+        # ici on met origin=WEB par défaut
+        if not args.get("origin", False):
             args["origin"] = "WEB"
         values = env["calendar.event"]._prepare_mutation_values(**args)
         intervention = env["calendar.event"].search([("id", "=", id)])
-        intervention.write(values)
+        intervention.with_context(of_ignore_event_state=True).write(values)
         return intervention
 
 
@@ -135,7 +142,7 @@ class PlanningInterventionDelete(graphene.Mutation):
     Output = PlanningIntervention
 
     def mutate(self, info, id):
-        env = info.context["env"]
+        env = info.context["env"].with_context(of_ignore_event_state=True)
 
         return lazy_delete(env, "calendar.event", id)
 
