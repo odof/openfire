@@ -71,7 +71,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='followup']" position="inside">
                     <xpath expr="//field[@name='opportunity_id']" position="move"/>
-                    <field name="of_sale_followup_tag_ids" widget="many2many_tags"/>
+                    <field name="of_sale_followup_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                     <field name="of_info"/>
                 </xpath>
                 <xpath expr="//group[@name='marketing']/field[@name='campaign_id']" position="before">
