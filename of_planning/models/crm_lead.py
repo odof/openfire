@@ -28,11 +28,17 @@ class CrmLead(models.Model):
                     "default_of_lead_id": self.id,
                 }
             )
-            if self.of_intervention_ids:
-                context["search_default_of_lead_id"] = self.id
+            if not self.of_intervention_ids or len(self.of_intervention_ids) > 1:
+                domain = safe_eval(action["domain"]) if action.get("domain") else []
+                domain += [("of_lead_id", "=", self.id)]
+                action["domain"] = domain
+            elif len(self.of_intervention_ids) == 1:
+                form_view = self.env.ref("of_planning.calendar_event_view_form", raise_if_not_found=False)
+                # Put the form view in first position
+                action["views"] = [(form_view and form_view.id or False, "form")] + [
+                    (state, view) for state, view in action.get("views", []) if view != "form"
+                ]
+                action["res_id"] = self.of_intervention_ids.id
             action["context"] = context
-            domain = safe_eval(action["domain"]) if action.get("domain") else []
-            domain += [("of_lead_id", "=", self.id)]
-            action["domain"] = domain
         action = self.mapped("of_intervention_ids")._get_calendar_event_action_views(action)
         return action
