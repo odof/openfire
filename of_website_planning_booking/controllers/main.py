@@ -171,9 +171,13 @@ class OFWebsitePlanningBooking(http.Controller):
         if validated:
             # Demande de RDV confirmée
             template = service = False
-            if values.get("service_id") and values.get("service_id") != "null":
+            if values.get("service_id") and values.get("service_id") != "null" and values.get("service_id") != "false":
                 template = request.env["of.planning.intervention.template"].sudo().browse(int(values["service_id"]))
-            elif values.get("contract_id") and values.get("contract_id") != "null":
+            elif (
+                values.get("contract_id")
+                and values.get("contract_id") != "null"
+                and values.get("contract_id") != "false"
+            ):
                 service = request.env["of.service.request"].sudo().browse(int(values["contract_id"]))
             partner = request.env["res.partner"].sudo().browse(int(values["partner_id"]))
             slot = request.env["of.tour.appointment.line.website.wizard"].browse(int(values["slot_id"]))
@@ -193,10 +197,10 @@ class OFWebsitePlanningBooking(http.Controller):
         template = request.env["of.planning.intervention.template"]
         service = request.env["of.service.request"]
         service_name = ""
-        if values.get("service_id") and values.get("service_id") != "null":
+        if values.get("service_id") and values.get("service_id") != "null" and values.get("service_id") != "false":
             template = request.env["of.planning.intervention.template"].sudo().browse(int(values["service_id"]))
             service_name = template.website_name or template.name
-        elif values.get("contract_id") and values.get("contract_id") != "null":
+        elif values.get("contract_id") and values.get("contract_id") != "null" and values.get("contract_id") != "false":
             service = request.env["of.service.request"].sudo().browse(int(values["contract_id"]))
             service_name = service.template_id.website_name or service.template_id.name or service.name
         partner = request.env["res.partner"].sudo().browse(int(values["partner_id"]))

@@ -13,7 +13,7 @@
                 <field name="of_resource_id" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='of_sector_id']" position="after">
-                <field name="of_travel_duration" widget="float_time" groups="base.group_no_one"/>
+                <field name="of_travel_duration" widget="float_time"/>
             </xpath>
         </field>
     </record>

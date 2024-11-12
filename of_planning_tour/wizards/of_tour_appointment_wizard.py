@@ -890,6 +890,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_order_id": order_id,
             "of_picking_manual_ids": len(picking_list) == 1 and picking_list[0] or False,
             "of_type": "intervention",
+            "of_type_id": template.type_id.id,
             "of_lead_id": self.lead_id.id,
         }
         if self.intervention_id:
