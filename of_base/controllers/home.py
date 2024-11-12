@@ -2,6 +2,7 @@
 
 from odoo import SUPERUSER_ID, http
 from odoo.http import request
+from odoo.service import security
 
 from odoo.addons.web.controllers.home import Home
 
@@ -26,3 +27,16 @@ class OFHome(Home):
             return request.redirect("/web/session/logout?redirect=/", 303)
         context = request.env["ir.http"].webclient_rendering_context()
         return request.render("of_base.inactive_user", qcontext=context)
+
+    @http.route("/web/become", type="http", auth="user", sitemap=False)
+    def switch_to_admin(self):
+        """Override the method to ensure that only `Admin` user can switch to `Superuser` and not any other user with
+        Administrator access."""
+        uid = request.env.user.id
+        if request.env.user._is_system() and request.env.user.id == request.env.ref("base.user_admin").id:
+            uid = request.session.uid = SUPERUSER_ID
+            # invalidate session token cache as we've changed the uid
+            request.env["res.users"].clear_caches()
+            request.session.session_token = security.compute_session_token(request.session, request.env)
+
+        return request.redirect(self._login_redirect(uid))
