@@ -71,6 +71,10 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='followup']" position="inside">
                     <xpath expr="//field[@name='opportunity_id']" position="move"/>
+                    <field name="of_show_update_salesman" invisible="1"/>
+                    <div colspan="2" attrs="{'invisible': [('of_show_update_salesman', '=', False)]}" role="alert" class="alert alert-info">
+                        The salesperson and prospector from the quote have been replaced by those from the selected opportunity.
+                    </div>
                     <field name="of_sale_followup_tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                     <field name="of_info"/>
                 </xpath>
