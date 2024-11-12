@@ -3,11 +3,13 @@
 from datetime import datetime, timedelta
 
 from odoo import api, fields, models, tools
+from odoo.tools.safe_eval import safe_eval
 
 
 class HelpdeskTicket(models.Model):
     _inherit = "helpdesk.ticket"
 
+    description = fields.Html(required=False)
     of_lead_ids = fields.One2many(comodel_name="crm.lead", inverse_name="of_ticket_id", string="Opportunités")
     of_lead_count = fields.Integer(string="# Opportunités", compute="_compute_of_lead_count")
     of_service_request_ids = fields.One2many(
@@ -34,7 +36,7 @@ class HelpdeskTicket(models.Model):
 
     def action_button_view_lead(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("crm.crm_lead_all_leads")
+        action = self.env["ir.actions.actions"]._for_xml_id("crm.crm_lead_opportunities")
         action["context"] = {
             "default_name": self.name,
             "default_type": "opportunity",
@@ -47,7 +49,9 @@ class HelpdeskTicket(models.Model):
         }
         # Choose the view_mode accordingly
         if not self.of_lead_ids or len(self.of_lead_ids) > 1:
-            action["domain"] = [("id", "in", self.of_lead_ids.ids)]
+            domain = safe_eval(action["domain"]) if action.get("domain") else []
+            domain += [("of_ticket_id", "=", self.id)]
+            action["domain"] = domain
         elif len(self.of_lead_ids) == 1:
             form_view = self.env.ref("crm.crm_lead_view_form", raise_if_not_found=False)
             # Put the form view in first position
@@ -81,7 +85,9 @@ class HelpdeskTicket(models.Model):
         }
         # Choose the view_mode accordingly
         if not self.of_service_request_ids or len(self.of_service_request_ids) > 1:
-            action["domain"] = [("id", "in", self.of_service_request_ids.ids)]
+            domain = safe_eval(action["domain"]) if action.get("domain") else []
+            domain += [("ticket_id", "=", self.id)]
+            action["domain"] = domain
         elif len(self.of_service_request_ids) == 1:
             form_view = self.env.ref("of_service.of_service_request_view_form", raise_if_not_found=False)
             # Put the form view in first position
@@ -102,6 +108,7 @@ class HelpdeskTicket(models.Model):
                 "user_id": False,
                 "of_canvasser_id": self.user_id.id,
                 "description": self.description,
+                "company_id": self.company_id.id,
                 "medium_id": 11,
             }
         )
