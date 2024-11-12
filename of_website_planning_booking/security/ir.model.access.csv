@@ -13,4 +13,4 @@ access_of_tour_appointment_line_wizard_public,access.of.tour.appointment.line.wi
 access_of_tour_appointment_line_wizard_portal,access.of.tour.appointment.line.wizard.portal,of_planning_tour.model_of_tour_appointment_line_wizard,base.group_portal,1,1,1,1
 access_of_tour_appointment_line_website_wizard_public,access.of.tour.appointment.line.website.wizard.public,model_of_tour_appointment_line_website_wizard,base.group_public,1,1,1,1
 access_of_tour_appointment_line_website_wizard_portal,access.of.tour.appointment.line.website.wizard.portal,model_of_tour_appointment_line_website_wizard,base.group_portal,1,1,1,1
-access_of_tour_appointment_line_website_wizard_portal,access.of.tour.appointment.line.website.wizard.portal,model_of_tour_appointment_line_website_wizard,base.group_user,1,1,1,1
+access_of_tour_appointment_line_website_wizard_user,access.of.tour.appointment.line.website.wizard.user,model_of_tour_appointment_line_website_wizard,base.group_user,1,1,1,1
