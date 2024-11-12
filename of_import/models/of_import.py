@@ -1480,14 +1480,18 @@ class OfImport(models.Model):
             erreur(u"Ligne %s : modèle non reconnu : %s" % (i, ligne['res_model']))
         else:
             res_name = ligne.get('res_id', '')
-            res_obj = self.env[res_model]
-            res_obj_name_search = res_obj.with_context(active_test=False).name_search(res_name, operator='=', limit=2)
-            if not res_obj_name_search:
+            res_obj = self.env[res_model].with_context(active_test=False)
+
+            champ_reference = self.get_model_data().get(res_model, {}).get('champ_reference')
+            if champ_reference:
+                res_obj = res_obj.search([(champ_reference, '=', res_name)], limit=2)
+            if not res_obj:
+                res_obj = res_obj.browse([r[0] for r in res_obj.name_search(res_name, operator='=', limit=2)])
+
+            if not res_obj:
                 erreur(u"Ligne %s : aucun résultat trouvé pour : %s" % (i, res_name))
-            elif len(res_obj_name_search) > 1:
+            elif len(res_obj) > 1:
                 erreur(u"Ligne %s : plusieurs résultats trouvés pour : %s" % (i, res_name))
-            else:
-                res_obj = res_obj.browse(res_obj_name_search[0][0])
 
         res_field = ligne.get('res_field') or False
         if res_field and res_obj is not False and res_field not in res_obj._fields:
@@ -1566,16 +1570,9 @@ class OfImport(models.Model):
                 self._cr.commit()
         return code, message, warnings
 
-    @api.multi
-    def importer(self, simuler=True):
-
-        # VARIABLES DE CONFIGURATION
-
-        frequence_commit = 100  # Enregistrer (commit) tous les n enregistrements
-
-        model = self.type_import  # On récupère l'objet (model) à importer indiqué dans le champ type d'import
-
-        model_data = {
+    @api.model
+    def get_model_data(self):
+        return {
             'product.template': {
                 # Libellé pour affichage dans message information/erreur
                 'nom_objet': u'Article',
@@ -1649,7 +1646,18 @@ class OfImport(models.Model):
                 # pour ajout du préfixe devant
                 'champ_reference': 'of_ref',
             },
-        }[model]
+        }
+
+    @api.multi
+    def importer(self, simuler=True):
+
+        # VARIABLES DE CONFIGURATION
+
+        frequence_commit = 100  # Enregistrer (commit) tous les n enregistrements
+
+        model = self.type_import  # On récupère l'objet (model) à importer indiqué dans le champ type d'import
+
+        model_data = self.get_model_data()[model]
         model_data['model'] = model
 
         # Initialisation variables
