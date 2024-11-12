@@ -4,3 +4,4 @@ from . import of_graphql
 from . import calendar_event
 from . import of_equipment
 from . import of_equipment_intervention_report_template
+from . import of_calendar_event_equipment_link

@@ -6,17 +6,29 @@ import logging
 import graphene
 
 from odoo import Command
-from odoo.exceptions import AccessError
 
 logger = logging.getLogger(__name__)
 
 
+# cette méthode est dépréciée et à terme sera supprimée
+# après la migration  des schemas graphql
 def lazy_delete(env, model, id):
     if record := env[model].search([("id", "=", id)]):
         record.unlink()
         return record
 
     return env[model]
+
+
+def lazy_delete_ids(env, model, ids):
+    # on s'oblige a delete les identifiants un par un car dans
+    # si celui-ci a été supprimé dans le BO, on veut éviter une exception
+    deleted_ids = []
+    for id in ids:
+        if record := env[model].search([("id", "=", id)]):
+            record.unlink()
+            deleted_ids.append(id)
+    return deleted_ids
 
 
 def convertImage(datas):
@@ -37,7 +49,7 @@ def many2one(self, model, input, context=None, user=None):
     obj_values = obj._prepare_mutation_values(**input)
     if input.id:
         if not (record := obj.search([("id", "=", input.id)])):
-            raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
+            return False
         if len(obj_values.keys()) > 0:
             record.write(obj_values)
         return record.id
@@ -68,7 +80,7 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
     if type(input) is not list:
         input = [input]
 
-    if len(input) == 0:
+    if not keep and len(input) == 0:
         return [Command.clear()]
 
     for record in input:
@@ -80,7 +92,7 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
             record_value.update(value)
             if record.id:
                 if not obj.search([("id", "=", record.id)]):
-                    raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
+                    continue
                 record = obj.search([("id", "=", record.id)])
                 if len(record_value.keys()) > 0:
                     record.write(record_value)
