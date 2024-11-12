@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_crm.of_crm_of_sale_view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_sale_followup_tag_ids']" position="before">
+                <field name="of_kanban_stage_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_kanban" model="ir.ui.view">
+        <field name="name">sale.order.view.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">of_kanban_stage_id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.view.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_kanban_stage_id" widget="badge" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_quotation_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.quotation.view.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_kanban_stage_id" widget="badge" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

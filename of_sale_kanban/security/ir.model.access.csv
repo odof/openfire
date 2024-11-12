@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_sale_order_kanban_stage_manager,access.of.sale.order.kanban.stage.manager,model_of_sale_order_kanban_stage,sales_team.group_sale_manager,1,1,1,1
+access_of_sale_order_kanban_stage_user,access.of.sale.order.kanban.stage.user,model_of_sale_order_kanban_stage,base.group_user,1,0,0,0
