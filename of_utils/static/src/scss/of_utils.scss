@@ -88,15 +88,15 @@
 }
 
 .of_blue_background {
-    background-color: #f3f0ff;
+    background-color: #e9ecef;
 
     .btn-secondary {
-        background-color: #f3f0ff;
+        background-color: #e9ecef;
     }
 
     &.o_field_many2one .o_external_button {
         &:hover {
-            background-color:  #f3f0ff;
+            background-color:  #e9ecef;
         }
     }
 }
