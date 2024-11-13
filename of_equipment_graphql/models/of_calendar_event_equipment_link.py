@@ -23,6 +23,10 @@ class OFCalendarEventEquipmentLink(models.Model):
         if equipment := args.get("equipment"):
             mutation["equipment_id"] = many2one(self=self, model="of.equipment", input=equipment)
 
-        if "images" in args:
-            mutation["all_image_ids"] = x2many(self=self, model="of.image", input=args.get("images"))
+        if images := args.get("images"):
+            mutation["all_image_ids"] = x2many(self=self, model="of.image", input=images)
+
+        if "report_text" in args:
+            mutation["report_text"] = args["report_text"]
+
         return mutation

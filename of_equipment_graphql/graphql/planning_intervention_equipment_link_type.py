@@ -26,11 +26,11 @@ class PlanningInterventionEquipmentLink(OdooObjectType):
     partner = graphene.Field(Partner)
     site_address = graphene.Field(Partner)
     address = graphene.Field(Partner)
-    equipment = graphene.Field(Equipment, name="equipment")
+    equipment_id = graphene.Field(Equipment, name="equipment")
     task = graphene.Field(PlanningInterventionTask)
     equipment_report_template = graphene.Field(EquipmentInterventionReportTemplate)
-    duration = graphene.Float()
     images = graphene.NonNull(graphene.List(graphene.NonNull(Image)))
+    report_text = graphene.String()
 
     @staticmethod
     def resolve_task(root, info):
@@ -69,8 +69,8 @@ class PlanningInterventionEquipmentLinkInput(graphene.InputObjectType):
     equipment = graphene.Field(EquipmentInput)
     task = graphene.Field(PlanningInterventionTaskInput)
     equipment_report_template = graphene.Field(EquipmentInterventionReportTemplateInput)
-
     images = graphene.List(graphene.NonNull(ImageInput))
+    report_text = graphene.String()
 
 
 class PlanningInterventionEquipmentLinkFilterInput(PlanningInterventionEquipmentLinkInput):
