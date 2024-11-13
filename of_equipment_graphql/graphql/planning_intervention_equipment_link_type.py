@@ -26,7 +26,7 @@ class PlanningInterventionEquipmentLink(OdooObjectType):
     partner = graphene.Field(Partner)
     site_address = graphene.Field(Partner)
     address = graphene.Field(Partner)
-    equipment_id = graphene.Field(Equipment, name="equipment")
+    equipment_id = graphene.Field(Equipment, name="equipment", required=True)
     task = graphene.Field(PlanningInterventionTask)
     equipment_report_template = graphene.Field(EquipmentInterventionReportTemplate)
     images = graphene.NonNull(graphene.List(graphene.NonNull(Image)))
