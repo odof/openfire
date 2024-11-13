@@ -694,22 +694,21 @@
                         </div>
 
                         <!-- Signatures -->
-                        <div t-if="template.report_signature" name="report_signature"
-                            style="page-break-inside: avoid;" class="row">
+                        <div t-if="template.report_signature" name="report_signature" style="page-break-inside: avoid;" class="row">
                             <div class="col-6" style="padding-right: 10px !important;">
                                 <strong>Operator Signature</strong>
                                 <div name="operator_signature" class="border" style="height: 180px;" align="center">
-                                    <t t-if="doc.of_operator_signature">
-                                        <span t-field="doc.of_operator_signature" class="o_not_editable" t-options="{'widget': 'image', 'class': 'img-photo', 'style': 'max-height: 178px;'}"/>
-                                    </t>
+                                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
+                                        signature when the report is called from the mobile API whereas field is containing the image -->
+                                    <img t-if="doc.of_operator_signature" t-att-src="image_data_uri(doc.of_operator_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
                                 </div>
                             </div>
                             <div class="col-6" style="padding-left: 10px !important;">
                                 <strong>Customer Signature</strong>
                                 <div name="customer_signature" class="border" style="height: 180px;" align="center">
-                                    <t t-if="doc.of_customer_signature">
-                                        <span t-field="doc.of_customer_signature" class="o_not_editable" t-options="{'widget': 'image', 'class': 'img-photo', 'style': 'max-height: 178px;'}"/>
-                                    </t>
+                                    <!-- Using `image_data_uri` here because for a weird reason if we use a `<span t-field/>` with a widget image, that will not print the customer
+                                        signature when the report is called from the mobile API whereas field is containing the image -->
+                                    <img t-if="doc.of_customer_signature" t-att-src="image_data_uri(doc.of_customer_signature)" class="img-photo pt-1" style="max-height: 178px;"/>
                                 </div>
                             </div>
                         </div>
