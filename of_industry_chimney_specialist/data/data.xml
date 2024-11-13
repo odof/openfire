@@ -8,16 +8,15 @@
 {{ object.of_flamme_verte or "0" }}{{ "\u2605" }}
 {{ object.of_flamme_verte_equivalence and "Flamme Verte Equivalence: " + object.of_flamme_verte_equivalence or "Flamme Verte Equivalence: 0" }}{{ "\u2605" }}
 {{ object.of_eco_label and "Eco-label: " + object.of_eco_label or "" }}
-{{ object.of_power_rating and "Power Rating: " + object.of_power_rating + "kW\n" or "" }}
-{{ object.of_yield and "Yield: " + object.of_yield or "" }}
+{{ object.of_power_rating and "Power Rating: " + object.of_power_rating + " kW\n" or "" }}
+{{ object.of_yield and "Yield: " + object.of_yield + "%" or "" }}
 {{ object.of_co_emission and "CO Emission: " + object.of_co_emission + "% at 13% O₂" or "" }}
-{{ object.of_co_mg_emission and "CO Emission: " + object.of_co_mg_emission + "mg/Nm³ at 13% O₂" or "" }}
-{{ object.of_dust_emission and "Dust Emission: " + object.of_dust_emission + "mg/Nm³ at 13% O₂" or "" }}
-{{ object.of_nox_emission and "Nox Emission: " + object.of_nox_emission + "mg/Nm³ at 13% O₂" or "" }}
-{{ object.of_goc_emission and "GOC Emission: " + object.of_goc_emission + "mg/Nm³ at 13% O₂" or "" }}
-{{ object.of_voc_emission and "VOC Emission: " + object.of_voc_emission + "mg/Nm³ at 13% O₂" or "" }}
+{{ object.of_co_mg_emission and "CO Emission: " + object.of_co_mg_emission + " mg/Nm³ at 13% O₂" or "" }}
+{{ object.of_dust_emission and "Dust Emission: " + object.of_dust_emission + " mg/Nm³ at 13% O₂" or "" }}
+{{ object.of_nox_emission and "Nox Emission: " + object.of_nox_emission + " mg/Nm³ at 13% O₂" or "" }}
+{{ object.of_goc_emission and "GOC Emission: " + object.of_goc_emission + " mg/Nm³ at 13% O₂" or "" }}
+{{ object.of_voc_emission and "VOC Emission: " + object.of_voc_emission + " mg/Nm³ at 13% O₂" or "" }}
 {{ object.of_i_index and "I Index: " + object.of_i_index or "" }}
-{{ "\r" }}
 {{ object.of_season_efficiency and "Seasonal Energy Efficiency: " + object.of_season_efficiency or "" }}
 {{ object.of_fonds_air_bois and "Eligible for Fonds Air Bois" or "" }}
 {{ "\r" }}
