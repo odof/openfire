@@ -32,13 +32,17 @@ class OfWizardInsertKitComps(models.TransientModel):
         order_line_obj = self.env['sale.order.line']
         sale_order = sale_order_obj.browse(self._context.get('active_ids')[0])
         for line in self.comp_ids.filtered('is_selected'):
-            vals = {
-                'product_id': line.product_id.id,
-                'product_uom_qty': line.product_uom_qty,
-                'product_uom': line.product_uom_id.id,
-                'order_id': sale_order.id,
-            }
-            order_line_obj.create(vals)
+            sale_order_line = order_line_obj.new(
+                {
+                    'product_id': line.product_id.id,
+                    'product_uom_qty': line.product_uom_qty,
+                    'product_uom': line.product_uom_id.id,
+                    'order_id': sale_order.id,
+                }
+            )
+            sale_order_line.product_id_change()
+            sale_order_line_vals = sale_order_line._convert_to_write(sale_order_line._cache)
+            order_line_obj.create(sale_order_line_vals)
         sale_order._compute_tax_id()
 
     @api.multi
