@@ -12,7 +12,7 @@
                 <field name="of_theoretical_cost" groups="of_account.of_group_sale_margin_manager" widget='monetary' options="{'currency_field': 'currency_id'}"
                         attrs="{'invisible': [('cost_method' , '=', 'standard')]}"/>
             </xpath>
-            <xpath expr="//group[@name='group_general']//div[@name='pricing']" position="after">
+            <xpath expr="//field[@name='of_theoretical_cost']" position="after">
                 <label id="of_margin" for="of_margin" groups="of_account.of_group_sale_margin_manager"/>
                 <span id="of_margin" groups="of_account.of_group_sale_margin_manager"><field name="of_margin" class="oe_inline"/>%</span>
             </xpath>

@@ -1,72 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="of_product_product_template_only_form_view" model="ir.ui.view">
+        <field name="name">of.product.template.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='list_price']" position="before">
+                <field name="of_model" />
+                <xpath expr="//field[@name='default_code']" position="move" />
+                <xpath expr="//field[@name='categ_id']" position="move" />
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_product_template_form_view" model="ir.ui.view">
         <field name="name">of.product.template.common.form</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="priority" eval="1"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='sale_ok']/parent::span" position="replace"/>
-            <xpath expr="//field[@name='purchase_ok']/parent::span" position="replace"/>
-            <xpath expr="//div[@name='options']" position="inside">
-                <span class="d-inline-block">
-                    <field name="of_obsolete"/>
-                    <label for="of_obsolete"/>
-                </span>
-            </xpath>
+
             <xpath expr="//group[@name='group_general']" position="attributes">
-                <attribute name="cols" eval="2"/>
                 <attribute name="string">Distributor information</attribute>
             </xpath>
-            <xpath expr="//group[@name='group_general']//field[@name='uom_id']" position="replace"/>
-            <xpath expr="//group[@name='group_general']//field[@name='uom_po_id']" position="replace"/>
-            <xpath expr="//group[@name='group_standard_price']" position="replace">
-                <group>
-                    <group name="group_standard_price" string="Supplier information" colspan="2">
-                        <field name="of_cost_date"/>
-                        <div id="uom-display" col="3">
-                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" string="Purchase UoM" class="oe_inline"/></span>
-                        </div>
-                        <div id="uom-display-2" col="5">
-                            <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" string="Purchase UoM" class="oe_inline"/></span>
-                        </div>
-                    </group>
-                    <group name="advanced_information" string="Advanced information" colspan="2">
-                        <field name="currency_id" invisible="1"/>
-                        <field name="cost_currency_id" invisible="1"/>
-                        <field name="product_variant_id" invisible="1"/>
-                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                        <field name="uom_id" groups="uom.group_uom" options="{'no_create': True}"/>
-                        <field name="uom_po_id" groups="uom.group_uom" options="{'no_create': True}"/>
-                        <field name="categ_id" string="Product Category"/>
-                        <field name="of_model"/>
-                        <field name="product_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_edit_color': 1}"/>
-                        <field name="of_uom_category_id" invisible="1"/>
-                    </group>
-                    <group name="miscellaneous" string="Miscellaneous" colspan="2">
-                        <field name="sale_ok"/>
-                        <field name="purchase_ok"/>
-                    </group>
-                </group>
-            </xpath>
+
             <xpath expr="//group[@name='group_general']" position="inside">
+                <label for="list_price" class="mt-1"/>
+                <div name="pricing">
+                    <field name="list_price" class="oe_inline" widget="monetary"
+                    options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                </div>
                 <label for="standard_price" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
                 <div name="standard_price_uom" groups="base.group_user" attrs="{'invisible': [('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
-                    <field name="standard_price" class="oe_inline" widget='monetary' options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
-                    <span groups="uom.group_uom" >/
+                    <field name="standard_price" class="oe_inline" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                    <span groups="uom.group_uom">/
                         <field name="uom_name" class="oe_inline"/>
                     </span>
                 </div>
-                <label for="list_price" class="mt-1"/>
-                <div name="pricing">
-                    <field name="list_price" class="oe_inline" widget='monetary'
-                    options="{'currency_field': 'currency_id', 'field_digits': True}"/>
-                </div>
             </xpath>
-            <xpath expr="//page[@name='general_information']//field[@name='description']/.." position="attributes">
-                <attribute name="name">group_internal_note</attribute>
+
+            <xpath expr="//group[@name='upsell']" position="before">
+                <group string="Customer Invoice" name="customer_invoice"/>
             </xpath>
+
+            <xpath expr="//div[@name='options']" position="inside">
+                <group name="tags_and_pack_group">
+                    <group name="tags_group">
+                        <field name="product_tag_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_edit_color': 1}" string="Tags"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <xpath expr="//group[@name='group_standard_price']" position="replace">
+                <group name="group_standard_price" string="Supplier information">
+                    <field name="of_cost_date"/>
+                    <div id="uom-display" col="3">
+                        <span groups="uom.group_uom"> / <field name="of_uom_po_id_display" string="Purchase UoM" class="oe_inline"/></span>
+                    </div>
+                    <div id="uom-display-2" col="5">
+                        <span groups="uom.group_uom"> / <field name="of_uom_po_id_display2" string="Purchase UoM" class="oe_inline"/></span>
+                    </div>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='group_standard_price']" position="inside">
+                <separator name="advanced_information" string="Advanced information"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="cost_currency_id" invisible="1"/>
+                <field name="product_variant_id" invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <xpath expr="//group[@name='group_general']//field[@name='uom_id']" position="move"/>
+                <xpath expr="//group[@name='group_general']//field[@name='uom_po_id']" position="move"/>
+                <field name="categ_id" string="Product Category"/>
+                <field name="of_obsolete"/>
+                <field name="of_uom_category_id" invisible="1"/>
+            </xpath>
+
             <xpath expr="//page[@name='sales']//group[@name='description']" position="after">
                 <group string="Description of the manufacturer" name="manufacturer_description">
                     <field colspan="2" name="of_manufacturer_description" nolabel="1" placeholder="This note corresponds to the description of the product by its manufacturer."/>
@@ -75,10 +84,7 @@
                     <field colspan="2" name="of_url" nolabel="1" placeholder="This field provides access to the product's web page."/>
                 </group>
             </xpath>
-            <xpath expr="//notebook//page[@name='purchase']" position="before">
-                <page string="Technical" name="technical" invisible="1"/>
-            </xpath>
-            <xpath expr="//notebook//page[@name='sales']//group[@name='sale']" position="after">
+            <xpath expr="//page[@name='sales']//group[@name='sale']" position="after">
                 <group name="price_struct" string="Pricing structure" colspan="2">
                     <field name="of_purchase_transport"/>
                     <field name="of_sale_transport"/>
@@ -87,6 +93,24 @@
                     <field name="of_misc_taxes"/>
                     <field name="of_misc_costs"/>
                 </group>
+            </xpath>
+            <xpath expr="//page[@name='purchase']" position="before">
+                <page string="Technical" name="technical" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//page[@name='general_information']//field[@name='description']/.." position="attributes">
+                <attribute name="name">group_internal_note</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='sale_ok']/parent::span" position="replace"/>
+            <xpath expr="//field[@name='purchase_ok']/parent::span" position="replace"/>
+
+            <xpath expr="//group[@name='group_standard_price']" position="after">
+                <group name="miscellaneous" string="Miscellaneous">
+                    <field name="sale_ok"/>
+                    <field name="purchase_ok"/>
+                </group>
+                <xpath expr="//group[@name='group_internal_note']" position="move"/>
             </xpath>
         </field>
     </record>
@@ -103,6 +127,17 @@
             </xpath>
             <xpath expr="//tree" position="inside">
                 <field name="description" optional="hide" string="Internal Notes"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_product_account_product_template_form_view" model="ir.ui.view">
+        <field name="name">of.product.template.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='customer_invoice']" position="inside">
+                <field name="taxes_id" position="move"/>
             </xpath>
         </field>
     </record>
