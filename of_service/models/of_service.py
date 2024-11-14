@@ -3,16 +3,17 @@
 
 import math
 from datetime import date
-from dateutil.relativedelta import relativedelta
+
 from bs4 import BeautifulSoup
-import odoo.addons.decimal_precision as dp
-from odoo import api, models, fields, _
+from dateutil.relativedelta import relativedelta
+
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
-from odoo.tools import float_is_zero
-from odoo.tools import float_compare
+from odoo.tools import float_compare, float_is_zero
 from odoo.tools.safe_eval import safe_eval
-from odoo.addons.of_utils.models.of_utils import se_chevauchent
-from odoo.addons.of_utils.models.of_utils import format_date
+
+import odoo.addons.decimal_precision as dp
+from odoo.addons.of_utils.models.of_utils import format_date, se_chevauchent
 
 
 class OfService(models.Model):
@@ -1374,6 +1375,39 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 number = self.env['ir.sequence'].next_by_code('of.service')
                 service.write({'number': number})
 
+    @api.multi
+    def _get_new_service_vals(self, msg_dict):
+        self = self.with_context(default_user_id=False)
+        template_id = (
+            self.env['ir.values'].get_default('of.intervention.settings', 'auto_service_template_id')
+            or self.env.ref('of_planning.of_planning_default_intervention_template').id
+        )
+
+        body_html = msg_dict.get('body')
+        if body_html:
+            soup = BeautifulSoup(body_html, features="lxml")
+            body = '\n'.join([text for text in soup.stripped_strings])
+        else:
+            body = ""
+        new_service = self.env['of.service'].new(
+            {
+                'base_state': 'draft',
+                'template_id': template_id,
+                'company_id': self.env.ref('base.main_company').id,
+                'partner_id': msg_dict.get('author_id') or self.env.ref('base.partner_root').id,
+                'date_next': fields.Date.today(),
+                'note': "De : "
+                + msg_dict.get('from')
+                + '\n'
+                + "Sujet : "
+                + msg_dict.get('subject')
+                + '\n'
+                + "Corps : \n"
+                + body,
+            }
+        )
+        return new_service
+
     @api.model
     def of_get_report_name(self, docs):
         return "Demande d'intervention"
@@ -1406,26 +1440,10 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
         if custom_values is None:
             custom_values = {}
 
-        template_id = self.env['ir.values'].get_default('of.intervention.settings', 'auto_service_template_id') or \
-            self.env.ref('of_planning.of_planning_default_intervention_template').id
-
-        body_html = msg_dict.get('body')
-        if body_html:
-            soup = BeautifulSoup(body_html, features="lxml")
-            body = '\n'.join([text for text in soup.stripped_strings])
-        else :
-            body = ""
-
-        new_service = self.env['of.service'].new({
-            'base_state': 'draft',
-            'template_id': template_id,
-            'company_id': self.env.ref('base.main_company').id,
-            'partner_id': msg_dict.get('author_id') or self.env.ref('base.partner_root').id,
-            'date_next': fields.Date.today(),
-            'note': "De : " + msg_dict.get('from') + '\n' +
-                    "Sujet : " + msg_dict.get('subject') + '\n' +
-                    "Corps : \n" + body,
-        })
+        # si il n'y a de sujet pas dans le mail importer
+        # msg_dict.get('subject') == none ce qui fait planter les concaténation
+        msg_dict['subject'] = msg_dict.get('subject', "")
+        new_service = self._get_new_service_vals(msg_dict)
 
         new_service.onchange_template_id()
         new_service.onchange_type_id()
