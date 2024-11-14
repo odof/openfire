@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-23 08:53+0000\n"
-"PO-Revision-Date: 2024-10-23 08:53+0000\n"
+"POT-Creation-Date: 2024-11-14 10:50+0000\n"
+"PO-Revision-Date: 2024-11-14 10:50+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -81,6 +81,11 @@ msgid "Intervention"
 msgstr ""
 
 #. module: of_basic_interface
+#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_planning
+msgid "Intervention Planning"
+msgstr "Mon planning d'intervention"
+
+#. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_intervention_template
 msgid "Intervention template"
 msgstr "Modèle d'intervention"
@@ -104,11 +109,6 @@ msgstr ""
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_sales_account_payments_receivable
 msgid "Payments"
 msgstr "Mes paiements"
-
-#. module: of_basic_interface
-#: model:ir.ui.menu,name:of_basic_interface.menu_openfire_interventions_planning
-msgid "Planning"
-msgstr "Mon planning"
 
 #. module: of_basic_interface
 #: model:ir.ui.menu,name:of_basic_interface.menu_openfire_config_sale_product_category

@@ -11,3 +11,9 @@ def _uninstall_hook(cr, registry):
     if "map" in view_modes:
         view_modes.remove("map")
         action.view_mode = ",".join(view_modes)
+
+    action = env.ref("of_planning_view.action_calendar_event_calendar")
+    view_modes = action.view_mode.split(",")
+    if "map" in view_modes:
+        view_modes.remove("map")
+        action.view_mode = ",".join(view_modes)
