@@ -223,6 +223,7 @@ class HREmployee(models.Model):
                                          limit=1)
             if not segment:
                 segment = segment_obj.search([('employee_id', '=', employee.id),
+                                              ('date_deb', '<=', date_str),
                                               ('date_fin', '=', False),
                                               ('type', '=', seg_type)], limit=1)
             # si même après ça il n'y a aucun segment de défini, res[employee.id] = []
