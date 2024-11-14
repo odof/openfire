@@ -28,16 +28,17 @@
                 <attribute name="string">Kit Price</attribute>
                 <attribute name="attrs">{'invisible': ['|',('pack_component_price','=','ignored'),('pack_ok','=',False)]}</attribute>
             </xpath>
+
             <xpath expr="//label[@for='list_price']" position="after">
                 <label for="list_price" string="Sales Price" attrs="{'invisible': ['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
             </xpath>
 
             <xpath expr="//label[@for='standard_price']" position="attributes">
                 <attribute name="string">Kit Cost</attribute>
-                <attribute name="attrs">{'invisible': ['|',('pack_component_price','=','ignored'),('pack_ok','=',False)]}</attribute>
+                <attribute name="attrs">{'invisible': ['|','&amp;',('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False),'|',('pack_component_price','=','ignored'),('pack_ok','=',False)]}</attribute>
             </xpath>
             <xpath expr="//label[@for='standard_price']" position="after">
-                <label for="standard_price" string="Cost" attrs="{'invisible': ['&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
+                <label for="standard_price" string="Cost" attrs="{'invisible': ['|','&amp;',('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False),'&amp;',('pack_component_price','=','totalized'),('pack_ok','=',True)]}" />
             </xpath>
         </field>
     </record>
