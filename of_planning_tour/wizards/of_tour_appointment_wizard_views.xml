@@ -76,14 +76,14 @@
                                     <field name="partner_address_city" nolabel="1" />
                                 </group>
                             </div>
-                            <field name="search_template_id" options="{'no_create': True, 'no_open':True}" invisible="1"/>
                             <field name="search_type" invisible="1"/>
                             <field name="search_mode" invisible="1"/>
+                            <field name="task_id"/>
                             <field name="template_id"/>
-                            <field name="task_id" invisible="0"/>
                             <field name="duration" widget="float_time"/>
                         </group>
                         <group name="search_criteria" string="Search Criterias">
+                            <field name="search_template_id" options="{'no_create': True, 'no_open':True}"/>
                             <field name="start_date_search"/>
                             <field name="stop_date_search" invisible="1"/>
                             <field name="search_period_in_days" invisible="1"/>

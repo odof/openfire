@@ -19,8 +19,8 @@
                     <group>
                         <group>
                             <field name="employee_ids" widget="many2many_tags"/>
-                            <field name="task_id"/>
                             <field name="template_id"/>
+                            <field name="task_id"/>
                             <field name="search_type"/>
                             <field name="search_mode"/>
                         </group>

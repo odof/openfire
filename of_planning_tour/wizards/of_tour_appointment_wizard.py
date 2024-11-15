@@ -348,9 +348,9 @@ class OFTourAppointmentWizard(models.TransientModel):
         vals = {}
         if self.search_template_id.employee_ids:
             vals["pre_employee_ids"] = [Command.set([emp.id for emp in self.search_template_id.employee_ids])]
-        if self.search_template_id.task_id and not self.task_id:
+        if self.search_template_id.task_id:
             vals["task_id"] = self.search_template_id.task_id.id
-        if self.search_template_id.template_id and not self.template_id:
+        if self.search_template_id.template_id:
             vals["template_id"] = self.search_template_id.template_id.id
         if self.search_template_id.search_mode:
             vals["search_mode"] = self.search_template_id.search_mode
