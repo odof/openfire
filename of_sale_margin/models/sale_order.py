@@ -9,6 +9,18 @@ class SaleOrder(models.Model):
     of_margin_percent = fields.Float(
         compute="_compute_of_margin_percent", string="Margin %", search="_search_of_margin_percent"
     )
+    of_amount_to_invoice = fields.Monetary(
+        string="Remains to be invoiced Tax. Excl.", compute="_compute_of_amount_to_invoice_fields", store=True
+    )
+    of_amount_to_invoice_no_deposit = fields.Monetary(
+        string="Remains to be invoiced Tax. Excl. (Deposit excluded)",
+        compute="_compute_of_amount_to_invoice_fields",
+        store=True,
+    )
+
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
 
     @api.depends("margin_percent")
     def _compute_of_margin_percent(self):
@@ -50,6 +62,25 @@ class SaleOrder(models.Model):
         self.env.cr.execute(request, params)
         ids = [r[0] for r in self.env.cr.fetchall()]
         return [("id", "in", ids)]
+
+    @api.depends("order_line.of_amount_to_invoice")
+    def _compute_of_amount_to_invoice_fields(self):
+        if categ_id := self.env["ir.config_parameter"].sudo().get_param("of.sale.of_deposit_product_categ_id"):
+            categ_id = int(categ_id)
+        if deposit_product_id := self.env["ir.config_parameter"].sudo().get_param("sale.default_deposit_product_id"):
+            deposit_product_id = int(deposit_product_id)
+        for order in self:
+            order.of_amount_to_invoice = sum(order.mapped("order_line.of_amount_to_invoice"))
+            filtered_lines = order.order_line
+            if categ_id:
+                filtered_lines = filtered_lines.filtered(lambda li: li.product_id.categ_id.id != categ_id)
+            if deposit_product_id:
+                filtered_lines = filtered_lines.filtered(lambda li: li.product_id.id != deposit_product_id)
+            order.of_amount_to_invoice_no_deposit = sum(filtered_lines.mapped("of_amount_to_invoice"))
+
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
 
     @api.model
     def fields_get(self, allfields=None, attributes=None):
