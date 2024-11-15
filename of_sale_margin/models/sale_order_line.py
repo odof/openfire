@@ -14,6 +14,15 @@ class SaleOrderLine(models.Model):
         readonly=False,
         precompute=True,
     )
+    of_amount_to_invoice = fields.Float(
+        string="Remains to be invoiced Tax. Excl.",
+        compute="_compute_of_amount_to_invoice",
+        store=True,
+    )
+
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
 
     @api.depends("product_id", "company_id", "currency_id", "product_uom")
     def _compute_purchase_price(self):
@@ -33,6 +42,52 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.product_id:
                 line.of_seller_price = line._of_convert_price(line.product_id.of_seller_price, line.product_id.uom_id)
+
+    @api.depends("product_uom_qty", "qty_invoiced", "of_price_unit_taxexcl", "discount")
+    def _compute_of_amount_to_invoice(self):
+        for line in self:
+            line.of_amount_to_invoice = (
+                (line.product_uom_qty - line.qty_invoiced)
+                * line.of_price_unit_taxexcl
+                * (1 - (line.discount or 0.0) / 100.0)
+            )
+
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        """Override to change the way the margin percentage is displayed on pivot views.
+        The default behavior displays the margin as a float <= 1.0, which is not very user-friendly.
+        This method displays the margin as a percentage instead.
+        """
+        fname = "margin_percent"
+        field = self._fields.get(fname)
+        func = field and field.group_operator  # default is `sum`
+        if f"{fname}:{func}" in fields:  # noqa
+            for depends_field in ("margin", "price_subtotal"):
+                if f"{depends_field}:{func}" not in fields:  # noqa
+                    fields.append(f"{depends_field}:{func}")  # noqa
+
+        res = super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+
+        if f"{fname}:{func}" in fields:  # noqa
+            for line in res:
+                if (
+                    "margin" in line
+                    and line["margin"] is not None
+                    and "price_subtotal" in line
+                    and line["price_subtotal"]
+                ):
+                    line["margin_percent"] = round(100.0 * line["margin"] / line["price_subtotal"], 2)
+                else:
+                    line["margin_percent"] = 0.0
+        return res
+
+    # -------------------------------------------------------------------------
+    # Business methods
+    # -------------------------------------------------------------------------
 
     def _of_convert_price(self, seller_price, from_uom):
         """
@@ -63,32 +118,3 @@ class SaleOrderLine(models.Model):
         )
         # The pricelist may not have been set, therefore no conversion
         # is needed because we don't know the target currency..
-
-    @api.model
-    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
-        """Override to change the way the margin percentage is displayed on pivot views.
-        The default behavior displays the margin as a float <= 1.0, which is not very user-friendly.
-        This method displays the margin as a percentage instead.
-        """
-        fname = "margin_percent"
-        field = self._fields.get(fname)
-        func = field and field.group_operator  # default is `sum`
-        if f"{fname}:{func}" in fields:  # noqa
-            for depends_field in ("margin", "price_subtotal"):
-                if f"{depends_field}:{func}" not in fields:  # noqa
-                    fields.append(f"{depends_field}:{func}")  # noqa
-
-        res = super().read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
-
-        if f"{fname}:{func}" in fields:  # noqa
-            for line in res:
-                if (
-                    "margin" in line
-                    and line["margin"] is not None
-                    and "price_subtotal" in line
-                    and line["price_subtotal"]
-                ):
-                    line["margin_percent"] = round(100.0 * line["margin"] / line["price_subtotal"], 2)
-                else:
-                    line["margin_percent"] = 0.0
-        return res
