@@ -15,6 +15,7 @@
     'data': [
         'views/sale_order_views.xml',
         'views/product_category_views.xml',
+        'views/product_template_views.xml',
         'reports/ir_actions_report_templates.xml',
         'reports/of_sale_report_view.xml',
     ],
