@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_line_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.view.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale_order_line_menu.sale_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="of_type_id" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
