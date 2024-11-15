@@ -15,6 +15,7 @@
         'sale_margin',
         'sale_crm',
         'sale_stock',
+        'sale_order_line_menu',  # OCA/sale-workflow
         'of_utils',
         'of_utm',
         'remove_odoo_enterprise',
@@ -33,6 +34,7 @@
         'views/sale_order_views.xml',
         'views/sale_order_line_views.xml',
         'views/product_category_views.xml',
+        'views/product_template_views.xml',
         'views/res_partner_views.xml',
         'report/report_sale_order.xml',
         'report/report_account_move.xml',
