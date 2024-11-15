@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 from .res_config_settings import SELECTION_SEARCH_MODES, SELECTION_SEARCH_TYPES
 
@@ -11,7 +11,9 @@ class OFTourAppointmentTemplate(models.Model):
 
     name = fields.Char(required=True)
     employee_ids = fields.Many2many(comodel_name="hr.employee", string="Operator(s)")
-    task_id = fields.Many2one(comodel_name="of.planning.task", string="Task")
+    task_id = fields.Many2one(
+        comodel_name="of.planning.task", string="Task", compute="_compute_task_id", store=True, readonly=False
+    )
     template_id = fields.Many2one(comodel_name="of.planning.intervention.template", string="Intervention template")
     search_type = fields.Selection(selection=SELECTION_SEARCH_TYPES, string="Search type")
     search_mode = fields.Selection(selection=SELECTION_SEARCH_MODES, string="Search mode")
@@ -31,3 +33,9 @@ class OFTourAppointmentTemplate(models.Model):
         string="Default for",
         help="Users for whom this template will be used by default",
     )
+
+    @api.depends("template_id")
+    def _compute_task_id(self):
+        for template in self:
+            if template.template_id:
+                template.task_id = template.template_id.task_id.id
