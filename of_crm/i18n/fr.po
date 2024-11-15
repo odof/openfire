@@ -468,7 +468,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_crm.field_res_users__of_lead_source_id
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_view_partner_form
 msgid "Source"
-msgstr "Origin"
+msgstr "Origine"
 
 #. module: of_crm
 #: model:ir.ui.menu,name:of_crm.menu_utm_source

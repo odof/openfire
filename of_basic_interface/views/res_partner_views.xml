@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_partner_view_form" model="ir.ui.view">
+        <field name="name">res.partner.view.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_base_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="attrs">{'invisible': [('company_type', '=', 'person')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lang']" position="attributes">
+                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+            <xpath expr="//group//field[@name='function'][2]" position="attributes">
+                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_calendar" model="ir.ui.view">
+        <field name="name">res.partner.view.form.calendar</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="calendar.view_partners_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='schedule_meeting']" position="attributes">
+                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_purchase" model="ir.ui.view">
+        <field name="name">res.partner.view.form.purchase</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="purchase.res_partner_view_purchase_account_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(purchase.act_res_partner_2_supplier_invoices)d']" position="attributes">
+                <attribute name="groups">account.group_account_invoice,!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_purchase_button" model="ir.ui.view">
+        <field name="name">res.partner.view.form.purchase.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="purchase.res_partner_view_purchase_buttons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(purchase.act_res_partner_2_purchase_order)d']" position="attributes">
+                <attribute name="groups">purchase.group_purchase_user,!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_view_form_purchase_inherit" model="ir.ui.view">
+        <field name="name">res.partner.view.form.purchase.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="purchase_stock.res_partner_view_purchase_buttons_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='%(purchase_stock.action_purchase_vendor_delay_report)d']" position="attributes">
+                <attribute name="groups">purchase.group_purchase_user,!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

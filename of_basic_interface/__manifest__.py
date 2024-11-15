@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Basic Interface",
-    "version": "16.0.1.3.1",
+    "version": "16.0.1.4.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "category": "OpenFire",
@@ -21,6 +21,7 @@
         "security/of_basic_interface_security.xml",
         "views/ir_ui_menu.xml",
         "views/res_config_settings_views.xml",
+        "views/res_partner_views.xml",
     ],
     "external_dependencies": {},
     "assets": {},
