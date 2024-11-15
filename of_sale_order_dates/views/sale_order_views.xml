@@ -43,6 +43,28 @@
         </field>
     </record>
 
+    <record id="sale_order_view_tree_quotation" model="ir.ui.view">
+        <field name="name">sale.order.view.tree.quotation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="of_requested_week" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_tree_order" model="ir.ui.view">
+        <field name="name">sale.order.view.tree.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="of_requested_week" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Sale Order Line Views -->
 
     <record id="view_order_line_tree" model="ir.ui.view">
