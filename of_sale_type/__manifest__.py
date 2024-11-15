@@ -15,6 +15,8 @@
     'data': [
         'views/sale_order_type.xml',
         'views/res_partner.xml',
+        'views/sale_order_views.xml',
+        'views/sale_order_line_views.xml',
         'views/sale_order_template.xml',
     ],
     'installable': True,
