@@ -11,12 +11,25 @@ from odoo.exceptions import AccessError
 logger = logging.getLogger(__name__)
 
 
+# cette méthode est dépréciée et à terme sera supprimée
+# après la migration  des schemas graphql
 def lazy_delete(env, model, id):
     if record := env[model].search([("id", "=", id)]):
         record.unlink()
         return record
 
     return env[model]
+
+
+def lazy_delete_ids(env, model, ids):
+    # on s'oblige a delete les identifiants un par un car dans
+    # si celui-ci a été supprimé dans le BO, on veut éviter une exception
+    deleted_ids = []
+    for id in ids:
+        if record := env[model].search([("id", "=", id)]):
+            record.unlink()
+            deleted_ids.append(id)
+    return deleted_ids
 
 
 def convertImage(datas):

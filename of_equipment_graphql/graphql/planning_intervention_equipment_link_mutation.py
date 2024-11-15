@@ -2,7 +2,8 @@
 
 import graphene
 
-from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete
+from odoo.addons.of_graphql.graphql.delete_result_type import DeleteResult
+from odoo.addons.of_graphql.graphql.odoo_graphql import lazy_delete_ids
 
 from ..graphql.equipment_type import EquipmentInput
 from .planning_intervention_equipment_link_type import PlanningInterventionEquipmentLink
@@ -44,15 +45,16 @@ class PlanningInterventionEquipmentLinkDelete(graphene.Mutation):
     _name = "PlanningInterventionEquipmentLinkDelete"
 
     class Arguments:
-        id = graphene.Int()
-        ids = graphene.List(graphene.NonNull(graphene.Int))
+        ids = graphene.List(graphene.NonNull(graphene.Int), required=True)
 
-    Output = PlanningInterventionEquipmentLink
+    Output = DeleteResult
 
-    def mutate(self, info, id, ids={}):
+    def mutate(self, info, ids):
         env = info.context["env"]
 
-        return lazy_delete(env, "of.calendar.event.equipment.link", id)
+        deleted_ids = lazy_delete_ids(env, "of.calendar.event.equipment.link", ids)
+        non_existent_ids = list(set(ids) - set(deleted_ids))
+        return DeleteResult(deleted_ids=deleted_ids, non_existent_ids=non_existent_ids)
 
 
 class PlanningInterventionEquipmentLinkMutation(graphene.ObjectType):
