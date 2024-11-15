@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-07 18:39+0000\n"
-"PO-Revision-Date: 2023-12-07 18:39+0000\n"
+"POT-Creation-Date: 2024-11-15 13:20+0000\n"
+"PO-Revision-Date: 2024-11-15 13:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -94,6 +94,17 @@ msgstr "Variante de produit"
 #: model:ir.model.fields,field_description:of_sale_margin.field_sale_order_line__of_seller_price
 msgid "Purchase price"
 msgstr "Prix d'achat"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_sale_order__of_amount_to_invoice
+#: model:ir.model.fields,field_description:of_sale_margin.field_sale_order_line__of_amount_to_invoice
+msgid "Remains to be invoiced Tax. Excl."
+msgstr "Reste à facturer HT"
+
+#. module: of_sale_margin
+#: model:ir.model.fields,field_description:of_sale_margin.field_sale_order__of_amount_to_invoice_no_deposit
+msgid "Remains to be invoiced Tax. Excl. (Deposit excluded)"
+msgstr "Reste à facturer HT (hors acompte)"
 
 #. module: of_sale_margin
 #: model:ir.model,name:of_sale_margin.model_sale_order

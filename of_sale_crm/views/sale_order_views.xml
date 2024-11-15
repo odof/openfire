@@ -91,15 +91,4 @@
             </field>
         </record>
 
-        <record id="of_crm_of_sale_order_line_tree" model="ir.ui.view">
-            <field name="name">of.crm.of.sale.order.line.tree</field>
-            <field name="model">sale.order.line</field>
-            <field name="inherit_id" ref="of_sale.of_sale_order_line_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='price_subtotal']" position="after">
-                    <field name="of_amount_to_invoice"/>
-                </xpath>
-            </field>
-        </record>
-
 </odoo>
