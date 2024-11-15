@@ -230,6 +230,50 @@
             </field>
         </record>
 
+        <record id="sale_order_view_tree_quotation" model="ir.ui.view">
+            <field name="name">sale.order.view.tree.quotation</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_quotation_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sale_order_template_id" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='create_date']" position="after">
+                    <field name="date_order" optional="hide"/>
+                    <field name="validity_date" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="partner_shipping_id" optional="hide"/>
+                    <field name="client_order_ref" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_untaxed']" position="before">
+                    <field name="pricelist_id" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="sale_order_view_tree_order" model="ir.ui.view">
+            <field name="name">sale.order.view.tree.order</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="sale_order_template_id" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='date_order']" position="before">
+                    <field name="create_date" optional="hide"/>
+                    <field name="validity_date" optional="hide"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="partner_shipping_id" optional="hide"/>
+                    <field name="client_order_ref" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_untaxed']" position="before">
+                    <field name="pricelist_id" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="of_sale_view_sales_order_filter" model="ir.ui.view">
             <field name="name">of.sale.sale.order.list.select</field>
             <field name="model">sale.order</field>

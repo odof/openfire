@@ -69,6 +69,9 @@ class SaleOrderLine(models.Model):
     of_obsolete = fields.Boolean(string="Obsolete Product", related="product_id.of_obsolete", readonly=True)
     date_order = fields.Datetime(related="order_id.date_order", store=True, index=True)
     of_customer_view = fields.Boolean(string="Customer/Vendor view", related="order_id.of_customer_view")
+    of_order_partner_shipping_id = fields.Many2one(related="order_id.partner_shipping_id")
+    of_client_order_ref = fields.Char(related="order_id.client_order_ref")
+    of_commitment_date = fields.Datetime(related="order_id.commitment_date")
 
     # Related fields for the sale order line custom form view called by `action_button_open_sale_order_line`
     of_order_state = fields.Selection(

@@ -120,6 +120,22 @@
         </field>
     </record>
 
+    <record id="sale_order_line_view_tree" model="ir.ui.view">
+        <field name="name">sale.order.line.view.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale_order_line_menu.sale_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="of_order_partner_shipping_id" optional="hide"/>
+                <field name="of_client_order_ref" optional="hide"/>
+                <field name="of_commitment_date" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='qty_delivered']" position="attributes">
+                <attribute name="optional">show</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="of_sale_order_line_tree" model="ir.ui.view">
         <field name="name">of.sale.order.line.tree</field>
         <field name="model">sale.order.line</field>
