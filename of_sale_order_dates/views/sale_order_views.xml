@@ -32,6 +32,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree/field[@name='of_invoice_policy'][2]" position="after">
+                <field name="of_order_requested_week" optional="show" />
+            </xpath>
             <!-- Informations de date déplacées dans la section date du formulaire -->
             <xpath expr="//group[@name='sale_shipping']//label[@for='commitment_date']" position="attributes">
                 <attribute name="string">Delivery</attribute>
@@ -39,6 +42,28 @@
             <xpath expr="//group[@name='date_details']" position="inside">
                 <xpath expr="//group[@name='sale_shipping']//label[@for='commitment_date']" position="move"/>
                 <xpath expr="//group[@name='sale_shipping']//div[hasclass('o_row')]" position="move"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_tree_quotation" model="ir.ui.view">
+        <field name="name">sale.order.view.tree.quotation</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="of_requested_week" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_tree_order" model="ir.ui.view">
+        <field name="name">sale.order.view.tree.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before">
+                <field name="of_requested_week" optional="show"/>
             </xpath>
         </field>
     </record>
@@ -51,7 +76,7 @@
         <field name="inherit_id" ref="sale.view_order_line_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='qty_delivered']" position="before">
-                <field name="of_order_requested_week"/>
+                <field name="of_order_requested_week" optional="hide" />
             </xpath>
         </field>
     </record>
