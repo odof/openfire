@@ -71,7 +71,7 @@
                 <group string="Description of the manufacturer" name="manufacturer_description">
                     <field colspan="2" name="of_manufacturer_description" nolabel="1" placeholder="This note corresponds to the description of the product by its manufacturer."/>
                 </group>
-                <group string="URL" name="manufacturer_description">
+                <group string="URL" name="url">
                     <field colspan="2" name="of_url" nolabel="1" placeholder="This field provides access to the product's web page."/>
                 </group>
             </xpath>
