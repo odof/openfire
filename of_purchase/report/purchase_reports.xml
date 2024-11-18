@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <report
+            string="Commande sans prix"
+            id="of_action_report_purchase_order_sans_prix"
+            model="purchase.order"
+            report_type="qweb-pdf"
+            name="of_purchase.of_report_purchaseorder_sans_prix"
+            file="of_purchase.of_report_purchaseorder_sans_prix"
+        />
+</odoo>

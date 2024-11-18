@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_purchase_order_line_display_stock_info" model="res.groups">
+        <field name="name">Lignes de commande d'achat - Affichage des informations de stock</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Affiche les informations de stock au niveau des lignes de commande</field>
+    </record>
+
+</odoo>
