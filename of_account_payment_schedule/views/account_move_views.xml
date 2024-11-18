@@ -14,7 +14,7 @@
                         help="Recompute the payment schedule based on the current pricelist and the payment terms."
                         class="btn-link g-col-sm-2" icon="fa-refresh"
                         confirm="This will update the payment schedule based on the current pricelist and the payment terms. Do you want to continue ?"
-                        attrs="{'invisible': ['|', ('of_show_update_payment_schedule', '=', False), ('state', 'in', ['sale', 'done', 'cancel'])]}"/>
+                        attrs="{'invisible': ['|', ('of_show_update_payment_schedule', '=', False), ('state', 'in', ['cancel'])]}"/>
                     <field name="of_payment_schedule_ids" nolabel="1" colspan="2">
                         <tree editable="bottom" create="false" delete="false">
                             <field name="sequence" invisible="1"/>

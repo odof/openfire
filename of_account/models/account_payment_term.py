@@ -19,6 +19,7 @@ class AccountPaymentTerm(models.Model):
         """Returns a dictionary with the values for the payment term line. For inheritance purpose."""
         return {
             "name": line.of_name,
+            "value": line.value,
             "date": line._get_due_date(date_ref),
             "has_discount": line.discount_percentage,
             "value_amount": line.value_amount,
