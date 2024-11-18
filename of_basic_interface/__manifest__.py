@@ -22,6 +22,7 @@
         "views/ir_ui_menu.xml",
         "views/res_config_settings_views.xml",
         "views/res_partner_views.xml",
+        "views/product_template_views.xml",
     ],
     "external_dependencies": {},
     "assets": {},
