@@ -23,6 +23,8 @@ class MailActivity(models.Model):
                     for at in activity_type.of_activities_type:
                         value = vals.copy()
                         value["activity_type_id"] = at.id
+                        if at.default_user_id:
+                            value["user_id"] = at.default_user_id.id
                         res.append(value)
                 else:
                     res.append(vals)

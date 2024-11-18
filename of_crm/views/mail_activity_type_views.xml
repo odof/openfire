@@ -8,8 +8,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='category']" position="after">
                 <field name="of_activities_type" widget="many2many_tags"
-                        attrs="{'invisible': [('category','!=','activities_lot')], 'required': [('category','=','activities_lot')]}"
-                        domain="[('category','!=','activities_lot')]"/>
+                        attrs="{'invisible': [('category', '!=', 'activities_lot')], 'required': [('category', '=', 'activities_lot')]}"
+                        domain="[('category', '!=', 'activities_lot')]"/>
             </xpath>
             <!-- Always show res_model field : display the hidden one and hide the one for group `base.group_no_one` -->
             <xpath expr="//field[@name='res_model' and @invisible='1']" position="attributes">
@@ -17,6 +17,27 @@
             </xpath>
             <xpath expr="//field[@name='res_model' and @groups='base.group_no_one']" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='default_user_id']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='summary']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='icon']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='decoration_type']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//label[@for='default_note']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='default_note']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
+            </xpath>
+            <xpath expr="//group[@name='activity_planning']" position="attributes">
+                <attribute name="attrs">{'invisible': [('category', '=', 'activities_lot')]}</attribute>
             </xpath>
         </field>
     </record>
