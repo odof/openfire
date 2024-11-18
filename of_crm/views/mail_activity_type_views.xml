@@ -11,6 +11,13 @@
                         attrs="{'invisible': [('category','!=','activities_lot')], 'required': [('category','=','activities_lot')]}"
                         domain="[('category','!=','activities_lot')]"/>
             </xpath>
+            <!-- Always show res_model field : display the hidden one and hide the one for group `base.group_no_one` -->
+            <xpath expr="//field[@name='res_model' and @invisible='1']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='res_model' and @groups='base.group_no_one']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
 
