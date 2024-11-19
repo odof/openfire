@@ -122,18 +122,26 @@ class ResPartner(models.Model):
         self.invalidate_recordset(["partner_latitude", "partner_longitude"])
 
         if tours_to_recompute := (
-            self.env["of.planning.tour.line"]
+            self.env["of.planning.tour"]
             .sudo()
             .with_context(**context)
             .search(
                 [
-                    ("address_id", "in", self.ids),
-                    ("tour_id.date", ">=", fields.Date.today()),
+                    ("state", "!=", "3-confirmed"),
+                    ("date", ">=", fields.Date.today()),
+                    "|",
+                    "|",
+                    ("start_address_id", "in", self.ids),
+                    ("return_address_id", "in", self.ids),
+                    ("tour_line_ids.address_id", "in", self.ids),
                 ]
             )
-            .mapped("tour_id")
         ):
-            tours_to_recompute = tours_to_recompute.filtered(
-                lambda t: t.state != "confirmed" and t.date >= fields.Date.today()
-            )
-            tours_to_recompute.action_compute_osrm_data(reload=True)
+            # Recompute geo data
+            for line in tours_to_recompute.tour_line_ids.sorted("date_start"):
+                line._update_line_data_from_intervention()
+                line._compute_line_data()
+                line._osrm_update_line_data()
+                line.intervention_id.of_travel_duration = line.duration_one_way
+            # Recompute available slots
+            tours_to_recompute._reorganize_available_slot()

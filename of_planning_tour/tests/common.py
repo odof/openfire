@@ -49,9 +49,6 @@ class TestOFPlanningTourCommon(TestOFServiceCommon):
             cls.now_dt.replace(hour=18, minute=0),
         )
 
-        cls.group_tour_manual_creation = cls.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
-        cls.group_tour_no_manual_creation = cls.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
-
         cls.partner_antoine = cls.env["res.partner"].create(
             {
                 "name": "Antoine",

@@ -1,9 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import ast
 import json
-import logging
-from datetime import datetime, time, timedelta
+from datetime import datetime
 from urllib.parse import urlparse
 
 import pytz
@@ -13,14 +11,13 @@ from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import config
 
-_logger = logging.getLogger(__name__)
+from odoo.addons.resource.models.resource import float_to_time
 
 TZ_EUROPE_PARIS = "Europe/Paris"
 
 AM_LIMIT_FLOAT = 12.0  # Define the limit between AM and PM
-DEFAULT_MIN_DURATION_IN_HOURS = 0.5  # Default minimum duration between two interventions in hours
-DEFAULT_PERIOD_IN_DAYS = 30
-SECURITY_MARGIN_IN_DAYS = 10  # Security margin in minutes to add to the duration of the interventions
+DEFAULT_MIN_DURATION_IN_HOURS = 0.25  # Default minimum duration for free slots in hours
+DEFAULT_PERIOD_IN_MONTHS = 18
 
 # Mapping dictionary to translate the weekday name to the short version
 WEEKDAYS_STR_TR = {
@@ -89,7 +86,7 @@ class OFPlanningTour(models.Model):
     )
 
     # Employee
-    employee_id = fields.Many2one(comodel_name="hr.employee", string="Operators", required=True, ondelete="cascade")
+    employee_id = fields.Many2one(comodel_name="hr.employee", string="Operator", required=True, ondelete="cascade")
     employee_other_ids = fields.Many2many(
         comodel_name="hr.employee",
         relation="tour_employee_other_rel",
@@ -159,7 +156,7 @@ class OFPlanningTour(models.Model):
         string="Interventions",
         copy=False,
     )
-    intervention_count = fields.Integer(string="# Interventions", compute="_compute_count_interventions", store=True)
+    intervention_count = fields.Integer(string="# Interventions", compute="_compute_count_interventions")
     tour_line_ids = fields.One2many(
         comodel_name="of.planning.tour.line", inverse_name="tour_id", string="Tour lines", copy=False
     )
@@ -340,65 +337,19 @@ class OFPlanningTour(models.Model):
                 (d for d in tour.mapped("tour_line_ids.last_modification_date") if d), default=False
             )
 
-    @api.depends(
-        "employee_id",
-        "date",
-        "employee_id.tz",
-        "tour_line_ids",
-        "tour_line_ids.intervention_id",
-    )
+    @api.depends("date", "available_slot_ids")
     def _compute_is_full(self):
         """A tour full is a tour that is in the past or that has no more available slots."""
-        if not self.env.context.get("tz"):
-            self = self.with_context(tz=TZ_EUROPE_PARIS)
-
-        event_obj = self.env["calendar.event"]
         today = fields.Date.today()
         for tour in self:
             if tour.date < today:
                 tour.is_full = True
                 continue
 
-            employee = tour.employee_id
-            if employee.tz and employee.tz != TZ_EUROPE_PARIS:
-                self = self.with_context(tz=employee.tz)
-
-            interventions = event_obj.search(
-                [
-                    ("of_type", "=", "intervention"),
-                    ("of_employee_ids", "in", tour.employee_id.id),
-                    ("start_date", "<=", tour.date),
-                    ("stop_date", ">=", tour.date),
-                    ("of_state", "in", ("draft", "confirmed")),
-                ],
-                order="start",
-            )
-            if not interventions or not tour.tour_line_ids:
-                tour.is_full = False
-                continue
-
-            employee_wh = employee._get_employee_working_hours_list(tour.date)[employee.id]
-            nb_timeslots = len(employee_wh)
-            if nb_timeslots == 0:  # employee is not working, so the tour is full
-                tour.is_full = True
-                continue
-
-            # build the timeline for occupied timeslots of the day for the employee and check if it is full
-            min_duration = float(
-                self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.available_slot_min_duration_hours")
-                or DEFAULT_MIN_DURATION_IN_HOURS
-            )
-            day_timeline = self._get_employee_day_unavailability_timeline(tour.date, interventions, employee_wh)
+            # Tour is considered full if there is not free slot attached to it
             is_full = True
-            last_end = 0
-            for start, end in day_timeline:
-                if start - last_end > min_duration:
-                    # there is a gap in the timeline so the tour is not full
-                    # we consider that a gap of more than 30 min is enough to consider the tour as not full
-                    is_full = False
-                    break
-                if end > last_end:
-                    last_end = end
+            if tour.available_slot_ids:
+                is_full = False
             tour.is_full = is_full
 
     @api.depends("tour_line_ids", "tour_line_ids.sequence")
@@ -431,7 +382,15 @@ class OFPlanningTour(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             vals |= self._process_address_values(vals)
-        return super().create(vals_list)
+
+        tours = super().create(vals_list)
+
+        # Initialize available slots
+        for tour in tours:
+            available_slots = self._get_initial_available_slots(tour)
+            self._update_available_slot(tour, available_slots)
+
+        return tours
 
     def write(self, vals):
         if ("start_address_id" in vals and not vals["start_address_id"]) or (
@@ -535,12 +494,14 @@ class OFPlanningTour(models.Model):
         for tour in self:
             if not tour.tour_line_ids:
                 tour._populate_tour_lines()
-            for line in tour.tour_line_ids:
+            for line in tour.tour_line_ids.sorted(key=lambda line: (line.tour_id.id, line.date_start)):
                 if reload:
                     line._update_line_data_from_intervention()
                 # force the recomputation of the line data (previous/next geo_lat, geo_lng etc.)
                 line._compute_line_data()
                 line._osrm_update_line_data()
+                # impact intervention travel duration with tour line duration one way
+                line.intervention_id.of_travel_duration = line.duration_one_way
         self._fields["map_tour_line_ids"].compute_value(self)
 
     def action_button_restore_tour(self):
@@ -593,40 +554,6 @@ class OFPlanningTour(models.Model):
 
         return reorganization_wizard.action_button_open(custom_title=self.name)
 
-    @api.model
-    def action_generate_tour(self, date=False, employee=False):
-        """
-        Generate a tour for a given date and employee.
-
-        Args:
-            date (date): The date for which the tour is generated.
-            employee (recorset): The employee for whom the tour is generated.
-
-        Returns:
-            tour (object): The generated tour object.
-
-        Raises:
-            None
-        """
-        if not date or not employee:
-            return False
-        self_sudo = self.sudo()  # to avoid access rights issues if this method is not called from a cron
-
-        tour = self_sudo.search([("date", "=", date), ("employee_id", "=", employee.id)], limit=1)
-        if tour:
-            return tour
-
-        tour = self_sudo.create(
-            {
-                "employee_id": employee.id,
-                "date": date,
-            }
-        )
-        if tour.intervention_ids and not tour.tour_line_ids:
-            # interventions were already existing before tour creation, we need to populate the tour lines
-            tour._populate_tour_lines()
-        return tour
-
     def action_update_lines_data(self):
         """
         Update the lines data for the tour.
@@ -635,6 +562,7 @@ class OFPlanningTour(models.Model):
         """
         for tour in self.sudo():
             tour._populate_tour_lines()
+            tour._reset_sequence()
             tour._osrm_recompute_data_if_needed(force=True)
 
     def action_mass_tour_route_update(self):
@@ -673,6 +601,10 @@ class OFPlanningTour(models.Model):
     #  - map data related
     # ---------------------------------------------------------
 
+    @api.model
+    def _get_intervention_state_values_to_exclude(self):
+        return ["cancel", "postponed", "being_optimized"]
+
     def _prepare_tour_line_values(self, idx, intervention):
         """
         Prepare the values for a tour line based on the given index and intervention.
@@ -701,15 +633,6 @@ class OFPlanningTour(models.Model):
             "duration_one_way": False,
             "distance_one_way": False,
         }
-
-    def _reorder_tour_lines(self):
-        """
-        Reorders the tour lines based on the start time of the intervention associated with each line.
-        Also resets the sequence of the tour lines after reordering.
-        """
-        for tour in self:
-            tour.tour_line_ids = tour.tour_line_ids.sorted(key=lambda line: line.intervention_id.start)
-            tour._reset_sequence()
 
     def _reset_sequence(self):
         """Reset the tour lines sequence depending on each line date_start."""
@@ -782,11 +705,40 @@ class OFPlanningTour(models.Model):
                 ("of_employee_ids", "in", [self.employee_id.id]),
                 ("start_date", "<=", self.date),
                 ("stop_date", ">=", self.date),
-                ("of_state", "in", ("draft", "confirmed", "ongoing")),
+                ("of_state", "not in", self._get_intervention_state_values_to_exclude()),
             ],
             order="start",
         )
         return interventions - self.tour_line_ids.mapped("intervention_id")
+
+    def _remove_tour_lines(self):
+        """
+        Remove the tour lines with interventions that are not supposed to be in the tour.
+
+        This method checks if there are interventions that need to be removed to the tour based on certain conditions,
+        such as the tour date and the employee and the intervention state. If interventions need to be removed,
+        it deletes tour lines.
+
+        Parameters:
+            self (RecordSet): The current tour recordset.
+
+        Returns:
+            None
+        """
+        for tour in self:
+            # Get the interventions that are not supposed to be in the tour and remove them
+            lines_to_remove = tour.tour_line_ids.filtered(
+                lambda line: line.intervention_id.of_type != "intervention"
+                or tour.employee_id.id not in line.intervention_id.of_employee_ids.ids
+                or tour.date < line.intervention_id.start_date
+                or tour.date > line.intervention_id.stop_date
+                or line.intervention_id.of_state in self._get_intervention_state_values_to_exclude()
+                or not line.intervention_id.active
+            )
+            if lines_to_remove:
+                lines_to_remove.unlink()
+                tour._reorganize_available_slot()
+                tour._reset_sequence()
 
     def _write_update_states(self, values):
         """
@@ -899,105 +851,24 @@ class OFPlanningTour(models.Model):
         return tours
 
     @api.model
-    def cron_generate_employees_tours(self, force_date=False, force_company_id=False):
+    def cron_generate_employees_tours(self):
         """
-        Generate tours for employees for the next period of days defined in the configuration.
-        At each cron execution, it will check if there are new employees created since the last execution and generate
-        tours for them if needed.
-
-        Args:
-            force_date (str, optional): A specific date in the format 'YYYY-MM-DD' to force the generation of tours.
-                Defaults to False.
-            force_company_id (bool, optional): The ID of a specific company to generate tours for. Defaults to False.
+        Generate tours for employees for the next period of months defined in the configuration.
 
         Returns:
             bool: True if the generation of tours is successful.
         """
-        icp_obj = self.env["ir.config_parameter"]
-        employee_obj = self.env["hr.employee"]
-        days_obj = self.env["of.days"]
-        icp_obj = self.env["ir.config_parameter"]
+        today = datetime.now().date()
+        employees = self.env["hr.employee"].search([])
 
-        new_employees = employee_obj
-        today = datetime.strptime(force_date, "%Y-%m-%d").date() if force_date else datetime.now().date()
+        employees._recompute_tours()
 
-        # we are using config parameters here to avoid cron autolock during job processing
-        cron_lastcreation = icp_obj.get_param(
-            "of.planning.tour.cron_generate_lastcreation", datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        )
-        lastcreation_d = datetime.strptime(cron_lastcreation, "%Y-%m-%d %H:%M:%S").date()
+        # Delete potential empty tour for inactive employees
+        inactive_employees = self.env["hr.employee"].search([("active", "=", False)])
+        self.env["of.planning.tour"].search(
+            [("date", ">=", today), ("employee_id", "in", inactive_employees.ids), ("tour_line_ids", "=", False)]
+        ).unlink()
 
-        # checking if cron has to do someting by comparing nextcall date with today
-        cron_nextcall = icp_obj.get_param("of.planning.tour.cron_generate_nextcall", False)
-        cron_nextcall_dt = datetime.strptime(cron_nextcall, "%Y-%m-%d %H:%M:%S") if cron_nextcall else False
-        if cron_nextcall_dt and cron_nextcall_dt.strftime("%Y-%m-%d") > today.strftime("%Y-%m-%d"):
-            # cron is not due to run today but if there is new created employees since the last execution we need to
-            # generate tours for them
-            new_employees = employee_obj.search([("create_date", ">=", cron_lastcreation)])
-            if not new_employees:
-                _logger.info(f"Nothing todo. Cron generate tour is scheduled for {cron_nextcall}")
-                return True
-
-        company_id = int(force_company_id) if force_company_id else False
-        employee_ids = icp_obj.get_param("of.planning.tour.tour_employee_ids", "[]")
-        day_ids = icp_obj.get_param("of.planning.tour.tour_day_ids", [])
-        period_in_days = int(icp_obj.get_param("of.planning.tour.nbr_days_tour_creation", DEFAULT_PERIOD_IN_DAYS))
-        employee_ids = ast.literal_eval(employee_ids)
-        day_ids = ast.literal_eval(day_ids)
-
-        if not new_employees:
-            # get employees to process from the settings if its set, search all employees otherwise
-            employee_domain = [("id", "in", employee_ids)] if employee_ids else []
-            if company_id:
-                employee_domain.append("|", ("company_id", "=", company_id), ("company_id", "=", False))
-            employees = employee_obj.search(employee_domain)
-        elif employee_ids:
-            return True  # we don't need to generate tours for new employees if we have a list of employees
-        else:
-            employees = new_employees
-
-        days = days_obj.search([("id", "in", day_ids)])
-        days_number = [day.number for day in days] or range(1, 8)
-
-        delta = timedelta(days=period_in_days)
-
-        # generate the list of dates for which we need to generate tours on that period (with a security margin)
-        tour_dates = []
-        for date in [lastcreation_d + timedelta(days=i) for i in range(1, delta.days + 1 + SECURITY_MARGIN_IN_DAYS)]:
-            tour_dates.append(date.strftime("%Y-%m-%d")) if date.weekday() + 1 in days_number else None
-
-        # search existing tours for employees on this period
-        if tour_dates:
-            search_existing_tours = self.search(
-                [("date", ">=", tour_dates[0]), ("date", "<=", tour_dates[-1]), ("employee_id", "in", employees.ids)]
-            )
-            tour_by_employee = {}
-            for tour in search_existing_tours:
-                tour_by_employee.setdefault(tour.employee_id, []).append(tour.date)
-
-            # generate tours for each employee for missing dates
-            for employee in employees:
-                employee_tour_dates = tour_dates[:]
-                if tour_by_employee.get(employee):
-                    employee_tour_dates = [x for x in employee_tour_dates if x not in tour_by_employee.get(employee)]
-
-                for date in employee_tour_dates:
-                    self.action_generate_tour(date, employee)
-
-        # set the nextcall date (in x days)
-        cron_nextcall_dt = datetime.strptime(cron_nextcall, "%Y-%m-%d %H:%M:%S") if cron_nextcall else datetime.now()
-        cron_generate_nextcall = (cron_nextcall_dt + timedelta(days=period_in_days)).strftime("%Y-%m-%d %H:%M:%S")
-        if not new_employees:  # normal cron call
-            icp_obj.set_param(
-                "of.planning.tour.cron_generate_lastcreation", datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            )
-            icp_obj.set_param("of.planning.tour.cron_generate_nextcall", cron_generate_nextcall)
-            _logger.info(f"Done. Cron generate tour is scheduled for {cron_generate_nextcall}")
-        else:  # cron call for new employees
-            _logger.info(
-                f"Done. Cron generate tour for new employees {new_employees}."
-                f" Next call is still scheduled on {cron_generate_nextcall}"
-            )
         return True
 
     def _get_start_stop_markers_data_for_tour(self):
@@ -1436,16 +1307,22 @@ class OFPlanningTour(models.Model):
                     the 'start' and 'stop' datetime values for a slot.
         """
         available_slots = []
-        if tour.date > fields.Date.today():
-            user_tz = pytz.timezone(self.env.user.tz) if self.env.user.tz else pytz.utc
+        if tour.date >= fields.Date.today():
+            calendar_tz = (
+                pytz.timezone(tour.employee_id.resource_calendar_id.tz)
+                if tour.employee_id.resource_calendar_id
+                else pytz.timezone("Europe/Paris")
+            )
             for attendance in tour.mapped("employee_id.resource_calendar_id.attendance_ids").filtered(
-                lambda a: a.dayofweek == str(tour.date.weekday()) and not a.week_type or a.week_type == tour.week_type
+                lambda a: not a.display_type
+                and a.dayofweek == str(tour.date.weekday())
+                and (not a.week_type or a.week_type == tour.week_type)
             ):
-                start_time = time(hour=int(attendance.hour_from), minute=int(attendance.hour_from % 1 * 60))
-                stop_time = time(hour=int(attendance.hour_to), minute=int(attendance.hour_to % 1 * 60))
+                start_time = float_to_time(attendance.hour_from)
+                stop_time = float_to_time(attendance.hour_to)
+                start = calendar_tz.localize(datetime.combine(tour.date, start_time))
+                stop = calendar_tz.localize(datetime.combine(tour.date, stop_time))
 
-                start = user_tz.localize(datetime.combine(tour.date, start_time))
-                stop = user_tz.localize(datetime.combine(tour.date, stop_time))
                 available_slots.append(
                     {
                         "start": start.astimezone(pytz.utc).replace(tzinfo=None),
@@ -1466,7 +1343,7 @@ class OFPlanningTour(models.Model):
         Returns:
             list: The list of updated available slots.
         """
-        if available_slots:
+        if available_slots and not line.allday:
             res = []
             slot = available_slots[0]
             if slot["start"] > line.date_stop or slot["stop"] < line.date_start:
@@ -1519,7 +1396,7 @@ class OFPlanningTour(models.Model):
     def _delete_available_slot_too_small_recursive(self, available_slots):
         """
         Recursively deletes available slots that are too small.
-        We test if the remains are bigger than the minimun duration of a task.
+        We test if the remains are bigger than the minimum duration defined.
 
         Args:
             available_slots (list): A list of available slots.
@@ -1531,8 +1408,11 @@ class OFPlanningTour(models.Model):
             return []
 
         slot_dict = available_slots[0]
-        task_obj = self.env["of.planning.task"]
-        min_duration = task_obj._get_minimal_task_duration()
+        min_duration = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_minimum_free_slot_duration", DEFAULT_MIN_DURATION_IN_HOURS)
+        )
 
         duration = round(((slot_dict["stop"] - slot_dict["start"]).total_seconds() / 3600.0), 2)
         if slot_dict.get("next_tour_line_id"):
