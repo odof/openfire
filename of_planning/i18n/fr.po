@@ -1861,12 +1861,11 @@ msgstr ""
 #. module: of_planning
 #: model:ir.model.fields,help:of_planning.field_calendar_event__allday
 msgid ""
-"If you define an all-day intervention, its start and end timeswill be the "
-"start and end times of the main technician's workday."
+"If you define an all-day intervention, its start and end times will be "
+"arbitrary times."
 msgstr ""
 "Si vous définissez une intervention sur toute la journée, ses heures de "
-"début et de fin seront les horaires de début et de fin de la journée de "
-"travail du technicien principal."
+"début et de fin seront des horaires arbitraires."
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
