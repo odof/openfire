@@ -36,8 +36,7 @@ class CalendarEvent(models.Model):
     allday = fields.Boolean(
         string="All Day",
         default=False,
-        help="If you define an all-day intervention, its start and end times"
-        "will be the start and end times of the main technician's workday.",
+        help="If you define an all-day intervention, its start and end times will be arbitrary times.",
     )
     description = fields.Html(
         help="The external description allows you to provide information "
@@ -489,11 +488,6 @@ class CalendarEvent(models.Model):
     # Compute methods
     # --------------------------------------------------------------------------
 
-    def _inverse_dates(self):
-        for meeting in self:
-            if meeting.allday:
-                meeting._update_datetime_with_work_hours()
-
     @api.depends("of_resource_id")
     def _compute_of_employee_ids(self):
         """Compute the employee_id based on the resource_id.
@@ -526,11 +520,12 @@ class CalendarEvent(models.Model):
     def _compute_dates(self):
         """Override to always compute simple dates for interventions"""
         events = self.filtered(lambda e: e.of_type == "intervention")
+        tz = pytz.timezone(self.of_employee_id.tz or "Europe/Paris")
         for event in events:
             if event.start:
-                event.start_date = event.start.date()
+                event.start_date = pytz.utc.localize(event.start).astimezone(tz).date()
             if event.stop:
-                event.stop_date = event.stop.date()
+                event.stop_date = pytz.utc.localize(event.stop).astimezone(tz).date()
         return super(CalendarEvent, self - events)._compute_dates()
 
     @api.depends("of_partner_id", "user_id")
@@ -818,15 +813,17 @@ class CalendarEvent(models.Model):
         event_obj = self.env["calendar.event"]
         for event in self:
             if event.of_employee_ids and event.start and event.stop:
-                conflicts_domain = [
-                    ("of_employee_ids", "in", event.of_employee_ids.ids),
-                    ("start", "<", event.stop),
-                    ("stop", ">", event.start),
-                    ("of_state", "!=", "cancel"),
-                ]
-                if not isinstance(event.id, models.NewId):
-                    conflicts_domain.append(("id", "!=", event.id))
-                conflicts = event_obj.search(conflicts_domain, limit=1)
+                event_id = event._origin.id if isinstance(event.id, models.NewId) else event.id
+                conflicts = event_obj.search(
+                    [
+                        ("of_employee_ids", "in", event.of_employee_ids.ids),
+                        ("start", "<", event.stop),
+                        ("stop", ">", event.start),
+                        ("of_state", "!=", "cancel"),
+                        ("id", "!=", event_id),
+                    ],
+                    limit=1,
+                )
                 event.of_has_conflict_warning = bool(conflicts)
             else:
                 event.of_has_conflict_warning = False
@@ -866,12 +863,6 @@ class CalendarEvent(models.Model):
     # Onchange methods
     # --------------------------------------------------------------------------
 
-    @api.onchange("allday")
-    def _onchange_allday(self):
-        self.ensure_one()
-        if self.allday:
-            self._update_datetime_with_work_hours()
-
     @api.onchange("of_employee_ids")
     def _onchange_of_employee_ids(self):
         for event in self:
@@ -910,6 +901,14 @@ class CalendarEvent(models.Model):
     def _onchange_date(self):
         """Override to not update the start_date and stop_date fields"""
         events = self.filtered(lambda e: e.of_type == "intervention")
+        for event in events:
+            if event.allday and event.start_date and event.stop_date:
+                event.with_context(is_calendar_event_new=True).write(
+                    {
+                        "start": fields.Datetime.from_string(event.start_date).replace(hour=8),
+                        "stop": fields.Datetime.from_string(event.stop_date).replace(hour=18),
+                    }
+                )
         return super(CalendarEvent, self - events)._onchange_date()
 
     @api.onchange("of_partner_id")
@@ -1379,11 +1378,13 @@ class CalendarEvent(models.Model):
         end_hour = None
 
         if not resource_calendar.two_weeks_calendar:
-            attendances = resource_calendar.attendance_ids.filtered(lambda a: int(a.dayofweek) == week_day)
+            attendances = resource_calendar.attendance_ids.filtered(
+                lambda a: not a.display_type and int(a.dayofweek) == week_day
+            )
         else:
             week_type = resource_calendar.attendance_ids.get_week_type(self.start_date)
             attendances = resource_calendar.attendance_ids.filtered(
-                lambda a: int(a.dayofweek) == week_day and int(a.week_type) == week_type
+                lambda a: not a.display_type and int(a.dayofweek) == week_day and int(a.week_type) == week_type
             )
 
         if attendances:
@@ -1391,24 +1392,6 @@ class CalendarEvent(models.Model):
             end_hour = max(attendances.mapped("hour_to"))
 
         return start_hour, end_hour
-
-    def _update_datetime_with_work_hours(self):
-        """Update the start and stop of the intervention with the work hours"""
-        self.ensure_one()
-        start_date, end_date = self._retrieve_work_hours()
-        tz = pytz.timezone(self.of_employee_id.tz or "Europe/Paris")
-
-        if start_date is not None and end_date is not None:
-            startdate = self.start.replace(hour=int(start_date), minute=int(((start_date - int(start_date)) * 60)))
-            enddate = self.stop.replace(hour=int(end_date), minute=int(((end_date - int(end_date)) * 60)))
-        else:
-            startdate = self.start.replace(hour=9)
-            enddate = self.stop.replace(hour=18)
-
-        start = tz.localize(startdate).astimezone(pytz.UTC).replace(tzinfo=None)
-        stop = tz.localize(enddate).astimezone(pytz.UTC).replace(tzinfo=None)
-
-        self.write({"start": start, "stop": stop})
 
     def _affect_intervention_number(self):
         events = self.filtered(
