@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-19 13:43+0000\n"
-"PO-Revision-Date: 2024-07-19 13:43+0000\n"
+"POT-Creation-Date: 2024-11-19 11:55+0000\n"
+"PO-Revision-Date: 2024-11-19 11:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -50,17 +50,6 @@ msgid "(OF) Default intervention template for searching"
 msgstr "(OF) Modèle d'intervention par défaut pour la recherche"
 
 #. module: of_planning_tour
-#: model:res.groups,name:of_planning_tour.group_of_planning_tour_manual_creation
-msgid "(OF) Manual tour creation allowed"
-msgstr "(OF) Création manuelle de tournée autorisée"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__of_planning_tour_manual_creation
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__of_planning_tour_manual_creation
-msgid "(OF) Manual tour creation authorized"
-msgstr "(OF) Création manuelle de tournée autorisée"
-
-#. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__search_mode
 #: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__search_mode
 msgid "(OF) Search mode"
@@ -73,27 +62,16 @@ msgid "(OF) Search type"
 msgstr "(OF) Type de recherche"
 
 #. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__nbr_days_tour_creation
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__nbr_days_tour_creation
-msgid "(OF) Tours // Create Tours over __ days"
-msgstr "(OF) Tournées // Créer des tournées sur __ jours"
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__nbr_months_tour_creation
+#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__nbr_months_tour_creation
+msgid "(OF) Tours // Create Tours over __ months"
+msgstr "(OF) Tournées // Créer des tournées sur __ mois"
 
 #. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_day_ids
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_day_ids
-msgid "(OF) Tours // Days"
-msgstr "(OF) Tournées // Jours"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_employee_ids
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_employee_ids
-msgid "(OF) Tours // Employees"
-msgstr "(OF) Tournées // Employés"
-
-#. module: of_planning_tour
-#: model:res.groups,name:of_planning_tour.group_of_planning_tour_no_manual_creation
-msgid "(OF) Unauthorized manual tour creation"
-msgstr "(OF) Création manuelle de tournée non autorisée"
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_minimum_free_slot_duration
+#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_minimum_free_slot_duration
+msgid "(OF) Tours // Minimum free slot duration"
+msgstr "(OF) Tournées // Durée minimale des créneaux disponibles"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_kanban
@@ -159,6 +137,16 @@ msgstr ""
 "title=\"Pointeur\"/></span>"
 
 #. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__is_flexible
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_optimization_line_wizard__is_flexible
+msgid ""
+"A flexible intervention is one that allows a certain amount of flexibility "
+"in planning and could be moved."
+msgstr ""
+"Une intervention flexible est une intervention qui permet une certaine "
+"souplesse dans la planification et qui pourrait être déplacée."
+
+#. module: of_planning_tour
 #: model:ir.model.constraint,message:of_planning_tour.constraint_of_planning_tour_date_employee_uniq
 msgid "A tour already exists for this employee on this date."
 msgstr "Une tournée existe déjà pour cet employé à cette date."
@@ -167,11 +155,6 @@ msgstr "Une tournée existe déjà pour cet employé à cette date."
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_optimization_wizard_view_form
 msgid "Accept that an intervention ends during the lunch break."
 msgstr "Accepter qu'une intervention se termine pendant la pause déjeuner."
-
-#. module: of_planning_tour
-#: model:ir.model,name:of_planning_tour.model_res_groups
-msgid "Access Groups"
-msgstr "Groupes d'accès"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__access_user_ids
@@ -208,6 +191,11 @@ msgid "Afternoon"
 msgstr "Après-midi"
 
 #. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__allday
+msgid "All Day"
+msgstr "Toute la journée"
+
+#. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 msgid ""
 "Allow to restore the tour as it was before the last optimization/reorganization. <br/>\n"
@@ -215,17 +203,6 @@ msgid ""
 msgstr ""
 "Permet de restaurer la tournée telle qu'elle était avant la dernière "
 "optimisation/réorganisation. <br/>"
-
-#. module: of_planning_tour
-#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
-msgid "Allows the creation of tours manually by the user."
-msgstr "Autorise la création manuelle de tournées par l'utilisateur."
-
-#. module: of_planning_tour
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__of_planning_tour_manual_creation
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__of_planning_tour_manual_creation
-msgid "Allows users to manually create tours."
-msgstr "Permet aux utilisateurs de créer manuellement des tournées"
 
 #. module: of_planning_tour
 #. odoo-python
@@ -263,7 +240,7 @@ msgstr "Archivé"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_attachment_count
 msgid "Attachment Count"
-msgstr ""
+msgstr "Nombre de pièces jointes"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__available_slot_id
@@ -348,7 +325,7 @@ msgstr "Peut chevaucher la pause déjeuner ?"
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_optimization_wizard_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_reorganization_wizard_view_form
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__check_availability_before_modification
@@ -404,7 +381,7 @@ msgstr "L'url OSRM construite n'est pas valide"
 #. module: of_planning_tour
 #: model:ir.model,name:of_planning_tour.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__could_overlap
@@ -417,18 +394,6 @@ msgstr "Pourrait chevaucher"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__partner_address_country_id
 msgid "Country"
 msgstr "Pays"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_day_ids
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_day_ids
-msgid "Create tours for these days only"
-msgstr "Créer des tournées pour ces jours uniquement"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_employee_ids
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_employee_ids
-msgid "Create tours for these employees only."
-msgstr "Créer des tournées pour ces employés uniquement"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__create_uid
@@ -444,7 +409,7 @@ msgstr "Créer des tournées pour ces employés uniquement"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__create_uid
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Créé par"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__create_date
@@ -460,7 +425,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__create_date
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Créé le"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_filter
@@ -489,7 +454,7 @@ msgstr "Données pour l'affichage d'enregistrements supplémentaires"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__date
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__date
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__date_before_modification
@@ -499,7 +464,7 @@ msgstr "Date (avant modification)"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__date_str
 msgid "Date (str)"
-msgstr ""
+msgstr "Date (str)"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__date_deadline_before_modification
@@ -520,12 +485,12 @@ msgstr ""
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__date_max
 msgid "Date max"
-msgstr ""
+msgstr "Date max"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__date_min
 msgid "Date min"
-msgstr ""
+msgstr "Date min"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__day_period
@@ -560,15 +525,49 @@ msgid "Default intervention template to use when creating for an appointment."
 msgstr "Le modèle d'intervention par défaut a utiliser pour créer un RDV"
 
 #. module: of_planning_tour
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__nbr_days_tour_creation
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__nbr_days_tour_creation
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__address_id
+msgid ""
+"Define the address of the intervention site; by default, the customer's "
+"address will be used."
+msgstr ""
+"Définissez l'adresse du lieu de l'intervention, par défaut, l'adresse du "
+"client sera reprise"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_minimum_free_slot_duration
+#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_minimum_free_slot_duration
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
 msgid ""
-"Defines the number of days on which to create the routes for each employee "
-"whose work hours are defined. Maximum: 180 days."
+"Defines the minimum free slot duration in hours. It corresponds to the "
+"minimum duration between two interventions to consider that employees "
+"available."
 msgstr ""
-"Définit le nombre de jours sur lesquels créer les tournées pour chaque "
-"employé dont les heures de travail sont définies. Maximum : 180 jours."
+"Définit la durée minimum des créneaux disponibles en heures. Elle correspond"
+" à la durée minimale entre deux interventions pour considérer que les "
+"employés soient disponibles."
+
+#. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__nbr_months_tour_creation
+#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__nbr_months_tour_creation
+msgid ""
+"Defines the number of months on which to create the routes for each employee"
+" whose work hours are defined. Maximum: 36 months. Tip: this number must be "
+"at least equal to the maximum number of months over which you realize slots "
+"research."
+msgstr ""
+"Définit le nombre de mois sur lesquels créer les tournées pour chaque "
+"employé dont les heures de travail sont définies. Maximum : 36 mois. Conseil"
+" : ce nombre doit être au moins égal au nombre maximum de mois sur lesquels "
+"vous réalisez des recherches de créneaux."
+
+#. module: of_planning_tour
+#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
+msgid ""
+"Defines the number of months on which to create the routes for each employee whose work hours are defined. Maximum: 36 months.<br/>\n"
+"                                Tip: this number must be at least equal to the maximum number of months over which you realize slots research."
+msgstr ""
+"Définit le nombre de mois sur lesquels créer les tournées pour chaque employé dont les heures de travail sont définies. Maximum : 36 mois.<br/>\n"
+"                                Conseil : ce nombre doit être au moins égal au nombre maximum de mois sur lesquels vous réalisez des recherches de créneaux."
 
 #. module: of_planning_tour
 #. odoo-python
@@ -589,7 +588,7 @@ msgstr "Départ/Retour"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__description
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__description
 msgid "Description"
-msgstr ""
+msgstr "Description"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_appointment_line_wizard_view_tree
@@ -610,7 +609,7 @@ msgstr "Afficher"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__display_name
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Nom d'affichage"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_wizard__display_multi_employees_opt
@@ -631,7 +630,7 @@ msgstr "Afficher l'option de chevauchement ?"
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__res_config_settings__search_type__distance
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_optimization_line_wizard_view_tree
 msgid "Distance (km)"
-msgstr ""
+msgstr "Distance (km)"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__orthodromic
@@ -685,15 +684,16 @@ msgstr "Durée jusqu'au point final (heures)"
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_kanban
 msgid "Duration:"
-msgstr "Durée:"
+msgstr "Durée :"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__partner_email
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #. module: of_planning_tour
 #: model:ir.model,name:of_planning_tour.model_hr_employee
+#: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_filter
 msgid "Employee"
 msgstr "Employé"
 
@@ -771,7 +771,12 @@ msgstr "Erreur lors du processus d'optimisation : %(error)s"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__intervention_id
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_wizard_line_mixin__intervention_id
 msgid "Event"
-msgstr "Evènement"
+msgstr "Événement"
+
+#. module: of_planning_tour
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour__week_type__0
+msgid "First"
+msgstr "Premier"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__is_first_line_of_tour
@@ -782,17 +787,17 @@ msgstr "Première ligne de la tournée"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__is_flexible
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__is_flexible
 msgid "Flexible"
-msgstr ""
+msgstr "Flexible"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_follower_ids
 msgid "Followers"
-msgstr ""
+msgstr "Abonnés"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_partner_ids
 msgid "Followers (Partners)"
-msgstr ""
+msgstr "Abonnés (Partenaires)"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__force_date_before_modification
@@ -825,18 +830,18 @@ msgstr "Complet"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_team__partner_latitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__geo_lat
 msgid "Geo Latitude"
-msgstr ""
+msgstr "Latitude"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_team__partner_longitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__geo_lng
 msgid "Geo Longitude"
-msgstr ""
+msgstr "Longitude"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__geodata_update_date
 msgid "Geodata update date"
-msgstr ""
+msgstr "Date de mise à jour des données géographiques"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__geometry_data
@@ -845,7 +850,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_wizard_line_mixin__geometry_data
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__additional_record_geometry_data
 msgid "Geojson data"
-msgstr ""
+msgstr "Données Geojson"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__endpoint_geometry_data
@@ -879,6 +884,9 @@ msgid ""
 "Geojson data used to draw the route on the map between the meeting we are "
 "trying to plan and the previous/next coordinates"
 msgstr ""
+"Données Geojson utilisées pour dessiner la route sur la carte entre le "
+"rendez-vous en cours de planification et les coordonnées précédentes et "
+"suivantes"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_appointment_line_wizard_view_kanban
@@ -893,12 +901,12 @@ msgstr "Grouper par..."
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__has_message
 msgid "Has Message"
-msgstr ""
+msgstr "A un message"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__hexa_color
 msgid "Hexa color"
-msgstr ""
+msgstr "Couleur Hexa"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__hide_action_buttons
@@ -919,35 +927,26 @@ msgstr "Cacher les boutons d'action"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__id
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour__message_needaction
 msgid "If checked, new messages require your attention."
-msgstr ""
+msgstr "Si coché, de nouveaux messages demandent votre attention."
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour__message_has_error
 msgid "If checked, some messages have a delivery error."
-msgstr ""
+msgstr "Ignorer les données géographiques"
 
 #. module: of_planning_tour
-#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__allday
 msgid ""
-"If specified, only the selected days will be taken into account when "
-"creating tours by the scheduled action."
+"If you define an all-day intervention, its start and end times will be "
+"arbitrary times."
 msgstr ""
-"Si spécifié, seuls les jours sélectionnés seront pris en compte lors de la "
-"création des tournées par l'action planifiée."
-
-#. module: of_planning_tour
-#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
-msgid ""
-"If specified, only the selected employees will be taken into account when "
-"creating tours by the scheduled action."
-msgstr ""
-"Si spécifié, seuls les employés sélectionnés seront pris en compte lors de "
-"la création des tournées par l'action planifiée."
+"Si vous définissez une intervention sur toute la journée, ses heures de "
+"début et de fin seront des horaires arbitraires."
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__ignore_geodata
@@ -967,7 +966,7 @@ msgstr "Inclure un rendez-vous flexible"
 #. module: of_planning_tour
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour_optimization_wizard__state__init
 msgid "Init"
-msgstr ""
+msgstr "Init"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__intervention_id
@@ -975,7 +974,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__intervention_id
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_appointment_wizard_view_form
 msgid "Intervention"
-msgstr ""
+msgstr "Intervention"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__partner_address_id
@@ -1017,7 +1016,7 @@ msgstr "Modèle d'intervention"
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 #, python-format
 msgid "Interventions"
-msgstr ""
+msgstr "Interventions"
 
 #. module: of_planning_tour
 #. odoo-python
@@ -1034,7 +1033,7 @@ msgstr "Est la première ligne de la tournée"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_is_follower
 msgid "Is Follower"
-msgstr ""
+msgstr "Est abonné"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__is_last_line_of_tour
@@ -1060,7 +1059,7 @@ msgstr "Est-ce que la tournée est optimisée par le serveur OSRM ?"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template____last_update
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard____last_update
 msgid "Last Modified on"
-msgstr ""
+msgstr "Dernière modification le"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__write_uid
@@ -1076,7 +1075,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__write_uid
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Dernière mise à jour par"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__write_date
@@ -1092,31 +1091,31 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_template__write_date
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Dernière mise à jour le"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__is_last_line_of_tour
 msgid "Last line of the tour"
-msgstr ""
+msgstr "Dernière ligne de la tournée"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__last_modification_date
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__last_modification_date
 msgid "Last modification date"
-msgstr ""
+msgstr "Date de dernière mise à jour"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_calendar_event__of_partner_latitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__geo_lat
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__geo_lat
 msgid "Latitude"
-msgstr ""
+msgstr "Latitude"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__map_latitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__map_latitude
 msgid "Latitude (map)"
-msgstr "Latitude"
+msgstr "Latitude (map)"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__next_geo_lat
@@ -1158,13 +1157,13 @@ msgstr "Lignes à réorganiser"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__geo_lng
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__geo_lng
 msgid "Longitude"
-msgstr ""
+msgstr "Longitude"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__map_longitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__map_longitude
 msgid "Longitude (map)"
-msgstr "Longitude"
+msgstr "Longitude (map)"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__next_geo_lng
@@ -1189,26 +1188,26 @@ msgstr "Longitude du point précédent"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_main_attachment_id
 msgid "Main Attachment"
-msgstr ""
+msgstr "Pièce jointe principale"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 msgid "Map & OSRM data"
-msgstr ""
+msgstr "Données Map & OSRM"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__map_latitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_wizard__map_latitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__map_latitude
 msgid "Map Latitude"
-msgstr ""
+msgstr "Latitude Map"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__map_longitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_wizard__map_longitude
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__map_longitude
 msgid "Map Longitude"
-msgstr ""
+msgstr "Longitude Map"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_wizard__map_tour_line_ids
@@ -1236,17 +1235,17 @@ msgstr "Assignation de secteur en masse"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__max_line_sequence
 msgid "Max sequence in lines"
-msgstr ""
+msgstr "Séquence max des lignes"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_has_error
 msgid "Message Delivery error"
-msgstr ""
+msgstr "Erreur d'envoi du message"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_ids
 msgid "Messages"
-msgstr ""
+msgstr "Messages"
 
 #. module: of_planning_tour
 #: model:ir.model,name:of_planning_tour.model_of_planning_tour_wizard_line_mixin
@@ -1264,7 +1263,7 @@ msgstr "Classe Mixin pour le wizard de planification de tournée"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__partner_mobile
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__partner_mobile
 msgid "Mobile"
-msgstr ""
+msgstr "Mobile"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.hr_employee_view_form
@@ -1295,7 +1294,7 @@ msgstr "Matin et après-midi"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__is_multi_employees
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_wizard_line_mixin__is_multi_employees
 msgid "Multi-employees"
-msgstr ""
+msgstr "Multi-employés"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__name
@@ -1346,7 +1345,7 @@ msgstr "Nouveau créneau"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__new_index
 msgid "New index"
-msgstr ""
+msgstr "Index"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__new_date_start
@@ -1420,22 +1419,22 @@ msgstr "Incomplet"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_needaction_counter
 msgid "Number of Actions"
-msgstr ""
+msgstr "Nombre d'actions"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__message_has_error_counter
 msgid "Number of errors"
-msgstr ""
+msgstr "Nombre d'erreurs"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour__message_needaction_counter
 msgid "Number of messages requiring action"
-msgstr ""
+msgstr "Nombre de messages qui requiert une action"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour__message_has_error_counter
 msgid "Number of messages with delivery error"
-msgstr ""
+msgstr "Nombre de messages avec erreur de livraison"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__osrm_query
@@ -1458,17 +1457,17 @@ msgstr "Durée (h)"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__old_sequence
 msgid "Old Sequence"
-msgstr ""
+msgstr "Ancienne séquence"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__old_time_slot
 msgid "Old Time Slot"
-msgstr ""
+msgstr "Ancien créneau"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__old_index
 msgid "Old index"
-msgstr ""
+msgstr "Ancien index"
 
 #. module: of_planning_tour
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_connector_config_settings__search_mode__oneway
@@ -1495,6 +1494,9 @@ msgid "One way or Return"
 msgstr "Aller ou Retour"
 
 #. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__employee_id
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__employee_id
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__employee_id
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__employee_id
 msgid "Operator"
 msgstr "Technicien"
@@ -1526,13 +1528,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__pre_employee_ids
 msgid "Operator(s)"
 msgstr "Technicien(s)"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__employee_id
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__employee_id
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__employee_id
-msgid "Operators"
-msgstr "Techniciens"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
@@ -1619,8 +1614,7 @@ msgid "Planning End Date"
 msgstr "Date de fin de la planification"
 
 #. module: of_planning_tour
-#: model:ir.actions.act_window,name:of_planning_tour.action_of_planning_tour_manual_create
-#: model:ir.actions.act_window,name:of_planning_tour.action_of_planning_tour_no_manual_create
+#: model:ir.actions.act_window,name:of_planning_tour.action_of_planning_tour
 msgid "Planning Tours"
 msgstr "Planification des tournées"
 
@@ -1723,6 +1717,11 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 #. module: of_planning_tour
+#: model:ir.model,name:of_planning_tour.model_resource_calendar
+msgid "Resource Working Time"
+msgstr "Temps de travail de la ressource"
+
+#. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 msgid "Restore tour"
 msgstr "Restaurer la tournée"
@@ -1772,7 +1771,7 @@ msgstr "Aller-retour"
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 msgid "Route"
-msgstr ""
+msgstr "Route"
 
 #. module: of_planning_tour
 #. odoo-python
@@ -1838,6 +1837,11 @@ msgid "Search type"
 msgstr "Type de recherche"
 
 #. module: of_planning_tour
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour__week_type__1
+msgid "Second"
+msgstr "Deuxième"
+
+#. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__gb_sector_id
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_filter
 msgid "Sector"
@@ -1857,6 +1861,14 @@ msgstr "Secteur à assigner"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__sector_ids
 msgid "Sectors"
 msgstr "Secteurs"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__employee_ids
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_optimization_line_wizard__employee_ids
+#: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__employee_ids
+msgid "Select a team to add all team members to the intervention"
+msgstr ""
+"Sélectionnez un ou plusieurs intervenants qui effectueront l'intervention"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__selected_datetime
@@ -1997,6 +2009,8 @@ msgstr "Heure de fin"
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_optimization_line_wizard__date_stop
 msgid "Stop date of an event, without time for full days events"
 msgstr ""
+"Date de fin d'événement, sans heure pour les événements durant toute la "
+"journée"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__partner_address_street
@@ -2015,7 +2029,6 @@ msgid "Sunday"
 msgstr "Dimanche"
 
 #. module: of_planning_tour
-#: model:ir.model,name:of_planning_tour.model_of_planning_task
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__task_name
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_line_wizard__task_name
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__task_name
@@ -2081,21 +2094,6 @@ msgid "Technical field to know the last update date of line geodata"
 msgstr ""
 "Champ technique pour connaître la date de la dernière mise à jour des "
 "données géographiques de la ligne"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_day_ids_str
-#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_employee_ids_str
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_day_ids_str
-#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_employee_ids_str
-msgid ""
-"Technical field to store M2M fields into a config parameter. As "
-"config_parameters does not accept m2m field, we store the fields with a "
-"comma separated string into a Char config field."
-msgstr ""
-"Champ technique pour stocker les champs M2M dans un paramètre de "
-"configuration. Comme les paramètres de configuration n'acceptent pas les "
-"champs m2m, nous stockons les champs avec une chaîne séparée par des "
-"virgules dans un champ de configuration Char"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_optimization_line_wizard__new_intervention_id
@@ -2190,7 +2188,7 @@ msgstr ""
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__map_latitude
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour_line__map_longitude
 msgid "Technical field user to center the map on the tour"
-msgstr "Technique utilisé pour centrer la carte sur la tournée"
+msgstr "Champ technique utilisé pour centrer la carte sur la tournée"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
@@ -2220,11 +2218,11 @@ msgstr ""
 #: code:addons/of_planning_tour/models/res_config_settings.py:0
 #, python-format
 msgid ""
-"The number of days for the tours creation must be positive and can't exceed "
-"180."
+"The number of months for the tours creation must be positive and can't "
+"exceed 36."
 msgstr ""
-"Le nombre de jours pour la création des tournées doit être positif et ne "
-"peut pas dépasser 180."
+"Le nombre de mois pour la création des tournées doit être positif et ne peut"
+" pas dépasser 36."
 
 #. module: of_planning_tour
 #. odoo-python
@@ -2260,17 +2258,6 @@ msgstr ""
 
 #. module: of_planning_tour
 #. odoo-python
-#: code:addons/of_planning_tour/models/of_service_request.py:0
-#, python-format
-msgid ""
-"The planning dates have already passed. You should plan an intervention for "
-"a future date."
-msgstr ""
-"Les dates de planification sont déjà passées. Vous devriez planifier une "
-"intervention pour une date future."
-
-#. module: of_planning_tour
-#. odoo-python
 #: code:addons/of_planning_tour/wizards/of_tour_appointment_wizard.py:0
 #, python-format
 msgid "The value of 'Search period (in days)' must be between 1 and 45."
@@ -2289,26 +2276,6 @@ msgid ""
 msgstr ""
 "Cette adresse n'est pas géocodée, merci de la géocoder pour planifier une "
 "intervention."
-
-#. module: of_planning_tour
-#: model:res.groups,comment:of_planning_tour.group_of_planning_tour_manual_creation
-msgid ""
-"This group allows the user to manually create tours. A User in this group "
-"shouldn't be in the group \"(OF) Unauthorized manual tour creation\"."
-msgstr ""
-"Ce groupe permet à l'utilisateur de créer manuellement des tournées. Un "
-"utilisateur de ce groupe ne doit pas être dans le groupe \"Création manuelle"
-" de tournée non autorisée\"."
-
-#. module: of_planning_tour
-#: model:res.groups,comment:of_planning_tour.group_of_planning_tour_no_manual_creation
-msgid ""
-"This group doesn't allow the user to manually create tours. A User in this "
-"group shouldn't be in the group \"(OF) Manual tour creation allowed\"."
-msgstr ""
-"Ce groupe n'autorise pas l'utilisateur à créer manuellement des tournées. Un"
-" utilisateur de ce groupe ne doit pas être dans le groupe \"Création "
-"manuelle de tournée autorisée\"."
 
 #. module: of_planning_tour
 #. odoo-python
@@ -2499,8 +2466,7 @@ msgstr "Réorganisation de tournée"
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_calendar_event__of_tour_ids
 #: model:ir.model.fields,field_description:of_planning_tour.field_hr_employee__of_tour_ids
-#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_tour_create
-#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_tour_no_create
+#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
 msgid "Tours"
@@ -2515,18 +2481,6 @@ msgstr "Wizard de mise à jour de l'itinéraire en masse des tournées."
 #: model:ir.model,name:of_planning_tour.model_of_planning_tour_mass_sector_assignation_wizard
 msgid "Tours Mass Sector Assignation Wizard"
 msgstr "Wizard d'assignation de secteur en masse des tournées"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_day_ids_str
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_day_ids_str
-msgid "Tours days in String"
-msgstr "Jours de tournées en chaîne de caractères"
-
-#. module: of_planning_tour
-#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_employee_ids_str
-#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_employee_ids_str
-msgid "Tours employees in String"
-msgstr "Employés de tournées en chaîne de caractères"
 
 #. module: of_planning_tour
 #: model:ir.actions.server,name:of_planning_tour.cron_planning_generate_employees_tours_ir_actions_server
@@ -2579,11 +2533,6 @@ msgid "Useful Duration in minutes"
 msgstr "Durée utile en minutes"
 
 #. module: of_planning_tour
-#: model:ir.model,name:of_planning_tour.model_res_users
-msgid "User"
-msgstr "Utilisateur"
-
-#. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_tour_appointment_template__default_user_ids
 msgid "Users for whom this template will be used by default"
 msgstr "Utilisateurs pour lesquels ce modèle sera utilisé par défaut"
@@ -2614,18 +2563,23 @@ msgstr ""
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__website_message_ids
 msgid "Website Messages"
-msgstr ""
+msgstr "Messages site web"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_planning_tour__website_message_ids
 msgid "Website communication history"
-msgstr ""
+msgstr "Historique de communication site web"
 
 #. module: of_planning_tour
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_available_slot__dayofweek__2
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour__weekday__wed
 msgid "Wednesday"
 msgstr "Mercredi"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__week_type
+msgid "Week Number"
+msgstr "Numéro de la semaine"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_available_slot__weekday
@@ -2639,7 +2593,7 @@ msgstr "Jour de la semaine"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_reorganization_line_wizard__wizard_id
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__wizard_id
 msgid "Wizard"
-msgstr ""
+msgstr "Wizard"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_line_wizard__map_tour_line_coordinates
@@ -2657,6 +2611,11 @@ msgid "Wizard to optimize the tour lines."
 msgstr "Wizard pour optimiser les lignes de tournée."
 
 #. module: of_planning_tour
+#: model:ir.model,name:of_planning_tour.model_resource_calendar_attendance
+msgid "Work Detail"
+msgstr "Détail du travail"
+
+#. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_reorganization_wizard_view_form
 msgid "You are about to reorganize the tour"
 msgstr "Vous êtes sur le point de réorganiser la tournée"
@@ -2670,11 +2629,14 @@ msgstr "Il n'est pas possible de réorganiser une tournée vide."
 
 #. module: of_planning_tour
 #. odoo-python
-#: code:addons/of_planning_tour/models/res_config_settings.py:0
+#: code:addons/of_planning_tour/models/hr_employee.py:0
 #, python-format
-msgid "You must select at least one day for the tours creation."
+msgid ""
+"You cannot delete an employee with associated interventions, archive it "
+"instead."
 msgstr ""
-"Vous devez sélectionner au moins un jour pour la création des tournées."
+"Vous ne pouvez pas supprimer un employé associé à des interventions, "
+"veuillez plutôt l'archiver."
 
 #. module: of_planning_tour
 #. odoo-python
@@ -2723,7 +2685,7 @@ msgstr "directement."
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_appointment_line_wizard_view_kanban
 msgid "km)"
-msgstr ""
+msgstr "km)"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_tour_planning_optimization_wizard_view_form

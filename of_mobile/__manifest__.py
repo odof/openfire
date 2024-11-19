@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Mobile",
-    "version": "16.0.1.6.1",
+    "version": "16.0.1.7.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "website": "https://www.openfire.fr",

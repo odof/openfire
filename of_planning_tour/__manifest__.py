@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Planning des tournées",
-    "version": "16.0.1.2.1",
+    "version": "16.0.2.0.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "website": "https://www.openfire.fr",
@@ -13,10 +13,8 @@
     ],
     "data": [
         "data/ir_cron.xml",
-        "data/ir_config_parameter.xml",
         "data/ir_action_server.xml",
         "security/ir.model.access.csv",
-        "security/of_planning_tour_security.xml",
         "views/calendar_event_views.xml",
         "views/of_planning_available_slot_views.xml",
         "views/of_planning_tour_views.xml",

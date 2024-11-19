@@ -1,6 +1,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import timedelta
+from datetime import datetime, timedelta
+
+from freezegun import freeze_time
 
 from odoo import Command, fields
 
@@ -10,7 +12,15 @@ LATITUDE_SAINT_GREGOIRE_KERGUELEN = "48.1518877"
 LONGITUDE_SAINT_GREGOIRE_KERGUELEN = "-1.6984516"
 
 
+@freeze_time("2024-12-02 08:00:00")  # Monday
 class TestOFTourAppointmentWizard(TestOFPlanningTourCommon):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Ensure all tasks have their employee_ids computed
+        tasks = cls.env["of.planning.task"].search([])
+        tasks._compute_employee_ids()
+
     def setUp(self):
         super().setUp()
 
@@ -47,8 +57,8 @@ class TestOFTourAppointmentWizard(TestOFPlanningTourCommon):
                 {
                     "name": "Event1",
                     "of_type": "intervention",
-                    "start": self.now_dt_8am,
-                    "stop": self.now_dt_9am,
+                    "start": fields.Datetime.now(),
+                    "stop": fields.Datetime.now() + timedelta(hours=1),
                     "of_partner_id": self.partner_hounaida.id,
                     "of_template_id": self.template_sweeping.id,
                     "of_task_id": self.task_sweeping.id,
@@ -59,8 +69,8 @@ class TestOFTourAppointmentWizard(TestOFPlanningTourCommon):
                 {
                     "name": "Event2",
                     "of_type": "intervention",
-                    "start": self.now_dt_12pm,
-                    "stop": self.now_dt_1pm,
+                    "start": fields.Datetime.now() + timedelta(hours=4),
+                    "stop": fields.Datetime.now() + timedelta(hours=5),
                     "of_partner_id": self.partner_saif.id,
                     "of_template_id": self.template_sweeping.id,
                     "of_task_id": self.task_sweeping.id,
@@ -90,10 +100,24 @@ class TestOFTourAppointmentWizard(TestOFPlanningTourCommon):
         self.assertEqual(self.appointment_wizard.search_type, self.search_type)
 
     def test_03_action_button_search(self):
-        """Check if the line_ids contains the same line as every by_*_line_ids"""
-        self.assertEqual(
-            self.appointment_wizard.mapped("line_ids.available_slot_id"), self.tours.mapped("available_slot_ids")
+        """Check if the search is correctly computed"""
+
+        # Search all available slots for the employee_tech_jean in the range of the service request
+        min_today = fields.Datetime.now()
+        max_end_date = datetime.combine((min_today + timedelta(days=15)), datetime.max.time())
+        time_slots_range = self.env["of.planning.available.slot"].search(
+            [
+                ("start", ">=", min_today.strftime("%Y-%m-%d %H:%M:%S")),
+                ("stop", "<=", max_end_date.strftime("%Y-%m-%d %H:%M:%S")),
+                ("employee_id", "=", self.employee_tech_jean.id),
+            ]
         )
+
+        # Check if available slots returned by the wizard are the same as the ones in the range
+        self.assertEqual(len(self.appointment_wizard.mapped("line_ids.available_slot_id")), len(time_slots_range))
+        self.assertEqual(self.appointment_wizard.mapped("line_ids.available_slot_id"), time_slots_range)
+
+        # Check if the line_ids contains the same line as every by_*_line_ids
         self.assertEqual(self.appointment_wizard.line_ids, self.appointment_wizard.by_distance_line_ids)
         self.assertEqual(self.appointment_wizard.line_ids, self.appointment_wizard.by_duration_line_ids)
         self.assertEqual(self.appointment_wizard.line_ids, self.appointment_wizard.by_date_line_ids)

@@ -1,6 +1,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from datetime import datetime, timedelta
+
+from dateutil.relativedelta import relativedelta
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+
+from odoo.addons.of_planning_tour.models.of_planning_tour import DEFAULT_PERIOD_IN_MONTHS
 
 
 class HrEmployee(models.Model):
@@ -10,65 +17,149 @@ class HrEmployee(models.Model):
     of_start_address_id = fields.Many2one(comodel_name="res.partner", string="Start Address")
     of_return_address_id = fields.Many2one(comodel_name="res.partner", string="Return Address")
 
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        employees = super().create(vals_list)
+
+        employees._recompute_tours(recompute_available_slots=False)
+
+        return employees
+
     def write(self, vals):
-        employees_address_changed = self._get_start_return_address_changed(vals)
         result = super().write(vals)
-        if employees_address_changed:
-            self._update_tours_addresses(vals, employees_address_changed)
+
+        if "resource_calendar_id" in vals or vals.get("active"):
+            self._recompute_tours()
+        elif "active" in vals:
+            self._unlink_future_empty_tours()
+
+        if "of_start_address_id" in vals or "of_return_address_id" in vals:
+            self._handle_address_change()
         return result
 
-    def _get_start_return_address_changed(self, vals):
-        """
-        Returns a filtered set of employees whose start or return address has changed.
+    def unlink(self):
+        # Empêcher la suppression des employés avec des tournées non vides
+        if self.env["of.planning.tour"].search([("employee_id", "=", self.ids), ("tour_line_ids", "!=", False)]):
+            raise UserError(_("You cannot delete an employee with associated interventions, archive it instead."))
+        return super().unlink()
 
-        Args:
-            vals (dict): A dictionary containing the updated values for the employee.
+    # -------------------------------------------------------------------------
+    # Business methods
+    # -------------------------------------------------------------------------
+
+    def _unlink_future_empty_tours(self):
+        """Unlink future tours that have no tour lines for the current employee(s)."""
+        today = datetime.now().date()
+        self.env["of.planning.tour"].search(
+            [("date", ">=", today), ("employee_id", "in", self.ids), ("tour_line_ids", "=", False)]
+        ).unlink()
+
+    def _handle_address_change(self):
+        """Handles the change of address for an employee and updates the related tours."""
+        today = datetime.now().date()
+        for employee in self:
+            tours = self.env["of.planning.tour"].search([("date", ">=", today), ("employee_id", "=", employee.id)])
+            tours.write(
+                {
+                    "start_address_id": employee.of_start_address_id.id,
+                    "return_address_id": employee.of_return_address_id.id,
+                }
+            )
+            tours.action_compute_osrm_data()
+
+    def _get_employee_work_days(self):
+        """
+        Compute the work days for each employee based on their resource calendar.
 
         Returns:
-            filtered_set (hr_employee): A filtered set of employees whose start or return address has changed.
+            dict: A dictionary with employee IDs as keys and lists of unique work day tuples as values.
         """
-
-        def _compare_address(e, vals):
-            if (
-                "of_address_depart_id" in vals
-                and vals["of_address_depart_id"]
-                and e.of_address_depart_id != vals["of_address_depart_id"]
-            ):
-                return True
-            return bool(
-                "of_address_retour_id" in vals
-                and vals["of_address_retour_id"]
-                and e.of_address_retour_id != vals["of_address_retour_id"]
+        result = {}
+        for employee in self:
+            work_days = employee.resource_calendar_id.attendance_ids.filtered(lambda a: not a.display_type).mapped(
+                lambda a: (a.dayofweek, a.week_type)
             )
+            result[employee.id] = list(set(work_days))
+        return result
 
-        return self.filtered(lambda e: _compare_address(e, vals))
-
-    @api.model
-    def _update_tours_addresses(self, vals, employees_address_changed):
+    def _get_tour_dates_from_work_days(self, start_date, days_count, work_days):
         """
-        Update tours with new address values.
+        Calculate tour dates based on work days from a given start date to a specified number of days.
 
         Args:
-            vals (dict): A dictionary containing the updated address values.
-            employees_address_changed (recordset): A recordset of employees whose addresses have changed.
+            start_date (datetime.date): The starting date of the tour.
+            days_count (int): The number of days to consider from the start date.
+            work_days (list of tuple): A list of tuples representing work days.
+                Each tuple contains:
+                    - str: The weekday as a string (0 for Monday, 6 for Sunday).
+                    - str or bool: The week type or False.
+
+        Returns:
+            list of datetime.date: A list of dates that match the work days criteria.
+        """
+        tour_dates = []
+        for date in [start_date + timedelta(days=i) for i in range(days_count + 1)]:
+            if ((str(date.weekday()), False) in work_days) or (
+                (str(date.weekday()), str(self.env["resource.calendar.attendance"].get_week_type(date))) in work_days
+            ):
+                tour_dates.append(date)
+        return tour_dates
+
+    def _recompute_tours(self, recompute_available_slots=True):
+        """
+        Initialize tours for employees depending of their working hours.
+
+        Args:
+            recompute_available_slots (bool): If True, recompute the available slots for the existing tours.
 
         Returns:
             None
         """
-        tours_to_update = self.env["of.planning.tour"].search(
-            [
-                ("employee_id", "in", employees_address_changed.ids),
-                ("state", "!=", "3-confirmed"),
-                ("date", ">=", fields.Date.today()),
-            ]
+        period_in_months = int(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.nbr_months_tour_creation", DEFAULT_PERIOD_IN_MONTHS)
         )
-        # write address on tours will trigger a recomputation of OSRM route
-        tour_values = {}
-        if "of_address_depart_id" in vals and vals["of_address_depart_id"]:
-            tour_values["start_address_id"] = vals["of_address_depart_id"]
-        if "of_address_retour_id" in vals and vals["of_address_retour_id"]:
-            tour_values["return_address_id"] = vals["of_address_retour_id"]
-        tour_values and tours_to_update and tours_to_update.write(tour_values)
+        today = datetime.now().date()
+        end_date = today + relativedelta(months=period_in_months)
+        delta = end_date - today
+
+        employees_work_days_dict = self._get_employee_work_days()
+
+        for employee in self:
+            # Génération de la liste de dates pour lesquelles des tournées doivent être créées
+            employee_work_days = employees_work_days_dict.get(employee.id, [])
+
+            # Récupération des dates de tournées à créer en fonction des jours travaillés de l'employé
+            tour_dates = self._get_tour_dates_from_work_days(
+                start_date=today, days_count=delta.days, work_days=employee_work_days
+            )
+
+            # Contrôle des tournées existantes
+            existing_tours = self.env["of.planning.tour"].search(
+                [
+                    ("date", ">=", today),
+                    ("employee_id", "=", employee.id),
+                ]
+            )
+
+            new_tour_dates = tour_dates[:]
+            if existing_tour_dates := existing_tours.mapped("date"):
+                new_tour_dates = [x for x in tour_dates if x not in existing_tour_dates]
+
+                # Suppression des tournées vides non travaillées à venir
+                existing_tours.filtered(lambda t: not t.tour_line_ids and t.date not in tour_dates).unlink()
+
+                # Re-calcul des créneaux dispo des tournées existantes
+                if recompute_available_slots:
+                    existing_tours.exists()._reorganize_available_slot()
+
+            # Création des nouvelles tournées
+            self.env["of.planning.tour"].create([{"employee_id": employee.id, "date": date} for date in new_tour_dates])
 
     def _get_employee_working_hours_list(self, date_eval=None, wh_type="regular"):
         """
@@ -97,7 +188,7 @@ class HrEmployee(models.Model):
         workings_hours = {employee.id: [] for employee in self}
         for employee in self:
             attendance = employee.resource_calendar_id.attendance_ids.filtered(
-                lambda a: a.dayofweek == str(date_eval.weekday())
+                lambda a: not a.display_type and a.dayofweek == str(date_eval.weekday())
             )
             sorted_attendance = attendance.sorted(key=lambda a: a.hour_from)
             workings_hours[employee.id] = [[att.hour_from, att.hour_to] for att in sorted_attendance]

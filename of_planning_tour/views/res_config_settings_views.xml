@@ -53,61 +53,34 @@
 
                 <!-- Tours -->
                 <h2>Tours</h2>
-                <div class="row mt16 o_settings_container" id="nbr_days_tour_creation">
-                    <div class="col-12 col-lg-6 o_setting_box">
+                <div class="row mt16 o_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box" id="nbr_months_tour_creation">
                         <div class="o_setting_left_pane">
                         </div>
                         <div class="o_setting_right_pane">
-                            <label for="nbr_days_tour_creation"/>
+                            <label for="nbr_months_tour_creation"/>
                             <div class="text-muted">
-                                Defines the number of days on which to create the routes for each employee whose work hours are defined. Maximum: 180 days.
+                                Defines the number of months on which to create the routes for each employee whose work hours are defined. Maximum: 36 months.<br/>
+                                Tip: this number must be at least equal to the maximum number of months over which you realize slots research.
                             </div>
                             <div class="content-group mt-2">
                                 <div class="row">
-                                    <field name="nbr_days_tour_creation"/>
+                                    <field name="nbr_months_tour_creation"/>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="tour_employee_ids">
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_minimum_free_slot_duration">
                         <div class="o_setting_left_pane">
                         </div>
                         <div class="o_setting_right_pane">
-                            <label for="tour_employee_ids"/>
+                            <label for="tour_minimum_free_slot_duration"/>
                             <div class="text-muted">
-                                If specified, only the selected employees will be taken into account when creating tours by the scheduled action.
+                                Defines the minimum free slot duration in hours. It corresponds to the minimum duration between two interventions to consider that employees available.
                             </div>
                             <div class="content-group mt-2">
                                 <div class="row">
-                                    <field name="tour_employee_ids_str" invisible="1"/>
-                                    <field name="tour_employee_ids" widget="many2many_tags"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="group_of_planning_tour_manual_creation">
-                        <div class="o_setting_left_pane">
-                            <field name="of_planning_tour_manual_creation"/>
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <label for="of_planning_tour_manual_creation"/>
-                            <div class="text-muted">
-                            Allows the creation of tours manually by the user.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6 o_setting_box" id="tour_day_ids">
-                        <div class="o_setting_left_pane">
-                        </div>
-                        <div class="o_setting_right_pane">
-                            <label for="tour_day_ids"/>
-                            <div class="text-muted">
-                                If specified, only the selected days will be taken into account when creating tours by the scheduled action.
-                            </div>
-                            <div class="content-group mt-2">
-                                <div class="row">
-                                    <field name="tour_day_ids_str" invisible="1"/>
-                                    <field name="tour_day_ids" widget="many2many_tags"/>
+                                    <field name="tour_minimum_free_slot_duration" widget="float_time" readonly="1"/>
                                 </div>
                             </div>
                         </div>

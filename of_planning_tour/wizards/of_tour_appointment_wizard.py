@@ -697,8 +697,6 @@ class OFTourAppointmentWizard(models.TransientModel):
             employee_obj = employee_obj.sudo()
             event_obj = event_obj.sudo()
 
-        # Create tours for employees
-        tours = tour_obj.browse()
         dates_eval = self._get_tour_dates()
         address = self.partner_address_id
         address_sector = address.of_tech_sector_id
@@ -721,9 +719,8 @@ class OFTourAppointmentWizard(models.TransientModel):
         if self.pre_employee_ids:
             capable_employees &= self.pre_employee_ids
 
-        tours = tour_obj._create_tours_for_employees(capable_employees, dates_eval, address_sector)
-
-        tours._reorganize_available_slot()
+        # Create tours for employees if needed
+        tour_obj._create_tours_for_employees(capable_employees, dates_eval, address_sector)
 
         # Delete old lines
         if mode == "new":
@@ -840,7 +837,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             else request.order_id.picking_ids.ids
         )
         name = self.intervention_id.name if self.intervention_id else self.name
-        useful_duration = self.selected_line_id.useful_duration / 60
+        previous_duration = self.selected_line_id.previous_duration / 60
         values = {
             "of_partner_id": self.partner_id.id,
             "of_address_id": self.partner_address_id.id,
@@ -850,9 +847,9 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_employee_id": self.employee_id.id,
             "of_employee_ids": [Command.link(self.employee_id.id)],
             "of_tag_ids": tag_ids,
-            "start": self.selected_datetime + timedelta(hours=useful_duration),
-            "stop": self.selected_datetime + timedelta(hours=(self.duration + useful_duration)),
-            "of_travel_duration": self.selected_line_id.useful_duration / 60,
+            "start": self.selected_datetime + timedelta(hours=previous_duration),
+            "stop": self.selected_datetime + timedelta(hours=(self.duration + previous_duration)),
+            "of_travel_duration": previous_duration,
             "user_id": self._uid,
             "of_company_id": self.company_id.id,
             "name": name,
