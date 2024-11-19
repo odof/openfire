@@ -59,12 +59,13 @@
                             <field name="tour_line_ids" mode="tree" nolabel="1" readonly="1" context="{'of_from_tour': 1, 'of_active_tour_id': active_id}">
                                 <tree string="Tour lines">
                                     <field name="intervention_id"/>
-                                    <field name="date_start"/>
+                                    <field name="allday"/>
+                                    <field name="date_start" attrs="{'invisible': [('allday', '=', True)]}"/>
                                     <field name="date_stop" optional="hide"/>
                                     <field name="address_city"/>
                                     <field name="is_flexible" optional="hide"/>
                                     <field name="employee_ids" optional="hide" widget="many2many_tags" />
-                                    <field name="duration" widget="float_time"/>
+                                    <field name="duration" attrs="{'invisible': [('allday', '=', True)]}" widget="float_time"/>
                                     <field name="duration_one_way" widget="float_time"/>
                                     <field name="distance_one_way"/>
                                 </tree>
@@ -138,27 +139,6 @@
         </field>
     </record>
 
-    <record id="of_planning_tour_view_form_manual_creation" model="ir.ui.view">
-        <field name="name">of.planning.tour.form.manual.creation</field>
-        <field name="model">of.planning.tour</field>
-        <field name="inherit_id" ref="of_planning_tour.of_planning_tour_view_form"/>
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//form" position="attributes">
-                <attribute name="create">true</attribute>
-                <attribute name="delete">true</attribute>
-            </xpath>
-            <xpath expr="//field[@name='employee_id']" position="attributes">
-                <attribute name="readonly">0</attribute>
-                <attribute name="attrs">{'readonly': [('id', '!=', False)]}</attribute>
-            </xpath>
-            <xpath expr="//field[@name='date']" position="attributes">
-                <attribute name="readonly">0</attribute>
-                <attribute name="attrs">{'readonly': [('id', '!=', False)]}</attribute>
-            </xpath>
-        </field>
-    </record>
-
     <record id="of_planning_tour_view_tree" model="ir.ui.view">
         <field name="name">of.planning.tour.tree</field>
         <field name="model">of.planning.tour</field>
@@ -179,19 +159,6 @@
                 <field name="ignore_alert_optimization_update" invisible="1"/>
                 <field name="intervention_count"/>
             </tree>
-        </field>
-    </record>
-
-    <record id="of_planning_tour_view_tree_manual_creation" model="ir.ui.view">
-        <field name="name">of.planning.tour.tree.manual.creation</field>
-        <field name="model">of.planning.tour</field>
-        <field name="inherit_id" ref="of_planning_tour.of_planning_tour_view_tree"/>
-        <field name="mode">primary</field>
-        <field name="arch" type="xml">
-            <xpath expr="//tree" position="attributes">
-                <attribute name="create">true</attribute>
-                <attribute name="delete">true</attribute>
-            </xpath>
         </field>
     </record>
 
@@ -236,7 +203,7 @@
                 <separator/>
                 <filter name="not_full" string="Not full" domain="[('is_full', '=', False)]"/>
                 <filter name="optimized" string="Optimized" domain="[('is_optimized', '=', True)]"/>
-                <filter name="not_empty" string="Not empty" domain="[('intervention_count', '>', 0)]"/>
+                <filter name="not_empty" string="Not empty" domain="[('tour_line_ids', '!=', False)]"/>
                 <!-- "ignore_alert_optimization_update" not in domain to be able to see the tours that need to be optimized even if the user ignored alert  -->
                 <filter name="need_optimization_update" string="Need optimization update" domain="[('need_optimization_update', '=', True)]"/>
                 <separator/>
@@ -276,45 +243,23 @@
         </field>
     </record>
 
-    <record id="action_of_planning_tour_manual_create" model="ir.actions.act_window">
+    <record id="action_of_planning_tour" model="ir.actions.act_window">
         <field name="name">Planning Tours</field>
         <field name="res_model">of.planning.tour</field>
         <field name="view_mode">tree,form</field>
         <field name="search_view_id" ref="of_planning_tour.of_planning_tour_view_filter"/>
-        <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_manual_creation')])]"/>
-    </record>
-    <record id="sale_order_action_view_quotation_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="1"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_tree_manual_creation"/>
-        <field name="act_window_id" ref="action_of_planning_tour_manual_create"/>
-    </record>
-    <record id="sale_order_action_view_quotation_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="3"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="of_planning_tour.of_planning_tour_view_form_manual_creation"/>
-        <field name="act_window_id" ref="action_of_planning_tour_manual_create"/>
-    </record>
-
-
-    <record id="action_of_planning_tour_no_manual_create" model="ir.actions.act_window">
-        <field name="name">Planning Tours</field>
-        <field name="res_model">of.planning.tour</field>
-        <field name="view_mode">tree,form</field>
-        <field name="search_view_id" ref="of_planning_tour.of_planning_tour_view_filter"/>
-        <field name="groups_id" eval="[Command.set([ref('of_planning_tour.group_of_planning_tour_no_manual_creation')])]"/>
     </record>
     <record id="sale_order_action_view_quotation_tree" model="ir.actions.act_window.view">
         <field name="sequence" eval="1"/>
         <field name="view_mode">tree</field>
         <field name="view_id" ref="of_planning_tour.of_planning_tour_view_tree"/>
-        <field name="act_window_id" ref="action_of_planning_tour_no_manual_create"/>
+        <field name="act_window_id" ref="action_of_planning_tour"/>
     </record>
     <record id="sale_order_action_view_quotation_form" model="ir.actions.act_window.view">
         <field name="sequence" eval="3"/>
         <field name="view_mode">form</field>
         <field name="view_id" ref="of_planning_tour.of_planning_tour_view_form"/>
-        <field name="act_window_id" ref="action_of_planning_tour_no_manual_create"/>
+        <field name="act_window_id" ref="action_of_planning_tour"/>
     </record>
 
 </odoo>

@@ -1,21 +1,29 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import timedelta
+from freezegun import freeze_time
 
 from odoo import Command, fields
 
 from odoo.addons.of_planning_tour.tests.common import TestOFPlanningTourCommon
 
 
+@freeze_time("2024-12-02 08:00:00")  # Monday
 class TestOFPlanningTour(TestOFPlanningTourCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.calendar_event_obj = cls.env["calendar.event"]
-        cls.dt_now = fields.Datetime.now() + timedelta(days=1)
 
     def setUp(self):
         super().setUp()
+        dt_8am = fields.Datetime.now()
+        dt_9am = fields.Datetime.now().replace(hour=9, minute=0)
+        dt_10am = fields.Datetime.now().replace(hour=10, minute=0)
+        dt_11am = fields.Datetime.now().replace(hour=11, minute=0)
+        dt_12pm = fields.Datetime.now().replace(hour=12, minute=0)
+        dt_1pm = fields.Datetime.now().replace(hour=13, minute=0)
+        dt_2pm = fields.Datetime.now().replace(hour=14, minute=0)
+        dt_3pm = fields.Datetime.now().replace(hour=15, minute=0)
         self.event1, self.event2, self.event3, self.event4 = self.calendar_event_obj.with_context(
             of_avoid_osrm_calls=True
         ).create(
@@ -23,8 +31,8 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 {
                     "name": "Event1",
                     "of_type": "intervention",
-                    "start": self.now_dt_10am,
-                    "stop": self.now_dt_11am,
+                    "start": dt_10am,
+                    "stop": dt_11am,
                     "of_partner_id": self.partner_antoine.id,
                     "of_task_id": self.task_sweeping.id,
                     "duration": 1,
@@ -34,8 +42,8 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 {
                     "name": "Event2",
                     "of_type": "intervention",
-                    "start": self.now_dt_11am,
-                    "stop": self.now_dt_12pm,
+                    "start": dt_11am,
+                    "stop": dt_12pm,
                     "of_partner_id": self.partner_saif.id,
                     "of_task_id": self.task_sweeping.id,
                     "duration": 1,
@@ -45,8 +53,8 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 {
                     "name": "Event3",
                     "of_type": "intervention",
-                    "start": self.now_dt_8am,
-                    "stop": self.now_dt_9am,
+                    "start": dt_8am,
+                    "stop": dt_9am,
                     "of_partner_id": self.partner_hounaida.id,
                     "of_task_id": self.task_sweeping.id,
                     "duration": 1,
@@ -56,8 +64,8 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 {
                     "name": "Event4",
                     "of_type": "intervention",
-                    "start": self.now_dt_1pm,
-                    "stop": self.now_dt_3pm,
+                    "start": dt_1pm,
+                    "stop": dt_3pm,
                     "of_partner_id": self.partner_hounaida.id,
                     "of_task_id": self.task_sweeping.id,
                     "duration": 2,
@@ -72,8 +80,8 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 {
                     "name": "Test Event 1",
                     "of_type": "intervention",
-                    "start": self.now_dt_1pm.replace(minute=45, second=0),
-                    "stop": self.now_dt_2pm.replace(minute=45, second=0),
+                    "start": dt_1pm.replace(minute=45, second=0),
+                    "stop": dt_2pm.replace(minute=45, second=0),
                     "of_company_id": self.company_fr.id,
                     "of_employee_ids": [Command.set([self.employee_tech_bruce.id])],
                     "of_partner_id": self.customer_a.id,
@@ -81,17 +89,18 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
                 },
             ]
         )
+
         self.bruce_tour = self.env["of.planning.tour"].search(
-            [("employee_id", "=", self.employee_tech_bruce.id), ("date", "=", fields.Date.today() + timedelta(days=1))]
+            [("employee_id", "=", self.employee_tech_bruce.id), ("date", "=", fields.Date.today())]
         )
         self.jean_tour = self.env["of.planning.tour"].search(
-            [("employee_id", "=", self.employee_tech_jean.id), ("date", "=", fields.Date.today() + timedelta(days=1))]
+            [("employee_id", "=", self.employee_tech_jean.id), ("date", "=", fields.Date.today())]
         )
 
     def test_01_compute_line_data(self):
         """Checks the computation of the line data of a tour."""
         tour = self.planning_tour_obj.search(
-            [("date", "=", self.now_dt.date()), ("employee_id", "=", self.employee_tech_jean.id)], limit=1
+            [("date", "=", fields.Date.today()), ("employee_id", "=", self.employee_tech_jean.id)], limit=1
         )
         self.assertEqual(len(tour), 1)
         self.assertEqual(len(tour.tour_line_ids), 4)
@@ -142,103 +151,84 @@ class TestOFPlanningTour(TestOFPlanningTourCommon):
         """Check that when a intervention is created, a tour, a tour line and available slots are created."""
         self.assertEqual(len(self.bruce_tour), 1)
         self.assertTrue(self.bruce_event in self.bruce_tour.mapped("tour_line_ids.intervention_id"))
-        self.assertEqual(len(self.bruce_tour.available_slot_ids), 2)
-
-        self.assertEqual(
-            self.bruce_tour.available_slot_ids[0].start,
-            fields.Datetime.now().replace(hour=8, minute=0, second=0) + timedelta(days=1),
-        )
-        self.assertEqual(
-            self.bruce_tour.available_slot_ids[0].stop,
-            fields.Datetime.now().replace(hour=12, minute=00, second=0) + timedelta(days=1),
-        )
-        self.assertEqual(
-            self.bruce_tour.available_slot_ids[1].start,
-            fields.Datetime.now().replace(hour=14, minute=45, second=0) + timedelta(days=1),
-        )
-        self.assertEqual(
-            self.bruce_tour.available_slot_ids[1].stop,
-            fields.Datetime.now().replace(hour=17, minute=00, second=0) + timedelta(days=1),
-        )
-
-    def test_03_task_duration_changed(self):
-        """Check that when a the minimum task duration is changed, available slots are correctly updated."""
-        self.task_sweeping.duration = 0.5
         self.assertEqual(len(self.bruce_tour.available_slot_ids), 3)
-
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].start,
-            fields.Datetime.now().replace(hour=8, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=7, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].stop,
-            fields.Datetime.now().replace(hour=12, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=11, minute=00, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].start,
-            fields.Datetime.now().replace(hour=13, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=12, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].stop,
-            fields.Datetime.now().replace(hour=13, minute=45, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=13, minute=45, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[2].start,
-            fields.Datetime.now().replace(hour=14, minute=45, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=14, minute=45, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[2].stop,
-            fields.Datetime.now().replace(hour=17, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=16, minute=0, second=0),
         )
 
-    def test_04_travel_duration_changed(self):
+    def test_03_travel_duration_changed(self):
         """Check that when a the travel duration is changed, available slots are correctly updated."""
-        self.bruce_event.of_travel_duration = 1.5
+
+        # As Bruce has an event there is now 3 available slots (7-11, 12-13:45, 14:45-16 UTC)
+        # If we increase the travel duration to 2 hours, the available slots should be reorganized
+        self.bruce_event.of_travel_duration = 2.0
         self.bruce_tour._reorganize_available_slot()
 
+        # Now there are only 2 available slots (7-11, 14:45-16 UTC)
         self.assertEqual(len(self.bruce_tour.available_slot_ids), 2)
 
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].start,
-            fields.Datetime.now().replace(hour=8, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=7, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].stop,
-            fields.Datetime.now().replace(hour=12, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=11, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].start,
-            fields.Datetime.now().replace(hour=14, minute=45, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=14, minute=45, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].stop,
-            fields.Datetime.now().replace(hour=17, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=16, minute=0, second=0),
         )
 
-    def test_05_unlink_event(self):
-        """Check that when a the sole event of a tour is unlinked, the tour is correctly resetted."""
+    def test_04_unlink_event(self):
+        """Check that when a the sole event of a tour is unlinked, the tour is correctly reset."""
         self.bruce_event.unlink()
 
         self.assertEqual(len(self.bruce_tour.tour_line_ids), 0)
         self.assertEqual(len(self.bruce_tour.available_slot_ids), 2)
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].start,
-            fields.Datetime.now().replace(hour=8, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=7, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[0].stop,
-            fields.Datetime.now().replace(hour=12, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=11, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].start,
-            fields.Datetime.now().replace(hour=13, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=12, minute=0, second=0),
         )
         self.assertEqual(
             self.bruce_tour.available_slot_ids[1].stop,
-            fields.Datetime.now().replace(hour=17, minute=0, second=0) + timedelta(days=1),
+            fields.Datetime.now().replace(hour=16, minute=0, second=0),
         )
 
-    def test_06_compute_geo_data(self):
+    def test_05_compute_geo_data(self):
         """Check that the coordinates are correctly computed."""
         line1, line2, line3, line4 = self.jean_tour.tour_line_ids.sorted(key=lambda x: x.sequence)
         map_tour_line_coordinates = (

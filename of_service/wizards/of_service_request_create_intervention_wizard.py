@@ -5,6 +5,8 @@ from dateutil.relativedelta import relativedelta
 from odoo import Command, api, fields, models
 from odoo.tools.safe_eval import safe_eval
 
+from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
+
 
 class OFServiceRequestCreateInterventionWizard(models.TransientModel):
     _name = "of.service.request.create.intervention.wizard"
@@ -62,7 +64,7 @@ class OFServiceRequestCreateInterventionWizard(models.TransientModel):
         event_obj = self.env["calendar.event"]
         created_interventions = self.env["calendar.event"]
         if not self._context.get("tz"):
-            self = self.with_context(tz="Europe/Paris")
+            self = self.with_context(tz=TZ_EUROPE_PARIS_STR)
 
         current_date = self.start_date
         for request in self.line_ids.mapped("request_id"):

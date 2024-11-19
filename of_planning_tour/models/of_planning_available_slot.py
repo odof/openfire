@@ -6,6 +6,8 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 
+from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
+
 from .of_planning_tour import AM_LIMIT_FLOAT
 
 SELECTION_DAY_PERIOD = [
@@ -24,7 +26,7 @@ class OFPlanningAvailableSlot(models.Model):
     name = fields.Char()
     time_slot = fields.Char(compute="_compute_time_slot", store=True)
 
-    tour_id = fields.Many2one(comodel_name="of.planning.tour", string="Tour", readonly=False, ondelete="cascade")
+    tour_id = fields.Many2one(comodel_name="of.planning.tour", string="Tour", required=True, ondelete="cascade")
     previous_tour_line_id = fields.Many2one(
         comodel_name="of.planning.tour.line", string="Previous Tour Line", compute="_compute_previous_tour_line_id"
     )
@@ -98,9 +100,15 @@ class OFPlanningAvailableSlot(models.Model):
     @api.depends("start", "stop")
     def _compute_time_slot(self):
         for record in self:
+            calendar_tz_name = (
+                record.employee_id.resource_calendar_id.tz
+                if record.employee_id.resource_calendar_id
+                else TZ_EUROPE_PARIS_STR
+            )
+            record = record.with_context(tz=calendar_tz_name)
             if record.start and record.stop:
-                start_str = fields.Datetime.context_timestamp(self, record.start).strftime("%H:%M")
-                stop_str = fields.Datetime.context_timestamp(self, record.stop).strftime("%H:%M")
+                start_str = fields.Datetime.context_timestamp(record, record.start).strftime("%H:%M")
+                stop_str = fields.Datetime.context_timestamp(record, record.stop).strftime("%H:%M")
                 record.time_slot = " - ".join([start_str, stop_str])
             else:
                 record.time_slot = False

@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import Command, _, api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 SELECTION_SEARCH_TYPES = [
@@ -42,115 +42,29 @@ class ResConfigSettings(models.TransientModel):
     )
 
     # Tour planning
-    nbr_days_tour_creation = fields.Integer(
-        string="(OF) Tours // Create Tours over __ days",
-        default=30,
+    nbr_months_tour_creation = fields.Integer(
+        string="(OF) Tours // Create Tours over __ months",
+        default=18,
         required=True,
-        help="Defines the number of days on which to create the routes for each employee whose work hours "
-        "are defined. Maximum: 180 days.",
-        config_parameter="of.planning.tour.nbr_days_tour_creation",
+        help="Defines the number of months on which to create the routes for each employee whose work hours "
+        "are defined. Maximum: 36 months. Tip: this number must be at least equal to the maximum number "
+        "of months over which you realize slots research.",
+        config_parameter="of.planning.tour.nbr_months_tour_creation",
     )
-    tour_employee_ids = fields.Many2many(
-        comodel_name="hr.employee",
-        relation="res_config_settings_tour_employee_rel",
-        string="(OF) Tours // Employees",
-        help="Create tours for these employees only.",
-        compute="_compute_tour_employee_ids",
-        inverse="_inverse_tour_employee_ids_str",
-    )
-    tour_employee_ids_str = fields.Char(
-        string="Tours employees in String",
-        config_parameter="of.planning.tour.tour_employee_ids",
-        help="Technical field to store M2M fields into a config parameter. As config_parameters does not accept m2m "
-        "field, we store the fields with a comma separated string into a Char config field.",
-    )
-    tour_day_ids = fields.Many2many(
-        comodel_name="of.days",
-        relation="res_config_settings_tour_days_rel",
-        string="(OF) Tours // Days",
-        compute="_compute_tour_day_ids",
-        inverse="_inverse_tour_day_ids_str",
-        help="Create tours for these days only",
-    )
-    tour_day_ids_str = fields.Char(
-        string="Tours days in String",
-        config_parameter="of.planning.tour.tour_day_ids",
-        help="Technical field to store M2M fields into a config parameter. As config_parameters does not accept m2m "
-        "field, we store the fields with a comma separated string into a Char config field.",
-    )
-    of_planning_tour_manual_creation = fields.Boolean(
-        string="(OF) Manual tour creation authorized",
-        help="Allows users to manually create tours.",
+    # Non modifiable pour le moment, il faudra le rendre modifiable à terme et
+    # donc gérer le re-calcul des créneaux dispo
+    tour_minimum_free_slot_duration = fields.Float(
+        string="(OF) Tours // Minimum free slot duration",
+        config_parameter="of.planning.tour.tour_minimum_free_slot_duration",
+        default=0.25,
+        help="Defines the minimum free slot duration in hours. It corresponds to the minimum duration between two "
+        "interventions to consider that employees available.",
     )
 
-    @api.constrains("nbr_days_tour_creation")
-    def _check_nbr_days_tour_creation(self):
-        if 1 <= self.nbr_days_tour_creation > 180:
-            raise ValidationError(_("The number of days for the tours creation must be positive and can't exceed 180."))
-
-    @api.constrains("tour_day_ids")
-    def _check_tour_day_ids(self):
-        if not self.tour_day_ids:
-            raise ValidationError(_("You must select at least one day for the tours creation."))
-
-    @api.depends("tour_day_ids_str")
-    def _compute_tour_day_ids(self):
-        days_obj = self.env["of.days"]
+    @api.constrains("nbr_months_tour_creation")
+    def _check_nbr_months_tour_creation(self):
         for setting in self:
-            if setting.tour_day_ids_str:
-                ids = setting.tour_day_ids_str.split(",")
-                ids = [int(id) for id in ids if id.isdigit()]
-                setting.tour_day_ids = days_obj.search([("id", "in", ids)])
-            else:
-                setting.tour_day_ids = None
-
-    def _inverse_tour_day_ids_str(self):
-        for setting in self:
-            if setting.tour_day_ids:
-                setting.tour_day_ids_str = ",".join(setting.tour_day_ids.mapped(lambda x: str(x.id)))
-            else:
-                setting.tour_day_ids_str = ""
-
-    @api.depends("tour_employee_ids_str")
-    def _compute_tour_employee_ids(self):
-        for setting in self:
-            if setting.tour_employee_ids_str:
-                ids = setting.tour_employee_ids_str.split(",")
-                ids = [int(id) for id in ids if id.isdigit()]
-                setting.tour_employee_ids = self.env["hr.employee"].search([("id", "in", ids)])
-            else:
-                setting.tour_employee_ids = None
-
-    def _inverse_tour_employee_ids_str(self):
-        for setting in self:
-            if setting.tour_employee_ids:
-                setting.tour_employee_ids_str = ",".join(setting.tour_employee_ids.mapped(lambda x: str(x.id)))
-            else:
-                setting.tour_employee_ids_str = ""
-
-    def set_values(self):
-        res = super().set_values()
-        self._set_of_planning_tour_manual_creation()
-        return res
-
-    def get_values(self):
-        res = super().get_values()
-        of_planning_tour_manual_creation = self.env["ir.config_parameter"].get_param(
-            "of.planning.tour.group_of_planning_tour_manual_creation"
-        )
-        res.update(of_planning_tour_manual_creation=of_planning_tour_manual_creation)
-        return res
-
-    def _set_of_planning_tour_manual_creation(self):
-        self.ensure_one()
-        group_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_manual_creation")
-        group_no_manual_creation = self.env.ref("of_planning_tour.group_of_planning_tour_no_manual_creation")
-        # Get all users except the deactivated ones (e.g SUPERUSER_ID)
-        all_users = self.env["res.users"].with_context(active_test=True).search([])
-        if self.of_planning_tour_manual_creation:
-            group_manual_creation.write({"users": [Command.set(all_users.ids)]})
-        else:
-            group_no_manual_creation.write({"users": [Command.set(all_users.ids)]})
-        self.env["ir.config_parameter"].set_param(
-            "of.planning.tour.group_of_planning_tour_manual_creation", int(self.of_planning_tour_manual_creation)
-        )
+            if setting.nbr_months_tour_creation <= 0 or setting.nbr_months_tour_creation > 36:
+                raise ValidationError(
+                    _("The number of months for the tours creation must be positive and can't exceed 36.")
+                )

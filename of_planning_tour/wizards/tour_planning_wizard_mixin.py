@@ -8,9 +8,8 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import _, api, fields, models
 
+from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
 from odoo.addons.of_utils.models.misc import float_2_hours_minutes
-
-from ..models.of_planning_tour import TZ_EUROPE_PARIS
 
 
 class OFPlanningTourWizardMixin(models.AbstractModel):
@@ -299,7 +298,7 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
 
             # get the utc datetime for the new start hour to store it in the database
             new_start_datetime_utc = (
-                pytz.timezone(self.env.user.tz or TZ_EUROPE_PARIS)
+                pytz.timezone(self.env.user.tz or TZ_EUROPE_PARIS_STR)
                 .localize(new_start_datetime, is_dst=None)
                 .astimezone(pytz.utc)
             )

@@ -9,6 +9,7 @@ from odoo.exceptions import UserError
 from odoo.models import expression
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import many2one
+from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
 
 
 class CalendarEvent(models.Model):
@@ -399,8 +400,7 @@ class CalendarEvent(models.Model):
                 employee_ids,
                 intervention_id,
             ) = notification
-
-            tz = pytz.timezone(intervention_tz or self.env.context.get("tz"))
+            tz = pytz.timezone(intervention_tz or self.env.context.get("tz") or TZ_EUROPE_PARIS_STR)
             intervention_time = (
                 pytz.utc.localize(fields.Datetime.from_string(intervention_start_date)).astimezone(tz).strftime("%H:%M")
             )
