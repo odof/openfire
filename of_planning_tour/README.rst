@@ -51,12 +51,8 @@ Tournée (`of.planning.tour`)
 
 * Mise en place d'un cron de création de tournées pour les techniciens :
 
-  - Ce cron permet de créer automatiquement les tournées vides pour les techniciens pour une période de jours donnée (option de configuration) ;
-  - Ce cron s'exécute tous les jours et vérifie s'il doit ou non créer des tournées :
-
-    - Si nous sommes dans la période de jours donnée, il crée les tournées vides pour les techniciens ;
-    - Si jamais un employé est créé entre-temps, il crée les tournées vides pour ce nouvel employé jusqu'à la fin de la période de jours donnée ;
-    - Il y a un nombre de jours "de sécurité" (10 jours) pour créer des tournées un peu plus loin que la période définie pour éviter de ne pas avoir de tournées pour les techniciens à la fin de la période.
+  - Ce cron permet de créer automatiquement les tournées vides pour les techniciens pour une période de mois donnée (option de configuration) ;
+  - Ce cron s'exécute tous les jours et vérifie s'il doit ou non créer des tournées.
 
 * Sur la vue liste des tournées, il est possible de filtrer et de visualiser rapidement les tournées selon un code couleur :
 
@@ -95,7 +91,7 @@ Intervention (`calendar.event`)
 
   - Si une tournée existe déjà pour le technicien à la date de l'intervention, l'intervention est ajoutée à la tournée existante.
 
-* Lors de la **modification** des champs **"Date de début"**, **"Date de fin"**, **"Durée"**, **"Adresse de l'intervention"**, **"Techniciens"** ou lors de son **changement d'état**, les lignes de tournées sont **recalculées** :
+* Lors de la **modification** des champs **"Date de début"**, **"Date de fin"**, **"Durée"**, **"Adresse de l'intervention"**, **"Techniciens"** et **"Actif"** ou lors de son **changement d'état**, les lignes de tournées sont **recalculées** :
 
   - Si l'intervention est **déplacée à une autre date**, elle est **retirée** de la tournée actuelle et **ajoutée** à la tournée du technicien à la nouvelle date ;
   - Si la **durée** de l'intervention est **modifiée**, les **lignes** de tournées sont **recalculées** pour prendre en compte la nouvelle durée ;
@@ -121,17 +117,18 @@ Créneaux disponibles (`of.planning.available.slot`)
 
 * Un **créneau disponible** est une **période de temps de travail** durant laquelle un **technicien est libre**.
 
-* La **durée du créneau** doit être au moins équivalente à la **durée de la tâche la plus courte de la base**.
+* La **durée du créneau** doit être au moins équivalente à la **durée minimale d'un créneau** (option de configuration).
 
 * Un **créneau disponible est créé** à partir du moment où :
 
+  - Une **tournée** est créée pour un technicien ;
   - Une **intervention est placée** sur une journée travaillée d’un technicien ;
   - La **durée minimale du créneau est respectée** entre :
 
     - Le début de la disponibilité (démarrage de la journée ou intervention précédente) ;
     - La fin de la disponibilité (fin de la journée ou début de l’intervention suivante) ;
 
-  - La **différence entre la durée** du créneau et **le temps de trajet de l'intervention suivante** doit au moins être **égale** à la **durée minimale d’un créneau** (durée de tâche la plus courte sur la base) ;
+  - La **différence entre la durée** du créneau et **le temps de trajet de l'intervention suivante** doit au moins être **égale** à la **durée minimale d’un créneau** (option de configuration) ;
   - Sans intervention, la journée est considérée comme disponible sur les horaires travaillés du technicien.
 
 * Ils sont utilisés pour déterminer les créneaux horaires disponibles lors de la planification d'une demande d'intervention (DI) :
@@ -174,14 +171,6 @@ Modèle de recherche de créneaux (`of.tour.appointment.template`)
   - Si aucun utilisateur n'est défini, le modèle est disponible pour tous les utilisateurs.
   - Les utilisateurs non définis dans la liste ne verront pas le modèle de recherche de créneaux lors de la planification d'une DI.
 
-Droits utilisateurs
-###################
-
-* Mise en place de deux groupes "(OF) Création manuelle de tournée autorisée" et "(OF) Création manuelle de tournée non autorisée" pour permettre ou non la création manuelle de tournée depuis la vue liste des tournées :
-
-  - Ces groupes sont contraires et donc un utilisateur ne peut appartenir qu'à un seul des deux groupes.
-  - Ces groupes sont accessibles via des paramètres de configuration. (Cf. Paramètres de configuration).
-
 Paramètres de configuration
 ###########################
 
@@ -199,15 +188,10 @@ Paramètres de configuration
 
   - Cf. Paramètres > Intervention > Planification d'intervention > **(OF) Modèle d'intervention par défaut pour la recherche**.
 
-* Ajout d'un paramètre "(OF) Tournées // Créer des tournées sur __ jours" pour permettre de définir le nombre de jours pour lesquels les tournées doivent être créées pour les techniciens :
+* Ajout d'un paramètre "(OF) Tournées // Créer des tournées sur __ mois" pour permettre de définir le nombre de mois pour lesquels les tournées doivent être créées pour les techniciens :
 
-  - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Créer des tournées sur __ jours**.
+  - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Créer des tournées sur __ mois**.
 
-* Ajout d'un paramètre "(OF) Tournées // Employés" pour permettre de définir les employés pour lesquels les tournées doivent être créées via le cron :
+* Ajout d'un paramètre "(OF) Tournées // Durée minimale des créneaux disponibles" pour permettre de définir la durée minimale des créneaux disponibles des techniciens :
 
-  - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Employés**.
-
-* Ajout d'un paramètre "(OF) Création manuelle de tournée autorisée" pour autoriser la création manuelle de tournée depuis la vue liste des tournées :
-
-  - Ce paramètre provoquera l'ajout de tous les utilisateurs dans le groupe "(OF) Création manuelle de tournée autorisée".
-  - Cf. Paramètres > Intervention > Tournées > **(OF) Création manuelle de tournée autorisée**.
+  - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Durée minimale des créneaux disponibles**.

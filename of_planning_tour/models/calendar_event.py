@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
@@ -38,8 +38,9 @@ class CalendarEvent(models.Model):
     @api.depends("of_employee_ids", "start", "of_tour_ids.date", "of_tour_ids.employee_id", "of_state")
     def _compute_of_tour_ids(self):
         tour_obj = self.env["of.planning.tour"]
+        state_values_to_exclude = tour_obj._get_intervention_state_values_to_exclude()
         for event in self:
-            if event.of_employee_ids and event.start and event.of_state in ("draft", "confirmed", "done", "unfinished"):
+            if event.of_employee_ids and event.start and event.of_state not in state_values_to_exclude:
                 tours = tour_obj.search(
                     [("employee_id", "in", event.of_employee_ids.ids), ("date", "=", event.start_date)]
                 )
@@ -56,7 +57,7 @@ class CalendarEvent(models.Model):
                     ("of_employee_ids", "in", tour.employee_id.id),
                     ("start", "<=", tour.date),
                     ("stop", ">=", tour.date),
-                    ("of_state", "not in", self._compute_tour_data_state_values()),
+                    ("of_state", "not in", tour._get_intervention_state_values_to_exclude()),
                     ("of_type", "=", "intervention"),
                 ],
                 order="start",
@@ -94,20 +95,7 @@ class CalendarEvent(models.Model):
         if not self.env.context.get("of_avoid_tour_process") and any(
             field_name in vals for field_name in fields_trigger_tour_compute
         ):
-            saved_events_data = {
-                event: {
-                    "dates": event._get_tour_dates(),
-                    "start": event.start,
-                    "of_partner_latitude": event.of_partner_latitude,
-                    "of_partner_longitude": event.of_partner_longitude,
-                    "duration": event.duration,
-                    "of_force_dates": event.of_force_dates,
-                    "of_state": event.of_state,
-                    "of_employee_ids": event.of_employee_ids.ids,
-                    "active": event.active,
-                }
-                for event in self
-            }
+            previous_tours = self.filtered(lambda rec: isinstance(rec.id, int)).mapped("of_tour_ids")
 
         res = super().write(vals)
 
@@ -115,7 +103,7 @@ class CalendarEvent(models.Model):
         if not self.env.context.get("of_avoid_tour_process") and any(
             field_name in vals for field_name in fields_trigger_tour_compute
         ):
-            self._handle_tour_update(saved_events_data)
+            self.filtered(lambda rec: isinstance(rec.id, int))._handle_tour_update(previous_tours)
         return res
 
     def name_get(self):
@@ -148,148 +136,6 @@ class CalendarEvent(models.Model):
             tours = event._create_tour()
             self.env.add_to_compute(event._fields["of_tour_ids"], event)
             tours.action_update_lines_data()
-
-    def action_resync_and_update_tours(self, updated_events):
-        """
-        Resyncs and updates tours based on the provided updated events.
-
-        Resyncs tours if the geodata of the interventions has changed, to update tour lines data.
-        Updates tours if the geodata has not changed but the intervention has been reopened
-            (its tour lines have been deleted)
-
-        Args:
-            updated_events (RecordSet): A recordset of updated events.
-
-        Returns:
-            None
-        """
-        # Resyncs
-        tours_to_resync = updated_events.mapped("of_tour_ids")
-        tours_to_resync and tours_to_resync.sudo().action_compute_osrm_data(reload=True)
-
-        # Updates
-        tours_to_update = self.filtered(lambda ev: ev.of_state != "cancel").mapped("of_tour_ids") - tours_to_resync
-        tours_to_update and tours_to_update.sudo().action_update_lines_data()
-
-    @api.model
-    def action_reorder_tours(self, udpated_events):
-        """
-        Reorders the tour lines based on the updated events.
-        If the intervention's duration or hours have changed, we must reorder the tour lines.
-
-        Args:
-            udpated_events (RecordSet): The updated events.
-
-        Returns:
-            None
-        """
-        tours = udpated_events.mapped("of_tour_ids").sudo()
-        tours and tours._reorder_tour_lines()
-
-    @api.model
-    def action_update_tour_lines(self, events_saved_values=None):
-        """
-        Updates the tour lines based on the saved values of events.
-
-        If duration of an intervention has changed, we must add or remove the intervention from other tours.
-        Add to tours where it is not present and remove from tours where it is.
-
-        Args:
-            events_saved_values (dict): A dictionary containing the saved values of events.
-
-        Returns:
-            None
-        """
-        if not events_saved_values:
-            return
-
-        for event, old_dates in events_saved_values.items():
-            current_dates_list = list(set(event._get_tour_dates()))  # Get the new dates
-            removed_dates_list = list(set(old_dates) - set(current_dates_list))  # Get the removed dates
-
-            # Add the intervention to the new tours and update OSRM data
-            if current_dates_list:
-                tours = (
-                    self.env["of.planning.tour"]
-                    .sudo()
-                    .search([("date", "in", current_dates_list), ("employee_id", "in", event.of_employee_ids.ids)])
-                ) or event._create_tour()
-                tours and tours.action_update_lines_data()
-
-            # Remove the intervention from the tours for the removed dates
-            if removed_dates_list:
-                self.action_remove_from_tour({event: removed_dates_list})
-
-    @api.model
-    def action_remove_from_tour(self, events_saved_values=None):
-        """
-        Removes the intervention from its tour if the intervention's date has changed.
-        """
-        if not events_saved_values:
-            return
-
-        tours_dates = list(events_saved_values.values())
-        events = self.env["calendar.event"].browse()
-        for event in events_saved_values:  # transform dict keys to recordset
-            events |= event
-
-        if not tours_dates or not events:
-            return
-
-        event_ids = events.ids
-        if existing_tour_lines := (
-            self.env["of.planning.tour.line"]
-            .sudo()
-            .search(
-                [
-                    ("intervention_id", "in", event_ids),
-                    ("tour_id.date", "in", tours_dates[0]),
-                    ("tour_id.date", ">=", fields.Date.today()),
-                ]
-            )
-        ):
-            tours = existing_tour_lines.mapped("tour_id")
-            existing_tour_lines.unlink()
-
-            # As we are deleting a tour line, we need to recompute sequences and OSRM data
-            tours._reset_sequence()
-            tours._osrm_recompute_data_if_needed(force=True)
-
-    @api.model
-    def action_transfert_events_between_tours(self, events_saved_values=None):
-        """
-        Transfers events between tours based on the changes in employee assignments.
-
-        Args:
-            events_saved_values (dict): A dictionary containing the saved values of events.
-
-        Returns:
-            None
-        """
-        if not events_saved_values:
-            return
-
-        for event in events_saved_values:
-            current_employee_ids = set(event.of_employee_ids.ids)
-            removed_employee_ids = set(events_saved_values[event]["of_employee_ids"]) - current_employee_ids
-            added_employee_ids = current_employee_ids - set(events_saved_values[event]["of_employee_ids"])
-            if removed_employee_ids:
-                tours_to_recompute = (
-                    self.env["of.planning.tour"]
-                    .sudo()
-                    .search(
-                        [("employee_id", "in", list(removed_employee_ids)), ("date", "in", event._get_tour_dates())]
-                    )
-                )
-                tour_lines_to_remove = tours_to_recompute.mapped("tour_line_ids").filtered(
-                    lambda line: line.intervention_id == event
-                )
-                tour_lines_to_remove.unlink()
-                # As we are deleting a tour line, we need to recompute sequences and OSRM data
-                tours_to_recompute._osrm_recompute_data_if_needed(force=True)
-
-            if added_employee_ids:
-                event.action_create_tours()
 
     def action_button_open_tour_appointment_wizard(self):
         """
@@ -352,10 +198,7 @@ class CalendarEvent(models.Model):
     # Business methods
     # --------------------------------------------------------------------------
 
-    def _compute_tour_data_state_values(self):
-        return ["cancel", "being_optimized"]
-
-    def _handle_tour_update(self, saved_events_data):
+    def _handle_tour_update(self, previous_tours):
         """
         Handles the update of tours for calendar events.
 
@@ -364,182 +207,56 @@ class CalendarEvent(models.Model):
         It also transfers events between tours based on the changes in employee assignments.
 
         Args:
-            saved_events_data (dict): A dictionary containing the saved values of events before the update.
+            previous_tours (recordset): The event tours before the update.
         Returns:
             None
         """
-        # Get interventions that have changed their geodata, hours, duration, force_date or date
-        # or that have been cancelled, reopened, postponed or have changed their employees assignments, to update tours
-        # accordingly
-        events_geodata_changed = self._get_events_geodata_updated(saved_events_data)
-        events_hours_changed = self._get_events_only_hours_changed(saved_events_data)
-        events_duration_changed = self._get_events_duration_changed(saved_events_data)
-        events_force_date_changed = self._get_events_force_date_changed(saved_events_data)
-        events_start_date_changed = self._get_events_start_date_changed(saved_events_data)
-        events_cancelled = self._get_cancelled_events(saved_events_data)
-        events_reopened = self._get_reopened_events(saved_events_data)
-        events_postponed = self._get_postponed_events(saved_events_data)
-        events_employee_changed = self._get_events_employee_changed(saved_events_data)
-        events_archived = self._get_archived_events(saved_events_data)
-        events_unarchived = self._get_unarchived_events(saved_events_data)
+        old_dates = previous_tours.mapped("date")
+        new_dates = self.mapped("start_date")
+        all_dates = list(set(old_dates + new_dates))
 
-        # Build dictionaries of interventions to move, remove with their dates before the update
-        events_to_move = {
-            event: saved_events_data[event]["dates"]
-            for event in events_duration_changed
-            | events_force_date_changed
-            | events_start_date_changed
-            | events_unarchived
-        }
-        events_to_remove = {
-            event: saved_events_data[event]["dates"]
-            for event in events_start_date_changed | events_cancelled | events_postponed | events_archived
-            if event not in events_to_move
-        }
+        old_employees = previous_tours.mapped("employee_id")
+        new_employees = self.mapped("of_employee_ids")
+        all_employees = old_employees + new_employees
 
-        # Build a dictionary of interventions to transfert between tours
-        events_to_transfert = {event: saved_events_data[event] for event in events_employee_changed}
+        all_tours_to_recompute = self.env["of.planning.tour"].search(
+            [("date", ">=", datetime.now().date()), ("date", "in", all_dates), ("employee_id", "in", all_employees.ids)]
+        )
 
-        # Updates tours data based on the changes in interventions
-        events_to_move and self.action_update_tour_lines(events_to_move)
-        events_to_remove and self.action_remove_from_tour(events_to_remove)
-        events_hours_changed and self.action_reorder_tours(events_hours_changed)
-        events_geodata_changed and self.action_resync_and_update_tours(events_geodata_changed)
-        events_to_transfert and self.action_transfert_events_between_tours(events_to_transfert)
-        events_reopened and self.action_create_tours()
+        for event in self:
+            all_tours_to_recompute |= event._create_tour()
 
-        # Reorganize available slot
-        self.mapped("of_tour_ids")._reorganize_available_slot()
-
-    def _get_archived_events(self, saved_vals):
-        """
-        Filters and returns the events that have been archived.
-        """
-
-        return self.filtered(lambda ev: ev in saved_vals and saved_vals[ev]["active"] is True and ev.active is False)
-
-    def _get_unarchived_events(self, saved_vals):
-        """
-        Filters and returns the events that have been unarchived.
-        """
-        return self.filtered(lambda ev: ev in saved_vals and saved_vals[ev]["active"] is False and ev.active is True)
+        for tour in all_tours_to_recompute.sudo():
+            # Add potential new lines
+            tour._populate_tour_lines()
+            # Remove potential old lines
+            tour._remove_tour_lines()
+            # Reorder lines
+            tour._reset_sequence()
+            # Recompute geo data
+            for line in tour.tour_line_ids.sorted("date_start"):
+                line._update_line_data_from_intervention()
+                line._compute_line_data()
+                line._osrm_update_line_data()
+                line.intervention_id.of_travel_duration = line.duration_one_way
+            # Recompute available slots
+            tour._reorganize_available_slot()
 
     @api.model
     def _get_fields_trigger_tour_compute(self):
         """
         Returns a list of fields that trigger the tour computation.
         """
-        return ["start", "of_employee_ids", "of_state", "duration", "of_address_id", "of_force_dates", "active"]
-
-    def _get_events_geodata_updated(self, saved_vals):
-        """
-        Filters and returns the events whose dates have been changed.
-        """
-
-        def _compare_geodata(ev, vals):
-            if ev not in vals:
-                return False
-
-            event_vals = vals[ev]
-            address_id = ev.of_address_id and ev.of_address_id.id or False
-            if "of_partner_latitude" in event_vals and ev.of_partner_latitude != event_vals.get("of_partner_latitude"):
-                return True
-            if "of_partner_longitude" in event_vals and ev.of_partner_longitude != event_vals.get(
-                "of_partner_longitude"
-            ):
-                return True
-            return "of_address_id" in event_vals and address_id != event_vals.get("of_address_id")
-
-        return self.filtered(lambda ev: _compare_geodata(ev, saved_vals))
-
-    def _get_events_start_date_changed(self, saved_vals):
-        """
-        Filters and returns the events whose start date have been changed.
-        """
-
-        def _compare_dates(ev, vals):
-            if ev not in vals or "start" not in vals[ev]:
-                return False
-            date_saved = fields.Datetime.from_string(vals[ev]["start"])
-            return ev.start != date_saved and ev.start.date() != date_saved.date()
-
-        return self.filtered(lambda ev: _compare_dates(ev, saved_vals))
-
-    def _get_cancelled_events(self, saved_vals):
-        """
-        Filters and returns the events that have been cancelled.
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals and saved_vals[ev]["of_state"] != "cancel" and ev.of_state == "cancel"
-        )
-
-    def _get_reopened_events(self, saved_vals):
-        """
-        Filters and returns the events that have been reopened (from cancelled or postponed to another state).
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals
-            and saved_vals[ev]["of_state"] in ["cancel", "postponed"]
-            and ev.of_state != "cancel"
-        )
-
-    def _get_postponed_events(self, saved_vals):
-        """
-        Filters and returns the events that have been postponed.
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals and saved_vals[ev]["of_state"] != "postponed" and ev.of_state == "postponed"
-        )
-
-    def _get_events_only_hours_changed(self, saved_vals):
-        """
-        Filters and returns the events whose hours have been changed. If the start date has been changed,
-        it will not be considered as a change in hours and will fallback to the `_get_events_start_date_changed` method.
-        """
-
-        def _compare_hours(ev, vals):
-            if ev not in vals or "start" not in vals[ev]:
-                return False
-            date_saved = fields.Datetime.from_string(vals[ev]["start"])
-            if date_saved.date() != ev.start.date():
-                return False
-            return (
-                ev.start.hour != date_saved.hour
-                or ev.start.minute != date_saved.minute
-                or ev.start.second != date_saved.second
-            )
-
-        return self.filtered(lambda ev: _compare_hours(ev, saved_vals))
-
-    def _get_events_duration_changed(self, saved_vals):
-        """
-        Filters and returns the events whose duration has been changed.
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals
-            and saved_vals[ev].get("duration")
-            and ev.duration != saved_vals[ev].get("duration")
-        )
-
-    def _get_events_force_date_changed(self, saved_vals):
-        """
-        Filters and returns the events whose `of_force_dates` field has been changed.
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals
-            and "of_force_dates" in saved_vals[ev]
-            and ev.of_force_dates != saved_vals[ev].get("of_force_dates")
-        )
-
-    def _get_events_employee_changed(self, saved_vals):
-        """
-        Filters and returns the events whose employees have been changed.
-        """
-        return self.filtered(
-            lambda ev: ev in saved_vals
-            and "of_employee_ids" in saved_vals[ev]
-            and ev.of_employee_ids.ids != saved_vals[ev].get("of_employee_ids")
-        )
+        return [
+            "start",
+            "of_employee_ids",
+            "of_state",
+            "duration",
+            "of_address_id",
+            "of_force_dates",
+            "of_resource_id",
+            "active",
+        ]
 
     def _get_tour_dates(self):
         """
@@ -578,7 +295,7 @@ class CalendarEvent(models.Model):
 
         tour_obj = self.env["of.planning.tour"]
         tours = tour_obj.browse()
-        if self.of_state in ("cancel", "postponed"):
+        if self.of_state in tour_obj._get_intervention_state_values_to_exclude():
             return tours
 
         dates_eval = self._get_tour_dates()

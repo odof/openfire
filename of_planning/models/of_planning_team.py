@@ -6,6 +6,8 @@ import pytz
 
 from odoo import api, fields, models
 
+from .calendar_event import TZ_EUROPE_PARIS_STR
+
 
 @api.model
 def _tz_get(self):
@@ -23,7 +25,7 @@ class OFPlanningTeam(models.Model):
         return ["|", ("of_is_operator", "=", True), ("of_is_salesperson", "=", True)]
 
     def _default_tz(self):
-        return self.env.user.tz or "Europe/Paris"
+        return self.env.user.tz or TZ_EUROPE_PARIS_STR
 
     name = fields.Char(string="Team", size=128, required=True)
     active = fields.Boolean(default=True)
