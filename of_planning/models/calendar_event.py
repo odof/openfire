@@ -9,6 +9,8 @@ from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import format_datetime
 
+TZ_EUROPE_PARIS_STR = "Europe/Paris"
+
 
 class CalendarEvent(models.Model):
     _name = "calendar.event"
@@ -522,7 +524,7 @@ class CalendarEvent(models.Model):
         """Override to always compute simple dates for interventions"""
         events = self.filtered(lambda e: e.of_type == "intervention")
         for event in events:
-            tz = pytz.timezone(event.of_employee_id.tz or "Europe/Paris")
+            tz = pytz.timezone(event.of_employee_id.tz or TZ_EUROPE_PARIS_STR)
             if event.start:
                 event.start_date = pytz.utc.localize(event.start).astimezone(tz).date()
             if event.stop:

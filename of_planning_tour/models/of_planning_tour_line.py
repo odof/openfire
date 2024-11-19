@@ -72,6 +72,7 @@ class OFPlanningTourLine(models.Model):
     address_id = fields.Many2one(related="intervention_id.of_address_id", string="Address", readonly=True)
     date_start = fields.Datetime(related="intervention_id.start", string="Start date", readonly=True)
     date_stop = fields.Datetime(related="intervention_id.stop", string="End date", readonly=True)
+    allday = fields.Boolean(related="intervention_id.allday", readonly=True)
     employee_ids = fields.Many2many(related="intervention_id.of_employee_ids", string="Employees", readonly=True)
     is_flexible = fields.Boolean(related="intervention_id.of_is_flexible", string="Flexible", readonly=True)
     duration = fields.Float(related="intervention_id.duration", string="Duration", readonly=True)
