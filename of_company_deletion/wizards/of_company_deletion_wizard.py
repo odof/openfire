@@ -199,9 +199,9 @@ class OFCompanyDeletionWizard(models.TransientModel):
         account_move_lines.remove_move_reconcile()
         # On vide les dates de verrouillage comptable sur les sociétés à supprimer
         if hasattr(self.env['res.company'], 'permanent_lock_date'):
-            self.company_ids.permanent_lock_date = False
+            self.company_ids.write({'permanent_lock_date': False})
         if hasattr(self.env['res.company'], 'fiscalyear_lock_date'):
-            self.company_ids.fiscalyear_lock_date = False
+            self.company_ids.write({'fiscalyear_lock_date': False})
         # Seules les pièces annulées peuvent être supprimées
         account_moves.button_cancel()
         # Des valeurs de débit mal arrondies à 0 empêchent la suppression des écritures
