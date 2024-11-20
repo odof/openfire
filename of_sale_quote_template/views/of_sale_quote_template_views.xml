@@ -274,6 +274,7 @@
                             <field name="order_id" invisible="1"/>
                             <field name="of_client_view" invisible="1"/>
                             <field name="product_id"/>
+                            <field name="name" invisible="1"/>
                             <field name="of_layout_category_id" invisible="1"/>
                             <field name="product_uom_qty"/>
                             <field name="product_uom"/>
