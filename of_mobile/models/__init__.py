@@ -26,3 +26,4 @@ from . import account_payment
 from . import res_company
 from . import sale_order_template
 from . import product_product
+from . import of_calendar_equipment_link
