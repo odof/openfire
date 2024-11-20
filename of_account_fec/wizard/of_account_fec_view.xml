@@ -8,21 +8,30 @@
     <field name="arch" type="xml">
         <xpath expr="//group" position="replace">
             <field name="where_clause_create_date" invisible="1"/>
-            <group col="4">
+            <group col="4" name="date">
                 <field name="date_from"/>
                 <field name="date_to"/>
             </group>
-            <group col="4">
-                <field name="export_type" widget="radio"/>
-                <field name="sortby" widget="radio" attrs="{'invisible': [('export_type','=','official')]}"/>
-                <field name="of_ouv_code"/>
-                <field name="of_ouv_name"/>
-                <field name="of_ouv_include" attrs="{'invisible': [('export_type','=','official')]}"/>
-                <field name="of_extension"/>
-                <field name="of_encoding" attrs="{'invisible': [('export_type','=','official')]}"/>
+            <group name="params">
+                <group>
+                    <field name="sortby" widget="radio"/>
+                </group>
+                <group>
+                    <field name="of_extension"/>
+                    <field name="of_encoding"/>
+                </group>
+            </group>
+            <group name="opening">
+                <group>
+                    <field name="of_ouv_include"/>
+                </group>
+                <group attrs="{'invisible': [('of_ouv_include', '=', False)]}">
+                    <field name="of_ouv_code"/>
+                    <field name="of_ouv_name"/>
+                </group>
             </group>
             <group>
-                <field name="journal_ids" widget="many2many_tags" options="{'no_create': True}" attrs="{'invisible': [('export_type','=','official')]}"/>
+                <field name="journal_ids" widget="many2many_tags" options="{'no_create': True}"/>
             </group>
         </xpath>
     </field>

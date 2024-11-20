@@ -2,11 +2,11 @@
 
 import base64
 import csv
+
 import StringIO
 
-from odoo import api, fields, models, _
-from odoo.exceptions import Warning, AccessDenied
-
+from odoo import _, api, fields, models
+from odoo.exceptions import AccessDenied, Warning
 
 # liste des encodages les plus utilisés, seuls les encodages régulièrement utilisés en France sont non commentés
 available_encodings = [
@@ -30,19 +30,10 @@ class OFAccountFrFec(models.TransientModel):
 
     journal_ids = fields.Many2many('account.journal', string='Journals', required=True, default=lambda self: self.env['account.journal'].search([]))
     sortby = fields.Selection([('sort_date', 'Date'), ('sort_journal_partner', 'Journal & Partner')], string='Sort by', required=True, default='sort_date')
-    export_type = fields.Selection([
-        ('official', 'Official'),
-        ('nonofficial_posted', 'Non-official posted only'),
-        ('nonofficial', 'Non-official'),
-        ], string='Export Type', required=True, default='official',
-        help="Export Type :\n"
-             " - Official : Official FEC report (posted entries only)\n"
-             " - Non-official posted only : Non-official FEC report (posted entries only)\n"
-             " - Non-official : Non-official FEC report (posted and unposted entries)")
     of_extension = fields.Selection([('csv', 'csv'), ('txt', 'txt')], string="File extension", required=True, default='csv')
     of_ouv_code = fields.Char("Code du journal d'ouverture", required=True, default='OUV')
     of_ouv_name = fields.Char("Libellé du journal d'ouverture", required=True, default='Balance initiale')
-    of_ouv_include = fields.Boolean(string="inclure le journal d'ouverture", default=True)
+    of_ouv_include = fields.Boolean(string="Inclure le journal d'ouverture", default=True)
     of_encoding = fields.Selection(
         selection=available_encodings, string=u"Encodage du fichier", default=available_encodings[0][0], required=True)
 
@@ -53,8 +44,6 @@ class OFAccountFrFec(models.TransientModel):
             This is needed because we have to display only one line for the initial balance of all expense/revenue accounts in the FEC.
             copy of parent function.
         """
-        if self.export_type == 'official':  # use parent function instead
-            return super(OFAccountFrFec, self)._do_query_unaffected_earnings()
         sql_query = """
         SELECT
             %s AS JournalCode,
@@ -82,6 +71,7 @@ class OFAccountFrFec(models.TransientModel):
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
             am.company_id = %s
+            AND am.state = 'posted'
             AND aat.include_initial_balance = 'f'
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
@@ -93,11 +83,6 @@ class OFAccountFrFec(models.TransientModel):
         else:
             sql_query += """
             AND am.date < %s
-            """
-
-        if self.export_type == 'nonofficial_posted':
-            sql_query += """
-            AND am.state = 'posted'
             """
 
         company = self.env.user.company_id
@@ -117,15 +102,6 @@ class OFAccountFrFec(models.TransientModel):
         copy of parent function
         """
         self.ensure_one()
-        if self.export_type == 'official':  # use parent function instead
-            result = super(OFAccountFrFec, self).generate_fec()
-            if self.of_extension != 'csv':
-                old_filename = self.filename
-                # On remplace l'extension csv par celle choisie
-                new_filename = old_filename[:-3] + self.of_extension
-                self.write({'filename': new_filename})
-                result['url'] = result['url'].replace(old_filename, new_filename)
-            return result
         if not (self.env.is_admin() or self.env.user.has_group('account.group_account_user')):
             raise AccessDenied()
         # We choose to implement the flat file instead of the XML
@@ -155,7 +131,7 @@ class OFAccountFrFec(models.TransientModel):
             'ValidDate',      # 15
             'Montantdevise',  # 16
             'Idevise',        # 17
-            ]
+        ]
 
         company = self.env.user.company_id
         while not company.chart_template_id and company.parent_id:
@@ -223,6 +199,7 @@ class OFAccountFrFec(models.TransientModel):
             LEFT JOIN account_account_type aat ON aa.user_type_id = aat.id
         WHERE
             am.company_id = %s
+            AND am.state = 'posted'
             AND aat.include_initial_balance = 't'
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
@@ -234,11 +211,6 @@ class OFAccountFrFec(models.TransientModel):
         else:
             sql_query += """
             AND am.date < %s
-            """
-
-        if self.export_type == 'nonofficial_posted':
-            sql_query += """
-            AND am.state = 'posted'
             """
 
         sql_query += """
@@ -345,10 +317,12 @@ class OFAccountFrFec(models.TransientModel):
             LEFT JOIN account_full_reconcile rec ON rec.id = aml.full_reconcile_id
         WHERE
             am.company_id = %s
+            AND am.state = 'posted'
             AND (aml.debit != 0 OR aml.credit != 0)
             AND am.journal_id IN %s
         """
-        if self.where_clause_create_date:  # Certains client veulent la date de création (export mensuel vers logiciel compta).
+        if self.where_clause_create_date:
+            # Certains clients veulent la date de création (export mensuel vers logiciel compta).
             sql_query += """
             AND am.create_date >= %s
             AND am.create_date <= %s
@@ -357,11 +331,6 @@ class OFAccountFrFec(models.TransientModel):
             sql_query += """
             AND am.date >= %s
             AND am.date <= %s
-            """
-
-        if self.export_type == 'nonofficial_posted':
-            sql_query += """
-            AND am.state = 'posted'
             """
 
         sql_sort = 'am.date, am.name, aml.id'
@@ -377,15 +346,14 @@ class OFAccountFrFec(models.TransientModel):
 
         siren = company.vat[4:13]
         end_date = self.date_to.replace('-', '')
-        suffix = '-NONOFFICIAL'
         fecvalue = fecfile.getvalue()
         # venant du fichier est toujours en utf-8
         if self.of_encoding != 'utf-8':
             fecvalue = fecvalue.decode('utf-8').encode(self.of_encoding)
         self.write({
             'fec_data': base64.encodestring(fecvalue),
-            'filename': '%sFEC%s%s.%s' % (siren, end_date, suffix, self.of_extension),
-            })
+            'filename': '%sFEC%s.%s' % (siren, end_date, self.of_extension),
+        })
         fecfile.close()
 
         action = {
@@ -393,5 +361,5 @@ class OFAccountFrFec(models.TransientModel):
             'type': 'ir.actions.act_url',
             'url': "web/content/?model=account.fr.fec&id=" + str(self.id) + "&filename_field=filename&field=fec_data&download=true&filename=" + self.filename,
             'target': 'self',
-            }
+        }
         return action
