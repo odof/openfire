@@ -33,11 +33,18 @@ Tournée (`of.planning.tour`)
     - L'itinéraire de la tournée avant et après l'optimisation pour constater les changements ;
     - Les interventions réordonnées dans la liste de lignes de tournées (nouveau créneau horaire, nouvelle distance entre les interventions, etc.).
 
-  - L'**optimisation est réalisée par l'API de OSRM** (Open Source Routing Machine), selon l’algorithme du voyageur de commerce.
+  - L'**optimisation est réalisée par l'API de OSRM** (Open Source Routing Machine), selon des algorithmes performants de résolution du problème du voyageur de commerce.
   - Lors de l'optimisation, nous **essayons de prendre en compte** les **horaires de l'employé** pour éviter de positionner une intervention en **dehors des horaires de travail** :
 
     - Si pendant l'optimisation, on se rend compte qu'il est possible de positionner une intervention pendant la pause déjeuner, un message d'avertissement est affiché pour prévenir l'utilisateur et lui laisser le choix de valider ou non cette position ;
     - Cependant, si les horaires n'étaient déjà pas respectés avant l'optimisation, nous ne cherchons pas à les respecter pendant l'optimisation.
+
+  - Plusieurs **modes d'optimisation** sont disponibles : (La distinction matin/après-midi est réalisé via l'option de configuration "(OF) Tournées // Heure de coupure matin/après-midi".)
+
+    - Journée entière : Optimise tous les rendez-vous de la journée ;
+    - À la demi-journée : Optimise les rendez-vous du matin entre eux, et ceux de l'après-midi entre eux ;
+    - Matin : Optimise uniquement les rendez-vous du matin ;
+    - Après-midi : Optimise uniquement les rendez-vous de l'après-midi ;
 
   - L'utilisateur peut choisir de valider ou non l'optimisation de la tournée ;
   - Si jamais la tournée a été optimisée ou réorganisée, **un bouton de "restauration"** est disponible pour revenir au **dernier état connu de la tournée** avant l'optimisation ou la réorganisation ;
@@ -195,3 +202,7 @@ Paramètres de configuration
 * Ajout d'un paramètre "(OF) Tournées // Durée minimale des créneaux disponibles" pour permettre de définir la durée minimale des créneaux disponibles des techniciens :
 
   - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Durée minimale des créneaux disponibles**.
+
+* Ajout d'un paramètre "(OF) Tournées // Heure de coupure matin/après-midi" pour permettre de définir l'heure de coupure entre le matin et l'après-midi :
+
+  - Cf. Paramètres > Intervention > Tournées > **(OF) Tournées // Heure de coupure matin/après-midi**.
