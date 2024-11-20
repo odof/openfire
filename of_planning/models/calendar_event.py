@@ -133,6 +133,7 @@ class CalendarEvent(models.Model):
         domain=lambda self: self._domain_employee_ids(),
         copy=False,
         help="Select a team to add all team members to the intervention",
+        context={"active_test": False},
     )
     partner_ids = fields.Many2many(compute="_compute_partner_ids", readonly=False, store=True)
     of_employee_id = fields.Many2one(
