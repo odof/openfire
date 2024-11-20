@@ -12,9 +12,11 @@
         "of_equipment",
         "of_planning_tour",
         "of_planning_view",
+        "of_crm",
         "of_sale",
         "of_service",
         "of_survey",
+        "base_phone",
         "base_menu_visibility_restriction",
     ],
     "data": [
