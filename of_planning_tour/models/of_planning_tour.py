@@ -1110,6 +1110,13 @@ class OFPlanningTour(models.Model):
             if self.employee_id
             else []
         )
+        if not hours:
+            raise UserError(
+                _(
+                    "No work hours is set on this date for this operator. "
+                    "The tour cannot therefore be optimized or reorganized."
+                )
+            )
 
         if len(hours) == 1:
             # only one slot of working hours for the day, split it into two slots at half day duration
