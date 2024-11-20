@@ -60,6 +60,13 @@ class ResConfigSettings(models.TransientModel):
         help="Defines the minimum free slot duration in hours. It corresponds to the minimum duration between two "
         "interventions to consider that employees available.",
     )
+    tour_am_limit_float = fields.Float(
+        string="(OF) Tours // Morning/Afternoon break hour",
+        config_parameter="of.planning.tour.tour_am_limit_float",
+        default=13.0,
+        help="Defines the break hour between morning and afternoon. Interventions starting before this hour will be "
+        "considered in the morning and vice versa.",
+    )
 
     @api.constrains("nbr_months_tour_creation")
     def _check_nbr_months_tour_creation(self):

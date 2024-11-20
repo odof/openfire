@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-19 11:55+0000\n"
-"PO-Revision-Date: 2024-11-19 11:55+0000\n"
+"POT-Creation-Date: 2024-11-20 13:28+0000\n"
+"PO-Revision-Date: 2024-11-20 13:28+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -72,6 +72,12 @@ msgstr "(OF) Tournées // Créer des tournées sur __ mois"
 #: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_minimum_free_slot_duration
 msgid "(OF) Tours // Minimum free slot duration"
 msgstr "(OF) Tournées // Durée minimale des créneaux disponibles"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_connector_config_settings__tour_am_limit_float
+#: model:ir.model.fields,field_description:of_planning_tour.field_res_config_settings__tour_am_limit_float
+msgid "(OF) Tours // Morning/Afternoon break hour"
+msgstr "(OF) Tournées // Heure de coupure matin/après-midi"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_kanban
@@ -185,6 +191,7 @@ msgstr "Adresse"
 
 #. module: of_planning_tour
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_available_slot__day_period__afternoon
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour_optimization_wizard__optim_mode__afternoon
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_tour_appointment_wizard__day_period__afternoon
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_filter
 msgid "Afternoon"
@@ -194,6 +201,11 @@ msgstr "Après-midi"
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_line__allday
 msgid "All Day"
 msgstr "Toute la journée"
+
+#. module: of_planning_tour
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour_optimization_wizard__optim_mode__all
+msgid "All day"
+msgstr "Journée entière"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
@@ -532,6 +544,17 @@ msgid ""
 msgstr ""
 "Définissez l'adresse du lieu de l'intervention, par défaut, l'adresse du "
 "client sera reprise"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_am_limit_float
+#: model:ir.model.fields,help:of_planning_tour.field_res_config_settings__tour_am_limit_float
+#: model_terms:ir.ui.view,arch_db:of_planning_tour.res_config_settings_view_form
+msgid ""
+"Defines the break hour between morning and afternoon. Interventions starting"
+" before this hour will be considered in the morning and vice versa."
+msgstr ""
+"Définit l'heure de coupure entre matin et après-midi. Les interventions "
+"commençant avant cette heure seront considérées du matin et inversement."
 
 #. module: of_planning_tour
 #: model:ir.model.fields,help:of_planning_tour.field_of_connector_config_settings__tour_minimum_free_slot_duration
@@ -897,6 +920,11 @@ msgstr "Aller :"
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_filter
 msgid "Group by..."
 msgstr "Grouper par..."
+
+#. module: of_planning_tour
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour_optimization_wizard__optim_mode__half
+msgid "Half day"
+msgstr "À la demi-journée"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__has_message
@@ -1278,6 +1306,7 @@ msgstr "Lundi"
 
 #. module: of_planning_tour
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_available_slot__day_period__morning
+#: model:ir.model.fields.selection,name:of_planning_tour.selection__of_planning_tour_optimization_wizard__optim_mode__morning
 #: model:ir.model.fields.selection,name:of_planning_tour.selection__of_tour_appointment_wizard__day_period__morning
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_filter
 msgid "Morning"
@@ -1528,6 +1557,11 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_tour_appointment_wizard__pre_employee_ids
 msgid "Operator(s)"
 msgstr "Technicien(s)"
+
+#. module: of_planning_tour
+#: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour_optimization_wizard__optim_mode
+msgid "Optimization mode"
+msgstr "Mode d'optimisation"
 
 #. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form

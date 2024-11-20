@@ -9,7 +9,7 @@
             <xpath expr="//div[@data-key='of_planning']/div[last()]" position="after">
                 <!-- Intervention planning -->
                 <h2>Intervention planning</h2>
-                <div class="row mt16 o_settings_container" id="nbr_days_tour_creation">
+                <div class="row mt16 o_settings_container">
                     <div class="col-12 col-lg-6 o_setting_box" id="search_mode">
                         <div class="o_setting_left_pane">
                         </div>
@@ -81,6 +81,21 @@
                             <div class="content-group mt-2">
                                 <div class="row">
                                     <field name="tour_minimum_free_slot_duration" widget="float_time" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_am_limit_float">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="tour_am_limit_float"/>
+                            <div class="text-muted">
+                                Defines the break hour between morning and afternoon. Interventions starting before this hour will be considered in the morning and vice versa.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="tour_am_limit_float" widget="float_time"/>
                                 </div>
                             </div>
                         </div>
