@@ -8,7 +8,7 @@ from odoo import api, fields, models
 
 from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
 
-from .of_planning_tour import AM_LIMIT_FLOAT
+from .of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
 
 SELECTION_DAY_PERIOD = [
     ("both", "Morning and Afternoon"),
@@ -67,8 +67,13 @@ class OFPlanningAvailableSlot(models.Model):
 
     @api.depends("start")
     def _compute_day_period(self):
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
         for record in self:
-            if fields.Datetime.context_timestamp(self, record.start).hour < AM_LIMIT_FLOAT:
+            if fields.Datetime.context_timestamp(self, record.start).hour < am_limit_float:
                 record.day_period = "morning"
             else:
                 record.day_period = "afternoon"

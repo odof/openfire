@@ -13,7 +13,7 @@ from odoo.exceptions import UserError, ValidationError
 from odoo.addons.of_utils.models.misc import distance_between_points
 
 from ..models.of_planning_available_slot import SELECTION_DAY_PERIOD
-from ..models.of_planning_tour import AM_LIMIT_FLOAT
+from ..models.of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
 from ..models.res_config_settings import SELECTION_SEARCH_MODES, SELECTION_SEARCH_TYPES
 
 _logger = logging.getLogger(__name__)
@@ -1167,6 +1167,11 @@ class OFTourAppointmentLine(models.TransientModel):
 
     @api.depends("search_mode")
     def _compute_useful_distance(self):
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
         for line in self:
             search_mode = line.search_mode
             if search_mode == "oneway":
@@ -1174,7 +1179,7 @@ class OFTourAppointmentLine(models.TransientModel):
             elif search_mode == "oneway_am_return_pm":
                 line.useful_distance = (
                     line.previous_distance
-                    if line.available_slot_id.start.hour <= AM_LIMIT_FLOAT  # one way, if morning
+                    if line.available_slot_id.start.hour <= am_limit_float  # one way, if morning
                     else line.next_distance  # return, if afternoon
                 )
             elif search_mode == "oneway_or_return":
@@ -1186,6 +1191,11 @@ class OFTourAppointmentLine(models.TransientModel):
 
     @api.depends("search_mode")
     def _compute_useful_duration(self):
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
         for line in self:
             search_mode = line.search_mode
             if search_mode == "oneway":
@@ -1193,7 +1203,7 @@ class OFTourAppointmentLine(models.TransientModel):
             elif search_mode == "oneway_am_return_pm":
                 line.useful_duration = (
                     line.previous_duration
-                    if line.available_slot_id.start.hour <= AM_LIMIT_FLOAT
+                    if line.available_slot_id.start.hour <= am_limit_float
                     else line.next_duration
                 )
             elif search_mode == "oneway_or_return":

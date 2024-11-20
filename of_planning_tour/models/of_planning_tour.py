@@ -10,11 +10,12 @@ import requests
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import config
+from odoo.tools.float_utils import float_compare
 
 from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
 from odoo.addons.resource.models.resource import float_to_time
 
-AM_LIMIT_FLOAT = 12.0  # Define the limit between AM and PM
+DEFAULT_AM_LIMIT_FLOAT = 13.0  # Define the limit between AM and PM
 DEFAULT_MIN_DURATION_IN_HOURS = 0.25  # Default minimum duration for free slots in hours
 DEFAULT_PERIOD_IN_MONTHS = 18
 
@@ -1099,6 +1100,11 @@ class OFPlanningTour(models.Model):
             If the employee has more than two slots, they will be split into two lists based on the noon limit.
         """
         self.ensure_one()
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
         hours = (
             self.employee_id._get_employee_working_hours_list(self.date)[self.employee_id.id]
             if self.employee_id
@@ -1115,7 +1121,7 @@ class OFPlanningTour(models.Model):
             # more than two slots of working hours for the day, split them into two lists (morning and afternoon)
             new_hours = [[], []]
             for slot in hours:
-                if slot[0] < AM_LIMIT_FLOAT:
+                if slot[0] < am_limit_float:
                     new_hours[0].append(slot)
                 else:
                     new_hours[1].append(slot)
@@ -1233,28 +1239,33 @@ class OFPlanningTour(models.Model):
         """
         Get the first hour (as a float) of the afternoon for the tour.
         For that we are building a list of start hours of interventions and then in this list, get the first hour
-        after the AM_LIMIT_FLOAT by comparing the hours of the interventions.
+        after the tour_am_limit_float by comparing the hours of the interventions.
 
         Returns:
-            float: The first hour of the afternoon for the tour, or AM_LIMIT_FLOAT if not found.
+            float: The first hour of the afternoon for the tour, or tour_am_limit_float if not found.
         """
         self.ensure_one()
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
         if not self.tour_line_ids:
             return False
 
         employee_wh = self._get_employee_working_hours()
         # if the employee has complex hours, fallback to start of the afternoon hours  otherwise get the first hour
-        # after the AM_LIMIT_FLOAT
+        # after the tour_am_limit_float
         complex_hours = len(employee_wh[0]) > 1
         afternoon_hours = (
-            employee_wh[1][0] if complex_hours else [h[0][0] for h in employee_wh if h[0][0] > AM_LIMIT_FLOAT]
+            employee_wh[1][0] if complex_hours else [h[0][0] for h in employee_wh if h[0][0] > am_limit_float]
         )
         if not afternoon_hours:
-            return AM_LIMIT_FLOAT
+            return am_limit_float
 
         first_afternoon_line = self._find_index_first_afternoon_line(afternoon_hours)
         if not first_afternoon_line:
-            return AM_LIMIT_FLOAT
+            return am_limit_float
 
         first_afternoon_dt = fields.Datetime.context_timestamp(  # get datetime of the first afternoon line
             self, self.tour_line_ids[first_afternoon_line].date_start
@@ -1288,6 +1299,10 @@ class OFPlanningTour(models.Model):
                 )
             raise UserError(message)
         return True
+
+    def _get_float_intervention_start_hour(self, intervention):
+        start_date = fields.Datetime.context_timestamp(self, intervention.start)
+        return round(start_date.hour + start_date.minute / 60.0 + start_date.second / 3600.0, 5)
 
     # == Available time slots methods ==
 
@@ -1451,81 +1466,84 @@ class OFPlanningTour(models.Model):
 
     # == OSRM methods ==
 
-    def _osrm_get_tour_coordinates_data(self):
+    def _osrm_get_tour_coordinates_data(self, optim_mode="day", afternoon_start_address=False):
         """
         Retrieves the tour coordinates data.
 
-        This method retrieves the coordinates data for the tour, including the start address, stop address,
-        intervention points, and their associated hints.
-
-        This dict of hints will be used by wizards to be able to retrieve the tour line associated to the coordinates
-        because OSRM will send us this hint string in the response.
+        This method retrieves the coordinates data for the tour, including the start address, stop address and
+        intervention points.
 
         Returns:
-            tuple: A tuple containing the coordinates string and a dictionary of tour data by hint.
+            coordinates (list): List of dict with string of coordinates as "longitude,latitude" and origin tour line
 
         Example:
-            coordinates_str, tour_data_by_hint = self._osrm_get_tour_coordinates_data()
+            coordinates = self._osrm_get_tour_coordinates_data()
         """
         self.ensure_one()
 
-        start_address = self._get_start_address()
-        if not start_address:
-            self._set_start_address(start_address)
+        if not self.start_address_id:
+            self._set_start_address()
+        start_address = self.start_address_id
 
-        return_address = self._get_return_address()
         if not self.return_address_id:
-            self._set_return_address(return_address)
+            self._set_return_address()
+        return_address = self.return_address_id
+
+        tour_line_obj = self.env["of.planning.tour.line"]
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+        )
+        compare_precision = 5
+
+        # get tour_lines and addresses depending on optim_mode
+        tour_lines = self.tour_line_ids
+        if optim_mode == "morning":
+            afternoon_lines = self.tour_line_ids.sorted(key=lambda line: line.date_start).filtered(
+                lambda line: float_compare(
+                    self._get_float_intervention_start_hour(line.intervention_id), am_limit_float, compare_precision
+                )
+                >= 0
+            )
+            return_address = afternoon_lines and afternoon_lines[0].intervention_id.of_address_id or return_address
+            tour_lines = self.tour_line_ids - afternoon_lines
+        elif optim_mode == "afternoon":
+            morning_lines = self.tour_line_ids.sorted(key=lambda line: line.date_start).filtered(
+                lambda line: float_compare(
+                    self._get_float_intervention_start_hour(line.intervention_id), am_limit_float, compare_precision
+                )
+                < 0
+            )
+            start_address = (
+                afternoon_start_address
+                or morning_lines
+                and morning_lines[-1].intervention_id.of_address_id
+                or start_address
+            )
+            tour_lines = self.tour_line_ids - morning_lines
 
         # Start point
-        coordinates_str = f"{start_address.partner_longitude},{start_address.partner_latitude}"  # noqa
-        hint = self._osrm_get_nearest_point_hint(coordinates_str)
-
-        tour_data_by_hint = {  # dict of a hint string of each coordinates associated to the tour line
-            hint: [
-                {
-                    "tour": self,
-                    "line": False,
-                    "coordinates": (start_address.partner_longitude, start_address.partner_latitude),
-                    "intervention_id": False,
-                    "type": "start",
-                }
-            ]
-        }
-
-        # Interventions lines
-        for line in self.tour_line_ids:
-            coord_str = f"{line.geo_lng},{line.geo_lat}"  # noqa
-            coordinates_str += f";{coord_str}"  # noqa
-
-            hint = self._osrm_get_nearest_point_hint(coord_str)
-            if not tour_data_by_hint.get(hint):
-                tour_data_by_hint[hint] = []
-            tour_data_by_hint[hint].append(
-                {
-                    "tour": self,
-                    "line": line,
-                    "coordinates": (line.geo_lng, line.geo_lat),
-                    "intervention_id": line.intervention_id.id,
-                    "type": "intervention",
-                }
-            )
-
-        # End point
-        coord_str = f"{return_address.partner_longitude},{return_address.partner_latitude}"  # noqa
-        hint = self._osrm_get_nearest_point_hint(coord_str)
-        coordinates_str += f";{coord_str}"  # noqa
-        tour_data_by_hint[hint] = [
+        coordinates = [
             {
-                "tour": self,
-                "line": False,
-                "intervention_id": False,
-                "coordinates": (return_address.partner_longitude, return_address.partner_latitude),
-                "type": "end",
+                "coord_str": f"{start_address.partner_longitude},{start_address.partner_latitude}",  # noqa
+                "origin_line_id": tour_line_obj,
             }
         ]
 
-        return coordinates_str, tour_data_by_hint
+        # Interventions lines
+        for line in tour_lines:
+            coordinates.append({"coord_str": f"{line.geo_lng},{line.geo_lat}", "origin_line_id": line})  # noqa
+
+        # End point
+        coordinates.append(
+            {
+                "coord_str": f"{return_address.partner_longitude},{return_address.partner_latitude}",  # noqa
+                "origin_line_id": tour_line_obj,
+            }
+        )
+
+        return coordinates
 
     @api.model
     def _osrm_get_base_url(self, mode="route"):

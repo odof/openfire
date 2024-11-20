@@ -206,6 +206,7 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
         # allow user to accept that an intervention can ends inside the lunch break time slot (count_wh_disrupted is
         # priority over this option). Reorganization wizard doesn't have this option (yet ?).
         lunchbreak_overlapping = self.can_overlap_lunchbreak if hasattr(self, "can_overlap_lunchbreak") else False
+        keep_halfday = self.optim_mode != "all" if hasattr(self, "optim_mode") else False
         timeline = []
         result = {}
 
@@ -227,10 +228,18 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
             )
             hours, minutes = float_2_hours_minutes(duration)
 
+            if keep_halfday:
+                # for half day, morning and afternoon optimization, we want to keep afternoon meetings during afternoon,
+                # even if there is free space in the morning
+                start_date_local = fields.Datetime.context_timestamp(self, optz_intervention.start)
+                start_flo = start_date_local.hour + start_date_local.minute / 60.0 + start_date_local.second / 3600.0
+                if new_start_hour < afternoon_start_hour <= start_flo:
+                    new_start_hour = afternoon_start_hour
+
             # get the new start/end hour for the intervention depending on the employee hours
             if complex_employee_hours:
                 len_flattened_employee_hours = len(flattened_employee_hours)
-                for i in range(len_flattened_employee_hours):
+                for i in range(len_flattened_employee_hours - 1):
                     slot_end_hour = flattened_employee_hours[i][1]
                     next_slot_start_hour = (
                         flattened_employee_hours[i + 1][0]
@@ -255,7 +264,7 @@ class OFPlanningTourWizardMixin(models.AbstractModel):
 
             new_end_hour = new_start_hour + duration
             if complex_employee_hours:
-                for i in range(len_flattened_employee_hours):
+                for i in range(len_flattened_employee_hours - 1):
                     slot_end_hour = flattened_employee_hours[i][1]
                     next_slot_start_hour = (
                         flattened_employee_hours[i + 1][0]
