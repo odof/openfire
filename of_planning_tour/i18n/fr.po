@@ -1436,6 +1436,17 @@ msgid "No optimized tour lines found."
 msgstr "Aucune ligne de tournée optimisée n'a été trouvée."
 
 #. module: of_planning_tour
+#. odoo-python
+#: code:addons/of_planning_tour/models/of_planning_tour.py:0
+#, python-format
+msgid ""
+"No work hours is set on this date for this operator. The tour cannot "
+"therefore be optimized or reorganized."
+msgstr ""
+"Aucun horaire n'est défini à cette date pour cet intervenant. La tournée ne "
+"peut donc pas être optimisée ou réorganisée."
+
+#. module: of_planning_tour
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_filter
 msgid "Not empty"
 msgstr "Non vide"
