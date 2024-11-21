@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//h1" position="after">
+                <field name="of_website_create" invisible="1"/>
+                <field name="of_potential_duplicated_partner" invisible="1"/>
+                <h3 class="inline-heading inline-heading-web" attrs="{'invisible': [('of_website_create', '=', False)]}">Web</h3>
+                <h3 class="inline-heading inline-heading-duplicated" attrs="{'invisible': ['|', ('of_website_create', '=', False), ('of_potential_duplicated_partner', '=', False)]}">Duplicated</h3>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="calendar_event_view_search" model="ir.ui.view">
+        <field name="name">calendar.event.view.search</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='fixed']" position="after">
+                <separator/>
+                <filter name="web" string="Web interventions" domain="[('of_website_create', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

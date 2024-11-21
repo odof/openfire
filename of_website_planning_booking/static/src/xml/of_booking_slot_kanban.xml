@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <div t-name="of_website_planning_booking.slot_kanban" class="mb-4 col-6">
+        <div class="card slot-card of_js_slot_change">
+            <div class="of-card-slot">
+                <input type="hidden" id="slot_id" name="slot_id" t-att-value="slot_id"/>
+                <b>
+                    <span t-esc="title"/>
+                </b>
+                <br/>
+                <i><div t-if="extra_info" t-out="extra_info"/></i>
+            </div>
+        </div>
+    </div>
+
+    <div t-name="of_website_planning_booking.unavailable_slot_kanban" class="mb-4 col-6">
+        <div class="card">
+            <div class="of-unavailable-card-slot">
+                <div style="margin-top: 10px;">
+                    <b>
+                        <i>
+                        <span style="color: white;">UNAVAILABLE</span>
+                        </i>
+                    </b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</templates>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="of_planning_tour.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@data-key='of_planning']/div[last()]" position="after">
+                <h2>Website Planning Booking</h2>
+                <div class="row mt16 o_settings_container" name="of_booking_main_panel">
+                    <field name="website_id" invisible="1"/>
+                    <div class="col-12 col-lg-12 o_setting_box" id="of_booking_open_new_customer">
+                        <div class="o_setting_left_pane">
+                            <field name="of_booking_open_new_customer"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_open_new_customer"/>
+                            <div class="text-muted">
+                                If checked, allows any visitor to make an appointment on your website. Otherwise, only your customers who already have a portal account can make an appointment.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-12 o_setting_box" groups="base.group_multi_company" id="of_booking_use_partner_company">
+                        <div class="o_setting_left_pane">
+                            <field name="of_booking_use_partner_company"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_use_partner_company"/>
+                            <div class="text-muted">
+                                If checked, appointments made by your existing customers will be placed on the company defined on the contact.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" groups="base.group_multi_company" id="of_booking_intervention_company_id"
+                        attrs="{'invisible': [('of_booking_open_new_customer', '=', False), ('of_booking_use_partner_company', '=', True)],
+                                'required': ['|', ('of_booking_open_new_customer', '=', True), ('of_booking_use_partner_company', '=', False)]}">
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_intervention_company_id"/>
+                            <div class="text-muted">
+                                Specifies the company on which to create appointments made online.
+                            </div>
+                            <field name="of_booking_intervention_company_id"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt16 o_settings_container" name="of_booking_specific_panel">
+                    <div class="col-12 col-lg-12 o_setting_box" groups="base.group_multi_company" id="of_booking_company_specific">
+                        <div class="o_setting_left_pane">
+                            <field name="of_booking_company_specific"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_company_specific"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+                                If checked, allows you to define a configuration specific to one of your companies.
+                            </div>
+                        </div>
+                    </div>
+                    <field name="of_booking_company_specific" invisible="1" groups="!base.group_multi_company"/>
+                    <div class="col-12 col-lg-12 o_setting_box" id="of_booking_employee_ids">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_employee_ids"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Defines the technicians available to carry out appointments made online.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_employee_ids_str" invisible="1"/>
+                                    <field name="of_booking_employee_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_opened_day_ids">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_opened_day_ids"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Defines the open days for making online appointments.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_opened_day_ids_str" invisible="1"/>
+                                    <field name="of_booking_opened_day_ids" widget="many2many_tags"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_open_days_number">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_open_days_number"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Defines the period in days for which you open the online appointment booking (maximum 180 days).
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_open_days_number"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_search_mode">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_search_mode"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to indicate the search method to take into account when proposing available slots.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_search_mode"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_search_type">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_search_type"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to indicate the search criterion to take into account when proposing available slots.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_search_type" class="oe_inline" style="margin-right: 10px"/>
+                                    <field name="of_booking_search_max_criteria" class="oe_inline"/>
+                                    <span class="oe_inline" attrs="{'invisible': [('of_booking_search_type', '!=', 'distance')]}">km max</span>
+                                    <span class="oe_inline" attrs="{'invisible': [('of_booking_search_type', '!=', 'duration')]}">minutes max</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_allow_empty_days">
+                        <div class="o_setting_left_pane">
+                            <field name="of_booking_allow_empty_days"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_allow_empty_days"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                If checked, authorizes appointments to be made on blank days.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_empty_days_search_type" attrs="{'invisible': [('of_booking_allow_empty_days', '=', False)]}">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_empty_days_search_type"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to indicate the search criterion to take into account when proposing available slots on empty days.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_empty_days_search_type" class="oe_inline" style="margin-right: 10px"/>
+                                    <field name="of_booking_empty_days_search_max_criteria" class="oe_inline"/>
+                                    <span class="oe_inline" attrs="{'invisible': [('of_booking_empty_days_search_type', '!=', 'distance')]}">km max</span>
+                                    <span class="oe_inline" attrs="{'invisible': [('of_booking_empty_days_search_type', '!=', 'duration')]}">minutes max</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"/>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_display_price">
+                        <div class="o_setting_left_pane">
+                            <field name="of_booking_display_price"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_display_price"/>
+                            <div class="text-muted">
+                                If checked, the price of the services will be displayed as an indication when making an appointment.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_intervention_state">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_intervention_state"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to indicate in which state appointments made online will be created.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_intervention_state"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-12 o_setting_box" id="of_booking_terms_file">
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_terms_file"/>
+                            <div class="text-muted">
+                                Allows you to load a PDF file of your GTC which will be accessible during the confirmation step.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_terms_file" filename="of_booking_terms_filename"/>
+                                    <field name="of_booking_terms_filename"  invisible="1"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_morning_hours_label">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_morning_hours_label"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to specify the time slot corresponding to the morning slots.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_morning_hours_label"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="of_booking_afternoon_hours_label">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_afternoon_hours_label"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to specify the time slot corresponding to the afternoon slots.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_afternoon_hours_label"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-12 o_setting_box" id="of_booking_validation_note">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="of_booking_validation_note"/>
+                            <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." aria-label="Values set here are company-specific." role="img" attrs="{'invisible': [('of_booking_company_specific', '=', False)]}"/>
+                            <div class="text-muted">
+                                Allows you to specify a note in HTML format that will be visible at the confirmation step.
+                            </div>
+                            <div class="content-group mt-2">
+                                <div class="row">
+                                    <field name="of_booking_validation_note"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

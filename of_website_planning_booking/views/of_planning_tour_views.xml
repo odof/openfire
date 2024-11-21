@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_planning_tour_view_form" model="ir.ui.view">
+        <field name="name">of.planning.tour.view.form</field>
+        <field name="model">of.planning.tour</field>
+        <field name="inherit_id" ref="of_planning_tour.of_planning_tour_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='hide_action_buttons']" position="after">
+                <field name="employee_web_resource_calendar_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='available_slots']" position="after">
+                <page name="web_available_slots" string="Web Available Slots" groups="of_base.of_group_root_only" attrs="{'invisible': [('employee_web_resource_calendar_id', '=', False)]}">
+                    <field name="web_available_slot_ids" mode="tree" nolabel="1" readonly="1" context="{'of_from_tour':1}">
+                        <tree string="Web Available Slots">
+                            <field name="date" optional="hide"/>
+                            <field name="time_slot"/>
+                            <field name="start" optional="hide"/>
+                            <field name="stop" optional="hide"/>
+                            <field name="employee_id" optional="hide" />
+                            <field name="duration" widget="float_time"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,1087 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_website_planning_booking
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-12 10:24+0000\n"
+"PO-Revision-Date: 2024-12-12 10:24+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_afternoon_hours_label
+msgid "(OF) Afternoon hours label"
+msgstr "(OF) Libellé horaires après-midi"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_allow_empty_days
+msgid "(OF) Allow booking on empty days"
+msgstr "(OF) Autorise la réservation sur des journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_open_new_customer
+msgid "(OF) Allow new customers"
+msgstr "(OF) Autorise les nouveaux clients"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_employee_ids
+msgid "(OF) Available operators"
+msgstr "(OF) Techniciens disponibles"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_employee_ids_str
+msgid "(OF) Available operators in String"
+msgstr "(OF) Techniciens disponibles en String"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_display_price
+msgid "(OF) Display service price"
+msgstr "(OF) Afficher le prix de la prestation"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_intervention_company_id
+msgid "(OF) Intervention company"
+msgstr "(OF) Société des RDV"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_validation_note
+msgid "(OF) Intervention confirmation notes"
+msgstr "(OF) Notes de confirmation de RDV"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_intervention_state
+msgid "(OF) Interventions state"
+msgstr "(OF) État des RDV"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_morning_hours_label
+msgid "(OF) Morning hours label"
+msgstr "(OF) Libellé horaires matin"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_open_days_number
+msgid "(OF) Number of opened days"
+msgstr "(OF) Nombre de jours ouverts"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_opened_day_ids
+msgid "(OF) Opened days"
+msgstr "(OF) Jours ouverts"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_opened_day_ids_str
+msgid "(OF) Opened days in String"
+msgstr "(OF) Jours ouverts en String"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_terms_file
+msgid "(OF) PDF file for General Terms and Conditions"
+msgstr "(OF) Fichier PDF des Conditions Générales de Vente"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_terms_filename
+msgid "(OF) PDF file name for General Terms and Conditions"
+msgstr "(OF) Nom du fichier PDF des Conditions Générales de Vente"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_search_max_criteria
+msgid "(OF) Search max criterion"
+msgstr "(OF) Critère de recherche max"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_empty_days_search_max_criteria
+msgid "(OF) Search max criterion for empty days"
+msgstr "(OF) Critère de recherche max pour les journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_search_mode
+msgid "(OF) Search mode"
+msgstr "(OF) Mode de recherche"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_search_type
+msgid "(OF) Search type"
+msgstr "(OF) Type de recherche"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_empty_days_search_type
+msgid "(OF) Search type for empty days"
+msgstr "(OF) Type de recherche pour les journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_company_specific
+msgid "(OF) Specific configuration for this company"
+msgstr "(OF) Configuration spécifique à cette société"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_config_settings__of_booking_use_partner_company
+msgid "(OF) Use partner company for existing customers"
+msgstr "(OF) Société du partenaire pour les clients existants"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<b>No free slot matches your search, please contact your store.</b>"
+msgstr ""
+"<b>Aucun créneau libre ne correspond à votre recherche, veuillez contacter "
+"votre magasin.</b>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_error
+msgid ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            Something went wrong, please try again later or contact us.\n"
+"                        </b>"
+msgstr ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            Une erreur est survenue, veuillez réessayer plus tard ou contactez nous.\n"
+"                        </b>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_unavailable
+msgid ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            The slot you selected is no longer available, please try another search.\n"
+"                        </b>"
+msgstr ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            Le créneau que vous avez sélectionné n'est plus disponible, veuillez essayer une autre recherche.\n"
+"                        </b>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_thank_you
+msgid ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            Your appointment request has been recorded and a confirmation has been sent to you by email.\n"
+"                            <br/>\n"
+"                            We will contact you again to confirm the terms of this meeting with you.\n"
+"                        </b>"
+msgstr ""
+"<br/>\n"
+"                        <b class=\"col-md-10\">\n"
+"                            Votre demande de rendez-vous a bien été enregistrée et une confirmation vous a été envoyée par e-mail.\n"
+"                            <br/>\n"
+"                            Nous vous recontacterons pour valider avec vous les modalités de ce rendez-vous.\n"
+"                        </b>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<option value=\"\">Address selection...</option>"
+msgstr "<option value=\"\">Choix de l'adresse...</option>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<option value=\"\">Contract selection...</option>"
+msgstr "<option value=\"\">Choix du contrat...</option>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<option value=\"\">Service selection...</option>"
+msgstr "<option value=\"\">Choix de la prestation...</option>"
+
+#. module: of_website_planning_booking
+#: model:mail.template,body_html:of_website_planning_booking.booking_confirmation_mail_template
+msgid ""
+"<p>Hello <t t-out=\"object.of_partner_id.name or ''\">partner</t>,</p>\n"
+"<p>Your appointment request for <span style=\"font-weight:bold;\" t-out=\"format_date(object.start_date) or ''\">2024-02-06</span> has been recorded.</p>\n"
+"<p>Wishing you good reception.</p>\n"
+"        "
+msgstr ""
+"<p style=\"margin:0px 0 12px 0;box-sizing:border-box;\">Bonjour <t t-out=\"object.of_partner_id.name or ''\">partenaire</t>,</p>\n"
+"<p style=\"margin:0px 0 12px 0;box-sizing:border-box;\">Votre demande de rendez-vous pour le <span style=\"font-weight:bold;\" t-out=\"format_date(object.start_date) or ''\">06/02/2024</span> a bien été enregistrée.</p>\n"
+"<p style=\"margin:0px 0 12px 0;box-sizing:border-box;\">Vous en souhaitant bonne réception.</p>\n"
+"        "
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"groups=\"base.group_multi_company\" role=\"img\"/>"
+msgstr ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont"
+" spécifiques à la société.\" aria-label=\"Les valeurs définies ici sont "
+"spécifiques à la société.\" groups=\"base.group_multi_company\" "
+"role=\"img\"/>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Values set here are company-"
+"specific.\" aria-label=\"Values set here are company-specific.\" "
+"role=\"img\" attrs=\"{'invisible': [('of_booking_company_specific', '=', "
+"False)]}\"/>"
+msgstr ""
+"<span class=\"fa fa-lg fa-building-o\" title=\"Les valeurs définies ici sont"
+" spécifiques à la société.\" aria-label=\"Les valeurs définies ici sont "
+"spécifiques à la société.\" role=\"img\" attrs=\"{'invisible': "
+"[('of_booking_company_specific', '=', False)]}\"/>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid ""
+"<span class=\"fa fa-long-arrow-left\"/>\n"
+"                                        Back"
+msgstr ""
+"<span class=\"fa fa-long-arrow-left\"/>\n"
+"                                        Retour"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"<span class=\"oe_inline\" attrs=\"{'invisible': [('of_booking_empty_days_search_type', '!=', 'distance')]}\">km max</span>\n"
+"                                    <span class=\"oe_inline\" attrs=\"{'invisible': [('of_booking_empty_days_search_type', '!=', 'duration')]}\">minutes max</span>"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"<span class=\"oe_inline\" attrs=\"{'invisible': [('of_booking_search_type', '!=', 'distance')]}\">km max</span>\n"
+"                                    <span class=\"oe_inline\" attrs=\"{'invisible': [('of_booking_search_type', '!=', 'duration')]}\">minutes max</span>"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_intervention_template_view_form
+msgid "<span class=\"text-danger\">Web</span>"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_intervention_template_view_form
+msgid "<span class=\"text-success\">Web</span>"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<span class=\"visually-hidden\">Loading...</span>"
+msgstr "<span class=\"visually-hidden\">Chargement...</span>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "<strong>Additional comments</strong>"
+msgstr "<strong>Commentaires additionnels</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Additional</strong>"
+msgstr "<strong>Complément</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Address</strong>"
+msgstr "<strong>Adresse</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>City *</strong>"
+msgstr "<strong>Ville *</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Contract</strong>"
+msgstr "<strong>Contrat</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>E-mail *</strong>"
+msgstr "<strong>Courriel *</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>From</strong>"
+msgstr "<strong>À partir de</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>LASTNAME Firstname *</strong>"
+msgstr "<strong>NOM Prénom *</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Phone *</strong>"
+msgstr "<strong>Téléphone *</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Service</strong>"
+msgstr "<strong>Prestation</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Street (and number) *</strong>"
+msgstr "<strong>Rue (et numéro) *</strong>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "<strong>Zip *</strong>"
+msgstr "<strong>Code Postal *</strong>"
+
+#. module: of_website_planning_booking
+#. odoo-python
+#: code:addons/of_website_planning_booking/controllers/main.py:0
+#, python-format
+msgid "Additional notes from customer: <br/>%s"
+msgstr "Commentaires additionnels du client : <br/>%s"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "Address"
+msgstr "Adresse"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Address..."
+msgstr "Adresse..."
+
+#. module: of_website_planning_booking
+#. odoo-python
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/wizards/of_tour_appointment_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+#, python-format
+msgid "Afternoon"
+msgstr "Après-midi"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,help:of_website_planning_booking.field_res_config_settings__of_booking_opened_day_ids
+msgid "Allow booking for these days only"
+msgstr "Autorise la prise de RDV pour ces jours uniquement"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,help:of_website_planning_booking.field_res_config_settings__of_booking_employee_ids
+msgid "Allow booking for these operators only"
+msgstr "Autorise la prise de RDV pour ces techniciens uniquement"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to indicate in which state appointments made online will be "
+"created."
+msgstr "Permet d'indiquer dans quel état seront créés les RDV pris en ligne."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to indicate the search criterion to take into account when "
+"proposing available slots on empty days."
+msgstr ""
+"Permet d'indiquer le critère de recherche à prendre en compte pour la "
+"proposition des créneaux disponibles sur des journées vierges."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to indicate the search criterion to take into account when "
+"proposing available slots."
+msgstr ""
+"Permet d'indiquer le critère de recherche à prendre en compte pour la "
+"proposition des créneaux disponibles."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to indicate the search method to take into account when proposing"
+" available slots."
+msgstr ""
+"Permet d'indiquer le mode de recherche à prendre en compte pour la "
+"proposition des créneaux disponibles."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to load a PDF file of your GTC which will be accessible during "
+"the confirmation step."
+msgstr ""
+"Permet de charger un fichier PDF de vos CGV qui sera accessibles lors de "
+"l'étape de confirmation."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to specify a note in HTML format that will be visible at the "
+"confirmation step."
+msgstr ""
+"Permet de spécifier une note au format HTML qui sera visible à l'étape de "
+"confirmation."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to specify the time slot corresponding to the afternoon slots."
+msgstr ""
+"Permet de spécifier la plage horaire correspondant aux créneaux de l'après-"
+"midi."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Allows you to specify the time slot corresponding to the morning slots."
+msgstr ""
+"Permet de spécifier la plage horaire correspondant aux créneaux du matin."
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_tour_appointment_line_website_wizard
+msgid "Appointment Proposals for website"
+msgstr "Proposition de RDV pour le site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_tour_appointment_wizard
+msgid "Appointment scheduling for tours"
+msgstr "Recherche de créneaux pour les tournées"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Are you already a customer? Do not hesitate to"
+msgstr "Vous êtes déjà client ? N'hésitez pas à vous"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_tour__available_slot_ids
+msgid "Available Slots"
+msgstr "Créneaux disponibles"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_planning_available_slot
+msgid "Available slot on planning"
+msgstr "Créneaux disponibles du planning"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_calendar_event
+msgid "Calendar Event"
+msgstr "Calendrier de l'événement"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "Confirm your appointment"
+msgstr "Confirmez votre rendez-vous"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_intervention_state__confirmed
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_intervention_state__confirmed
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Contract..."
+msgstr "Contrat..."
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_calendar_event__of_website_create
+msgid "Created by website"
+msgstr "Créé par le site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__date
+msgid "Date"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Date..."
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid "Defines the open days for making online appointments."
+msgstr "Définit les jours ouverts pour la prise de RDV en ligne."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Defines the period in days for which you open the online appointment booking"
+" (maximum 180 days)."
+msgstr ""
+"Définit la période en jours pour laquelle vous ouvrez la prise de RDV en "
+"ligne (maximum 180 jours)."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"Defines the technicians available to carry out appointments made online."
+msgstr ""
+"Définit les techniciens disponibles pour réaliser les RDV pris en ligne."
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_empty_days_search_type__distance
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_type__distance
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_empty_days_search_type__distance
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_type__distance
+msgid "Distance (km)"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_intervention_state__draft
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_intervention_state__draft
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.calendar_event_view_form
+msgid "Duplicated"
+msgstr "Doublon"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_empty_days_search_type__duration
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_type__duration
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_empty_days_search_type__duration
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_type__duration
+msgid "Duration (min)"
+msgstr "Durée (min)"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_hr_employee
+msgid "Employee"
+msgstr "Employé"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__planning_ids
+msgid "Employee slots"
+msgstr "Créneaux d'employés"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_error
+msgid "Error"
+msgstr "Erreur"
+
+#. module: of_website_planning_booking
+#. odoo-python
+#: code:addons/of_website_planning_booking/controllers/main.py:0
+#, python-format
+msgid "Error during meeting creation in website: %s"
+msgstr "Erreur pendant la création d'un RDV depuis le site web : %s"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "General terms and conditions"
+msgstr "Conditions Générales de Vente"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_ir_http
+msgid "HTTP Routing"
+msgstr "Routage HTTP"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_error
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_thank_you
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_unavailable
+msgid "Home"
+msgstr "Accueil"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "I accept the"
+msgstr "J'accepte les"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "I agree to be contacted by"
+msgstr "J'accepte d'être contacté par"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__id
+msgid "ID"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"If checked, allows any visitor to make an appointment on your website. "
+"Otherwise, only your customers who already have a portal account can make an"
+" appointment."
+msgstr ""
+"Si coché, autorise n'importe quel visiteur à prendre un RDV sur votre site "
+"web. Sinon, seuls vos clients disposants déjà d'un compte portail peuvent "
+"prendre RDV."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"If checked, allows you to define a configuration specific to one of your "
+"companies."
+msgstr ""
+"Si coché, permet de définir une configuration propre à une de vos sociétés."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"If checked, appointments made by your existing customers will be placed on "
+"the company defined on the contact."
+msgstr ""
+"Si coché, les RDV pris par vos clients existants seront placés sur la "
+"société définit sur le contact."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid "If checked, authorizes appointments to be made on blank days."
+msgstr "Si coché, autorise la prise de RDV sur des journées vierges."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid ""
+"If checked, the price of the services will be displayed as an indication "
+"when making an appointment."
+msgstr ""
+"Si coché, le prix des prestations sera affiché à titre indicatif lors de la "
+"prise de RDV."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "Intervention"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_planning_intervention_template
+msgid "Intervention template"
+msgstr "Modèle d'intervention"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__key
+msgid "Key"
+msgstr "Clef"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Dernière modification par"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__write_date
+msgid "Last Updated on"
+msgstr "Dernière modification le"
+
+#. module: of_website_planning_booking
+#: model:website.menu,name:of_website_planning_booking.booking_menu
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Make an appointment"
+msgstr "Prendre rendez-vous"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "More..."
+msgstr "Chercher plus..."
+
+#. module: of_website_planning_booking
+#. odoo-python
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/controllers/main.py:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/wizards/of_tour_appointment_wizard.py:0
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+#, python-format
+msgid "Morning"
+msgstr "Matin"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "My contracts"
+msgstr "Mes contrats"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "New address"
+msgstr "Nouvelle adresse"
+
+#. module: of_website_planning_booking
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#, python-format
+msgid "One moment please, we are looking for additional slots."
+msgstr "Un instant svp, nous recherchons des créneaux supplémentaires."
+
+#. module: of_website_planning_booking
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#, python-format
+msgid "One moment please, we are looking for the best slot for your request."
+msgstr ""
+"Un instant svp, nous recherchons le meilleur créneau pour votre demande."
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_mode__oneway
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_mode__oneway
+msgid "One way"
+msgstr "Aller"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_mode__oneway_am_return_pm
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_mode__oneway_am_return_pm
+msgid "One way if morning / Return if afternoon"
+msgstr "Aller si matin / Retour si après-midi"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_mode__oneway_or_return
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_mode__oneway_or_return
+msgid "One way or Return"
+msgstr "Aller ou retour"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Other services"
+msgstr "Autres prestations"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_afternoon_hours_label
+msgid "Planning booking - Afternoon hours label"
+msgstr "Prise de RDV en ligne - Libellé horaires après-midi"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_allow_empty_days
+msgid "Planning booking - Allow booking on empty days"
+msgstr ""
+"Prise de RDV en ligne - Autorise la réservation sur des journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_employee_ids
+msgid "Planning booking - Available operators"
+msgstr "Prise de RDV en ligne - Techniciens disponibles"
+
+#. module: of_website_planning_booking
+#: model:mail.template,name:of_website_planning_booking.booking_confirmation_mail_template
+msgid "Planning booking - Confirmation"
+msgstr "Prise de RDV en ligne - Confirmation"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_display_price
+msgid "Planning booking - Display service price"
+msgstr "Prise de RDV en ligne - Afficher le prix de la prestation"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_validation_note
+msgid "Planning booking - Intervention confirmation notes"
+msgstr "Prise de RDV en ligne - Notes de confirmation de RDV"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_intervention_state
+msgid "Planning booking - Interventions state"
+msgstr "Prise de RDV en ligne - État des RDV"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_morning_hours_label
+msgid "Planning booking - Morning hours label"
+msgstr "Prise de RDV en ligne - Libellé horaires matin"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_open_days_number
+msgid "Planning booking - Number of opened days"
+msgstr "Prise de RDV en ligne - Nombre de jours ouverts"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_opened_day_ids
+msgid "Planning booking - Opened days"
+msgstr "Prise de RDV en ligne - Jours ouverts"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_terms_file
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_website__of_booking_terms_file
+msgid "Planning booking - PDF file for General Terms and Conditions"
+msgstr "Prise de RDV en ligne - Fichier PDF des Conditions Générales de Vente"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_terms_filename
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_website__of_booking_terms_filename
+msgid "Planning booking - PDF file name for General Terms and Conditions"
+msgstr ""
+"Prise de RDV en ligne - Nom du fichier PDF des Conditions Générales de Vente"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_search_max_criteria
+msgid "Planning booking - Search max criterion"
+msgstr "Prise de RDV en ligne - Critère de recherche max"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_empty_days_search_max_criteria
+msgid "Planning booking - Search max criterion for empty days"
+msgstr ""
+"Prise de RDV en ligne - Critère de recherche max pour journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_search_mode
+msgid "Planning booking - Search mode"
+msgstr "Prise de RDV en ligne - Mode de recherche"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_search_type
+msgid "Planning booking - Search type"
+msgstr "Prise de RDV en ligne - Type de recherche"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_empty_days_search_type
+msgid "Planning booking - Search type for empty days"
+msgstr "Prise de RDV en ligne - Type de recherche pour journées vierges"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_res_company__of_booking_specific
+msgid "Planning booking - Specific configuration for this company"
+msgstr "Prise de RDV en ligne - Configuration spécifique à cette société"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_calendar_event__of_potential_duplicated_partner
+msgid "Potential duplicate ?"
+msgstr "Doublon potentiel ?"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_intervention_template__website_published
+msgid "Published on website"
+msgstr "Publié sur le site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__of_planning_available_slot__type__regular
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_available_slot_view_search
+msgid "Regular"
+msgstr "Normal"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_resource_calendar
+msgid "Resource Working Time"
+msgstr "Temps de travail de la ressource"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_mode__return
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_mode__return
+msgid "Return"
+msgstr "Retour"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_company__of_booking_search_mode__round_trip
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__res_config_settings__of_booking_search_mode__round_trip
+msgid "Round trip"
+msgstr "Aller-retour"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__selected
+msgid "Selected Slot"
+msgstr "Créneau sélectionné"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Service..."
+msgstr "Prestation..."
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__description
+msgid "Slot info"
+msgstr "Infos créneau"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_unavailable
+msgid "Sorry"
+msgstr "Désolé"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid "Specifies the company on which to create appointments made online."
+msgstr "Spécifie la société sur laquelle créer les RDV pris en ligne."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid ""
+"TTC\n"
+"                                                <br/>\n"
+"                                                <i style=\"font-size: 65%\">This price is indicative and may change depending on the specificities of your installation</i>"
+msgstr ""
+"TTC\n"
+"                                                <br/>\n"
+"                                                <i style=\"font-size: 65%\">Ce tarif est indicatif et pourra évoluer en fonction des spécificités de votre installation</i>"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,help:of_website_planning_booking.field_res_config_settings__of_booking_employee_ids_str
+#: model:ir.model.fields,help:of_website_planning_booking.field_res_config_settings__of_booking_opened_day_ids_str
+msgid ""
+"Technical field to store M2M fields into a config parameter. As "
+"config_parameters does not accept m2m field, we store the fields with a "
+"comma separated string into a Char config field."
+msgstr ""
+"Champ technique pour stocker les champs M2M dans un paramètre de "
+"configuration. Comme les paramètres de configuration n'acceptent pas les "
+"champs m2m, nous stockons les champs avec une chaîne séparée par des "
+"virgules dans un champ de configuration Char"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_thank_you
+msgid "Thank you"
+msgstr "Merci"
+
+#. module: of_website_planning_booking
+#. odoo-python
+#: code:addons/of_website_planning_booking/models/res_config_settings.py:0
+#, python-format
+msgid ""
+"The number of opened days for booking must be positive and can't exceed 180."
+msgstr ""
+"Le nombre de jours ouverts à la réservation doit être positif et ne pas "
+"dépasser 180."
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_planning_tour
+msgid "Tour"
+msgstr "Tournée"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_available_slot__type
+msgid "Type"
+msgstr ""
+
+#. module: of_website_planning_booking
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/xml/of_booking_slot_kanban.xml:0
+#, python-format
+msgid "UNAVAILABLE"
+msgstr "INDISPONIBLE"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Validate"
+msgstr "Valider"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid ""
+"Validate\n"
+"                                                    <span class=\"fa fa-long-arrow-right\"/>"
+msgstr ""
+"Valider\n"
+"                                                    <span class=\"fa fa-long-arrow-right\"/>"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid ""
+"Validate\n"
+"                                            <span class=\"fa fa-long-arrow-right\"/>"
+msgstr ""
+"Valider\n"
+"                                            <span class=\"fa fa-long-arrow-right\"/>"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields.selection,name:of_website_planning_booking.selection__of_planning_available_slot__type__web
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.calendar_event_view_form
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_available_slot_view_search
+msgid "Web"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_tour__web_available_slot_ids
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_tour_view_form
+msgid "Web Available Slots"
+msgstr "Créneaux disponibles Web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_hr_employee__of_web_resource_calendar_id
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_tour__employee_web_resource_calendar_id
+msgid "Web Working Hours"
+msgstr "Horaire Web"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.calendar_event_view_search
+msgid "Web interventions"
+msgstr "Interventions web"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_website
+msgid "Website"
+msgstr "Site web"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
+msgid "Website Planning Booking"
+msgstr "Prise de RDV en ligne"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_intervention_template__website_name
+msgid "Website label"
+msgstr "Libellé site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_wizard__website_line_ids
+msgid "Website slots Proposals"
+msgstr "Propositions de créneaux pour le site web"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__wizard_id
+msgid "Wizard"
+msgstr ""
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_resource_calendar_attendance
+msgid "Work Detail"
+msgstr "Détail du travail"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "You must select a slot before validating."
+msgstr "Vous devez sélectionner un créneau avant de valider."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "log in"
+msgstr "connecter"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+msgid "of"
+msgstr "de"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "to retrieve your information."
+msgstr "pour récupérer vos informations."
+
+#. module: of_website_planning_booking
+#: model:mail.template,subject:of_website_planning_booking.booking_confirmation_mail_template
+msgid "{{ object.of_company_id.name }} - Confirmation of your appointment"
+msgstr ""
+"{{ object.of_company_id.name }} - Confirmation de votre prise de rendez-vous"
