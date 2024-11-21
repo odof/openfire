@@ -3,6 +3,8 @@
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
+from .of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
+
 SELECTION_SEARCH_TYPES = [
     ("distance", "Distance (km)"),
     ("duration", "Duration (min)"),
@@ -51,8 +53,8 @@ class ResConfigSettings(models.TransientModel):
         "of months over which you realize slots research.",
         config_parameter="of.planning.tour.nbr_months_tour_creation",
     )
-    # Non modifiable pour le moment, il faudra le rendre modifiable à terme et
-    # donc gérer le re-calcul des créneaux dispo
+    # TODO: Non modifiable pour le moment, il faudra le rendre modifiable à terme et donc gérer le re-calcul
+    # des créneaux dispo
     tour_minimum_free_slot_duration = fields.Float(
         string="(OF) Tours // Minimum free slot duration",
         config_parameter="of.planning.tour.tour_minimum_free_slot_duration",
@@ -63,7 +65,7 @@ class ResConfigSettings(models.TransientModel):
     tour_am_limit_float = fields.Float(
         string="(OF) Tours // Morning/Afternoon break hour",
         config_parameter="of.planning.tour.tour_am_limit_float",
-        default=13.0,
+        default=DEFAULT_AM_LIMIT_FLOAT,
         help="Defines the break hour between morning and afternoon. Interventions starting before this hour will be "
         "considered in the morning and vice versa.",
     )
