@@ -146,7 +146,7 @@
                 <field name="old_time_slot" />
                 <field name="old_duration" widget="float_time" string="Duration (h)"/>
                 <field name="old_distance" string="Distance (km)"/>
-                <field name="new_index" string=" "/>
+                <field name="new_index" string=" " attrs="{'invisible': [('new_index', '=', 0)]}"/>
                 <field name="new_time_slot" />
                 <field name="new_duration" string="Duration (h)" widget="float_time" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>
                 <field name="new_distance" string="Distance (km)" attrs="{'invisible': [('wizard_state', '=', 'init')]}"/>

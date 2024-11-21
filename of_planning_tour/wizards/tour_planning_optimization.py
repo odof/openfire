@@ -267,7 +267,7 @@ class OFPlanningTourOptimizationWizard(models.TransientModel):
                     self._get_new_values_for_intervention(line)
                 )
                 # update the line with the new sequence and the geojson data updated from the optimization
-                tour_line_values = self.tour_id._prepare_tour_line_values(int(line.new_index), line.intervention_id)
+                tour_line_values = self.tour_id._prepare_tour_line_values(line.new_index, line.intervention_id)
                 del tour_line_values["tour_id"]
                 tour_line_values.update(
                     {
@@ -366,9 +366,9 @@ class OFPlanningTourOptimizationLineWizard(models.TransientModel):
     )
     is_flexible = fields.Boolean(string="Flexible", related="intervention_id.of_is_flexible")
     employee_ids = fields.Many2many(related="intervention_id.of_employee_ids", string="Employees", readonly=True)
-    old_index = fields.Char(string="Old index")
+    old_index = fields.Integer(string="Old index")
     old_time_slot = fields.Char()
-    new_index = fields.Char(string="New index")
+    new_index = fields.Integer(string="New index")
     new_time_slot = fields.Char()
     old_duration = fields.Float(string="Old Duration (h)")
     old_distance = fields.Float(string="Old Distance (km)")
@@ -382,7 +382,7 @@ class OFPlanningTourOptimizationLineWizard(models.TransientModel):
     address_city = fields.Char(related="new_intervention_id.of_address_city", readonly=True)
     partner_phone = fields.Char(related="new_intervention_id.of_partner_id.phone", readonly=True)
     partner_mobile = fields.Char(related="new_intervention_id.of_partner_id.mobile", readonly=True)
-    tour_number = fields.Char(related="new_index", string="Tour number", readonly=True)
+    tour_number = fields.Integer(related="new_index", string="Tour number", readonly=True)
     hexa_color = fields.Char(string="Hexa color", compute="_compute_hexa_color")
     date_start = fields.Datetime(related="new_intervention_id.start", string="Start date", readonly=True)
     date_stop = fields.Datetime(related="new_intervention_id.stop", string="End date", readonly=True)
@@ -398,9 +398,9 @@ class OFPlanningTourOptimizationLineWizard(models.TransientModel):
             tour: max(len(ROUTES_AVAILABLE_COLORS) // len(tour.tour_line_ids), 1) for tour in tours
         }
         last_index = 0
-        for line in self.sorted(key=lambda line: int(line.new_index)):
+        for line in self.sorted(key=lambda line: line.new_index):
             color_padding = color_padding_by_tour[line.wizard_id.tour_id]
-            sequence = int(line.new_index) - 1 if int(line.new_index) > 0 else 0
+            sequence = line.new_index - 1 if line.new_index > 0 else 0
             color_index = last_index + color_padding if sequence > 0 else last_index
             last_index = color_index
             line.hexa_color = AVAILABLE_COLORS_TOUR_LINES[min(color_index, len(AVAILABLE_COLORS_TOUR_LINES) - 1)]
