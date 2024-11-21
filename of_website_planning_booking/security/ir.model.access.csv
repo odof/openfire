@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_planning_intervention_template_public,access.of.planning.intervention.template.public,model_of_planning_intervention_template,base.group_public,1,0,0,0
+access_of_planning_intervention_template_portal,access.of.planning.intervention.template.portal,model_of_planning_intervention_template,base.group_portal,1,0,0,0
+access_of_planning_tour_public,access.of.planning.tour.public,of_planning_tour.model_of_planning_tour,base.group_public,1,0,0,0
+access_of_planning_tour_portal,access.of.planning.tour.portal,of_planning_tour.model_of_planning_tour,base.group_portal,1,0,0,0
+access_of_planning_tour_line_public,access.of.planning.tour.line.public,of_planning_tour.model_of_planning_tour_line,base.group_public,1,0,0,0
+access_of_planning_tour_line_portal,access.of.planning.tour.line.portal,of_planning_tour.model_of_planning_tour_line,base.group_portal,1,0,0,0
+access_of_planning_available_slot_public,access.of.planning.available.slot.public,of_planning_tour.model_of_planning_available_slot,base.group_public,1,0,0,0
+access_of_planning_available_slot_portal,access.of.planning.available.slot.portal,of_planning_tour.model_of_planning_available_slot,base.group_portal,1,0,0,0
+access_of_tour_appointment_wizard_public,access.of.tour.appointment.wizard.public,model_of_tour_appointment_wizard,base.group_public,1,1,1,1
+access_of_tour_appointment_wizard_portal,access.of.tour.appointment.wizard.portal,model_of_tour_appointment_wizard,base.group_portal,1,1,1,1
+access_of_tour_appointment_line_wizard_public,access.of.tour.appointment.line.wizard.public,of_planning_tour.model_of_tour_appointment_line_wizard,base.group_public,1,1,1,1
+access_of_tour_appointment_line_wizard_portal,access.of.tour.appointment.line.wizard.portal,of_planning_tour.model_of_tour_appointment_line_wizard,base.group_portal,1,1,1,1
+access_of_tour_appointment_line_website_wizard_public,access.of.tour.appointment.line.website.wizard.public,model_of_tour_appointment_line_website_wizard,base.group_public,1,1,1,1
+access_of_tour_appointment_line_website_wizard_portal,access.of.tour.appointment.line.website.wizard.portal,model_of_tour_appointment_line_website_wizard,base.group_portal,1,1,1,1
+access_of_tour_appointment_line_website_wizard_portal,access.of.tour.appointment.line.website.wizard.portal,model_of_tour_appointment_line_website_wizard,base.group_user,1,1,1,1

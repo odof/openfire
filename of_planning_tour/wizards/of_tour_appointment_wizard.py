@@ -641,7 +641,7 @@ class OFTourAppointmentWizard(models.TransientModel):
                 employee_ids.append(planning.employee_id.id)
         return employee_ids
 
-    def _get_tour_dates(self):
+    def _get_tour_dates(self, sudo=False):
         """
         Returns a list of tour dates between the start_date and stop_date of the wizard that are the right days.
 
@@ -651,7 +651,8 @@ class OFTourAppointmentWizard(models.TransientModel):
         self.ensure_one()
 
         # To only create tour or display slot from the selected days
-        selected_days = self.day_ids.mapped(lambda d: d.number - 1)
+        days = sudo and self.day_ids.sudo() or self.day_ids
+        selected_days = days.mapped(lambda d: d.number - 1)
 
         start_date = self.start_date_search
         if not start_date:
@@ -696,13 +697,16 @@ class OFTourAppointmentWizard(models.TransientModel):
         if sudo:
             employee_obj = employee_obj.sudo()
             event_obj = event_obj.sudo()
+            available_slot_obj = available_slot_obj.sudo()
+            tour_obj = tour_obj.sudo()
 
-        dates_eval = self._get_tour_dates()
-        address = self.partner_address_id
+        dates_eval = self._get_tour_dates(sudo=sudo)
+        address = sudo and self.partner_address_id.sudo() or self.partner_address_id
         address_sector = address.of_tech_sector_id
 
         # Get employees who can carry out the task
         task_id = sudo and self.task_id.sudo() or self.task_id
+        pre_employee_ids = sudo and self.sudo().pre_employee_ids or self.pre_employee_ids
         if task_id and not task_id.employee_ids:
             if not sudo:
                 raise UserError(_("This service cannot be carried out by any operator"))
@@ -716,8 +720,8 @@ class OFTourAppointmentWizard(models.TransientModel):
         if task_id:
             capable_employees &= task_id.employee_ids
         # If there are operators provided
-        if self.pre_employee_ids:
-            capable_employees &= self.pre_employee_ids
+        if pre_employee_ids:
+            capable_employees &= pre_employee_ids
 
         # Create tours for employees if needed
         tour_obj._create_tours_for_employees(capable_employees, dates_eval, address_sector)

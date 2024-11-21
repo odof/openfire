@@ -1,0 +1,323 @@
+//screen-xs-max=360px;
+
+@font-face {
+    font-family: 'Glyphicons Halflings';
+
+    src: url('../fonts/glyphicons-halflings-regular.eot');
+    src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
+
+.of_booking {
+
+    .card-title>a,
+    .card-title>a:active {
+        display: block;
+        font-size: 25px;
+        color: #323232;
+    }
+    .card-title>a:hover {
+        color: inherit;
+    }
+
+    h2 {
+        color: #323232;
+    }
+
+    .card-header a:before {
+        font-family: 'Glyphicons Halflings';
+        content: "\e114";
+        float: right;
+        transition: all 0.5s;
+    }
+
+    .card-header.active a:before {
+        -webkit-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+
+    .slot-card {
+        box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.05);
+    }
+
+    .of-card-slot {
+        min-height: 60px;
+        text-align: center;
+        padding-top: 5px;
+
+        &:hover {
+            background: o-color('o-cc4-bg');
+            color: white;
+        }
+    }
+
+    .of-unavailable-card-slot {
+        min-height: 60px;
+        text-align: center;
+        padding-top: 5px;
+        background-color: rgba(90, 90, 90, 0.5);
+    }
+
+    .of-border-primary {
+        outline: 2px solid o-color('o-cc4-bg');
+    }
+
+    .col-6.float-start {
+        padding-right: 15px;
+    }
+
+    .col-6.float-end {
+        padding-left: 15px;
+    }
+
+    // Responsive
+
+    @media (min-width: 360px) {
+        &.container {
+            width: 340px;
+        }
+
+        .of-card-slot {
+            min-height: 75px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 75px;
+            padding-top: 17px;
+            font-size: 12px;
+        }
+
+        .slot-btn {
+            margin: 5px;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .col-6.float-start {
+            padding-left: 0;
+        }
+
+        .col-6.float-end {
+            padding-right: 0;
+        }
+    }
+
+    @media (min-width: 420px) {
+        &.container {
+            width: 400px;
+        }
+
+        .of-card-slot {
+            min-height: 75px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 75px;
+            padding-top: 17px;
+            font-size: 12px;
+        }
+
+        .slot-btn {
+            margin: 5px;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .col-6.float-start {
+            padding-left: 0;
+        }
+
+        .col-6.float-end {
+            padding-right: 0;
+        }
+    }
+
+    @media (min-width: 576px) {
+        &.container {
+            width: 540px;
+        }
+
+        .of-card-slot {
+            min-height: 60px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 60px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+
+        .slot-btn {
+            margin: 0;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .col-6.float-start {
+            padding-left: 15px;
+        }
+
+        .col-6.float-end {
+            padding-right: 15px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        &.container {
+            width: 750px;
+        }
+
+        .of-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .slot-btn {
+            margin: 0;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .col-6.float-start {
+            padding-left: 15px;
+        }
+
+        .col-6.float-end {
+            padding-right: 15px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        &.container {
+            width: 970px;
+        }
+
+        .of-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .slot-btn {
+            margin: 0;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .col-6.float-start {
+            padding-left: 15px;
+        }
+
+        .col-6.float-end {
+            padding-right: 15px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        &.container {
+            width: 1170px;
+        }
+
+        .of-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .of-unavailable-card-slot {
+            min-height: 60px;
+            padding-top: 5px;
+            font-size: 15px;
+        }
+
+        .slot-btn {
+            margin: 0;
+        }
+
+        .col-lg-12, .col-lg-10, .col-lg-8, .col-lg-7, .col-lg-5, .col-lg-4, .col-lg-3 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .col-6.float-start {
+            padding-left: 15px;
+        }
+
+        .col-6.float-end {
+            padding-right: 15px;
+        }
+    }
+}
+
+.spinner-popup {
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s ease;
+    text-align: center;
+}
+
+.show-popup .spinner-popup {
+    opacity: 1;
+    visibility: visible;
+}
+
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: white;
+    transform: translate(-50%, -50%);
+}
+
+.popup-text {
+    position: absolute;
+    bottom: 55%;
+    left: 50%;
+    width: 90%;
+    color: white;
+    font-size: 16px;
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
