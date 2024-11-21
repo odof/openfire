@@ -50,7 +50,7 @@ def many2one(self, model, input, context=None, user=None):
     obj_values = obj._prepare_mutation_values(**input)
     if input.id:
         if not (record := obj.search([("id", "=", input.id)])):
-            raise AccessError(f"Unable to find object ({model}) with id: {input.id}")
+            return False
         if len(obj_values.keys()) > 0:
             record.write(obj_values)
         return record.id
@@ -93,7 +93,7 @@ def x2many(self, model, input, default=False, keep=False, context=None, user=Non
             record_value.update(value)
             if record.id:
                 if not obj.search([("id", "=", record.id)]):
-                    raise AccessError(f"Unable to find object ({model}) with id: {record.id}")
+                    continue
                 record = obj.search([("id", "=", record.id)])
                 if len(record_value.keys()) > 0:
                     record.write(record_value)
