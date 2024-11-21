@@ -6,7 +6,6 @@ import logging
 import graphene
 
 from odoo import Command
-from odoo.exceptions import AccessError
 
 logger = logging.getLogger(__name__)
 
