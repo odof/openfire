@@ -9,7 +9,7 @@
             <xpath expr="//div[@data-key='of_planning']/div[last()]" position="after">
                 <!-- Intervention planning -->
                 <h2>Intervention planning</h2>
-                <div class="row mt16 o_settings_container">
+                <div class="row mt16 o_settings_container" id="intervention_planning_settings">
                     <div class="col-12 col-lg-6 o_setting_box" id="search_mode">
                         <div class="o_setting_left_pane">
                         </div>
@@ -53,7 +53,7 @@
 
                 <!-- Tours -->
                 <h2>Tours</h2>
-                <div class="row mt16 o_settings_container">
+                <div class="row mt16 o_settings_container" id="tour_planning_settings">
                     <div class="col-12 col-lg-6 o_setting_box" id="nbr_months_tour_creation">
                         <div class="o_setting_left_pane">
                         </div>

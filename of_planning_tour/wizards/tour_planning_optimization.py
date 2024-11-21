@@ -147,34 +147,38 @@ class OFPlanningTourOptimizationWizard(models.TransientModel):
         return self.action_button_validate()
 
     def action_optimize(self):
-        """Optimize the tour lines.
-        1 - Get the tour lines coordinates and their hints to be able to retrieve them during the process
-        2 - Send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
-        3 - Update the wizard lines with the new time slot built from the new optimized trip
-        4 - Update the wizard lines with the new distance from the new optimized trip
-            > We can't get the new distance from the "trip OSRM API", because the trip service response doesn't return
-                the distance between each reordered waypoints.
-            > We have to compute it manually using the "route OSRM API" with the new optimized route.
+        """Optimize the tour planning based on the selected optimization mode.
+
+        This method optimizes the waypoints for a tour based on the selected optimization mode
+        (morning, afternoon, all, or half). It updates the wizard lines with the new time slots
+        created by the optimization and recalculates the distance and duration between each intervention.
+
+        OSRM resolves the TSP problem using the farthest insertion algorithm.
+
+        Returns:
+            None
         """
         self.ensure_one()
 
         # build a mapping between tour lines and wizard lines to be able to retrieve them during the process
         wizard_line_mapping = dict(zip(self.mapped("line_ids.tour_line_id"), self.line_ids))
 
-        # get coordinates of the tour lines to optimize to send them to the OSRM server
-        # and also get the tour lines data by hint to be able to retrieve them during the process
-        if self.optim_mode != "half":
+        if self.optim_mode != "half":  # (morning, afternoon, all)
+            # get the optimized waypoints for the whole day
             ordered_waypoints = self._get_optimized_waypoints(self.tour_id, self.optim_mode)
         else:
+            # get the optimized waypoints for the morning and afternoon separately
             waypoints_morning = self._get_optimized_waypoints(self.tour_id, "morning")
-            waypoints_morning.pop()
+            waypoints_morning.pop()  # remove the last waypoint that is the return address
 
             afternoon_start_address = waypoints_morning[-1]["origin_line_id"].intervention_id.of_address_id
 
             waypoints_afternoon = self._get_optimized_waypoints(
                 self.tour_id, "afternoon", afternoon_start_address=afternoon_start_address
             )
-            waypoints_afternoon.pop(0)
+            waypoints_afternoon.pop(0)  # remove the first waypoint that is the start address
+
+            # reposition the afternoon waypoints indexes to be continuous with the morning waypoints
             morning_pts_num = len(waypoints_morning)
             for waypoint in waypoints_afternoon:
                 waypoint["waypoint_index"] = waypoint["waypoint_index"] + morning_pts_num - 1
@@ -188,7 +192,7 @@ class OFPlanningTourOptimizationWizard(models.TransientModel):
         )
         compare_precision = 5
 
-        optimized_lines = self.env["of.planning.tour.line"]
+        optimized_lines = self.env["of.planning.tour.line"].browse()
 
         if self.optim_mode == "afternoon":
             optimized_lines |= self.tour_id.tour_line_ids.filtered(
@@ -325,9 +329,24 @@ class OFPlanningTourOptimizationWizard(models.TransientModel):
 
     @api.model
     def _get_optimized_waypoints(self, tour, mode, afternoon_start_address=False):
+        """Retrieve optimized waypoints for a given tour using the OSRM server trip service.
+        OSRM is using farthest insertion algorithm to solve the TSP problem.
+
+        Args:
+            tour (recordset): Tour to optimize.
+            mode (str): The optimization mode to use. Possible values are "all", "morning", "afternoon" or "half".
+            afternoon_start_address (bool, optional): Flag to indicate if the tour starts in the afternoon.
+                Defaults to False.
+
+        Returns:
+            list: A list of optimized waypoints with their respective origin line IDs.
+
+        Raises:
+            UserError: If there is an error during the optimization process or if no waypoints are found.
+        """
         coordinates = tour._osrm_get_tour_coordinates_data(mode, afternoon_start_address=afternoon_start_address)
 
-        # send the request to the OSRM server to get the optimized tour lines with the TSP algorithm
+        # send the request to the OSRM server to get the optimized waypoints
         res = tour._osrm_send_trip_request(coordinates_str=";".join(coord["coord_str"] for coord in coordinates))
 
         if res.get("code") != "Ok":

@@ -289,6 +289,7 @@ export class OFMapPlanningTourX2Many extends Component {
             const lat_long = `${record.geo_lat}-${record.geo_lng}`;
             const key = `${lat_long}`;
             if (key in markersInfo) {
+                markersInfo[key].additional = true;
                 markersInfo[key].record = record;
                 markersInfo[key].ids.push(record.id);
             } else {
@@ -445,6 +446,11 @@ export class OFMapPlanningTourX2Many extends Component {
         let markerColor = markerInfo.additional ? "black" : "blue";
         let markerIcon = markerInfo.additional ? "home" : "circle";
         let markerNumber = markerInfo.additional ? null : record.data.tour_number;
+
+        let isMulti = markerNumber && typeof markerNumber === "string" && markerNumber.split(',').length > 1 || false;
+        if (isMulti) {
+            markerNumber = `${markerNumber.split(',')[0]}...`;
+        }
 
         return {
             icon: markerIcon,

@@ -1246,7 +1246,7 @@ class OFPlanningTour(models.Model):
         """
         Get the first hour (as a float) of the afternoon for the tour.
         For that we are building a list of start hours of interventions and then in this list, get the first hour
-        after the tour_am_limit_float by comparing the hours of the interventions.
+        after the `tour_am_limit_float` by comparing the start hours of interventions.
 
         Returns:
             float: The first hour of the afternoon for the tour, or tour_am_limit_float if not found.
@@ -1262,7 +1262,7 @@ class OFPlanningTour(models.Model):
 
         employee_wh = self._get_employee_working_hours()
         # if the employee has complex hours, fallback to start of the afternoon hours  otherwise get the first hour
-        # after the tour_am_limit_float
+        # after the `tour_am_limit_float`
         complex_hours = len(employee_wh[0]) > 1
         afternoon_hours = (
             employee_wh[1][0] if complex_hours else [h[0][0] for h in employee_wh if h[0][0] > am_limit_float]
@@ -1524,8 +1524,7 @@ class OFPlanningTour(models.Model):
             )
             start_address = (
                 afternoon_start_address
-                or morning_lines
-                and morning_lines[-1].intervention_id.of_address_id
+                or (morning_lines and morning_lines[-1].intervention_id.of_address_id)
                 or start_address
             )
             tour_lines = self.tour_line_ids - morning_lines
@@ -1533,19 +1532,20 @@ class OFPlanningTour(models.Model):
         # Start point
         coordinates = [
             {
-                "coord_str": f"{start_address.partner_longitude},{start_address.partner_latitude}",  # noqa
+                "coord_str": f"{start_address.partner_longitude},{start_address.partner_latitude}",  # noqa E231
                 "origin_line_id": tour_line_obj,
             }
         ]
 
         # Interventions lines
-        for line in tour_lines:
-            coordinates.append({"coord_str": f"{line.geo_lng},{line.geo_lat}", "origin_line_id": line})  # noqa
+        coordinates.extend(
+            {"coord_str": f"{line.geo_lng},{line.geo_lat}", "origin_line_id": line} for line in tour_lines  # noqa E231
+        )
 
         # End point
         coordinates.append(
             {
-                "coord_str": f"{return_address.partner_longitude},{return_address.partner_latitude}",  # noqa
+                "coord_str": f"{return_address.partner_longitude},{return_address.partner_latitude}",  # noqa E231
                 "origin_line_id": tour_line_obj,
             }
         )
