@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Planning des tournées",
-    "version": "16.0.2.1.2",
+    "version": "16.0.2.1.3",
     "license": "AGPL-3",
     "author": "OpenFire",
     "website": "https://www.openfire.fr",

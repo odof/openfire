@@ -107,10 +107,15 @@ export class PopupMap extends Component {
             icon = "circle";
         }
 
+        let widgetText = this.props.map.markers[this.value.id]?.options?.icon?.options?.text;
+        if (widgetText === undefined) {
+            widgetText = this.value.data.tour_number;
+        }
+
         let newIcon = L.AwesomeMarkers.icon({
             icon: icon,
             markerColor: color,
-            text: fromWidget ? this.value.data.tour_number : null,
+            text: fromWidget ? widgetText : null,
         });
         this.props.map.markers[this.value.id].setIcon(newIcon);
     }
