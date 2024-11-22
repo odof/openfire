@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Base",
-    'version': '16.0.1.2.1',
+    'version': '16.0.1.3.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'category': 'OpenFire',
@@ -18,6 +18,7 @@
         'mail',
         'contacts',
         'base_view_inheritance_extension',
+        'partner_firstname',  # OCA/partner-contact
         'of_web_widgets',
     ],
     'data': [

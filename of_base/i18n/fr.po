@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-15 12:16+0000\n"
-"PO-Revision-Date: 2024-07-15 12:16+0000\n"
+"POT-Creation-Date: 2024-10-17 13:47+0000\n"
+"PO-Revision-Date: 2024-10-17 13:47+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -142,6 +142,11 @@ msgid ""
 "Add and customize route operations to process product moves in your warehouse(s): e.g. unload > quality control > stock for incoming products, pick > pack > ship for outgoing products. \n"
 " You can also set putaway strategies on warehouse locations in order to send incoming products into specific child locations straight away (e.g. specific bins, racks)."
 msgstr ""
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Address"
+msgstr "Adresse"
 
 #. module: of_base
 #: model:res.groups,name:of_base.of_group_root_only
@@ -501,8 +506,9 @@ msgstr ""
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__company_name
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Company Name"
-msgstr ""
+msgstr "Nom de la société"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__resource_calendar_id
@@ -513,6 +519,12 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_base.field_of_connector_config_settings__has_chart_of_accounts
 msgid "Company has a chart of accounts"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__of_company_name
+#: model:ir.model.fields,field_description:of_base.field_res_users__of_company_name
+msgid "Company name"
+msgstr "Nom de la société"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_account_invoice_send__of_computed_body
@@ -2374,7 +2386,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Title"
-msgstr "Titre"
+msgstr "Civilité"
 
 #. module: of_base
 #: model:ir.model.fields,help:of_base.field_of_connector_config_settings__module_product_expiry
