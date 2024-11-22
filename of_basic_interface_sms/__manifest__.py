@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Basic Interface / SMS",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.2.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "category": "OpenFire",
@@ -14,6 +14,7 @@
     ],
     "data": [
         "views/ir_ui_menu.xml",
+        "views/res_config_settings_views.xml",
     ],
     "external_dependencies": {},
     "assets": {},
