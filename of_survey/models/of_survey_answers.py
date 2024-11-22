@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import Command, _, fields, models
+from odoo import Command, _, api, fields, models
 
 
 class OFSurveyAnswers(models.Model):
@@ -26,6 +26,7 @@ class OFSurveyAnswers(models.Model):
         compute="_compute_answers_images_ids",
     )
 
+    @api.depends("user_input", "user_input.user_input_line_ids")
     def _compute_image_ids(self):
         for answer in self:
             # on va chercher les images qui sont associées à la question dans le user_input
@@ -34,6 +35,7 @@ class OFSurveyAnswers(models.Model):
             )
             answer.image_ids = user_input_lines.mapped("value_image_ids")
 
+    @api.depends("user_input", "user_input.user_input_line_ids")
     def _compute_form(self):
         for answer in self:
             if user_input_lines := answer.user_input.user_input_line_ids.filtered(
@@ -45,6 +47,7 @@ class OFSurveyAnswers(models.Model):
                 answer.form = False
                 answer.form_filename = False
 
+    @api.depends("user_input", "user_input.user_input_line_ids")
     def _compute_answers_images_ids(self):
         for answer in self:
             if user_input_lines := answer.user_input.user_input_line_ids.filtered(
