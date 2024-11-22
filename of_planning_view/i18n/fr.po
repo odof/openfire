@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:09+0000\n"
-"PO-Revision-Date: 2024-07-11 07:09+0000\n"
+"POT-Creation-Date: 2024-11-14 10:51+0000\n"
+"PO-Revision-Date: 2024-11-14 10:51+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -110,6 +110,12 @@ msgstr ""
 "Champ d'aide, pour afficher les intervenants dans la fenêtre contextuelle"
 
 #. module: of_planning_view
+#: model:ir.actions.act_window,name:of_planning_view.action_calendar_event_calendar
+#: model:ir.actions.act_window,name:of_planning_view.action_calendar_event_planning
+msgid "Intervention Planning"
+msgstr ""
+
+#. module: of_planning_view
 #: model:ir.model,name:of_planning_view.model_of_planning_intervention_template
 msgid "Intervention template"
 msgstr "Modèle d'intervention"
@@ -126,6 +132,7 @@ msgstr "Techniciens"
 
 #. module: of_planning_view
 #: model:ir.model.fields.selection,name:of_planning_view.selection__calendar_event__of_allocation_type__planning
+#: model:ir.ui.menu,name:of_planning_view.menu_of_planning_calendar_event
 msgid "Planning"
 msgstr ""
 

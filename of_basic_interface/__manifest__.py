@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Basic Interface",
-    "version": "16.0.1.1.0",
+    "version": "16.0.1.2.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "category": "OpenFire",
@@ -15,8 +15,10 @@
         "of_sale",
         "of_service",
         "of_survey",
+        "base_menu_visibility_restriction",
     ],
     "data": [
+        "security/of_basic_interface_security.xml",
         "views/ir_ui_menu.xml",
     ],
     "external_dependencies": {},
