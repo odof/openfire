@@ -2,17 +2,19 @@
 
 {
     "name": "OpenFire / Données techniques",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.1.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "category": "OpenFire",
     "summary": "Gestion des données techniques",
     "website": "https://www.openfire.fr",
     "depends": [
-        "of_base",
+        "of_sale",
     ],
     "data": [
         "security/ir.model.access.csv",
+        "views/menuitems.xml",
+        "views/of_industry_views.xml",
         "views/product_category_views.xml",
         "views/product_template_views.xml",
     ],
