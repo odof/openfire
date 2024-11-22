@@ -131,6 +131,10 @@
                     <xpath expr="//field[@name='fiscal_position_id']/.." position="move"/>
                 </xpath>
                 <!-- Order lines -->
+                 <xpath expr="//field[@name='order_line']" position="attributes">
+                    <attribute name="context" operation="update">{"of_only_default_code": True}</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='order_line']/tree//field[@name='price_total']" position="attributes">
                     <attribute name="groups">account.group_show_line_subtotals_tax_included,of_sale.of_group_display_tax_inclued_total_in_so_lines</attribute>
                 </xpath>
