@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Comptabilité",
-    'version': '16.0.1.2.0',
+    'version': '16.0.1.3.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -23,6 +23,7 @@
         'views/account_move_views.xml',
         'views/account_move_line_views.xml',
         'views/account_payment_term_views.xml',
+        'views/account_payment_method_line_views.xml',
         'views/res_partner_views.xml',
         'views/res_company_views.xml',
         'views/res_config_settings_views.xml',

@@ -1,10 +1,12 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, fields, models
 
 
 class AccountPaymentMethodLine(models.Model):
     _inherit = "account.payment.method.line"
+
+    name = fields.Char(compute=False, readonly=False, required=True)
 
     @api.model_create_multi
     def create(self, vals_list):
