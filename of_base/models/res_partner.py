@@ -224,33 +224,17 @@ class ResPartner(models.Model):
             name=name, args=args, operator=operator, limit=limit
         )
 
-    def name_get(self):
+    def _get_name(self):
         """Permet de renvoyer le nom + la ville du client quand valeur du contexte 'of_show_address_line' présent"""
-        name = self._rec_name
+        name = super()._get_name()
         if (
-            self._context.get("of_show_address_line")
-            and name in self._fields
+            not self._context.get("show_address")
+            and self._context.get("of_show_address_line")
             and self.env["ir.config_parameter"].sudo().get_param("of.partner.display_city")
+            and self.city
         ):
-            convert = self._fields[name].convert_to_display_name
-            result = [
-                (
-                    record.id,
-                    f"{convert(record[name], record)}{''.join([' (', record.city, ')']) if record.city else ''}",
-                )
-                for record in self
-            ]
-
-        elif self._context.get("show_email"):
-            result = []
-            for partner in self:
-                name = partner.name or ""
-                if partner.email:
-                    name = f"{partner.email} <{name}>"
-                result.append((partner.id, name))
-        else:
-            result = super().name_get()
-        return result
+            name = f"{name} ({self.city})"
+        return name.strip()
 
     @api.model
     def _get_default_image(self, partner_type, is_company, parent_id):
