@@ -73,6 +73,7 @@
             <t t-set="pdf_prefill_vendor_signature" t-value="doc.pdf_prefill_vendor_signature()"/>
             <t t-set="pdf_signature_text" t-value="doc.pdf_signature_text()"/>
             <t t-set="pdf_signature_text_label" t-value="doc.pdf_signature_text_label()"/>
+            <t t-set="pdf_product_reference" t-value="doc.pdf_product_reference()"/>
         </xpath>
 
         <!-- Address -->
@@ -252,10 +253,14 @@
 
         <!-- Lines and totals block -->
         <xpath expr="//th[@name='th_description']" position="before">
+            <th t-if="pdf_product_reference" name="th_product_reference" class="text-start">Reference</th>
             <th name="th_image" class="text-end" t-if="pdf_print_image_level == 'line'">Image</th>
         </xpath>
 
         <xpath expr="//td[@name='td_name']" position="before">
+            <td t-if="pdf_product_reference" >
+                <span t-field="line.product_id.default_code"/>
+            </td>
             <td name="td_image" class="text-center" t-if="pdf_print_image_level == 'line'" style="vertical-align: middle;">
                 <t t-if="line.product_id.image_128">
                     <img t-att-src="image_data_uri(line.product_id.image_128)" style="max-height: 48px;"/>

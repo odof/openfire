@@ -34,6 +34,7 @@
                 <t t-set="packlines_to_report" t-value="line._get_items_lines_data_to_report()"/>
                 <t t-foreach="packlines_to_report" t-as="packline">
                     <tr name="tr_packlines">
+                        <td name="td_pack_reference" t-if="pdf_product_reference"><span t-field="packline.product_id.default_code"/></td>
                         <td name="td_pack_name"><span t-field="packline.name"/></td>
                         <td name="td_pack_quantity" class="text-end">
                             <span t-field="packline.product_uom_qty"/>
