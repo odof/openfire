@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Paiements",
-    'version': '16.0.1.2.0',
+    'version': '16.0.1.3.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -18,6 +18,7 @@
         'views/account_payment_views.xml',
         'views/of_payment_mode_views.xml',
         'views/of_payment_tags_views.xml',
+        'wizards/account_payment_register_views.xml',
         'views/menu.xml',
     ],
     'installable': True,
