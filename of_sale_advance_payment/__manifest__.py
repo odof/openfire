@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': "Openfire / Paiement d'avance de vente",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.1.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",
@@ -13,6 +13,7 @@
     ],
     'data': [
         'views/sale_order_views.xml',
+        'views/account_payment_views.xml',
     ],
     'installable': True,
     'application': False,
