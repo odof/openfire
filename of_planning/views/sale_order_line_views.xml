@@ -24,7 +24,7 @@
         <field name="inherit_id" ref="sale.view_order_line_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='price_subtotal']" position="after">
-                <field name="of_intervention_state"/>
+                <field name="of_intervention_state" optional="hide"/>
             </xpath>
         </field>
     </record>
