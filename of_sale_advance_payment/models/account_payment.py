@@ -13,3 +13,8 @@ class AccountPayment(models.Model):
         copy=False,
         domain="[('partner_id', '=', partner_id)]",
     )
+
+    # Since `account.payment` is a delegated inheritance of `account.move`, we force the `ref` field to be stored
+    # because we want `ref` to be in sync with the `move_id.ref` field when creating a payment from a sales order.
+    # (see https://github.com/odoo/odoo/blob/16.0/addons/account/models/account_payment.py#L715)
+    ref = fields.Char(related="move_id.ref", readonly=False, store=True)
