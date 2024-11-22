@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_openfire_main" name="Openfire" groups="of_group_basic_interface" sequence="1">
+    <menuitem id="menu_openfire_main" name="Openfire" sequence="1">
 
         <menuitem id="menu_openfire_sales" name="Sales" sequence="10">
             <menuitem id="menu_openfire_sales_contacts" name="Contacts" action="of_planning.action_res_partner" sequence="1"/>
