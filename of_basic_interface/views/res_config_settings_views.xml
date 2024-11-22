@@ -6,25 +6,13 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='invite_users']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            <xpath expr="//button[@name='%(base.action_apikeys_admin)d']//ancestor::div[hasclass('o_setting_box')]" position="attributes">
+                <attribute name="groups">base.group_system,!of_basic_interface.of_group_basic_interface</attribute>
             </xpath>
-            <xpath expr="//div[@id='languages']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
-            </xpath>
-            <xpath expr="//div[@id='contacts_settings']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
-            </xpath>
-            <xpath expr="//div[@name='integration']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
-            </xpath>
-            <xpath expr="//div[@id='user_default_rights']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            <xpath expr="//div[@name='performance']" position="attributes">
+                <attribute name="groups">base.group_no_one,!of_basic_interface.of_group_basic_interface</attribute>
             </xpath>
             <xpath expr="//widget[@name='res_config_dev_tool']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
-            </xpath>
-            <xpath expr="//div[@id='about']" position="attributes">
                 <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
             </xpath>
         </field>
@@ -36,17 +24,6 @@
         <field name="inherit_id" ref="product.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@id='product_general_settings']" position="attributes">
-                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
-            </xpath>
-        </field>
-    </record>
-
-    <record id="res_config_settings_view_form_mail" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.mail</field>
-        <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="mail.res_config_settings_view_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//div[@id='emails']" position="attributes">
                 <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
             </xpath>
         </field>
@@ -68,8 +45,11 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="crm.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@data-key='crm']" position="attributes">
-                <attribute name="groups">sales_team.group_sale_manager,!of_basic_interface.of_group_basic_interface</attribute>
+            <xpath expr="//div[@name='convert_visitor_setting_container']" position="attributes">
+                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
+            </xpath>
+            <xpath expr="//div[@name='generate_lead_setting_container']" position="attributes">
+                <attribute name="groups">!of_basic_interface.of_group_basic_interface</attribute>
             </xpath>
         </field>
     </record>
