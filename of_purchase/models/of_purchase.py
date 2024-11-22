@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api, _, SUPERUSER_ID
-import odoo.addons.decimal_precision as dp
-from odoo.tools.misc import formatLang
-from odoo.tools.float_utils import float_round
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.float_utils import float_round
+from odoo.tools.misc import formatLang
+
+import odoo.addons.decimal_precision as dp
 from odoo.addons.purchase.models.purchase import PurchaseOrder as Purchase
 
 
@@ -94,7 +97,12 @@ class PurchaseOrder(models.Model):
         res = super(PurchaseOrder, self).button_draft()
         for order in self:
             # on va chercher les procurement.order à l'état annulé uniquement
-            procurements = order.order_line.mapped('procurement_ids').filtered(lambda r: r.state == 'cancel')
+            procurements = (
+                order
+                .order_line
+                .mapped('procurement_ids')
+                .filtered(lambda r: r.state == 'cancel' and r.move_dest_id.picking_id.state != 'done')
+            )
             moves = procurements.filtered(lambda r: r.rule_id.propagate).mapped('move_dest_id')
             moves_filtered = moves.filtered(lambda r: r.state == 'cancel')
             procurements |= moves_filtered.mapped('procurement_id').filtered(lambda r: r.state == 'cancel')
