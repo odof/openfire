@@ -434,6 +434,11 @@ msgid "Invoice line"
 msgstr "Ligne de facture"
 
 #. module: of_invoice_report_setting
+#: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__module_of_account_sale_report_totals
+msgid "Invoice totals management"
+msgstr "Montants récapitulatifs de la facture"
+
+#. module: of_invoice_report_setting
 #: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_invoicing_address_specific_title
 msgid "Invoicing Address Specific Title"
 msgstr "Titre spécifique d'adresse de facturation"
@@ -683,6 +688,11 @@ msgstr "Label Titre spécifique d'adresse de livraison"
 #: model:ir.model.fields,field_description:of_invoice_report_setting.field_res_company__pdf_invoice_shipping_address_specific_title_label
 msgid "Shipping Address Specific Title Label (Invoice report settings)"
 msgstr "Label Titre spécifique d'adresse de livraison"
+
+#. module: of_invoice_report_setting
+#: model_terms:ir.ui.view,arch_db:of_invoice_report_setting.of_invoice_document_layout_view_form
+msgid "Summary invoice amounts"
+msgstr "Montants récapitulatifs de la facture"
 
 #. module: of_invoice_report_setting
 #: model:ir.model.fields,field_description:of_invoice_report_setting.field_of_invoice_document_layout__pdf_invoice_address_contact_titles

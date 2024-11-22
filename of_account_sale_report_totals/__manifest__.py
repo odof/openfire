@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Impression totaux des factures",
-    'version': '16.0.1.0.0',
+    'version': '16.0.1.1.0',
     'license': 'LGPL-3',
     'author': "OpenFire",
     'website': 'https://www.openfire.fr',
@@ -17,7 +17,7 @@
         'report/of_invoice_report_templates.xml',
         'views/of_invoice_report_total_group_views.xml',
     ],
-    'installable': False,  # This module will be installable in a future commit.
+    'installable': True,
     'application': False,
     'auto_install': False,
 }

@@ -3,7 +3,7 @@
 {
     'name': "OpenFire / Paramétrage du rapport de facture",
     'author': "OpenFire",
-    'version': '16.0.1.1.0',
+    'version': '16.0.1.2.0',
     'license': 'LGPL-3',
     'category': 'OpenFire',
     'summary': "Print options for Invoice report",
