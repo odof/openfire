@@ -2007,7 +2007,13 @@ class OfContractProduct(models.Model):
                                                                                 and i.state == 'done'))
             search = bool(new_qty)
             qty += new_qty
-        return qty * self.quantity
+        result = qty * self.quantity
+        if self.line_id.frequency_type == 'date':
+            # self.quantity représente la qté facturée à chaque RDV réalisé lors de la facturation à la prestation.
+            return result
+        # self.quantity représente la qté facturée sur la période dans tous les autres cas.
+        # il faut donc faire une proportion de RDVs réalisés /  RDVs prévus pour trouver la bonne quantité.
+        return result / (self.line_id.nbr_interv or 1.0)
 
 
 class OfContractPeriod(models.Model):
