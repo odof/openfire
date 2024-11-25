@@ -34,6 +34,7 @@ class SaleOrderLine(models.Model):
         store=True,
         readonly=False,
         precompute=True,
+        copy=True,
         help="Products that are part of this pack.",
     )
 
