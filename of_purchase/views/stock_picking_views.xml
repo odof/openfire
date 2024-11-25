@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Ajout du client sur Bon de réception -->
+<record id="of_purchase_view_picking_form" model="ir.ui.view">
+    <field name="name">of.purchase.view.picking.form</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="of_partner_shipping_id" invisible="1"/>
+            <field name="of_partner_shipping_city" invisible="1"/>
+            <field name="of_partner_shipping_zip" invisible="1"/>
+        </xpath>
+        <xpath expr="//field[@name='origin']" position="after">
+            <field name="of_user_id"/>
+            <field name="of_location_usage" invisible="1"/>
+            <field name="of_customer_id" attrs="{'invisible': [('of_location_usage', '!=', 'supplier')]}"/>
+            <field name="of_customer_shipping_id" invisible="1"/>
+            <field name="of_customer_shipping_city" invisible="1"/>
+            <field name="of_customer_shipping_zip" invisible="1"/>
+        </xpath>
+    </field>
+</record>
+
+<record id="of_purchase_view_picking_search" model="ir.ui.view">
+    <field name="name">of.purchase.view.picking.search</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="of_customer_id" string="Client final"/>
+        </xpath>
+    </field>
+</record>
+
+<record id="of_purchase_view_picking_tree" model="ir.ui.view">
+    <field name="name">of.purchase.view.picking.tree</field>
+    <field name="model">stock.picking</field>
+    <field name="inherit_id" ref="stock.vpicktree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="of_partner_shipping_id" invisible="1"/>
+            <field name="of_partner_shipping_city" string="Ville"/>
+            <field name="of_partner_shipping_zip" string="Code Postal"/>
+            <field name="of_customer_id" string="Client final"/>
+            <field name="of_customer_shipping_id" invisible="1"/>
+            <field name="of_customer_shipping_city" string="Ville"/>
+            <field name="of_customer_shipping_zip" string="Code Postal"/>
+        </xpath>
+    </field>
+</record>
+
+<record id="of_purchase_open_picking" model="ir.actions.act_window">
+    <field name="name">Réceptions</field>
+    <field name="res_model">stock.picking</field>
+    <field name="domain">[]</field> <!-- Force empty -->
+    <field name="view_mode">form</field>
+</record>
+</odoo>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Smart button des BRs dans les partenaires -->
+    <record id="of_purchase_open_picking_view_partner" model="ir.ui.view">
+        <field name="name">of.purchase.open.picking.view.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" name="action_view_picking" type="object" icon="fa-shopping-cart">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_value">
+                        <field name="of_br_count"/></span>
+                        <span class="o_stat_text">Réceptions</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

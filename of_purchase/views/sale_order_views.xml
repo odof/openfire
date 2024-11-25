@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="of_view_order_form_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">of.sale.stock.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_shipping']" position="inside">
+                <field name="of_delivery_expected"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="of_user_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_purchase_button_achats_view" model="ir.ui.view">
+        <field name="name">of.purchase.button.achats</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/div[@name='button_box']/button[@name='action_view_invoice']" position="after">
+                <button class="oe_stat_button" name="action_view_purchases" type="object" icon="fa-shopping-cart" attrs="{'invisible': [('of_purchase_count', '=', 0)]}">
+                    <field string="Achats" name="of_purchase_count" widget="statinfo"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <!-- Action afficher achats list -->
+    <record id="of_purchase_open_purchases" model="ir.actions.act_window">
+        <field name="name">Achats</field>
+        <field name="res_model">purchase.order</field>
+        <field name="domain">[]</field> <!-- Force empty -->
+        <field name="view_mode">form</field>
+    </record>
+
+</odoo>

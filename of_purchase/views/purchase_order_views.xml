@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_purchase_order_customer_form" model="ir.ui.view">
+        <field name="name">purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_unlock']" position="after">
+                <button name="button_update_purchase_price" string="Recalcul prix de revient"
+                    type="object"
+                    attrs="{'invisible': ['|', ('state', 'not in', ['draft', 'to approve', 'sent', 'purchase']),
+                        ('of_sale_order_id', '=', False)]}" />
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="of_sent" />
+                <field name="of_sale_order_id" />
+                <field name="of_customer_id" />
+                <field name="of_customer_shipping_id" invisible="1" />
+                <field name="of_customer_shipping_city" invisible="1" />
+                <field name="of_customer_shipping_zip" invisible="1" />
+            </xpath>
+            <xpath expr="//label[@for='date_planned']" position="before">
+                <field name="of_delivery_expected" />
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="of_user_id" />
+            </xpath>
+            <xpath expr="//field[@name='date_planned']" position="replace">
+                <field name="of_delivery_force" class="oe_edit_only"
+                    attrs="{'readonly': [('state', 'not in', ('draft', 'sent'))]}" />
+            </xpath>
+            <xpath expr="//label[@for='date_planned']" position="replace">
+                <field name="date_planned" readonly="1" />
+                <label for="of_delivery_force" class="oe_edit_only" />
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree" position="inside">
+                <field name="of_total_stock_qty"
+                    groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager" />
+                <field name="of_available_stock_qty"
+                    groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager" />
+                <field name="of_theoretical_stock_qty"
+                    groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager" />
+                <field name="of_reserved_qty"
+                    groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager" />
+            </xpath>
+             <!-- <xpath expr="//field[@name='order_line']/form/sheet/group/group[1]"
+            position="inside"> -->
+            <!-- Champs présents en vue liste mais pas en vue form  -->
+            <!-- <field name="currency_id" invisible="1"/>
+                    <field name="state" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="date_planned" invisible="1"/>
+                    <field name="analytic_tag_ids" groups="purchase.group_analytic_accounting" widget="many2many_tags"
+            invisible="1"/>
+                    <field name="qty_received" invisible="not context.get('show_purchase', False)"/>
+                    <field name="qty_invoiced" invisible="not context.get('show_purchase', False)"/>
+                    <field name="price_subtotal" widget="monetary" invisible="1"/>
+            </xpath> -->
+            <!-- <xpath expr="//field[@name='order_line']/form/sheet/group/group[2]"
+            position="inside">
+                    <separator colspan="2" string="Informations de Stock" name="stock_info_sep"
+            groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_total_stock_qty"
+            groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_available_stock_qty"
+            groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_theoretical_stock_qty"
+            groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                    <field name="of_reserved_qty"
+            groups="of_purchase.group_purchase_order_line_display_stock_info+purchase.group_purchase_manager"/>
+                </xpath> -->
+        </field>
+    </record>
+<!--
+    <record id="of_purchase_order_customer_form_edit" model="ir.ui.view">
+            <field name="name">purchase.order.form</field>
+            <field name="model">purchase.order</field>
+            <field name="groups_id" eval="[(4,
+    ref('of_purchase.group_purchase_order_line_display_stock_info'))]"/>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree" position="attributes">
+                    <attribute name="bottom">0</attribute>
+                    <attribute name="editable">1</attribute>
+                </xpath>
+            </field>
+        </record> -->
+
+    <record id="of_purchase_order_customer_tree" model="ir.ui.view">
+        <field name="name">purchase.order.tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="before">
+                <field name="of_customer_id" />
+                <field name="of_customer_shipping_id" invisible="1" />
+                <field name="of_customer_shipping_city" />
+                <field name="of_customer_shipping_zip" />
+            </xpath>
+            <xpath expr="//field[@name='date_planned']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_planned']" position="before">
+                <field name="of_delivery_expected" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_view_purchase_order_customer_filter" model="ir.ui.view">
+            <field name="name">of.purchase.order.customer.filter</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <filter name="partner_ref" string="Supplier reference" domain="[]"
+                    context="{'group_by':'partner_ref'}"/>
+                    <field name="partner_ref" string="Supplier reference"/>
+                </xpath>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="of_customer_id" operator="child_of"/>
+                </xpath>
+                <!-- <xpath expr="//filter[@name='order_date']" position="before">
+                    <separator/>
+                    <filter string="Customer" domain="[]" context="{'group_by':'of_customer_id'}"/>
+                    <separator/>
+                </xpath> -->
+                    <xpath expr="//filter[@name='order_date']" position="after">
+                    <separator/>
+                    <filter name="not_received" string="Not Received" domain="[('of_reception_state','=', 'not_received')]"/>
+                    <filter name="received" string="Received" domain="[('of_reception_state','=', 'received')]"/>
+                </xpath>
+
+    </field>
+        </record>
+
+
+
+    <!-- <record id="purchase.action_purchase_line_product_tree" model="ir.actions.act_window">
+        <field name="domain">[('product_id.product_tmpl_id','in',active_ids)]</field>
+    </record>
+ -->
+
+
+    <!-- modif du domain sur action existante -->
+    <!-- <record id="purchase.act_res_partner_2_supplier_invoices" model="ir.actions.act_window">
+        <field name="domain">[('type','in',('in_invoice','in_refund'))]</field>
+    </record>
+
+ -->
+
+</odoo>

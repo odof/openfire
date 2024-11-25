@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <!-- Ajouter la configuration "Description articles" -->
+    <record id="of_view_purchase_configuration" model="ir.ui.view">
+        <field name="name">of_purchase.res.config.view</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@data-key='purchase']" position="inside">
+                <h2>Stock</h2>
+                <div class="row mt16 o_settings_container" name="stock_settings_container">
+                    <div class="col-12 col-lg-6 o_setting_box" id="group_purchase_order_line_display_stock_info">
+                        <div class="o_setting_right_pane">
+                            <label for="group_purchase_order_line_display_stock_info" />
+                            <div class="text-muted">
+                                Display stock information in order line
+                            </div>
+                            <field name="group_purchase_order_line_display_stock_info" />
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6" id="of_date_purchase_order">
+                        <div class="o_setting_right_pane">
+                            <label for="of_date_purchase_order" />
+                            <div class="text-muted">
+                                test
+                            </div>
+                            <field name="of_date_purchase_order" widget="radio" />
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-lg-6" id="of_description_as_order_setting">
+                        <div class="o_setting_right_pane">
+                            <label for="of_description_as_order_setting" />
+                            <div class="text-muted">
+                                test
+                            </div>
+                            <field name="of_description_as_order_setting" widget="radio" />
+                        </div>
+
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+
+
+    <record id="of_purchase_view_sale_config_settings" model="ir.ui.view">
+        <field name="name">sale.res.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="of_sale.of_sale_res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='down_payments']" position="after">
+                <div class="col-24 col-lg-6 o_setting_box" id="of_recalcul_pa">
+                    <div class="o_setting_left_pane">
+                        <field name="of_recalcul_pa"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_recalcul_pa"/>
+                        <div class="text-muted">
+                            Recompute the purchase price of the order lines based on the linked purchase order                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

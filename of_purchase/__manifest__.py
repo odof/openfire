@@ -1,52 +1,34 @@
-# -*- coding: utf-8 -*-
-
-##############################################################################
-#
-#    OpenFire
-#    Version OF10.0
-#
-#    Module conçu et développé par OpenFire SAS
-#
-#    Compatible avec Odoo 10 Community Edition
-#
-##############################################################################
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': u"OpenFire / Achats",
-    'version': "10.0.1.0.0",
+    'name': "OpenFire / Achats",
+    'version': "16.0.1.0.0",
+    'license': 'AGPL-3',
     'author': "OpenFire",
-    'website': "www.openfire.fr",
     'category': "Purchases",
-    'summary': u"OpenFire Purchases",
-    'description': u"""
-Module OpenFire / Achats
-==========================
-Modifications OpenFire pour les commandes fournisseur
-
-Fonctionnalités
-----------------
-- Ajout de la date souhaitée de livraison (champ texte) pour les commandes client et fournisseur
-- Ajout du client final dans les commandes fournisseur, auto-alimenté depuis la commande client
-- Modification des documents imprimés pour l'ajout de ces informations
-- Ajout de l'impression de la commande fournisseur sans prix
-- Ajout option pour afficher la description telle que saisie dans le devis dans la commande fournisseur et les documents imprimables associés
-- Ajoute un smart button vers les commandes fournisseurs liées depuis le bon de commande
-
-""",
+    'summary': "Modifications OpenFire pour les commandes fournisseur",
+    'website': "www.openfire.fr",
     'depends': [
         'purchase',
-        'sale',
+        'purchase_stock', #J'ai ajouté cette dependance car picking_ids est définit dans purchase_stock
         'of_product',
-        'of_external',
-        'of_sale',
+        # 'of_external',
+        'of_sale_stock_purchase', #> get_cost
+        'sale_stock',
     ],
     'data': [
         'security/of_purchase_security.xml',
-        'report/purchase_report_templates.xml',
-        'report/purchase_reports.xml',
-        'views/of_purchase_view.xml',
+        # 'report/purchase_report_templates.xml',
+        # 'report/purchase_reports.xml',
+        'views/stock_picking_views.xml',
+        'views/res_partner_views.xml',
+        'views/sale_order_views.xml',
+        'views/purchase_order_views.xml',
+        'views/purchase_order_line_views.xml',
+        'views/res_config_settings_views.xml',
     ],
-    'installable': True,
     'application': False,
+    'installable': True,
     'auto_install': False,
+
 }

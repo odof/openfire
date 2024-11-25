@@ -55,10 +55,10 @@
                             <strong>Contremarque&amp;nbsp;:</strong>
                             <p t-field="o.customer_id"/>
                         </div>
-                        <div t-if="o.delivery_expected" style="display: table-cell; width: 4px;"/>
-                        <div t-if="o.delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div t-if="o.of_delivery_expected" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.of_delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Livraison attendue&amp;nbsp;:</strong>
-                            <p t-field="o.delivery_expected"/>
+                            <p t-field="o.of_delivery_expected"/>
                         </div>
                         <div name="date_planned1" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="display: table-cell; width: 4px;"/>
                         <div name="date_planned2" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
@@ -138,10 +138,10 @@
                             <strong>Contremarque&amp;nbsp;:</strong>
                             <p t-field="o.customer_id"/>
                         </div>
-                        <div t-if="o.delivery_expected" style="display: table-cell; width: 4px;"/>
-                        <div t-if="o.delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
+                        <div t-if="o.of_delivery_expected" style="display: table-cell; width: 4px;"/>
+                        <div t-if="o.of_delivery_expected" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
                             <strong>Livraison attendue&amp;nbsp;:</strong>
-                            <p t-field="o.delivery_expected"/>
+                            <p t-field="o.of_delivery_expected"/>
                         </div>
                         <div name="date_planned1" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="display: table-cell; width: 4px;"/>
                         <div name="date_planned2" t-if="o.date_planned and all([l.date_planned == o.date_planned for l in o.order_line])" style="padding: 8px 16px; border: 1px solid darkgray; display: table-cell; border-radius: 8px;">
