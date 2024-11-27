@@ -908,6 +908,7 @@ class OfPlanningIntervention(models.Model):
         - to invoice: if any OPI line is 'to invoice', the whole OPI is 'to invoice'
         - invoiced: if all OPI lines are invoiced, the OPI is invoiced..
         """
+        billable_states = self._get_billable_states()
         for rdv in self:
             # Ignore the status of the deposit product
             deposit_product_id = self.env['sale.advance.payment.inv']._default_product_id()
@@ -915,7 +916,7 @@ class OfPlanningIntervention(models.Model):
                                    if line.product_id != deposit_product_id]
 
             if len(line_invoice_status):
-                if rdv.state not in ('confirm', 'done'):
+                if rdv.state not in billable_states:
                     rdv.invoice_status = 'no'
                 elif 'to invoice' in line_invoice_status:
                     rdv.invoice_status = 'to invoice'
@@ -2097,6 +2098,10 @@ class OfPlanningIntervention(models.Model):
             'context': {'default_intervention_ids': self._ids}
         }
 
+    @api.model
+    def _get_billable_states(self):
+        return ['confirm', 'done']
+
 
 class OfPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
@@ -2212,8 +2217,9 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('intervention_id.invoice_policy', 'intervention_id.state',
                  'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id')
     def _compute_qty_invoiceable(self):
+        billable_states = self.env['of.planning.intervention']._get_billable_states()
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+            if line.intervention_id.state not in billable_states or line.order_line_id:
                 line.qty_invoiceable = 0.0
             elif line.invoice_policy == 'intervention':
                 line.qty_invoiceable = line.qty - line.qty_invoiced
@@ -2223,8 +2229,9 @@ class OfPlanningInterventionLine(models.Model):
     @api.depends('intervention_id.state', 'qty', 'qty_delivered', 'qty_invoiced', 'order_line_id', 'qty_invoiceable')
     def _compute_invoice_status(self):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+        billable_states = self.env['of.planning.intervention']._get_billable_states()
         for line in self:
-            if line.intervention_id.state not in ('confirm', 'done') or line.order_line_id:
+            if line.intervention_id.state not in billable_states or line.order_line_id:
                 line.invoice_status = 'no'
             elif not float_is_zero(line.qty_invoiceable, precision_digits=precision):
                 line.invoice_status = 'to invoice'
