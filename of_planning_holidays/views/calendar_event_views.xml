@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_form" model="ir.ui.view">
+        <field name="name">of.planning.holidays.calendar.event.view.form</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning.calendar_event_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="after">
+                <field name="of_has_leave_warning" invisible="1"/>
+                <div class="alert alert-warning" role="alert" attrs="{'invisible': [('of_has_leave_warning', '=', False)]}">
+                    <field name="of_leave_warning_message" class="text-center"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
