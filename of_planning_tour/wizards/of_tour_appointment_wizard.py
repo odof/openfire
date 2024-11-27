@@ -859,7 +859,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "description": self.description or "",
             "of_state": "confirmed",
             "of_order_id": order_id,
-            "of_picking_manual_ids": len(picking_list) == 1 and picking_list[0] or False,
+            "of_picking_manual_ids": len(picking_list) == 1 and [Command.link(picking_list[0])] or False,
             "of_type": "intervention",
         }
         if self.intervention_id:
