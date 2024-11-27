@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="calendar_event_view_planning" model="ir.ui.view">
+        <field name="name">calendar.event.view.plannning</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="of_planning_view.of_planning_intervention_view_planning"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_has_geolocalize_warning']" position="after">
+                <field name="of_has_leave_warning"/>
+                <field name="of_leave_warning_message"/>
+            </xpath>
+            <xpath expr="//div[@id='warnings']" position="inside">
+                <div class="text-danger" style="white-space: pre-wrap;" t-if="of_has_leave_warning" t-out="of_leave_warning_message"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
