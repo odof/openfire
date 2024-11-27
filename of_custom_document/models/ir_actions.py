@@ -20,7 +20,9 @@ class IrActionsReport(models.Model):
         if report_sudo.report_name.startswith("of_custom_document."):
             document = self.env["of.custom.document"].browse(int(report_sudo.report_name.split(".")[1]))
             if document.file:
-                return self._render_pdf_form(report_ref, res_ids=res_ids, data=data)
+                # `_render_pdf_form` will return a tuple of tuple ((pdf_content, file_type)), so we need to extract the
+                # first tuple
+                return self._render_pdf_form(report_ref, res_ids=res_ids, data=data)[0]
 
         pdf_content, file_type = super()._render_qweb_pdf(report_ref, res_ids=res_ids, data=data)
 

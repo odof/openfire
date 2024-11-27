@@ -183,7 +183,7 @@ class OFCustomDocument(models.Model):
                     "print_report_name": f'"{document.name}"',
                     "report_name": document.name,
                 }
-            if action.model_name != document.model_id.model:
+            if action.model != document.model_id.model:
                 vals |= {
                     "model": document.model_id.model,
                     "binding_model_id": document.model_id.id,
