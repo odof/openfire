@@ -23,6 +23,19 @@
                     </div>
                 </div>
             </xpath>
+            <xpath expr="//div[@id='group_of_display_tax_inclued_total_in_so_lines']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="of_copy_opportunity_with_sale_order">
+                    <div class="o_setting_left_pane">
+                        <field name="of_copy_opportunity_with_sale_order"/>
+                    </div>
+                    <div class="o_setting_right_pane">
+                        <label for="of_copy_opportunity_with_sale_order"/>
+                        <div class="text-muted">
+                            When copying a sale order, copy the opportunity too
+                        </div>
+                    </div>
+                </div>
+            </xpath>
         </field>
     </record>
 

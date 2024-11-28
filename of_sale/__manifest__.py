@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Ventes",
-    "version": "16.0.1.7.1",
+    "version": "16.0.1.8.1",
     "license": "AGPL-3",
     "author": "OpenFire",
     "website": "https://www.openfire.fr",
