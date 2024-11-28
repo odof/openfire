@@ -904,6 +904,7 @@ class OFPlanningTour(models.Model):
             "partner_name": self.return_address_id.name,
             "geo_lng": self.return_address_id.partner_longitude,
             "geo_lat": self.return_address_id.partner_latitude,
+            "address_zip": self.return_address_id.zip,
         }
         return start_marker, end_marker
 
