@@ -28,6 +28,7 @@ class CrmLead(models.Model):
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context["default_of_referred_id"] = self.of_referred_id.id
+        quotation_context["default_of_canvasser_id"] = self.of_canvasser_id.id
         return quotation_context
 
     def action_set_lost(self, **additional_values):
