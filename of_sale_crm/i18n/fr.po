@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-15 13:50+0000\n"
-"PO-Revision-Date: 2024-11-15 13:50+0000\n"
+"POT-Creation-Date: 2024-12-06 09:20+0000\n"
+"PO-Revision-Date: 2024-12-06 09:20+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,11 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_crm
-#: model:ir.model.fields,field_description:of_sale_crm.field_of_connector_config_settings__of_lost_opportunity_stage_id
+#: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__of_copy_opportunity_with_sale_order
+msgid "(OF) Copy opportunity"
+msgstr "(OF) Copier l'opportunité"
+
+#. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__of_lost_opportunity_stage_id
 msgid "(OF) Lost stage of opportunities"
 msgstr "(OF) Étape perdue des opportunités"
@@ -413,6 +417,15 @@ msgid "Status"
 msgstr "Statut"
 
 #. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_crm_of_sale_view_order_form
+msgid ""
+"The salesperson and prospector from the quote have been replaced by those "
+"from the selected opportunity."
+msgstr ""
+"Le vendeur et le prospecteur du devis ont été remplacés par ceux de "
+"l'opportunité sélectionnée."
+
+#. module: of_sale_crm
 #: model:res.groups,comment:of_sale_crm.group_of_estimate_sale_order_state
 msgid "The start step of the sales order workflow is \"Estimate\"."
 msgstr "L'étape de départ du workflow de commande est \"Estimation\"."
@@ -477,6 +490,11 @@ msgstr "Très haut"
 #, python-format
 msgid "Warning for %s"
 msgstr "Avertissement pour %s"
+
+#. module: of_sale_crm
+#: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_res_config_settings_view_form
+msgid "When copying a sale order, copy the opportunity too"
+msgstr "Lors de la copie d'une commande client, copier aussi l'opportunité"
 
 #. module: of_sale_crm
 #: model_terms:ir.ui.view,arch_db:of_sale_crm.of_sale_crm_view_partner_lead_warn_form
