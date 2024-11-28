@@ -82,6 +82,7 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     of_company_name = fields.Char(string="Company name")
+    company_type = fields.Selection(default="person")
     name = fields.Char(tracking=True)
     street = fields.Char(tracking=True)
     street2 = fields.Char(tracking=True)
