@@ -77,6 +77,19 @@ class SaleOrder(models.Model):
         string="Brand of the main product",
     )
 
+    # UX fields
+    of_show_update_salesman = fields.Boolean(store=False, string="Has opportunity changed")
+
+    @api.onchange("opportunity_id")
+    def _onchange_opportunity_id(self):
+        for order in self:
+            if order.opportunity_id:
+                order.user_id = order.opportunity_id.user_id
+                order.of_canvasser_id = order.opportunity_id.of_canvasser_id
+                order.of_show_update_salesman = True
+            else:
+                order._compute_user_id()
+
     @api.model_create_multi
     def create(self, vals_list):
         order_start_state = self.env["ir.config_parameter"].sudo().get_param("of.sale.crm.sale.order.start_state")
@@ -87,6 +100,16 @@ class SaleOrder(models.Model):
                 elif order_start_state == "quotation" and vals.get("state", "draft") == "draft":
                     vals["state"] = "sent"
         return super().create(vals_list)
+
+    def copy_data(self, default=None):
+        """By default, the opportunity is copied when the sale order is copied (attribute copy=True)."""
+        data_list = super().copy_data(default)
+        for order, data in zip(self, data_list):
+            if self.env["ir.config_parameter"].sudo().get_param("of.sale.of_copy_opportunity_with_sale_order"):
+                data["opportunity_id"] = order.opportunity_id.id
+            else:
+                data["opportunity_id"] = False
+        return data_list
 
     def action_button_confirm_estimate(self):
         for order in self:

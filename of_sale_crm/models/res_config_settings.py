@@ -15,6 +15,10 @@ class ResConfigSettings(models.TransientModel):
     )
 
     # Sales
+    of_copy_opportunity_with_sale_order = fields.Boolean(
+        string="(OF) Copy opportunity",
+        config_parameter="of.sale.of_copy_opportunity_with_sale_order",
+    )
     of_sale_order_start_state = fields.Selection(
         selection=[
             ("estimate", 'Orders are created at the initial "Estimate" stage.'),
