@@ -343,7 +343,12 @@ export class OFMapPlanningTourX2Many extends Component {
 
     getTooltip(record, additional = false) {
         const context = additional
-            ? { record: { tour_number: record.tour_number } }
+            ? { record: { tour_number: record.tour_number,
+                partner_name : record.partner_name,
+                of_address_zip: record.address_zip,
+                of_address_city: record.address_city,
+            }
+        }
             : { record: record.data };
         return renderToString(this.tooltipView, context);
     }
@@ -534,8 +539,12 @@ export class OFMapPlanningTourX2Many extends Component {
     /** Events **/
 
     onClickMarker(record) {
-        this.popups[record.id].toggle();
-        record.selected = !record.selected;
+        // Fake records likes Start/Stop markers are not available in `popups` object as its
+        // initialized with `map.model.root.records`.
+        if (record.id in this.popups){
+            this.popups[record.id].toggle();
+            record.selected = !record.selected;
+        }
     }
 
     onMouseOverMarker(record) {
