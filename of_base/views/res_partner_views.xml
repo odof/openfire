@@ -119,6 +119,8 @@
                 </field>
                 <field name="function" placeholder="e.g. Sales Director" attrs="{'invisible': [('is_company','=', True)]}"/>
                 <field name="lang"/>
+                <xpath expr="//field[@name='website']" position="move"/>
+                <xpath expr="//field[@name='category_id']" position="move"/>
             </xpath>
 
             <!--  Add new notebook pages  -->
