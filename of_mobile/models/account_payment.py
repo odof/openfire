@@ -108,6 +108,7 @@ class AccountPayment(models.Model):
                 active_model="account.move",
                 active_ids=invoices.ids,
                 default_of_payment_mode_id=mode.id,
+                default_of_payment_ref=payment_reference,
                 default_journal_id=mode.journal_id.id,
                 default_partner_id=partner.id,
                 default_amount=amount,
