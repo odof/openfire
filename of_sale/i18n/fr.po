@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-21 13:05+0000\n"
-"PO-Revision-Date: 2024-11-21 13:05+0000\n"
+"POT-Creation-Date: 2024-12-06 09:27+0000\n"
+"PO-Revision-Date: 2024-12-06 09:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,12 +35,6 @@ msgstr "(OF) Bloquer les modifications des commandes de vente"
 #: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
 msgid "(OF) Category of items used for down payments"
 msgstr "(OF) Catégorie d'articles utilisés pour les acomptes"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_copy_opportunity_with_sale_order
-#: model:ir.model.fields,field_description:of_sale.field_res_config_settings__of_copy_opportunity_with_sale_order
-msgid "(OF) Copy opportunity"
-msgstr "(OF) Copier l'opportunité"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_connector_config_settings__of_validate_pickings_on_move
@@ -1398,11 +1392,6 @@ msgid ""
 msgstr ""
 "Avertissement : Nous avons changé l'option \"Affichage des sous-totaux de "
 "ligne\" dans les paramètres de comptabilité (de B2C à B2B)"
-
-#. module: of_sale
-#: model_terms:ir.ui.view,arch_db:of_sale.of_sale_res_config_settings_view_form
-msgid "When copying a sale order, copy the opportunity too"
-msgstr "Lors de la copie d'une commande client, copier aussi l'opportunité"
 
 #. module: of_sale
 #: model:ir.model,name:of_sale.model_of_sale_order_add_quote_wizard
