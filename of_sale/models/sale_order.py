@@ -418,18 +418,6 @@ class SaleOrder(models.Model):
     def _get_valid_states_to_add_quote(self):
         return ["sale", "done"]
 
-    def copy_data(self, default=None):
-        """By default, the opportunity is copied when the sale order is copied (attribute copy=True).
-        TODO: Move this feature in of_sale_crm when the module will be migrated to v16.
-        """
-        data_list = super().copy_data(default)
-        for order, data in zip(self, data_list):
-            if self.env["ir.config_parameter"].sudo().get_param("of.sale.of_copy_opportunity_with_sale_order"):
-                data["opportunity_id"] = order.opportunity_id.id
-            else:
-                data["opportunity_id"] = False
-        return data_list
-
     # --------------------------------------------------------------------------
     # Report methods
     # --------------------------------------------------------------------------
