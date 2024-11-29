@@ -101,6 +101,7 @@ class OFServiceRequest(models.Model):
         store=True,
         help="State for non recurrent request. If the request is recurrent, the punctual state is null.",
     )
+    force_done = fields.Boolean(string="Force closure")
 
     # Interventions
     intervention_ids = fields.One2many(
@@ -420,10 +421,13 @@ class OFServiceRequest(models.Model):
         "recurrency",
         "intervention_ids",
         "intervention_ids.of_state",
+        "force_done",
     )
     def _compute_state(self):
         for request in self:
-            if not request.next_date and not request.end_date:
+            if request.force_done:
+                request.state = "done"
+            elif not request.next_date and not request.end_date:
                 request.state = "nothing_to_plan"
             elif request.base_state != "calculated":
                 request.state = request.base_state
@@ -444,10 +448,13 @@ class OFServiceRequest(models.Model):
         "recurrency",
         "intervention_ids",
         "intervention_ids.of_state",
+        "force_done",
     )
     def _compute_state_punctual(self):
         for request in self:
-            if request.recurrency:
+            if request.force_done:
+                request.state = "done"
+            elif request.recurrency:
                 request.state_punctual = "null"
             elif request.base_state != "calculated":
                 request.state_punctual = request.base_state
@@ -844,6 +851,9 @@ class OFServiceRequest(models.Model):
 
     def action_button_draft(self):
         self.write({"base_state": "draft"})
+
+    def action_button_force_done(self):
+        self.write({"force_done": True})
 
     def action_button_update_taxes(self):
         self.ensure_one()

@@ -549,6 +549,11 @@ msgstr ""
 "l'intervention."
 
 #. module: of_service
+#: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_form
+msgid "End"
+msgstr "Terminer"
+
+#. module: of_service
 #: model_terms:ir.ui.view,arch_db:of_service.of_service_request_view_tree
 msgid "End of contract"
 msgstr "Fin de contrat"
@@ -599,6 +604,11 @@ msgstr "Abonnés"
 #: model:ir.model.fields,field_description:of_service.field_of_service_request__message_partner_ids
 msgid "Followers (Partners)"
 msgstr "Abonnés (Partenaires)"
+
+#. module: of_service
+#: model:ir.model.fields,field_description:of_service.field_of_service_request__force_done
+msgid "Force closure"
+msgstr "Forcer la clôture"
 
 #. module: of_service
 #: model:ir.model.fields.selection,name:of_service.selection__of_planning_intervention_template__planning_granularity__fortnightly
