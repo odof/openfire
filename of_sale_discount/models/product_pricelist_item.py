@@ -13,6 +13,11 @@ class PricelistItem(models.Model):
     of_percent_price_formula = fields.Char(
         string="Percentage (discount)", help='Discount or amount of discounts.\nEg. "40 + 10.5" equals "46.3"'
     )
+    of_brand_ids = fields.Many2many(
+        comodel_name="of.product.brand",
+        string="Marques",
+        help="Si renseigné, la règle s'appliquera uniquement aux produits de ces marques, sinon à toutes les marques",
+    )
 
     @api.depends("of_percent_price_formula")
     def _compute_percent_price(self):
@@ -26,3 +31,10 @@ class PricelistItem(models.Model):
                 except Exception as e:
                     raise UserError(_("Invalid discount formula:\n%s") % line.of_percent_price_formula) from e
             line.percent_price = 100.0 - price_percent
+
+    def _is_applicable_for(self, product, qty_in_product_uom):
+        result = super()._is_applicable_for(product, qty_in_product_uom)
+        if result:
+            if self.of_brand_ids and product.brand_id.id not in self.of_brand_ids.ids:
+                return False
+        return True

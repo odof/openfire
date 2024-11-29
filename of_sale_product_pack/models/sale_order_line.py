@@ -103,9 +103,18 @@ class SaleOrderLine(models.Model):
         super()._compute_price_unit()
         for line in self:
             if line.of_pack_component_price == "totalized":
-                line.price_unit = sum(
-                    pack_line.product_id.lst_price * pack_line.quantity for pack_line in line.of_pack_line_ids
-                )
+                total_price = 0
+                pricelist_rule = line.pricelist_item_id
+                order_date = line.order_id.date_order or fields.Date.today()
+                currency = line.currency_id or line.order_id.company_id.currency_id
+                for pack_line in line.of_pack_line_ids:
+                    product = pack_line.product_id.with_context(**line._get_product_price_context())
+                    qty = pack_line.quantity or 1.0
+                    uom = pack_line.product_id.uom_id
+
+                    pack_line_price = pricelist_rule._compute_price(product, qty, uom, order_date, currency=currency)
+                    total_price += pack_line_price * pack_line.quantity
+                line.price_unit = total_price
 
     @api.depends("product_id", "product_id.pack_ok", "of_pack_line_ids", "of_pack_component_price")
     def _compute_purchase_price(self):
