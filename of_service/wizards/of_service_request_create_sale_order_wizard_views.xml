@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_service_request_create_sale_order_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.service.request.create.sale.order.wizard.view.form</field>
+        <field name="model">of.service.request.create.sale.order.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="service_request_id" invisible="1"/>
+                    <field name="template_id" invisible="1"/>
+                    <field name="sale_order_template_ids" invisible="1"/>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="partner_invoice_id"/>
+                        <field name="partner_shipping_id"/>
+                        <field name="client_order_ref"/>
+                    </group>
+                    <group>
+                        <field name="sale_order_template_id"  domain="[('id', 'in', sale_order_template_ids)]"/>
+                        <field name="pricelist_id"/>
+                        <field name="fiscal_position_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Générer Devis" name="action_button_create_sale_order" type="object" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

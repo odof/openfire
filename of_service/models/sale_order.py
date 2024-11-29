@@ -16,6 +16,7 @@ class SaleOrder(models.Model):
         store=True,
     )
     of_request_count = fields.Integer(string="Service Requests count", compute="_compute_of_request_count")
+    of_origin_request_id = fields.Many2one(comodel_name="of.service.request", string="Demande d'intervention d'origine")
 
     @api.depends("of_request_ids", "order_line.of_request_line_id")
     def _compute_of_request_count(self):

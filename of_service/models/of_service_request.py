@@ -326,6 +326,13 @@ class OFServiceRequest(models.Model):
     order_ids = fields.Many2many(comodel_name="sale.order", compute="_compute_order_ids", string="Orders", store=True)
     order_count = fields.Integer(string="# Orders", compute="_compute_order_ids", compute_sudo=True)
 
+    generated_order_ids = fields.One2many(
+        comodel_name="sale.order", inverse_name="of_origin_request_id", string="Commandes générées"
+    )
+    generated_order_count = fields.Integer(
+        string="# Orders", compute="_compute_generated_order_count", compute_sudo=True
+    )
+
     # ===== Invoice and invoicing fields =====
     invoice_ids = fields.One2many(comodel_name="account.move", compute="_compute_invoice_ids", string="Invoices")
     invoice_count = fields.Integer(string="# Invoices", compute="_compute_invoice_ids")
@@ -597,6 +604,11 @@ class OFServiceRequest(models.Model):
             request.order_ids = request.mapped("line_ids.order_line_id.order_id")
             request.order_count = len(request.order_ids)
 
+    @api.depends("generated_order_ids")
+    def _compute_generated_order_count(self):
+        for request in self:
+            request.generated_order_count = len(request.generated_order_ids)
+
     @api.depends(
         "line_ids",
         "line_ids.invoice_line_ids",
@@ -778,7 +790,7 @@ class OFServiceRequest(models.Model):
 
     def action_button_view_order(self):
         self.ensure_one()
-        orders = self.order_ids
+        orders = self.generated_order_ids
         action = self.env.ref("sale.action_orders").read()[0]
         if len(orders) > 1:
             action["domain"] = [("id", "in", orders.ids)]
@@ -856,6 +868,25 @@ class OFServiceRequest(models.Model):
                 self.fiscal_position_id._get_html_link() if self.fiscal_position_id else "",
             )
         )
+
+    def action_button_create_sale_order(self):
+        self.ensure_one()
+
+        if self.template_id.so_generation_method == "auto":
+            wizard_obj = self.env["of.service.request.create.sale.order.wizard"]
+            default_values = wizard_obj.with_context(
+                active_model=self._name,
+                active_ids=self.ids,
+            ).default_get({})
+            wizard = wizard_obj.create(default_values)
+            return wizard.action_button_create_sale_order()
+        else:
+            return {
+                "type": "ir.actions.act_window",
+                "view_mode": "form",
+                "res_model": "of.service.request.create.sale.order.wizard",
+                "target": "new",
+            }
 
     # --------------------------------------------------------------------------
     # Business methods

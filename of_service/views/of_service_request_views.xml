@@ -13,6 +13,7 @@
                     <button name="action_button_cancel" string="Cancel" type="object" attrs="{'invisible': [('base_state', '!=', 'calculated')]}" />
                     <button name="action_button_draft" string="Return to draft" states="cancel" type="object" />
                     <button name="action_button_request_send_mail" string="Send Email" type="object" />
+                    <button name="action_button_create_sale_order" string="Générer Devis" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_plan,planned,done" />
                 </header>
                 <!-- /Header part -->
@@ -25,7 +26,7 @@
                     <!-- Button box part -->
                     <div class="oe_button_box" name="button_box">
                         <button name="action_button_view_order" type="object" context="{'default_partner_id': partner_id}" class="oe_stat_button" icon="fa-usd">
-                            <field name="order_count" widget="statinfo" string="Order" />
+                            <field name="generated_order_count" widget="statinfo" string="Order" />
                         </button>
                         <button name="action_button_view_invoice" type="object" class="oe_stat_button" icon="fa-usd">
                             <field name="invoice_count" widget="statinfo" string="Invoices" />
