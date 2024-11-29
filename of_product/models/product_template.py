@@ -26,9 +26,13 @@ class ProductTemplate(models.Model):
     of_uom_po_id_display2 = fields.Many2one(related="uom_po_id", string="Purchase UoM (display 2)", readonly=True)
 
     # Champs ajoutés pour openImport et affichage dans formulaire produit
-    of_seller_pp_untaxed = fields.Float(related="seller_ids.of_public_price_untaxed", related_sudo=False)
-    of_seller_price = fields.Float(related="seller_ids.price", string="Purchase price", related_sudo=False)
-    of_seller_discount = fields.Float(related="seller_ids.of_discount", related_sudo=False)
+    of_seller_pp_untaxed = fields.Float(
+        related="seller_ids.of_public_price_untaxed", related_sudo=False, store=True, readonly=False
+    )
+    of_seller_price = fields.Float(
+        related="seller_ids.price", string="Purchase price", related_sudo=False, store=True, readonly=False
+    )
+    of_seller_discount = fields.Float(related="seller_ids.of_discount", related_sudo=False, store=True, readonly=False)
     of_seller_product_code = fields.Char(related="seller_ids.product_code", related_sudo=False)
     of_seller_product_name = fields.Char(related="seller_ids.product_name", related_sudo=False)
     of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name", related_sudo=False)

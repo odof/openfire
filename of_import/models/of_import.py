@@ -1307,11 +1307,9 @@ class OfImport(models.Model):
         )
         for f in fields_definition:
             field = self.env[model]._fields[f]
-            if field.compute and not field.inverse and field.readonly:
+            if (field.compute or not field.store) and not field.inverse:
                 continue
 
-            if not field.store:
-                continue
             fields_odoo[f] = {
                 "description": fields_definition[f].get("string"),
                 "required": fields_definition[f].get("required"),
@@ -1357,6 +1355,7 @@ class OfImport(models.Model):
 
         if model == "product.pack.line" and "product_uom_id" in fields_odoo:
             fields_odoo["product_uom_id"]["required"] = False
+
         return fields_odoo
 
     def _choose_reader(self):
@@ -1420,7 +1419,7 @@ class OfImport(models.Model):
         )
         if "categ_id" in file_fields and "categ_id" not in values:
             # Si la catégorie d'article n'est pas renseignée, on prend la catégorie par défaut de la marque
-            values["categ_id"] = brand.compute_product_categ(supplier_categ, product=res_object).id
+            values["categ_id"] = brand and brand.compute_product_categ(supplier_categ, product=res_object).id or False
 
         # Calcul des prix d'achat/vente en fonction des règles de calcul et du prix public ht
         if "list_price" in values and brand:
@@ -1482,7 +1481,15 @@ class OfImport(models.Model):
         return None
 
     def _process_selection_field(self, model, line, file_field, file_field_norel, fields_odoo, i, model_data, values):
-        if line[file_field] not in dict(self.env[model]._fields[file_field].selection):
+        selection = self.env[model]._fields[file_field].selection
+        # Un champ selection n'est pas toujours défini par une liste de tuple,
+        # il peut aussi être défini par une fonction
+        if not isinstance(selection, list):
+            if callable(selection):  # Cette fonction peut être définie par un objet callable
+                selection = selection(self.env[model])
+            else:  # Ou par une string
+                selection = getattr(self.env[model], selection)()
+        if line[file_field] not in dict(selection):
             return _(
                 'line %(i)s : field %(field)s (%(file_field)s) value "%(value)s" not authorized. %(model)s'
                 "not imported",

@@ -54,15 +54,12 @@ def _compute_encoding(file_enc):
 
 def _read_csv(file, separator=None):
     # Lecture du fichier d'import par la bibliothèque csv de python
-    csv_data = base64.decodestring(file)
+    csv_data = base64.decodebytes(file)
+    file_encoding = _compute_encoding(csv_data)
+    csv_data = csv_data.decode(file_encoding or "utf-8")
+
     # Deviner automatiquement les paramètres : caractère séparateur, type de saut de ligne,...
     dialect = csv.Sniffer().sniff(csv_data)
-    file_encoding = _compute_encoding(csv_data)
-
-    # Encode en utf-8
-    if file_encoding != "utf-8":
-        csv_data = csv_data.decode(file_encoding).encode("utf-8")
-
     if separator and separator.strip(" "):
         dialect.delimiter = separator.strip(" ").replace("\\t", "\t")
 
@@ -72,14 +69,11 @@ def _read_csv(file, separator=None):
     for row in reader:
         if first:
             first = False
-            yield [item.strip().decode("utf8", "ignore") for item in row]
+            yield [item.strip() for item in row]
         if not any(x for x in row if x.strip()):
             # Ligne vide
             continue
-        yield {
-            key.strip().decode("utf8", "ignore"): value.strip().decode("utf8", "ignore")
-            for key, value in row.iteritems()
-        }
+        yield {key.strip(): value.strip() for key, value in row.items()}
 
 
 # MS OFFICE
