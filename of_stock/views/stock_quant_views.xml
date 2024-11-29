@@ -15,4 +15,18 @@
         </field>
     </record>
 
+    <record id="of_action_quant_reconcile_negative" model="ir.actions.server">
+        <field name="name">Fusionner avec quants négatifs</field>
+        <field name="model_id" ref="of_stock.model_stock_quant"/>
+        <field name="state">code</field>
+        <field name="code">action = records.of_quant_reconcile_negative()</field>
+    </record>
+
+    <record id="of_value_action_quant_reconcile_negative" model="ir.values">
+        <field name="name">Fusionner avec quants négatifs</field>
+        <field name="key2">client_action_multi</field>
+        <field name="model">stock.quant</field>
+        <field name="value" eval="'ir.actions.server,%d'%of_action_quant_reconcile_negative"/>
+    </record>
+
 </odoo>

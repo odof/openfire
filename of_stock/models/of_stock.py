@@ -1521,6 +1521,18 @@ class StockQuant(models.Model):
 
                 repair_negative_quant(quant, loc_in)
 
+    @api.multi
+    def of_quant_reconcile_negative(self):
+        if any(quant.qty < 0 for quant in self):
+            raise UserError(u"Vous ne pouvez pas sélectionner de quant négatif pour cette action")
+        self.sudo()._quant_reconcile_negative(False)
+        quant_done = len(self) - len(self.exists())
+        if quant_done == 1:
+            quant_message = u"1 Quant a été fusionné"
+        else:
+            quant_message = u"%s Quants ont été fusionnés" % quant_done
+        return self.env['of.popup.wizard'].popup_return(message=quant_message)
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
