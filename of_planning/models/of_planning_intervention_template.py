@@ -76,9 +76,25 @@ class OFPlanningInterventionTemplate(models.Model):
         help="The intervention report will be automatically attached to the intervention.",
     )
     is_default_template = fields.Boolean(compute="_compute_is_default_template", store=True)
-    line_ids = fields.One2many(
-        comodel_name="of.planning.intervention.template.line", inverse_name="template_id", string="Template lines"
+
+    # New invoicing management
+    sale_order_template_ids = fields.Many2many(
+        comodel_name="sale.order.template", string="Modèles de devis disponibles"
     )
+    default_sale_order_template_id = fields.Many2one(
+        comodel_name="sale.order.template",
+        string="Modèle de devis par défaut",
+    )
+    so_generation_method = fields.Selection(
+        selection=[("auto", "Automatique"), ("manual", "Manuelle")],
+        string="Méthode de suivi de la génération des devis",
+    )
+    default_sale_order_template_line_ids = fields.One2many(
+        comodel_name="sale.order.template.line",
+        related="default_sale_order_template_id.sale_order_template_line_ids",
+        readonly=True,
+    )
+
     # INTERVENTION SHEET (IS)
     sheet_use_default = fields.Boolean(
         string="Use default report (IS)",
