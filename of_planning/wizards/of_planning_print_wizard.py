@@ -121,21 +121,29 @@ class PlanningImpressionWizard(models.TransientModel):
     def _get_intervention_datetime(self, intervention=False):
         if not intervention:
             return ""
+
+        start_tz = fields.Datetime.context_timestamp(intervention, intervention.start)
+        stop_tz = fields.Datetime.context_timestamp(intervention, intervention.stop)
+
         self._set_locale()
         return (
-            Markup(_("from %s %s<br/>to %s %s"))
-            % (
-                intervention.start.strftime("%a %d/%m"),
-                intervention.start.strftime("%H:%M"),
-                intervention.stop.strftime("%a %d/%m"),
-                intervention.stop.strftime("%H:%M"),
+            Markup(
+                _(
+                    "from %(start_d)s %(start_h)s<br/>to %(stop_d)s %(stop_h)s",
+                    start_d=start_tz.strftime("%a %d/%m"),
+                    start_h=start_tz.strftime("%H:%M"),
+                    stop_d=stop_tz.strftime("%a %d/%m"),
+                    stop_h=stop_tz.strftime("%H:%M"),
+                )
             )
             if intervention.start_date != intervention.stop_date
-            else Markup(_("%s<br/>from %s to %s"))
-            % (
-                intervention.start.strftime("%a %d/%m"),
-                intervention.start.strftime("%H:%M"),
-                intervention.stop.strftime("%H:%M"),
+            else Markup(
+                _(
+                    "%(start_d)s<br/>from %(start_h)s to %(stop_h)s",
+                    start_d=start_tz.strftime("%a %d/%m"),
+                    start_h=start_tz.strftime("%H:%M"),
+                    stop_h=stop_tz.strftime("%H:%M"),
+                )
             )
         )
 
