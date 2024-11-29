@@ -12,6 +12,7 @@
                     <button name="action_button_validate" string="Validate" states="draft" type="object" groups="of_planning.group_planning_intervention_responsible" />
                     <button name="action_button_cancel" string="Cancel" type="object" attrs="{'invisible': [('base_state', '!=', 'calculated')]}" />
                     <button name="action_button_draft" string="Return to draft" states="cancel" type="object" />
+                    <button name="action_button_force_done" string="Terminer" type="object" attrs="{'invisible': ['|', ('base_state', '!=', 'calculated'), ('state', '=', 'done')]}" />
                     <button name="action_button_request_send_mail" string="Send Email" type="object" />
                     <button name="action_button_create_sale_order" string="Générer Devis" type="object"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,to_plan,planned,done" />
@@ -19,6 +20,7 @@
                 <!-- /Header part -->
 
                 <sheet>
+                    <field name="force_done" invisible="1" />
                     <field name="alert_dates" invisible="1" />
                     <field name="active" invisible="1" />
                     <widget name="web_ribbon" text="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
