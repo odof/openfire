@@ -986,6 +986,10 @@ class CalendarEvent(models.Model):
     def copy(self, default=None):
         """When copying a intervention, we change the start and stop by the next available datetimes."""
         self.ensure_one()
+
+        if not default:
+            default = {}
+
         events = self.env["calendar.event"].search(
             [
                 ("of_type", "=", "intervention"),
