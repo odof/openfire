@@ -313,16 +313,12 @@
         <!-- Signature -->
         <xpath expr="//div[@name='signature']" position="replace">
             <div t-if="pdf_signature_insert" class="mt-4 mb-4" name="signature">
-                <div name="customer_signature" class="col-6" style="float: left; page-break-inside: avoid; padding-right: 10px;">
+                <div name="customer_signature" class="col-6 float-start pe-2" style="page-break-inside: avoid;">
                     <t t-if="pdf_customer_signature">
-                        <div class="signature_insert_title h4 mb4">
-                            <div>
-                                <strong>Customer Signature</strong>
-                            </div>
-                            <div t-if="pdf_signature_text">
-                                <span t-esc="pdf_signature_text_label" style="font-size: 14px; font-style: italic;"/>
-                            </div>
+                        <div class="signature_insert_title text-center text-uppercase p-1">
+                            <strong>Customer Signature</strong>
                         </div>
+                        <div t-if="pdf_signature_text" t-esc="pdf_signature_text_label" class="lh-base fst-italic text-center mb4" style="font-size: 14px;"/>
                         <div class="signature_insert">
                             <t t-if="doc.signature">
                                 <div style="height: 100px; padding: 10px;">
@@ -335,17 +331,12 @@
                         </div>
                     </t>
                 </div>
-                <div name="vendor_signature" class="col-6"
-                        t-att-style="'float: left; page-break-inside: avoid;' + (' padding-left: 10px;' if pdf_customer_signature else ' padding-right: 10px;')">
+                <div name="vendor_signature" t-att-class="'col-6 float-start ps-2' if pdf_customer_signature else 'col-6 float-start pe-2'" style="page-break-inside: avoid;">
                     <t t-if="pdf_vendor_signature">
-                        <div class="signature_insert_title h4 mb4">
-                            <div>
-                                <strong>Salesperson Signature</strong>
-                            </div>
-                            <div t-if="pdf_signature_text">
-                                <span t-esc="pdf_signature_text_label" style="font-size: 14px; font-style: italic;"/>
-                            </div>
+                        <div class="signature_insert_title text-center text-uppercase  p-1">
+                            <strong>Salesperson Signature</strong>
                         </div>
+                        <div t-if="pdf_signature_text" t-esc="pdf_signature_text_label" class="lh-base fst-italic text-center mb4" style="font-size: 14px;"/>
                         <div class="signature_insert">
                             <t t-if="pdf_prefill_vendor_signature and doc.user_id.of_vendor_signature">
                                 <div style="height: 130px; padding: 10px;">
