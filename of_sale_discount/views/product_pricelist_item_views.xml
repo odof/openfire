@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <odoo>
-    
+
     <record id="of_sale_discount_product_pricelist_item_form_view" model="ir.ui.view">
         <field name="name">of.sale.discount.product.pricelist.item.form</field>
         <field name="model">product.pricelist.item</field>
@@ -11,6 +11,23 @@
             </xpath>
             <xpath expr="//group[@name='pricelist_rule_base']//field[@name='percent_price']" position="after">
                 <field name="of_percent_price_formula" class="oe_inline" attrs="{'invisible':[('compute_price', '!=', 'percentage')]}" />
+            </xpath>
+            <xpath expr="//field[@name='min_quantity']" position="before">
+                <field name="of_brand_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_pricelist_view_form" model="ir.ui.view">
+        <field name="name">product.pricelist.view.form</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='item_ids']/tree[1]/field[@name='min_quantity']" position="before">
+                <field name="of_brand_ids" widget="many2many_tags"/>
+            </xpath>
+            <xpath expr="//field[@name='item_ids']/tree[2]/field[@name='min_quantity']" position="before">
+                <field name="of_brand_ids" widget="many2many_tags"/>
             </xpath>
         </field>
     </record>
