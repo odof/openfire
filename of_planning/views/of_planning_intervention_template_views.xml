@@ -32,7 +32,26 @@
                                 <field name="attach_report" colspan="2" />
                             </group>
                         </page>
-                        <page name="invoicing" string="Invoicing">
+                        <page name="sale" string="Vente">
+                            <group>
+                                <group>
+                                    <field name="sale_order_template_ids" widget="many2many_tags"/>
+                                    <field name="default_sale_order_template_id" domain="[('id', 'in', sale_order_template_ids)]"/>
+                                </group>
+                                <group>
+                                    <field name="so_generation_method" />
+                                </group>
+                            </group>
+                            <field name="default_sale_order_template_line_ids" widget="section_and_note_one2many">
+                                <tree>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="product_uom_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="invoicing" string="Invoicing" invisible="1">
                             <group>
                                 <group>
                                     <field name="fiscal_position_id" />

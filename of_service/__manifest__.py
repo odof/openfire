@@ -33,6 +33,7 @@
         'reports/of_service_request_templates.xml',
         'data/mail_template.xml',
         'wizards/of_service_request_create_intervention_wizard_views.xml',
+        'wizards/of_service_request_create_sale_order_wizard_views.xml',
     ],
     'installable': True,
     'application': False,
