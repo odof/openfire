@@ -2,16 +2,20 @@
 
 import ast
 import json
+import logging
 from datetime import datetime, timedelta
 
 import pytz
 
-from odoo import Command, fields, http
+from odoo import Command, _, fields, http
 from odoo.http import request
+from odoo.tools import plaintext2html
 from odoo.tools.float_utils import float_compare
 
-from odoo.addons.of_planning_tour.models.of_planning_tour import AM_LIMIT_FLOAT
-from odoo.addons.of_utils.models.misc import hours_to_strs
+from odoo.addons.of_planning_tour.models.of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
+from odoo.addons.resource.models.resource import float_to_time
+
+_logger = logging.getLogger(__name__)
 
 
 class OFWebsitePlanningBooking(http.Controller):
@@ -77,12 +81,12 @@ class OFWebsitePlanningBooking(http.Controller):
             address_list.append(
                 {
                     "id": request.env.user.partner_id.id,
-                    "name": "%s - %s" % (request.env.user.partner_id.zip, request.env.user.partner_id.city),
+                    "name": f"{request.env.user.partner_id.zip} - {request.env.user.partner_id.city}",
                 }
             )
             address_list += request.env.user.partner_id.child_ids.filtered(
                 lambda child: child.zip and child.city
-            ).mapped(lambda c: {"id": c.id, "name": "%s - %s" % (c.zip, c.city)})
+            ).mapped(lambda c: {"id": c.id, "name": f"{c.zip} - {c.city}"})
         values["contract_list"] = contract_list
         values["address_list"] = address_list
 
@@ -175,16 +179,19 @@ class OFWebsitePlanningBooking(http.Controller):
             elif values.get("contract_id") and values.get("contract_id") != "null":
                 service = request.env["of.service.request"].sudo().browse(int(values["contract_id"]))
             partner = request.env["res.partner"].sudo().browse(int(values["partner_id"]))
-            slot = request.env["of.tour.appointment.line.website.wizard"].browse(int(values["slot_id"]))
-            intervention_id = self._create_intervention(slot)
-            # Envoyer l'email de confirmation
-            mail_template = request.env.ref(
-                "of_website_planning_booking.booking_confirmation_mail_template", raise_if_not_found=False
-            )
-            if mail_template:
-                mail_template.sudo().send_mail(intervention_id, force_send=True)
+            website_line = request.env["of.tour.appointment.line.website.wizard"].browse(int(values["slot_id"]))
+            intervention_id = self._create_intervention(website_line)
+            if intervention_id:
+                # Envoyer l'email de confirmation
+                mail_template = request.env.ref(
+                    "of_website_planning_booking.booking_confirmation_mail_template", raise_if_not_found=False
+                )
+                if mail_template:
+                    mail_template.sudo().send_mail(intervention_id, force_send=True)
 
-            return request.render("of_website_planning_booking.booking_thank_you")
+                return request.render("of_website_planning_booking.booking_thank_you")
+            else:
+                return request.redirect("/booking")
 
         # Arrivée sur la page
         booking_company_id = self._get_company_id()
@@ -331,16 +338,27 @@ class OFWebsitePlanningBooking(http.Controller):
             search_type = booking_company.of_booking_search_type
             search_max_criteria = booking_company.of_booking_search_max_criteria
             allow_empty_days = booking_company.of_booking_allow_empty_days
+            empty_days_search_type = booking_company.of_booking_empty_days_search_type
+            empty_days_search_max_criteria = booking_company.of_booking_empty_days_search_max_criteria
         else:
             search_type = request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.search_type")
-            search_max_criteria = (
-                request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.search_max_criteria")
-                or 0
+            search_max_criteria = float(
+                request.env["ir.config_parameter"]
+                .sudo()
+                .get_param("of.website.planning.booking.search_max_criteria", 0)
             )
-            if isinstance(search_max_criteria, str):
-                search_max_criteria = float(search_max_criteria)
             allow_empty_days = (
                 request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.allow_empty_days")
+            )
+            empty_days_search_type = (
+                request.env["ir.config_parameter"]
+                .sudo()
+                .get_param("of.website.planning.booking.empty_days_search_type")
+            )
+            empty_days_search_max_criteria = float(
+                request.env["ir.config_parameter"]
+                .sudo()
+                .get_param("of.website.planning.booking.empty_days_search_max_criteria", 0)
             )
         if search_more and request.session.get("of_booking_wizard_id"):
             # Clic sur le bouton "Chercher plus"
@@ -360,15 +378,17 @@ class OFWebsitePlanningBooking(http.Controller):
                 search_mode = booking_company.of_booking_search_mode
             else:
                 employee_ids = (
-                    request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.employee_ids")
-                    or []
+                    request.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param("of.website.planning.booking.employee_ids", "[]")
                 )
                 employee_ids = ast.literal_eval(employee_ids)
                 if isinstance(employee_ids, int):
                     employee_ids = [employee_ids]
                 day_ids = (
-                    request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.opened_day_ids")
-                    or []
+                    request.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param("of.website.planning.booking.opened_day_ids", "[]")
                 )
                 day_ids = ast.literal_eval(day_ids)
                 if isinstance(day_ids, int):
@@ -376,6 +396,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 search_mode = (
                     request.env["ir.config_parameter"].sudo().get_param("of.website.planning.booking.search_mode")
                 )
+
             if template_id:
                 service = request.env["of.service.request"]
                 template = request.env["of.planning.intervention.template"].browse(template_id)
@@ -384,10 +405,16 @@ class OFWebsitePlanningBooking(http.Controller):
                 service = request.env["of.service.request"].sudo().browse(service_id)
                 template = service.template_id
                 task = service.sudo().task_id
+
+            address_id = partner_id
+            customer_id = partner_id
+            if request.env.uid != request.website.user_id.id:
+                customer_id = request.env.user.partner_id.id
+
             wizard_vals = {
                 "company_id": booking_company_id,
-                "partner_id": partner_id,
-                "partner_address_id": partner_id,
+                "partner_id": customer_id,
+                "partner_address_id": address_id,
                 "template_id": template.id,
                 "request_id": service.id,
                 "task_id": task.id,
@@ -421,10 +448,15 @@ class OFWebsitePlanningBooking(http.Controller):
         if compute == "new":
             search_end_date = from_date + timedelta(days=14)
             wizard.stop_date_search = min(search_end_date, max_search_date)
-            wizard._populate_line_ids(sudo=True, mode=compute)
+            wizard._populate_line_ids(web=True, mode=compute)
 
         valid_lines = self._filter_slots(
-            wizard.line_ids, search_type, search_max_criteria, allow_empty_days, wizard.duration
+            wizard.line_ids,
+            search_type,
+            search_max_criteria,
+            allow_empty_days,
+            empty_days_search_type,
+            empty_days_search_max_criteria,
         )
 
         # Tenter jusqu'à avoir au moins 10 résultats ou ne plus être dans les jours ouverts à la réservation
@@ -433,18 +465,23 @@ class OFWebsitePlanningBooking(http.Controller):
             new_search_end_date = new_search_start_date + timedelta(days=6)
             wizard.start_date_search = new_search_start_date
             wizard.stop_date_search = min(new_search_end_date, max_search_date)
-            wizard._populate_line_ids(sudo=True, mode="more")
+            wizard._populate_line_ids(web=True, mode="more")
             valid_lines = self._filter_slots(
-                wizard.line_ids, search_type, search_max_criteria, allow_empty_days, wizard.duration
+                wizard.line_ids,
+                search_type,
+                search_max_criteria,
+                allow_empty_days,
+                empty_days_search_type,
+                empty_days_search_max_criteria,
             )
 
         if valid_lines:
-            web_slots = wizard.build_website_slots(valid_lines, mode="half_day")
+            web_slots = wizard.build_website_slots(valid_lines)
             # Keep slots of the same day together
             slots_nb = request.session["search_slot_result_nb"]
             if (
                 len(web_slots) > slots_nb
-                and web_slots[slots_nb - 1].description == "Matin"
+                and web_slots[slots_nb - 1].description == _("Morning")
                 and web_slots[slots_nb - 1].name == web_slots[slots_nb].name
             ):
                 slots_nb += 1
@@ -456,31 +493,62 @@ class OFWebsitePlanningBooking(http.Controller):
 
         return [web_slots, not no_more_search]
 
-    def _filter_slots(self, rdv_lines, search_type, search_max_criteria, allow_empty_days, duration):
-        if search_type == "duration":
-            valid_lines = rdv_lines.filtered(lambda line: line.useful_duration <= search_max_criteria)
-        else:
-            valid_lines = rdv_lines.filtered(lambda line: line.useful_distance <= search_max_criteria)
+    def _filter_slots(
+        self,
+        rdv_lines,
+        search_type,
+        search_max_criteria,
+        allow_empty_days,
+        empty_days_search_type,
+        empty_days_search_max_criteria,
+    ):
+        available_lines = rdv_lines.filtered(lambda p: not p.no_geolocated)
 
-        if not allow_empty_days:
-            # Check that employee has at least one intervention on the same day
-            valid_lines = valid_lines.filtered(lambda line: line.sudo().tour_id.intervention_ids)
+        not_empty_day_lines = available_lines.filtered(lambda line: line.sudo().tour_id.tour_line_ids)
+
+        if search_type == "duration":
+            valid_lines = not_empty_day_lines.filtered(lambda line: line.useful_duration <= search_max_criteria)
+        else:
+            valid_lines = not_empty_day_lines.filtered(lambda line: line.useful_distance <= search_max_criteria)
+
+        if allow_empty_days:
+            empty_day_lines = available_lines - not_empty_day_lines
+
+            if empty_days_search_type == "duration":
+                valid_lines += empty_day_lines.filtered(
+                    lambda line: line.useful_duration <= empty_days_search_max_criteria
+                )
+            else:
+                valid_lines += empty_day_lines.filtered(
+                    lambda line: line.useful_distance <= empty_days_search_max_criteria
+                )
 
         return valid_lines
 
-    def _create_intervention(self, slot):
-        # TODO Test de création en parallèle sur le même créneau dispo
-        backend_slot = slot.planning_ids.sorted(lambda p: (p.useful_distance))[0]
-        result = backend_slot.sudo().action_button_confirm_slot()
-        # TODO Maj inter avec infos supplémentaires (cf _get_intervention_vals)
-        return result["res_id"]
+    def _create_intervention(self, website_line):
+        created = False
 
-    def _get_intervention_vals(self, slot, backend_slot, template, service, partner):
-        tz = pytz.timezone("Europe/Paris")
-        am_limit_float = (
-            request.env["ir.config_parameter"].sudo().get_param("of.planning.tour.tour_am_limit_float")
-            or AM_LIMIT_FLOAT
-        )
+        # Fonctionnement basique pour la création : si le créneau backend sélectionné a été rempli entre temps
+        # et que le créneau frontend est connecté à d'autre créneaux backend, essayer un autre créneau backend
+        while not created and website_line.planning_ids:
+            line = website_line.planning_ids.sorted(lambda p: (p.useful_distance))[0]
+            line.action_select(sudo=True)
+
+            vals = self._get_intervention_vals(website_line, line)
+            try:
+                intervention = request.env["calendar.event"].sudo().create(vals)
+                created = True
+            except Exception as e:
+                line.unlink()
+                _logger.warning(_("Error during meeting creation in website: %s"), e)
+
+        # Si le créneau front n'est plus connecté à des lignes de wizard, le supprimer
+        if not website_line.planning_ids:
+            website_line.unlink()
+
+        return intervention.id
+
+    def _get_intervention_vals(self, website_line, line):
         booking_company_id = self._get_company_id()
         booking_company = request.env["res.company"].browse(booking_company_id)
         if booking_company.of_booking_specific:
@@ -491,55 +559,37 @@ class OFWebsitePlanningBooking(http.Controller):
                 or "draft"
             )
 
-        description = ""
+        vals = line.wizard_id._prepare_calendar_event_values()
+
         if request.params.get("comment"):
-            description = "Commentaires additionnels du client : %s" % request.params.get("comment")
+            vals["description"] = _("Additional notes from customer: <br/>%s") % plaintext2html(
+                request.params.get("comment")
+            )
 
-        if template:
-            template_id = template.id
-            service_id = False
-            task = template.tache_id
-        else:
-            template_id = service.template_id and service.template_id.id
-            service_id = service.id
-            task = service.tache_id
+        vals.update(
+            {
+                "of_state": default_state,
+                "of_website_create": True,
+            }
+        )
 
-        partner_id = partner.id
-        if request.env.uid != request.website.user_id.id:
-            partner_id = request.env.user.partner_id.id
+        # Si le client a choisi un créneau l'après-midi, on doit faire en sorte que le RDV commence après l'heure de
+        # coupure
+        if website_line.key.endswith("afternoon"):
+            employee = line.wizard_id.employee_id.sudo()
+            calendar = employee.of_web_resource_calendar_id or employee.resource_calendar_id
+            calendar_tz = pytz.timezone(calendar.tz)
+            am_limit_float = float(
+                request.env["ir.config_parameter"]
+                .sudo()
+                .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
+            )
+            start_date = pytz.utc.localize(vals["start"]).astimezone(calendar_tz)
 
-        vals = {
-            "name": "Intervention web",
-            "partner_id": partner_id,
-            "address_id": partner.id,
-            "template_id": template_id,
-            "service_id": service_id,
-            "tache_id": task.id,
-            "flexible": task.flexible,
-            "employee_ids": [(4, backend_slot.employee_id.id, 0)],
-            "duree": task.duree,
-            "company_id": booking_company_id,
-            "state": default_state,
-            "fiscal_position_id": task.fiscal_position_id.id or False,
-            "verif_dispo": True,
-            "origin_interface": "Portail web",
-            "website_create": True,
-            "description": description,
-        }
+            if float_compare(am_limit_float, start_date.hour, 5) > 0:
+                start_time = float_to_time(am_limit_float)
+                vals["start"] = calendar_tz.localize(datetime.combine(start_date.date(), start_time)).astimezone(
+                    pytz.utc
+                )
 
-        # Le créneau de l'employé peut commencer avant le début d'aprem,
-        # on fait donc un max pour s'assurer que le RDV soit pris l'aprem
-        if slot.name.lower() == "après-midi":
-            if float_compare(am_limit_float, backend_slot.date_flo, 5) <= 0:
-                date_start = backend_slot.debut_dt
-            # création d'un dt à partir de l'heure de début d'aprem
-            # attention /!\ l'employé doit travailler à partir de l'heure de début d'aprem
-            # @todo: gérer le cas ou l'employé commence à travailler après l'heure de début d'aprem
-            else:
-                time_str = hours_to_strs("time", am_limit_float)
-                date_start_local = tz.localize(datetime.strptime(slot.date + " %s:00" % time_str, "%Y-%m-%d %H:%M:%S"))
-                date_start = date_start_local.astimezone(pytz.utc).strftime("%Y-%m-%d %H:%M:%S")
-        else:
-            date_start = backend_slot.debut_dt
-        vals["date"] = date_start
         return vals

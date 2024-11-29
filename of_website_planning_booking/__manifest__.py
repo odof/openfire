@@ -25,7 +25,10 @@ Module OpenFire pour la prise de RDV en ligne depuis le site internet
         "security/of_website_planning_booking_security.xml",
         "templates/of_website_planning_booking_templates.xml",
         "views/calendar_event_views.xml",
+        "views/hr_employee_views.xml",
+        "views/of_planning_available_slot_views.xml",
         "views/of_planning_intervention_template_views.xml",
+        "views/of_planning_tour_views.xml",
         "views/res_config_settings_views.xml",
     ],
     'assets': {

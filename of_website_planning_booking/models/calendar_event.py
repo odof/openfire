@@ -7,3 +7,4 @@ class CalendarEvent(models.Model):
     _inherit = "calendar.event"
 
     of_website_create = fields.Boolean(string="Created by website")
+    of_potential_duplicated_partner = fields.Boolean(related="of_partner_id.of_potential_duplication")

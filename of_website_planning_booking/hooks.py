@@ -18,6 +18,8 @@ def _set_default_of_website_planning_booking_settings(env):
             "of_booking_search_type": "distance",
             "of_booking_search_max_criteria": 20,
             "of_booking_allow_empty_days": True,
+            "of_booking_empty_days_search_type": "distance",
+            "of_booking_empty_days_search_max_criteria": 50,
             "of_booking_intervention_state": "draft",
             "of_booking_display_price": True,
             "of_booking_morning_hours_label": "8h00 - 13h00",

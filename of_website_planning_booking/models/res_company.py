@@ -40,8 +40,15 @@ class ResCompany(models.Model):
         string="Planning booking - Allow booking on empty days",
         default=True,
     )
+    of_booking_empty_days_search_type = fields.Selection(
+        selection=SELECTION_SEARCH_TYPES,
+        string="Planning booking - Search type for empty days",
+    )
+    of_booking_empty_days_search_max_criteria = fields.Integer(
+        string="Planning booking - Search max criterion for empty days",
+    )
     of_booking_intervention_state = fields.Selection(
-        selection=[("draft", "Draft"), ("confirm", "Confirmed")],
+        selection=[("draft", "Draft"), ("confirmed", "Confirmed")],
         string="Planning booking - Interventions state",
         default="draft",
     )

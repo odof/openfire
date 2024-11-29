@@ -571,8 +571,8 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                                     slot_id: slot.id,
                                 })
                             );
-                            if (slot.description == "Matin") {
-                                if (last_desc == "Matin") {
+                            if (slot.description == _t("Morning")) {
+                                if (last_desc == _t("Morning")) {
                                     var $unavailable_slot_div = $(
                                         QWeb.render(
                                             "of_website_planning_booking.unavailable_slot_kanban"
@@ -589,7 +589,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                                 $slot_div.addClass("float-start");
                             } else {
                                 if (slot.name !== last_day) {
-                                    if (last_desc == "Matin") {
+                                    if (last_desc == _t("Morning")) {
                                         var $unavailable_slot_div = $(
                                             QWeb.render(
                                                 "of_website_planning_booking.unavailable_slot_kanban"
@@ -617,7 +617,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                             }
                             $slot_div.on("click", self._onClickSlot);
                             self.booking_slots_div.append($slot_div);
-                            if (slot.description === "Après-midi") {
+                            if (slot.description === _t("Afternoon")) {
                                 self.booking_slots_div.append(
                                     '<div class="clearfix"/>'
                                 );
@@ -626,7 +626,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                             last_desc = slot.description;
                         }
 
-                        if (last_desc == "Matin") {
+                        if (last_desc == _t("Morning")) {
                             var $unavailable_slot_div = $(
                                 QWeb.render(
                                     "of_website_planning_booking.unavailable_slot_kanban"
@@ -687,8 +687,8 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                                     slot_id: slot.id,
                                 })
                             );
-                            if (slot.description == "Matin") {
-                                if (last_desc == "Matin") {
+                            if (slot.description == _t("Morning")) {
+                                if (last_desc == _t("Morning")) {
                                     var $unavailable_slot_div = $(
                                         QWeb.render(
                                             "of_website_planning_booking.unavailable_slot_kanban"
@@ -705,7 +705,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                                 $slot_div.addClass("float-start");
                             } else {
                                 if (slot.name !== last_day) {
-                                    if (last_desc == "Matin") {
+                                    if (last_desc == _t("Morning")) {
                                         var $unavailable_slot_div = $(
                                             QWeb.render(
                                                 "of_website_planning_booking.unavailable_slot_kanban"
@@ -733,7 +733,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                             }
                             $slot_div.on("click", self._onClickSlot);
                             self.booking_slots_div.append($slot_div);
-                            if (slot.description === "Après-midi") {
+                            if (slot.description === _t("Afternoon")) {
                                 self.booking_slots_div.append(
                                     '<div class="clearfix"/>'
                                 );
@@ -742,7 +742,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                             last_desc = slot.description;
                         }
 
-                        if (last_desc == "Matin") {
+                        if (last_desc == _t("Morning")) {
                             var $unavailable_slot_div = $(
                                 QWeb.render(
                                     "of_website_planning_booking.unavailable_slot_kanban"

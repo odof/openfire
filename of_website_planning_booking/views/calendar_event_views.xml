@@ -8,9 +8,14 @@
         <field name="arch" type="xml">
             <xpath expr="//h1" position="after">
                 <field name="of_website_create" invisible="1"/>
+                <field name="of_potential_duplicated_partner" invisible="1"/>
                 <h3 style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: #337ab7; padding-left: 5px; padding-right: 5px;"
                     attrs="{'invisible': [('of_website_create', '=', False)]}">
                     Web
+                </h3>
+                <h3 style="display: inline; color: white; border: 1px solid black; border-radius: 5px; background: red; padding-left: 5px; padding-right: 5px; margin-left: 10px;"
+                    attrs="{'invisible': ['|', ('of_website_create', '=', False), ('of_potential_duplicated_partner', '=', False)]}">
+                    Duplicated
                 </h3>
             </xpath>
         </field>

@@ -83,8 +83,20 @@ class ResConfigSettings(models.TransientModel):
         compute="_compute_of_booking_allow_empty_days",
         inverse="_inverse_of_booking_allow_empty_days",
     )
+    of_booking_empty_days_search_type = fields.Selection(
+        selection=SELECTION_SEARCH_TYPES,
+        string="(OF) Search type for empty days",
+        compute="_compute_of_booking_empty_days_search_type",
+        inverse="_inverse_of_booking_empty_days_search_type",
+        required=True,
+    )
+    of_booking_empty_days_search_max_criteria = fields.Integer(
+        string="(OF) Search max criterion for empty days",
+        compute="_compute_of_booking_empty_days_search_max_criteria",
+        inverse="_inverse_of_booking_empty_days_search_max_criteria",
+    )
     of_booking_intervention_state = fields.Selection(
-        selection=[("draft", "Draft"), ("confirm", "Confirmed")],
+        selection=[("draft", "Draft"), ("confirmed", "Confirmed")],
         string="(OF) Interventions state",
         compute="_compute_of_booking_intervention_state",
         inverse="_inverse_of_booking_intervention_state",
@@ -279,6 +291,53 @@ class ResConfigSettings(models.TransientModel):
             else:
                 config_param_obj.set_param(
                     "of.website.planning.booking.allow_empty_days", setting.of_booking_allow_empty_days
+                )
+
+    @api.depends("of_booking_company_specific", "company_id.of_booking_empty_days_search_type")
+    def _compute_of_booking_empty_days_search_type(self):
+        config_param_obj = self.env["ir.config_parameter"]
+        for setting in self:
+            if setting.of_booking_company_specific:
+                setting.of_booking_empty_days_search_type = setting.company_id.of_booking_empty_days_search_type
+            else:
+                setting.of_booking_empty_days_search_type = config_param_obj.sudo().get_param(
+                    "of.website.planning.booking.empty_days_search_type"
+                )
+
+    def _inverse_of_booking_empty_days_search_type(self):
+        config_param_obj = self.env["ir.config_parameter"]
+        for setting in self:
+            if setting.of_booking_company_specific:
+                setting.company_id.of_booking_empty_days_search_type = setting.of_booking_empty_days_search_type
+            else:
+                config_param_obj.set_param(
+                    "of.website.planning.booking.empty_days_search_type", setting.of_booking_empty_days_search_type
+                )
+
+    @api.depends("of_booking_company_specific", "company_id.of_booking_empty_days_search_max_criteria")
+    def _compute_of_booking_empty_days_search_max_criteria(self):
+        config_param_obj = self.env["ir.config_parameter"]
+        for setting in self:
+            if setting.of_booking_company_specific:
+                setting.of_booking_empty_days_search_max_criteria = (
+                    setting.company_id.of_booking_empty_days_search_max_criteria
+                )
+            else:
+                setting.of_booking_empty_days_search_max_criteria = config_param_obj.sudo().get_param(
+                    "of.website.planning.booking.empty_days_search_max_criteria"
+                )
+
+    def _inverse_of_booking_empty_days_search_max_criteria(self):
+        config_param_obj = self.env["ir.config_parameter"]
+        for setting in self:
+            if setting.of_booking_company_specific:
+                setting.company_id.of_booking_empty_days_search_max_criteria = (
+                    setting.of_booking_empty_days_search_max_criteria
+                )
+            else:
+                config_param_obj.set_param(
+                    "of.website.planning.booking.empty_days_search_max_criteria",
+                    setting.of_booking_empty_days_search_max_criteria,
                 )
 
     @api.depends("of_booking_company_specific", "company_id.of_booking_intervention_state")

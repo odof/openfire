@@ -2,15 +2,10 @@
 
 import locale
 
-from odoo import fields, models
+from odoo import _, fields, models
 from odoo.tools.float_utils import float_compare
 
-from odoo.addons.of_planning_tour.models.of_planning_tour import AM_LIMIT_FLOAT
-
-SEARCH_MODES = [
-    ("distance", "Distance (km)"),
-    ("duree", "Durée (min)"),
-]
+from odoo.addons.of_planning_tour.models.of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
 
 
 class OFTourAppointmentWizard(models.TransientModel):
@@ -22,7 +17,26 @@ class OFTourAppointmentWizard(models.TransientModel):
         string="Website slots Proposals",
     )
 
-    def build_website_slots(self, lines, mode="day"):
+    def _create_line_ids(self, available_slots, web=False):
+        wizard_line_obj = self.env["of.tour.appointment.line.wizard"]
+
+        for slot in available_slots:
+            if (
+                (not web and slot.type != "regular")
+                or (web and not slot.tour_id.employee_id.of_web_resource_calendar_id and slot.type != "regular")
+                or (web and slot.tour_id.employee_id.of_web_resource_calendar_id and slot.type != "web")
+            ):
+                continue
+
+            wizard_line_obj.create(
+                {
+                    "available_slot_id": slot.id,
+                    "wizard_id": self.id,
+                    "template_id": self.template_id.id,
+                }
+            )
+
+    def build_website_slots(self, lines):
         """Construit les créneaux affichés dans le site web, appelée depuis le controller"""
 
         def format_date(date):
@@ -30,53 +44,45 @@ class OFTourAppointmentWizard(models.TransientModel):
             return fields.Date.from_string(date).strftime("%A %d %B %Y").capitalize()
 
         self.ensure_one()
-        am_limit_float = (
-            self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.tour_am_limit_float") or AM_LIMIT_FLOAT
+        am_limit_float = float(
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("of.planning.tour.tour_am_limit_float", DEFAULT_AM_LIMIT_FLOAT)
         )
-        if isinstance(am_limit_float, str):
-            am_limit_float = float(am_limit_float)
         compare_precision = 5
 
         slots_dict = {}
-        for slot in lines:
-            if mode == "day":
-                # création d'un créneau site web
-                if slot.date not in slots_dict:
-                    slots_dict[slot.date] = {
-                        "key": slot.date,
-                        "date": slot.date,
-                        "ids": [slot.id],
+        for line in lines:
+            # Des créneaux dispo chevauchent souvent l'heure de midi, il faut les ajouter aux créneaux front
+            # du matin et de l'après midi si possible
+            # TEST
+            distance_min = line.useful_distance
+            keys = []
+            start_hour = fields.Datetime.context_timestamp(self, line.available_slot_id.start).hour
+            stop_hour = fields.Datetime.context_timestamp(self, line.available_slot_id.stop).hour
+            # il y a de la place entre le début du créneau et l'heure de fin de matinée
+            if float_compare(start_hour, am_limit_float - self.duration, compare_precision) <= 0:
+                keys.append(line.date.strftime("%Y-%m-%d") + "-0-morning")
+            # il y a de la place entre l'heure de début d'après-midi et la fin du créneau
+            if float_compare(stop_hour, am_limit_float + self.duration, compare_precision) >= 0:
+                keys.append(line.date.strftime("%Y-%m-%d") + "-1-afternoon")
+            for key in keys:
+                if key not in slots_dict:
+                    # créer un nouveau créneau front
+                    slots_dict[key] = {
+                        "key": key,
+                        "date": line.date,
+                        "ids": [line.id],
                         "selected": False,
+                        "distance_min": distance_min,  # TEST
                     }
                 else:
-                    slots_dict[slot.date]["ids"].append(slot.id)
-                if slot.selected:
-                    slots_dict[slot.date]["selected"] = True
-            elif mode == "half_day":
-                # Des créneaux dispo chevauchent souvent l'heure de midi, il faut les ajouter aux créneaux front
-                # du matin et de l'après midi si possible
-                keys = []
-                start_hour = fields.Datetime.context_timestamp(self, slot.available_slot_id.start).hour
-                stop_hour = fields.Datetime.context_timestamp(self, slot.available_slot_id.stop).hour
-                # il y a de la place entre le début du créneau et l'heure de fin de matinée
-                if float_compare(start_hour, am_limit_float - self.duration, compare_precision) <= 0:
-                    keys.append(slot.date.strftime("%Y-%m-%d") + "-0-matin")
-                # il y a de la place entre l'heure de début d'aprem et la fin du créneau
-                if float_compare(stop_hour, am_limit_float + self.duration, compare_precision) >= 0:
-                    keys.append(slot.date.strftime("%Y-%m-%d") + "-1-aprem")
-                for key in keys:
-                    if key not in slots_dict:
-                        # créer un nouveau créneau front
-                        slots_dict[key] = {
-                            "key": key,
-                            "date": slot.date,
-                            "ids": [slot.id],
-                            "selected": False,
-                        }
-                    else:
-                        slots_dict[key]["ids"].append(slot.id)
-                    if slot.selected:
-                        slots_dict[key]["selected"] = True
+                    slots_dict[key]["ids"].append(line.id)
+                    # TEST
+                    if distance_min < slots_dict[key]["distance_min"]:
+                        slots_dict[key]["distance_min"] = distance_min
+                if line.selected:
+                    slots_dict[key]["selected"] = True
 
         update_vals = [(5,)]
         for k in slots_dict:
@@ -84,11 +90,12 @@ class OFTourAppointmentWizard(models.TransientModel):
             vals = {}
             vals["key"] = slot["key"]
             vals["name"] = format_date(k)
-            if mode == "half_day":
-                if k.endswith("matin"):
-                    vals["description"] = "Matin"
-                else:
-                    vals["description"] = "Après-midi"
+            if k.endswith("morning"):
+                vals["description"] = _("Morning")
+            else:
+                vals["description"] = _("Afternoon")
+            # TEST
+            vals["description"] += "<br/>À %dkm" % slot["distance_min"]
             vals["date"] = slot["date"]
             vals["selected"] = slot["selected"]
             vals["planning_ids"] = [(4, id_p, 0) for id_p in slot["ids"]]
@@ -105,7 +112,7 @@ class OFTourAppointmentLineWebsite(models.TransientModel):
     wizard_id = fields.Many2one(
         comodel_name="of.tour.appointment.wizard", string="Wizard", required=True, ondelete="cascade", index=True
     )
-    name = fields.Char(default="DISPONIBLE")
+    name = fields.Char()
     key = fields.Char()
     date = fields.Date()
     description = fields.Text(string="Slot info", size=128)
@@ -116,26 +123,3 @@ class OFTourAppointmentLineWebsite(models.TransientModel):
         comodel_name="of.tour.appointment.line.wizard",
         relation="of_tour_appointment_line_website_rel",
     )
-
-    # @api.depends('name', 'key', 'date')
-    # def _compute_display_name(self):
-    #     # le display_name est affiché lors de la confirmation du RDV depuis le portail
-    #     lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
-    #     for creneau in self:
-    #         date_formatted = fields.Date.from_string(creneau.date).strftime('%A ' + lang.date_format)
-    #         date_formatted = date_formatted[0].upper() + date_formatted[1:]
-    #         if creneau.date == creneau.key:
-    #             creneau.display_name = date_formatted
-    #         else:
-    #             creneau.display_name = u"%s - %s" % (date_formatted, creneau.name)
-
-    # def button_select(self, sudo=False):
-    #     """Sélectionne ce créneau en tant que résultat. Appelée depuis le controller"""
-    #     self.ensure_one()
-    #     line_obj = self.env["of.tournee.rdv.line.website"]
-    #     selected_line = line_obj.search([('wizard_id', '=', self.wizard_id.id), ('selected', '=', True)])
-    #     selected_line.write({'selected': False})
-    #     self.selected = True
-    #     # sélectionner le créneau d'intervenant le plus proche au passage
-    #     creneau_employee = self.planning_ids.sorted(lambda p: (p.dist_prec, p.dist_ortho_prec))[0]
-    #     creneau_employee.button_select(sudo=sudo)

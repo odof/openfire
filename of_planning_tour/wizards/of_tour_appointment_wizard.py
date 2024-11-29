@@ -641,7 +641,7 @@ class OFTourAppointmentWizard(models.TransientModel):
                 employee_ids.append(planning.employee_id.id)
         return employee_ids
 
-    def _get_tour_dates(self, sudo=False):
+    def _get_tour_dates(self, web=False):
         """
         Returns a list of tour dates between the start_date and stop_date of the wizard that are the right days.
 
@@ -651,7 +651,7 @@ class OFTourAppointmentWizard(models.TransientModel):
         self.ensure_one()
 
         # To only create tour or display slot from the selected days
-        days = sudo and self.day_ids.sudo() or self.day_ids
+        days = web and self.day_ids.sudo() or self.day_ids
         selected_days = days.mapped(lambda d: d.number - 1)
 
         start_date = self.start_date_search
@@ -669,22 +669,21 @@ class OFTourAppointmentWizard(models.TransientModel):
 
         return [fields.Date.to_string(date) for date in res]
 
-    def _populate_line_ids(self, sudo=False, mode="new", sector_id=False):
+    def _populate_line_ids(self, web=False, mode="new", sector_id=False):
         """
         Remplit le champ line_ids avec les créneaux disponibles.
         Lance le calcul des distances et sélectionne un résultat si il y en a
-        sudo=True quand recherche de créneau depuis le site web.
+        web=True quand recherche de créneau depuis le site web.
         """
         self.ensure_one()
 
         tour_obj = self.env["of.planning.tour"]
         employee_obj = self.env["hr.employee"]
-        wizard_line_obj = self.env["of.tour.appointment.line.wizard"]
         available_slot_obj = self.env["of.planning.available.slot"]
         event_obj = self.with_context(force_read=True).env["calendar.event"]
 
         # To avoid an access error from the website
-        company = self.company_id.sudo() if sudo else self.company_id
+        company = self.company_id.sudo() if web else self.company_id
         if not company.partner_id.partner_latitude and not company.partner_id.partner_longitude:
             raise UserError(
                 _(
@@ -694,21 +693,21 @@ class OFTourAppointmentWizard(models.TransientModel):
                 )
             )
 
-        if sudo:
+        if web:
             employee_obj = employee_obj.sudo()
             event_obj = event_obj.sudo()
             available_slot_obj = available_slot_obj.sudo()
             tour_obj = tour_obj.sudo()
 
-        dates_eval = self._get_tour_dates(sudo=sudo)
-        address = sudo and self.partner_address_id.sudo() or self.partner_address_id
+        dates_eval = self._get_tour_dates(web=web)
+        address = web and self.partner_address_id.sudo() or self.partner_address_id
         address_sector = address.of_tech_sector_id
 
         # Get employees who can carry out the task
-        task_id = sudo and self.task_id.sudo() or self.task_id
-        pre_employee_ids = sudo and self.sudo().pre_employee_ids or self.pre_employee_ids
+        task_id = web and self.task_id.sudo() or self.task_id
+        pre_employee_ids = web and self.sudo().pre_employee_ids or self.pre_employee_ids
         if task_id and not task_id.employee_ids:
-            if not sudo:
+            if not web:
                 raise UserError(_("This service cannot be carried out by any operator"))
 
             _logger.warning(
@@ -720,7 +719,7 @@ class OFTourAppointmentWizard(models.TransientModel):
         if task_id:
             capable_employees &= task_id.employee_ids
         # If there are operators provided
-        if pre_employee_ids:
+        if pre_employee_ids or web:
             capable_employees &= pre_employee_ids
 
         # Create tours for employees if needed
@@ -746,14 +745,8 @@ class OFTourAppointmentWizard(models.TransientModel):
         # Get the employees' availability
         available_slots = available_slot_obj.search(search_domain)
 
-        for slot in available_slots:
-            wizard_line_obj.create(
-                {
-                    "available_slot_id": slot.id,
-                    "wizard_id": self.id,
-                    "template_id": self.template_id.id,
-                }
-            )
+        # Create wizard lines
+        self._create_line_ids(available_slots, web=web)
 
         if not self.ignore_geodata:
             try:
@@ -762,10 +755,22 @@ class OFTourAppointmentWizard(models.TransientModel):
                     self.orthodromic = False
             except Exception:
                 self.orthodromic = True
-            self._calculate_distance_and_duration()
+            self._calculate_distance_and_duration(web=web)
             self._unlink_line_too_far()
             self._select_first_line()
             self._handle_first_line()
+
+    def _create_line_ids(self, available_slots, web=False):
+        wizard_line_obj = self.env["of.tour.appointment.line.wizard"]
+
+        for slot in available_slots:
+            wizard_line_obj.create(
+                {
+                    "available_slot_id": slot.id,
+                    "wizard_id": self.id,
+                    "template_id": self.template_id.id,
+                }
+            )
 
     def _unlink_line_too_far(self):
         """
@@ -890,7 +895,7 @@ class OFTourAppointmentWizard(models.TransientModel):
 
         return values
 
-    def _calculate_distance_and_duration(self):
+    def _calculate_distance_and_duration(self, web=False):
         """
         This method calculates the distance and duration between the available time slots and existing appointments
         by calling the OSRM openfire server.
@@ -901,6 +906,7 @@ class OFTourAppointmentWizard(models.TransientModel):
 
         lines = wizard_line_obj.search([("wizard_id", "=", self.id)], order="start")
         for line in lines:
+            line = web and line.sudo() or line
             tour = line.tour_id
             employee = line.employee_id
             origin = tour.start_address_id
@@ -939,6 +945,10 @@ class OFTourAppointmentWizard(models.TransientModel):
                         "duration": -1,
                     }
                 )
+                if (not line.previous_geo_lat and not line.previous_geo_lng) or (
+                    not line.next_geo_lat and not line.next_geo_lng
+                ):
+                    line.no_geolocated = True
                 continue
             else:
                 try:
@@ -973,6 +983,8 @@ class OFTourAppointmentWizard(models.TransientModel):
                         "duration": previous_duration + next_duration,
                     }
                 )
+            else:
+                line.no_geolocated = True
 
 
 class OFTourAppointmentLineMixin(models.AbstractModel):
@@ -1101,6 +1113,7 @@ class OFTourAppointmentLine(models.TransientModel):
     best = fields.Boolean(string="Best slot")
     selected = fields.Boolean(string="Selected Slot")
     description = fields.Text(string="Description", related="wizard_id.description")
+    no_geolocated = fields.Boolean()
 
     @api.depends("date")
     def _compute_date_str(self):
