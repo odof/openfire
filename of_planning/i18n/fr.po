@@ -69,8 +69,8 @@ msgstr "%s - Planning intervention pour %s"
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
-msgid "%s<br/>from %s to %s"
-msgstr "%s<br/>de %s à %s"
+msgid "%(start_d)s<br/>from %(start_h)s to %(stop_h)s"
+msgstr "%(start_d)s<br/>de %(start_h)s à %(stop_h)s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.report_intervention_report_document
@@ -3866,8 +3866,8 @@ msgstr "Code postal"
 #. odoo-python
 #: code:addons/of_planning/wizards/of_planning_print_wizard.py:0
 #, python-format
-msgid "from %s %s<br/>to %s %s"
-msgstr "de %s %s<br/>à %s %s"
+msgid "from %(start_d)s %(start_h)s<br/>to %(stop_d)s %(stop_h)s"
+msgstr "de %(start_d)s %(start_h)s<br/>à %(stop_d)s %(stop_h)s"
 
 #. module: of_planning
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_view_partner_intervention_warn_form
