@@ -300,7 +300,7 @@ class OFPlanningTour(models.Model):
             tour_lines = [f"{round(origin.partner_longitude, 7)},{round(origin.partner_latitude, 7)}"]  # noqa
             tour_lines.extend(
                 f"{round(line.geo_lng, 7)},{round(line.geo_lat, 7)}"  # noqa
-                for line in tour.map_tour_line_ids.filtered(lambda tl: tl.geo_lng and tl.geo_lat)
+                for line in tour.map_tour_line_ids.filtered(lambda tl: tl.geo_lng or tl.geo_lat)
             )
             tour_lines.append(f"{round(arrival.partner_longitude, 7)},{round(arrival.partner_latitude, 7)}")  # noqa
 
