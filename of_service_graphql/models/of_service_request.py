@@ -194,7 +194,7 @@ class OFServiceRequest(models.Model):
                             ON partner.id = service.address_id
                         where service.address_id is not null and
                         service.state in %s and
-                        (partner.partner_longitude != 0 and partner.partner_latitude != 0) and
+                        (partner.partner_longitude != 0 or partner.partner_latitude != 0) and
                         float8 (point(partner.partner_longitude,partner.partner_latitude) <@> point(%s, %s)) < %s
                         ORDER BY point(partner.partner_longitude,partner.partner_latitude) <@> point(%s, %s);
                         """,
@@ -228,7 +228,7 @@ class OFServiceRequest(models.Model):
         services_index = {}
         destinations = ""
         for i, service in enumerate(service_requests):
-            if service.address_id.partner_longitude and service.address_id.partner_latitude:
+            if service.address_id.partner_longitude or service.address_id.partner_latitude:
                 destinations += f";{service.address_id.partner_longitude},{service.address_id.partner_latitude}"  # noqa
                 services_index[service.id] = i
 
