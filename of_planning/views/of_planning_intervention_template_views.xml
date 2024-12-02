@@ -26,6 +26,9 @@
                     </group>
                 </group>
             </xpath>
+            <xpath expr="//field[@name='report_use_default']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
             <xpath expr="//group[@name='report_displayed_fields']//field[@name='report_title']" position="after">
                 <field name="report_partner_id" string="Customer" attrs="{'readonly':[('report_use_default','=',True)]}" />
                 <field name="report_date" string="Date" attrs="{'readonly':[('report_use_default','=',True)]}" />
