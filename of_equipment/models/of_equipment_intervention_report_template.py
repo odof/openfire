@@ -18,6 +18,11 @@ class OFEquipmentInterventionReportTemplate(models.Model):
     line_ids = fields.One2many(
         comodel_name="of.equipment.intervention.report.template.line", inverse_name="template_id"
     )
+    sale_order_template_ids = fields.Many2many(
+        comodel_name="sale.order.template",
+        relation="of_equipment_inter_report_template_sale_order_template_rel",
+        string="Modèles de devis disponibles",
+    )
 
     @api.depends("task_id")
     def _compute_name(self):

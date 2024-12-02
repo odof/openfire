@@ -23,6 +23,7 @@
         "data/email_planning.xml",
         "reports/report_intervention_report.xml",  # required before email_intervention.xml for email template
         "data/email_intervention.xml",
+        "data/of_planning_task.xml",
         "security/res_groups.xml",
         "security/ir_rule.xml",
         "security/ir.model.access.csv",
