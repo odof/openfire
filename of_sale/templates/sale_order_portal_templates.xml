@@ -7,4 +7,10 @@
         </xpath>
     </template>
 
+    <template id="sale_order_portal_content" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//td[@id='product_name']/span" position="replace">
+            <span t-field="line.of_display_name"/>
+        </xpath>
+    </template>
+
 </odoo>

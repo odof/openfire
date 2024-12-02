@@ -332,6 +332,8 @@ class SaleOrderLine(models.Model):
     def action_button_open_sale_order_line(self):
         """Open the sale order line in a new window."""
         self.ensure_one()
+        context = self._context.copy()
+        context.update({"of_only_default_code": False})
         form_id = self.env.ref("of_sale.of_sale_order_line_view").id
         return {
             "name": _("Sale Order Line"),
@@ -340,6 +342,7 @@ class SaleOrderLine(models.Model):
             "res_id": self.id,
             "views": [(form_id, "form")],
             "type": "ir.actions.act_window",
+            "context": context,
             "target": "new",
         }
 
