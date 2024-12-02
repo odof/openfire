@@ -11,3 +11,4 @@ from . import of_tour_appointment_template
 from . import res_config_settings
 from . import res_partner
 from . import resource_calendar
+from . import crm_lead

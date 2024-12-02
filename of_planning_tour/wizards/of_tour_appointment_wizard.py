@@ -30,6 +30,8 @@ class OFTourAppointmentWizard(models.TransientModel):
         context = self.env.context
         if active_model == "res.partner":
             self._handle_default_get_res_partner(context, default_values)
+        elif active_model == "crm.lead":
+            self._handle_default_get_crm_lead(context, default_values)
         elif active_model == "calendar.event":
             self._handle_default_get_calendar_event(context, default_values)
         elif active_model == "of.service.request":
@@ -208,6 +210,8 @@ class OFTourAppointmentWizard(models.TransientModel):
     return_address_id = fields.Many2one(comodel_name="res.partner", compute="_compute_map_data")
     map_latitude = fields.Text(compute="_compute_map_data")
     map_longitude = fields.Text(compute="_compute_map_data")
+
+    lead_id = fields.Many2one(comodel_name="crm.lead", string="Opportunité")
 
     # --------------------------------------------------------------------------
     # Constraints methods
@@ -428,6 +432,24 @@ class OFTourAppointmentWizard(models.TransientModel):
         address = partner_obj.browse(partner.address_get(["delivery"])["delivery"])
         self._default_get_update_default_values(default_values, "res.partner", partner, address, request)
 
+    def _handle_default_get_crm_lead(self, context, default_values):
+        """
+        Handle the default get operation for the `crm.lead` model.
+
+        Args:
+            context (dict): The context dictionary.
+            default_values (dict): The default values dictionary.
+
+        Returns:
+            None
+        """
+        lead_obj = self.env["crm.lead"]
+        lead_id = context["active_ids"][0]
+        lead = lead_obj.browse(lead_id)
+        self._default_get_update_default_values(
+            default_values, "crm.lead", lead.partner_id, lead.partner_id, False, False, lead
+        )
+
     def _handle_default_get_calendar_event(self, context, default_values):
         """
         Handle the default get operation for the `calendar.event` model.
@@ -511,7 +533,9 @@ class OFTourAppointmentWizard(models.TransientModel):
         address = partner_obj.browse(partner.address_get(["delivery"])["delivery"])
         self._default_get_update_default_values(default_values, active_model, partner, address, request)
 
-    def _default_get_update_default_values(self, default_values, active_model, partner, address, request, event=False):
+    def _default_get_update_default_values(
+        self, default_values, active_model, partner, address, request, event=False, lead=False
+    ):
         default_values.update(
             {
                 "source_model": active_model,
@@ -519,6 +543,7 @@ class OFTourAppointmentWizard(models.TransientModel):
                 "partner_address_id": address and address.id or partner.id or False,
                 "request_id": request and request.id or False,
                 "intervention_id": event and event.id or False,
+                "lead_id": lead and lead.id or False,
             }
         )
         if request:
@@ -867,6 +892,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_order_id": order_id,
             "of_picking_manual_ids": len(picking_list) == 1 and picking_list[0] or False,
             "of_type": "intervention",
+            "of_lead_id": self.lead_id.id,
         }
         if self.intervention_id:
             copied_lines = []

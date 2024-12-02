@@ -442,6 +442,20 @@ class CalendarEvent(models.Model):
     of_attach_report = fields.Boolean(related="of_template_id.attach_report")
     of_report_send_date = fields.Datetime(string="Report dispatch date")
 
+    of_lead_id = fields.Many2one(comodel_name="crm.lead", string="Opportunité")
+    of_lead_survey_link = fields.Char(
+        string="Lien questionnaire opportunité", compute="_compute_of_lead_survey_link", store=True)
+
+    @api.depends("of_lead_id")
+    def _compute_of_lead_survey_link(self):
+        for event in self:
+            if event.of_lead_id and event.of_lead_id.of_survey_user_input_line_ids:
+                web_base_url = self.env["ir.config_parameter"].sudo().get_param("web.base.url", default="")
+                url = f"/of_survey/{event.of_lead_id.of_survey_id.access_token}/{event.of_lead_id.of_survey_user_input_id.access_token}"
+                event.of_lead_survey_link = web_base_url + url
+            else:
+                event.of_lead_survey_link = False
+
     @api.constrains("of_alert_unable")
     def _check_of_alert_unable(self):
         for event in self:

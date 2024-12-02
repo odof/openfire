@@ -41,6 +41,7 @@
         "views/procurement_group_views.xml",
         "views/calendar_event_views.xml",
         "views/res_config_settings_views.xml",
+        "views/crm_lead_views.xml",
         "views/menuitems.xml",
         "reports/report_intervention_template.xml",
         "reports/report_intervention_sheet.xml",
