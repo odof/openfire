@@ -13,6 +13,7 @@
                         <group string="Customer" name="customer">
                             <field name="of_interlocutor"/>
                             <field name="of_decision_maker"/>
+                            <field name="of_site_address_id"/>
                         </group>
                         <group string="Externals" name="externals">
                             <field name="of_architect"/>
