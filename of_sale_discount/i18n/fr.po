@@ -110,3 +110,8 @@ msgid "You can apply a mark-up by setting a negative discount."
 msgstr ""
 "Vous pouvez appliquer une marge commerciale en configurant une remise "
 "négative."
+
+#. module: product
+#: model:ir.model.fields.selection,name:product.selection__product_pricelist_item__applied_on__2_product_category
+msgid "Product Category"
+msgstr "Catégories de produit"

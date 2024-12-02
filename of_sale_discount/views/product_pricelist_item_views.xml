@@ -15,6 +15,11 @@
             <xpath expr="//field[@name='min_quantity']" position="before">
                 <field name="of_brand_ids" widget="many2many_tags"/>
             </xpath>
+            <xpath expr="//field[@name='categ_id']" position="replace">
+                <field name="of_categ_ids" widget="many2many_tags" options="{'no_create':1}" attrs="{
+                'invisible':[('applied_on', '!=', '2_product_category')],
+                'required':[('applied_on', '=', '2_product_category')]}"/>
+            </xpath>
         </field>
     </record>
 
