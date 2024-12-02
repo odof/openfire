@@ -40,6 +40,7 @@ class CrmLead(models.Model):
         store=True,
         readonly=False,
     )
+    of_site_address_id = fields.Many2one(comodel_name="res.partner", string="Installation site")
 
     @api.depends("of_survey_user_input_line_ids", "of_question_ids")
     def _compute_question_answers_ids(self):
@@ -151,3 +152,8 @@ class CrmLead(models.Model):
             "target": "self",
             "url": url,
         }
+
+    def _prepare_opportunity_quotation_context(self):
+        quotation_context = super()._prepare_opportunity_quotation_context()
+        quotation_context.update({"default_partner_shipping_id": self.of_site_address_id.id or self.partner_id.id})
+        return quotation_context

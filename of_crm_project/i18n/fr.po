@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-21 08:35+0000\n"
-"PO-Revision-Date: 2024-06-21 08:35+0000\n"
+"POT-Creation-Date: 2024-12-19 07:56+0000\n"
+"PO-Revision-Date: 2024-12-19 07:56+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -51,6 +51,11 @@ msgstr "Bureau d’études"
 #: model_terms:ir.ui.view,arch_db:of_crm_project.of_crm_project_crm_lead_view_form
 msgid "Externals"
 msgstr "Externes"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_site_address_id
+msgid "Installation site"
+msgstr "Site d'installation"
 
 #. module: of_crm_project
 #: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_interlocutor
@@ -126,12 +131,17 @@ msgid "Survey"
 msgstr "Questionnaire"
 
 #. module: of_crm_project
-#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_survey_user_input
+#: model:ir.model,name:of_crm_project.model_of_survey_answers
+msgid "Survey Answers"
+msgstr "Réponses au Questionnaire"
+
+#. module: of_crm_project
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_survey_user_input_id
 msgid "Survey User Input"
 msgstr ""
 
 #. module: of_crm_project
-#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_survey_user_input_line
+#: model:ir.model.fields,field_description:of_crm_project.field_crm_lead__of_survey_user_input_line_ids
 msgid "Survey User Input Line"
 msgstr ""
 
@@ -146,8 +156,3 @@ msgstr "Questionnaires"
 #: model_terms:ir.ui.view,arch_db:of_crm_project.of_survey_survey_view_search_crm_project
 msgid "Type Lead/Opportunity"
 msgstr "Type Piste/Opportunité"
-
-#. module: of_crm_project
-#: model:ir.model,name:of_crm_project.model_of_survey_answers
-msgid "of.survey.answers"
-msgstr ""
