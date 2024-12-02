@@ -29,6 +29,11 @@
         'views/res_config_settings_views.xml',
         'wizards/of_mark_account_move_as_exported_view.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'of_account/static/src/**/*',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
