@@ -268,14 +268,12 @@ class OFOutlayAnalysisKanbanRecord(models.Model):
             'type': '02_expense',
             'category': inv_budget_categ,
             'main_color': inv_budget_color,
-            'value1': self.format_number(sale_cost_totals[0], lang, currency=currency),
+            'value1': self.format_number(
+                sum(analysis_lines['all_expense'].mapped('amount_engaged')),
+                lang, currency=currency),
             'label3': u"Dont achats :",
             'value3': self.format_number(
-                sum(line.purchase_price * line.product_uom_qty
-                    for line in sale_cost_lines[0].filtered(lambda line: line.product_id.type != 'service'))
-                +
-                sum(expense_entries[0].filtered(lambda line: line.product_id.type != 'service')
-                    .mapped('price_subtotal')),
+                sum(analysis_lines['expense'].mapped('amount_engaged')),
                 lang, currency=currency),
             'label4': u"Dont stock consommé :",
             'value4': self.format_number(
