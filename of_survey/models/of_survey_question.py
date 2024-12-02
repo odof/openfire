@@ -62,6 +62,8 @@ class OFSurveyQuestion(models.Model):
     background_image_url = fields.Char(string="Background Url", compute="_compute_background_image_url")
     survey_id = fields.Many2one(comodel_name="of.survey.survey", string="Survey", ondelete="cascade")
     sequence = fields.Integer(default=10)
+    question_number = fields.Char(compute="_compute_question_number")
+
     # page specific
     is_page = fields.Boolean(string="Is a page?")
     question_ids = fields.One2many(
@@ -197,6 +199,24 @@ class OFSurveyQuestion(models.Model):
     # --------------------------------------------------------------------------
     # COMPUTE METHODS
     # --------------------------------------------------------------------------
+
+    @api.depends("survey_id", "survey_id.question_ids")
+    def _compute_question_number(self):
+        survey_map = {}
+        for question in self:
+            if question.survey_id:
+                survey_map.setdefault(question.survey_id.id, []).append(question)
+
+        for questions_in_survey in survey_map.values():
+            survey = questions_in_survey[0].survey_id
+            all_questions = survey.question_ids.filtered(lambda q: not q.is_page).sorted("sequence")
+            question_index_map = {q.id: i for i, q in enumerate(all_questions, 1)}
+
+            for q in questions_in_survey:
+                if not q.is_page and q.id in question_index_map:
+                    q.question_number = f"Q{question_index_map[q.id]}"
+                else:
+                    q.question_number = False
 
     @api.depends("question_type")
     def _compute_question_placeholder(self):
