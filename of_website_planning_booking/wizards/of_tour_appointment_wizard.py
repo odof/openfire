@@ -40,9 +40,11 @@ class OFTourAppointmentWizard(models.TransientModel):
         """Construit les créneaux affichés dans le site web, appelée depuis le controller"""
 
         def format_date(date):
-            locale.setlocale(locale.LC_TIME, self.env.user.lang)
-            return fields.Date.from_string(date).strftime("%A %d %B %Y").capitalize()
-
+            try:
+                locale.setlocale(locale.LC_TIME, self.env.user.lang)
+            except locale.Error:
+                locale.setlocale(locale.LC_TIME, f"{self.env.user.lang}.utf8")
+            return fields.Date.from_string(date).strftime('%A %d %B %Y').capitalize()
         self.ensure_one()
         am_limit_float = float(
             self.env["ir.config_parameter"]
