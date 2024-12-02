@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_equipment_link_template">
+        <div class="row mb-4" name="report_equipment_link" style="page-break-inside: avoid;">
+            <t t-set="equipment" t-value="link.equipment_id"/>
+            <t t-set="product_name" t-value="equipment.product_id.name"/>
+            <t t-set="serial_number" t-value="equipment.name"/>
+            <div class="col">
+                <h5 name="title_equipment">
+                    <strong>Equipment - <span t-esc="product_name" /> - <span t-esc="serial_number" /></strong>
+                </h5>
+                <!-- Equipment infos -->
+                <div t-if="template.report_equipment" class="row mb-4" name="equipment_infos" style="page-break-inside: avoid;">
+                    <div class="col">
+                        <h6 name="title_equipment">
+                            <strong>Equipment</strong>
+                        </h6>
+                        <div class="border border-top-0 w-100 d-table">
+                            <div class="w-50 border-end d-table-cell">
+                                <div t-if="template.report_equipment_name and equipment.name" name="equipment_name" class="border-top">
+                                    <div class="m-2">
+                                        <span>Serial Number&amp;nbsp;:</span>
+                                        <strong t-field="equipment.name" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_product_id and equipment.product_id" name="equipment_product_id" class="border-top">
+                                    <div class="m-2">
+                                        <span>Product&amp;nbsp;:</span>
+                                        <strong t-field="equipment.product_id.name" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_model and equipment.model_name" name="equipment_model" class="border-top">
+                                    <div class="m-2">
+                                        <span>Model&amp;nbsp;:</span>
+                                        <strong t-field="equipment.model_name" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_brand_id and equipment.brand_id" name="equipment_brand_id" class="border-top">
+                                    <div class="m-2">
+                                        <span>Brand&amp;nbsp;:</span>
+                                        <strong t-field="equipment.brand_id.name" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_product_category_id and equipment.product_category_id" name="equipment_product_category_id" class="border-top">
+                                    <div class="m-2">
+                                        <span>Category&amp;nbsp;:</span>
+                                        <strong t-field="equipment.product_category_id.name" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-50 d-table-cell">
+                                <div t-if="template.report_equipment_installation_date and equipment.installation_date" name="equipment_installation_date" class="border-top">
+                                    <div class="m-2">
+                                        <span>Installation Date&amp;nbsp;:</span>
+                                        <strong t-field="equipment.installation_date" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_installation_type and equipment.installation_type" name="equipment_installation_type" class="border-top">
+                                    <div class="m-2">
+                                        <span>Installation Type&amp;nbsp;:</span>
+                                        <strong t-field="equipment.installation_type" />
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_is_compliant" name="equipment_is_compliant" class="border-top">
+                                    <div class="m-2">
+                                        <span>Compliant&amp;nbsp;:</span>
+                                        <strong t-if="equipment.is_compliant">Yes</strong>
+                                        <strong t-else="">No</strong>
+                                    </div>
+                                </div>
+                                <div t-if="template.report_equipment_installer_id and equipment.installer_id" name="equipment_installer_id" class="border-top">
+                                    <div class="m-2">
+                                        <span>Installer&amp;nbsp;:</span>
+                                        <strong t-field="equipment.installer_id.name" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div t-if="template.report_equipment_note and equipment.note" name="equipment_note" class="border border-top-0 w-100 d-table">
+                            <div class="w-100 d-table-cell">
+                                <div class="m-2">
+                                    <span>Note&amp;nbsp;:</span>
+                                    <span t-field="equipment.note" />
+                                </div>
+                            </div>
+                        </div>
+                        <div t-if="link.task_id" class="border border-top-0 w-100 d-table">
+                            <div class="w-50 border-end d-table-cell">
+                                <div name="equipment_link_task" class="border-top">
+                                    <div class="m-2">
+                                        <span>Task&amp;nbsp;:</span>
+                                        <strong t-field="link.task_id" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-50 border-end d-table-cell">
+                                <div name="equipment_link_task_duration" class="border-top">
+                                    <div class="m-2">
+                                        <span>Duration&amp;nbsp;:</span>
+                                        <strong t-field="link.task_duration" t-options="{'widget': 'duration', 'digital': True, 'unit': 'hour', 'round': 'minute'}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div t-if="link.task_description" name="equipment_link_task_description" class="border border-top-0 w-100 d-table">
+                            <div class="w-100 d-table-cell">
+                                <div class="m-2">
+                                    <span>Task description&amp;nbsp;:</span>
+                                    <strong t-field="link.task_description" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Minutes -->
+                <div t-if="template.report_minutes and link.report_text" class="row mb-4" name="equipment_minutes" style="page-break-inside: avoid;">
+                    <div class="col">
+                        <h6 name="title_minutes">
+                            <strong>Minutes</strong>
+                        </h6>
+                        <div class="border w-100 d-table">
+                            <div style="white-space: pre-wrap;" t-out="link.report_text"/>
+                        </div>
+                    </div>
+                </div>
+                <!-- Images -->
+                <t t-if="template.report_photos">
+                    <t t-set="images" t-value="link.all_image_ids.filtered(lambda img: img.printable)"/>
+                    <div t-if="images" class="row mb-4" name="equipment_images" style="page-break-inside: avoid;">
+                        <div class="col">
+                            <h6 name="title_images">
+                                <strong>Photos</strong>
+                            </h6>
+                            <div class="border w-100 d-table">
+                                <t t-foreach="images" t-as="image">
+                                    <figure class="d-inline-block align-top w-25 overflow-hidden" style="max-width: 24.7%; max-height: 320px;">
+                                        <span t-field="image.image_256" t-options="{'widget': 'image', 'class': 'mx-auto', 'style': 'max-height: 250px;'}" />
+                                        <figcaption class="text-muted text-center mt-1" t-if="image.caption" t-esc="image.caption"/>
+                                    </figure>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </template>
+
+
+    <template id="report_equipment_link_document">
+        <t t-call="web.external_layout">
+
+            <t t-set="template" t-value="link.equipment_report_tmpl_id"/>
+            <t t-set="event" t-value="link.event_id"/>
+
+            <h1>
+                <span t-field="template.report_title"/>
+            </h1>
+
+            <!-- Intervention informations -->
+            <t t-call="of_planning.report_event_information_template"/>
+
+            <!-- Intervention descriptions -->
+            <t t-call="of_planning.report_event_information_description_template"/>
+
+            <!-- Equipment -->
+            <t t-call="of_equipment.report_equipment_link_template"/>
+
+            <!-- Order -->
+            <t t-call="of_planning.report_event_information_order_template">
+                <t t-set="order" t-value="link.event_id.of_order_id"/>
+            </t>
+
+            <!-- Products and works -->
+            <t t-call="of_planning.report_event_information_products_works_template">
+                <t t-set="order" t-value="link.event_id.of_order_id"/>
+            </t>
+
+            <!-- Pickings -->
+            <t t-call="of_planning.report_event_information_pickings_template"/>
+
+            <!-- Legal  Notice -->
+            <t t-call="of_planning.report_event_information_legal_notice_template">
+                <t t-set="legal_notice" t-value="link.event_id.of_template_id.legal"/>
+            </t>
+
+            <!-- Photos -->
+            <t t-call="of_planning.report_event_information_photos_template"/>
+
+            <!-- Signatures -->
+            <t t-call="of_planning.report_event_information_signatures_template"/>
+        </t>
+    </template>
+
+
+    <template id="report_equipment_link_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="partner" t-value="doc.event_id.of_partner_id or doc.equipment_id.partner_id"/>
+                <t t-call="of_equipment.report_equipment_link_document" t-lang="partner.lang">
+                    <t t-set="link" t-value="doc"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="report_action_equipment_report" model="ir.actions.report">
+        <field name="name">Equipment report</field>
+        <field name="model">of.calendar.event.equipment.link</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">of_equipment.report_equipment_link_report</field>
+        <field name="report_file">of_equipment.report_equipment_link_report</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="model_of_calendar_event_equipment_link"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

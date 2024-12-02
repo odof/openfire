@@ -11,6 +11,7 @@ from . import account_fiscal_position
 from . import account_move
 from . import stock_picking
 from . import of_planning_task
+from . import of_planning_intervention_template_mixin
 from . import of_planning_intervention_template
 from . import of_planning_intervention_section
 from . import of_equipment

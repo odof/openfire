@@ -17,7 +17,6 @@ class OFPlanningInterventionTemplate(models.Model):
         section_to_display_ids = self.env["of.planning.intervention.section"].search([])
         return [Command.link(section_to_display.id) for section_to_display in section_to_display_ids]
 
-    mobile = fields.Boolean(string="Mobile Intervention Template")
     section_to_display_ids = fields.Many2many(
         comodel_name="of.planning.intervention.section",
         relation="of_planning_intervention_template_section_rel",
@@ -32,11 +31,6 @@ class OFPlanningInterventionTemplate(models.Model):
         " report is automatically e-mailed to the customer.\n"
         "* Manual dispatch from mobile: from the mobile app, as soon as the user clicks on 'Completed'"
         " in an intervention, he can send the intervention report by e-mail to the customer.",
-    )
-    additional_line_ids = fields.One2many(
-        comodel_name="of.planning.intervention.template.additional.line",
-        inverse_name="additional_template_id",
-        string="Additional Invoice lines",
     )
     mobile_payment = fields.Boolean(string="Mobile payment")
     payment_mode_ids = fields.Many2many(
@@ -71,16 +65,13 @@ class OFPlanningInterventionTemplate(models.Model):
         if default_template and self.id == default_template.id and self.mobile:
             raise UserError(_("The default template cannot be unpublished."))
 
-        self.mobile = not self.mobile
-        if self.mobile and self.task_id:
-            self.task_id.mobile = True
+        return super().action_button_toggle_mobile()
 
     @api.model
     def _prepare_graphql_domain(self, select, domain):
         odoo_domain = super()._prepare_graphql_domain(select, domain)
 
-        if select:
-            if "mobile" in select:
-                odoo_domain += [("mobile", "=", select.mobile)]
+        if select and "mobile" in select:
+            odoo_domain += [("mobile", "=", select.mobile)]
 
         return odoo_domain

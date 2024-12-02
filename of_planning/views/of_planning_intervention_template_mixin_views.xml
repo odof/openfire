@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- This view is used to avoid code duplication between two models that share the same fields structure and behavior. -->
+    <record id="of_planning_intervention_template_mixin_view_form" model="ir.ui.view">
+        <field name="name">of.planning.intervention.template.mixin.view.form</field>
+        <field name="model">of.planning.intervention.template.mixin</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget name="web_ribbon" text="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Template name" />
+                        </h1>
+                    </div>
+                    <group name="general">
+                        <group name="general_one">
+                            <field name="task_id" />
+                        </group>
+                        <group name="general_two" />
+                    </group>
+                    <notebook>
+                        <page name="configuration" string="Configuration">
+                        </page>
+                        <page name="sale" string="Vente">
+                            <group>
+                                <group>
+                                    <field name="sale_order_template_ids" widget="many2many_tags"/>
+                                    <field name="default_sale_order_template_id" domain="[('id', 'in', sale_order_template_ids)]"/>
+                                </group>
+                                <group>
+                                    <field name="so_generation_method" />
+                                </group>
+                            </group>
+                            <field name="default_sale_order_template_line_ids" widget="section_and_note_one2many">
+                                <tree>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="product_uom_qty"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="invoicing" string="Invoicing" invisible="1">
+                            <group name="invoicing_main">
+                                <group>
+                                    <field name="fiscal_position_id" />
+                                </group>
+                            </group>
+                        </page>
+                        <page name="report" string="Intervention report">
+                            <group col="1" class="mb-4">
+                                <group name="report_displayed_fields">
+                                    <field name="report_use_default" invisible="1" />
+                                    <separator string="Displayed fields" />
+                                    <field name="report_title" string="Report title" attrs="{'readonly':[('report_use_default','=',True)]}" />
+                                </group>
+                            </group>
+                            <group col="8" class="mb-4">
+                                <group name="report_first">
+                                    <!-- Intervention report -->
+                                    <field name="report_intervention" string="INTERVENTION" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_intervention_partner_id" string="Customer" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_partner_code" string="Customer code" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_task_id" string="Task" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_task_description" string="Task description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_date" string="Start date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_duration" string="Duration" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_team_id" string="Team" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_employee_ids" string="Operator(s)" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_company_id" string="Company" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_label" string="Label" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_address" string="Address" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_contact" string="Contact" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_type" string="Intervention type" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_internal_description" string="Internal description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                    <field name="report_intervention_description" string="External description" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_intervention', '=', False)]}"/>
+                                </group>
+                                <group name="report_second">
+                                    <!-- Report - Installed equipment -->
+                                </group>
+                                <group name="report_third">
+                                    <!-- Report - History -->
+
+                                    <!-- Report - Order -->
+                                    <field name="report_order" string="ORDER" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_order_name" string="Number" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_confirmation_date" string="Confirmation date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_user_id" string="Vendor" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_inspection_visit_date" string="Inspection visit date" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_totals" string="Totals" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                    <field name="report_order_intervention_notes" string="Intervention notes" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_order', '=', False)]}"/>
+                                </group>
+                                <group name="report_fourth">
+                                    <!-- Report - Products -->
+                                    <field name="report_products" string="PRODUCTS AND WORKS" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Pickings -->
+                                    <field name="report_pickings" string="DELIVERIES" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Invoicing -->
+
+                                    <!-- Report - Survey -->
+
+                                    <!-- Report - Debriefing -->
+
+                                    <!-- Report - Legal notice -->
+                                    <field name="report_legal" string="LEGAL NOTICE" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Minutes -->
+                                    <field name="report_minutes" string="MINUTES" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Photos -->
+                                    <field name="report_photos" string="PHOTOS" class="mb-4" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+
+                                    <!-- Report - Signatures -->
+                                    <field name="report_signature" string="SIGNATURES" attrs="{'readonly':[('report_use_default','=',True)]}"/>
+                                    <field name="report_signature_date" string="Signature date" class="mb-4" attrs="{'readonly':['|', ('report_use_default','=',True), ('report_signature', '=', False)]}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

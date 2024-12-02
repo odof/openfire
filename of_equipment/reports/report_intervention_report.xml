@@ -21,16 +21,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-foreach="doc.of_history_equipment_ids" t-as="interv">
+                            <t t-foreach="doc.of_history_equipment_ids" t-as="history">
                                 <tr>
                                     <td>
-                                        <span t-field="interv.start" />
+                                        <span t-field="history.start" />
                                     </td>
                                     <td class="text-center">
-                                        <span t-field="interv.of_task_id.name" />
+                                        <span t-field="history.of_task_id.name" />
                                     </td>
                                     <td class="text-center">
-                                        <span t-field="interv.description" />
+                                        <span t-field="history.description" />
                                     </td>
                                 </tr>
                             </t>
@@ -41,81 +41,15 @@
         </xpath>
 
         <!-- Equipment -->
-        <xpath expr="//div[@name='report_intervention']" position="after">
+        <xpath expr="//t[@t-call='of_planning.report_event_information_template']" position="after">
             <div t-if="template.report_equipment" class="row mb-4" name="report_equipment" style="page-break-inside: avoid;">
-                <t t-set="equipment" t-value="doc.of_equipment_ids and doc.of_equipment_ids[0]"/>
                 <div t-if="doc.of_use_equipment" class="col">
-                    <h5 name="title_equipment">
-                        <strong>Equipment</strong>
-                    </h5>
-                    <div class="border border-top-0 w-100 d-table">
-                        <div class="w-50 border-end d-table-cell">
-                            <div t-if="template.report_equipment_name and equipment.name" name="report_equipment_name" class="border-top">
-                                <div class="m-2">
-                                    <span>Serial Number&amp;nbsp;:</span>
-                                    <strong t-field="equipment.name" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_product_id and equipment.product_id" name="report_equipment_product_id" class="border-top">
-                                <div class="m-2">
-                                    <span>Product&amp;nbsp;:</span>
-                                    <strong t-field="equipment.product_id.name" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_model and equipment.model_name" name="report_equipment_model" class="border-top">
-                                <div class="m-2">
-                                    <span>Model&amp;nbsp;:</span>
-                                    <strong t-field="equipment.model_name" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_brand_id and equipment.brand_id" name="report_equipment_brand_id" class="border-top">
-                                <div class="m-2">
-                                    <span>Brand&amp;nbsp;:</span>
-                                    <strong t-field="equipment.brand_id.name" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_product_category_id and equipment.product_category_id" name="report_equipment_product_category_id" class="border-top">
-                                <div class="m-2">
-                                    <span>Category&amp;nbsp;:</span>
-                                    <strong t-field="equipment.product_category_id.name" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-50 d-table-cell">
-                            <div t-if="template.report_equipment_installation_date and equipment.installation_date" name="report_equipment_installation_date" class="border-top">
-                                <div class="m-2">
-                                    <span>Installation Date&amp;nbsp;:</span>
-                                    <strong t-field="equipment.installation_date" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_installation_type and equipment.installation_type" name="report_equipment_installation_type" class="border-top">
-                                <div class="m-2">
-                                    <span>Installation Type&amp;nbsp;:</span>
-                                    <strong t-field="equipment.installation_type" />
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_is_compliant" name="report_equipment_is_compliant" class="border-top">
-                                <div class="m-2">
-                                    <span>Compliant&amp;nbsp;:</span>
-                                    <strong t-if="equipment.is_compliant">Yes</strong>
-                                    <strong t-else="">No</strong>
-                                </div>
-                            </div>
-                            <div t-if="template.report_equipment_installer_id and equipment.installer_id" name="report_equipment_installer_id" class="border-top">
-                                <div class="m-2">
-                                    <span>Installer&amp;nbsp;:</span>
-                                    <strong t-field="equipment.installer_id.name" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div t-if="template.report_equipment_note and equipment.note" name="report_equipment_note" class="border border-top-0 w-100 d-table">
-                        <div class="w-100 d-table-cell">
-                            <div class="m-2">
-                                <span t-field="equipment.note" />
-                            </div>
-                        </div>
-                    </div>
+                    <t t-set="equipment_links_merged" t-value="doc._report_get_equipment_links_print_mode_merged()"/>
+                    <t t-foreach="equipment_links_merged" t-as="equipment_lnk">
+                        <t t-call="of_equipment.report_equipment_link_template">
+                            <t t-set="link" t-value="equipment_lnk"/>
+                        </t>
+                    </t>
                 </div>
             </div>
         </xpath>

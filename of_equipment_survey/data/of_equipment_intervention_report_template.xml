@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="of_equipment.of_equipment_intervention_report_template_maintenance" model="of.equipment.intervention.report.template">
+        <field name="report_survey" eval="True" />
+    </record>
+
+    <record id="of_equipment.of_equipment_intervention_report_template_aftersales" model="of.equipment.intervention.report.template">
+        <field name="report_survey" eval="True" />
+    </record>
+
+</odoo>

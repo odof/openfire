@@ -28,6 +28,7 @@
         "security/ir.model.access.csv",
         "views/of_sector_views.xml",
         "views/of_planning_intervention_line_views.xml",
+        "views/of_planning_intervention_template_mixin_views.xml",
         "views/of_planning_intervention_template_views.xml",
         "views/of_planning_tag_views.xml",
         "views/of_planning_task_views.xml",

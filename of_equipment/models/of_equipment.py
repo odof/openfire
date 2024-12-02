@@ -221,10 +221,10 @@ class OFEquipment(models.Model):
         :return: A list of tuples containing the equipment ID and its name.
         :rtype: list
         """
-        if self._context.get("equipment_simple_name_display"):
+        if self.env.context.get("equipment_simple_name_display"):
             return super().name_get()
 
-        customer_id = self._context.get("partner_id_serial_number")
+        customer_id = self.env.context.get("partner_id_serial_number")
         customer_id = customer_id and int(customer_id) or False
         result = []
         for record in self:
@@ -246,7 +246,7 @@ class OFEquipment(models.Model):
         du contact en premier précédées d'une puce.
         Permet, dans une DI, de montrer en 1er les appareils de l'adresse, puis ceux du customer et enfin les autres.
         """
-        if customer_id := self._context.get("partner_id_serial_number"):
+        if customer_id := self.env.context.get("partner_id_serial_number"):
             customer_equipments = super().name_search(name, [("customer_id", "=", customer_id)], operator, limit) or []
             limit = limit - len(customer_equipments)
             customer_equipments = [(equipment[0], f"-> {equipment[1]}") for equipment in customer_equipments]
@@ -254,7 +254,7 @@ class OFEquipment(models.Model):
                 customer_equipments + super().name_search(name, [("customer_id", "!=", customer_id)], operator, limit)
                 or []
             )
-        if address_id := self._context.get("address_prio_id"):
+        if address_id := self.env.context.get("address_prio_id"):
             args = args or []
             address_equipments = (
                 super().name_search(name, args + [["site_address_id", "=", address_id]], operator, limit) or []

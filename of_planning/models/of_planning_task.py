@@ -8,7 +8,7 @@ class OFPlanningTask(models.Model):
     _description = "Task"
     _order = "sequence"
 
-    name = fields.Char(size=100, required=True, help="Enter a task name")
+    name = fields.Char(size=100, required=True, help="Enter a task name", translate=True)
     description = fields.Text()
     active = fields.Boolean(default=True)
     sequence = fields.Integer(default=1, help="Used to order tasks. Lower is better.")

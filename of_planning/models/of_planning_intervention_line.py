@@ -10,73 +10,31 @@ from odoo.tools.float_utils import float_compare
 
 class OFPlanningInterventionLine(models.Model):
     _name = "of.planning.intervention.line"
+    _inherit = "of.planning.intervention.line.mixin"
     _description = "Intervention line"
 
     sequence = fields.Integer(default=10)
-    name = fields.Text(string="Description", compute="_compute_name", store=True, readonly=False)
-
     # Intervention Related fields
     intervention_id = fields.Many2one(
         comodel_name="calendar.event", string="Intervention", required=True, ondelete="cascade"
     )
-    partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Partner", related="intervention_id.of_partner_id", readonly=True
-    )
-    company_id = fields.Many2one(
-        comodel_name="res.company", string="Company", related="intervention_id.of_company_id", readonly=True
-    )
-    currency_id = fields.Many2one(
-        comodel_name="res.currency", string="Currency", readonly=True, related="company_id.currency_id"
-    )
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Partner", related="intervention_id.of_partner_id")
+    company_id = fields.Many2one(related="intervention_id.of_company_id")
     intervention_state = fields.Selection(
         related="intervention_id.of_state", string="Intervention state", copy=False, store=True, precompute=True
     )
 
     # Sale order related fields
     order_line_id = fields.Many2one(comodel_name="sale.order.line", string="Order line", copy=False)
-    so_number = fields.Char(string="Sale order number", related="order_line_id.order_id.name", readonly=True)
+    so_number = fields.Char(string="Sale order number", related="order_line_id.order_id.name")
 
     # Product & Quantity
-    product_id = fields.Many2one(comodel_name="product.product", string="Product")
-    qty = fields.Float(digits="Product Unit of Measure", default=1.0)
     qty_invoiceable = fields.Float(string="Invoiceable qty", compute="_compute_qty_invoiceable", store=True)
     qty_invoiced = fields.Float(string="Invoiced qty", compute="_compute_qty_invoiced", store=True)
     qty_delivered = fields.Float(string="Delivered qty", copy=False)
-    uom_id = fields.Many2one(
-        comodel_name="uom.uom",
-        string="Unit of Measure",
-        compute="_compute_uom_id",
-        store=True,
-        readonly=False,
-        precompute=True,
-        ondelete="restrict",
-    )
 
     # Picking
     move_ids = fields.One2many(comodel_name="stock.move", inverse_name="of_intervention_line_id", string="Stock Moves")
-
-    # Pricing
-    price_unit = fields.Float(
-        string="Unit price",
-        digits="Product Price",
-        default=0.0,
-        compute="_compute_price_unit",
-        store=True,
-        readonly=False,
-    )
-    discount = fields.Float(string="Discount (%)", digits="Discount", default=0.0)
-    price_subtotal = fields.Monetary(
-        compute="_compute_amount", string="Price subtotal", readonly=True, store=True, currency_field="currency_id"
-    )
-    price_tax = fields.Monetary(
-        compute="_compute_amount", string="Taxes", readonly=True, store=True, currency_field="currency_id"
-    )
-    price_total = fields.Monetary(
-        compute="_compute_amount", string="Price total", readonly=True, store=True, currency_field="currency_id"
-    )
-    tax_ids = fields.Many2many(
-        comodel_name="account.tax", string="VAT", compute="_compute_tax_ids", store=True, readonly=False
-    )
 
     # Invoicing
     invoice_line_ids = fields.One2many(
@@ -98,16 +56,15 @@ class OFPlanningInterventionLine(models.Model):
     # Compute methods
     # ------------------------------------------------------------------------------
 
+    @api.depends("intervention_id")
+    def _compute_currency_id(self):
+        for record in self:
+            record.currency_id = record.intervention_id.of_company_id.currency_id
+
     @api.depends("product_id")
     def _compute_price_unit(self):
         for line in self.filtered(lambda li: li.product_id):
             line.price_unit = line.product_id.lst_price
-
-    @api.depends("product_id")
-    def _compute_uom_id(self):
-        for line in self:
-            if not line.uom_id or (line.product_id.uom_id.id != line.uom_id.id):
-                line.uom_id = line.product_id.uom_id
 
     @api.depends("qty", "price_unit", "tax_ids")
     def _compute_amount(self):
@@ -165,27 +122,25 @@ class OFPlanningInterventionLine(models.Model):
             refund_lines = line.invoice_line_ids.filtered(lambda il: il.move_type == "out_refund")
             line.qty_invoiced = sum(invoice_lines.mapped("quantity")) - sum(refund_lines.mapped("quantity"))
 
-    @api.depends("product_id", "company_id", "partner_id")
-    def _compute_tax_ids(self):
-        for line in self:
-            fiscal_position = line.intervention_id.of_fiscal_position_id
-            taxes = line.company_id._of_filter_taxes(line.product_id.taxes_id)
-            line.tax_ids = fiscal_position and fiscal_position.map_tax(taxes) or taxes
-
-    @api.depends("product_id")
-    def _compute_name(self):
-        for line in self:
-            if product := line.product_id:
-                name = product.name_get()[0][1]
-                if product.description_sale:
-                    name += "\n" + product.description_sale
-                line.name = name
-            else:
-                line.name = ""
-
     # ------------------------------------------------------------------------------
     # Business methods
     # ------------------------------------------------------------------------------
+
+    def _get_fiscal_position_taxes(self):
+        """
+        Get the fiscal position to use for taxes computation.
+        See `of.planning.intervention.line.mixin._get_fiscal_position_taxes()`.
+        """
+        self.ensure_one()
+        return self.intervention_id.of_fiscal_position_id
+
+    def _get_partner_taxes(self):
+        """
+        Get the partner to use for taxes computation.
+        See `of.planning.intervention.line.mixin._get_partner_taxes()`.
+        """
+        self.ensure_one()
+        return self.intervention_id.of_address_id
 
     def _update_vals(self):
         for line in self.filtered(lambda line: line.order_line_id):
