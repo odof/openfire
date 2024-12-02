@@ -26,6 +26,8 @@
         "views/of_planning_intervention_template_mixin_views.xml",
         "views/of_equipment_intervention_report_template_views.xml",
         "views/res_config_settings_views.xml",
+        "views/of_installation_views.xml",
+        "views/of_equipment_tag_views.xml",
         "views/menuitems.xml",
         "reports/report_intervention_report.xml",
         "reports/report_intervention_sheet.xml",

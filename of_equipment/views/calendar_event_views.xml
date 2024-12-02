@@ -28,6 +28,8 @@
                                 attrs="{'invisible': [('of_use_equipment', '=', False)], 'required': [('of_use_equipment', '=', True)], 'readonly': [('of_state', 'in', ('done', 'cancel'))]}">
                             <tree editable="bottom" no_open="True">
                                 <field name="equipment_id"/>
+                                <field name="installation_id"/>
+                                <field name="tag_ids" widget="many2many_tags"  options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}"/>
                                 <field name="equipment_address"/>
                                 <field name="equipment_report_tmpl_id"/>
                                 <field name="task_id" readonly="1" force_save="1"/>

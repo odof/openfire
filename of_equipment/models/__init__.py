@@ -19,3 +19,5 @@ from . import of_calendar_event_equipment_link
 from . import of_calendar_event_equipment_link_line
 from . import of_image
 from . import of_planning_intervention_line
+from . import of_installation
+from . import of_equipment_tag

@@ -86,6 +86,7 @@ class OFEquipment(models.Model):
         domain="['|', ('parent_id', '=', installer_id), ('id', '=', installer_id)]",
         ondelete="restrict",
     )
+    installation_id = fields.Many2one(comodel_name="of.installation", string="Installation", ondelete="set null")
 
     # Interventions
     intervention_ids = fields.Many2many(
@@ -116,6 +117,12 @@ class OFEquipment(models.Model):
         help="State of geocoding",
         compute="_compute_geocoding_data",
         store=True,
+    )
+
+    # Misc
+    tag_ids = fields.Many2many(
+        comodel_name="of.equipment.tag",
+        string="Étiquettes",
     )
 
     # --------------------------------------------------------------------------
