@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models
+from odoo import api, models
 
 from odoo.addons.of_graphql.graphql.odoo_graphql import OdooGraphql
 
@@ -87,3 +87,10 @@ class OFGraphql(models.AbstractModel):
                 UserInput,
             ],
         )
+
+    @api.model
+    def server_capabilities(self):
+        capabilities = super(OFGraphql, self).server_capabilities()
+        capabilities["mobile"] = True
+        capabilities["partner_firstname"] = True
+        return capabilities

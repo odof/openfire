@@ -14,6 +14,8 @@ class PartnerCreate(graphene.Mutation):
 
     class Arguments:
         name = graphene.String()
+        lastname = graphene.String()
+        firstname = graphene.String()
         title = graphene.Argument(PartnerTitleInput)
         parent = graphene.Argument(PartnerInput)
         street = graphene.String()
@@ -44,6 +46,8 @@ class PartnerUpdate(graphene.Mutation):
     class Arguments:
         id = graphene.Int(required=True)
         name = graphene.String()
+        lastname = graphene.String()
+        firstname = graphene.String()
         title = graphene.Argument(PartnerTitleInput)
         parent = graphene.Argument(PartnerInput)
         street = graphene.String()

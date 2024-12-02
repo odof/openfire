@@ -5,6 +5,12 @@ import graphene
 from odoo.addons.graphql_base import OdooObjectType
 
 
+class PartnerNamesOrderType(graphene.Enum):
+    LAST_FIRST = "last_first"
+    LAST_FIRST_COMMA = "last_first_comma"
+    FIRST_LAST = "first_last"
+
+
 class Configuration(OdooObjectType):
     _name = "Configuration"
     _type = "types"
@@ -18,6 +24,7 @@ class Configuration(OdooObjectType):
     mobile_image_resolution_width = graphene.Int(required=True)
     mobile_image_resolution_height = graphene.Int(required=True)
     mobile_can_create_additional_sale = graphene.Boolean()
+    partner_names_order = graphene.Field(PartnerNamesOrderType, required=True)
 
     @staticmethod
     def resolve_mobile_display_planning_days_before(root, info):
@@ -61,6 +68,12 @@ class Configuration(OdooObjectType):
         # graphene n'arrive pas à interpréter le true venant des parametres.
         # on le reconverti pour lui
         return bool(param)
+
+    @staticmethod
+    def resolve_partner_names_order(root, info):
+        env = info.context["env"]
+        param = env["ir.config_parameter"].sudo().get_param("partner_names_order")
+        return param
 
     @staticmethod
     def resolve_mobile_can_create_additional_sale(root, info):
