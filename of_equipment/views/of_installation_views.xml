@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_installation_view_form" model="ir.ui.view">
+        <field name="name">of.installation.view.form</field>
+        <field name="model">of.installation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de l'installation" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="customer_id"/>
+                            <field name="site_address_id"/>
+                            <field name="company_id"/>
+                            <field name="installer_id"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <group string="Équipements" colspan="2">
+                        <field name="equipment_ids" nolabel="1" colspan="2"
+                        context="{'default_customer_id': customer_id, 'default_site_address_id': site_address_id, 'default_company_id': company_id, 'default_installer_id': installer_id}">
+                            <tree>
+                                <field name="product_id"/>
+                                <field name="name"/>
+                                <field name="reseller_id"/>
+                                <field name="installer_id"/>
+                                <field name="tag_ids" string="Étiquettes" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" />
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_installation_view_tree" model="ir.ui.view">
+        <field name="name">of.installation.view.tree</field>
+        <field name="model">of.installation</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="customer_id"/>
+                <field name="name"/>
+                <field name="site_address_id"/>
+                <field name="installer_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_installation_view_search" model="ir.ui.view">
+        <field name="name">of.installation.view.search</field>
+        <field name="model">of.installation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="site_address_id"/>
+                <field name="company_id"/>
+                <field name="installer_id"/>
+                <group string="Group By" name="groupby">
+                    <filter name="customer_groupby" string="Client" context="{'group_by': 'customer_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_view_of_installation" model="ir.actions.act_window">
+        <field name="name">Installations</field>
+        <field name="res_model">of.installation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="of_equipment.of_installation_view_tree"/>
+        <field name="search_view_id" ref="of_equipment.of_installation_view_search"/>
+    </record>
+
+</odoo>

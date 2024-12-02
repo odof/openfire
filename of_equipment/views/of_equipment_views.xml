@@ -12,6 +12,8 @@
                 <field name="site_address_id"/>
                 <field name="reseller_id"/>
                 <field name="installer_id"/>
+                <field name="installation_id"/>
+                <field name="tag_ids" string="Étiquettes" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" />
             </tree>
         </field>
     </record>
@@ -41,6 +43,7 @@
                             <field name="product_category_id"/>
                             <field name="model_name"/>
                             <field name="state" required="1"/>
+                            <field name="tag_ids" string="Étiquettes" widget="many2many_tags" options="{'color_field': 'color', 'no_create': True, 'no_create_edit': True}" />
                         </group>
                         <group name="customer" string="Customer">
                             <field name="customer_id"/>
@@ -72,6 +75,7 @@
                                 <field name="reseller_id" context="{'default_of_is_reseller': 1, 'of_is_reseller_prio': 1}"/>
                                 <field name="installer_id" context="{'default_of_is_installer': 1, 'of_is_installer_prio': 1}"/>
                                 <field name="operator_id"/>
+                                <field name="installation_id"/>
                             </group>
                         </page>
                         <page string="Intervention History" name="intervention_history">
@@ -111,6 +115,7 @@
                 <field name="site_phone_number_ids"/>
                 <field name="service_date"/>
                 <field name="reseller_id"/>
+                <field name="installation_id"/>
                 <separator/>
                 <filter string="Compliant" name="compliant" domain="[('is_compliant', '=', True)]"/>
                 <filter string="Not Compliant" name="not_compliant" domain="[('is_compliant', '=', False)]"/>
@@ -124,6 +129,7 @@
                     <filter name="product_groupby" string="Product" context="{'group_by': 'product_id'}"/>
                     <filter name="reseller_groupby" string="Reseller" context="{'group_by': 'reseller_id'}"/>
                     <filter name="zip_groupby" string="Zip Code" context="{'group_by': 'site_zip'}"/>
+                    <filter name="installation_groupby" string="Installation" context="{'group_by': 'installation_id'}"/>
                 </group>
             </search>
         </field>

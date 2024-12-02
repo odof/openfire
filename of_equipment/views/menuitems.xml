@@ -4,7 +4,10 @@
     <!-- Equipments -->
     <menuitem id="menu_of_equipment" action="of_equipment.action_view_of_equipment" name="Equipments" parent="sale.sale_order_menu" sequence="50"/>
     <menuitem id="menu_of_equipment_planning" action="of_equipment.action_view_of_equipment" name="Equipments" parent="of_planning.menu_res_partner_main" sequence="20"/>
+    <!-- Installation -->
+    <menuitem id="menu_of_installation_planning" action="of_equipment.action_view_of_installation" name="Installations" parent="of_planning.menu_res_partner_main" sequence="30"/>
     <!-- Configuration -->
     <menuitem id="menu_of_equipment_intervention_report_template" name="Equipment report" parent="of_planning.menu_of_planning_configuration" action="of_equipment.of_equipment_intervention_report_template_action" sequence="61"/>
+    <menuitem id="menu_of_equipment_tag_tree" name="Étiquettes d'équipement" parent="of_planning.menu_of_planning_configuration" action="of_equipment.action_of_equipment_tag" sequence="55" />
 
 </odoo>

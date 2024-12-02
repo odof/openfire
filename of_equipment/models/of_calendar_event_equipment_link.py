@@ -26,6 +26,13 @@ class OFCalendarEventEquipmentLink(models.Model):
     model_name = fields.Char(related="equipment_id.model_name", string="Model")
     note = fields.Text(related="equipment_id.note", string="Note")
     site_address_id = fields.Many2one(related="equipment_id.site_address_id", string="Site Address")
+    installation_id = fields.Many2one(related="equipment_id.installation_id", string="Installation", readonly=True)
+    tag_ids = fields.Many2many(
+        comodel_name="of.equipment.tag",
+        string="Étiquettes",
+        related="equipment_id.tag_ids",
+        readonly=True,
+    )
     site_street = fields.Char(related="site_address_id.street", string="Street")
     site_street2 = fields.Char(related="site_address_id.street2", string="Street2")
     site_zip = fields.Char(related="site_address_id.zip", string="Zip")
