@@ -12,7 +12,7 @@ AVAILABLE_PRIORITIES = [
 
 class SaleOrder(models.Model):
     _name = "sale.order"
-    _inherit = "sale.order"
+    _inherit = ["sale.order", "of.crm.stage.auto.update"]
 
     @api.model
     def _get_default_state(self):
