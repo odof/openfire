@@ -16,28 +16,26 @@ class OfCrmStageAutoUpdate(models.AbstractModel):
     def create(self, vals_list):
         records = super().create(vals_list)
 
-        # CRM stages
-        if records.opportunity_id:
+        for vals, record in zip(vals_list, records):
+            if not record.opportunity_id:
+                continue
+
             stages = self.env["crm.stage"].search(
                 [
                     ("of_auto_model_name", "=", self._name),
-                    ("sequence", ">", min(records.opportunity_id.stage_id.mapped("sequence"))),
+                    ("sequence", ">", record.opportunity_id.stage_id.sequence),
                 ],
                 order="sequence desc",
             )
-
-            for vals, record in zip(vals_list, records):
-                if not record.opportunity_id:
+            for stage in stages:
+                if stage.sequence <= record.opportunity_id.stage_id.sequence:
                     continue
-                for stage in stages:
-                    if stage.sequence <= record.opportunity_id.stage_id.sequence:
-                        continue
-                    if stage.of_auto_field_id.name in vals:
-                        value = vals.get(stage.of_auto_field_id.name)
-                        ctx = {"value": value, "fields": fields, "self": self.sudo()}
-                        if safe_eval(f"value {stage.of_auto_comparison_code or ''}", ctx):
-                            record.with_context(crm_stage_auto_update=True).opportunity_id.write({"stage_id": stage.id})
-                            break
+                if stage.of_auto_field_id.name in vals:
+                    value = vals.get(stage.of_auto_field_id.name)
+                    ctx = {"value": value, "self": self.sudo()}
+                    if safe_eval(f"value {stage.of_auto_comparison_code or ''}", ctx):
+                        record.with_context(crm_stage_auto_update=True).opportunity_id.write({"stage_id": stage.id})
+                        break
         return records
 
     def write(self, values):
@@ -58,7 +56,7 @@ class OfCrmStageAutoUpdate(models.AbstractModel):
                         value = record[stage.of_auto_field_id.name]
                         if hasattr(value, "id"):
                             value = value["id"]
-                        ctx = {"value": value, "fields": fields, "self": self.sudo()}
+                        ctx = {"value": value, "self": self.sudo()}
                         if safe_eval(f"value {stage.of_auto_comparison_code or ''}", ctx):
                             record.with_context(crm_stage_auto_update=True).opportunity_id.write({"stage_id": stage.id})
                             break
