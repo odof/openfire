@@ -34,7 +34,7 @@ class OfCrmStageAutoUpdate(models.AbstractModel):
                         continue
                     if stage.of_auto_field_id.name in vals:
                         value = vals.get(stage.of_auto_field_id.name)
-                        ctx = {"value": value, "fields": fields, "self": self.sudo()}
+                        ctx = {"value": value, "self": self.sudo()}
                         if safe_eval(f"value {stage.of_auto_comparison_code or ''}", ctx):
                             record.with_context(crm_stage_auto_update=True).opportunity_id.write({"stage_id": stage.id})
                             break
@@ -58,7 +58,7 @@ class OfCrmStageAutoUpdate(models.AbstractModel):
                         value = record[stage.of_auto_field_id.name]
                         if hasattr(value, "id"):
                             value = value["id"]
-                        ctx = {"value": value, "fields": fields, "self": self.sudo()}
+                        ctx = {"value": value, "self": self.sudo()}
                         if safe_eval(f"value {stage.of_auto_comparison_code or ''}", ctx):
                             record.with_context(crm_stage_auto_update=True).opportunity_id.write({"stage_id": stage.id})
                             break
