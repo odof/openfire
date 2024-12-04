@@ -4,12 +4,12 @@
 import base64
 import logging
 
-from odoo import api, fields, models
-from odoo.tools import float_compare
-
-from cStringIO import StringIO
 import xlsxwriter
+from cStringIO import StringIO
 from xlsxwriter.utility import xl_rowcol_to_cell
+
+from odoo import api, fields, models
+from odoo.tools import float_compare, float_round
 
 _logger = logging.getLogger(__name__)
 
@@ -242,6 +242,8 @@ class OFStockInventoryValuation(models.TransientModel):
             # On met à jour le prix des articles en fonction des règles de calcul
             for product_id, serial_dict in product_dict.iteritems():
                 product = product_obj.browse(product_id)
+                for hist_vals in serial_dict.itervalues():
+                    hist_vals['quantity'] = float_round(hist_vals['quantity'], product.uom_id.rounding)
                 if product.cost_method != 'real':
                     price_unit = product.get_history_price(self.company_id.id, date=self.date)
                     for hist_vals in serial_dict.itervalues():
