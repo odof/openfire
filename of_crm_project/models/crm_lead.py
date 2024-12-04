@@ -155,5 +155,8 @@ class CrmLead(models.Model):
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
-        quotation_context.update({"default_partner_shipping_id": self.of_site_address_id.id or self.partner_id.id})
+        quotation_context.update({
+            "default_partner_shipping_id": self.of_site_address_id.id or self.partner_id.id,
+            "default_tag_ids": []
+        })
         return quotation_context
