@@ -888,7 +888,7 @@ export class PlanningRenderer extends Component {
         }
         if (tripBarFields) {
             pill._trip = pill.record[tripBarFields] || 0;
-            pill._tripDsp = `${pill._trip * 60 } min`;
+            pill._tripDsp = pill._trip ? `${Math.ceil(pill._trip * 60)} min` : "";
         }
 
         pill.className = classes.join(" ");
