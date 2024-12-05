@@ -43,7 +43,7 @@
                 <div class="o_form_field_radio o_vertical o_form_field o_form_required" attrs="{'invisible':[('refund_only','!=',True)]}">
                     <div class="o_radio_item">
                         <input class="o_form_radio" type="radio" value="refund" checked="checked"/>
-                        <span class="o_form_label">Créer un avoir en brouillon</span>
+                        <span class="o_form_label">Créer un avoir partiel en brouillon</span>
                     </div>
                     <div class="o_radio_item">
                         <input class="o_form_radio" disabled="disabled" type="radio" value="cancel"/>
@@ -56,11 +56,17 @@
                 </div>
             </xpath>
             <xpath expr="//group[1]/group[2]" position="inside">
-                 <div attrs="{'invisible':[('refund_only','!=',True)]}" class="oe_grey" colspan="4">
+                <div attrs="{'invisible':[('refund_only','!=',True)]}" class="oe_grey" colspan="4">
                     Votre facture est partiellement lettrée,
-                     si vous souhaitez annuler ou modifier intégralement
-                     votre facture, vous devez annuler le lettrage
-                 </div>
+                    si vous souhaitez annuler ou modifier intégralement
+                    votre facture, vous devez annuler le lettrage
+                    <br/>
+                    La création d'un avoir partiel ne permet pas de refaire une facturation depuis le bon de commande ensuite.
+                </div>
+            </xpath>
+            <xpath expr="//group[1]/group[2]/div[1]" position="inside">
+                <br/>
+                La création d'un avoir partiel ne permet pas de refaire une facturation depuis le bon de commande ensuite.
             </xpath>
         </field>
     </record>

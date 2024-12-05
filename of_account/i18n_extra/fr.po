@@ -1,0 +1,4 @@
+#. module: account
+#: selection:account.invoice.refund,filter_refund:0
+msgid "Create a draft refund"
+msgstr "Créer un avoir partiel en brouillon"
