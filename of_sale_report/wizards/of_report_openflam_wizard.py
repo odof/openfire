@@ -2,12 +2,13 @@
 
 import base64
 from datetime import datetime
-from odoo import models, fields, api
-from odoo.tools import float_compare
 
-from cStringIO import StringIO
 import xlsxwriter
-from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
+from cStringIO import StringIO
+from xlsxwriter.utility import xl_range, xl_rowcol_to_cell
+
+from odoo import api, fields, models
+from odoo.tools import float_compare, float_is_zero
 
 
 class OFRapportOpenflamWizard(models.TransientModel):
@@ -1071,6 +1072,7 @@ class OFRapportOpenflamWizard(models.TransientModel):
             for payment in payment_filtered:
                 affectations = []
                 aml = payment.move_line_ids.filtered(lambda l: l.account_id.user_type_id.type == 'receivable')
+                payment_accounts = aml.mapped('account_id')
                 invoice_move_lines = aml.mapped('matched_credit_ids').mapped('credit_move_id')
                 invoice_move_lines |= aml.mapped('matched_debit_ids').mapped('debit_move_id')
                 credit = sum(aml.mapped('credit'))
@@ -1086,11 +1088,16 @@ class OFRapportOpenflamWizard(models.TransientModel):
                     # Calcul du montant affecté aux différents comptes de taxes
                     for invoice_move, amount in affectations:
                         invoice_partner_lines = invoice_move.line_ids.filtered(
-                            lambda l: l.account_id.internal_type in ('receivable', 'payable'))
+                            lambda l: l.account_id in payment_accounts)
                         invoice_partner_amount = \
                             sum(invoice_partner_lines.mapped('debit')) - sum(invoice_partner_lines.mapped('credit'))
-                        percent = amount / invoice_partner_amount
                         payment_dict = payments_dict.setdefault(payment, {})
+                        if float_is_zero(invoice_partner_amount, 2):
+                            # Ce cas ne devrait pas arriver
+                            # La pièce identifiée comme facture a des écritures au débit et au crédit pour un
+                            #  total identique sur le compte de tiers du paiement
+                            continue
+                        percent = amount / invoice_partner_amount
                         tax_move_lines = invoice_move.line_ids.filtered(lambda l: l.account_id in sorted_accounts)
                         account_checked = self.env['account.account']
                         for tax_move_line in tax_move_lines:
