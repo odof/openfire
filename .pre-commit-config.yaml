@@ -46,3 +46,7 @@ repos:
         # B101: Assert and compilation. We don't compile Python code.
         # B404: We are aware of the security implications associated with subproces
         args: [--skip=B101, B404]
+  - repo: https://gitlab.openfire.fr/odoo/commit-hooks
+    rev: v0.1.0
+    hooks:
+    - id: check-commit-message
