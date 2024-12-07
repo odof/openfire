@@ -7,6 +7,8 @@ from urllib.parse import urlparse
 import pytz
 import requests
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import config
@@ -871,6 +873,50 @@ class OFPlanningTour(models.Model):
         ).unlink()
 
         return True
+
+    @api.model
+    def cron_optimize_complete_tours(self):
+        """
+        Optimize complete tours.
+
+        Returns:
+        """
+        today = datetime.now().date()
+        optim_mode = (
+            self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.tour_automatic_optim_mode") or "all"
+        )
+        days_nb = int(self.env["ir.config_parameter"].sudo().get_param("of.planning.tour.tour_automatic_nb_days", 2))
+        effective_date = today + relativedelta(days=days_nb)
+
+        tours = self.env["of.planning.tour"].search(
+            [
+                ("date", "=", effective_date),
+                ("state", "!=", "3-confirmed"),
+            ]
+        )
+        complete_tours = tours.filtered(lambda tour: not tour.available_slot_ids)
+
+        for tour in complete_tours:
+            tour._check_tour_addresses()
+            tour._check_employee_no_working_hours()
+            tour._check_interventions_addresses()
+            tour._osrm_recompute_data_if_needed()
+
+            lines_values = [
+                Command.create(tour_line._prepare_optimization_line_values()) for tour_line in tour.tour_line_ids
+            ]
+
+            wizard = self.env["of.planning.tour.optimization.wizard"].create(
+                {
+                    "tour_id": tour.id,
+                    "line_ids": lines_values,
+                    "optim_mode": optim_mode,
+                }
+            )
+            wizard.action_button_optimize()
+            wizard.action_button_validate()
+
+            tour.state = "3-confirmed"
 
     def _get_start_stop_markers_data_for_tour(self):
         """

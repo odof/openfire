@@ -104,6 +104,37 @@
                             </div>
                         </div>
                     </div>
+                    <div class="clearfix"/>
+                    <div class="row mt16 o_settings_container" id="send_customer_notif">
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_left_pane">
+                                <field name="of_send_customer_notification"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_send_customer_notification"/>
+                                <div class="text-muted">
+                                    Permet d'activer l'envoi de notification client pour les RDV.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="send_customer_notif_mode" attrs="{'invisible': [('of_send_customer_notification', '=', False)]}">
+                            <div class="o_setting_left_pane">
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="of_customer_notification_mode" string="Critères"/>
+                                <div class="text-muted">
+                                    Définit les critères pour l'envoi de notification client pour les RDV (mode et nombre de jours avant).
+                                </div>
+                                <div class="row">
+                                    <div class="oe_inline pe-0">Mode</div><field name="of_customer_notification_mode" style="padding-left: 5px;"/>
+                                </div>
+                                <div class="row">
+                                    <div class="oe_inline pe-0">À envoyer</div><field name="of_customer_notification_nb_days" style="padding-left: 5px; padding-right: 5px;"/><div class="oe_inline ps-0">jour(s) avant</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"/>
                 </div>
             </xpath>
         </field>

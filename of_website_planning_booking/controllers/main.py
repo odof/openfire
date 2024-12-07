@@ -517,13 +517,23 @@ class OFWebsitePlanningBooking(http.Controller):
 
         if allow_empty_days:
             empty_day_lines = available_lines - not_empty_day_lines
+            special_empty_day_lines = empty_day_lines.sudo().filtered(
+                lambda line: line.employee_id.of_booking_empty_days_search_max_criteria > 0
+            )
+            other_empty_day_lines = empty_day_lines - special_empty_day_lines
 
             if empty_days_search_type == "duration":
-                valid_lines += empty_day_lines.filtered(
+                valid_lines += special_empty_day_lines.filtered(
+                    lambda line: line.useful_duration <= line.employee_id.of_booking_empty_days_search_max_criteria
+                )
+                valid_lines += other_empty_day_lines.filtered(
                     lambda line: line.useful_duration <= empty_days_search_max_criteria
                 )
             else:
-                valid_lines += empty_day_lines.filtered(
+                valid_lines += special_empty_day_lines.filtered(
+                    lambda line: line.useful_distance <= line.employee_id.of_booking_empty_days_search_max_criteria
+                )
+                valid_lines += other_empty_day_lines.filtered(
                     lambda line: line.useful_distance <= empty_days_search_max_criteria
                 )
 

@@ -67,6 +67,26 @@ class ResConfigSettings(models.TransientModel):
         help="Defines the break hour between morning and afternoon. Interventions starting before this hour will be "
         "considered in the morning and vice versa.",
     )
+    tour_automatic_optimization = fields.Boolean(
+        string="(OF) Tournées // Optimisation automatique des tournées complètes",
+    )
+    tour_automatic_optim_mode = fields.Selection(
+        selection=[
+            ("all", "Journée entière"),
+            ("half", "À la demi-journée"),
+            ("morning", "Matin"),
+            ("afternoon", "Après-midi"),
+        ],
+        string="Mode d'optimisation",
+        config_parameter="of.planning.tour.tour_automatic_optim_mode",
+        required=True,
+        default="all",
+    )
+    tour_automatic_optim_nb_days = fields.Integer(
+        string="Nombre de jours à prendre en compte pour l'optimisation automatique",
+        config_parameter="of.planning.tour.tour_automatic_nb_days",
+        default="2",
+    )
 
     @api.constrains("nbr_months_tour_creation")
     def _check_nbr_months_tour_creation(self):
@@ -75,3 +95,14 @@ class ResConfigSettings(models.TransientModel):
                 raise ValidationError(
                     _("The number of months for the tours creation must be positive and can't exceed 36.")
                 )
+
+    @api.model
+    def get_values(self):
+        res = super().get_values()
+        res.update(tour_automatic_optimization=self.env.ref("of_planning_tour.cron_optimize_complete_tours").active)
+        return res
+
+    def set_values(self):
+        super().set_values()
+        self.env.ref("of_planning_tour.cron_optimize_complete_tours").active = self.tour_automatic_optimization
+        return True
