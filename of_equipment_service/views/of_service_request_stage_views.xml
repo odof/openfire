@@ -6,10 +6,8 @@
         <field name="model">of.service.request.stage</field>
         <field name="inherit_id" ref="of_service.of_service_request_stage_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="before">
-                <header>
-                    <field name="state" widget="statusbar" options="{'clickable': '1'}"/>
-                </header>
+            <xpath expr="//field[@name='type_ids']" position="before">
+                <field name="state"/>
             </xpath>
         </field>
     </record>
