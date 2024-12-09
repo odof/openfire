@@ -8,16 +8,8 @@ class ResConfigSettings(models.TransientModel):
 
     geocoding_on_write = fields.Selection(
         selection=[
-            (
-                "no",
-                "Do not recalculate geocoding values automatically "
-                "(GPS coordinates are reset to zero if not entered at the same time.)",
-            ),
-            (
-                "yes",
-                "Recalculate geocoding values (Geocoding is attempted if GPS coordinates \
-                    are not entered at the same time.)",
-            ),
+            ("no", "Do not recalculate geocoding values automatically (GPS coordinates are reset to zero)"),
+            ("yes", "Recalculate automatically geocoding values"),
         ],
         config_parameter="of.geolocalize.geocoding_on_write",
         string="If an address is changed",
@@ -26,7 +18,7 @@ class ResConfigSettings(models.TransientModel):
 
     geocoding_on_create = fields.Selection(
         selection=[
-            ("no", "Do not calculate geocoding values " "(recommended when a large number of partners are imported)"),
+            ("no", "Do not calculate geocoding values (recommended before importing a large number of partners)"),
             ("yes", "Calculate geocoding values automatically"),
         ],
         config_parameter="of.geolocalize.geocoding_on_create",
