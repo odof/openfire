@@ -570,8 +570,8 @@ class OFTourAppointmentWizard(models.TransientModel):
                         ("id", "=", partner.id),
                         ("parent_id", "=", partner.id),
                         "|",
-                        ("geo_lat", "!=", 0),
-                        ("geo_lng", "!=", 0),
+                        ("partner_latitude", "!=", 0),
+                        ("partner_longitude", "!=", 0),
                     ],
                     limit=1,
                 )
@@ -939,21 +939,19 @@ class OFTourAppointmentWizard(models.TransientModel):
             arrival = tour.return_address_id
             # Pas d'origine ni pour la tournée ni pour l'employé
             if not origin:
-                raise UserError(_('The operator "%(name)s" has no starting address.'), name=employee.name)
+                raise UserError(_('The operator "%(name)s" has no starting address.') % {"name": employee.name})
             # Pas d'arrivée ni pour la tournée ni pour l'employé
             elif not arrival:
-                raise UserError(_('The operator "%(name)s" has no return address.'), name=employee.name)
+                raise UserError(_('The operator "%(name)s" has no return address.') % {"name": employee.name})
             elif origin.partner_latitude == origin.partner_longitude == 0:
                 raise UserError(
-                    _('Operator\'s starting address "%(name)s" is not geolocated.\nDate : %(date)s'),
-                    name=employee.name,
-                    date=line.date,
+                    _('Operator\'s starting address "%(name)s" is not geolocated.\nDate : %(date)s')
+                    % {"name": employee.name, "date": line.date}
                 )
             elif arrival.partner_latitude == arrival.partner_longitude == 0:
                 raise UserError(
-                    _('Operator\'s return address "%(name)s" is not geolocated.\nDate : %(date)s'),
-                    name=employee.name,
-                    date=line.date,
+                    _('Operator\'s return address "%(name)s" is not geolocated.\nDate : %(date)s')
+                    % {"name": employee.name, "date": line.date},
                 )
 
             if self.orthodromic:
