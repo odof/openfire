@@ -45,6 +45,51 @@ check_commit_message:
         fi
       fi
 
+check_all_commit_messages:
+  stage: check_commit_message
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  script:
+    - |
+      #!/bin/bash
+      # Displaying logs for the branch
+      EXIT_CODE=0
+      git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+      HASHES=$(git log ^origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME HEAD --pretty=format:"%h")
+      set -f                      # avoid globbing (expansion of *).
+      HASH_ARRAY=(${HASHES//\n/ })
+      for i in "${!HASH_ARRAY[@]}"
+      do
+          CURRENT_HASH=${HASH_ARRAY[i]}
+          echo "======== Hash : $CURRENT_HASH ========"
+          commit_message=$(git log $CURRENT_HASH --pretty=%B)
+          # Get the first line of the commit message
+          first_line=$(echo "$commit_message" | head -n 1)
+
+          # Check if the first line is within the 72 character limit
+          if [ ${#first_line} -le 72 ]; then
+            echo "First line is within 72 characters."
+          else
+            echo "First line exceeds 72 characters."
+            EXIT_CODE=1
+          fi
+
+          # Get the number of lines in the commit message
+          commit_lines=$(echo "$commit_message" | wc -l)
+
+          # If there are more than one line, check for a blank line after the first line
+          if [ $commit_lines -gt 1 ]; then
+            second_line=$(echo "$commit_message" | sed -n '2p')
+            if [ -z "$second_line" ]; then
+              echo "There is a blank line after the first line."
+            else
+              echo "There is no blank line after the first line."
+              EXIT_CODE=1
+            fi
+          fi
+      done
+      exit $EXIT_CODE
+
 linting:
   stage: linting
   script:
