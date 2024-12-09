@@ -22,10 +22,10 @@ Paramètres de configuration
 
 * Ajout d'un **paramètre** de configuration pour le géocodage à la **modification de l'adresse**
     - les choix possibles sont :
-        - Ne pas recalculer pas automatiquement les valeurs de géocodage (les coordonnées GPS sont remises à zéro si elles ne sont pas saisies en même temps.);
-        - Recalculer automatiquement les valeurs de géocodage lorsque l'adresse d'un partenaire est modifiée.
+        - Ne pas recalculer automatiquement les valeurs de géolocalisation (les coordonnées GPS sont remises à zéro);
+        - Recalculer automatiquement les valeurs de géolocalisation.
 
 * Ajout d'un **paramètre** de configuration pour le géocodage à la **création d'une adresse**
     - les choix possibles sont :
-        - Ne pas calculer les valeurs de géocodage (recommandé lorsqu'un grand nombre de partenaires sont importés);
-        - Calculer automatiquement les valeurs de géocodage lorsqu'un nouveau partenaire est ajouté.
+        - Ne pas calculer automatiquement les valeurs de géolocalisation (option recommandée avant de lancer l'import d'un grand nombre de contacts);
+        - Calculer automatiquement les valeurs de géolocalisation.

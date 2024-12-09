@@ -13,7 +13,7 @@
                     <div class="row mt16 o_settings_container">
                         <div class="o_setting_left_pane"/>
                         <div class="o_setting_right_pane">
-                            <span class="o_form_label">If a partner is added</span>
+                            <span class="o_form_label">If a partner is created with an address</span>
                             <div class="text-muted">
                                 <field name="geocoding_on_create" widget="radio" />
                             </div>
@@ -22,7 +22,7 @@
                     <div class="row mt16 o_settings_container">
                         <div class="o_setting_left_pane"/>
                         <div class="o_setting_right_pane">
-                            <span class="o_form_label">If a partner is changed</span>
+                            <span class="o_form_label">If a partner's address is edited</span>
                             <div class="text-muted">
                                 <field name="geocoding_on_write" widget="radio" />
                             </div>
