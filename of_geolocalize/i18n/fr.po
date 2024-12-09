@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 11:48+0000\n"
-"PO-Revision-Date: 2023-12-28 11:48+0000\n"
+"POT-Creation-Date: 2024-12-13 15:01+0000\n"
+"PO-Revision-Date: 2024-12-13 15:01+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -30,18 +30,20 @@ msgstr ""
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">If a partner is added</span>"
-msgstr "<span class=\"o_form_label\">Si un partenaire est ajouté</span>"
+msgid ""
+"<span class=\"o_form_label\">If a partner is created with an address</span>"
+msgstr ""
+"<span class=\"o_form_label\">Si un contact est créé avec une adresse</span>"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
-msgid "<span class=\"o_form_label\">If a partner is changed</span>"
-msgstr "<span class=\"o_form_label\">Si un partenaire est changé</span>"
+msgid "<span class=\"o_form_label\">If a partner's address is edited</span>"
+msgstr "<span class=\"o_form_label\">Si l'adresse d'un contact est éditée</span>"
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.res_config_settings_view_form
 msgid "<span class=\"o_form_label\">Timeout</span>"
-msgstr "<span class=\"o_form_label\">Timeout</span>"
+msgstr ""
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
@@ -159,20 +161,20 @@ msgstr "Nom"
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_create__no
 msgid ""
-"Do not calculate geocoding values (recommended when a large number of "
-"partners are imported)"
+"Do not calculate geocoding values (recommended before importing a large "
+"number of partners)"
 msgstr ""
-"Ne pas calculer les valeurs de géolocalisation (recommandé lorsqu'un grand nombre"
-" de partenaires sont importés)"
+"Ne pas calculer automatiquement les valeurs de géolocalisation (option "
+"recommandée avant de lancer l'import d'un grand nombre de contacts) "
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__no
 msgid ""
 "Do not recalculate geocoding values automatically (GPS coordinates are reset"
-" to zero if not entered at the same time.)"
+" to zero)"
 msgstr ""
-"Ne pas recalculer automatiquement les valeurs de géolocalisation (les coordonnées "
-"GPS sont remis à zéro s'il n'est pas saisi en même temps.)"
+"Ne pas recalculer automatiquement les valeurs de géolocalisation (les "
+"coordonnées GPS sont remises à zéro) "
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__of_geo_wizard_line__precision__excellent
@@ -307,7 +309,7 @@ msgstr ""
 #. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__geocoding_on_create
 msgid "If a partner is added"
-msgstr "Si un partenaire est ajouté"
+msgstr "Si un contact est créé avec une adresse"
 
 #. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__geocoding_on_write
@@ -460,12 +462,8 @@ msgstr "Précision"
 
 #. module: of_geolocalize
 #: model:ir.model.fields.selection,name:of_geolocalize.selection__res_config_settings__geocoding_on_write__yes
-msgid ""
-"Recalculate geocoding values (Geocoding is attempted if GPS coordinates"
-"                     are not entered at the same time.)"
-msgstr ""
-"Recalculer les valeurs de géolocalisation (La géolocalisation est tentéé si les "
-"coordonnées GPS ne sont pas saisis en même temps.)"
+msgid "Recalculate automatically geocoding values"
+msgstr "Recalculer automatiquement les valeurs de géolocalisation"
 
 #. module: of_geolocalize
 #: model:ir.model.fields,help:of_geolocalize.field_res_config_settings__geocoding_on_write
@@ -524,7 +522,7 @@ msgstr "Succès"
 #. module: of_geolocalize
 #: model:ir.model.fields,field_description:of_geolocalize.field_res_config_settings__timeout
 msgid "Timeout"
-msgstr "Timeout"
+msgstr ""
 
 #. module: of_geolocalize
 #: model_terms:ir.ui.view,arch_db:of_geolocalize.of_geo_wizard_form_view
