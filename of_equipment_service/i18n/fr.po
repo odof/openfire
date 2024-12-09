@@ -384,7 +384,7 @@ msgstr ""
 #. module: of_equipment_service
 #: model:ir.model.fields.selection,name:of_equipment_service.selection__of_service_request_stage__state__open
 msgid "Open"
-msgstr "Ouvrir"
+msgstr "En cours"
 
 #. module: of_equipment_service
 #: model:ir.model.fields,field_description:of_equipment_service.field_of_service_request_equipment_line__operator_id
