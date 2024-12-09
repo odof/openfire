@@ -220,6 +220,18 @@
         </field>
     </record>
 
+    <record id="res_partner_view_tree" model="ir.ui.view">
+        <field name="name">res.partner.view.tree</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="of_base.of_res_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <button name="action_button_open_tour_appointment_wizard" type="object" string="Planifier" icon="fa-calendar"
+                    groups="of_planning.group_planning_intervention_read_own_write_own"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Ajout bouton planifier une intervention dans vue form opportunité -->
     <record id="crm_lead_view_form" model="ir.ui.view">
         <field name="name">crm.lead.view.form</field>
