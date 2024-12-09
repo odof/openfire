@@ -2,7 +2,7 @@
 
 {
     "name": "OpenFire / Types de devis",
-    "version": "16.0.1.2.0",
+    "version": "16.0.1.3.0",
     "license": "AGPL-3",
     "author": "OpenFire",
     "website": "https://www.openfire.fr",
