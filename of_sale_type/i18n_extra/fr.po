@@ -1,0 +1,4 @@
+#. module: of_sale_type
+#: model:ir.model.fields,field_description:sale_order_type.field_sale_order_type__pricelist_id
+msgid "Pricelist"
+msgstr "Liste de prix"
