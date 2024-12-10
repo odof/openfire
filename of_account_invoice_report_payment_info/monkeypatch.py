@@ -40,10 +40,11 @@ def _compute_payments_widget_reconciled_info(self):
             payment_dict["move_ref"] = move.ref
             payment_dict["payment_amount"] = format_amount(self.env, payment_dict["amount"], currency)
             payment_dict["date"] = format_date(self.env, payment_dict["date"])
-            payment_dict["payment_mode"] = payment.of_payment_mode_id.shortname
-            payment_dict["payment_reference"] = payment.payment_reference
-            payment_dict["payment_method_id"] = payment.payment_method_line_id.id
-            payment_dict["extra_info"] = payment.payment_method_line_id.of_display_config.format(**payment_dict)
+            if payment:
+                payment_dict["payment_mode"] = payment.of_payment_mode_id.shortname
+                payment_dict["payment_reference"] = payment.payment_reference
+                payment_dict["payment_method_id"] = payment.payment_method_line_id.id
+                payment_dict["extra_info"] = payment.payment_method_line_id.of_display_config.format(**payment_dict)
     return res
 
 
