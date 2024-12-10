@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:18+0000\n"
-"PO-Revision-Date: 2024-07-11 07:18+0000\n"
+"POT-Creation-Date: 2024-12-19 09:30+0000\n"
+"PO-Revision-Date: 2024-12-19 09:30+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,30 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_discount
-#: model:ir.model.fields,field_description:of_sale_discount.field_of_connector_config_settings__group_discount_on_invoice_line
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "%(percent)s %% discount"
+msgstr "%(percent)s %% remise"
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "%(percentage)s %% discount and %(price)s surcharge"
+msgstr "%(percentage)s %% remise et supplément de %(price)s "
+
+#. module: of_sale_discount
 #: model:ir.model.fields,field_description:of_sale_discount.field_res_config_settings__group_discount_on_invoice_line
 msgid "(OF) Discount"
 msgstr "(OF) Remise"
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "All products"
+msgstr "Tous les produits"
 
 #. module: of_sale_discount
 #: model_terms:ir.ui.view,arch_db:of_sale_discount.of_sale_discount_res_config_settings_view_form
@@ -30,6 +50,18 @@ msgstr "Permettre les remises sur les lignes de facture"
 #: model:res.groups,comment:of_sale_discount.of_group_discount_on_invoice_line
 msgid "Allows discounts on invoice lines"
 msgstr "Permet les remises sur les lignes de facture"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_product_pricelist_item__of_brand_ids
+msgid "Brands"
+msgstr "Marques"
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "Category(ies) : %(categ_names)s"
+msgstr "Catégorie(s) : %(categ_names)s"
 
 #. module: of_sale_discount
 #: model:ir.model,name:of_sale_discount.model_res_config_settings
@@ -60,6 +92,15 @@ msgid ""
 "Discount or amount of discounts.\n"
 "Eg. \"40 + 10.5\" equals \"46.3\""
 msgstr ""
+
+#. module: of_sale_discount
+#: model:ir.model.fields,help:of_sale_discount.field_product_pricelist_item__of_brand_ids
+msgid ""
+"If set, the rule will apply only to products from these brands, otherwise to"
+" all brands."
+msgstr ""
+"Si renseigné, la règle s'appliquera uniquement aux produits de ces marques, sinon à "
+"toutes les marques."
 
 #. module: of_sale_discount
 #. odoo-python
@@ -95,14 +136,57 @@ msgid "Percentage Price"
 msgstr "Pourcentage du prix"
 
 #. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "Please specify the category to which this rule should be applied."
+msgstr "Veuillez préciser la catégorie à laquelle cette règle doit être appliquée."
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "Please specify the product for which this rule should be applied."
+msgstr "Veuillez préciser le produit pour lequel cette règle doit être appliquée."
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid ""
+"Please specify the product variant for which this rule should be applied."
+msgstr ""
+"Veuillez préciser la variante de produit pour laquelle cette règle doit être"
+" appliquée."
+
+#. module: of_sale_discount
 #: model:ir.model,name:of_sale_discount.model_product_pricelist_item
 msgid "Pricelist Rule"
 msgstr "Règle des listes des prix"
 
 #. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "Product: %(pname)s"
+msgstr "Produit : %(pname)s"
+
+#. module: of_sale_discount
+#: model:ir.model.fields,field_description:of_sale_discount.field_product_pricelist_item__of_categ_ids
+msgid "Product categories"
+msgstr "Catégories de produit"
+
+#. module: of_sale_discount
 #: model:ir.model,name:of_sale_discount.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de bons de commande"
+
+#. module: of_sale_discount
+#. odoo-python
+#: code:addons/of_sale_discount/models/product_pricelist_item.py:0
+#, python-format
+msgid "Variant: %(pname)s"
+msgstr "Variante : %(pname)s"
 
 #. module: of_sale_discount
 #: model:ir.model.fields,help:of_sale_discount.field_product_pricelist_item__percent_price
