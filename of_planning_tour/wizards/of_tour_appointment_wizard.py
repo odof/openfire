@@ -861,6 +861,7 @@ class OFTourAppointmentWizard(models.TransientModel):
             "of_order_id": order_id,
             "of_picking_manual_ids": len(picking_list) == 1 and [Command.link(picking_list[0])] or False,
             "of_type": "intervention",
+            "of_type_id": template.type_id.id,
         }
         if self.intervention_id:
             copied_lines = []
