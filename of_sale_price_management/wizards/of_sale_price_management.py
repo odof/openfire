@@ -734,7 +734,8 @@ class OFPriceManagementWizardLine(models.TransientModel):
 
             if not round_tax:
                 amount_tax = sum(tax["amount"] for tax in taxes["taxes"])
-                taxes.update({"total_excluded": taxes["base"], "total_included": taxes["base"] + amount_tax})
+                amount_base = sum(tax["base"] for tax in taxes["taxes"])
+                taxes.update({"total_excluded": amount_base, "total_included": amount_base + amount_tax})
 
             self._update_values_and_lines_total(values, vals, taxes, lf)
             total_forced += taxes[tax_field]
@@ -783,10 +784,11 @@ class OFPriceManagementWizardLine(models.TransientModel):
             # Recalcul de 'total_excluded' et 'total_included' sans les arrondis
             if not round_tax:
                 amount_tax = sum(tax["amount"] for tax in taxes["taxes"])
+                amount_base = sum(tax["base"] for tax in taxes["taxes"])
                 taxes.update(
                     {
-                        "total_excluded": taxes["base"],
-                        "total_included": taxes["base"] + amount_tax,
+                        "total_excluded": amount_base,
+                        "total_included": amount_base + amount_tax,
                     }
                 )
 
