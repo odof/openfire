@@ -72,6 +72,9 @@
                     <field name="of_delivery_count" widget="statinfo" string="# Deliveries" />
                 </button>
             </xpath>
+            <xpath expr="//button[@name='action_open_calendar_event']" position="attributes">
+                <attribute name="attrs">{'invisible': ['|', ('of_type', '!=', 'event'), '|', ('res_model', '=', False), ('res_id', '=', False)]}</attribute>
+            </xpath>
             <!-- /Button Box part -->
 
             <!-- Hiding fields part -->
