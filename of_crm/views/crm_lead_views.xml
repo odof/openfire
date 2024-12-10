@@ -103,6 +103,10 @@
             <xpath expr="//page[@name='lead']//field[@name='zip']" position="before">
                 <field name="zip_id" placeholder="City completion" options="{'no_open': True, 'no_create': True}" class="oe_edit_only"/>
             </xpath>
+            <xpath expr="//group[@name='opportunity_partner']//field[@name='phone']/ancestor::div" position="after">
+                <xpath expr="//page[@name='lead']//label[@for='mobile_page_lead']" position="move"/>
+                <xpath expr="//page[@name='lead']//field[@name='mobile']/ancestor::div" position="move"/>
+            </xpath>
             <xpath expr="//div[hasclass('o_lead_opportunity_form_inline_fields')]/.." position="attributes">
                 <attribute name="name">opportunity_followup</attribute>
                 <attribute name="string">Qualification and follow-up</attribute>
