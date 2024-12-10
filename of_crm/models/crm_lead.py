@@ -13,11 +13,10 @@ class CrmLead(models.Model):
     of_title = fields.Many2one(related="partner_id.title", readonly=False, string="Partner Title")
     is_company = fields.Boolean(string="Is a company", tracking=True, related="partner_id.is_company", readonly=False)
     of_website = fields.Char(related="partner_id.website")
-    tag_ids = fields.Many2many(
+    of_partner_category_ids = fields.Many2many(
         comodel_name="res.partner.category",
         related="partner_id.category_id",
-        string="Tags",
-        help="Classify and analyze your lead/opportunity categories like: Training, Service",
+        string="Customer Tags",
     )
     meeting_ids = fields.Many2many(
         comodel_name="calendar.event", string="Meetings (Partner)", related="partner_id.meeting_ids"

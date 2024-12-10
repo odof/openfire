@@ -112,6 +112,7 @@
                 <xpath expr="//group[@name='opportunity_followup']//field[@name='date_deadline']/ancestor::div" position="move"/>
                 <field name="company_id"/>
                 <xpath expr="//group[@name='opportunity_followup']//field[@name='tag_ids']" position="move"/>
+                <field name="of_partner_category_ids" widget="many2many_tags" readonly="1" options="{'color_field': 'color', 'no_create_edit': True}"/>
             </xpath>
             <xpath expr="//group[@name='opportunity_followup']//field[@name='user_id']" position="after">
                 <field name="of_canvasser_id" widget="many2one_avatar_user"/>

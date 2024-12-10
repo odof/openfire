@@ -157,15 +157,6 @@ msgid "City/Location"
 msgstr "Ville/Localisation"
 
 #. module: of_crm
-#: model:ir.model.fields,help:of_crm.field_crm_lead__tag_ids
-msgid ""
-"Classify and analyze your lead/opportunity categories like: Training, "
-"Service"
-msgstr ""
-"Classez et analysez vos catégories de pistes/opportunités. Exemples : "
-"Formation, Service"
-
-#. module: of_crm
 #: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_closing_date
 #: model_terms:ir.ui.view,arch_db:of_crm.of_crm_lead_view_form
 msgid "Closing date"
@@ -491,9 +482,9 @@ msgid "Success"
 msgstr "Succès"
 
 #. module: of_crm
-#: model:ir.model.fields,field_description:of_crm.field_crm_lead__tag_ids
-msgid "Tags"
-msgstr "Étiquettes"
+#: model:ir.model.fields,field_description:of_crm.field_crm_lead__of_partner_category_ids
+msgid "Customer Tags"
+msgstr "Étiquettes client"
 
 #. module: of_crm
 #: model:ir.model.fields,help:of_crm.field_crm_lead__of_date_action_filter
