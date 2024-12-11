@@ -580,12 +580,12 @@ class OFOutlayAnalysis(models.Model):
             amounts = get_section_amounts(line.of_analytic_section_id.id)
             if amounts is False:
                 continue
-            amounts['sale_invoiced'] += line.price_subtotal
+            amounts['sale_invoiced'] += line.price_subtotal_signed
         for line in self.in_invoice_line_ids.filtered('of_outlay_analysis_selected'):
             amounts = get_section_amounts(line.of_analytic_section_id.id)
             if amounts is False:
                 continue
-            amounts['purchase_invoiced'] += line.price_subtotal
+            amounts['purchase_invoiced'] += line.price_subtotal_signed
         # 2 - ODs
         all_invoice_moves = self.env['account.invoice'].search(
             [('invoice_line_ids.account_analytic_id', 'in', analytic_accounts.ids)]).mapped('move_id')
