@@ -138,6 +138,7 @@ class OFTourPlanningWizardMixin(models.AbstractModel):
         # allow user to accept that an intervention can ends inside the lunch break time slot (count_wh_disrupted is
         # priority over this option). Reorganization wizard doesn't have this option (yet ?).
         lunchbreak_overlapping = self.can_overlap_lunchbreak if hasattr(self, 'can_overlap_lunchbreak') else False
+        keep_halfday = self.optim_mode != 'all' if hasattr(self, 'optim_mode') else False
         timeline = []
         result = {}
         for index, ordered_line in enumerate(ordered_lines, 1):
@@ -157,10 +158,16 @@ class OFTourPlanningWizardMixin(models.AbstractModel):
                 new_intervention.duree, duration) if new_intervention.forcer_dates else new_intervention.duree
             hours, minutes = float_2_heures_minutes(duration)
 
+            if keep_halfday:
+                dstart_ctx = fields.Datetime.context_timestamp(self, fields.Datetime.from_string(dstart))
+                dstart_hour = round(dstart_ctx.hour + dstart_ctx.minute / 60.0 + dstart_ctx.second / 3600.0, 5)
+                if new_start_hour < afternoon_start_hour <= dstart_hour:
+                    new_start_hour = afternoon_start_hour
+
             # get the new start/end hour for the intervention depending on the employee hours
             if complex_employee_hours:
                 len_flattened_employee_hours = len(flattened_employee_hours)
-                for i in range(len_flattened_employee_hours):
+                for i in xrange(len_flattened_employee_hours - 1):
                     if new_start_hour >= flattened_employee_hours[i][1] and \
                             new_start_hour <= flattened_employee_hours[i + 1][0]:
                         if count_wh_disrupted <= 0:
@@ -180,7 +187,7 @@ class OFTourPlanningWizardMixin(models.AbstractModel):
 
             new_end_hour = new_start_hour + duration
             if complex_employee_hours:
-                for i in range(len_flattened_employee_hours):
+                for i in xrange(len_flattened_employee_hours - 1):
                     if new_end_hour > flattened_employee_hours[i][1] and \
                             new_end_hour <= flattened_employee_hours[i + 1][0]:
                         if count_wh_disrupted <= 0:
