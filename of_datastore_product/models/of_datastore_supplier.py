@@ -1,10 +1,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
 
-from .of_datastore_centralized import DATASTORE_IND
+from odoo.addons.of_datastore.models.of_datastore_model import DATASTORE_IND
 
 
 class OFDatastoreSupplier(models.Model):
@@ -95,29 +96,26 @@ class OFDatastoreSupplier(models.Model):
             raise UserError(_("Failed to connect to central base"))
         ds_brand_obj = self.of_datastore_get_model(client, "of.product.brand")
         ds_brand_ids = self.of_datastore_search(ds_brand_obj, [])
-        ds_brand_data = self.of_datastore_read(ds_brand_obj, ds_brand_ids, ["name", "code", "logo", "note_update"])
+        ds_brand_data = self.of_datastore_read(ds_brand_obj, ds_brand_ids, ["name", "code", "logo", "update_note"])
         brand_names = self.env["of.product.brand"].search([]).mapped("name")
 
-        wizard = wizard_obj.create(
-            {
-                "datastore_supplier_id": self.id,
-                "line_ids": [
-                    [
-                        Command.create(
-                            {
-                                "datastore_brand_id": ds_brand["id"],
-                                "name": ds_brand["name"],
-                                "code": ds_brand["code"],
-                                "logo": ds_brand["logo"],
-                                "note_update": ds_brand["note_update"],
-                                "state": "done" if ds_brand["name"] in brand_names else "do",
-                            }
-                        )
-                    ]
-                    for ds_brand in ds_brand_data
-                ],
-            }
-        )
+        wizard_value = {
+            "datastore_supplier_id": self.id,
+            "line_ids": [
+                Command.create(
+                    {
+                        "datastore_brand_id": ds_brand["id"],
+                        "name": ds_brand["name"],
+                        "code": ds_brand["code"],
+                        "logo": ds_brand["logo"],
+                        "update_note": ds_brand["update_note"],
+                        "state": "done" if ds_brand["name"] in brand_names else "do",
+                    }
+                )
+                for ds_brand in ds_brand_data
+            ],
+        }
+        wizard = wizard_obj.create(wizard_value)
         return {
             "type": "ir.actions.act_window",
             "view_mode": "form",
@@ -148,7 +146,7 @@ class OFDatastoreSupplier(models.Model):
             client = self.of_datastore_connect()
         ds_brand_obj = self.of_datastore_get_model(client, "of.product.brand")
         brand_match = {brand.datastore_brand_id: brand for brand in self.brand_ids}
-        ds_brands_data = self.of_datastore_read(ds_brand_obj, brand_match.keys(), ["code", "use_prefix"])
+        ds_brands_data = self.of_datastore_read(ds_brand_obj, list(brand_match.keys()), ["code", "use_prefix"])
         default_code_func = {}
         for ds_brand in ds_brands_data:
             brand = brand_match[ds_brand["id"]]

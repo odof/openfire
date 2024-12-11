@@ -1,8 +1,9 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 from odoo import _, api, fields, models
 
-from .of_datastore_centralized import DATASTORE_IND
+from odoo.addons.of_datastore.models.of_datastore_model import DATASTORE_IND
 
 
 class OFDatastoreSupplierBrand(models.AbstractModel):
@@ -12,9 +13,8 @@ class OFDatastoreSupplierBrand(models.AbstractModel):
     datastore_brand_id = fields.Integer(string="Supplier brand ID", required=True, readonly=True)
     brand_id = fields.Many2one(comodel_name="of.product.brand", string="Brand")
     product_count = fields.Integer(string="# Products", readonly=True)
-    prices_date = fields.Date(readonly=True)
-    note_update = fields.Text(string="Update notes", readonly=True)
-
+    price_date = fields.Date(readonly=True)
+    update_note = fields.Text(string="Update notes", readonly=True)
     # -------------------------------------------------------------------------
     # ORM methods
     # -------------------------------------------------------------------------
@@ -35,20 +35,25 @@ class OFDatastoreSupplierBrand(models.AbstractModel):
         default_ds_brand_name = _("Error")
         result = []
         for ds_brand_full_id in self.ids:
-            ds_supplier_id = ds_brand_full_id / DATASTORE_IND
+            ds_supplier_id = ds_brand_full_id // DATASTORE_IND
             ds_brand_id = ds_brand_full_id % DATASTORE_IND
 
             brand = brand_obj.search(
-                [("datastore_supplier_id", "=", ds_supplier_id), ("datastore_brand_id", "=", ds_brand_id)]
+                [("datastore_supplier_id", "=", ds_supplier_id), ("datastore_brand_id", "=", ds_brand_id)], limit=1
             )
+
+            if brand:
+                brand_id = (brand.id, brand.name)
+            else:
+                brand_id = False
 
             vals = {
                 "id": ds_brand_full_id,
-                "brand_id": brand and brand.id or False,
+                "brand_id": brand_id,
                 "name": default_ds_brand_name,
                 "datastore_brand_id": False,
                 "update_date": False,
-                "note_update": "",
+                "update_note": "",
                 "product_count": False,
             }
 
@@ -57,15 +62,18 @@ class OFDatastoreSupplierBrand(models.AbstractModel):
             if not isinstance(client, str):
                 ds_brand_obj = ds_supplier.of_datastore_get_model(client, "of.product.brand")
                 ds_brand_data = ds_supplier.of_datastore_read(
-                    ds_brand_obj, [ds_brand_id], ["name", "prices_date", "note_update", "product_count"]
+                    ds_brand_obj, [ds_brand_id], ["name", "price_date", "update_note", "product_count", "display_name"]
                 )[0]
                 del ds_brand_data["id"]
-                vals |= ds_brand_data
+                vals.update(ds_brand_data)
 
             if fields:
+                if "id" not in fields:
+                    fields.append("id")
                 vals = {key: val for key, val in iter(vals.items()) if key in fields}
 
             result.append(vals)
+
         return result
 
     @api.model
@@ -74,11 +82,11 @@ class OFDatastoreSupplierBrand(models.AbstractModel):
             return args[0][2]
         return super()._search(args, offset, limit, order, count, access_rights_uid)
 
-    def _write(self, vals):
+    def write(self, vals):
         if self and vals and "brand_id" in vals:
             brand_obj = self.env["of.product.brand"]
             ds_brand_full_id = self.ids[0]
-            ds_supplier_id = ds_brand_full_id / DATASTORE_IND
+            ds_supplier_id = ds_brand_full_id // DATASTORE_IND
             ds_brand_id = ds_brand_full_id % DATASTORE_IND
 
             new_brand_id = vals["brand_id"]

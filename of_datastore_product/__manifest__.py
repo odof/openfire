@@ -10,6 +10,7 @@
     'summary': "Gestion des produits centralisés",
     'depends': [
         'of_datastore_connector',
+        'of_datastore',
         'of_product_pack',  # of_product_brand > of_product
         'stock',
         'purchase',

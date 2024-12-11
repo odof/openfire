@@ -1,17 +1,17 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-
-# import socket  # Ne pas supprimer cette ligne, voir fonction connect()
-import threading
-import xmlrpc.client
+from urllib.parse import urlparse
 
 from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+
+DATASTORE_IND = 100000000
 
 _logger = logging.getLogger(__name__)
 
 try:
-    import openerplib  # NOTE: Still using a "2013 library", consider updating to odoorpc ?
+    import odoorpc
 except (ImportError, IOError) as err:
     _logger.debug(err)
 
@@ -26,6 +26,8 @@ class OFDatastoreConnector(models.AbstractModel):
 
     _name = "of.datastore.connector"
     _description = "Datastore Connector"
+    _rec_name = "db_name"
+    _order = "db_name"
 
     server_address = fields.Char(string="Server address", required=True)
     db_name = fields.Char(string="Database", required=True)
@@ -38,6 +40,9 @@ class OFDatastoreConnector(models.AbstractModel):
         help="Specify a value only when changing the password, otherwise leave empty",
     )
     error_msg = fields.Char(string="Error", compute="_compute_error_msg")
+    active = fields.Boolean(default=True)
+
+    _sql_constraints = [("db_name_uniq", "unique (db_name)", "There is already a connection to this database")]
 
     @api.depends()
     def _compute_new_password(self):
@@ -74,6 +79,22 @@ class OFDatastoreConnector(models.AbstractModel):
                     error_msg = _("Connection successful")
             connector.error_msg = error_msg
 
+    # -------------------------------------------------------------------------
+    # Onchange methods
+    # -------------------------------------------------------------------------
+
+    @api.onchange("server_address")
+    def onchange_server_address(self):
+        if self.server_address and not self.server_address.startswith("http"):
+            return {"value": {"server_address": f"https://{self.server_address}"}}  # noqa
+        return False
+
+    @api.onchange("db_name")
+    def onchange_db_name(self):
+        if self.db_name:
+            return {"value": {"server_address": f"https://{self.db_name}.openfire.fr"}}  # noqa
+        return False
+
     @api.model
     def _get_context(self):
         return {key: val for key, val in self._context.copy().items() if key in ("lang", "tz", "active_test")}
@@ -81,61 +102,30 @@ class OFDatastoreConnector(models.AbstractModel):
     @api.model
     def get_connector(self, url, db_name, login, password):
         # Connexion à la base du fournisseur
-        # Utilisation d'un thread pour stopper une connexion trop longue
+        try:
+            parse_url = urlparse(url)
 
-        class FuncThread(threading.Thread):
-            def __init__(self):
-                threading.Thread.__init__(self)
-                self.result = None
+            port = parse_url.port
 
-            def run(self):
-                try:
-                    server_address = url
-                    # TODO: OF 10 legacy, check if still needed, remove if not
-                    # ========== Code à recommenter après la résolution du bug OVH ==========
-                    # Retrait du prefixe http:// et extraction du port (optionnel)
-                    # address_split = server_address.split('://')[-1].split(':')  # [adresse, port]
-                    # ip_address = socket.gethostbyname(address_split[0])
-                    # if len(address_split) == 2:
-                    #     port = f':{address_split[1]}'
-                    # elif ip_address == socket.gethostbyname('s-alpha.openfire.fr'):
-                    #     # Sur s-alpha le port 8010 est utilisé pour la connexion xmlrpc v10
-                    #     port = ':8010'
-                    # else:
-                    #     port = ''
-                    # server_address = f'http://{ip_address}{port}'
-                    # =======================================================================
+            if not parse_url.port:
+                port = 80
+            else:
+                port = parse_url.port
 
-                    i = server_address.find("://")
-                    if i == -1:
-                        # Protocole xmlrpcs par defaut
-                        protocol = "xmlrpcs"
-                        address = server_address
-                    else:
-                        # Protocole xmlrpc ou xmlrpcs en fonction de http ou https
-                        protocol = server_address[:i].replace("http", "xmlrpc")
-                        address = server_address[i + 3 :]
-                    j = address.find(":")
-                    if j == -1:
-                        port = 443 if server_address[:i] == "https" else 80
-                    else:
-                        port = int(address[j + 1 :])
-                        address = address[:j]
-                    cli = openerplib.get_connection(
-                        hostname=address, port=port, protocol=protocol, database=db_name, login=login, password=password
-                    )
+            if port == 443:
+                protocol = "jsonrpc+ssl"
+            else:
+                protocol = "jsonrpc"
 
-                    # Opération pour vérifier la connexion
-                    self.result = cli.get_model("res.users").search([]) and cli or ""
-                except xmlrpc.client.Fault as exc:
-                    self.result = exc.faultCode
-                except Exception as exc:
-                    self.result = _(str(exc))
+            odoo_tc = odoorpc.ODOO(host=parse_url.hostname, port=port, protocol=protocol, timeout=120)
 
-        it = FuncThread()
-        it.start()
-        it.join(10)  # attente de 10 secondes ou jusqu'à la fin de l'opération
-        return _("Connection timeout") if it.is_alive() else it.result
+            odoo_tc.login(db=db_name, login=login, password=password)
+
+            # Opération pour vérifier la connexion
+            odoo_tc.env["res.users"].search([], limit=1)
+            return odoo_tc
+        except Exception as exc:
+            raise UserError(_(str(exc)))
 
     def of_datastore_connect(self):
         self.ensure_one()
@@ -148,7 +138,7 @@ class OFDatastoreConnector(models.AbstractModel):
 
     @api.model
     def of_datastore_get_model(self, ds_client, model_name):
-        return ds_client.get_model(model_name)
+        return ds_client.env[model_name]
 
     @api.model
     def of_datastore_search(self, ds_model, args, offset=None, limit=None, order=None, count=None):
@@ -159,11 +149,12 @@ class OFDatastoreConnector(models.AbstractModel):
                 ("limit", limit),
                 ("order", order),
                 ("count", count),
-                ("context", self._get_context()),
             ]
             if val is not None
         }
-        return ds_model.search(args, **kwargs)
+        res = ds_model.with_context(self._get_context()).search(args, **kwargs)
+
+        return res
 
     @api.model
     def of_datastore_name_search(self, ds_model, name=None, args=None, operator=None, limit=None):
@@ -174,27 +165,25 @@ class OFDatastoreConnector(models.AbstractModel):
                 ("args", args),
                 ("operator", operator),
                 ("limit", limit),
-                ("context", self._get_context()),
             ]
             if val is not None
         }
-        return ds_model.name_search(**kwargs)
+        res = ds_model.with_context(self._get_context()).name_search(**kwargs)
+        return res
 
     @api.model
     def of_datastore_name_get(self, ds_model, ids):
         return ds_model.name_get(ids)
 
     @api.model
-    def of_datastore_read(self, ds_model, ids, fields=None, load=None, check_fields=True):
+    def of_datastore_read(self, ds_model, ids, fields=None, load=None, check_fields=False):
         if check_fields:
             ds_fields = ds_model.fields_get_keys()
             fields = [f for f in fields if f in ds_fields]
-        kwargs = {
-            key: val
-            for key, val in [("fields", fields), ("load", load), ("context", self._get_context())]
-            if val is not None
-        }
-        return ds_model.read(ids, **kwargs)
+
+        kwargs = {key: val for key, val in [("fields", fields), ("load", load)] if val is not None}
+        res = ds_model.with_context(self._get_context()).read(ids, **kwargs)
+        return res
 
     @api.model
     def of_datastore_read_group(
@@ -207,18 +196,15 @@ class OFDatastoreConnector(models.AbstractModel):
                 ("limit", limit),
                 ("orderby", orderby),
                 ("lazy", lazy),
-                ("context", self._get_context()),
             ]
             if val is not None
         }
-        return ds_model.read_group(domain, fields, groupby, **kwargs)
+        return ds_model.with_context(self._get_context()).read_group(domain, fields, groupby, **kwargs)
 
     @api.model
     def of_datastore_search_read(self, ds_model, domain=None, fields=None, offset=0, limit=None, order=None):
-        # La fonction search_read de openerplib ne fonctionne pas bien et fonctionne par un appel search() puis read().
-        # On reprend le même système, mais avec nos méthodes.
-        record_ids = self.of_datastore_search(ds_model, domain, offset, limit, order, count=False)
-        return self.of_datastore_read(ds_model, record_ids, fields) if record_ids else []
+        res = ds_model.search_read(domain, offset, limit, order, count=False)
+        return res
 
     @api.model
     def of_datastore_create(self, ds_model, values):

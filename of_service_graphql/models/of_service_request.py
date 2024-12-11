@@ -194,7 +194,7 @@ class OFServiceRequest(models.Model):
                             ON partner.id = service.address_id
                         where service.address_id is not null and
                         service.state in %s and
-                        (partner.partner_longitude != 0 and partner.partner_latitude != 0) and
+                        not (partner.partner_longitude == 0 and partner.partner_latitude == 0) and
                         float8 (point(partner.partner_longitude,partner.partner_latitude) <@> point(%s, %s)) < %s
                         ORDER BY point(partner.partner_longitude,partner.partner_latitude) <@> point(%s, %s);
                         """,
