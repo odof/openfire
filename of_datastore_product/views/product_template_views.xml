@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
     <!-- Vue formulaire -->
     <record id="of_datastore_product_template_form_view" model="ir.ui.view">
         <field name="name">of.kit.product.template.common.form</field>
@@ -11,8 +10,8 @@
         <field name="arch" type="xml">
             <xpath expr="//div[@name='options']" position="inside">
                 <div>
-                    <label for="of_datastore_res_id" string="Connected" />
-                    <field name="of_datastore_res_id" widget="boolean" readonly="1" />
+                    <label for="of_datastore_is_connected" string="Connected" />
+                    <field name="of_datastore_is_connected" widget="boolean" readonly="1" />
                 </div>
             </xpath>
         </field>
@@ -47,17 +46,16 @@
     </record>
 
     <!-- Recherche d'articles sur base centralisée -->
-    <!-- FIXME : Format de domaine invalide ['of_datastore_product_search'] dans domain of <filter name="of_datastore_search">-->
-    <!-- <record id="of_datastore_product_template_search_view" model="ir.ui.view">
+    <record id="of_datastore_product_template_search_view" model="ir.ui.view">
         <field name="name">product.template.search</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='inactive']" position="before">
-                <filter string="Search on centralized database" name="of_datastore_search" domain="['of_datastore_product_search']"/>
+                <filter string="Search on centralized database" name="of_datastore_search" domain="[('is_of_ds_search','=',True)]"/>
                 <separator/>
             </xpath>
         </field>
-    </record> -->
+    </record>
 
 </odoo>

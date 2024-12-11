@@ -1,0 +1,169 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_datastore
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-12-27 10:57+0000\n"
+"PO-Revision-Date: 2024-12-27 10:57+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_ir_attachment
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_res_company
+msgid "Companies"
+msgstr "Sociétés"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_ir_property
+msgid "Company Property"
+msgstr "Propriété de la société"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_res_partner
+msgid "Contact"
+msgstr ""
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_res_currency
+msgid "Currency"
+msgstr "Devise"
+
+#. module: of_datastore
+#: model:ir.model.fields,field_description:of_datastore.field_uom_uom__of_datastore_res_ids
+msgid "Datastore res_ids"
+msgstr ""
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_mail_followers
+msgid "Document Followers"
+msgstr "Abonnés au document"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_ir_binary
+msgid "File streaming helper model for controllers"
+msgstr "Modèle d'aide au contrôleur - Streaming de fichier"
+
+#. module: of_datastore
+#: model:ir.model.fields,field_description:of_datastore.field_account_tax__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_ir_attachment__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_ir_binary__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_mail_followers__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_mail_mail__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_mail_message__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_of_datastore_model__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_product_category__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_product_supplierinfo__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_res_company__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_res_currency__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_res_partner__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_res_users__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_stock_location__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_stock_route__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_uom_category__of_datastore_res_id
+#: model:ir.model.fields,field_description:of_datastore.field_uom_uom__of_datastore_res_id
+msgid "ID on supplier database"
+msgstr "ID sur la base centralisée"
+
+#. module: of_datastore
+#: model:ir.model.fields,field_description:of_datastore.field_account_tax__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_ir_attachment__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_ir_binary__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_mail_followers__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_mail_mail__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_mail_message__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_of_datastore_model__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_product_category__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_product_supplierinfo__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_res_company__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_res_currency__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_res_partner__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_res_users__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_stock_location__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_stock_route__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_uom_category__is_of_ds_search
+#: model:ir.model.fields,field_description:of_datastore.field_uom_uom__is_of_ds_search
+msgid "IS DS Search"
+msgstr ""
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_stock_location
+msgid "Inventory Locations"
+msgstr "Emplacements des stocks"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_stock_route
+msgid "Inventory Routes"
+msgstr "Routes d'inventaire"
+
+#. module: of_datastore
+#: model:ir.model.fields,field_description:of_datastore.field_account_tax__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_ir_attachment__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_ir_binary__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_mail_followers__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_mail_mail__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_mail_message__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_of_datastore_model__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_product_category__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_product_supplierinfo__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_res_company__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_res_currency__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_res_partner__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_res_users__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_stock_location__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_stock_route__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_uom_category__of_datastore_is_connected
+#: model:ir.model.fields,field_description:of_datastore.field_uom_uom__of_datastore_is_connected
+msgid "Is Connected"
+msgstr "Est connectée"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_mail_message
+msgid "Message"
+msgstr ""
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_of_datastore_model
+msgid "OF Model Datastore"
+msgstr ""
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_product_category
+msgid "Product Category"
+msgstr "Catégorie de produit"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_uom_uom
+msgid "Product Unit of Measure"
+msgstr "Unité de mesure du produit"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_uom_category
+msgid "Product UoM Categories"
+msgstr "Catégorie d'UdM du produit"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_product_supplierinfo
+msgid "Supplier Pricelist"
+msgstr "Liste de prix du fournisseur"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_account_tax
+msgid "Tax"
+msgstr "Taxe"
+
+#. module: of_datastore
+#: model:ir.model,name:of_datastore.model_res_users
+msgid "User"
+msgstr "Utilisateur"

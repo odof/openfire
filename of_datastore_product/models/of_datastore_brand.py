@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+
 import requests
 from requests.exceptions import JSONDecodeError
 
@@ -125,6 +126,7 @@ class OFDatastoreBrand(models.Model):
             params={"dbname": self._cr.dbname, "since_dt": last_update or ""},
             timeout=10,
         )
+
         if response.status_code != requests.codes.ok:
             try:
                 message = response.json()

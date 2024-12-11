@@ -16,3 +16,4 @@ pypdfium2
 pyfcm==2.0.4
 odoorpc==0.10.1
 paramiko==3.5.0
+odoorpc==0.10.1

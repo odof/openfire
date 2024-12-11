@@ -5,7 +5,8 @@ import contextlib
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import ValidationError
 
-from .of_datastore_centralized import DATASTORE_IND
+from odoo.addons.of_datastore.models.of_datastore_cache import DS_CACHE
+from odoo.addons.of_datastore.models.of_datastore_model import DATASTORE_IND
 
 
 class OFProductBrand(models.Model):
@@ -33,6 +34,17 @@ class OFProductBrand(models.Model):
     datastore_update_required = fields.Boolean(
         string="To update", compute="_compute_datastore_update_required", search="_search_datastore_update_required"
     )
+
+    def of_ds_match_many2one(self, value, base_index, data):
+        base_id = base_index // DATASTORE_IND
+        brand = self.env["of.product.brand"].search(
+            [("datastore_brand_id", "=", value[0]), ("datastore_supplier_id", "=", base_id)], limit=1
+        )
+        if brand:
+            return (brand.id, brand.name)
+        # on retourne un id négatif basé sur l'index de la base distante
+        brand = self.browse(-(value[0] + base_index))
+        return (brand.id, brand.name)
 
     # -------------------------------------------------------------------------
     # Compute methods
@@ -90,8 +102,8 @@ class OFProductBrand(models.Model):
             ds_brand_obj = supplier.of_datastore_get_model(client, "of.product.brand")
             ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [("id", "in", brand_ids)])
             suppliers_data[supplier] = {
-                data["id"]: (data["note_update"], data["product_count"])
-                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ["note_update", "product_count"])
+                data["id"]: (data["update_note"], data["product_count"])
+                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ["update_note", "product_count"])
             }
 
         for brand in self:
@@ -126,7 +138,7 @@ class OFProductBrand(models.Model):
 
         # Lors de la modification de la marque, les données en cache sont invalidées
         if vals and self and not self._context.get("no_clear_datastore_cache"):
-            self.clear_datastore_cache()
+            DS_CACHE.clear_cache(self.env.cr.dbname)
         if new_products:
             new_products.action_button_update_from_brand()
         return res
@@ -276,27 +288,6 @@ class OFProductBrand(models.Model):
         match_dict[res_id] = result
         return result
 
-    def clear_datastore_cache(self):
-        """Cache cleaning function.
-        Since the cache is a TransientModel, it is automatically cleaned every day
-        Odoo's `_transient_vacuum()` function clears all TransientModels including write_date or create_date
-        is more than an hour old
-            - Every day, via the cron base.autovacuum_job
-            - Every 20 calls to `_create()`
-        This cleaning function allows additional manual cleaning per central base.
-        The goal is to be able to clean by PD connector if necessary, especially when the rules
-        calculation have been modified in the brand.
-        """
-        suppliers = self.mapped("datastore_supplier_id")
-        domain = [("model", "in", ("product.product", "product.template"))] + ["|"] * (len(suppliers._ids) - 1)
-        for supplier in suppliers:
-            domain += [
-                "&",
-                ("res_id", "<=", -DATASTORE_IND * supplier.id),
-                ("res_id", ">", -DATASTORE_IND * (supplier.id + 1)),
-            ]
-        self.env["of.datastore.cache"].search(domain).unlink()
-
     def _datastore_update_product_vals(self, product_vals):
         """Imports centralized items used in product_vals.
 
@@ -312,7 +303,7 @@ class OFProductBrand(models.Model):
             if val[0] == Command.SET:
                 pass
             elif val[1] < 0:
-                product = self.env["product.template"].browse(val[1]).of_datastore_import()
+                product = self.env["product.template"].browse(val[1]).of_ds_import()
                 val = list(val)
                 val[1] = product.id
                 new_products |= product

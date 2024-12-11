@@ -6,7 +6,7 @@ import logging
 from odoo import Command, _, fields, models
 from odoo.exceptions import ValidationError
 
-from ..models.of_datastore_centralized import DATASTORE_IND
+from odoo.addons.of_datastore.models.of_datastore_model import DATASTORE_IND
 
 _logger = logging.getLogger(__name__)
 
@@ -16,12 +16,12 @@ class OFDatastoreUpdateProduct(models.TransientModel):
     _description = "Import / update products"
 
     def _default_is_update(self):
-        active_ids = self._context.get("active_ids") or [0]
+        active_ids = self.env.context.get("active_ids") or [0]
         return max(active_ids) > 0
 
     def _default_nb_local_products(self):
-        active_model = self._context.get("active_model")
-        active_ids = self._context.get("active_ids")
+        active_model = self.env.context.get("active_model")
+        active_ids = self.env.context.get("active_ids")
         nb_local_products = 0
         if active_model == "of.product.brand":
             nb_local_products = (
@@ -71,7 +71,7 @@ class OFDatastoreUpdateProduct(models.TransientModel):
         }
         # Récupération des correspondances de la base centrale
         ds_product_new_ids = supplier.with_context(active_test=False).of_datastore_search(
-            ds_product_obj, [("default_code", "in", code_to_match_dict.keys())]
+            ds_product_obj, [("default_code", "in", list(code_to_match_dict.keys()))]
         )
         if ds_product_new_ids:
             for ds_product_data in supplier.of_datastore_read(ds_product_obj, ds_product_new_ids, ["default_code"]):
@@ -103,7 +103,6 @@ class OFDatastoreUpdateProduct(models.TransientModel):
         product_obj = self.env["product.product"].with_context(of_from_product_datastore=True)
         product_template_obj = self.env["product.template"]
 
-        supplier_value = supplier.id * DATASTORE_IND
         # Détection des articles non liés à la base centrale.
         no_match_ids = [product.id for product in products if not product.of_datastore_res_id]
         id_match = {product.of_datastore_res_id: product for product in products if product.of_datastore_res_id}
@@ -112,7 +111,7 @@ class OFDatastoreUpdateProduct(models.TransientModel):
         client = supplier.of_datastore_connect()
         ds_product_obj = supplier.of_datastore_get_model(client, "product.product")
         ds_product_ids = supplier.with_context(active_test=False).of_datastore_search(
-            ds_product_obj, [("id", "in", id_match.keys())]
+            ds_product_obj, [("id", "in", list(id_match.keys()))]
         )
 
         # Articles dont le lien existait mais dont la cible n'existe plus
@@ -131,12 +130,24 @@ class OFDatastoreUpdateProduct(models.TransientModel):
 
         # --- Mise à jour des articles ---
         products_write_data = {}
-        fields_to_update = product_obj.of_datastore_get_import_fields()
-        fields_to_not_empty = product_obj.of_datastore_get_fields_to_not_empty()
+        fields_to_update = product_obj.of_ds_fields_to_import()
+        fields_to_not_empty = product_obj.of_ds_fields_to_not_empty()
         if self.noup_name:
             fields_to_update.remove("name")
-        ds_product_ids = [-(ds_product_id + supplier_value) for ds_product_id in ds_product_ids]
-        ds_products_data = product_obj.browse(ds_product_ids)._of_read_datastore(fields_to_update, create_mode=True)
+
+        ds_products_data = product_obj.of_ds_read(
+            supplier, ds_product_ids, fields_to_update, check_fields=True, no_cache=True
+        )
+        ds_products_data = product_obj.of_ds_set_calculate_values(ds_products_data, supplier)
+
+        # les id dans ds_products_data sont négatifs encore, donc on doit les passer en positif et les remplacer
+        # par les id produits dans odoo via of_datastore_res_id
+        for ds_product_data in ds_products_data:
+            product = self.env["product.product"].search(
+                [("of_datastore_res_id", "=", ds_product_data["of_datastore_res_id"])], limit=1
+            )
+            ds_product_data["id"] = product.id
+            ds_product_data["product_tmpl_id"] = (product.product_tmpl_id.id, product.product_tmpl_id.display_name)
 
         for ds_product_data in itertools.chain(unmatched_ids, ds_products_data):
             if isinstance(ds_product_data, int):
@@ -179,7 +190,7 @@ class OFDatastoreUpdateProduct(models.TransientModel):
                     del ds_product_data[field]
 
             if ds_product_data.get("seller_ids"):
-                # La fonction _of_read_datastore renvoie un seller_ids de la forme [(5, ), (0, 0, {...})]
+                # La fonction of_ds_set_calculate_values() renvoie un seller_ids de la forme [(5, ), (0, 0, {...})]
                 # Cela pose un problème de performance, car le (5, ) appelle la fonction unlink(),
                 # laquelle vide toutes les valeurs en cache
                 # On retire donc le code (5, ) et on remplace au besoin le (0, ) par un (1, )
@@ -269,7 +280,7 @@ class OFDatastoreUpdateProduct(models.TransientModel):
                 # Détection des articles déjà importés
                 create_product_ids = {}
                 for full_id in to_create:
-                    supplier_id = -full_id / DATASTORE_IND
+                    supplier_id = -full_id // DATASTORE_IND
                     create_product_ids.setdefault(supplier_id, []).append((-full_id) % DATASTORE_IND)
                 for supplier_id, product_ids in create_product_ids.items():
                     supplier_ind = DATASTORE_IND * supplier_id
@@ -330,7 +341,7 @@ class OFDatastoreUpdateProduct(models.TransientModel):
                 to_create += ds_product_ids
 
         if to_create:
-            model_obj.browse(to_create).of_datastore_import()
+            model_obj.browse(to_create).of_ds_import()
             notes.append(_("Created products : %s") % (len(to_create)))
 
         if active_model == "of.product.brand":
@@ -357,4 +368,4 @@ class OFDatastoreUpdateProduct(models.TransientModel):
         )
         note = "\n".join(notes + notes_warning)
 
-        return self.env["of.popup.wizard"].popup_return(note, titre=_("Import/update notes"))
+        return self.env["of.popup.wizard"].popup_return(note, title=_("Import/update notes"))

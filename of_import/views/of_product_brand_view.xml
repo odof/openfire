@@ -7,12 +7,12 @@
         <field name="inherit_id" ref="of_product_brand.of_product_brand_view_form" />
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Apply rules"/>
+                <button name="%(action_of_import_update_product_brand_products)d" type="action" string="Apply rules" />
             </xpath>
-            <xpath expr="//field[@name='use_prefix']" position="replace"/>
-            <xpath expr="//field[@name='show_in_sales']" position="replace"/>
-            <xpath expr="//label[@for='note']" position="replace"/>
-            <xpath expr="//field[@name='note']" position="replace"/>
+            <xpath expr="//field[@name='use_prefix']" position="replace" />
+            <xpath expr="//field[@name='show_in_sales']" position="replace" />
+            <xpath expr="//label[@for='note']" position="replace" />
+            <xpath expr="//field[@name='note']" position="replace" />
         </field>
     </record>
 
@@ -25,88 +25,82 @@
             <xpath expr="//notebook" position="inside">
                 <page name="import_config" string="Import">
                     <group name="import_config">
-                        <separator string="Default import settings" colspan="2"/>
-                        <field name="of_import_categ_id"/>
-                        <field name="of_import_discount"/>
-                        <field name="of_import_sale_price"/>
-                        <field name="of_import_cost_price"/>
-                        <separator string="Matching of item categories" colspan="2"/>
+                        <separator string="Default import settings" colspan="2" />
+                        <field name="of_import_categ_id" />
+                        <field name="of_import_discount" />
+                        <field name="of_import_sale_price" />
+                        <field name="of_import_cost_price" />
+                        <separator string="Matching of item categories" colspan="2" />
                         <field name="categ_ids" nolabel="1" colspan="2">
                             <tree editable="bottom">
-                                <field name="categ_origin"/>
-                                <field name="of_import_categ_id"/>
-                                <field name="of_import_discount"/>
-                                <field name="of_import_sale_price"/>
-                                <field name="of_import_cost_price"/>
-                                <button name="action_button_update_products" type="object" string="Update" icon="fa-cogs"
-                                    confirm="Attention! This action is irreversible and will recalculate the category, purchase price, and selling price of all items in this category."/>
+                                <field name="categ_origin" />
+                                <field name="of_import_categ_id" />
+                                <field name="of_import_discount" />
+                                <field name="of_import_sale_price" />
+                                <field name="of_import_cost_price" />
+                                <button name="action_button_update_products" type="object" string="Update" icon="fa-cogs" confirm="Attention! This action is irreversible and will recalculate the category, purchase price, and selling price of all items in this category." />
                             </tree>
                         </field>
-                        <separator string="Items with specific rules" colspan="2"/>
+                        <separator string="Items with specific rules" colspan="2" />
                         <field name="product_config_ids" widget="many2many" nolabel="1" colspan="2">
                             <tree editable="bottom">
-                                <field name="default_code" readonly="1"/>
-                                <field name="name" readonly="1"/>
-                                <field name="of_import_categ_id"/>
-                                <field name="of_import_discount"/>
-                                <field name="of_import_sale_price"/>
-                                <field name="of_import_cost_price"/>
-                                <button name="action_button_update_from_brand" type="object" string="Update" icon="fa-cogs"
-                                    confirm="Attention! This action is irreversible and will recalculate the category, purchase price, and selling price of the item."/>
+                                <field name="default_code" readonly="1" />
+                                <field name="name" readonly="1" />
+                                <field name="of_import_categ_id" />
+                                <field name="of_import_discount" />
+                                <field name="of_import_sale_price" />
+                                <field name="of_import_cost_price" />
+                                <button name="action_button_update_from_brand" type="object" string="Update" icon="fa-cogs" confirm="Attention! This action is irreversible and will recalculate the category, purchase price, and selling price of the item." />
                             </tree>
                         </field>
                     </group>
                 </page>
                 <page name="config" string="Settings">
                     <group name="config">
-                        <field name="use_prefix"/>
-                        <field name="show_in_sales"/>
+                        <field name="use_prefix" />
+                        <field name="show_in_sales" />
                     </group>
                     <group groups="base.group_system">
                         <group>
-                            <field name="use_brand_description_sale"/>
+                            <field name="use_brand_description_sale" />
                         </group>
-                        <separator string="Description sale" colspan="4"/>
-                        <field name="description_sale" nolabel="1" colspan="4"/>
+                        <separator string="Description sale" colspan="4" />
+                        <field name="description_sale" nolabel="1" colspan="4" />
                     </group>
                 </page>
                 <page name="notes" string="Notes">
-                    <field name="note"/>
+                    <field name="note" />
                 </page>
                 <page name="help" string="Help">
-                    <group>
-                        <group>
-                            <div colspan="2">
-                                <p>The brand module allows processing of data received from the supplier for integration into your database.</p>
-                                <p>The fields for <b>discount</b>, <b>selling price excluding taxes</b>, and <b>cost price</b> accept Python expressions.</p>
-                                <p>The following specific elements are recognized in the expressions (in addition to standard Python functions):</p>
-                                <ul>
-                                    <li><b>ppht</b>: The list price excluding taxes provided by the supplier.</li>
-                                    <li><b>pa</b>: The purchase price</li>
-                                    <li><b>cumul()</b> is a function used to accumulate multiple discounts. cumul(40.5,5) accumulates a discount of 40.5% and a discount of 5% for a total of 43.475% (Pay attention to the distinction between dot and comma)</li>
-                                    <li><b>tr_a</b>: "Purchase transport" specified in the item's price structure</li>
-                                    <li><b>tr_v</b>: "Sales transport" specified in the item's price structure</li>
-                                    <li><b>coef</b>: "Selling coefficient" specified in the item's price structure</li>
-                                    <li><b>fr_l</b>: "Other logistics fees" specified in the item's price structure</li>
-                                    <li><b>taxe</b>: "Various taxes" specified in the item's price structure</li>
-                                    <li><b>fr_d</b>: "Various fees" specified in the item's price structure</li>
-                                </ul>
-                                <p>The discount is an optional field that can be left blank. For example, if you import your own price list with a specified purchase price.</p>
-                            </div>
-                        </group>
-                        <group>
-                            <div colspan="2">
-                                <p>Examples:</p>
-                                <ul>
-                                    <li><b>40.5</b>: Use a discount of 40.5%.</li>
-                                    <li><b>cumul(40.5,5)</b>: Use two discounts, one of 40.5% plus one of 5%.</li>
-                                    <li><b>pa + 20</b>: Add 20€ of additional costs to the cost price of the item.</li>
-                                    <li><b>(ppht + 20) * 1.15</b>: Sale of the item at the list price + 20€ of additional costs, all increased by 15%.</li>
-                                    <li><b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Sale of the item at the list price if less than 1000€, otherwise at the list price increased by 20% and rounded to the nearest euro.</li>
-                                </ul>
-                            </div>
-                        </group>
-                    </group>
+                    <div class="row">
+                        <div class="col">
+                            <p>The brand module allows processing of data received from the supplier for integration into your database.</p>
+                            <p>The fields for <b>discount</b>, <b>selling price excluding taxes</b>, and <b>cost price</b> accept Python expressions.</p>
+                            <p>The following specific elements are recognized in the expressions (in addition to standard Python functions):</p>
+                            <ul>
+                                <li><b>ppht</b>: The list price excluding taxes provided by the supplier.</li>
+                                <li><b>pa</b>: The purchase price</li>
+                                <li><b>cumul()</b> is a function used to accumulate multiple discounts. cumul(40.5,5) accumulates a discount of 40.5% and a discount of 5% for a total of 43.475% (Pay attention to the distinction between dot and comma)</li>
+                                <li><b>tr_a</b>: "Purchase transport" specified in the item's price structure</li>
+                                <li><b>tr_v</b>: "Sales transport" specified in the item's price structure</li>
+                                <li><b>coef</b>: "Selling coefficient" specified in the item's price structure</li>
+                                <li><b>fr_l</b>: "Other logistics fees" specified in the item's price structure</li>
+                                <li><b>taxe</b>: "Various taxes" specified in the item's price structure</li>
+                                <li><b>fr_d</b>: "Various fees" specified in the item's price structure</li>
+                            </ul>
+                            <p>The discount is an optional field that can be left blank. For example, if you import your own price list with a specified purchase price.</p>
+                        </div>
+                        <div class="col">
+                            <p>Examples:</p>
+                            <ul>
+                                <li><b>40.5</b>: Use a discount of 40.5%.</li>
+                                <li><b>cumul(40.5,5)</b>: Use two discounts, one of 40.5% plus one of 5%.</li>
+                                <li><b>pa + 20</b>: Add 20€ of additional costs to the cost price of the item.</li>
+                                <li><b>(ppht + 20) * 1.15</b>: Sale of the item at the list price + 20€ of additional costs, all increased by 15%.</li>
+                                <li><b>ppht if ppht &lt; 1000 else round(ppht * 1.2)</b>: Sale of the item at the list price if less than 1000€, otherwise at the list price increased by 20% and rounded to the nearest euro.</li>
+                            </ul>
+                        </div>
+                    </div>
                 </page>
             </xpath>
         </field>
