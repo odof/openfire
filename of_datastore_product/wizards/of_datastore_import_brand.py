@@ -7,7 +7,7 @@ class OFImportBrand(models.TransientModel):
     _name = "of.datastore.import.brand"
 
     datastore_supplier_id = fields.Many2one(comodel_name="of.datastore.supplier", string="Connector")
-    partner_id = fields.Many2one(comodel_name="res.partner", string="Supplier", domain=[("supplier", "=", True)])
+    partner_id = fields.Many2one(comodel_name="res.partner", string="Supplier", domain=[("is_supplier", "=", True)])
     product_categ_id = fields.Many2one(comodel_name="product.category", string="Category")
     line_ids = fields.One2many(comodel_name="of.datastore.import.brand.line", inverse_name="wizard_id", string="Brands")
 

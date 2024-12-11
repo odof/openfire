@@ -52,11 +52,11 @@ class Users(models.Model):
     # -------------------------------------------------------------------------
 
     @api.model
-    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        if self.env.context.get("of_distributor_test", True) and all(item[0] != "of_is_distributor" for item in args):
-            args = [("of_is_distributor", "=", False)] + args
+    def _search(self, domain, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
+        if self.env.context.get("of_distributor_test", True) and all(item[0] != "of_is_distributor" for item in domain):
+            domain = [("of_is_distributor", "=", False)] + domain
         return super()._search(
-            args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid
+            domain, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid
         )
 
     # -------------------------------------------------------------------------

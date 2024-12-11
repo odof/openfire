@@ -3,7 +3,7 @@
 from odoo import api, models
 
 
-class Property(models.Model):
+class IrProperty(models.Model):
     _inherit = "ir.property"
 
     @api.model
@@ -18,5 +18,5 @@ class Property(models.Model):
             profile = self.env.ref("of_datastore_supplier.user_profile_distributor")
             user = self.env["res.users"].browse(of_product_user_id)
             if user.of_user_profile_id == profile and group and not user.has_group("of_sale.of_group_sale_responsible"):
-                return {id: 0.0 for id in ids}
+                return {id_: 0.0 for id_ in ids}
         return super()._get_multi(name, model, ids)

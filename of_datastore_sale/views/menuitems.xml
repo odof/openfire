@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem  name="Sales connectors"
-            id="of_datastore_sale_menu"
-            parent="of_base.of_connector_menu"
-            sequence="10"
-            action="of_datastore_sale_action"/>
+    <menuitem  name="Sales connectors" id="of_datastore_sale_menu" parent="of_datastore.of_connector_menu" sequence="10" action="of_datastore_sale_action"/>
 
 </odoo>

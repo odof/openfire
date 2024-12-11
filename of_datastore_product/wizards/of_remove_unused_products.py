@@ -22,5 +22,5 @@ class OFRemoveUnusedProducts(models.TransientModel):
                 except Exception:
                     new_cr.rollback()
         return self.env["of.popup.wizard"].popup_return(
-            _("%i products were removed") % cpt, titre=_("Products removal")
+            _("%i products were removed") % cpt, title=_("Products removal")
         )

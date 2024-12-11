@@ -16,9 +16,7 @@ class OFDatastoreBrandAskWizard(models.TransientModel):
         selection=[("connect", "Connection"), ("disconnect", "Disconnect"), ("cancel", "Cancellation")], required=True
     )
     brand_id = fields.Many2one(
-        comodel_name="of.product.brand",
-        related="datastore_brand_id.brand_id",
-        string="Brand to associate",
+        comodel_name="of.product.brand", related="datastore_brand_id.brand_id", string="Brand to associate"
     )
     datastore_brand_id = fields.Many2one(
         comodel_name="of.datastore.brand", string="Product datastore brand", required=True, ondelete="cascade"

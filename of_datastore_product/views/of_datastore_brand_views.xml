@@ -33,6 +33,7 @@
                 <field name="logo" />
                 <field name="name" />
                 <field name="state" />
+                <field name="id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click">
@@ -42,11 +43,13 @@
                                 </t>
                             </div>
                             <div class="oe_kanban_details">
+
                                 <strong>
                                     <span>
                                         <t t-esc="record.name.value" />
                                     </span>
                                 </strong>
+
                                 <ul>
                                     <li t-if="record.is_partner_managed.raw_value" class="text-success">Partner</li>
                                     <li t-if="!record.is_partner_managed.raw_value" class="text-warning">Not partner</li>
@@ -59,6 +62,8 @@
                                 </ul>
                             </div>
                         </div>
+
+
                     </t>
                 </templates>
             </kanban>

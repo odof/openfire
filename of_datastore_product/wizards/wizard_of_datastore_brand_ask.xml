@@ -28,7 +28,7 @@
                         attrs="{'invisible': [('action', '!=', 'connect')], 'required': [('action', '=', 'connect')]}" />
                 </group>
                 <footer>
-                    <button name="action_button_process" string="Envoyer la demande" type="object"
+                    <button name="action_button_process" string="Send request" type="object"
                         class="oe_highlight" />
                     <button string="Cancel" special="cancel" class="btn-default" />
                 </footer>
