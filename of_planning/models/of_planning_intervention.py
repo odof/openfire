@@ -518,7 +518,10 @@ class OfPlanningIntervention(models.Model):
 
     line_ids = fields.One2many('of.planning.intervention.line', 'intervention_id', string='Lignes de facturation')
     lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')
-    fiscal_position_id = fields.Many2one('account.fiscal.position', string="Position fiscale")
+    fiscal_position_id = fields.Many2one(
+        comodel_name='account.fiscal.position', string=u"Position fiscale",
+        domain="[('company_id', 'parent_of', company_id)]"
+    )
     partner_pricelist_id = fields.Many2one(
         comodel_name='product.pricelist',
         string=u"Liste de prix",
