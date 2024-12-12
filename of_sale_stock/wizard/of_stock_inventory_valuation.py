@@ -243,7 +243,10 @@ class OFStockInventoryValuation(models.TransientModel):
             for product_id, serial_dict in product_dict.iteritems():
                 product = product_obj.browse(product_id)
                 for hist_vals in serial_dict.itervalues():
-                    hist_vals['quantity'] = float_round(hist_vals['quantity'], product.uom_id.rounding)
+                    hist_vals['quantity'] = float_round(
+                        hist_vals['quantity'],
+                        precision_rounding=product.uom_id.rounding
+                    )
                 if product.cost_method != 'real':
                     price_unit = product.get_history_price(self.company_id.id, date=self.date)
                     for hist_vals in serial_dict.itervalues():
