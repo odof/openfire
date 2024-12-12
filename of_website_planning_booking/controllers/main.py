@@ -54,7 +54,11 @@ class OFWebsitePlanningBooking(http.Controller):
             )
         service_list = []
         for template in request.env["of.planning.intervention.template"].search([]):
-            vals = {"id": template.id, "name": template.website_name or template.name}
+            vals = {
+                "id": template.id,
+                "name": template.website_name or template.name,
+                "fixed": 1 if template.is_fixed_meeting else 0,
+            }
             if display_price:
                 price = self._get_service_price(template.sudo(), False, partner, pricelist.sudo())
                 vals["name"] = f'{vals["name"]} - {price:.2f} €'  # noqa E231
@@ -445,7 +449,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 template = service.template_id
                 task = service.task_id
 
-            address_id = partner_id
+            address_id = template.fixed_address_id.id if template.is_fixed_meeting else partner_id
             customer_id = partner_id
             if request.env.uid != request.website.user_id.id:
                 customer_id = request.env.user.partner_id.id
@@ -462,6 +466,7 @@ class OFWebsitePlanningBooking(http.Controller):
                 "day_ids": [Command.set(day_ids)],
                 "search_mode": search_mode,
                 "search_type": search_type,
+                "ignore_geodata": template.is_fixed_meeting,
             }
             wizard = appointment_wiz_obj.with_context(of_from_portal=True).create(wizard_vals)
             wizard.sudo().pre_employee_ids = [Command.set(employee_ids)]
@@ -571,7 +576,7 @@ class OFWebsitePlanningBooking(http.Controller):
                     lambda line: line.useful_distance <= empty_days_search_max_criteria
                 )
 
-        return valid_lines
+        return valid_lines.sorted("date")
 
     def _create_intervention(self, website_line):
         """

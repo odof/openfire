@@ -49,10 +49,15 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             this.street2_input = false;
             this.zip_input = false;
             this.city_input = false;
+            this.street_div = false;
+            this.street2_div = false;
+            this.zip_div = false;
+            this.city_div = false;
             this.from_date_input = false;
             this.logged_partner_id = false;
             this.session_mode = false;
             this.session_service_id = false;
+            this.session_service_fixed = false;
             this.session_contract_id = false;
             this.session_partner_id = false;
             this.session_from_date = false;
@@ -88,6 +93,10 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             self.street2_input = self.$("input#street2");
             self.zip_input = self.$("input#zip");
             self.city_input = self.$("input#city");
+            self.street_div = self.$("div#div_street");
+            self.street2_div = self.$("div#div_street2");
+            self.zip_div = self.$("div#div_zip");
+            self.city_div = self.$("div#div_city");
 
             self.from_date_input = self.$("input#from_date");
 
@@ -108,6 +117,9 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.session_service_id = sessionStorage.getItem(
                     "of_booking_service_id"
                 );
+                self.session_service_fixed = sessionStorage.getItem(
+                    "of_booking_service_fixed"
+                );
                 self.session_contract_id = sessionStorage.getItem(
                     "of_booking_contract_id"
                 );
@@ -123,6 +135,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 // On ne retire pas du cache of_booking_partner_id pour éviter la création de doublons de partenaire
                 sessionStorage.removeItem("of_booking_mode");
                 sessionStorage.removeItem("of_booking_service_id");
+                sessionStorage.removeItem("of_booking_service_fixed");
                 sessionStorage.removeItem("of_booking_contract_id");
                 self.session_partner_id = sessionStorage.getItem(
                     "of_booking_partner_id"
@@ -152,7 +165,9 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.service_card.show();
 
                 if (self._isValid(self.session_service_id)) {
-                    self.service_selector.val(self.session_service_id);
+                    self.service_selector.val(
+                        `${self.session_service_id},${self.session_service_fixed}`
+                    );
                     self.service_card.find(".collapse").collapse("hide");
                     self.address_card.show();
                     if (!self._isValid(self.session_partner_id)) {
@@ -167,6 +182,18 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     self.address_select.show();
                 } else {
                     self.address_select.hide();
+                }
+
+                if (self.session_service_fixed === "1") {
+                    self.street_div.hide();
+                    self.street2_div.hide();
+                    self.zip_div.hide();
+                    self.city_div.hide();
+                } else {
+                    self.street_div.show();
+                    self.street2_div.show();
+                    self.zip_div.show();
+                    self.city_div.show();
                 }
             } else if (self.session_mode === "contract") {
                 self.contract_card.show();
@@ -185,6 +212,10 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 }
 
                 self.address_select.hide();
+                self.street_div.show();
+                self.street2_div.show();
+                self.zip_div.show();
+                self.city_div.show();
             }
 
             if (
@@ -223,12 +254,17 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.session_mode = "contract";
                 sessionStorage.setItem("of_booking_mode", self.session_mode);
                 sessionStorage.removeItem("of_booking_service_id");
+                sessionStorage.removeItem("of_booking_service_fixed");
                 self.service_selector.val("");
                 self.service_card.hide();
                 self.service_card.find(".collapse").collapse("hide");
                 self.contract_card.show();
                 self.contract_card.find(".collapse").collapse("show");
                 self.address_select.hide();
+                self.street_div.show();
+                self.street2_div.show();
+                self.zip_div.show();
+                self.city_div.show();
                 self.address_card.hide();
                 self.address_card.find(".collapse").collapse("hide");
                 self.slot_card.hide();
@@ -256,33 +292,59 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             });
 
             self.service_selector.on("change", function (event) {
-                const service_id = self.service_selector.find(":selected").val() || 0;
-                if (self._isValid(service_id)) {
-                    sessionStorage.setItem("of_booking_service_id", service_id);
-                    self.session_service_id = service_id;
+                const service_info = self.service_selector.find(":selected").val();
+                if (
+                    service_info !== null &&
+                    service_info !== undefined &&
+                    service_info !== ""
+                ) {
+                    const service_id = service_info.split(",")[0];
+                    const service_fixed = service_info.split(",")[1];
 
-                    sessionStorage.removeItem("of_booking_contract_id");
+                    if (self._isValid(service_id)) {
+                        sessionStorage.setItem("of_booking_service_id", service_id);
+                        sessionStorage.setItem(
+                            "of_booking_service_fixed",
+                            service_fixed
+                        );
+                        self.session_service_id = service_id;
+                        self.session_service_fixed = service_fixed;
 
-                    self.service_selector.removeClass("is-invalid");
-                    self.service_card.find(".collapse").collapse("hide");
+                        sessionStorage.removeItem("of_booking_contract_id");
 
-                    self.address_card.show();
-                    self.address_card.find(".collapse").collapse("show");
+                        self.service_selector.removeClass("is-invalid");
+                        self.service_card.find(".collapse").collapse("hide");
 
-                    if (
-                        !self._isValid(self.session_partner_id) &&
-                        self.logged_partner_id !== 0
-                    ) {
-                        self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
-                            partner_id: self.logged_partner_id,
-                        });
-                    } else if (self._isValid(self.session_partner_id)) {
-                        self._fetchPartnerAndUpdateUI(self.session_partner_id, {
-                            partner_id: self.session_partner_id,
-                        });
+                        if (self.session_service_fixed === "1") {
+                            self.street_div.hide();
+                            self.street2_div.hide();
+                            self.zip_div.hide();
+                            self.city_div.hide();
+                        } else {
+                            self.street_div.show();
+                            self.street2_div.show();
+                            self.zip_div.show();
+                            self.city_div.show();
+                        }
+
+                        self.address_card.show();
+                        self.address_card.find(".collapse").collapse("show");
+
+                        if (
+                            !self._isValid(self.session_partner_id) &&
+                            self.logged_partner_id !== 0
+                        ) {
+                            self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
+                                partner_id: self.logged_partner_id,
+                            });
+                        } else if (self._isValid(self.session_partner_id)) {
+                            self._fetchPartnerAndUpdateUI(self.session_partner_id, {
+                                partner_id: self.session_partner_id,
+                            });
+                        }
+                        self.slots_div.hide();
+                        self.no_slot_div.hide();
                     }
-                    self.slots_div.hide();
-                    self.no_slot_div.hide();
                 } else {
                     self.service_selector.addClass("is-invalid");
                 }
@@ -376,21 +438,30 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     self.phone_input.addClass("is-invalid");
                 }
 
-                if (street !== null && street !== undefined && street !== "") {
+                if (
+                    self.session_service_fixed === "1" ||
+                    (street !== null && street !== undefined && street !== "")
+                ) {
                     street_ok = true;
                     self.street_input.removeClass("is-invalid");
                 } else {
                     self.street_input.addClass("is-invalid");
                 }
 
-                if (zip !== null && zip !== undefined && zip !== "") {
+                if (
+                    self.session_service_fixed === "1" ||
+                    (zip !== null && zip !== undefined && zip !== "")
+                ) {
                     zip_ok = true;
                     self.zip_input.removeClass("is-invalid");
                 } else {
                     self.zip_input.addClass("is-invalid");
                 }
 
-                if (city !== null && city !== undefined && city !== "") {
+                if (
+                    self.session_service_fixed === "1" ||
+                    (city !== null && city !== undefined && city !== "")
+                ) {
                     city_ok = true;
                     self.city_input.removeClass("is-invalid");
                 } else {

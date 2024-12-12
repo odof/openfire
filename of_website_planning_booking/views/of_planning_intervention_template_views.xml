@@ -20,6 +20,17 @@
             <xpath expr="//field[@name='code']" position="after">
                 <field name="website_name" attrs="{'invisible': [('website_published', '=', False)]}"/>
             </xpath>
+            <xpath expr="//page[@name='legal']" position="after">
+                <page name="planning_booking" string="Planning booking" attrs="{'invisible': [('website_published', '=', False)]}">
+                    <group>
+                        <group>
+                            <field name="is_fixed_meeting"/>
+                            <field name="fixed_address_id" string="Address"
+                                attrs="{'invisible': [('is_fixed_meeting', '=', False)], 'required': [('is_fixed_meeting', '=', True)]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 
