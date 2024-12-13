@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.osv.expression import NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF, FALSE_LEAF
-from odoo.tools.safe_eval import safe_eval
-
 import copy
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
+from odoo.osv.expression import FALSE_LEAF, NEGATIVE_TERM_OPERATORS, TERM_OPERATORS_NEGATION, TRUE_LEAF
+from odoo.tools.safe_eval import safe_eval
 
 # 100.000.000 ids devraient suffire pour les produits. Les chiffres suivants serviront pour le fournisseur
 DATASTORE_IND = 100000000
@@ -386,6 +386,18 @@ class OfDatastoreCentralized(models.AbstractModel):
             res1 |= result
         # En cas d'ensemble vide, c'est result qui est renvoyé, qui vaut None
         return res1 or result
+
+    @api.multi
+    def write(self, vals):
+        if any(i < 0 for i in self.ids):
+            raise UserError(u"Vous ne pouvez pas modifier un article de la base centralisée")
+        return super(OfDatastoreCentralized, self).write(vals)
+
+    @api.multi
+    def unlink(self):
+        if any(i < 0 for i in self.ids):
+            raise UserError(u"Vous ne pouvez pas supprimer un article de la base centralisée")
+        return super(OfDatastoreCentralized, self).unlink()
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
