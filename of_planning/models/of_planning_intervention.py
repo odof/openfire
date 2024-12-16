@@ -520,7 +520,7 @@ class OfPlanningIntervention(models.Model):
     lien_commande = fields.Boolean(string='Facturation sur commande', compute='_compute_lien_commande')
     fiscal_position_id = fields.Many2one(
         comodel_name='account.fiscal.position', string=u"Position fiscale",
-        domain="[('company_id', 'parent_of', company_id)]"
+        domain="['|', ('company_id', '=', False), ('company_id', 'parent_of', company_id)]"
     )
     partner_pricelist_id = fields.Many2one(
         comodel_name='product.pricelist',
