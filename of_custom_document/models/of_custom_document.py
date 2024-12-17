@@ -21,6 +21,7 @@ try:
     from pdfminer.utils import decode_text
 except ImportError:
     PDFParser = PSLiteral = PDFDocument = resolve1 = decode_text = None
+import pymupdf
 
 try:
     import pypdftk
@@ -108,12 +109,20 @@ class OFCustomDocument(models.Model):
         try:
             for record in self.env[self.render_model].browse(res_ids):
                 values = self.get_pdf_fields_values(record)
+                # on utilise la norme adobe pour les noms de champs
+                # si le nom du chamnp se termine par _af_image, on le traite comme une image
+                values_text = {k: v for k, v in values.items() if not k.endswith("_af_image")}
+                values_image = {k: v for k, v in values.items() if k.endswith("_af_image")}
 
                 file_path = attachment_obj._full_path(attachment.store_fname)
                 fd, generated_pdf = tempfile.mkstemp(prefix="doc_joint_", suffix=".pdf")
                 pdf_docs.append(fd)
+
                 temp_file_paths.append(generated_pdf)
-                pypdftk.fill_form(file_path, values, out_file=generated_pdf, flatten=not self.fillable)
+                pypdftk.fill_form(file_path, values_text, out_file=generated_pdf, flatten=not self.fillable)
+
+                self._insert_images(generated_pdf, self.pdf_field_ids, values_image)
+
                 streams_to_merge.append(open(generated_pdf, "rb"))
 
             if len(streams_to_merge) == 1:
@@ -149,24 +158,82 @@ class OFCustomDocument(models.Model):
                 pf = io.BytesIO(base64.b64decode(self.file))
                 parser = PDFParser(pf)
                 doc = PDFDocument(parser)
+
+                pages = resolve1(doc.catalog.get("Pages"))
                 field_numbers = resolve1(doc.catalog.get("AcroForm", {})).get("Fields", [])
+                page_kids = [str(ref) for ref in pages.get("Kids")]
+
+                # permet de récupérer la liste des fields par page
+                # car dans certains cas les fields ne portent pas l'attribut P
+                pk_annots = {}
+                for str_ref, page in [(str(ref), resolve1(ref)) for ref in pages.get("Kids")]:
+                    annots = page.get("Annots")
+                    if isinstance(annots, list):
+                        pk_annots[str_ref] = [str(a) for a in annots]
+                    elif isinstance(resolve1(annots), list):
+                        pk_annots[str_ref] = [str(a) for a in resolve1(annots)]
 
                 for i in field_numbers:
                     doc_field = resolve1(i)
+
+                    page_ref = doc_field.get("P")
+
+                    page_number = None
+                    if page_ref:
+                        page_number = page_kids.index(str(page_ref))
+                    if not page_number:
+                        str_i = str(i)
+                        for str_page_ref, page_annots in pk_annots.items():
+                            if str_i in page_annots:
+                                page_number = page_kids.index(str_page_ref)
+                                break
+
+                    rect = doc_field.get("Rect")
+                    x0 = None
+                    x1 = None
+                    y0 = None
+                    y1 = None
+
+                    if not rect:
+                        # Si pas de rect, on va rechercher un enfant
+                        # Pas sur, sur de cette strat
+                        kids = doc_field.get("Kids")
+                        if kids:
+                            kid = resolve1(kids[0])
+                            rect = kid.get("Rect")
+
+                    if rect:
+                        x0 = rect[0]
+                        y0 = rect[1]
+                        x1 = rect[2]
+                        y1 = rect[3]
+
                     name = doc_field.get("T").decode("unicode-escape", "ignore")
                     value = pre_vals.get(name)
                     if not value:
-                        value = doc_field.get("V")
-                        if value:
-                            if isinstance(value, str):
-                                value = decode_text(value)
-                            elif isinstance(value, PSLiteral):
-                                value = value.name
+                        field_value = doc_field.get("V")
+                        if field_value:
+                            if isinstance(field_value, str):
+                                value = decode_text(field_value)
+                            elif isinstance(field_value, PSLiteral):
+                                value = field_value.name
+                            # decode des bytes comme une chaine de caractères
+                            elif isinstance(field_value, bytes):
+                                try:
+                                    value = field_value.decode("utf-8")
+                                except UnicodeDecodeError:
+                                    value = None
+
                     pdf_fields += pdf_field_obj.new(
                         {
                             "name": name,
                             "value": value,
                             "to_export": True,
+                            "page_number": page_number,
+                            "x0": x0,
+                            "x1": x1,
+                            "y0": y0,
+                            "y1": y1,
                         }
                     )
         self.pdf_field_ids = pdf_fields
@@ -224,3 +291,55 @@ class OFCustomDocument(models.Model):
     def unlink(self):
         self.unlink_action()
         return super().unlink()
+
+    @api.model
+    def _insert_images(self, pdf_path, pdf_field_ids, values):
+        image_data = {pdf_field: values.get(pdf_field.name, None) for pdf_field in pdf_field_ids}
+
+        doc = pymupdf.open(pdf_path)
+
+        for field, content in image_data.items():
+            if content and (abs(field.x1 - field.x0) > 0) and (abs(field.y1 - field.y0) > 0):
+                # on récupère toutes les infos du cadre et de l'image pour faire nos calculs
+                start_x = field.x0
+                end_x = field.x1
+                start_y = field.y0
+                end_y = field.y1
+                width = abs(field.x1 - field.x0)
+                height = abs(field.y1 - field.y0)
+                # Content a été évalué précédemment, c'est un bytes contenu dans un string
+                # exemple du format: "b'caractères en base 64'".
+                # On va donc juste récupérer le contenu base64
+                content = content[2:-1]
+
+                img = base64.b64decode(content)
+                pix = pymupdf.Pixmap(img)
+
+                # si les valeurs du cadre sont supérieures ou égales a celles de l'images, pas de resize à faire
+                ratio_w = width / pix.width
+                ratio_h = height / pix.height
+                h_to_move = 0.0
+                w_to_move = 0.0
+                # un resize du cadre est a faire car au moins une des deux valeurs de l'image est plus grande que
+                # celle du cadre. On utilise que le ratio le plus petit car le insertImage rempli totalement le cadre
+                if ratio_w < 1 or ratio_h < 1:
+                    if ratio_w < ratio_h:
+                        h_to_move = (height - ratio_w * pix.height) / 2
+                    else:
+                        w_to_move = (width - ratio_h * pix.width) / 2
+                else:
+                    h_to_move = (height - pix.height) / 2
+                    w_to_move = (width - pix.width) / 2
+                # on bouge les points du cadre ce qui a pour effet de changer la taille de l'image
+                end_y -= h_to_move
+                start_y += h_to_move
+                end_x -= w_to_move
+                start_x += w_to_move
+                page = doc[field.page_number]
+                page_height = page.rect[3]
+                # on créer le cadre et on insère l'image
+                rect = pymupdf.Rect(start_x, page_height - end_y, end_x, page_height - start_y)
+                page.insert_image(rect, pixmap=pix)
+
+        doc.saveIncr()
+        doc.close()

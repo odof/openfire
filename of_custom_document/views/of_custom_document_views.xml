@@ -1,110 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-<!-- page for creating a mail template -->
-<record model="ir.ui.view" id="view_of_custom_document_form">
-    <field name="name">of.custom.document.form</field>
-    <field name="model">of.custom.document</field>
-    <field name="arch" type="xml">
-        <form string="Document">
-        <sheet>
-            <div class="oe_button_box" name="button_box">
-                <field name="ref_ir_act_report" invisible="1"/>
-                <button class="oe_stat_button"
-                        groups="base.group_no_one"
-                        name="create_action" type="object"
-                        attrs="{'invisible':[('ref_ir_act_report','!=',False)]}" icon="fa-plus"
-                        help="Display an option on related documents to print this document">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_text">Add</span>
-                        <span class="o_stat_text">Action</span>
+    <!-- page for creating a mail template -->
+    <record model="ir.ui.view" id="view_of_custom_document_form">
+        <field name="name">of.custom.document.form</field>
+        <field name="model">of.custom.document</field>
+        <field name="arch" type="xml">
+            <form string="Document">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <field name="ref_ir_act_report" invisible="1"/>
+                        <button class="oe_stat_button"
+                            groups="base.group_no_one"
+                            name="create_action" type="object"
+                            attrs="{'invisible':[('ref_ir_act_report','!=',False)]}" icon="fa-plus"
+                            help="Display an option on related documents to print this document">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Add</span>
+                                <span class="o_stat_text">Action</span>
+                            </div>
+                        </button>
+                        <button name="unlink_action" type="object"
+                            groups="base.group_no_one"
+                            class="oe_stat_button" icon="fa-minus"
+                            attrs="{'invisible':[('ref_ir_act_report','=',False)]}"
+                            help="Remove the action to print this template on related documents" widget="statinfo">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Remove</span>
+                                <span class="o_stat_text">Action</span>
+                            </div>
+                        </button>
                     </div>
-                </button>
-                <button name="unlink_action" type="object"
-                        groups="base.group_no_one"
-                        class="oe_stat_button" icon="fa-minus"
-                        attrs="{'invisible':[('ref_ir_act_report','=',False)]}"
-                        help="Remove the action to print this template on related documents" widget="statinfo">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_text">Remove</span>
-                        <span class="o_stat_text">Action</span>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name"/>
+                        </h1>
                     </div>
-                </button>
-            </div>
-            <div class="oe_title">
-                <h1>
-                    <field name="name" default_focus="1" placeholder="Name"/>
-                </h1>
-            </div>
-            <group>
-                <separator string="Parameters"/>
-                <group>
-                    <field name="model_id" placeholder="e.g. Contact" required="1"
-                           options="{'no_create': True}"/>
-                    <field name="model" invisible="1"/>
-                    <field name="print_address" attrs="{'invisible': [('file','!=',False)]}"/>
-                    <field name="print_header" attrs="{'invisible': [('file','!=',False)]}"/>
-                    <field name="fillable"
-                           attrs="{'invisible': ['|',('file','=',False),('pdf_field_ids','=',[])]}"/>
-                </group>
-                <separator string="Import a PDF document"/>
-                <field name="file_name" invisible="1"/>
-                <field name="file" filename="file_name"/>
-                <field name="pdf_field_ids" nolabel="1" colspan="2"
-                       attrs="{'invisible': ['|',('file','=',False),('pdf_field_ids','=',[])]}">
-                    <tree string="PDF fields" create="false" delete="false" editable="bottom">
-                        <field name="name" force_save="1"/>
-                        <field name="value"/>
-                        <field name="to_export"/>
-                        <field name="to_import"/>
-                    </tree>
-                </field>
-                <group attrs="{'invisible': [('file','!=',False)]}" colspan="2">
-                    <separator string="Content"/>
-                    <field name="body_html" class="oe-bordered-editor" nolabel="1" colspan="2"
-                        options="{'style-inline': true, 'codeview': true, 'dynamic_placeholder': true}"/>
-                </group>
-            </group>
-        </sheet>
-        </form>
-    </field>
-</record>
+                    <group>
+                        <separator string="Parameters"/>
+                        <group>
+                            <field name="model_id" placeholder="e.g. Contact" required="1"
+                                options="{'no_create': True}"/>
+                            <field name="model" invisible="1"/>
+                            <field name="print_address" attrs="{'invisible': [('file','!=',False)]}"/>
+                            <field name="print_header" attrs="{'invisible': [('file','!=',False)]}"/>
+                            <field name="fillable"
+                                attrs="{'invisible': ['|',('file','=',False),('pdf_field_ids','=',[])]}"/>
+                        </group>
+                        <separator string="Import a PDF document"/>
+                        <field name="file_name" invisible="1"/>
+                        <field name="file" filename="file_name"/>
+                        <field name="pdf_field_ids" nolabel="1" colspan="2"
+                            attrs="{'invisible': ['|',('file','=',False),('pdf_field_ids','=',[])]}">
+                            <tree string="PDF fields" create="false" delete="false" editable="bottom">
+                                <field name="name" force_save="1"/>
+                                <field name="value"/>
+                                <field name="to_export"/>
+                                <field name="to_import"/>
+                                <field name="x0" invisible="1"/>
+                                <field name="x1" invisible="1"/>
+                                <field name="y0" invisible="1"/>
+                                <field name="y1" invisible="1"/>
+                                <field name="page_number" invisible="1"/>
+                            </tree>
+                        </field>
+                        <group attrs="{'invisible': [('file','!=',False)]}" colspan="2">
+                            <separator string="Content"/>
+                            <field name="body_html" class="oe-bordered-editor" nolabel="1" colspan="2"
+                                options="{'style-inline': true, 'codeview': true, 'dynamic_placeholder': true}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
-<record model="ir.ui.view" id="view_of_custom_document_tree">
-    <field name="name">of.custom.document.tree</field>
-    <field name="model">of.custom.document</field>
-    <field name="arch" type="xml">
-        <tree string="Templates">
-            <field name="sequence" invisible="1"/>
-            <field name="name"/>
-            <field name="file_name"/>
-            <field name="print_address"/>
-            <field name="print_header"/>
-        </tree>
-    </field>
-</record>
+    <record model="ir.ui.view" id="view_of_custom_document_tree">
+        <field name="name">of.custom.document.tree</field>
+        <field name="model">of.custom.document</field>
+        <field name="arch" type="xml">
+            <tree string="Templates">
+                <field name="sequence" invisible="1"/>
+                <field name="name"/>
+                <field name="file_name"/>
+                <field name="print_address"/>
+                <field name="print_header"/>
+            </tree>
+        </field>
+    </record>
 
-<!-- page for searching a mail template -->
-<record id="view_of_custom_document_search" model="ir.ui.view">
-    <field name="name">of.custom.document.search</field>
-    <field name="model">of.custom.document</field>
-    <field name="arch" type="xml">
-        <search>
-            <field name="name"/>
-        </search>
-    </field>
-</record>
+    <!-- page for searching a mail template -->
+    <record id="view_of_custom_document_search" model="ir.ui.view">
+        <field name="name">of.custom.document.search</field>
+        <field name="model">of.custom.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
 
-<record model="ir.actions.act_window" id="action_of_custom_document_tree_all">
-    <field name="name">Custom documents</field>
-    <field name="res_model">of.custom.document</field>
-    <field name="view_mode">form,tree</field>
-    <field name="view_id" ref="view_of_custom_document_tree" />
-    <field name="search_view_id" ref="view_of_custom_document_search"/>
-</record>
+    <record model="ir.actions.act_window" id="action_of_custom_document_tree_all">
+        <field name="name">Custom documents</field>
+        <field name="res_model">of.custom.document</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" ref="view_of_custom_document_tree" />
+        <field name="search_view_id" ref="view_of_custom_document_search"/>
+    </record>
 
-<!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->
-<menuitem id="menu_of_custom_document_accounting" parent="account.menu_finance_configuration"
-          action="action_of_custom_document_tree_all" sequence="100"/>
+    <!-- add menu item 'Modèles de courriers' for mail templates' configurations in Comptabilité-->
+    <menuitem id="menu_of_custom_document_accounting" parent="account.menu_finance_configuration"
+        action="action_of_custom_document_tree_all" sequence="100"/>
 
 </odoo>

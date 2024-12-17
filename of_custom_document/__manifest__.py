@@ -10,7 +10,7 @@
     "summary": "Module de rapports personnalisés",
     "depends": ["of_base"],
     "external_dependencies": {
-        "python": ["pdfminer", "pypdftk"],
+        "python": ["pdfminer", "pypdftk", "pymupdf"],
     },
     "data": [
         "security/ir.model.access.csv",

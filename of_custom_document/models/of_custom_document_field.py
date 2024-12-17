@@ -14,6 +14,11 @@ class OFCustomDocumentField(models.Model):
     to_export = fields.Boolean(string="Export", default=True)
     to_import = fields.Boolean(string="Import")
     lang = fields.Char(related="document_id.lang")
+    x0 = fields.Float(string="Coordonnée x0 du champ")
+    y0 = fields.Float(string="Coordonnée y0 du champ")
+    x1 = fields.Float(string="Coordonnée x1 du champ")
+    y1 = fields.Float(string="Coordonnée y1 du champ")
+    page_number = fields.Integer(string="Numéro de page du champ")
 
     @api.depends("document_id", "document_id.render_model")
     def _compute_render_model(self):
