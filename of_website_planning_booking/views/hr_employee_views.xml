@@ -4,10 +4,15 @@
     <record id="hr_employee_view_form" model="ir.ui.view">
         <field name="name">hr.employee.view.form</field>
         <field name="model">hr.employee</field>
-        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="inherit_id" ref="of_planning.hr_employee_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='resource_calendar_id']" position="after">
                 <field name="of_web_resource_calendar_id"/>
+            </xpath>
+            <xpath expr="//group[@name='task']" position="after">
+                <group string="Prise de RDV en ligne" name="booking">
+                    <field name="of_booking_empty_days_search_max_criteria"/>
+                </group>
             </xpath>
         </field>
     </record>

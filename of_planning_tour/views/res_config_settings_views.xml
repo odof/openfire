@@ -100,6 +100,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class="clearfix"/>
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_auto_optim">
+                        <div class="o_setting_left_pane">
+                            <field name="tour_automatic_optimization"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="tour_automatic_optimization"/>
+                            <div class="text-muted">
+                                Permet d'activer l'optimisation automatique des tournées complètes.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 o_setting_box" id="tour_auto_optim_mode" attrs="{'invisible': [('tour_automatic_optimization', '=', False)]}">
+                        <div class="o_setting_left_pane">
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="tour_automatic_optim_mode" string="Critères"/>
+                            <div class="text-muted">
+                                Définit les critères pour l'optimisation automatique (mode et nombre de jours avant).
+                            </div>
+                            <div class="row">
+                                <div class="oe_inline pe-0">Mode</div><field name="tour_automatic_optim_mode" style="padding-left: 5px;"/>
+                            </div>
+                            <div class="row">
+                                <div class="oe_inline pe-0">À réaliser</div><field name="tour_automatic_optim_nb_days" style="padding-left: 5px; padding-right: 5px;"/><div class="oe_inline ps-0">jour(s) avant</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"/>
                 </div>
             </xpath>
         </field>

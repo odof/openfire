@@ -4,6 +4,7 @@ import base64
 from datetime import timedelta
 
 import pytz
+from dateutil.relativedelta import relativedelta
 
 from odoo import Command, _, api, fields, models
 from odoo.exceptions import AccessError, UserError, ValidationError
@@ -451,7 +452,8 @@ class CalendarEvent(models.Model):
 
     of_lead_id = fields.Many2one(comodel_name="crm.lead", string="Opportunité")
     of_lead_survey_link = fields.Char(
-        string="Lien questionnaire opportunité", compute="_compute_of_lead_survey_link", store=True)
+        string="Lien questionnaire opportunité", compute="_compute_of_lead_survey_link", store=True
+    )
 
     @api.depends("of_lead_id")
     def _compute_of_lead_survey_link(self):
@@ -1608,6 +1610,39 @@ class CalendarEvent(models.Model):
         """
         self.ensure_one()
         return True
+
+    @api.model
+    def cron_planning_send_customer_notification(self):
+        now = fields.Datetime.now()
+        today = now.date()
+        notif_mode = (
+            self.env["ir.config_parameter"].sudo().get_param("of.planning.customer_notification_mode") or "mail"
+        )
+        days_nb = int(self.env["ir.config_parameter"].sudo().get_param("of.planning.customer_notification_nb_days", 1))
+
+        if now.isoweekday() == 7:  # 7 is Sunday. We don't send reminders on Sunday.
+            return True
+
+        if now.isoweekday() == 6:
+            # We are on Saturday, we need to send reminders for Monday.
+            reminder_date = today + timedelta(days=days_nb + 1)
+        else:
+            reminder_date = today + timedelta(days=days_nb)
+
+        interventions = self.env["calendar.event"].search(
+            [
+                ("start_date", "=", reminder_date),
+                ("of_state", "=", "confirmed"),
+            ]
+        )
+
+        for intervention in interventions:
+            if notif_mode == "mail":
+                email_template = self.env.ref("of_planning.customer_notification_email_template")
+                email_template.send_mail(intervention.id, force_send=True)
+            else:
+                sms_template = self.env.ref("of_planning_sms.of_sms_planning_customer_appointment_reminder")
+                intervention._message_sms_with_template(template=sms_template)
 
     # --------------------------------------------------------------------------
     # Report methods

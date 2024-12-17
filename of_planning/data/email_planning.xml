@@ -26,4 +26,30 @@
             <field name="description">Sent to employees who wish to receive tomorrow's schedule</field>
         </record>
 
+    <record id="of_planning.customer_notification_email_template" model="mail.template">
+            <field name="name">Planning : Envoi notification client</field>
+            <field name="model_id" ref="calendar.model_calendar_event"/>
+            <field name="subject">{{ object.of_company_id.name }} - Rappel de RDV</field>
+            <field name="email_from">{{ object.of_company_id.email_formatted }}</field>
+            <field name="email_to">{{ object.of_address_id.email_formatted }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Bonjour <t t-out="object.of_address_id.name">User</t>,
+        <br/>
+        <br/>
+        Pour rappel, votre RDV d'intervention aura lieu le <t t-out="object.start and format_datetime(object.start) or ''">01/12/2024 16:30</t>.
+        <br/>
+        Si vous avez la moindre question, n'hésitez pas à nous contacter.
+        <br/>
+        <br/>
+        Cordialement,
+    </p>
+</div>
+</field>
+            <field name="lang">{{ object.of_address_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="description">Sent to customer for coming intervention.</field>
+        </record>
+
 </odoo>

@@ -12,6 +12,9 @@ class HrEmployee(models.Model):
         index=True,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]",
     )
+    of_booking_empty_days_search_max_criteria = fields.Integer(
+        string="Critère de recherche max pour les journées vierges",
+    )
 
     def write(self, vals):
         result = super().write(vals)

@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
@@ -29,3 +29,34 @@ class ResConfigSettings(models.TransientModel):
         readonly=False,
         string="(OF) Make the Intervention template mandatory",
     )
+    of_send_customer_notification = fields.Boolean(
+        string="(OF) Envoi de notification client",
+    )
+    of_customer_notification_mode = fields.Selection(
+        selection=[
+            ("mail", "E-mail"),
+            ("sms", "SMS"),
+        ],
+        string="Mode d'envoi",
+        config_parameter="of.planning.customer_notification_mode",
+        required=True,
+        default="mail",
+    )
+    of_customer_notification_nb_days = fields.Integer(
+        string="Nombre de jours à prendre en compte pour l'envoi de notification client",
+        config_parameter="of.planning.customer_notification_nb_days",
+        default="1",
+    )
+
+    @api.model
+    def get_values(self):
+        res = super().get_values()
+        res.update(
+            of_send_customer_notification=self.env.ref("of_planning.cron_planning_send_customer_notification").active
+        )
+        return res
+
+    def set_values(self):
+        super().set_values()
+        self.env.ref("of_planning.cron_planning_send_customer_notification").active = self.of_send_customer_notification
+        return True
