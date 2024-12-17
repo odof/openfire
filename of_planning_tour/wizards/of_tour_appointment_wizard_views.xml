@@ -220,6 +220,19 @@
         </field>
     </record>
 
+    <!-- Ajout bouton planifier une intervention dans vue form partenaire -->
+    <record id="crm_lead_view_form" model="ir.ui.view">
+        <field name="name">crm.lead.view.form</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="of_planning.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_button_open_tour_appointment_wizard" string="Plan Intervention" type="object"
+                        groups="of_planning.group_planning_intervention_read_own_write_own"/>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Ajout bouton planifier une intervention dans vue form demande d'intervention -->
     <record id="of_service_request_view_form_add_button" model="ir.ui.view">
         <field name="name">of.planning.tour.service.request.view.form</field>

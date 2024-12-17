@@ -282,6 +282,7 @@
             <xpath expr="//page[@name='page_details']/group" position="before">
                 <group attrs="{'invisible':[('of_type', '!=', 'intervention')]}">
                     <group name="origin" string="Origin">
+                        <field name="of_lead_id"/>
                         <field name="of_order_id" context="{'sale_extended_name_display': 1}" groups="sales_team.group_sale_salesman,account.group_account_invoice,stock.group_stock_user" />
                         <field name="of_picking_domain" invisible="1" widget="many2many_tags" context="{'of_force_read': True}" />
                         <field name="of_picking_manual_ids" mode="tree" string="Stock pickings" groups="sales_team.group_sale_salesman, account.group_account_invoice, stock.group_stock_user" context="{'default_partner_id': of_address_id}">
@@ -472,6 +473,7 @@
                 <field name="of_team_id" widget="selection" />
                 <field name="of_employee_ids" />
                 <field name="of_order_id" />
+                <field name="of_lead_id" />
                 <field name="of_company_id" widget="selection" />
                 <filter string="Draft" name="state_draft" domain="[('of_state','=','draft')]" />
                 <filter string="Confirmed" name="state_confirmed" domain="[('of_state','=','confirmed')]" />

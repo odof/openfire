@@ -12,3 +12,4 @@ from . import res_config_settings
 from . import res_partner
 from . import resource_calendar
 from . import resource_calendar_attendance
+from . import crm_lead

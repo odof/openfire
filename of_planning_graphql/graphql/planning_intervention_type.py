@@ -68,6 +68,12 @@ class PlanningIntervention(OdooObjectType):
     description = graphene.String(name="externalDescription")
     of_internal_description = graphene.String(name="internalDescription")
 
+    lead_survey_link = graphene.String()
+
+    def resolve_lead_survey_link(root, info):
+        # A remplacer quand tu auras mis le champ
+        return root.of_lead_survey_link or None
+
     @staticmethod
     def resolve_attachments(root, info):
         env = info.context["env"]
