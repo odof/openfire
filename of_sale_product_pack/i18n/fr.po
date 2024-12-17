@@ -63,7 +63,7 @@ msgstr "Affichage du kit"
 #. module: of_sale_product_pack
 #: model:ir.model.fields,field_description:of_sale_product_pack.field_sale_order_line__of_pack_line_ids
 msgid "Pack Products"
-msgstr "Kit de produits"
+msgstr "Composants"
 
 #. module: of_sale_product_pack
 #: model:ir.model.fields,field_description:of_sale_product_pack.field_of_product_pack_lines__parent_product_id

@@ -20,3 +20,4 @@ class OFProductPackLines(models.Model):
         default=1.0,
         digits="Product UoS",
     )
+    price_unit = fields.Float(string="Unit price", required=True, default=1.0, digits="Product Price")

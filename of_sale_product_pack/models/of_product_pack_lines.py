@@ -6,6 +6,7 @@ from odoo import fields, models
 class OFProductPackLines(models.Model):
     _inherit = "of.product.pack.lines"
 
+    pricelist_item_id = fields.Many2one(comodel_name="product.pricelist.item")
     parent_product_id = fields.Many2one(
         comodel_name="sale.order.line",
         string="Parent Product",
@@ -13,6 +14,7 @@ class OFProductPackLines(models.Model):
         index=True,
         required=True,
     )
+
     _sql_constraints = [
         (
             "product_uniq",

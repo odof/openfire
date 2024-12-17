@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="of_product_pack_product_pack_line_tree" model="ir.ui.view">
+        <field name="name">product.pack.line.tree</field>
+        <field name="model">product.pack.line</field>
+        <field name="inherit_id" ref="product_pack.product_pack_line_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="component_price" />
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="context" operation="update">{"of_update_product_pack_prices": True}</attribute>
+            </xpath>
+        </field>
+    </record>
+    </odoo>

@@ -15,6 +15,7 @@
     "data": [
         "views/product_template_views.xml",
         "views/product_product_views.xml",
+        "views/product_pack_line_views.xml",
         "security/ir.model.access.csv",
     ],
     "installable": True,

@@ -5,95 +5,114 @@ from odoo import Command
 from odoo.addons.of_product_brand.tests.common import TestOFProductCommon
 
 
-class TestOFProdutPackCommon(TestOFProductCommon):
+class TestOFProductPackCommon(TestOFProductCommon):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.product_1, cls.product_2, cls.product_3 = cls.env["product.product"].create(
+        # Create categories
+        cls.kitchen_categ = cls.env["product.category"].create(
+            {
+                "name": "Kitchen",
+                "parent_id": cls.env.ref("product.product_category_all").id,
+            }
+        )
+        cls.kitchen_fork_categ = cls.env["product.category"].create(
+            {
+                "name": "Kitchen",
+                "parent_id": cls.kitchen_categ.id,
+            }
+        )
+
+        # Create products
+        cls.product_spoon, cls.product_knife, cls.product_pot, cls.product_fork, cls.product_glass = cls.env[
+            "product.product"
+        ].create(
             [
                 {
-                    "name": "Product 1",
-                    "default_code": "BA_PROD_001",
+                    "name": "Spoon",
+                    "default_code": "BA_SPN_001",
                     "brand_id": cls.product_brand_a.id,
-                    "categ_id": cls.env.ref("product.product_category_all").id,
-                    "standard_price": 10,
-                    "list_price": 12,
-                    "type": "service",
+                    "categ_id": cls.kitchen_categ.id,
+                    "standard_price": 5,
+                    "lst_price": 10.0,
+                    "type": "consu",
                 },
                 {
-                    "name": "Product 2",
-                    "default_code": "BA_PROD_002",
+                    "name": "Knife",
+                    "default_code": "BA_KNF_001",
                     "brand_id": cls.product_brand_a.id,
-                    "categ_id": cls.env.ref("product.product_category_all").id,
-                    "standard_price": 10,
-                    "list_price": 20,
-                    "type": "service",
+                    "categ_id": cls.kitchen_categ.id,
+                    "standard_price": 2.5,
+                    "lst_price": 5.0,
+                    "type": "consu",
                 },
                 {
-                    "name": "Product 3",
-                    "default_code": "BA_PROD_003",
+                    "name": "Pot",
+                    "default_code": "BA_POT_001",
                     "brand_id": cls.product_brand_a.id,
-                    "categ_id": cls.env.ref("product.product_category_all").id,
+                    "categ_id": cls.kitchen_categ.id,
+                    "standard_price": 15.0,
+                    "lst_price": 30.0,
+                    "type": "consu",
+                },
+                {
+                    "name": "Fork",
+                    "default_code": "BA_FRK_001",
+                    "brand_id": cls.product_brand_a.id,
+                    "categ_id": cls.kitchen_fork_categ.id,
+                    "standard_price": 5.0,
+                    "lst_price": 10,
+                    "type": "consu",
+                },
+                {
+                    "name": "Glass",
+                    "default_code": "BA_GLS_001",
+                    "brand_id": cls.product_brand_a.id,
+                    "categ_id": cls.kitchen_categ.id,
                     "standard_price": 10,
-                    "list_price": 27,
-                    "type": "service",
+                    "lst_price": 27,
+                    "type": "consu",
                 },
             ]
         )
 
-        cls.product_pack_non_detailed = cls.env["product.product"].create(
+        # Create packs
+        cls.pack_kitchen = cls.env["product.product"].create(
             {
-                "name": "Product pack 1 (Non Detailed)",
-                "default_code": "BA_PACK_001",
+                "name": "Pack Kitchen 1",
+                "default_code": "BA_PACK_KIT1",
                 "brand_id": cls.product_brand_a.id,
-                "categ_id": cls.env.ref("product.product_category_all").id,
+                "categ_id": cls.kitchen_categ.id,
                 "pack_ok": True,
                 "pack_type": "non_detailed",
                 "pack_component_price": "totalized",
-                "standard_price": 30,
-                "list_price": 40,
-                "type": "service",
+                "standard_price": 52.5,
+                "lst_price": 105.0,
+                "type": "consu",
                 "pack_line_ids": [
                     Command.create(
                         {
-                            "product_id": cls.product_1.id,
+                            "product_id": cls.product_spoon.id,
+                            "quantity": 3.0,
+                        },
+                    ),
+                    Command.create(
+                        {
+                            "product_id": cls.product_knife.id,
+                            "quantity": 3.0,
+                        },
+                    ),
+                    Command.create(
+                        {
+                            "product_id": cls.product_pot.id,
                             "quantity": 1.0,
                         },
                     ),
                     Command.create(
                         {
-                            "product_id": cls.product_2.id,
-                            "quantity": 1.0,
-                        },
-                    ),
-                ],
-            }
-        )
-
-        cls.product_pack_detailed = cls.env["product.product"].create(
-            {
-                "name": "Product pack 2 (Detailed)",
-                "default_code": "BA_PACK_002",
-                "brand_id": cls.product_brand_a.id,
-                "categ_id": cls.env.ref("product.product_category_all").id,
-                "pack_ok": True,
-                "pack_type": "detailed",
-                "pack_component_price": "ignored",
-                "standard_price": 30,
-                "list_price": 40,
-                "type": "service",
-                "pack_line_ids": [
-                    Command.create(
-                        {
-                            "product_id": cls.product_1.id,
-                            "quantity": 1.0,
-                        },
-                    ),
-                    Command.create(
-                        {
-                            "product_id": cls.product_2.id,
-                            "quantity": 1.0,
+                            "product_id": cls.product_fork.id,
+                            "quantity": 3.0,
                         },
                     ),
                 ],

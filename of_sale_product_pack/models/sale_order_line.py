@@ -1,5 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+
 from odoo import Command, api, fields, models
 from odoo.fields import first
 from odoo.tools import float_compare
@@ -57,6 +58,7 @@ class SaleOrderLine(models.Model):
                         {
                             "product_id": line.product_id.id,
                             "quantity": line.quantity * record.product_uom_qty,
+                            "price_unit": line.product_id.lst_price,
                         },
                     )
                     for line in pack_lines
@@ -99,13 +101,54 @@ class SaleOrderLine(models.Model):
             else:
                 record.of_pack_component_price = False
 
-    @api.depends("product_id", "product_id.pack_ok", "of_pack_line_ids", "of_pack_component_price")
+    @api.depends(
+        "of_pack_line_ids",
+        "of_pack_line_ids.price_unit",
+        "of_pack_line_ids.quantity",
+        "of_pack_component_price",
+        "pricelist_item_id",
+    )
     def _compute_price_unit(self):
         super()._compute_price_unit()
+        self._compute_components_prices()
+
+    def _compute_components_prices(self):
+        """Calculate the components prices in the sales order line after applying the price list"""
         for line in self:
             if line.of_pack_component_price == "totalized":
-                line.price_unit = sum(
-                    pack_line.product_id.lst_price * pack_line.quantity for pack_line in line.of_pack_line_ids
+                order_date = line.order_id.date_order or fields.Date.today()
+                currency = line.currency_id or line.order_id.company_id.currency_id
+                total_pack_price = 0.0
+
+                for pack_line in line.of_pack_line_ids:
+                    if pack_line.pricelist_item_id:
+                        component_price = pack_line.pricelist_item_id._compute_price(
+                            pack_line.product_id,
+                            pack_line.quantity,
+                            pack_line.product_id.uom_id,
+                            order_date,
+                            currency=currency,
+                        )
+                        pack_line.price_unit = component_price
+                    else:
+                        component_price = pack_line.price_unit
+
+                    total_pack_price += component_price * pack_line.quantity
+
+                line.price_unit = total_pack_price
+
+    @api.depends("product_id", "product_uom", "product_uom_qty")
+    def _compute_pricelist_item_id(self):
+        super()._compute_pricelist_item_id()
+        for line in self.filtered(lambda li: li.product_id.pack_ok):
+            order_pricelist = line.order_id.pricelist_id
+            date_order = line.order_id.date_order
+            for pack_line in line.of_pack_line_ids:
+                pack_line.pricelist_item_id = order_pricelist._get_product_rule(
+                    pack_line.product_id,
+                    pack_line.quantity or 1.0,
+                    uom=pack_line.product_id.uom_id,
+                    date=date_order,
                 )
 
     @api.depends("product_id", "product_id.pack_ok", "of_pack_line_ids", "of_pack_component_price")
@@ -298,7 +341,7 @@ class SaleOrderLine(models.Model):
                 "sequence": order_line.sequence,
                 "product_id": pack_line.product_id.id,
                 "product_uom_qty": pack_line.quantity * order_line.product_uom_qty,
-                "price_unit": pack_line.product_id.lst_price,
+                "price_unit": pack_line.price_unit,
                 "pack_parent_line_id": order_line.id,
                 "pack_modifiable": order_line.product_id.pack_modifiable,
             }

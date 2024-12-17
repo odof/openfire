@@ -9,6 +9,10 @@ class ProductTemplate(models.Model):
     pack_type = fields.Selection(default="non_detailed", required=True)
     pack_component_price = fields.Selection(selection="_get_pack_component_price", default="totalized", required=True)
 
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
+
     @api.depends(lambda self: self._get_pack_modifiable_invisible_depends())
     def _compute_pack_modifiable_invisible(self):
         """Overridden method for computing the pack modifiable invisible field.
@@ -17,23 +21,74 @@ class ProductTemplate(models.Model):
         for product in self:
             product.pack_modifiable_invisible = product.pack_type != "detailed"
 
-    @api.onchange("pack_ok", "pack_component_price", "pack_line_ids")
-    def _onchange_list_price(self):
-        if self.pack_ok and self.pack_component_price == "totalized" and self.pack_line_ids:
-            self.list_price = sum(
-                pack_line.product_id.list_price * pack_line.quantity for pack_line in self.pack_line_ids
-            )
-        else:
-            self.list_price = 1.0
+    @api.depends("pack_ok", "pack_component_price", "pack_line_ids", "pack_line_ids.product_id.standard_price")
+    def _compute_standard_price(self):
+        super()._compute_standard_price()
+        for product in self:
+            if product.pack_ok and product.pack_component_price == "totalized" and product.pack_line_ids:
+                product.standard_price = sum(
+                    pack_line.product_id.standard_price * pack_line.quantity for pack_line in product.pack_line_ids
+                )
+            else:
+                product.standard_price = product.standard_price
 
-    @api.onchange("pack_ok", "pack_component_price", "pack_line_ids")
-    def _onchange_standard_price(self):
-        if self.pack_ok and self.pack_component_price == "totalized" and self.pack_line_ids:
-            self.standard_price = sum(
-                pack_line.product_id.standard_price * pack_line.quantity for pack_line in self.pack_line_ids
-            )
-        else:
-            self.standard_price = 0.0
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
+
+    def write(self, vals):
+        res = super().write(vals)
+
+        # NOTE (improve me): Technical choice to keep updated all Packs using components in pending modification.
+        # This context is set only on the O2M components list of a Product pack to keep prices up to date.
+        # In that way we are avoiding updating packs during mass product modification (like product imports).
+        if self.env.context.get("of_update_product_pack_prices") and any(field in ["list_price"] for field in vals):
+            if packs_to_update := (
+                (
+                    self.env["product.pack.line"]
+                    .search(
+                        [
+                            (
+                                "product_id",
+                                "in",
+                                self.mapped("product_variant_id").ids,
+                            )
+                        ]
+                    )
+                    .mapped("parent_product_id")
+                )
+                .mapped("product_tmpl_id")
+                .filtered(lambda pt: pt.pack_component_price == "totalized")
+            ):
+                packs_to_update.with_context(
+                    of_force_pack_totalized_upd=True,
+                )._process_list_price()
+
+        # `list_price` is readonly when the product is flagged as pack with a totalize price, so we ensure that is
+        # correctly computed during the write.
+        if not self.env.context.get("of_pack_avoid_recompute_list_price"):
+            self._process_list_price(vals)
+        return res
+
+    # -------------------------------------------------------------------------
+    # Business methods
+    # -------------------------------------------------------------------------
+
+    def _process_list_price(self, vals=None):
+        if vals is None:
+            vals = {}
+
+        if any(field in ["pack_component_price", "pack_line_ids"] for field in vals) or self.env.context.get(
+            "of_force_pack_totalized_upd"
+        ):
+            for product in self.filtered(
+                lambda p: p.pack_ok and p.pack_component_price == "totalized" and p.pack_line_ids
+            ):
+                product.with_context(
+                    of_pack_avoid_recompute_list_price=True,
+                ).list_price = sum(
+                    pack_line.component_price * pack_line.quantity for pack_line in product.pack_line_ids
+                )
 
     def _get_pack_component_price(self):
         """Method for getting the selection for the pack component price."""

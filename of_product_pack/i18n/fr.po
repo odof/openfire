@@ -137,3 +137,8 @@ msgstr "Quantité"
 #: model_terms:ir.ui.view,arch_db:of_product_pack.product_template_view_form_product_pack
 msgid "Sales Price"
 msgstr "Prix de vente"
+
+#. module: of_product_pack
+#: model:ir.model.fields,field_description:of_product_pack.field_of_product_pack_lines__price_unit
+msgid "Unit price"
+msgstr "Prix unitaire"

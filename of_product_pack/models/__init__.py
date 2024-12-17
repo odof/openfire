@@ -2,3 +2,4 @@
 
 from . import product_template
 from . import of_product_pack_lines
+from . import product_pack_line
