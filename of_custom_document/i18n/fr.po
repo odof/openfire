@@ -245,7 +245,7 @@ msgstr ""
 
 #. module: of_custom_document
 #: model:ir.model.fields,field_description:of_custom_document.field_of_custom_document__model
-msgid "Related Document Model"
+msgid "Document Model"
 msgstr "Modèle associé"
 
 #. module: of_custom_document

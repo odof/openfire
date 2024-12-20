@@ -1,7 +1,7 @@
 #. module: of_custom_document_account
 #: model:ir.model.fields,field_description:of_custom_document_account.field_account_move__of_custom_document_ids
 msgid "Custom documents"
-msgstr "Document personnalisés"
+msgstr "Documents personnalisés"
 
 #. module: of_custom_document_account
 #: model:ir.model.fields,help:of_custom_document_account.field_account_move__of_custom_document_ids

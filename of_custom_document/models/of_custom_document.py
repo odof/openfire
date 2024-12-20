@@ -44,10 +44,8 @@ class OFCustomDocument(models.Model):
     file = fields.Binary()
     fillable = fields.Boolean(string="Keep fillable", help="The pdf document will be fillable")
     sequence = fields.Integer(default=10)
-    model_id = fields.Many2one(comodel_name="ir.model", string="Applies to")
-    model = fields.Char(
-        string="Related Document Model", related="model_id.model", index=True, store=True, readonly=True
-    )
+    model_ids = fields.Many2many(comodel_name="ir.model", string="Applies to")
+    model = fields.Char(string="Document Model", compute="_compute_model", index=True, store=True, readonly=True)
     pdf_field_ids = fields.One2many(
         comodel_name="of.custom.document.field", inverse_name="document_id", string="PDF fields", copy=True
     )
@@ -60,10 +58,18 @@ class OFCustomDocument(models.Model):
         help="Sidebar action to make this template available on records of the related document model",
     )
 
-    @api.depends("model_id")
+    @api.depends("model_ids")
+    def _compute_model(self):
+        for document in self:
+            models = [model_id.model for model_id in document.model_ids]
+            document.model = ", ".join(models)
+
+    @api.depends("model_ids")
     def _compute_render_model(self):
         for template in self:
-            template.render_model = template.model_id.model
+            if template.model_ids:
+                models = [model_id.model for model_id in template.model_ids]
+                template.render_model = ", ".join(models) if models else False
 
     def copy(self, default=None):
         default = dict(default or {})
@@ -183,44 +189,56 @@ class OFCustomDocument(models.Model):
                     "print_report_name": f'"{document.name}"',
                     "report_name": document.name,
                 }
-            if action.model != document.model_id.model:
-                vals |= {
-                    "model": document.model_id.model,
-                    "binding_model_id": document.model_id.id,
-                }
-            if vals:
-                action.write(vals)
+            for model_id in document.model_ids:
+                if action.model != model_id.model:
+                    vals |= {
+                        "model": model_id.model,
+                        "binding_model_id": model_id.id,
+                    }
+                if vals:
+                    action.write(vals)
 
     def unlink_action(self):
         for template in self:
-            if template.ref_ir_act_report:
-                template.ref_ir_act_report.unlink()
+            for model in template.model_ids:
+                action_reports = self.env["ir.actions.report"].search(
+                    [
+                        ("binding_model_id", "=", model.id),
+                        ("report_name", "=", f"of_custom_document.{template.id}"),
+                    ]
+                )
+
+                for action_report in action_reports:
+                    action_report.unlink()
+
         return True
 
     def create_action(self):
         action_report_obj = self.env["ir.actions.report"]
         for document in self:
-            action = action_report_obj.create(
-                {
-                    "name": document.name,
-                    "report_type": "qweb-pdf",
-                    "model": document.model_id.model,
-                    "print_report_name": f'"{document.name}"',
-                    "report_name": f"of_custom_document.{document.id}",
-                    "binding_model_id": document.model_id.id,
-                    "binding_type": "report",
-                }
-            )
-            document.write({"ref_ir_act_report": action.id})
+            for model_id in document.model_ids:
+                action = action_report_obj.create(
+                    {
+                        "name": document.name,
+                        "report_type": "qweb-pdf",
+                        "model": model_id.model,
+                        "print_report_name": f'"{document.name}"',
+                        "report_name": f"of_custom_document.{document.id}",
+                        "binding_model_id": model_id.id,
+                        "binding_type": "report",
+                    }
+                )
+                document.write({"ref_ir_act_report": action.id})
 
         return True
 
     def write(self, vals):
         res = super().write(vals)
-        if any(field in vals for field in ("name", "model_id")):
+        if any(field in vals for field in ("name", "model_ids")):
             self.update_action()
         return res
 
     def unlink(self):
-        self.unlink_action()
+        for template in self:
+            template.unlink_action()
         return super().unlink()

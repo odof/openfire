@@ -19,7 +19,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:of_custom_document_sale.field_sale_order__of_custom_document_ids
 #: model:ir.ui.menu,name:of_custom_document_sale.menu_of_custom_document
 msgid "Custom documents"
-msgstr "Document personnalisés"
+msgstr "Documents personnalisés"
 
 #. module: of_custom_document_sale
 #: model:ir.model.fields,help:of_custom_document_sale.field_sale_order__of_custom_document_ids
