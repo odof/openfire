@@ -174,6 +174,7 @@ class ProductProduct(models.Model):
 
     @api.model
     def name_search(self, name="", args=None, operator="ilike", limit=100):
+        """This method is used to search products in the Centralized database"""
         # on va chercher si dans la recherche on a ajouté le "m:" pour chercher par marque
 
         name, brands = self.env["product.template"].of_name_search_extract_brands(name)

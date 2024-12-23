@@ -5,6 +5,6 @@
             id="of_datastore_sale_menu"
             parent="of_base.of_connector_menu"
             sequence="10"
-            action="of_datastore_sale_action"/>
+            action="of_datastore_sale.of_datastore_sale_action"/>
 
 </odoo>

@@ -108,8 +108,9 @@ class OFProductMixin(models.AbstractModel):
 
     def compute_product_price(self, brand, values):
         # TODO : version plus complète avec les formules
-        if of_seller_pp_ht := values.get("of_seller_pp_ht"):
-            values["list_price"] = of_seller_pp_ht
+        # On a mis brand dans les paramètres car on va l'utiliser quand on modifiera la fct
+        if of_seller_pp_untaxed := values.get("of_seller_pp_untaxed"):
+            values["list_price"] = of_seller_pp_untaxed
 
         if of_seller_price := values.get("of_seller_price"):
             values["standard_price"] = of_seller_price

@@ -34,14 +34,17 @@ class OFDatastoreModel(models.AbstractModel):
     of_datastore_res_id = fields.Integer(string="ID on supplier database", index=True, copy=False)
     is_of_ds_search = fields.Boolean(string="IS DS Search")  # petit hack pour gérer la recherche sur les datastores
     of_datastore_is_connected = fields.Boolean(string="Is Connected", compute="_compute_of_datastore_is_connected")
-    # -------------------------------------------------------------------------
-    # ORM methods
-    # -------------------------------------------------------------------------
 
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
     def _compute_of_datastore_is_connected(self):
         for record in self:
             record.of_datastore_is_connected = record.of_datastore_res_id > 0
 
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
     def _register_hook(self):
         # First, clear the cache for this database
         DS_CACHE.clear_cache(self.env.cr.dbname)

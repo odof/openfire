@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_of_datastore_brand" name="CT Connections"
+        parent="sale.prod_config_main"
+        sequence="16"
+        action="of_datastore_product.of_datastore_brand_action" />
+
+    <menuitem id="of_datastore_product.menu_of_datastore_supplier" name="C.P.Connector"
+        parent="of_base.of_connector_menu"
+        sequence="1"
+        action="of_datastore_product.of_datastore_supplier_action" />
+</odoo>
