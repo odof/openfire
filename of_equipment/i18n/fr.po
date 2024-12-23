@@ -890,7 +890,7 @@ msgstr "Lien d'équipement"
 #: model:ir.actions.report,name:of_equipment.report_action_equipment_report
 #: model:ir.model.fields,field_description:of_equipment.field_of_calendar_event_equipment_link__equipment_report_tmpl_id
 #: model:ir.model.fields,field_description:of_equipment.field_of_planning_equipment_link_mixin__equipment_report_tmpl_id
-#: model:ir.ui.menu,name:of_equipment.menu_of_equipment_intervention_report_template
+#: model:ir.ui.menu,name:of_equipment.menu_of_equipment_intervention_cfg_report_tmpl
 #: model_terms:ir.ui.view,arch_db:of_equipment.of_equipment_intervention_report_template_view_form
 msgid "Equipment report"
 msgstr "Rapport d'équipement"
