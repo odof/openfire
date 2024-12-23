@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-20 13:28+0000\n"
-"PO-Revision-Date: 2024-11-20 13:28+0000\n"
+"POT-Creation-Date: 2024-12-27 13:52+0000\n"
+"PO-Revision-Date: 2024-12-27 13:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -261,7 +261,7 @@ msgstr "Créneau disponible"
 
 #. module: of_planning_tour
 #: model:ir.model.fields,field_description:of_planning_tour.field_of_planning_tour__available_slot_ids
-#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_available_slot
+#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_available_slot_cfg
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_available_slot_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning_tour.of_planning_tour_view_form
 msgid "Available Slots"
@@ -1649,6 +1649,11 @@ msgid "Plan intervention"
 msgstr "Planifier intervention"
 
 #. module: of_planning_tour
+#: model:ir.ui.menu,name:of_planning_tour.menu_of_planning_cfg_planning
+msgid "Planning"
+msgstr ""
+
+#. module: of_planning_tour
 #: model:ir.actions.act_window,name:of_planning_tour.action_of_planning_available_slot
 msgid "Planning Available Slots"
 msgstr "Créneaux disponibles du Planning"
@@ -1966,7 +1971,7 @@ msgstr "Créneau"
 
 #. module: of_planning_tour
 #: model:ir.actions.act_window,name:of_planning_tour.of_tour_appointment_template_action
-#: model:ir.ui.menu,name:of_planning_tour.menu_of_tour_appointment_template
+#: model:ir.ui.menu,name:of_planning_tour.menu_of_tour_appointment_template_cfg
 msgid "Slot search templates"
 msgstr "Modèles de recherche de créneaux"
 

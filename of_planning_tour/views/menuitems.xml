@@ -9,10 +9,11 @@
         <field name="action" ref="of_planning_tour.action_of_planning_tour"/>
     </record>
 
-    <!-- Tour appointments templates -->
-    <menuitem id="menu_of_tour_appointment_template" name="Slot search templates" action="of_tour_appointment_template_action" parent="of_planning.menu_of_planning_configuration" sequence="15"/>
-
-    <!-- Available Slots -->
-    <menuitem id="menu_of_planning_available_slot" name="Available Slots" action="action_of_planning_available_slot" parent="of_planning.menu_of_planning_configuration" sequence="30"/>
+    <!-- Configuration/Planification -->
+    <menuitem id="menu_of_planning_cfg_planning" name="Planning" parent="of_planning.menu_of_planning_configuration" sequence="25" />
+    <!-- Configuration/Planification/Tour appointments templates -->
+    <menuitem id="menu_of_tour_appointment_template_cfg" name="Slot search templates" action="of_tour_appointment_template_action" parent="of_planning_tour.menu_of_planning_cfg_planning" sequence="10"/>
+    <!-- Configuration/Planification/Available Slots -->
+    <menuitem id="menu_of_planning_available_slot_cfg" name="Available Slots" action="action_of_planning_available_slot" parent="of_planning_tour.menu_of_planning_cfg_planning" sequence="20"/>
 
 </odoo>
