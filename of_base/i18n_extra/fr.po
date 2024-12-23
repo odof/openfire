@@ -13,3 +13,8 @@ msgstr "Civilité"
 #: model_terms:ir.ui.view,arch_db:base.view_res_bank_form
 msgid "Street 2..."
 msgstr "Complément d'adresse..."
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:base.selection__res_partner__type__private
+msgid "Private Address"
+msgstr "Adresse privée"
