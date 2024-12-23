@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="of_business_sectors_chimney_maker" model="of.business.sectors">
+            <field name="name">Chimneyman</field>
+        </record>
+        <record id="of_business_sectors_air_conditioning_specialist" model="of.business.sectors">
+            <field name="name">Air conditioning technician</field>
+        </record>
+        <record id="of_business_sectors_photovoltaic" model="of.business.sectors">
+            <field name="name">Photovoltaic</field>
+        </record>
+        <record id="of_business_sectors_applicator" model="of.business.sectors">
+            <field name="name">Applicator / blower</field>
+        </record>
+        <record id="of_business_sectors_chimney_sweeps" model="of.business.sectors">
+            <field name="name">Chimney sweeps</field>
+        </record>
+        <record id="of_business_sectors_heating_specialist" model="of.business.sectors">
+            <field name="name">Heating engineer</field>
+        </record>
+        <record id="of_business_sectors_intervention_management" model="of.business.sectors">
+            <field name="name">Maintenance and intervention management</field>
+        </record>
+        <record id="of_business_sectors_network" model="of.business.sectors">
+            <field name="name">Networks</field>
+        </record>
+        <record id="of_business_fuel_distributor" model="of.business.sectors">
+            <field name="name">Fuel distributor</field>
+        </record>
+        <record id="of_business_other" model="of.business.sectors">
+            <field name="name">Other</field>
+        </record>
+
+</odoo>
