@@ -8,6 +8,7 @@
     <menuitem id="menu_of_service_request_maintenance_maintenance_first" name="Maintenance" parent="of_planning.menu_of_planning_intervention" action="action_of_service_request_maintenance" groups="of_service.of_group_intervention_open_menu_maintenance" sequence="1"/>
 
     <!-- Configuration -->
-    <menuitem id="menu_of_service_stage" name="Stage" parent="of_planning.menu_of_planning_configuration" action="action_of_service_request_stage" sequence="65"/>
+    <menuitem id="menu_of_service_request_configuration" name="Service request" parent="of_planning.menu_of_planning_configuration" sequence="15" />
+    <menuitem id="menu_of_service_cfg_stage" name="Stage" parent="of_service.menu_of_service_request_configuration" action="action_of_service_request_stage" sequence="10"/>
 
 </odoo>

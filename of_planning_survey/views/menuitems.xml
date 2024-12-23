@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_of_survey_survey" name="Surveys" parent="of_planning.menu_of_planning_configuration" action="of_planning_survey.of_action_survey_form" sequence="10"/>
+    <menuitem id="menu_of_survey_planning_cfg_survey" name="Surveys" parent="of_planning.menu_of_planning_cfg_interventions" action="of_planning_survey.of_action_survey_form" sequence="15"/>
 
 </odoo>

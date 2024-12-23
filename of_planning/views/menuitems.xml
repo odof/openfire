@@ -16,16 +16,19 @@
 
     <!-- Configuration -->
     <menuitem id="menu_of_planning_configuration" name="Configuration" parent="of_planning.menu_of_planning_main" sequence="100" groups="group_planning_intervention_responsible" />
-    <menuitem id="menu_of_planning_general_settings" name="Settings" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_config_settings" sequence="1" />
-    <menuitem id="menu_hr_employee" name="Employees" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_hr_employee" sequence="10"/>
-    <menuitem id="menu_of_planning_team" name="Teams" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_team" sequence="20" />
-    <menuitem id="menu_of_planning_task" name="Tasks" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_task" sequence="30" />
-    <menuitem id="menu_of_sector" name="Sectors" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_sector_planning" sequence="40"/>
-    <menuitem id="menu_of_planning_tag_tree" name="Intervention tags" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_tag" sequence="50" />
-    <menuitem id="menu_of_planning_intervention_template" name="Intervention template" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_intervention_template" sequence="60"/>
+    <menuitem id="menu_of_planning_general_settings" name="Settings" parent="of_planning.menu_of_planning_configuration" action="of_planning.action_of_planning_config_settings" sequence="10" />
 
-    <!-- Employé -->
-    <menuitem id="menu_settings_resource" name="Resources" parent="menu_of_planning_configuration" sequence="70"/>
-    <menuitem id="menu_resource_calendar" parent="menu_settings_resource" action="resource.action_resource_calendar_form" sequence="1"/>
+    <!-- Configuration/Interventions-->
+    <menuitem id="menu_of_planning_cfg_interventions" name="Interventions" parent="of_planning.menu_of_planning_configuration" sequence="20" />
+    <menuitem id="menu_of_planning_cfg_intervention_template" name="Intervention template" parent="of_planning.menu_of_planning_cfg_interventions" action="of_planning.action_of_planning_intervention_template" sequence="10"/>
+    <menuitem id="menu_of_planning_cfg_task" name="Tasks" parent="of_planning.menu_of_planning_cfg_interventions" action="of_planning.action_of_planning_task" sequence="20" />
+    <menuitem id="menu_of_planning_cfg_tag" name="Tags" parent="of_planning.menu_of_planning_cfg_interventions" action="of_planning.action_of_planning_tag" sequence="30" />
+
+    <!-- Configuration/Ressources -->
+    <menuitem id="menu_of_planning_cfg_resources" name="Resources" parent="menu_of_planning_configuration" sequence="30"/>
+    <menuitem id="menu_of_planning_cfg_team" name="Teams" parent="of_planning.menu_of_planning_cfg_resources" action="of_planning.action_of_planning_team" sequence="10" />
+    <menuitem id="menu_of_planning_cfg_employee" name="Employees" parent="of_planning.menu_of_planning_cfg_resources" action="of_planning.action_hr_employee" sequence="20"/>
+    <menuitem id="menu_of_planning_cfg_resource_calendar" parent="menu_of_planning_cfg_resources" action="resource.action_resource_calendar_form" sequence="30"/>
+    <menuitem id="menu_of_planning_cfg_sector" name="Sectors" parent="of_planning.menu_of_planning_cfg_resources" action="of_planning.action_of_sector_planning" sequence="40"/>
 
 </odoo>
