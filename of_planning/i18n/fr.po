@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-13 11:02+0000\n"
-"PO-Revision-Date: 2024-12-13 11:02+0000\n"
+"POT-Creation-Date: 2024-12-27 13:49+0000\n"
+"PO-Revision-Date: 2024-12-27 13:49+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1630,7 +1630,7 @@ msgstr "Catégorie employé"
 #: model:ir.actions.act_window,name:of_planning.action_hr_employee
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_print_wizard__employee_ids
 #: model:ir.model.fields,field_description:of_planning.field_of_planning_team__employee_ids
-#: model:ir.ui.menu,name:of_planning.menu_hr_employee
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_employee
 #: model_terms:ir.ui.view,arch_db:of_planning.report_planning_general_week_document
 msgid "Employees"
 msgstr "Employés"
@@ -2146,7 +2146,6 @@ msgstr "Étiquettes d'intervention"
 
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_tag
-#: model:ir.ui.menu,name:of_planning.menu_of_planning_tag_tree
 msgid "Intervention tags"
 msgstr "Étiquettes d'intervention"
 
@@ -2159,7 +2158,7 @@ msgstr "Équipe d'intervention"
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_intervention_template
 #: model:ir.model,name:of_planning.model_of_planning_intervention_template
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_template_id
-#: model:ir.ui.menu,name:of_planning.menu_of_planning_intervention_template
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_intervention_template
 #: model_terms:ir.ui.view,arch_db:of_planning.of_planning_intervention_template_view_form
 msgid "Intervention template"
 msgstr "Modèle d'intervention"
@@ -2207,6 +2206,7 @@ msgstr "Bons de livraison dans les interventions"
 #: model:ir.model.fields,field_description:of_planning.field_res_users__of_intervention_ids
 #: model:ir.model.fields,field_description:of_planning.field_sale_order__of_intervention_ids
 #: model:ir.ui.menu,name:of_planning.menu_of_planning_calendar_event
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_interventions
 #: model:ir.ui.menu,name:of_planning.menu_of_planning_intervention
 #: model:ir.ui.menu,name:of_planning.menu_of_planning_main
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_pivot
@@ -3110,7 +3110,7 @@ msgid "Resource linked to the intervention"
 msgstr "Ressource liée à l'intervention"
 
 #. module: of_planning
-#: model:ir.ui.menu,name:of_planning.menu_settings_resource
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_resources
 msgid "Resources"
 msgstr "Ressources"
 
@@ -3180,7 +3180,7 @@ msgstr "Secteur"
 
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_sector_planning
-#: model:ir.ui.menu,name:of_planning.menu_of_sector
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_sector
 msgid "Sectors"
 msgstr "Secteurs"
 
@@ -3409,6 +3409,7 @@ msgstr "Liste des étiquettes"
 
 #. module: of_planning
 #: model:ir.model.fields,field_description:of_planning.field_calendar_event__of_tag_ids
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_tag
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_form
 #: model_terms:ir.ui.view,arch_db:of_planning.calendar_event_view_search
 msgid "Tags"
@@ -3471,7 +3472,7 @@ msgstr "Tâche à effectuer pendant l'opération"
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_task
 #: model:ir.model.fields,field_description:of_planning.field_hr_employee__of_task_ids
-#: model:ir.ui.menu,name:of_planning.menu_of_planning_task
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_task
 #: model_terms:ir.ui.view,arch_db:of_planning.hr_employee_view_form
 msgid "Tasks"
 msgstr "Tâches"
@@ -3515,7 +3516,7 @@ msgstr "Équipe"
 #. module: of_planning
 #: model:ir.actions.act_window,name:of_planning.action_of_planning_team
 #: model:ir.model.fields,field_description:of_planning.field_hr_employee__of_team_ids
-#: model:ir.ui.menu,name:of_planning.menu_of_planning_team
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_team
 msgid "Teams"
 msgstr "Équipes"
 
@@ -3981,7 +3982,7 @@ msgid "Who"
 msgstr "Qui"
 
 #. module: of_planning
-#: model:ir.ui.menu,name:of_planning.menu_resource_calendar
+#: model:ir.ui.menu,name:of_planning.menu_of_planning_cfg_resource_calendar
 msgid "Working Times"
 msgstr "Temps de travail"
 
