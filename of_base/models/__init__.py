@@ -1,7 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from . import update
-from . import base_config_settings
+from . import res_config_settings
 from . import of_base_document_layout
 from . import base
 from . import ir_http
@@ -28,3 +28,4 @@ from . import res_partner_bank
 from . import res_partner_title
 from . import res_users
 from . import version_registery
+from . import of_business_sectors

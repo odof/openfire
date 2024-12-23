@@ -9,3 +9,5 @@ access_of_html_sanitize_wizard,access_of_html_sanitize_wizard,of_base.model_of_h
 access_of_image_user,of.image,model_of_image,base.group_user,1,1,1,1
 access_of_image_public,access.of.image.public,model_of_image,,1,0,0,0
 access_of_sanitize_query_user,access.of.sanitize.query,model_of_sanitize_query,base.group_user,1,0,0,0
+access_of_business_sectors_manager,access.of.business.sectors,model_of_business_sectors,base.group_system,1,1,1,1
+access_of_business_sectors_user,access.of.business.sectors,model_of_business_sectors,base.group_user,1,0,0,0

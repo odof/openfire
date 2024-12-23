@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-05 14:55+0000\n"
-"PO-Revision-Date: 2024-11-05 14:55+0000\n"
+"POT-Creation-Date: 2024-12-27 11:17+0000\n"
+"PO-Revision-Date: 2024-12-27 11:17+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -35,6 +35,12 @@ msgid "(OF) Block password modification"
 msgstr "(OF) Bloquer la modification du mot de passe"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_business_sectors_ids
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_business_sectors_ids_str
+msgid "(OF) Business sectors"
+msgstr "(OF) Secteurs d'activité"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_ref_mode
 msgid "(OF) Customer reference"
 msgstr "(OF) Référence client"
@@ -43,6 +49,16 @@ msgstr "(OF) Référence client"
 #: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_display_city
 msgid "(OF) Display city"
 msgstr "(OF) Afficher ville"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_invoicing_plan
+msgid "(OF) Invoicing plan"
+msgstr "(OF) Plan de facturation"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_config_settings__of_base_type
+msgid "(OF) Type"
+msgstr ""
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_email_compose_message_wizard_form
@@ -94,9 +110,24 @@ msgid "Admin only"
 msgstr "Admin seulement"
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_invoicing_plan__advanced
+msgid "Advanced"
+msgstr "Avancé"
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_view_company_form
 msgid "Advanced settings"
 msgstr "Paramètres avancés"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_air_conditioning_specialist
+msgid "Air conditioning technician"
+msgstr "Climaticien"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_applicator
+msgid "Applicator / blower"
+msgstr "Applicateur / souffleur"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
@@ -146,6 +177,28 @@ msgstr ""
 #: model:ir.model,name:of_base.model_of_base_document_layout
 msgid "Base Document Layout"
 msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_invoicing_plan__basic
+msgid "Basic"
+msgstr "Basique"
+
+#. module: of_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_business_sectors_view_form
+msgid "Business sector"
+msgstr "Secteur d'activité"
+
+#. module: of_base
+#: model:ir.actions.act_window,name:of_base.of_business_sectors_action
+#: model:ir.ui.menu,name:of_base.of_business_sectors_action_menu
+#: model_terms:ir.ui.view,arch_db:of_base.of_business_sectors_view_tree
+msgid "Business sectors"
+msgstr "Secteurs d'activité"
+
+#. module: of_base
+#: model:ir.model,name:of_base.model_of_business_sectors
+msgid "Business sectors for database qualification"
+msgstr "Secteurs d'activité pour la qualification des bases de données"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_res_partner_tree
@@ -200,6 +253,16 @@ msgstr ""
 #: model:ir.model,name:of_base.model_of_res_partner_check_duplications
 msgid "Check Partner Duplications"
 msgstr "Vérifier les doublons de partenaires"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_chimney_sweeps
+msgid "Chimney sweeps"
+msgstr "Ramoneurs"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_chimney_maker
+msgid "Chimneyman"
+msgstr "Cheministe"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__city
@@ -284,6 +347,7 @@ msgid "Country"
 msgstr "Pays"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_image__create_uid
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__create_uid
@@ -295,6 +359,7 @@ msgid "Created by"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_image__create_date
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__create_date
@@ -306,6 +371,11 @@ msgid "Created on"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer
+msgid "Customer"
+msgstr "Client"
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Customer note..."
 msgstr "Notes client..."
@@ -314,6 +384,11 @@ msgstr "Notes client..."
 #: model:ir.model.fields,field_description:of_base.field_res_company__of_ref_mode
 msgid "Customer reference"
 msgstr "Référence client"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer_test
+msgid "Customer test"
+msgstr "Test client"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_company__of_decennial_insurance
@@ -338,6 +413,12 @@ msgid "Delivery Failed"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__demo
+msgid "Demo"
+msgstr "Démo"
+
+#. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_image__display_name
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__display_name
@@ -415,6 +496,12 @@ msgid "Error type"
 msgstr "Type d'erreur"
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer_supplier
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_invoicing_plan__expert
+msgid "Expert"
+msgstr ""
+
+#. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__external
 msgid "External"
 msgstr "Externe"
@@ -475,6 +562,11 @@ msgid "Force authorization for grouping"
 msgstr "Autorisation forcée pour le regroupement"
 
 #. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_fuel_distributor
+msgid "Fuel distributor"
+msgstr "Distributeur de combustibles"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__function
 #: model_terms:ir.ui.view,arch_db:of_base.of_log_message_search_view
 msgid "Function"
@@ -517,6 +609,11 @@ msgid "Has Message"
 msgstr ""
 
 #. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_heating_specialist
+msgid "Heating engineer"
+msgstr "Climaticien"
+
+#. module: of_base
 #: model:res.groups,name:of_base.of_group_hidden
 msgid "Hidden Special Group"
 msgstr "Groupe spécial caché"
@@ -539,6 +636,7 @@ msgid "IBAN"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__id
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__id
 #: model:ir.model.fields,field_description:of_base.field_of_image__id
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__id
@@ -627,6 +725,11 @@ msgid "Internal"
 msgstr "Interne"
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__internal_test
+msgid "Internal test"
+msgstr "Test interne"
+
+#. module: of_base
 #: model:res.groups,name:of_base.of_group_intranet
 msgid "Intranet"
 msgstr ""
@@ -656,6 +759,7 @@ msgid "Is a valid number ?"
 msgstr "Est un numéro est valide ?"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_image____last_update
 #: model:ir.model.fields,field_description:of_base.field_of_log_message____last_update
@@ -667,6 +771,7 @@ msgid "Last Modified on"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_image__write_uid
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__write_uid
@@ -678,6 +783,7 @@ msgid "Last Updated by"
 msgstr ""
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_html_sanitize_wizard__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_image__write_date
 #: model:ir.model.fields,field_description:of_base.field_of_log_message__write_date
@@ -748,6 +854,11 @@ msgstr "Serveur d'email"
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_main_attachment_id
 msgid "Main Attachment"
 msgstr ""
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_intervention_management
+msgid "Maintenance and intervention management"
+msgstr "Gestion de maintenance et des interventions"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
@@ -826,11 +937,17 @@ msgid "Multi-risk insurance"
 msgstr "Assurance multirisques"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_of_business_sectors__name
 #: model:ir.model.fields,field_description:of_base.field_of_image__name
 #: model:ir.model.fields,field_description:of_base.field_res_partner__name
 #: model:ir.model.fields,field_description:of_base.field_res_users__name
 msgid "Name"
 msgstr "Nom"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_network
+msgid "Networks"
+msgstr "Réseaux"
 
 #. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_of_res_partner_check_duplications__new_partner_id
@@ -944,6 +1061,11 @@ msgid "OpenFire special group : allows to hide some menu items"
 msgstr "Groupe spécial OpenFire : permet de cacher certains éléments de menu"
 
 #. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_other
+msgid "Other"
+msgstr "Autre"
+
+#. module: of_base
 #: model:ir.model.fields.selection,name:of_base.selection__mail_message__of_state__outgoing
 msgid "Outgoing"
 msgstr ""
@@ -1002,6 +1124,11 @@ msgstr "Numéros de téléphone"
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
 msgid "Phones"
 msgstr "Téléphones"
+
+#. module: of_base
+#: model:of.business.sectors,name:of_base.of_business_sectors_photovoltaic
+msgid "Photovoltaic"
+msgstr "Photovoltaïque"
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_of_popup_wizard
@@ -1117,6 +1244,11 @@ msgid "Social capital"
 msgstr "Capital social"
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_invoicing_plan__standard
+msgid "Standard"
+msgstr ""
+
+#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_mail_message_view_form
 msgid "Status"
 msgstr "Statut"
@@ -1145,6 +1277,11 @@ msgid "Street2"
 msgstr "Rue 2"
 
 #. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__supplier
+msgid "Supplier"
+msgstr "Fournisseur"
+
+#. module: of_base
 #. odoo-javascript
 #: code:addons/of_base/static/src/js/user_menu_item.js:0
 #, python-format
@@ -1160,6 +1297,18 @@ msgstr "Suspicion de doublons !"
 #: model:ir.model.fields.selection,name:of_base.selection__res_users__of_user_type__technical
 msgid "Technical"
 msgstr "Technique"
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_res_config_settings__of_business_sectors_ids_str
+msgid ""
+"Technical field to store M2M fields into a config parameter. As "
+"config_parameters does not accept m2m field, we store the fields with a "
+"comma separated string into a Char config field."
+msgstr ""
+"Champ technique pour stocker les champs M2M dans un paramètre de "
+"configuration. Comme les paramètres de configuration n'acceptent pas les "
+"champs m2m, nous stockons les champs avec une chaîne séparée par des "
+"virgules dans un champ de configuration Char"
 
 #. module: of_base
 #. odoo-python
@@ -1338,6 +1487,21 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas accéder à l'application WEB OpenFire depuis un compte "
 "\"Ressource inactive\"."
+
+#. module: of_base
+#. odoo-python
+#: code:addons/of_base/models/res_config_settings.py:0
+#, python-format
+msgid ""
+"You have no the permission to change one of the following settings :\n"
+"* Base > (OF) Invoicing plan\n"
+"* Base > (OF) Type\n"
+"* Base > (OF) Business sectors"
+msgstr ""
+"Vous n'avez pas l'autorisation de modifier l'un des paramètres suivants :\n"
+"* Base > (OF) Plan de facturation\n"
+"* Base > (OF) Type\n"
+"* Base > (OF) Secteurs d'activité"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_html_sanitize_wizard_view_form

@@ -79,6 +79,14 @@ Fonctionnalités
   - si le fichier n'existe pas, le composant affichera "?!".
 
 
+Secteurs d'activité (`of.business.sectors`)
+-------------------------------------------
+
+* Ajout d'un modèle **"Secteurs d'activité"** qui est utilisé pour **catégoriser la base de données** via la la configuration générale.
+
+  - Voir **"Paramètres > Technique > Ressource > Secteurs d'activité"**
+
+
 Droits utilisateurs
 ###################
 
@@ -97,3 +105,17 @@ Droits utilisateurs
 * Ajout d'un groupe **"Modifier le contrat OpenFire"**
 
   - permet de donner accès aux utilisateurs pouvant opérer des modifications impactant le contrat OpenFire
+
+
+Paramètres de configuration
+############################
+
+Qualification de la base de données
+-----------------------------------
+
+- Ajout d'une section **"Base"** dans la configuration générale (seul l'administrateur peut voir cette section).
+
+- Cette section permet de renseigner des informations de qualification de la base de données, elle contient les champs :
+    - (OF) Plan de facturation;
+    - (OF) Secteurs d'activité;
+    - (OF) Type.

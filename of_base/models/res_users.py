@@ -124,3 +124,7 @@ class ResUsers(models.Model):
                 "base.user_admin"
             ):
                 raise UserError(_('Only the admin account can belong to group "%s".') % group_root.name)
+
+    def _is_admin_or_superuser(self):
+        self.ensure_one()
+        return self.env.user._is_superuser() or self.env.user == self.env.ref("base.user_admin")
