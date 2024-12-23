@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="of_account_document_layout_view_form" model="ir.ui.view">
-        <field name="name">of.account.payment.schedule.invoice.document.layout</field>
+    <record id="of_invoice_document_layout_view_form" model="ir.ui.view">
+        <field name="name">of.invoice.document.layout.view.form</field>
         <field name="model">of.invoice.document.layout</field>
         <field name="inherit_id" ref="of_invoice_report_setting.of_invoice_document_layout_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='pdf_invoice_price_taxinc']/../.." position="after">
-
                 <div>
                     <div class="o_setting_left_pane">
                         <field name="pdf_invoice_payment_schedule"/>

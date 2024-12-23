@@ -4,7 +4,7 @@ OF account payment schedule
 
 
 Fonctionnalités
-################
+###############
 
 * Ajout d'un échéancier de paiements visible dans la facture client.
     - l'échéancier se calcule en fonction des conditions de règlement du facture client.

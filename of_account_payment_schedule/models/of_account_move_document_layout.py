@@ -3,10 +3,7 @@
 from odoo import fields, models
 
 
-class ResConfigSettings(models.TransientModel):
+class OFInvoiceDocumentLayout(models.TransientModel):
     _inherit = "of.invoice.document.layout"
 
-    pdf_invoice_payment_schedule = fields.Boolean(
-        related="company_id.pdf_invoice_payment_schedule",
-        readonly=False,
-    )
+    pdf_invoice_payment_schedule = fields.Boolean(related="company_id.of_pdf_invoice_payment_schedule", readonly=False)

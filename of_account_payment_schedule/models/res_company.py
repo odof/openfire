@@ -6,4 +6,4 @@ from odoo import fields, models
 class ResCompany(models.Model):
     _inherit = "res.company"
 
-    pdf_invoice_payment_schedule = fields.Boolean(string="Payment schedule", default=True)
+    of_pdf_invoice_payment_schedule = fields.Boolean(string="Payment schedule", default=True)

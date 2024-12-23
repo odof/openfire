@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="of_account_report_invoice_document" inherit_id="of_invoice_report_setting.report_invoice_document">
+    <template id="of_account_report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='total_payment_term_details_table']" position="attributes">
+            <attribute name="class">row d-none</attribute>
+        </xpath>
+    </template>
+
+    <template id="of_account_report_invoice_document_report_setting" inherit_id="of_invoice_report_setting.report_invoice_document">
         <xpath expr="//t[@t-set='pdf_address_title']" position="after">
             <t t-set="pdf_invoice_payment_schedule" t-value="o.pdf_invoice_payment_schedule()"/>
         </xpath>
@@ -31,4 +37,5 @@
             </div>
         </xpath>
     </template>
+
 </odoo>

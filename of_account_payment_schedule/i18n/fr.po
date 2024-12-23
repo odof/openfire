@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-24 07:31+0000\n"
-"PO-Revision-Date: 2024-09-24 07:31+0000\n"
+"POT-Creation-Date: 2024-12-23 16:55+0000\n"
+"PO-Revision-Date: 2024-12-23 16:55+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,13 +18,18 @@ msgstr ""
 #. module: of_account_payment_schedule
 #: model:ir.model,name:of_account_payment_schedule.model_of_account_move_payment_schedule
 msgid "Account Payment Schedule"
-msgstr ""
+msgstr "Échéancier de paiement"
 
 #. module: of_account_payment_schedule
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__amount
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document_report_setting
 msgid "Amount"
 msgstr "Montant"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields.selection,name:of_account_payment_schedule.selection__of_account_move_payment_schedule__value__balance
+msgid "Balance"
+msgstr "Total"
 
 #. module: of_account_payment_schedule
 #: model:ir.model,name:of_account_payment_schedule.model_res_company
@@ -48,7 +53,7 @@ msgstr "Devise"
 
 #. module: of_account_payment_schedule
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__date
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document_report_setting
 msgid "Date"
 msgstr ""
 
@@ -58,11 +63,21 @@ msgid "Display Name"
 msgstr "Nom affiché"
 
 #. module: of_account_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_invoice_document_layout_view_form
+msgid "Displays the Payment schedule in the report"
+msgstr "Affiche l'échancier de paiement dans le rapport"
+
+#. module: of_account_payment_schedule
 #. odoo-python
 #: code:addons/of_account_payment_schedule/models/of_account_move_payment_schedule.py:0
 #, python-format
 msgid "Due"
 msgstr "Échéance"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields.selection,name:of_account_payment_schedule.selection__of_account_move_payment_schedule__value__fixed
+msgid "Fixed Amount"
+msgstr "Montant fixe"
 
 #. module: of_account_payment_schedule
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__id
@@ -105,7 +120,7 @@ msgid "Name"
 msgstr "Nom"
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_report_invoice_document_report_setting
 msgid "Payment Schedule"
 msgstr "Échéancier de paiement"
 
@@ -114,8 +129,8 @@ msgstr "Échéancier de paiement"
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_move__of_payment_schedule_ids
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_payment__of_payment_schedule_ids
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_invoice_document_layout__pdf_invoice_payment_schedule
-#: model:ir.model.fields,field_description:of_account_payment_schedule.field_res_company__pdf_invoice_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_res_company__of_pdf_invoice_payment_schedule
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.account_move_view_form
 msgid "Payment schedule"
 msgstr "Vos échéances"
 
@@ -125,6 +140,11 @@ msgstr "Vos échéances"
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_account_payment__of_show_update_payment_schedule
 msgid "Payment schedule needs to be updated"
 msgstr "Le calendrier des paiements doit être mis à jour"
+
+#. module: of_account_payment_schedule
+#: model:ir.model.fields.selection,name:of_account_payment_schedule.selection__of_account_move_payment_schedule__value__percent
+msgid "Percent"
+msgstr "Pourcentage"
 
 #. module: of_account_payment_schedule
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__percent
@@ -137,11 +157,13 @@ msgid "Printing Settings for Invoice"
 msgstr "Paramètres d'impression pour facture"
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.account_move_view_form
 msgid ""
 "Recompute the payment schedule based on the current pricelist and the "
 "payment terms."
 msgstr ""
+"Recalculer l'échéancier de paiement sur la base de la liste de prix actuelle et des "
+"conditions de paiement."
 
 #. module: of_account_payment_schedule
 #: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__sequence
@@ -149,25 +171,25 @@ msgid "Sequence"
 msgstr ""
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.account_move_view_form
 msgid ""
 "This will update the payment schedule based on the current pricelist and the"
 " payment terms. Do you want to continue ?"
 msgstr ""
- "Ceci mettra à jour l'échéancier de paiement sur la base de la liste de prix actuelle et des conditions de paiement. "
- "Voulez-vous continuer ? "
+"Ceci mettra à jour l'échéancier de paiement sur la base de la liste de prix actuelle et des conditions de paiement. "
+"Voulez-vous continuer ?"
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.account_move_view_form
 msgid "Total"
 msgstr ""
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_move_view_order_payment_schedule_form
-msgid "Update Payment Schedule"
-msgstr "Mise à jour de l'échéancier de paiements"
+#: model:ir.model.fields,field_description:of_account_payment_schedule.field_of_account_move_payment_schedule__value
+msgid "Type"
+msgstr ""
 
 #. module: of_account_payment_schedule
-#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.of_account_document_layout_view_form
-msgid "Displays the payment schedule in the report"
-msgstr "Affiche l'échancier de paiement dans le rapport"
+#: model_terms:ir.ui.view,arch_db:of_account_payment_schedule.account_move_view_form
+msgid "Update Payment Schedule"
+msgstr "Mise à jour de l'échéancier de paiements"

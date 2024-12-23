@@ -195,4 +195,4 @@ class AccountMove(models.Model):
     # ----------------------------------------------------------
 
     def pdf_invoice_payment_schedule(self):
-        return self.company_id.pdf_invoice_payment_schedule
+        return self.company_id.of_pdf_invoice_payment_schedule
