@@ -65,7 +65,7 @@
             </xpath>
 
             <xpath expr="//span[@name='address_name']" position="replace">
-                <field name="type" attrs="{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)], 'readonly': [('user_ids', '!=', [])]}" class="fw-bold"/>
+                <field name="type" attrs="{'invisible': [('is_company','=', True)], 'required': [('is_company','!=', True)], 'readonly': ['|',('user_ids', '!=', []), ('parent_id', '=', False)]}" class="fw-bold"/>
                 <label for="street" string="Address"/>
             </xpath>
 
