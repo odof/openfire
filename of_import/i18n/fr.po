@@ -614,7 +614,7 @@ msgstr ""
 #. module: of_import
 #: model_terms:ir.ui.view,arch_db:of_import.of_product_brand_view_config_form
 msgid "Items with specific rules"
-msgstr "Eléments avec règles spécifiques"
+msgstr "Éléments avec règles spécifiques"
 
 #. module: of_import
 #: model_terms:ir.ui.view,arch_db:of_import.of_import_form_view

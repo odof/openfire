@@ -19,6 +19,7 @@ class OFProductBrand(models.Model):
         comodel_name="product.template",
         string="Products",
         compute="_compute_product_config_ids",
+        inverse="_inverse_product_config_ids",
         domain="[('brand_id', '=', id)]",
     )
 
@@ -37,6 +38,14 @@ class OFProductBrand(models.Model):
         domain = ["|"] * (len(fields_list) - 1) + [(field, "!=", False) for field in fields_list]
         for brand in self:
             brand.product_config_ids = product_obj.search([("brand_id", "=", brand.id)] + domain)
+
+    # -------------------------------------------------------------------------
+    # Inverse methods
+    # -------------------------------------------------------------------------
+
+    def _inverse_product_config_ids(self):
+        # This inverse function is here to allow the modification of the O2M
+        pass
 
     # -------------------------------------------------------------------------
     # ORM methods

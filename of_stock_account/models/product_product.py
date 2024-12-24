@@ -90,7 +90,6 @@ class ProductProduct(models.Model):
         )
         for company in companies:  # OF
             svl_vals_list = []
-            company_id = company.id  # OF
             for product in self:
                 if product.cost_method not in ("standard", "average"):
                     continue
@@ -100,12 +99,12 @@ class ProductProduct(models.Model):
                 digits = self.env["decimal.precision"].precision_get("Product Price")
                 rounded_new_price = float_round(new_price, precision_digits=digits)
                 diff = rounded_new_price - product.standard_price
-                value = company_id.currency_id.round(quantity_svl * diff)
-                if company_id.currency_id.is_zero(value):
+                value = company.currency_id.round(quantity_svl * diff)
+                if company.currency_id.is_zero(value):
                     continue
 
                 svl_vals = {
-                    "company_id": company_id.id,
+                    "company_id": company.id,
                     "product_id": product.id,
                     "description": _("Product value manually modified (from %s to %s)")
                     % (product.standard_price, rounded_new_price),
@@ -145,7 +144,7 @@ class ProductProduct(models.Model):
 
                 move_vals = {
                     "journal_id": product_accounts[product.id]["stock_journal"].id,
-                    "company_id": company_id.id,
+                    "company_id": company.id,
                     "ref": product.default_code,
                     "stock_valuation_layer_ids": [(6, None, [stock_valuation_layer.id])],
                     "move_type": "entry",
