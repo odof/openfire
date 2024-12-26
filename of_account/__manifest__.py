@@ -2,7 +2,7 @@
 
 {
     'name': "OpenFire / Comptabilité",
-    'version': '16.0.1.5.0',
+    'version': '16.0.1.6.0',
     'license': 'AGPL-3',
     'author': "OpenFire",
     'website': "https://www.openfire.fr",

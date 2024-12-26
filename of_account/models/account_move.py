@@ -94,4 +94,30 @@ class AccountMove(models.Model):
             and move.amount_total < 0
         ):
             raise UserError(_("You cannot validate an invoice or a refund with a negative total."))
-        return super().action_post()
+        res = super().action_post()
+        self.of_update_posted_move_down_payment()
+        return res
+
+    # -------------------------------------------------------------------------
+    # Business methods
+    # -------------------------------------------------------------------------
+
+    def of_update_posted_move_down_payment(self):
+        """
+        Update down payment lines for all moves in the 'posted' state.
+        """
+        posted_moves = self.filtered(lambda p: p.state == "posted")
+        posted_moves.of_update_down_payment()
+
+    def of_update_down_payment(self):
+        """
+        Update the product description for down payment lines in orders
+        associated with the validated invoice.
+        """
+        for move in self:
+            move.mapped("line_ids.sale_line_ids").filtered(lambda line: line.is_downpayment).write(
+                {
+                    "name": _("Invoice N°: %s From %s")
+                    % (move.name, move.invoice_date and move.invoice_date.strftime("%d/%m/%Y"))
+                }
+            )
