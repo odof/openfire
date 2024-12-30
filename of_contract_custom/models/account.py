@@ -27,6 +27,7 @@ class OfAccountInvoice(models.Model):
         ('code', "Code magasin du site d'intervention"),
         ('city', "Ville du site d'intervention"),
         ], string=u"Séquence d'impression", default='standard')
+    of_contract_period_id = fields.Many2one(comodel_name='of.contract.period', string=u"Période du contrat (forcée)")
 
     @api.depends('of_contract_id')
     def _compute_contract_id(self):
@@ -38,11 +39,13 @@ class OfAccountInvoice(models.Model):
         for invoice in self:
             invoice.of_contract_id = invoice.of_compute_contract_id
 
-    @api.depends('of_contract_id', 'of_intervention_id')
+    @api.depends('of_contract_id', 'of_intervention_id', 'of_contract_period_id')
     def _compute_of_contract_period(self):
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         for invoice in self:
-            if invoice.of_contract_id:
+            if invoice.of_contract_period_id:
+                invoice.of_contract_period = invoice.of_contract_period_id.name
+            elif invoice.of_contract_id:
                 contractual_lines = invoice.invoice_line_ids.filtered('of_contract_line_id')
                 if not contractual_lines:
                     continue

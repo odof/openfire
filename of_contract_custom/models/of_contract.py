@@ -161,6 +161,7 @@ class OfContract(models.Model):
     purchase_order_count = fields.Integer(
         string=u"Nombre de commandes fournisseur", compute='_compute_purchase_order_ids')
     sale_type_id = fields.Many2one(comodel_name='of.sale.type', string=u"Type de devis")
+    invoice_keep_period = fields.Boolean(string=u"Conserver la période de contrat sur la facture")
 
     @api.model
     def _default_journal(self):
@@ -554,11 +555,10 @@ class OfContract(models.Model):
         date = self._context.get('force_date', self.recurring_next_date)
         if hasattr(self.partner_id, 'update_account'):
             self.partner_id.update_account()
-        invoice = self.env['account.invoice'].new({
+        invoice_data = {
             'reference': self.name,
             'type': 'out_invoice',
-            'partner_id': self.partner_id.address_get(
-                ['invoice'])['invoice'],
+            'partner_id': self.partner_id.address_get(['invoice'])['invoice'],
             'currency_id': currency.id,
             'journal_id': journal.id,
             'date_invoice': date,
@@ -571,7 +571,13 @@ class OfContract(models.Model):
             'of_intervention_id': intervention_id,
             'of_project_id': self.account_analytic_id and self.account_analytic_id.id,
             'of_sale_type_id': self.sale_type_id.id,
-        })
+        }
+        if self.invoice_keep_period:
+            period = self.period_ids.filtered(lambda r : r.date_start <= date <= r.date_end)
+            if not period:
+                period = self.current_period_id
+            invoice_data['of_contract_period_id'] = period[0].id
+        invoice = self.env['account.invoice'].new(invoice_data)
         # Get other invoice values from partner onchange
         invoice._onchange_partner_id()
         invoice.fiscal_position_id = self.fiscal_position_id.id
