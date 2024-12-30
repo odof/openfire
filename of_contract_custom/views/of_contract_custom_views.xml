@@ -148,6 +148,7 @@
                             <field name="revision" attrs="{'invisible': [('contract_type','=','simple')]}"/>
                             <field name="pricelist_id" invisible="1"/>
                             <field name="sale_type_id"/>
+                            <field name="invoice_keep_period"/>
                         </group>
                         <group col="2" colspan="2" string="Validité" name="validity">
                             <field name="current_period_id" options="{'no_open': True}"/>
