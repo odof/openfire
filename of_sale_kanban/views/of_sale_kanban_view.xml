@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!--##############################################################################-->
+<!--############################ ______ Kanban ______ ############################-->
+<!--##############################################################################-->
+
+    <record id="of_sale_view_sale_order_kanban" model="ir.ui.view">
+        <field name="name">of.sale.view.sale.order.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">of_priority desc, date_order desc, id desc</attribute>
+                <attribute name="default_group_by">of_kanban_step_id</attribute>
+                <attribute name="class">o_kanban_dashboard of_sale_kanban</attribute>
+            </xpath>
+            <xpath expr="//kanban/field[@name='currency_id']" position="after">
+                <field name="amount_untaxed"/>
+                <field name="of_priority"/>
+                <field name="of_sale_followup_tag_ids"/>
+                <field name="user_id"/>
+                <field name="of_main_product_brand_id"/>
+                <field name="of_laying_week"/>
+                <field name="invoice_status"/>
+                <field name="of_nbr_overdue_activities"/>
+                <field name="of_overdue_activities"/>
+                <field name="of_notes_display"/>
+                <field name="of_info_display"/>
+                <field name="of_activities_state"/>
+            </xpath>
+            <xpath expr="//templates/t[@t-name='kanban-box']" position="replace">
+                <t t-name="kanban-box">
+                    <div class="oe_kanban_global_click">
+                        <div class="of_sale_kanban_main">
+                            <div class="o_kanban_card_content">
+                                <div class="o_kanban_tags_section">
+                                    <field style="max-height: 100px;" name="of_sale_followup_tag_ids"/>
+                                </div>
+                                <div style="margin-left: 5px; margin-right: 5px; margin-bottom: 25px;">
+                                    <h4>
+                                        <b><field name="name"/></b> - <field name="partner_id"/>
+                                    </h4>
+                                    <table style="width: 100%;">
+                                        <tbody>
+                                            <tr>
+                                                <td><div id="amount_untaxed" style="display: flex;" groups="sale.group_show_price_subtotal"><field name="amount_untaxed"/>&amp;nbsp;HT</div></td>
+                                                <td><div id="amount_total" style="display: flex;" groups="sale.group_show_price_total"><field style="padding-left: 7px;" name="amount_total"/>&amp;nbsp;TTC</div></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <span style="white-space: inherit;">
+                                        <b><field name="user_id"/> / <field name="of_main_product_brand_id"/></b>
+                                    </span>
+                                    <br/>
+                                    <span><b>Sem. de pose : <field name="of_laying_week"/></b></span>
+                                    <br/>
+                                    <ul t-if="record.of_notes_display">
+                                        <t t-value="JSON.parse(record.of_notes_display.raw_value)" t-set="notes_lines"/>
+                                        <t t-foreach="notes_lines" t-as="note_line">
+                                            <li><i><t t-esc="note_line"/></i></li>
+                                        </t>
+                                    </ul>
+                                    <br/>
+                                    <ul t-if="record.of_info_display">
+                                        <t t-value="JSON.parse(record.of_info_display.raw_value)" t-set="info_lines"/>
+                                        <t t-foreach="info_lines" t-as="info_line">
+                                            <li><i><t t-esc="info_line"/></i></li>
+                                        </t>
+                                    </ul>
+                                </div>
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="of_priority" widget="priority"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="of_sale_kanban_boxes">
+                            <div class="of_sale_kanban_box">
+                                <field name="of_activities_state" class="oe_inline"/>
+                                <field t-if="record.of_activities_state.raw_value == 'late'" name="of_nbr_overdue_activities" class="oe_inline"/>
+                            </div>
+                            <div t-att-class="'of_sale_kanban_color_' + (record.of_activities_state.raw_value or '0') + ' of_sale_kanban_box'">
+                                <ul t-if="record.of_activities_state.raw_value == 'late'">
+                                    <t t-value="JSON.parse(record.of_overdue_activities.raw_value)" t-set="of_overdue_activities"/>
+                                    <t t-foreach="of_overdue_activities" t-as="overdue_activity">
+                                        <li><t t-esc="overdue_activity"/></li>
+                                    </t>
+                                </ul>
+                            </div>
+                            <div class="of_sale_kanban_box">
+                                <field name="invoice_status"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Ajout l'étape kanban sur les devis/commandes -->
+    <record id="of_sale_view_kanban_step" model="ir.ui.view">
+        <field name="name">of.sale.view.kanban.step</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="of_kanban_step_id" widget="selection" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_view_kanban_step2" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_view_kanban_step"/>
+        <field name="groups_id" eval="[(4, ref('sale_change_state_kanban'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_kanban_step_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="of_sale_order_kanban_tree_view" model="ir.ui.view">
+        <field name="name">of.sale.order.kanban.tree.view</field>
+        <field name="model">of.sale.order.kanban</field>
+        <field name="arch" type="xml">
+            <tree string="Étapes kanban" editable="top">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_sale_order_kanban" model="ir.actions.act_window">
+        <field name="name">Étapes kanban</field>
+        <field name="res_model">of.sale.order.kanban</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="of_sale_order_kanban_tree_view"/>
+    </record>
+
+    <menuitem name="Étapes kanban" id="menu_sale_order_kanban" parent="sale.menu_sales_config" sequence="5" action="action_sale_order_kanban"/>
+
+</odoo>
