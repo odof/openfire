@@ -6,14 +6,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-06 09:20+0000\n"
-"PO-Revision-Date: 2024-12-06 09:20+0000\n"
+"POT-Creation-Date: 2025-01-07 07:10+0000\n"
+"PO-Revision-Date: 2025-01-07 07:10+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
+
+#. module: of_sale_crm
+#. odoo-python
+#: code:addons/of_sale_crm/models/sale_order.py:0
+#, python-format
+msgid "%(year)s - W%(week)02d"
+msgstr "%(year)s - S%(week)02d"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_res_config_settings__of_copy_opportunity_with_sale_order
@@ -273,6 +280,13 @@ msgstr "Nom de l'appporteur d'affaires"
 #: model:ir.model.fields.selection,name:of_sale_crm.selection__sale_order__of_priority__0
 msgid "Normal"
 msgstr ""
+
+#. module: of_sale_crm
+#. odoo-python
+#: code:addons/of_sale_crm/models/sale_order.py:0
+#, python-format
+msgid "Not scheduled"
+msgstr "Non programmée"
 
 #. module: of_sale_crm
 #: model:ir.model.fields,field_description:of_sale_crm.field_sale_order__opportunity_id

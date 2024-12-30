@@ -1,48 +1,29 @@
-# -*- coding: utf-8 -*-
-
-##############################################################################
-#
-#    OpenFire
-#    Version OF10.0
-#
-#    Module conçu et développé par OpenFire SAS
-#
-#    Compatible avec Odoo 10 Community Edition
-#
-##############################################################################
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {
-    'name': u"OpenFire / Ventes - vue kanban",
-    'version': "10.0.1.1.0",
-    'license': '',
-    'author': "OpenFire",
-    'website': "www.openfire.fr",
-    'category': "Module OpenFlam",
-    'summary': u"Personnalisation des ventes OpenFire",
-    'description': u"""
-
-Module OpenFire / Ventes - vue kanban
-=====================================
-
-Modification de la vue kanban des devis/commandes + ajout d'un champ étapes kanban
-
-""",
-    'depends': [
-        'sale',
-        'of_crm'
+    "name": "OpenFire / Ventes Kanban",
+    "version": "16.0.1.0.0",
+    "license": "AGPL-3",
+    "author": "OpenFire",
+    "category": "OpenFire",
+    "sequence": 15,
+    "website": "https://www.openfire.fr",
+    "depends": [
+        "of_sale_crm",
     ],
-    'external_dependencies': {
-        'python': ['pdfminer', 'pypdftk', 'pyPdf'],
-    },
-    'data': [
-        'security/of_sale_kanban_security.xml',
-        'security/ir.model.access.csv',
-        'hooks/post_hook.xml',
-        'views/of_sale_kanban_view.xml',
-        'views/of_sale_kanban_templates.xml',
-        'data/of_sale_kanban_data.xml',
+    "data": [
+        "data/of_sale_order_kanban_stage.xml",
+        "security/ir.model.access.csv",
+        "views/of_sale_order_kanban_stage_views.xml",
+        "views/sale_order_views.xml",
+    ],
+    "assets": {
+        "web.assets_backend": [
+            "of_sale_kanban/static/src/scss/of_sale_kanban.scss",
         ],
-    'installable': True,
-    'application': False,
-    'auto_install': False,
+    },
+    "installable": True,
+    "application": False,
+    "auto_install": False,
+    "post_init_hook": "post_init_hook",
 }

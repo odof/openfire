@@ -1,6 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
 
 AVAILABLE_PRIORITIES = [
     ("0", "Normal"),
@@ -68,10 +68,12 @@ class SaleOrder(models.Model):
     of_priority = fields.Selection(selection=AVAILABLE_PRIORITIES, string="Priority", index=True, default="0")
     of_notes = fields.Text(string="Follow-up notes")
     of_info = fields.Text(string="Info")
-    of_reference_laying_date = fields.Date(string="Reference laying date")
+    of_reference_laying_date = fields.Date(
+        string="Reference laying date", compute="_compute_of_reference_laying_data", store=True
+    )
     of_force_laying_date = fields.Boolean(string="Force laying date")
     of_manual_laying_date = fields.Date(string="Manual laying date")
-    of_laying_week = fields.Char(string="Laying week")
+    of_laying_week = fields.Char(string="Laying week", compute="_compute_of_reference_laying_data", store=True)
     of_main_product_brand_id = fields.Many2one(
         comodel_name="of.product.brand",
         string="Brand of the main product",
@@ -79,6 +81,32 @@ class SaleOrder(models.Model):
 
     # UX fields
     of_show_update_salesman = fields.Boolean(store=False, string="Has opportunity changed")
+
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
+
+    @api.depends(
+        "of_force_laying_date",
+        "of_manual_laying_date",
+    )
+    def _compute_of_reference_laying_data(self):
+        for order in self:
+            laying_date = False
+            if order.of_force_laying_date:
+                laying_date = order.of_manual_laying_date
+
+            order.of_reference_laying_date = laying_date
+            if laying_date:
+                date_laying_week = laying_date
+                laying_week = laying_date.isocalendar()[1]
+                order.of_laying_week = _("%(year)s - W%(week)02d", year=date_laying_week.year, week=laying_week)
+            else:
+                order.of_laying_week = _("Not scheduled")
+
+    # -------------------------------------------------------------------------
+    # Onchange methods
+    # -------------------------------------------------------------------------
 
     @api.onchange("opportunity_id")
     def _onchange_opportunity_id(self):
@@ -89,6 +117,10 @@ class SaleOrder(models.Model):
                 order.of_show_update_salesman = True
             else:
                 order._compute_user_id()
+
+    # -------------------------------------------------------------------------
+    # ORM methods
+    # -------------------------------------------------------------------------
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -111,6 +143,17 @@ class SaleOrder(models.Model):
                 data["opportunity_id"] = False
         return data_list
 
+    @api.returns("mail.message", lambda value: value.id)
+    def message_post(self, **kwargs):
+        result = super().message_post(**kwargs)
+        if self.env.context.get("of_mark_so_as_sent"):
+            self.filtered(lambda o: not o.of_sent_quotation).write({"of_sent_quotation": True})
+        return result
+
+    # -------------------------------------------------------------------------
+    # Action methods
+    # -------------------------------------------------------------------------
+
     def action_button_confirm_estimate(self):
         for order in self:
             if order.state == "draft":
@@ -123,10 +166,3 @@ class SaleOrder(models.Model):
         action["context"].update({"of_mark_so_as_sent": True})
         action["context"].pop("mark_so_as_sent")  # disable the standard behavior
         return action
-
-    @api.returns("mail.message", lambda value: value.id)
-    def message_post(self, **kwargs):
-        result = super().message_post(**kwargs)
-        if self.env.context.get("of_mark_so_as_sent"):
-            self.filtered(lambda o: not o.of_sent_quotation).write({"of_sent_quotation": True})
-        return result

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">of.sale.kanban.sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="of_sale_crm.of_crm_of_sale_view_order_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='of_sale_followup_tag_ids']" position="before">
+                <field name="of_kanban_stage_id" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_kanban" model="ir.ui.view">
+        <field name="name">of.sale.kanban.sale.order.view.kanban</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban" />
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_group_by">of_kanban_stage_id</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.kanban.sale.order.view.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_kanban_stage_id" widget="badge" optional="show" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_quotation_view_tree" model="ir.ui.view">
+        <field name="name">of.sale.kanban.sale.order.quotation.view.tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree" />
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="of_kanban_stage_id" widget="badge" optional="show" />
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="of_sale_view_sale_order_kanban" model="ir.ui.view">
+        <field name="name">of.sale.kanban.sale.order.kanban.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban" />
+        <field name="arch" type="xml">
+            <xpath expr="//kanban[hasclass('o_kanban_mobile')]//field[@name='currency_id']" position="after">
+                <field name="of_main_product_name" />
+                <field name="of_laying_week" />
+            </xpath>
+            <xpath expr="//templates/t[@t-name='kanban-box']/div" position="replace">
+                <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                    <div class="o_kanban_record_top">
+                        <!-- Nom du client et Montant HT -->
+                        <div class="o_kanban_record_headings">
+                            <strong class="o_kanban_record_title_stronger"><span t-esc="record.partner_id.value" /> - <field name="amount_untaxed" widget="monetary"/> Untaxed</strong>
+                        </div>
+                    </div>
+
+                    <div class="o_kanban_record_middle">
+                        <!-- Numéro de commande / Produit principal / Semaine de pose -->
+                        <div>
+                            <span t-esc="record.name.value" />
+                            <t t-if="record.of_main_product_name.value"> / <span
+                                    t-esc="record.of_main_product_name.value" />
+                            </t>
+                            <div t-if="record.of_laying_week.value">
+                                <span>Laying week : <t t-out="record.of_laying_week.value" />
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Priorité / Activités -->
+                        <div class="oe_kanban_bottom_left">
+                            <field name="of_priority" widget="priority" />
+                            <div class="o_kanban_inline_block">
+                                <field name="activity_ids" widget="kanban_activity" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="o_kanban_record_bottom">
+                        <!-- Statut / Avatar -->
+                        <div class="oe_kanban_bottom_left">
+                            <field name="state" widget="label_selection" options="{'classes': {'draft': 'default', 'cancel': 'default', 'done': 'success'}}" />
+                        </div>
+                        <div class="oe_kanban_bottom_right">
+                            <span t-att-class="record.invoice_status.raw_value == 'to invoice' ? 'text-success' : ''" ><field name="invoice_status" /></span>
+                            <field name="user_id" widget="many2one_avatar_user" />
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -1,14 +1,14 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
-#	* of_sale_kanban
+# 	* of_sale_kanban
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 10.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-22 09:58+0000\n"
-"PO-Revision-Date: 2022-06-22 09:58+0000\n"
-"Last-Translator: <>\n"
+"POT-Creation-Date: 2024-12-30 09:31+0000\n"
+"PO-Revision-Date: 2024-12-30 09:31+0000\n"
+"Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,74 +16,65 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
-msgid "&amp;nbsp;HT"
-msgstr "&amp;nbsp;HT"
-
-#. module: of_sale_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
-msgid "&amp;nbsp;TTC"
-msgstr "&amp;nbsp;TTC"
-
-#. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_create_uid
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__create_uid
 msgid "Created by"
-msgstr "Créé par"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_create_date
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__create_date
 msgid "Created on"
-msgstr "Créé le"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_display_name
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__display_name
 msgid "Display Name"
-msgstr "Nom affiché"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_id
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__id
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_info_display
-msgid "Infos for display"
-msgstr "Infos pour affichage"
+#: model:ir.model,name:of_sale_kanban.model_of_sale_order_kanban_stage
+msgid "Kanban stage for sales orders"
+msgstr "Étape kanban des bons de commande"
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban___last_update
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage____last_update
 msgid "Last Modified on"
-msgstr "Dernière Modification le"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_write_uid
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__write_uid
 msgid "Last Updated by"
-msgstr "Dernière mise à jour par"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_write_date
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__write_date
 msgid "Last Updated on"
-msgstr "Dernière mise à jour le"
+msgstr ""
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_name
-msgid "Nom de l'étape"
-msgstr "Nom de l'étape"
+#: model_terms:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
+msgid "Laying week :"
+msgstr "Semaine de pose :"
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_notes_display
-msgid "Notes for display"
-msgstr "Notes pour affichage"
+#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order__of_main_product_name
+msgid "Main product name"
+msgstr "Nom d'article principal"
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_nbr_overdue_activities
-msgid "Number of overdue activities"
-msgstr "Nombre d'activités en retard"
+#: model:of.sale.order.kanban.stage,name:of_sale_kanban.of_sale_order_kanban_stage_new
+msgid "New"
+msgstr "Nouveau"
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_overdue_activities
-msgid "Overdue activities"
-msgstr "Activités en retard"
+#: model:ir.actions.act_window,name:of_sale_kanban.of_sale_order_kanban_stage_action
+#: model:ir.ui.menu,name:of_sale_kanban.of_sale_order_kanban_stage_menu
+msgid "Order tracking stages"
+msgstr "Étapes de suivi de commande"
 
 #. module: of_sale_kanban
 #: model:ir.model,name:of_sale_kanban.model_sale_order
@@ -91,28 +82,21 @@ msgid "Sales Order"
 msgstr "Bon de commande"
 
 #. module: of_sale_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
-msgid "Sem. de pose :"
-msgstr "Sem. de pose :"
-
-#. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_sequence
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__sequence
 msgid "Sequence"
 msgstr "Séquence"
 
 #. module: of_sale_kanban
-#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order_of_kanban_step_id
-msgid "Étape kanban"
-msgstr "Étape kanban"
+#: model:ir.model.fields,field_description:of_sale_kanban.field_of_sale_order_kanban_stage__name
+msgid "Stage name"
+msgstr "Nom de l'étape"
 
 #. module: of_sale_kanban
-#: model:ir.actions.act_window,name:of_sale_kanban.action_sale_order_kanban
-#: model:ir.ui.menu,name:of_sale_kanban.menu_sale_order_kanban
-#: model:ir.ui.view,arch_db:of_sale_kanban.of_sale_order_kanban_tree_view
-msgid "Étapes kanban"
-msgstr "Étapes kanban"
+#: model:ir.model.fields,field_description:of_sale_kanban.field_sale_order__of_kanban_stage_id
+msgid "Tracking stage"
+msgstr "Étape de suivi"
 
 #. module: of_sale_kanban
-#: model:ir.model,name:of_sale_kanban.model_of_sale_order_kanban
-msgid "Étapes kanban des sale.order"
-msgstr "Étapes kanban des sale.order"
+#: model_terms:ir.ui.view,arch_db:of_sale_kanban.of_sale_view_sale_order_kanban
+msgid "Untaxed"
+msgstr "HT"

@@ -17,6 +17,43 @@ class SaleOrder(models.Model):
     )
     of_request_count = fields.Integer(string="Service Requests count", compute="_compute_of_request_count")
 
+    # -------------------------------------------------------------------------
+    # Compute methods
+    # -------------------------------------------------------------------------
+
+    @api.depends(
+        "of_force_laying_date",
+        "of_manual_laying_date",
+        "of_intervention_ids",
+        "of_intervention_ids.start",
+        "of_intervention_ids.of_type_id",
+        "of_intervention_ids.of_state",
+    )
+    def _compute_of_reference_laying_data(self):
+        current_values = {order.id: order.of_reference_laying_date for order in self}
+        for order in self:
+            laying_date = False
+            if order.of_force_laying_date:
+                laying_date = order.of_manual_laying_date
+            elif order.of_intervention_ids:
+                installation_type = self.env.ref("of_service.of_service_request_type_installation")
+                if events_installation := order.of_intervention_ids.filtered(
+                    lambda ev: ev.of_type_id == installation_type and ev.of_state in ["draft", "confirmed"]
+                ).sorted("start"):
+                    laying_date = events_installation[0].start_date or False
+                else:
+                    # we keep the old value
+                    laying_date = current_values.get(order.id, False)
+
+            order.of_reference_laying_date = laying_date
+
+            if laying_date:
+                date_laying_week = laying_date
+                laying_week = date_laying_week.isocalendar()[1]
+                order.of_laying_week = _("%(year)s - W%(week)02d", year=date_laying_week.year, week=laying_week)
+            else:
+                order.of_laying_week = _("Not scheduled")
+
     @api.depends("of_request_ids", "order_line.of_request_line_id")
     def _compute_of_request_count(self):
         for order in self:
@@ -25,37 +62,13 @@ class SaleOrder(models.Model):
             order.of_request_ids = requests
             order.of_request_count = len(requests)
 
+    # -------------------------------------------------------------------------
+    # Action methods
+    # -------------------------------------------------------------------------
+
     def action_button_view_request(self):
         self.ensure_one()
         return self._get_action_view_request(self.of_request_ids)
-
-    def _get_action_view_request(self, requests):
-        """Return an action to display the service requests linked to the sale order"""
-        self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("of_service.action_of_service_request")
-        date_today = fields.Datetime.now()
-        fortnight_date = date_today + timedelta(days=14)  # arbitrary date in the future, 2 weeks from now
-        action["context"] = {
-            "default_partner_id": self.partner_id.id,
-            "default_address_id": self.partner_shipping_id.id or self.partner_id.id,
-            "default_recurrency": False,
-            "default_next_date": date_today,
-            "default_stop_date": fortnight_date,
-            "default_origin": _("[Order] %s") % self.name,
-            "default_order_id": self.id,
-            "default_type_id": self.env.ref("of_service.of_service_request_type_installation").id,
-        }
-        # Choose the view_mode accordingly
-        if not requests or len(requests) > 1:
-            action["domain"] = [("id", "in", requests.ids)]
-        elif len(requests) == 1:
-            form_view = self.env.ref("of_service.of_service_request_view_form", raise_if_not_found=False)
-            # Put the form view in first position
-            action["views"] = [(form_view and form_view.id or False, "form")] + [
-                (state, view) for state, view in action.get("views", []) if view != "form"
-            ]
-            action["res_id"] = requests.id
-        return action
 
     def action_button_schedule_intervention(self):
         self.ensure_one()
@@ -116,3 +129,35 @@ class SaleOrder(models.Model):
                     service_request._recompute_taxes()
                 service_request.end_date = service_request._get_end_date()
         return res
+
+    # -------------------------------------------------------------------------
+    # Business methods
+    # -------------------------------------------------------------------------
+
+    def _get_action_view_request(self, requests):
+        """Return an action to display the service requests linked to the sale order"""
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id("of_service.action_of_service_request")
+        date_today = fields.Datetime.now()
+        fortnight_date = date_today + timedelta(days=14)  # arbitrary date in the future, 2 weeks from now
+        action["context"] = {
+            "default_partner_id": self.partner_id.id,
+            "default_address_id": self.partner_shipping_id.id or self.partner_id.id,
+            "default_recurrency": False,
+            "default_next_date": date_today,
+            "default_stop_date": fortnight_date,
+            "default_origin": _("[Order] %s") % self.name,
+            "default_order_id": self.id,
+            "default_type_id": self.env.ref("of_service.of_service_request_type_installation").id,
+        }
+        # Choose the view_mode accordingly
+        if not requests or len(requests) > 1:
+            action["domain"] = [("id", "in", requests.ids)]
+        elif len(requests) == 1:
+            form_view = self.env.ref("of_service.of_service_request_view_form", raise_if_not_found=False)
+            # Put the form view in first position
+            action["views"] = [(form_view and form_view.id or False, "form")] + [
+                (state, view) for state, view in action.get("views", []) if view != "form"
+            ]
+            action["res_id"] = requests.id
+        return action
