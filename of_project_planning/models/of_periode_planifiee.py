@@ -157,7 +157,11 @@ class OfPeriodePlanifiee(models.Model):
             if periode.premier_jour:
                 date = datetime.strptime(periode.premier_jour, "%Y-%m-%d")
                 if periode.type == 'semaine':
-                    week_nb = date.isocalendar()[1]
+                    year, week_nb, _ = date.isocalendar()
+                    if year != date.year:
+                        # Si le premier jour de la semaine est entre le 29/12 et 31/12, alors la semaine sera la S01
+                        # de l'année suivante (norme ISO 8601)
+                        date = datetime(year, 1, 1)
                     periode.name = "S%02d - %s" % (week_nb, date.strftime('%b %Y'))
                 if periode.type == 'mois':
                     periode.name = date.strftime('%B - %Y')

@@ -349,15 +349,13 @@ class StockPicking(models.Model):
         for picking in self:
             min_date = picking.min_date
             if min_date:
-                min_year = fields.Date.from_string(min_date).year
-                min_week = datetime.strptime(min_date, "%Y-%m-%d %H:%M:%S").date().isocalendar()[1]
+                min_year, min_week, _ = fields.Date.from_string(min_date).isocalendar()
                 picking.of_min_week = "%s - S%02d" % (min_year, min_week)
             else:
                 picking.of_min_week = ""
 
     @api.multi
     def get_sale_value(self):
-
         amount = 0.0
         kit_line_ids = []
         for record in self:

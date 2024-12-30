@@ -70,9 +70,8 @@ class Project(models.Model):
             if project.task_ids.filtered(lambda t: t.date_start).mapped('date_start'):
                 project.of_start_date = min(project.task_ids.filtered(lambda t: t.date_start).mapped('date_start'))
 
-                date = datetime.strptime(project.of_start_date, "%Y-%m-%d")
-                week_nb = date.isocalendar()[1]
-                project.of_start_week = "%s S%02d" % (date.strftime('%Y'), week_nb)
+                year, week_nb, _ = fields.Date.from_string(project.of_start_date).isocalendar()
+                project.of_start_week = "%s S%02d" % (year, week_nb)
 
             if project.task_ids.filtered(lambda t: t.date_end).mapped('date_end'):
                 project.of_end_date = max(project.task_ids.filtered(lambda t: t.date_end).mapped('date_end'))

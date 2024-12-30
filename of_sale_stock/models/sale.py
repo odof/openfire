@@ -282,8 +282,7 @@ class SaleOrderLine(models.Model):
                 purchase_moves = purchase_procurement_orders.mapped('move_ids')
                 min_date = min(purchase_moves.mapped('date_expected') or [False])
                 if min_date:
-                    min_year = fields.Date.from_string(min_date).year
-                    min_week = datetime.strptime(min_date, "%Y-%m-%d %H:%M:%S").date().isocalendar()[1]
+                    min_year, min_week, _ = fields.Date.from_string(min_date).isocalendar()
                     line.of_receipt_min_week = "%s - S%02d" % (min_year, min_week)
                 else:
                     line.of_receipt_min_week = ""

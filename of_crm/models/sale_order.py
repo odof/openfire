@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
@@ -182,9 +182,8 @@ class SaleOrder(models.Model):
                     laying_date = rec.read(['of_reference_laying_date'])[0]['of_reference_laying_date']
             rec.of_reference_laying_date = laying_date
             if laying_date:
-                date_laying_week = datetime.strptime(laying_date, "%Y-%m-%d").date()
-                laying_week = date_laying_week.isocalendar()[1]
-                rec.of_laying_week = "%s - S%02d" % (date_laying_week.year, laying_week)
+                laying_year, laying_week, _ = fields.Date.from_string(laying_date).isocalendar()
+                rec.of_laying_week = "%s - S%02d" % (laying_year, laying_week)
             else:
                 rec.of_laying_week = u"Non programmée"
 
