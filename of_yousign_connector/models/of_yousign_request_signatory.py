@@ -5,13 +5,13 @@ from odoo.exceptions import UserError
 from odoo.addons.of_base.models.res_partner import convert_phone_number
 
 
-class YousignRequestSignatory(models.Model):
+class OFYousignRequestSignatory(models.Model):
     _name = "of.yousign.request.signatory"
     _order = "request_id, sequence"
     _rec_name = "partner_id"
 
     request_id = fields.Many2one(
-        comodel_name="yousign.request",
+        comodel_name="of.yousign.request",
         string="Request",
         ondelete="cascade",
     )
@@ -33,7 +33,7 @@ class YousignRequestSignatory(models.Model):
     )
     top_mention = fields.Char()
     bottom_mention = fields.Char()
-    ys_identifier = fields.Char(string="Yousign ID", readonly=True)
+    ys_identifier = fields.Char(string="YouSign ID", readonly=True)
     state = fields.Selection(
         [
             ("draft", "Draft"),
@@ -52,15 +52,17 @@ class YousignRequestSignatory(models.Model):
         string="Expiration date for signature link",
     )
 
-    def create(self, vals):
-        mobile = vals.get("mobile", False)
-        partner_id = vals.get("partner_id", False)
-        if mobile and partner_id:
-            partner = self.env["res.partner"].browse(partner_id)
-            country_code = partner.country_id.code and partner.country_id.code.upper()
-            converted_phone_number = convert_phone_number(mobile, country_code)
-            vals["mobile"] = converted_phone_number
-        return super(YousignRequestSignatory, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            mobile = vals.get("mobile", False)
+            partner_id = vals.get("partner_id", False)
+            if mobile and partner_id:
+                partner = self.env["res.partner"].browse(partner_id)
+                country_code = partner.country_id.code and partner.country_id.code.upper()
+                converted_phone_number = convert_phone_number(mobile, country_code)
+                vals["mobile"] = converted_phone_number
+        return super(OFYousignRequestSignatory, self).create(vals_list)
 
     def write(self, vals):
         mobile = vals.get("mobile", False)
@@ -78,10 +80,10 @@ class YousignRequestSignatory(models.Model):
                     )
                     converted_phone_number = convert_phone_number(mobile, country_code)
                     record_vals["mobile"] = converted_phone_number
-                res = super(YousignRequestSignatory, record).write(record_vals)
+                res = super(OFYousignRequestSignatory, record).write(record_vals)
             return res
         else:
-            return super(YousignRequestSignatory, self).write(vals)
+            return super(OFYousignRequestSignatory, self).write(vals)
 
     def unlink(self):
         if any(
@@ -91,9 +93,11 @@ class YousignRequestSignatory(models.Model):
             ]
         ):
             raise UserError(
-                "Impossible to delete a signatory in the state pending, signed or refused."
+                _(
+                    "Impossible to delete a signatory in the state pending, signed or refused."
+                )
             )
-        return super(YousignRequestSignatory, self).unlink()
+        return super(OFYousignRequestSignatory, self).unlink()
 
     @api.depends("partner_id")
     def _compute_partner_data(self):

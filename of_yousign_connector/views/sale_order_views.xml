@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <field name="of_yousign_requests_needupdate" invisible="1"/>
+                <button name="%(of_yousign_connector.action_new_of_yousign_request)d" type="action" string="Send YouSign Request"/>
+                <button name="action_yousign_direct_signature_wizard" type="object" string="Sign" attrs="{'invisible': [('of_yousign_request_count', '=', 0)]}"/>
+                <button name="yousign_update_status" type="object" string="Update Signature" attrs="{'invisible': [('of_yousign_requests_needupdate', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_yousing_request" type="object"
+                        class="oe_stat_button"  icon="fa-pencil-square-o">
+                    <field name="of_yousign_request_count" widget="statinfo" string="YouSign requests"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sale_order_view_search" model="ir.ui.view">
+        <field name="name">sale.order.view.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="before">
+                <separator/>
+                <filter name="yousign_signed" string="Signed quotes" domain="[('of_yousign_request_ids', 'in', ('signed', 'archived'))]"/>
+                <filter name="yousign_sent" string="Signature sent" domain="[('of_yousign_request_ids', '=', 'sent')]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

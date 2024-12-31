@@ -3,3 +3,7 @@
 from . import res_config_settings
 from . import of_yousign_request
 from . import of_yousign_request_signatory
+from . import sale_order
+from . import res_company
+from . import ir_attachment
+from . import of_yousign_request_template

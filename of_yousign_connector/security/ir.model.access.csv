@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_of_yousign_setup_wizard_admin,of.yousign.setup.wizard.admin,model_of_yousign_setup_wizard,of_base.of_group_root_only,1,1,1,1
+access_of_yousign_request_admin,of.yousign.request.admin,model_of_yousign_request,of_base.of_group_root_only,1,1,1,1
+access_of_yousign_request_template_admin,of.yousign.request.template.admin,model_of_yousign_request_template,of_base.of_group_root_only,1,1,1,1
+access_of_yousign_request_signatory_admin,of.yousign.request.signatory.admin,model_of_yousign_request_signatory,of_base.of_group_root_only,1,1,1,1

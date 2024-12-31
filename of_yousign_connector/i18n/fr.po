@@ -300,7 +300,7 @@ msgid "Signed"
 msgstr "Signée"
 
 #. module: of_yousign_connector
-#: model:ir.model.fields,field_description:of_yousign_connector.field_of_yousign_request__signed_attachment_ids
+#: model:ir.model.fields,field_description:of_yousign_connector.field_of_yousign_request__signed_attachment_id
 msgid "Signed Documents"
 msgstr "Documents signés"
 
@@ -334,7 +334,7 @@ msgstr ""
 
 #. module: of_yousign_connector
 #: model:ir.model.fields,field_description:of_yousign_connector.field_of_yousign_request__ys_identifier
-msgid "Yousign ID"
+msgid "YouSign ID"
 msgstr "ID YouSign"
 
 #. module: of_yousign_connector

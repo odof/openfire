@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_yousign_setup_wizard_view_form" model="ir.ui.view">
+        <field name="name">of.yousign.setup.wizard.view.form</field>
+        <field name="model">of.yousign.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Mise en place des workspaces/webhooks">
+                <group>
+                    <field name="name"/>
+                    <field name="message" nolabel="1" colspan="2" readonly="1"/>
+                    <field name="is_already_setup" invisible="1" readonly="1"/>
+                </group>
+                <footer>
+                    <button string="Créer" name="button_setup" type="object" class="btn-primary" attrs="{'invisible': [('is_already_setup', '=', True)]}"/>
+                    <button string="Quitter" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_of_yousign_setup_wizard" model="ir.actions.act_window">
+        <field name="name">YouSign Setup Wizard</field>
+        <field name="res_model">of.yousign.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="of_yousign_setup_wizard_view_form"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="res_config_settings_view_form_setup_wizard" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="of_yousign_connector.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='of_yousign_settings']/div[@class='col-lg-6 o_setting_box']" position="before">
+                <button
+                    name="of_yousign_connector.action_of_yousign_setup_wizard" type="action"
+                    string="Générer workspaces/webhooks" class="oe_highlight"
+                    groups="of_base.of_group_root_only"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

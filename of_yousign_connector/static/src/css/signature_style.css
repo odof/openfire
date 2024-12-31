@@ -1,0 +1,15 @@
+.encart_signature_titre {
+    width: 100%;
+    padding: 8px;
+    height: 40px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.encart_signature {
+    width: 100%;
+    height: 100px;
+    background-color: lightgray;
+}

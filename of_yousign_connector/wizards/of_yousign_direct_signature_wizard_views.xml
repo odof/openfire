@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_yousign_direct_signature_wizard_view_form" model="ir.ui.view">
+        <field name="name">yousign.direct.signature.wizard.view.form</field>
+        <field name="model">of.yousign.direct.signature.wizard</field>
+        <field name="arch"  type="xml">
+            <form string="Yousign Request Remind">
+                <group>
+                    <field name="model" invisible="1"/>
+                    <field name="res_id" invisible="1"/>
+                    <field name="request_id" domain="[('model','=',model),('res_id','=',res_id)]" options="{'no_create': True}"/>
+                    <field name="signatory_id" domain="[('request_id','=',request_id)]" options="{'no_create': True}"/>
+                </group>
+                <field name="iframe"/>
+                <footer>
+                    <button name="validate" type="object" string="Valider" class="oe_highlight"/>
+                    <button special="cancel" string="Close" class="oe_link"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

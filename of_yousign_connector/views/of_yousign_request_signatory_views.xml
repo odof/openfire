@@ -5,7 +5,7 @@
         <field name="name">of.yousign.request.signatory.view.search</field>
         <field name="model">of.yousign.request.signatory</field>
         <field name="arch" type="xml">
-            <search string="Search Yousign Requests">
+            <search string="Search YouSign Requests">
                 <field name="request_id" />
                 <field name="partner_id"/>
                 <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
@@ -23,7 +23,7 @@
         <field name="name">of.yousign.request.signatory.view.form</field>
         <field name="model">of.yousign.request.signatory</field>
         <field name="arch" type="xml">
-            <form string="Yousign Request">
+            <form string="YouSign Request">
                 <header>
                     <field name="state" widget="statusbar" statusbar_colors="{'draft': 'blue'}" statusbar_visible="draft,pending,signed"/>
                 </header>
