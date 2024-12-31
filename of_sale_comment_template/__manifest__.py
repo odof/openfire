@@ -16,6 +16,7 @@
         'data/ir_config_parameter.xml',
         'views/res_config_settings_views.xml',
         'views/sale_order_views.xml',
+        'views/report_saleorder.xml',
     ],
     'installable': True,
     'application': False,

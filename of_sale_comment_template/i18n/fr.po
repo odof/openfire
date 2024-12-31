@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-02 16:19+0000\n"
-"PO-Revision-Date: 2024-09-02 16:19+0000\n"
+"POT-Creation-Date: 2024-12-31 09:45+0000\n"
+"PO-Revision-Date: 2024-12-31 09:45+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,10 +16,14 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields,field_description:of_sale_comment_template.field_of_connector_config_settings__of_propagate_comments_settings
 #: model:ir.model.fields,field_description:of_sale_comment_template.field_res_config_settings__of_propagate_comments_settings
 msgid "(OF) Comments propagation"
 msgstr "(OF) Propagation des commentaires"
+
+#. module: of_sale_comment_template
+#: model_terms:ir.ui.view,arch_db:of_sale_comment_template.sale_order_form_add_comment
+msgid "Bottom Comments"
+msgstr "Commentaires du bas"
 
 #. module: of_sale_comment_template
 #: model:ir.model.fields,field_description:of_sale_comment_template.field_account_bank_statement_line__comment_template_ids
@@ -28,11 +32,11 @@ msgstr "(OF) Propagation des commentaires"
 #: model:ir.model.fields,field_description:of_sale_comment_template.field_comment_template__comment_template_ids
 #: model:ir.model.fields,field_description:of_sale_comment_template.field_sale_order__comment_template_ids
 msgid "Comment Template"
-msgstr "Modèle de commentaire"
+msgstr "Modèle"
 
 #. module: of_sale_comment_template
-#: model_terms:ir.ui.view,arch_db:of_sale_comment_template.sale_order_view_form
-msgid "Comments"
+#: model_terms:ir.ui.view,arch_db:of_sale_comment_template.sale_order_form_add_comment
+msgid "Comments template"
 msgstr "Commentaires"
 
 #. module: of_sale_comment_template
@@ -41,25 +45,21 @@ msgid "Config Settings"
 msgstr "Paramètres de configuration"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields.selection,name:of_sale_comment_template.selection__of_connector_config_settings__of_propagate_comments_settings__do_not_keep_comments
 #: model:ir.model.fields.selection,name:of_sale_comment_template.selection__res_config_settings__of_propagate_comments_settings__do_not_keep_comments
 msgid "Do not keep comments"
 msgstr "Ne pas garder les commentaires"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields.selection,name:of_sale_comment_template.selection__of_connector_config_settings__of_propagate_comments_settings__keep_comments
 #: model:ir.model.fields.selection,name:of_sale_comment_template.selection__res_config_settings__of_propagate_comments_settings__keep_comments
 msgid "Keep comments"
 msgstr "Garder les commentaires"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields.selection,name:of_sale_comment_template.selection__of_connector_config_settings__of_propagate_comments_settings__keep_bottom_comment
 #: model:ir.model.fields.selection,name:of_sale_comment_template.selection__res_config_settings__of_propagate_comments_settings__keep_bottom_comment
 msgid "Keep the bottom comment"
 msgstr "Garder que les commentaires du bas"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields.selection,name:of_sale_comment_template.selection__of_connector_config_settings__of_propagate_comments_settings__keep_top_comment
 #: model:ir.model.fields.selection,name:of_sale_comment_template.selection__res_config_settings__of_propagate_comments_settings__keep_top_comment
 msgid "Keep the top comment"
 msgstr "Garder que les commentaires du haut"
@@ -75,13 +75,17 @@ msgid "Sales Order"
 msgstr "Bon de commande"
 
 #. module: of_sale_comment_template
-#: model:ir.model.fields,help:of_sale_comment_template.field_of_connector_config_settings__of_propagate_comments_settings
 #: model:ir.model.fields,help:of_sale_comment_template.field_res_config_settings__of_propagate_comments_settings
 msgid ""
 "Select the way comments are propagated from the sale order to the invoice."
 msgstr ""
 "Sélectionnez la manière dont les commentaires sont propagés du bon de "
 "commande à la facture."
+
+#. module: of_sale_comment_template
+#: model_terms:ir.ui.view,arch_db:of_sale_comment_template.sale_order_form_add_comment
+msgid "Top Comments"
+msgstr "Commentaire du haut"
 
 #. module: of_sale_comment_template
 #: model:ir.model,name:of_sale_comment_template.model_comment_template

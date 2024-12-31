@@ -13,7 +13,22 @@
                     }
                 </attribute>
             </xpath>
+            <xpath expr="//page[@name='comments']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Comments template" name="comment_template">
+                    <group string="Top Comments" name="top_comments">
+                        <field name="of_top_comment_template_id"/>
+                    </group>
+                    <field name="of_top_comment" nolabel="1" />
+                    <group string="Bottom Comments" name="bottom_comments">
+                        <field name="of_bottom_comment_template_id"/>
+                    </group>
+                    <field name="of_bottom_comment" nolabel="1" />
+                </page>
+            </xpath>
         </field>
     </record>
-
 </odoo>

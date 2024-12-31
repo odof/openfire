@@ -25,3 +25,14 @@ msgid ""
 "If set, the comment template will be available only for the selected "
 "partner."
 msgstr "Le modèle de commentaire ne sera disponible que pour le client sélectionné"
+
+#. module: base_comment_template
+#: model:ir.actions.act_window,name:base_comment_template.action_base_comment_template
+#: model:ir.model.fields,field_description:base_comment_template.field_res_partner__base_comment_template_ids
+#: model:ir.model.fields,field_description:base_comment_template.field_res_users__base_comment_template_ids
+#: model:ir.ui.menu,name:base_comment_template.reports_base_comment_template_menuitem
+#: model_terms:ir.ui.view,arch_db:base_comment_template.view_base_comment_template_form
+#: model_terms:ir.ui.view,arch_db:base_comment_template.view_base_comment_template_search
+#: model_terms:ir.ui.view,arch_db:base_comment_template.view_partner_form
+msgid "Comment Templates"
+msgstr "Modèle"
