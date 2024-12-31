@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_yousign_request_signatory_view_search" model="ir.ui.view">
+        <field name="name">of.yousign.request.signatory.view.search</field>
+        <field name="model">of.yousign.request.signatory</field>
+        <field name="arch" type="xml">
+            <search string="Search Yousign Requests">
+                <field name="request_id" />
+                <field name="partner_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                <filter name="sent" string="Pending" domain="[('state', '=', 'pending')]" />
+                <filter name="signed" string="Signed" domain="[('state', '=', 'signed')]" />
+                <filter name="archived" string="Refused" domain="[('state', '=', 'refused')]" />
+                <group string="Group By" name="groupby">
+                    <filter name="state_groupby" string="State" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_signatory_view_form" model="ir.ui.view">
+        <field name="name">of.yousign.request.signatory.view.form</field>
+        <field name="model">of.yousign.request.signatory</field>
+        <field name="arch" type="xml">
+            <form string="Yousign Request">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_colors="{'draft': 'blue'}" statusbar_visible="draft,pending,signed"/>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <field name="ys_identifier" readonly="1"/>
+                        <field name="partner_id"/>
+                        <field name="lastname"/>
+                        <field name="firstname"/>
+                        <field name="email"/>
+                        <field name="mobile"/>
+                        <field name="auth_mode"/>
+                        <field name="top_mention"/>
+                        <field name="bottom_mention"/>
+                        <field name="comment"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_signatory_view_tree" model="ir.ui.view">
+        <field name="name">of.yousign.request.signatory.view.tree</field>
+        <field name="model">of.yousign.request.signatory</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="partner_id"/>
+                <field name="lastname"/>
+                <field name="firstname"/>
+                <field name="email"/>
+                <field name="mobile"/>
+                <field name="auth_mode"/>
+                <field name="top_mention"/>
+                <field name="bottom_mention"/>
+                <field name="comment"/>
+                <field name="ys_identifier" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>

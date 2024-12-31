@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_yousign_request_view_search" model="ir.ui.view">
+        <field name="name">of.yousign.request.view.search</field>
+        <field name="model">of.yousign.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Yousign Requests">
+                <field name="name" filter_domain="['|', '|', ('name', 'ilike', self), ('res_name', 'ilike', self), ('init_mail_subject', 'ilike', self)]" string="Name, Document Name or Mail Subject"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                <filter name="sent" string="Sent" domain="[('state', '=', 'sent')]" />
+                <filter name="signed" string="Signed" domain="[('state', '=', 'signed')]" />
+                <filter name="archived" string="Archived" domain="[('state', '=', 'archived')]" />
+                <group string="Group By" name="groupby">
+                    <filter name="state_groupby" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="object_groupby" string="Object" context="{'group_by': 'model'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_view_form" model="ir.ui.view">
+        <field name="name">of.yousign.request.view.form</field>
+        <field name="model">of.yousign.request</field>
+        <field name="arch" type="xml">
+            <form string="Yousign Request">
+                <header>
+                    <!-- <button name="send" states="draft" string="Send to Yousign" type="object" class="oe_highlight"/>
+                    <button name="update_status" states="sent" string="Update" type="object" help="Check if signatories have signed the documents" class="oe_highlight"/>
+                    <button name="archive" states="signed" string="Archive" type="object" help="Download signed files from Yousign and add them as attachments." class="oe_highlight"/>
+                    <button name="cancel" states="draft,sent" string="Cancel" type="object"/> -->
+                    <field name="state" widget="statusbar" statusbar_colors="{'draft': 'blue'}" statusbar_visible="draft,sent,signed,archived"/>
+                </header>
+                <sheet>
+                    <group name="main">
+                        <field name="name" readonly="1"/>
+                        <field name="ys_identifier"/>
+                        <field name="last_status_update"/>
+                        <field name="res_name"/>
+                        <field name="model" invisible="0"/>
+                        <field name="res_id" invisible="0"/>
+                        <field name="ordered"/>
+                        <field name="attachment_ids" widget="many2many_binary"/>
+                        <field name="signed_attachment_ids" widget="many2many_binary"/>
+                        <field name="has_automatic_reminder"/>
+                        <field name="expiry_date"/>
+                        <!-- <field name="experience_id" options="{'no_create': True}"/> -->
+                        <field name="company_id"/>
+                        <field name="language"/>
+                    </group>
+                    <notebook>
+                        <page name="signatories" string="Signatories">
+                            <field name="signatory_ids" nolabel="1" context="{'tree_view_ref': 'of_yousign_connector.of_yousign_request_signatory_view_tree'}"/>
+                        </page>
+                        <page name="remind" string="Auto-Remind Setup" attrs="{'invisible': [('has_automatic_reminder', '=', False)]}">
+                            <group name="remind">
+                                <label for="remind_interval"/>
+                                <div name="remind_interval">
+                                    <field name="remind_interval" class="oe_inline" attrs="{'required': [('has_automatic_reminder', '=', True)]}"/> days
+                                </div>
+                                <field name="remind_limit" attrs="{'required': [('has_automatic_reminder', '=', True)]}"/>
+                                <field name="remind_mail_subject" attrs="{'required': [('has_automatic_reminder', '=', True)]}"/>
+                                <field name="remind_mail_body" attrs="{'required': [('has_automatic_reminder', '=', True)]}"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_view_tree" model="ir.ui.view">
+        <field name="name">of.yousign.request.view.tree</field>
+        <field name="model">of.yousign.request</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="res_name"/>
+                <field name="ys_identifier"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_action" model="ir.actions.act_window">
+        <field name="name">of.yousign.request.action</field>
+        <field name="res_model">of.yousign.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>
