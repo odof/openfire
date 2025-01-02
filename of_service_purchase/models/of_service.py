@@ -16,6 +16,16 @@ class OfService(models.Model):
     gb_purchase_invoice_id = fields.Many2one(
         comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_purchase_invoice_id',
         string="Factures d'achat", of_custom_groupby=True)
+    purchase_invoicing_state = fields.Selection(
+        selection=[
+            ('no', u"Non facturée"),
+            ('partial', u"Partiellement facturée"),
+            ('invoiced', u"Entièrement facturée"),
+        ],
+        string=u"État de facturation (achat)",
+        compute='_compute_purchase_invoicing_state',
+        store=True,
+    )
     purchaseorder_count = fields.Integer(string=u"# Achats", compute='_compute_purchaseorder_ids')
     purchase_invoice_count = fields.Integer(string=u"# Factures d'achat", compute='_compute_purchase_invoice_ids')
 
@@ -52,6 +62,24 @@ class OfService(models.Model):
                 ('line_ids.purchaseorder_line_id.invoice_lines', '=', False),
             ]
         return [('line_ids.purchaseorder_line_id.invoice_lines.invoice_id', operator, operand)]
+
+    @api.depends('line_ids.purchaseorder_line_id.invoice_lines')
+    def _compute_purchase_invoicing_state(self):
+        for record in self:
+            lines_with_purchases = record.line_ids.filtered('purchaseorder_line_id')
+            if not lines_with_purchases:
+                record.purchase_invoicing_state = 'no'
+                continue
+            purchase_lines = lines_with_purchases.mapped('purchaseorder_line_id')
+            invoiced_lines = purchase_lines.filtered(
+                lambda s: any(state != 'cancel' for state in s.invoice_lines.mapped('invoice_id.state'))
+            )
+            if not invoiced_lines:
+                record.purchase_invoicing_state = 'no'
+            elif invoiced_lines != purchase_lines:
+                record.purchase_invoicing_state = 'partial'
+            else:
+                record.purchase_invoicing_state = 'invoiced'
 
     @api.model
     def _read_group_process_groupby(self, gb, query):
