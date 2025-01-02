@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-27 11:17+0000\n"
-"PO-Revision-Date: 2024-12-27 11:17+0000\n"
+"POT-Creation-Date: 2025-01-02 16:38+0000\n"
+"PO-Revision-Date: 2025-01-02 16:38+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -95,13 +95,13 @@ msgid "Accountant ID"
 msgstr ""
 
 #. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Accounting"
+#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_needaction
+msgid "Action Needed"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,field_description:of_base.field_of_res_partner_phone__message_needaction
-msgid "Action Needed"
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
+msgid "Address"
 msgstr ""
 
 #. module: of_base
@@ -128,16 +128,6 @@ msgstr "Climaticien"
 #: model:of.business.sectors,name:of_base.of_business_sectors_applicator
 msgid "Applicator / blower"
 msgstr "Applicateur / souffleur"
-
-#. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Apply"
-msgstr "Appliquer"
-
-#. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Are you sure to commit the changes ?"
-msgstr "Êtes-vous sûr de vouloir valider les modifications ?"
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_ir_attachment
@@ -170,6 +160,7 @@ msgstr "Comptes bancaires"
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_base
+#: model_terms:ir.ui.view,arch_db:of_base.of_base_view_general_configuration
 msgid "Base"
 msgstr ""
 
@@ -212,7 +203,6 @@ msgstr "Est ce que l'image 1024 peut-être zoomée"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_html_sanitize_wizard_view_form
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -303,6 +293,12 @@ msgid "Company Name"
 msgstr "Nom de la société"
 
 #. module: of_base
+#: model:ir.model.fields,field_description:of_base.field_res_partner__company_type
+#: model:ir.model.fields,field_description:of_base.field_res_users__company_type
+msgid "Company Type"
+msgstr "Type de société"
+
+#. module: of_base
 #: model:ir.model.fields,field_description:of_base.field_res_partner__of_company_name
 #: model:ir.model.fields,field_description:of_base.field_res_users__of_company_name
 msgid "Company name"
@@ -320,20 +316,9 @@ msgid "Config Settings"
 msgstr "Paramètres de configuration"
 
 #. module: of_base
-#: model:ir.actions.act_window,name:of_base.action_of_base_config_settings
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Configure connectors"
-msgstr "Configurer les connecteurs"
-
-#. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.view_users_form
 msgid "Connections"
 msgstr "Connexions"
-
-#. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Connectors Settings"
-msgstr "Paramètres de connecteurs"
 
 #. module: of_base
 #: model:ir.model,name:of_base.model_res_partner
@@ -374,6 +359,11 @@ msgstr ""
 #: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer
 msgid "Customer"
 msgstr "Client"
+
+#. module: of_base
+#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer_supplier
+msgid "Customer / Supplier"
+msgstr "Client / Fournisseur"
 
 #. module: of_base
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_partner_form
@@ -435,8 +425,14 @@ msgid "Display list"
 msgstr ""
 
 #. module: of_base
-#: model:ir.model.fields,help:of_base.field_res_config_settings__of_display_city
 #: model_terms:ir.ui.view,arch_db:of_base.of_base_view_general_configuration
+msgid ""
+"Displays the city in parentheses after the partner name when\n"
+"                                searching for a partner"
+msgstr ""
+
+#. module: of_base
+#: model:ir.model.fields,help:of_base.field_res_config_settings__of_display_city
 msgid ""
 "Displays the city in parentheses after the partner name when searching for a"
 " partner"
@@ -496,7 +492,6 @@ msgid "Error type"
 msgstr "Type d'erreur"
 
 #. module: of_base
-#: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_base_type__customer_supplier
 #: model:ir.model.fields.selection,name:of_base.selection__res_config_settings__of_invoicing_plan__expert
 msgid "Expert"
 msgstr ""
@@ -861,11 +856,6 @@ msgid "Maintenance and intervention management"
 msgstr "Gestion de maintenance et des interventions"
 
 #. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Marketing / CRM"
-msgstr ""
-
-#. module: of_base
 #: model:ir.model,name:of_base.model_ir_ui_menu
 msgid "Menu"
 msgstr ""
@@ -1165,11 +1155,6 @@ msgstr "Variante de produit"
 #. module: of_base
 #: model:ir.model,name:of_base.model_publisher_warranty_contract
 msgid "Publisher Warranty Contract"
-msgstr ""
-
-#. module: of_base
-#: model_terms:ir.ui.view,arch_db:of_base.res_config_settings_view_form
-msgid "Purchases"
 msgstr ""
 
 #. module: of_base

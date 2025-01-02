@@ -27,7 +27,7 @@ class ResConfigSettings(models.TransientModel):
         selection=[
             ("customer", "Customer"),
             ("supplier", "Supplier"),
-            ("customer_supplier", "Expert"),
+            ("customer_supplier", "Customer / Supplier"),
             ("demo", "Demo"),
             ("internal_test", "Internal test"),
             ("customer_test", "Customer test"),
