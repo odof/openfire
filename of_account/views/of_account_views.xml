@@ -365,6 +365,23 @@
         </field>
     </record>
 
+    <record id="view_account_payment_invoice_form" model="ir.ui.view">
+        <field name="name">account.payment.invoice.form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet//group[1]" position="before">
+                <div class="alert ">
+                <strong>Attention :</strong> Le changement du montant engendra une différence de paiement.
+                Si vous avez changé le montant et que vous voyez pas la valeur de différence de paiement n'hésitez pas à faire un simple clic dans le formulaire !
+            </div>
+            </xpath>
+            <xpath expr="//group[1]//group[3]//field[@name='writeoff_account_id']" position="attributes">
+                <attribute name="domain">[('code', 'not like', '658%'), ('code', 'not like', '758%'')]</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Account journal form view -->
     <record id="of_account_journal_form_view" model="ir.ui.view">
         <field name="name">account.journal.form</field>
