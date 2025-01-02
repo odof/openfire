@@ -304,6 +304,16 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     gb_invoice_id = fields.Many2one(
         comodel_name='account.invoice', compute=lambda s: None, search='_search_gb_invoice_id',
         string="Factures de DI", of_custom_groupby=True)
+    sale_invoicing_state = fields.Selection(
+        selection=[
+            ('no', u"Non facturée"),
+            ('partial', u"Partiellement facturée"),
+            ('invoiced', u"Entièrement facturée"),
+        ],
+        string=u"État de facturation (vente)",
+        compute='_compute_sale_invoicing_state',
+        store=True,
+    )
     historique_interv_ids = fields.Many2many(
         string=u"Historique des interventions", comodel_name='of.planning.intervention',
         column1='of.service', column2='of.planning.intervention', relation='of_service_historique_interv_rel',
@@ -606,6 +616,24 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 ('line_ids.invoice_line_ids', '=', False),
             ]
         return [('line_ids.invoice_line_ids.invoice_id', operator, operand)]
+
+    @api.depends('line_ids.saleorder_line_id.invoice_lines')
+    def _compute_sale_invoicing_state(self):
+        for record in self:
+            lines_with_sales = record.line_ids.filtered('saleorder_line_id')
+            if not lines_with_sales:
+                record.sale_invoicing_state = 'no'
+                continue
+            sale_lines = lines_with_sales.mapped('saleorder_line_id')
+            invoiced_lines = sale_lines.filtered(
+                lambda s: any(state != 'cancel' for state in s.invoice_lines.mapped('invoice_id.state'))
+            )
+            if not invoiced_lines:
+                record.sale_invoicing_state = 'no'
+            elif invoiced_lines != sale_lines:
+                record.sale_invoicing_state = 'partial'
+            else:
+                record.sale_invoicing_state = 'invoiced'
 
     # @api.onchange
 
