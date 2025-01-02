@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
+
 import odoo.addons.decimal_precision as dp
 
 
@@ -65,7 +66,14 @@ class AccountInvoiceLine(models.Model):
     of_margin = fields.Float(
         compute='_compute_of_margin', string=u"Marge", digits=dp.get_precision('Product Price'), store=True)
 
-    @api.depends('product_id')
+    @api.depends(
+        'product_id',
+        'of_is_kit',
+        'kit_id',
+        'kit_id.kit_line_ids',
+        'kit_id.kit_line_ids.product_id',
+        'kit_id.kit_line_ids.qty_per_kit',
+    )
     def _compute_of_cost(self):
         for line in self:
             if len(line.sale_line_ids) == 1 and not line.sale_line_ids.of_is_kit:
@@ -88,9 +96,21 @@ class AccountInvoiceLine(models.Model):
                 cost = line.sale_line_ids.purchase_price
                 purchase_price = line.sale_line_ids.of_seller_price
             else:
-                if line.product_id.of_is_kit:
-                    cost = line.product_id.cost_comps
-                    purchase_price = line.product_id.seller_price_comps
+                if line.of_is_kit:
+                    cost = purchase_price = 0.0
+                    for kit_line in line.kit_id.kit_line_ids:
+                        cost += (
+                            kit_line.product_id.uom_id._compute_price(
+                                kit_line.product_id.get_cost(), kit_line.product_uom_id
+                            )
+                            * kit_line.qty_per_kit
+                        )
+                        purchase_price += (
+                            kit_line.product_id.uom_id._compute_price(
+                                kit_line.product_id.of_seller_price, kit_line.product_uom_id
+                            )
+                            * kit_line.qty_per_kit
+                        )
                 else:
                     cost = line.product_id.get_cost()
                     purchase_price = line.product_id.of_seller_price
