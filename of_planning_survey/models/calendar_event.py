@@ -57,7 +57,7 @@ class CalendarEvent(models.Model):
                 )
                 event.of_survey_user_input_id.res_model = event._name
                 event.of_survey_user_input_id.res_id = event._origin.id
-                event.of_survey_user_input_id.redirect_action_id = self.env.ref("calendar.action_calendar_event").id
+                event.of_survey_user_input_id.redirect_action_id = self.env.ref("of_planning.action_calendar_event").id
                 event.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
 
     @api.depends("of_survey_user_input_line_ids", "of_question_ids")
@@ -158,18 +158,21 @@ class CalendarEvent(models.Model):
             dict: An action dictionary to open the survey URL.
         """
         self.ensure_one()
-        # cleaning up old data
-        self.env["of.survey.user_input"].search(
+        # Check user input already exists
+        existing_answer = self.env["of.survey.user_input"].search(
             [
                 ("res_model", "=", self._name),
                 ("res_id", "=", self._origin.id),
             ]
-        ).unlink()
-        self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-        self.of_survey_user_input_id.res_model = self._name
-        self.of_survey_user_input_id.res_id = self._origin.id
-        self.of_survey_user_input_id.redirect_action_id = self.env.ref("of_planning.action_calendar_event").id
-        self.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
+        )
+        if not existing_answer:
+            self.of_survey_user_input_id = self.of_survey_id._create_answer(
+                user=self.env.user, email=self.env.user.email
+            )
+            self.of_survey_user_input_id.res_model = self._name
+            self.of_survey_user_input_id.res_id = self._origin.id
+            self.of_survey_user_input_id.redirect_action_id = self.env.ref("of_planning.action_calendar_event").id
+            self.of_survey_user_input_id.menu_id = self.env.ref("of_planning.menu_of_planning_main").id
 
         url = f"/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}"
         return {

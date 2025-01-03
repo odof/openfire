@@ -40,7 +40,7 @@ class OFSurvey(http.Controller):
             )
         return survey_sudo, answer_sudo
 
-    def _check_validity(self, survey_token, answer_token, ensure_token=True, check_partner=True):
+    def _check_validity(self, survey_token, answer_token, ensure_token=True, check_partner=False):
         """Check survey is open and can be taken. This does not checks for
         security rules, only functional / business rules. It returns a string key
         allowing further manipulation of validity issues
@@ -95,7 +95,7 @@ class OFSurvey(http.Controller):
 
         return True
 
-    def _get_access_data(self, survey_token, answer_token, ensure_token=True, check_partner=True):
+    def _get_access_data(self, survey_token, answer_token, ensure_token=True, check_partner=False):
         """Get back data related to survey and user input, given the ID and access
         token provided by the route.
 
@@ -683,7 +683,7 @@ class OFSurvey(http.Controller):
     def survey_print(self, survey_token, review=False, answer_token=None, **post):
         """Display an survey in printable view; if <answer_token> is set, it will
         grab the answers of the user_input_id that has <answer_token>."""
-        access_data = self._get_access_data(survey_token, answer_token, ensure_token=False, check_partner=False)
+        access_data = self._get_access_data(survey_token, answer_token, ensure_token=False)
         if access_data["validity_code"] is not True and (
             access_data["has_survey_access"]
             or access_data["validity_code"] not in ["token_required", "survey_closed", "survey_void"]

@@ -117,18 +117,22 @@ class CrmLead(models.Model):
         Returns:
             dict: An action dictionary to open the survey URL.
         """
-        # on nettoie les anciennes données
-        self.env["of.survey.user_input"].search(
+        # Check user input already exists
+        existing_answer = self.env["of.survey.user_input"].search(
             [
                 ("res_model", "=", self._name),
                 ("res_id", "=", self._origin.id),
             ]
-        ).unlink()
-        self.of_survey_user_input_id = self.of_survey_id._create_answer(user=self.env.user, email=self.env.user.email)
-        self.of_survey_user_input_id.res_model = self._name
-        self.of_survey_user_input_id.res_id = self._origin.id
-        self.of_survey_user_input_id.redirect_action_id = self.env.ref("crm.crm_lead_action_pipeline").id
-        self.of_survey_user_input_id.menu_id = self.env.ref("crm.crm_menu_root").id
+        )
+        if not existing_answer:
+            self.of_survey_user_input_id = self.of_survey_id._create_answer(
+                user=self.env.user, email=self.env.user.email
+            )
+            self.of_survey_user_input_id.res_model = self._name
+            self.of_survey_user_input_id.res_id = self._origin.id
+            self.of_survey_user_input_id.redirect_action_id = self.env.ref("crm.crm_lead_action_pipeline").id
+            self.of_survey_user_input_id.menu_id = self.env.ref("crm.crm_menu_root").id
+
         url = f"/of_survey/{self.of_survey_id.access_token}/{self.of_survey_user_input_id.access_token}"
         return {
             "type": "ir.actions.act_url",

@@ -32,8 +32,8 @@
                             <field name="of_survey_id" domain="[('survey_type','=','lead_opportunity')]"/>
                         </div>
                         <div class="col-6">
-                            <button class="btn btn-primary oe_right ms-2" name="action_button_open_survey" type="object" string="Reply" attrs="{'invisible': [('of_survey_user_input_line_ids','!=',[])]}" />
-                            <button class="btn btn-primary oe_right" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': [('of_survey_user_input_line_ids','=',[])]}"/>
+                            <button class="btn btn-primary oe_right ms-2" name="action_button_open_survey" type="object" string="Reply" attrs="{'invisible': ['|', ('of_survey_id', '=', False), ('of_survey_user_input_line_ids','!=',[])]}" />
+                            <button class="btn btn-primary oe_right" name="action_button_edit_survey" type="object" string="Edit" attrs="{'invisible': ['|', ('of_survey_id', '=', False), ('of_survey_user_input_line_ids','=',[])]}"/>
                         </div>
                     </div>
 

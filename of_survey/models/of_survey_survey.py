@@ -378,10 +378,9 @@ class OFSurveySurvey(models.Model):
         :return: survey.question recordset excluding invalid conditional questions and pages without description
         """
         self.ensure_one()
-        valid_questions = self.question_and_page_ids.filtered(lambda q: q.is_valid_condition()).sorted()
-        return valid_questions + self.question_and_page_ids.filtered(
-            lambda q: q.is_page and not is_html_empty(q.description)
-        )
+        return self.question_and_page_ids.filtered(
+            lambda q: q.is_valid_condition() or (q.is_page and not is_html_empty(q.description))
+        ).sorted()
 
     def _get_next_page_or_question(self, user_input, page_or_question_id, go_back=False):
         """Generalized logic to retrieve the next question or page to show on the survey.
