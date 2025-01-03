@@ -66,7 +66,8 @@ class OfContract(models.Model):
     reference = fields.Char(string=u"Référence", required=True)
     partner_id = fields.Many2one("res.partner", string="Client payeur", required=True)
     department_id = fields.Many2one(
-        'res.country.department', related='partner_id.department_id', string=u"Département", readonly=True, store=True)
+        'res.country.department', related='partner_id.department_id', string=u"Département", readonly=True, store=True,
+        compute_sudo=True)
     category_ids = fields.Many2many(
         'res.partner.category', related="partner_id.category_id", string=u"Étiquettes client")
     pricelist_id = fields.Many2one('product.pricelist', string='Liste de prix')
@@ -819,7 +820,8 @@ class OfContractLine(models.Model):
     name = fields.Char(string="Nom", compute="_compute_name", store=True)
     partner_id = fields.Many2one('res.partner', related="contract_id.partner_id", string="Client payeur", readonly=True)
     department_id = fields.Many2one(
-        'res.country.department', related='address_id.department_id', string=u"Département", readonly=True, store=True)
+        'res.country.department', related='address_id.department_id', string=u"Département", readonly=True, store=True,
+        compute_sudo=True)
     address_id = fields.Many2one('res.partner', string="Adresse d'intervention", required=True)
     partner_code_magasin = fields.Char(string="Code magasin", related="address_id.of_code_magasin", readonly=True)
     address_street = fields.Char(string="Rue", related="address_id.street", readonly=True)
