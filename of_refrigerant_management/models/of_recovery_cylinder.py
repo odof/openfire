@@ -19,6 +19,7 @@ class RecoveryCylinder(models.Model):
     filled_quantity = fields.Float(string="Filled Quantity", compute="_compute_filled_quantity")
     filled_percentage = fields.Float(string="Filled Percentage", compute="_compute_filled_percentage")
 
+
     @api.depends('fluid_transactions_ids')
     def _compute_filled_quantity(self):
         for record in self:
@@ -41,8 +42,6 @@ class RecoveryCylinder(models.Model):
 
     def action_new_transaction(self):
         self.ensure_one()
-        print('+__________________________+')
-        print(self.id)
         return {
             'type': 'ir.actions.act_window',
             'name': _('New Fluid Transaction'),

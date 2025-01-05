@@ -4,6 +4,8 @@
         <field name="model">of.fluid.transaction</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="action_type"/>
+                <field name="transaction_date"/>
                 <field name="quantity"/>
                 <field name="recovery_cylinder_id"/>
             </tree>
@@ -17,6 +19,8 @@
             <form>
                 <sheet>
                     <group>
+                        <field name="action_type"/>
+                        <field name="transaction_date"/>
                         <field name="quantity"/>
                         <field name="recovery_cylinder_id"/>
                     </group>
