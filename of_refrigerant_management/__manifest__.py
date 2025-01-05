@@ -16,6 +16,7 @@
         'security/ir.model.access.csv',
         'views/of_fluid_type_views.xml',
         'views/of_recovery_cylinder_views.xml',
+        'views/of_fluid_transaction_views.xml', 
         'views/menuitems.xml',
         'data/data.xml',
     ],

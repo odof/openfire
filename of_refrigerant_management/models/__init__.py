@@ -2,3 +2,4 @@
 
 from . import of_fluid_type
 from . import of_recovery_cylinder
+from . import of_fluid_transaction

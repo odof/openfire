@@ -8,24 +8,42 @@
                 <field name="name"/>
                 <field name="fluid_type_id"/> 
                 <field name="total_capacity"/>
+                <field name="filled_percentage" widget="progressbar"/>
             </tree>
         </field>
     </record>
+
+    <!-- <record id="action_new_transaction" model="ir.actions.server">
+        <field name="name">New Transaction Action</field>
+        <field name="model_id" ref="model_of_recovery_cylinder"/>
+        <field name="binding_model_id" ref="model_of_recovery_cylinder"/>
+        <field name="state">code</field>
+        <field name="code">model.action_new_transaction()</field>
+    </record> -->
  
     <record id="of_recovery_cylinder_view_form" model="ir.ui.view">
         <field name="name">of.recovery.cylinder.view.form</field>
         <field name="model">of.recovery.cylinder</field>
         <field name="arch" type="xml">
             <form>
-                <header></header>
+                <header>    
+                    <button name="action_new_transaction" string="New Transaction" type="object"/>
+                </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
                     <div class="oe_button_box" name="button_box">
                         <field name="active" invisible="1" />
                     </div>
+                    <div class="oe_title mb-3">
+                        <div>
+                            <label for="name"/>
+                        </div>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
                     <group>
                         <group name="equipment" string="Recovery cylinder">
-                            <field name="name"/>
                             <field name="total_capacity" />
                             <field name="fluid_type_id"/> 
                             <field name="employee_id"/> 

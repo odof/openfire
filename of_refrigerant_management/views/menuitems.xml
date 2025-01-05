@@ -5,4 +5,5 @@
     <menuitem id="menu_settings_refrigerant_management" name="Refrigerant management" parent="of_planning.menu_of_planning_configuration" sequence="80"/>
     <menuitem id="menu_of_fluid_type"  parent="menu_settings_refrigerant_management"  action="of_refrigerant_management.action_of_fluid_type" sequence="1"/>
     <menuitem id="menu_of_recycling_cylinder"  parent="menu_settings_refrigerant_management"  action="of_refrigerant_management.action_of_recovery_cylinder" sequence="2"/>
+    <menuitem id="menu_of_recycling_transaction"  parent="menu_settings_refrigerant_management"  action="of_refrigerant_management.action_of_fluid_transaction" sequence="3"/>
 </odoo>

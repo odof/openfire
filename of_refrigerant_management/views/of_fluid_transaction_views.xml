@@ -1,0 +1,43 @@
+<odoo>
+    <record id="of_fluid_transaction_view_tree" model="ir.ui.view">
+        <field name="name">of.fluid.transaction.tree</field>
+        <field name="model">of.fluid.transaction</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="quantity"/>
+                <field name="recovery_cylinder_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="fluid_transaction_view_form" model="ir.ui.view">
+        <field name="name">of.fluid.transaction.form</field>
+        <field name="model">of.fluid.transaction</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="quantity"/>
+                        <field name="recovery_cylinder_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_fluid_transaction_view_search" model="ir.ui.view">
+        <field name="name">of.fluid.transaction.view.search</field>
+        <field name="model">of.fluid.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Fluid transactions">
+            </search>
+        </field>
+    </record>
+
+    <record id="action_of_fluid_transaction" model="ir.actions.act_window">
+        <field name="name">Fluid transactions</field>
+        <field name="res_model">of.fluid.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="of_refrigerant_management.of_fluid_transaction_view_search"/>
+    </record>
+</odoo>
