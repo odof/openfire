@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="of_trackdechets_account_res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">of.res.config.settings.view.form.inherit.base.setup</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='integration']//div[@id='oauth']" position="after">
+                <div class="col-12 col-lg-6 o_setting_box" id="trackdechets">
+                    <div class="o_setting_right_pane" name="auth_trackdechets_right_pane">
+                        <span class="o_form_label">Trackdéchets Authentication</span>
+                        <div class="text-muted" attrs="{'invisible': [('of_trackdechets_account_api_token', '=', False)]}">Connected
+                            to trackdéchets</div>
+                        <field name="of_trackdechets_account_api_token" invisible="1"/>
+                        <div class="content-group mt-2">
+                            <div class="row">
+                                <button type="object" name="action_redirect_to_trackdechets_authentication"
+                                    string="Authentication" class="btn btn-primary"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
