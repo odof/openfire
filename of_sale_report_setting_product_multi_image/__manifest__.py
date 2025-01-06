@@ -15,6 +15,7 @@
     'data': [
         'reports/ir_actions_report_templates.xml',
         'views/sale_order_views.xml',
+        'views/base_multi_image_image.xml',
     ],
     'installable': True,
     'application': False,

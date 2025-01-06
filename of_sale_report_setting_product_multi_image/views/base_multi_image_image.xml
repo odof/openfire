@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- TODO: move me ;
+    On a ajouté ce code ici car on veut pas créer un module openfire pour une petite modification
+    du coup si un jour on crée un module of_base_multi_image on doit déplacer cette vue  -->
+    <record id="of_image_form_view" model="ir.ui.view">
+        <field name="name">Multi image form inherit</field>
+        <field name="model">base_multi_image.image</field>
+        <field name="inherit_id" ref="base_multi_image.image_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='comments']" position="attributes">
+                <attribute name="colspan">2</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
