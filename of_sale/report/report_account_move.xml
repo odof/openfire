@@ -4,43 +4,33 @@
     <template id="of_sale_report_invoice_document" inherit_id="account.report_invoice_document">
 
         <!-- Lines and totals block -->
-        <xpath expr="//th[@name='th_priceunit']" position="replace">
-            <th name="th_priceunit" t-if="o.of_price_printing == 'order_line'" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
-        <xpath expr="//th[@name='th_price_unit']" position="replace">
-            <th name="th_price_unit" t-if="o.of_price_printing == 'order_line' and display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                <span>Disc.%</span>
-            </th>
+        <xpath expr="//th[@name='th_price_unit']" position="attributes">
+            <attribute name="t-if">o.of_price_printing == 'order_line' and display_discount</attribute>
         </xpath>
-        <xpath expr="//th[@name='th_taxes']" position="replace">
-            <th name="th_taxes" t-if="o.of_price_printing == 'order_line'" t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
-        <xpath expr="//th[@name='th_subtotal']" position="replace">
-            <th name="th_subtotal" t-if="o.of_price_printing == 'order_line'" class="text-end">
-                <span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
-                <span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
-            </th>
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
-        <xpath expr="//span[@t-field='line.price_unit']/.." position="replace">
-            <td name="td_price_unit" t-if="o.of_price_printing == 'order_line'" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                <span class="text-nowrap" t-field="line.price_unit"/>
-            </td>
+        <xpath expr="//span[@t-field='line.price_unit']/.." position="attributes">
+            <attribute name="name">td_priceunit</attribute>
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
-        <xpath expr="//td[@t-if='display_discount']" position="replace">
-            <td name="td_discount" t-if="o.of_price_printing == 'order_line' and display_discount" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                <span class="text-nowrap" t-field="line.discount"/>
-            </td>
+        <xpath expr="//span[@t-field='line.discount']/.." position="attributes">
+            <attribute name="name">td_discount</attribute>
+            <attribute name="t-if">o.of_price_printing == 'order_line' and display_discount</attribute>
         </xpath>
-        <xpath expr="//span[@id='line_tax_ids']/.." position="replace">
-            <td name="td_taxes" t-if="o.of_price_printing == 'order_line'" t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
-                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
-            </td>
+        <xpath expr="//span[@id='line_tax_ids']/.." position="attributes">
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
-        <xpath expr="//tbody[hasclass('invoice_tbody')]//td[hasclass('o_price_total')]" position="replace">
-            <td t-if="o.of_price_printing == 'order_line'" class="text-end o_price_total">
-                <span class="text-nowrap" t-field="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
-                <span class="text-nowrap" t-field="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
-            </td>
+
+        <xpath expr="//tbody[hasclass('invoice_tbody')]//td[hasclass('o_price_total')]" position="attributes">
+            <attribute name="name">td_price_total</attribute>
+            <attribute name="t-if">o.of_price_printing == 'order_line'</attribute>
         </xpath>
         <!-- /Lines and totals block -->
     </template>
