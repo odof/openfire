@@ -234,12 +234,19 @@
             <th t-if="pdf_invoice_product_reference" name="th_product_reference" class="text-start">Reference</th>
         </xpath>
 
-        <xpath expr="//th[@name='th_priceunit']" position="replace">
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="t-attf-class"></attribute>
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_priceunit']" position="after">
             <th name="th_priceunit_taxexcl" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxexcl">Unit Price Tax excl.</th>
             <th name="th_priceunit_taxinc" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxinc">Unit Price Tax incl.</th>
         </xpath>
 
-        <xpath expr="//th[@name='th_subtotal']" position="replace">
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_subtotal']" position="after">
             <th name="th_subtotal_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Price Tax excl.</th>
             <th name="th_subtotal_taxinc" class="text-end" t-if="pdf_price_taxinc">Price Tax incl.</th>
         </xpath>
@@ -250,7 +257,12 @@
             </td>
         </xpath>
 
-        <xpath expr="//span[@t-field='line.price_unit']/.." position="replace">
+        <xpath expr="//span[@t-field='line.price_unit']/.." position="attributes">
+            <attribute name="t-attf-class"></attribute>
+            <attribute name="class">d-none</attribute>
+            <attribute name="name">td_priceunit</attribute>
+        </xpath>
+        <xpath expr="//span[@t-field='line.price_unit']/.." position="after">
             <td name="td_priceunit_taxexcl" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" t-if="pdf_price_taxexcl">
                 <span t-field="line.of_price_unit_taxexcl"/>
             </td>

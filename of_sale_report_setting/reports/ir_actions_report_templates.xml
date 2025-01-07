@@ -3,17 +3,26 @@
 
     <template id="of_report_saleorder_document" inherit_id="of_sale.of_report_saleorder_document">
         <!-- Lines and totals block -->
-        <xpath expr="//th[@name='th_priceunit']" position="replace">
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_priceunit']" position="after">
             <th name="th_priceunit_taxexcl" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">Unit Price Tax excl.</th>
             <th name="th_priceunit_taxinc" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">Unit Price Tax incl.</th>
         </xpath>
 
-        <xpath expr="//th[@name='th_subtotal']" position="replace">
-            <th name="doc.of_price_printing == 'order_line' and th_subtotal_taxexcl" class="text-end" t-if="pdf_price_taxexcl">Price Tax excl.</th>
-            <th name="doc.of_price_printing == 'order_line' and th_subtotal_taxinc" class="text-end" t-if="pdf_price_taxinc">Price Tax incl.</th>
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_subtotal']" position="after">
+            <th name="th_subtotal_taxexcl" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">Price Tax excl.</th>
+            <th name="th_subtotal_taxinc" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxinc">Price Tax incl.</th>
         </xpath>
 
-        <xpath expr="//td[@name='td_priceunit']" position="replace">
+        <xpath expr="//td[@name='td_priceunit']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_priceunit']" position="after">
             <td name="td_priceunit_taxexcl" class="text-end" t-if="doc.of_price_printing == 'order_line' and pdf_price_taxexcl">
                 <span t-field="line.of_price_unit_taxexcl"/>
             </td>
@@ -22,7 +31,10 @@
             </td>
         </xpath>
 
-        <xpath expr="//td[@name='td_subtotal']" position="replace">
+        <xpath expr="//td[@name='td_subtotal']" position="attributes">
+            <attribute name="class">d-none</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_subtotal']" position="after">
             <td t-if="not line.is_downpayment and doc.of_price_printing == 'order_line' and pdf_price_taxexcl" name="td_subtotal_taxexcl" class="text-end o_price_total">
                 <span t-field="line.price_subtotal"/>
             </td>
