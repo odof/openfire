@@ -35,7 +35,9 @@ class ProductTemplate(models.Model):
     of_seller_discount = fields.Float(related="seller_ids.of_discount", related_sudo=False, store=True, readonly=False)
     of_seller_product_code = fields.Char(related="seller_ids.product_code", related_sudo=False)
     of_seller_product_name = fields.Char(related="seller_ids.product_name", related_sudo=False)
-    of_seller_product_category_name = fields.Char(related="seller_ids.of_product_category_name", related_sudo=False)
+    of_seller_product_category_name = fields.Char(
+        related="seller_ids.of_product_category_name", related_sudo=False, store=True, readonly=False
+    )
     of_seller_delay = fields.Integer(related="seller_ids.delay")
 
     of_linked_product_ids = fields.Many2many(
