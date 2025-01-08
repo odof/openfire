@@ -26,3 +26,15 @@ class ProductTemplate(models.Model):
     of_i_index = fields.Char(string="I index")
     of_season_efficiency = fields.Char(string="Seasonal energy efficiency (%)", help="Expressed in %")
     of_fonds_air_bois = fields.Boolean(string="Eligible for Fonds Air Bois ?")
+
+    def _compute_of_has_standard_attributes(self):
+        super()._compute_of_has_standard_attributes()
+        for record in self:
+            if record.of_code == "chimney":
+                record.of_has_standard_attributes = True
+
+    def _compute_of_has_technical_attributes(self):
+        super()._compute_of_has_technical_attributes()
+        for record in self:
+            if record.of_code == "chimney":
+                record.of_has_technical_attributes = True

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_industry_refrigerant_specialist" model="of.industry">
+        <field name="name">Refrigerant Specialist</field>
+        <field name="code">refrigerant</field>
+    </record>
+
+</odoo>

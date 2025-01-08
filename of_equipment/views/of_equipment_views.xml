@@ -23,9 +23,9 @@
             <form>
                 <header></header>
                 <sheet>
-                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <div class="oe_button_box" name="button_box">
-                        <field name="active" invisible="1" />
+                        <field name="active" invisible="1"/>
                         <button name="action_button_view_order" type="object" class="oe_stat_button" icon="fa-usd">
                             <field name="orders_count" string="Orders" widget="statinfo"/>
                         </button>
@@ -66,16 +66,20 @@
                     </group>
                     <notebook>
                         <page name="technical" string="Technical Data">
-                            <group name="installation" string="Installation">
-                                <field name="installation_type"/>
-                                <field name="is_compliant"/>
-                                <field name="reseller_id" context="{'default_of_is_reseller': 1, 'of_is_reseller_prio': 1}"/>
-                                <field name="installer_id" context="{'default_of_is_installer': 1, 'of_is_installer_prio': 1}"/>
-                                <field name="operator_id"/>
+                            <group name="technical_data">
+                                <group name="installation" string="Installation">
+                                    <field name="installation_type"/>
+                                    <field name="is_compliant"/>
+                                    <field name="reseller_id" context="{'default_of_is_reseller': 1, 'of_is_reseller_prio': 1}"/>
+                                    <field name="installer_id" context="{'default_of_is_installer': 1, 'of_is_installer_prio': 1}"/>
+                                    <field name="operator_id"/>
+                                </group>
                             </group>
                         </page>
                         <page string="Intervention History" name="intervention_history">
-                            <field name="intervention_ids" nolabel="1" context="{'default_of_address_id': site_address_id, 'default_of_use_equipment': True, 'default_of_partner_id': customer_id, 'default_of_equipment_ids': [(6, 0, [active_id])]}" domain="[('of_equipment_ids', 'in', [id])]">
+                            <field name="intervention_ids" nolabel="1"
+                                context="{'default_of_address_id': site_address_id, 'default_of_use_equipment': True, 'default_of_partner_id': customer_id, 'default_of_equipment_ids': [(6, 0, [active_id])]}"
+                                domain="[('of_equipment_ids', 'in', [id])]">
                                 <tree
                                     string="Interventions"
                                     decoration-success="of_state == 'confirmed'"
@@ -95,6 +99,11 @@
                         </page>
                     </notebook>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                </div>
             </form>
         </field>
     </record>

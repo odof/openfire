@@ -1,0 +1,152 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_industry_refrigerant_specialist
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-09 17:48+0000\n"
+"PO-Revision-Date: 2025-01-09 17:48+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_industry_refrigerant_specialist
+#. odoo-python
+#: code:addons/of_industry_refrigerant_specialist/models/of_fluid_nature.py:0
+#, python-format
+msgid "%s (copy)"
+msgstr "%s (copie)"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__active
+msgid "Active"
+msgstr "Actif"
+
+#. module: of_industry_refrigerant_specialist
+#: model_terms:ir.ui.view,arch_db:of_industry_refrigerant_specialist.of_fluid_nature_view_search
+msgid "Archived"
+msgstr "Archivé"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields.selection,name:of_industry_refrigerant_specialist.selection__of_fluid_nature__category__cfc
+#: model_terms:ir.ui.view,arch_db:of_industry_refrigerant_specialist.of_fluid_nature_view_search
+msgid "CFC"
+msgstr "CFC"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_product__of_co2_equivalent_tonnage
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_template__of_co2_equivalent_tonnage
+msgid "CO2 Equivalent Tonnage"
+msgstr "Tonnage équivalent CO2"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__category
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model,name:of_industry_refrigerant_specialist.model_of_fluid_nature
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_product__of_fluid_nature_id
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_template__of_fluid_nature_id
+msgid "Fluid Nature"
+msgstr "Nature de fluide"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.actions.act_window,name:of_industry_refrigerant_specialist.action_of_fluid_nature
+#: model:ir.ui.menu,name:of_industry_refrigerant_specialist.menu_of_fluid_nature
+msgid "Fluid Natures"
+msgstr "Nature des fluides"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__gwp
+msgid "GWP"
+msgstr "PRG"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields.selection,name:of_industry_refrigerant_specialist.selection__of_fluid_nature__category__hcfc
+#: model_terms:ir.ui.view,arch_db:of_industry_refrigerant_specialist.of_fluid_nature_view_search
+msgid "HCFC"
+msgstr "HCFC"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields.selection,name:of_industry_refrigerant_specialist.selection__of_fluid_nature__category__hfc
+#: model_terms:ir.ui.view,arch_db:of_industry_refrigerant_specialist.of_fluid_nature_view_search
+msgid "HFC"
+msgstr "HFC"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__id
+msgid "ID"
+msgstr "ID"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_of_fluid_nature__name
+msgid "Name"
+msgstr "Nom"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_product__of_permanent_leak_detection_system
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_template__of_permanent_leak_detection_system
+msgid "Permanent Leak Detection System"
+msgstr "Système permanent de détection de fuite"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model,name:of_industry_refrigerant_specialist.model_product_template
+msgid "Product"
+msgstr "Produit"
+
+#. module: of_industry_refrigerant_specialist
+#: model_terms:ir.ui.view,arch_db:of_industry_refrigerant_specialist.of_fluid_nature_view_search
+msgid "Recovery cylinders"
+msgstr ""
+
+#. module: of_industry_refrigerant_specialist
+#: model:of.industry,name:of_industry_refrigerant_specialist.of_industry_refrigerant_specialist
+msgid "Refrigerant Specialist"
+msgstr "Climaticien"
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.ui.menu,name:of_industry_refrigerant_specialist.menu_settings_refrigerant_management
+msgid "Refrigerant management"
+msgstr ""
+
+#. module: of_industry_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_product__of_total_load
+#: model:ir.model.fields,field_description:of_industry_refrigerant_specialist.field_product_template__of_total_load
+msgid "Total Load (kg)"
+msgstr "Charge totale (kg)"

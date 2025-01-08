@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- <odoo noupdate="1"> -->
+<odoo>
+    <record id="fluid_nature_r22" model="of.fluid.nature">
+        <field name="name">R22</field>
+        <field name="gwp">1500</field>
+        <field name="category">hcfc</field>
+    </record>
+    <record id="fluid_nature_r22" model="of.fluid.nature">
+        <field name="name">R22</field>
+        <field name="gwp">1500</field>
+        <field name="category">hcfc</field>
+    </record>
+    <record id="fluid_nature_r32" model="of.fluid.nature">
+        <field name="name">R32</field>
+        <field name="gwp">675</field>
+        <field name="category">hfc</field>
+    </record>
+    <record id="fluid_nature_r134a" model="of.fluid.nature">
+        <field name="name">R134a</field>
+        <field name="gwp">1430</field>
+        <field name="category">hfc</field>
+    </record>
+    <record id="fluid_nature_r290" model="of.fluid.nature">
+        <field name="name">R290</field>
+        <field name="gwp">3</field>
+        <field name="category">hfc</field>
+    </record>
+    <record id="fluid_nature_r401a" model="of.fluid.nature">
+        <field name="name">R401a</field>
+        <field name="gwp">1200</field>
+        <field name="category">hcfc</field>
+    </record>
+    <record id="fluid_nature_r402a" model="of.fluid.nature">
+        <field name="name">R402a</field>
+        <field name="gwp">2788</field>
+        <field name="category">hcfc</field>
+    </record>
+    <record id="fluid_nature_r404a" model="of.fluid.nature">
+        <field name="name">R404a</field>
+        <field name="gwp">3922</field>
+        <field name="category">hfc</field>
+    </record>
+    <record id="fluid_nature_r407c" model="of.fluid.nature">
+        <field name="name">R407c</field>
+        <field name="gwp">1174</field>
+        <field name="category">hfc</field>
+    </record>
+    <record id="fluid_nature_r448a" model="of.fluid.nature">
+        <field name="name">R448A</field>
+        <field name="gwp">1386</field>
+        <field name="category">hfc</field>
+    </record>
+</odoo>

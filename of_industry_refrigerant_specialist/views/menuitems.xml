@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Gestion des fluides -->
+    <menuitem id="menu_settings_refrigerant_management" name="Refrigerant management"
+        parent="sale.menu_sale_config" sequence="80"/>
+    <menuitem id="menu_of_fluid_nature" parent="menu_settings_refrigerant_management"
+        action="of_industry_refrigerant_specialist.action_of_fluid_nature" sequence="1"/>
+</odoo>

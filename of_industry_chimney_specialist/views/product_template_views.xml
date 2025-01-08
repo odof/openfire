@@ -7,21 +7,13 @@
         <field name="inherit_id" ref="of_industry.product_template_view_form"/>
         <field name="priority">20</field>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='standard']" position="attributes">
-                <attribute name="invisible">0</attribute>
-                <attribute name="attrs">{'invisible': [('of_code', '!=', 'chimney')]}</attribute>
-            </xpath>
-            <xpath expr="//group[@name='performance']" position="attributes">
-                <attribute name="invisible">0</attribute>
-                <attribute name="attrs">{'invisible': [('of_code', '!=', 'chimney')]}</attribute>
-            </xpath>
             <xpath expr="//group[@name='standard']" position="inside">
                 <field name="of_flamme_verte" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
                 <field name="of_flamme_verte_equivalence" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
                 <field name="of_eco_label" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
                 <field name="of_fonds_air_bois" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
             </xpath>
-            <xpath expr="//group[@name='performance']" position="inside">
+            <xpath expr="//group[@name='technical']" position="inside">
                 <field name="of_power_rating" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
                 <field name="of_yield" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>
                 <field name="of_co_emission" attrs="{'invisible': [('of_code', '!=', 'chimney')]}"/>

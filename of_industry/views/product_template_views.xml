@@ -11,10 +11,14 @@
                     <group>
                         <field name="of_industry_id" class="oe_inline"/>
                         <field name="of_code" invisible="1"/>
+                        <field name="of_has_standard_attributes" invisible="1"/>
+                        <field name="of_has_technical_attributes" invisible="1"/>
                     </group>
                     <group>
-                        <group name="standard" string="Standard &amp; Qualification" invisible="1"/>
-                        <group name="performance" string="Performance Indicator" invisible="1"/>
+                        <group name="standard" string="Standard &amp; Qualification"
+                            attrs="{'invisible': [('of_has_standard_attributes', '=', False)]}"/>
+                        <group name="technical" string="Technical"
+                            attrs="{'invisible': [('of_has_technical_attributes', '=', False)]}"/>
                     </group>
                 </page>
             </xpath>

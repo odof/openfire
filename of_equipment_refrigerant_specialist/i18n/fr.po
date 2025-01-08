@@ -1,0 +1,41 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* of_equipment_refrigerant_specialist
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-09 19:03+0000\n"
+"PO-Revision-Date: 2025-01-09 19:03+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: of_equipment_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_equipment_refrigerant_specialist.field_of_equipment__co2_equivalent_tonnage
+msgid "CO2 Equivalent Tonnage"
+msgstr "Tonnage équivalent CO2"
+
+#. module: of_equipment_refrigerant_specialist
+#: model:ir.model,name:of_equipment_refrigerant_specialist.model_of_equipment
+msgid "Equipment"
+msgstr "Équipement"
+
+#. module: of_equipment_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_equipment_refrigerant_specialist.field_of_equipment__fluid_nature_id
+msgid "Fluid Nature"
+msgstr "Nature du fluide"
+
+#. module: of_equipment_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_equipment_refrigerant_specialist.field_of_equipment__permanent_leak_detection_system
+msgid "Permanent Leak Detection System"
+msgstr "Système permanent de détection de fuite"
+
+#. module: of_equipment_refrigerant_specialist
+#: model:ir.model.fields,field_description:of_equipment_refrigerant_specialist.field_of_equipment__total_load
+msgid "Total Load (kg)"
+msgstr "Charge totale (kg)"

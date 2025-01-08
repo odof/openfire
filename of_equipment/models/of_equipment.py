@@ -8,6 +8,7 @@ from odoo.addons.of_geolocalize.models.res_partner import GEOCODING_STATE, OPENS
 class OFEquipment(models.Model):
     _name = "of.equipment"
     _description = "Equipment"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     active = fields.Boolean(default=True)
     name = fields.Char(string="Serial Number", size=64, copy=False)

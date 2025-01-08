@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_equipment_view_form" model="ir.ui.view">
+        <field name="name">of.equipment.view.form</field>
+        <field name="model">of.equipment</field>
+        <field name="inherit_id" ref="of_equipment.of_equipment_view_form"/>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='technical']//group[@name='technical_data']//group[@name='technical']" position="inside">
+                <field name="permanent_leak_detection_system" attrs="{'invisible': [('industry_code', '!=', 'refrigerant')]}"/>
+                <field name="fluid_nature_id" attrs="{'invisible': [('industry_code', '!=', 'refrigerant')]}"/>
+                <field name="total_load" attrs="{'invisible': [('industry_code', '!=', 'refrigerant')]}"/>
+                <field name="co2_equivalent_tonnage" attrs="{'invisible': [('industry_code', '!=', 'refrigerant')]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
