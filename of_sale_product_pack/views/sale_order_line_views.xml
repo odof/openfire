@@ -14,7 +14,8 @@
             </field>
             <field name="name" position="after">
                 <label for="of_pack_line_ids"/>
-                <field name="of_pack_line_ids" mode="tree" attrs="{'invisible': [('of_pack_ok', '=', False)]}" required="1">
+                <label for="of_order_state" invisible="1"/>
+                <field name="of_pack_line_ids" mode="tree" attrs="{'invisible': [('of_pack_ok', '=', False)], 'readonly': [('of_order_state', 'not in', ['draft', 'sent'])]}" required="1">
                     <tree editable="bottom">
                         <field name="product_id"/>
                         <field name="quantity"/>

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-11 07:28+0000\n"
-"PO-Revision-Date: 2024-07-11 07:28+0000\n"
+"POT-Creation-Date: 2025-01-02 15:19+0000\n"
+"PO-Revision-Date: 2025-01-02 15:19+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -94,6 +94,16 @@ msgstr "Bon de commande"
 #: model:ir.model,name:of_sale_product_pack.model_sale_order_line
 msgid "Sales Order Line"
 msgstr "Ligne de commande"
+
+#. module: of_sale_product_pack
+#. odoo-python
+#: code:addons/of_sale_product_pack/models/of_product_pack_lines.py:0
+#, python-format
+msgid ""
+"You cannot delete a component from a kit in a confirmed order. \n"
+"Instead, try changing the quantities to 0."
+msgstr "Vous ne pouvez pas supprimer un composant d'un kit dans une commande confirmée. \n"
+"Essayé plutôt de modifier les quantités à 0"
 
 #. module: of_sale_product_pack
 #. odoo-python

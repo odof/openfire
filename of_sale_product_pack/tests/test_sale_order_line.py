@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import Form
 
 from odoo.addons.of_product_pack.tests.common import TestOFProductPackCommon
@@ -478,3 +479,37 @@ class TestOFSaleOrderLinePack(TestOFProductPackCommon, TestOFSaleCommon):
         # the Glass
         self.assertEqual(order.order_line[1].price_unit, 22.5)  # Pot
         self.assertEqual(order.order_line[2].price_unit, 27.0)  # Glass (original price, no discount)
+
+    def test_06_unlink_allowed(self):
+        """Test that we can't unlink a pack line if the sale order is not in draft or sent state"""
+        order_values = self._prepare_empty_sale_order_values()
+        order_values["order_line"] = [
+            Command.create(
+                {
+                    "product_id": self.pack_kitchen.id,
+                    "product_uom_qty": 1,
+                },
+            ),
+        ]
+        order = self.env["sale.order"].create(order_values)
+
+        self.assertEqual(order.order_line[0].of_pack_ok, True)
+        self.assertEqual(len(order.order_line[0].of_pack_line_ids), 4)
+
+        order.order_line[0].of_pack_line_ids[0].unlink()
+        self.assertEqual(len(order.order_line[0].of_pack_line_ids), 3)
+
+        # Change the status of the sale order to 'sale' and try to delete a pack line
+        order.action_confirm()
+        with self.assertRaises(UserError):
+            order.order_line[0].of_pack_line_ids[0].unlink()
+
+        self.assertEqual(len(order.order_line[0].of_pack_line_ids), 3)
+
+        # Change the status of the sale order to 'cancel' and try to delete a pack line
+        order.with_context(disable_cancel_warning=True).action_cancel()
+        self.assertEqual(order.state, "cancel")
+        with self.assertRaises(UserError):
+            order.order_line[0].of_pack_line_ids[0].unlink()
+
+        self.assertEqual(len(order.order_line[0].of_pack_line_ids), 3)

@@ -1,6 +1,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from odoo import fields, models
+from odoo import _, fields, models
+from odoo.exceptions import UserError
 
 
 class OFProductPackLines(models.Model):
@@ -22,6 +23,16 @@ class OFProductPackLines(models.Model):
             "Product must be only once on a pack !",
         ),
     ]
+
+    def unlink(self):
+        if any(line.parent_product_id.order_id.state not in ("draft", "sent") for line in self):
+            raise UserError(
+                _(
+                    "You cannot delete a component from a kit in a confirmed order. \n"
+                    "Instead, try changing the quantities to 0."
+                )
+            )
+        return super().unlink()
 
     def _prepare_procurement_values(self, group_id=False):
         """Copy of the original method in sale.order.line to manage pack lines as well"""
