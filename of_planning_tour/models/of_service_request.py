@@ -49,6 +49,7 @@ class OFServiceRequest(models.Model):
                 "start_date_search": next_date,
                 "search_period_in_days": 30 if self.end_date < today else (self.end_date - next_date).days + 1,
                 "template_id": self.template_id.id or int(default_planning_intervention_template),
+                "duration": self.duration or False,
             }
         )
 
