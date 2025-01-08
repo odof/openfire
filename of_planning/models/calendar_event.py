@@ -502,11 +502,6 @@ class CalendarEvent(models.Model):
             if event.of_task_id:
                 event.duration = event.of_task_id.duration
 
-    def _inverse_dates(self):
-        for meeting in self:
-            if meeting.allday:
-                meeting._update_datetime_with_work_hours()
-
     @api.depends("of_resource_id")
     def _compute_of_employee_ids(self):
         """Compute the employee_id based on the resource_id.
