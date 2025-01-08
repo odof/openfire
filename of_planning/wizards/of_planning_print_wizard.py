@@ -59,19 +59,19 @@ class PlanningImpressionWizard(models.TransientModel):
         self._set_locale()
         title = ""
         if self.report_type == "day":
-            title = _("%s - Intervention Planning for %s") % (
+            title = _("%s - Intervention Planning for %s ") % (
                 employee.name,
                 self.start_date.strftime("%d %B %Y"),
             )
         elif self.report_type == "week":
-            title = _("Intervention Planning - %s<br/>Week %s from %s to %s") % (
+            title = _("Intervention Planning - %s <br/>Week %s from %s to %s ") % (
                 employee.name,
                 self.start_date.strftime("%W"),
                 self.start_date.strftime("%d %B"),
                 self.stop_date.strftime("%d %B %Y"),
             )
         elif self.report_type == "general_week":
-            title = _("Intervention Planning - Week %s from %s to %s") % (
+            title = _("Intervention Planning - Week %s from %s to %s ") % (
                 self.start_date.strftime("%W"),
                 self.start_date.strftime("%d %B"),
                 self.stop_date.strftime("%d %B %Y"),
