@@ -23,8 +23,8 @@ check_commit_message:
       # Get the first line of the commit message
       first_line=$(echo "$commit_message" | head -n 1)
 
-      # Check if the first line is within the 72 character limit
-      if [ ${#first_line} -le 72 ]; then
+      # Check if the first line is within the 72 character limit or start with fixup!
+      if [ ${#first_line} -le 72 ] || [[ "$first_line" == fixup!* ]]; then
         echo "First line is within 72 characters."
       else
         echo "First line exceeds 72 characters."
