@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_yousign_request_template_signatory_form" model="ir.ui.view">
+        <field name="model">of.yousign.request.template.signatory</field>
+        <field name="arch" type="xml">
+            <form string="Yousign Request Template Signatory">
+                <group name="main">
+                    <field name="template_id" invisible="not context.get('yousign_request_template_signatory_main_view')"/>
+                    <field name="partner_type" widget="radio"/>
+                    <field name="partner_id" attrs="{'invisible': [('partner_type', '=', 'dynamic')]}"/>
+                    <field name="partner_tmpl" attrs="{'invisible': [('partner_type', '=', 'static')]}"/>
+                    <field name="auth_mode"/>
+                    <field name="top_mention"/>
+                    <field name="bottom_mention"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="of_yousign_request_template_signatory_tree" model="ir.ui.view">
+        <field name="model">of.yousign.request.template.signatory</field>
+        <field name="arch" type="xml">
+            <tree string="Yousign Request Template Signatory">
+                <field name="template_id" invisible="not context.get('yousign_request_template_signatory_main_view')"/>
+                <field name="sequence" invisible="1"/>
+                <field name="partner_type"/>
+                <field name="partner_id"/>
+                <field name="partner_tmpl"/>
+                <field name="auth_mode"/>
+            </tree>
+        </field>
+    </record>
+
+
+</odoo>

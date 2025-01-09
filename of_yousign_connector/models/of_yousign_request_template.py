@@ -1,55 +1,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import codecs
-import logging
-import os
-import re
-import tempfile
-from base64 import b64decode, b64encode
-from contextlib import closing
-from io import StringIO
-
-from PyPDF2 import PdfFileReader
-
-from odoo import _, api, fields, models
-from odoo.exceptions import UserError, ValidationError
-from odoo.tools import config
-
-from odoo.addons.of_base.models.res_partner import convert_phone_number
-
-logger = logging.getLogger(__name__)
-
-try:
-    import requests
-except ImportError:
-    logger.debug("Cannot import requests")
-try:
-    from PyPDF2.errors import PdfReadError
-except ImportError:
-    from PyPDF2.utils import PdfReadError
-
-
-def rank2position_builder(width, height, x, y, mention=""):
-    base = {
-        "width": width,
-        "height": height,
-        "x": x,
-        "y": y,
-    }
-    if mention:
-        base.update(
-            {
-                "type": "mention",
-                "mention": mention,
-            }
-        )
-    else:
-        base.update(
-            {
-                "type": "signature",
-            }
-        )
-    return base
+from odoo import fields, models
 
 
 class OFYousignRequestTemplate(models.Model):
@@ -98,9 +49,11 @@ class OFYousignRequestTemplate(models.Model):
     company_id = fields.Many2one(
         comodel_name="res.company", string="Company", ondelete="cascade"
     )
-    # signatory_ids = fields.One2many(
-    #     "of.yousign.request.template.signatory", "parent_id", string="Signatories"
-    # )
+    signatory_ids = fields.One2many(
+        comodel_name="of.yousign.request.template.signatory",
+        inverse_name="template_id",
+        string="Signatories",
+    )
     # experience_id = fields.Many2one(
     #     comodel_name="of.yousign.experience", string="Expérience"
     # )

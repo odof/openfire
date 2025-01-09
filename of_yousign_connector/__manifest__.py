@@ -18,6 +18,7 @@
         "views/of_yousign_request_views.xml",
         "views/of_yousign_request_signatory_views.xml",
         "views/of_yousign_request_template_views.xml",
+        "views/of_yousign_request_template_signatory_views.xml",
         "views/sale_order_views.xml",
         "views/menuitems.xml",
         "wizards/of_yousign_setup_wizard_views.xml",

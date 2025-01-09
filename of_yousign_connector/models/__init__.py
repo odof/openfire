@@ -7,3 +7,4 @@ from . import sale_order
 from . import res_company
 from . import ir_attachment
 from . import of_yousign_request_template
+from . import of_yousign_request_template_signatory

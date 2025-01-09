@@ -243,11 +243,10 @@ class OFYousignRequest(models.Model):
             res_id = self.res_id
             ir_attachment_obj = self.env["ir.attachment"]
             source_obj = self.env[model].browse(res_id)
-            # signatory_ids = []
-            # for signatory in template.signatory_ids:
-            #     signatory_vals = signatory.prepare_template2request(
-            #         model, res_id)
-            #     signatory_ids.append((0, 0, signatory_vals))
+            signatory_ids = []
+            for signatory in template.signatory_ids:
+                signatory_vals = signatory.prepare_template2request(res_id)
+                signatory_ids.append((0, 0, signatory_vals))
             attachment_ids = [(5, 0)]
             report_order = 0
             partners = template.partner_ids
@@ -285,6 +284,7 @@ class OFYousignRequest(models.Model):
                 {
                     "attachment_ids": attachment_ids,
                     "partner_ids": [(4, partner_id) for partner_id in partners._ids],
+                    "signatory_ids": signatory_ids,
                 }
             )
 
@@ -749,8 +749,8 @@ class OFYousignRequest(models.Model):
         if self.state != "draft":
             return False
         activate_url = f"/signature_requests/{self.ys_identifier}/activate"
-        json_response = {}
-        # json_response = self.yousign_request("POST", activate_url, json={})
+        json_response = self.yousign_request("POST", activate_url, json={})
+        # json_response = {}
         # get_url = f"/signature_requests/{self.ys_identifier}/signers/{self.signatory_ids.ys_identifier}"
         # json_response = self.yousign_request("GET", get_url, json={}, expected_status_code=200)
         # self.signatory_ids.write({"state": "pending","signature_link": json_response.get("signature_link") })
