@@ -2,3 +2,4 @@
 
 from . import test_html_sanitze
 from . import test_res_groups
+from . import test_user_modification

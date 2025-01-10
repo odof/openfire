@@ -44,8 +44,14 @@ class ResUsers(models.Model):
         self.ensure_one()
         return re.sub("[^a-zA-Z0-9._%+-]", "", unidecode(self.partner_id.name)).lower() + "@example.com"
 
+    def _check_if_modifying_sensitive_users(self):
+        sensitive_users = {SUPERUSER_ID}
+        if user_admin := self.env.ref("base.user_admin", raise_if_not_found=False):
+            sensitive_users.add(user_admin.id)
+        return bool(sensitive_users & set(self.ids)) and not self.env.user._is_admin_or_superuser()
+
     def write(self, values):
-        if SUPERUSER_ID in self._ids and self._uid != SUPERUSER_ID:
+        if self._check_if_modifying_sensitive_users():
             raise AccessError(
                 _("Only the administrator account can modify the information of the administrator account.")
             )
@@ -124,3 +130,7 @@ class ResUsers(models.Model):
                 "base.user_admin"
             ):
                 raise UserError(_('Only the admin account can belong to group "%s".') % group_root.name)
+
+    def _is_admin_or_superuser(self):
+        self.ensure_one()
+        return self.env.user._is_superuser() or self.env.user == self.env.ref("base.user_admin")
