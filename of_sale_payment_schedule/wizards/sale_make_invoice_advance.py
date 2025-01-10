@@ -23,7 +23,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
             return super()._onchange_advance_payment_method()
         if self.advance_payment_method == "fixed":
             deposit_amount = order.of_payment_schedule_ids[nb_lines_deposit].amount
-            return {"value": {"amount": deposit_amount}}
+            return {"value": {"fixed_amount": deposit_amount}}
         elif self.advance_payment_method == "percentage":
             deposit_amount = order.of_payment_schedule_ids[nb_lines_deposit].percent
             return {"value": {"amount": deposit_amount}}
