@@ -505,22 +505,20 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('sale_kits_to_unlink'):
-            self.sudo().env['of.saleorder.kit'].search([('to_unlink', '=', True)]).unlink()
-            vals.pop('sale_kits_to_unlink')
+        unlink_kits = vals.pop('sale_kits_to_unlink', False)
         line = super(SaleOrderLine, self).create(vals)
         sale_kit_vals = {'order_line_id': line.id, 'name': line.name, 'of_pricing': line.of_pricing}
         line.kit_id.write(sale_kit_vals)
-        # Doit être rappeler pour les kits sinon les liens pour la création d'approvisionnements n'existent pas
+        if unlink_kits:
+            self.env['of.saleorder.kit'].unlink_unused_kits()
+        # Doit être rappelé pour les kits sinon les liens pour la création d'approvisionnements n'existent pas
         if line.kit_id and line.order_id.state == 'sale':
             line._action_procurement_create()
         return line
 
     @api.multi
     def write(self, vals):
-        if vals.get('sale_kits_to_unlink') or self.filtered(lambda l: l.sale_kits_to_unlink):
-            self.sudo().env['of.saleorder.kit'].search([('to_unlink', '=', True)]).unlink()
-            vals['sale_kits_to_unlink'] = False
+        unlink_kits = vals.pop('sale_kits_to_unlink', False)
         update_ol_id = False
         if len(self) == 1 and vals.get('kit_id') and not self.kit_id:
             # a sale_order_kit was added
@@ -555,11 +553,13 @@ class SaleOrderLine(models.Model):
                 sale_kit_vals['of_pricing'] = vals.get('of_pricing')
             self.kit_id.write(sale_kit_vals)
         if len(self) == 1 and 'kit_id' in vals:
-            if not vals.get('kit_id'):
+            if not vals['kit_id']:
                 self.env['of.saleorder.kit'].search([('order_line_id', '=', self.id)]).unlink()
             else:
                 self.env['of.saleorder.kit'].search(
-                    [('order_line_id', '=', self.id), ('id', '!=', vals.get('kit_id'))]).unlink()
+                    [('order_line_id', '=', self.id), ('id', '!=', vals['kit_id'])]).unlink()
+        if unlink_kits:
+            self.env['of.saleorder.kit'].unlink_unused_kits()
         return True
 
     @api.multi
@@ -719,6 +719,20 @@ class OfSaleOrderKit(models.Model):
             not_linked -= kit.kit_id
         not_linked.unlink()
 
+    @api.model
+    def unlink_unused_kits(self):
+        dt_limit = fields.Datetime.to_string(datetime.now() - timedelta(days=1))
+        all_kits = self.sudo().search([('to_unlink', '=', True)])
+        to_unlink = to_keep = self.env[self._name]
+        for kit in all_kits:
+            if kit.order_line_id.kit_id != kit:
+                to_unlink += kit
+            elif kit.write_date < dt_limit:
+                to_keep += kit
+        if to_unlink:
+            to_unlink.unlink()
+        if to_keep:
+            to_keep.write({'to_unlink': False})
 
 class OfSaleOrderKitLine(models.Model):
     _name = 'of.saleorder.kit.line'

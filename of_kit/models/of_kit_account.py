@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+
 from odoo import api, fields, models
 from odoo.tools.float_utils import float_compare
+
 import odoo.addons.decimal_precision as dp
 
 
@@ -263,26 +266,24 @@ class AccountInvoiceLine(models.Model):
     def create(self, vals):
         # from_so_line key added in vals in case of creation from a sale order
         from_so_line = vals.pop('from_so_line', False)
-        if vals.get('invoice_kits_to_unlink'):
-            self.sudo().env['of.invoice.kit'].search([('to_unlink', '=', True)]).unlink()
-            vals.pop('invoice_kits_to_unlink')
+        unlink_kits = vals.pop('invoice_kits_to_unlink', False)
         line = super(AccountInvoiceLine, self).create(vals)
         if line.of_is_kit and not from_so_line:
             account_kit_vals = {'invoice_line_id': line.id, 'name': line.name}
             line.kit_id.write(account_kit_vals)
             if line.of_pricing == 'computed':
                 line.price_unit = line.price_comps
+        if unlink_kits:
+            self.env['of.invoice.kit'].unlink_unused_kits()
         return line
 
     @api.multi
     def write(self, vals):
         update_il_id = False
+        unlink_kits = vals.pop('invoice_kits_to_unlink', False)
         if len(self._ids) == 1:
             if self.of_pricing == 'computed' and not float_compare(self.price_unit, self.price_comps, 2):
                 vals['price_unit'] = self.price_comps
-            if vals.get('invoice_kits_to_unlink') or self.invoice_kits_to_unlink:
-                self.sudo().env['of.invoice.kit'].search([('to_unlink', '=', True)]).unlink()
-                vals['invoice_kits_to_unlink'] = False
             if vals.get('kit_id') and not self.kit_id:
                 # a account_invoice_kit was added
                 update_il_id = True
@@ -316,6 +317,8 @@ class AccountInvoiceLine(models.Model):
             if vals.get('name'):
                 account_kit_vals['name'] = vals.get('name')
             self.kit_id.write(account_kit_vals)
+        if unlink_kits:
+            self.env['of.invoice.kit'].unlink_unused_kits()
         return True
 
     @api.multi
@@ -378,6 +381,21 @@ class OfAccountInvoiceKit(models.Model):
             kit.kit_id.invoice_line_id = kit.id
             not_linked -= kit.kit_id
         not_linked.unlink()
+
+    @api.model
+    def unlink_unused_kits(self):
+        dt_limit = fields.Datetime.to_string(datetime.now() - timedelta(days=1))
+        all_kits = self.sudo().search([('to_unlink', '=', True)])
+        to_unlink = to_keep = self.env[self._name]
+        for kit in all_kits:
+            if kit.invoice_line_id.kit_id != kit:
+                to_unlink += kit
+            elif kit.write_date < dt_limit:
+                to_keep += kit
+        if to_unlink:
+            to_unlink.unlink()
+        if to_keep:
+            to_keep.write({'to_unlink': False})
 
 
 class OfAccountInvoiceKitLine(models.Model):
