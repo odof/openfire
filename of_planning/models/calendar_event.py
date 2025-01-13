@@ -10,6 +10,7 @@ from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools import format_datetime
 
 TZ_EUROPE_PARIS_STR = "Europe/Paris"
+DEFAULT_AM_LIMIT_FLOAT = 13.0  # Define the limit between AM and PM
 
 
 class CalendarEvent(models.Model):
@@ -496,11 +497,72 @@ class CalendarEvent(models.Model):
     # Compute methods
     # --------------------------------------------------------------------------
 
-    @api.depends("of_task_id")
+    @api.depends("of_task_id", "of_force_dates")
     def _compute_duration(self):
         for event in self:
-            if event.of_task_id:
+            if event.of_task_id and not event.of_force_dates:
                 event.duration = event.of_task_id.duration
+            print("event.duration: %s " % event.duration)
+        # stop_field = self._fields["stop"]
+        # self.env.add_to_compute(stop_field, self)
+
+    @api.depends("of_force_dates")
+    def _compute_stop(self):
+        print("_compute_stop: %s " % self)
+        super()._compute_stop()
+        attendance_obj = self.env["resource.calendar.attendance"]
+
+        # On ne modifie le calcul de la date de fin que lorsqu'on a des horaires de travail
+        for event in self.filtered(
+            lambda e: e.of_employee_id.resource_calendar_id and not e.allday and not e.of_force_dates
+        ):
+            calendar_tz = (
+                pytz.timezone(event.of_employee_id.resource_calendar_id.tz)
+                if event.of_employee_id.resource_calendar_id
+                else pytz.timezone(TZ_EUROPE_PARIS_STR)
+            )
+            event_start = event.start.astimezone(calendar_tz)
+
+            # On initialise les variables
+            remaining_duration = event.duration
+            dayofweek = event_start.weekday()
+            week_type = str(attendance_obj.get_week_type(event_start))
+            start_hour = event_start.hour + event_start.minute / 60
+            day_period = start_hour < DEFAULT_AM_LIMIT_FLOAT and "morning" or "afternoon"
+            day_delta = 0
+
+            attendances = event.mapped("of_employee_id.resource_calendar_id.attendance_ids")
+            event_attendance = attendances.filtered(
+                lambda a: not a.display_type
+                and a.day_period == day_period
+                and a.dayofweek == str(dayofweek)
+                and (not a.week_type or a.week_type == week_type)
+            )
+
+            # Tant que la durée restante est plus grande que le créneau de travail
+            while not event_attendance or remaining_duration > (event_attendance.hour_to - start_hour):
+                # On met à jour la durée restante et on récupère le prochain créneau de travail
+                remaining_duration -= event_attendance.hour_to - start_hour
+                day_period = event_attendance.day_period == "morning" and "afternoon" or "morning"
+
+                # Quand on change de jour on incrémente day_delta
+                if day_period == "morning":
+                    day_delta += 1
+                    dayofweek = dayofweek + 1 if dayofweek < 6 else 0
+                event_attendance = attendances.filtered(
+                    lambda a: not a.display_type
+                    and a.day_period == day_period
+                    and a.dayofweek == str(dayofweek)
+                    and (not a.week_type or a.week_type == week_type)
+                )
+                start_hour = event_attendance.hour_from
+
+            stop_hour = start_hour + remaining_duration
+            event_stop = (event.start + timedelta(days=day_delta)).replace(
+                hour=int(stop_hour), minute=int((stop_hour % 1) * 60)
+            )
+            event.stop = calendar_tz.localize(event_stop).astimezone(pytz.utc).replace(tzinfo=None)
+            print("event.stop: %s " % event.stop)
 
     @api.depends("of_resource_id")
     def _compute_of_employee_ids(self):

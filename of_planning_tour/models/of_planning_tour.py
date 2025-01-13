@@ -12,10 +12,9 @@ from odoo.exceptions import UserError
 from odoo.tools import config
 from odoo.tools.float_utils import float_compare
 
-from odoo.addons.of_planning.models.calendar_event import TZ_EUROPE_PARIS_STR
+from odoo.addons.of_planning.models.calendar_event import DEFAULT_AM_LIMIT_FLOAT, TZ_EUROPE_PARIS_STR
 from odoo.addons.resource.models.resource import float_to_time
 
-DEFAULT_AM_LIMIT_FLOAT = 13.0  # Define the limit between AM and PM
 DEFAULT_MIN_DURATION_IN_HOURS = 0.25  # Default minimum duration for free slots in hours
 DEFAULT_PERIOD_IN_MONTHS = 18
 

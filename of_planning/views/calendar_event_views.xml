@@ -195,7 +195,7 @@
                         <field name="stop_date" string="Ending at" attrs="{'required': [('allday','=',True)],'invisible': [('allday','=',False)]}" force_save="1" />
 
                         <field name="start" string="Starting at" attrs="{'required': [('allday','=',False)], 'invisible': [('allday','=',True)]}" />
-                        <field name="stop" string="Ending At" attrs="{'invisible': [('allday','=',True)]}" />
+                        <field name="stop" string="Ending At" attrs="{'invisible': [('allday','=',True)], 'readonly': [('of_force_dates','=',False)]}" />
                         <field name="event_tz" attrs="{'invisible': [('recurrency', '=', False)]}" />
                         <field name="of_has_conflict_warning" invisible="1" />
                         <div colspan="2" attrs="{'invisible': [('of_has_conflict_warning', '=', False)]}" class="text-danger">
