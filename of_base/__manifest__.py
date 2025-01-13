@@ -18,8 +18,9 @@
         "mail",
         "contacts",
         "base_view_inheritance_extension",
-        "partner_firstname",  # OCA/partner-contact
         "of_web_widgets",
+        "partner_firstname",  # OCA/partner-contact
+        "partner_manual_rank",  # OCA/partner-contact
     ],
     "data": [
         "data/ir_cron.xml",
