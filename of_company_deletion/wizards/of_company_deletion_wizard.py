@@ -2,10 +2,9 @@
 
 import logging
 
-from odoo import models, fields, api, SUPERUSER_ID
+from odoo import SUPERUSER_ID, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import float_is_zero
-
 
 _logger = logging.getLogger(__name__)
 
@@ -28,6 +27,10 @@ class OFCompanyDeletionWizard(models.TransientModel):
             raise UserError(u"Seul l'administrateur peut effectuer cette action !")
 
         _logger.info(u"Company Deletion - START")
+
+        # On utilise divers appels write() pour préparer les éléments avant leur suppression
+        # On désactive donc la création inutile de mail.message, très coûteuse en temps
+        self = self.with_context(mail_notrack=True)
 
         company_ids = self.company_ids.ids
         _logger.info(u"Company Deletion - Companies %s - START" % company_ids)
