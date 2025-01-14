@@ -1546,20 +1546,22 @@ class CalendarEvent(models.Model):
         return tax_grouped
 
     def _get_calendar_event_action_views(self, action):
-        """Helper method to add the tree in first position view to the given action.
-        :return: dict with the updated action
+        """Helper method to switch the calendar event action views based on the number of records selected.
+
+        Args:
+            action (dict): The action dictionary to update.
+
+        Returns:
+            dict: The updated action dictionary.
         """
-        event_count = len(self)
-        if event_count == 1:
+        if len(self) == 1:
             views = [(self.env.ref("calendar.view_calendar_event_form", raise_if_not_found=False).id, "form")]
             views.extend(view for view in action["views"] if view[1] != "form")
             action["views"] = views
-            return action
-        else:
-            if tree_view := self.env.ref("calendar.view_calendar_event_tree", raise_if_not_found=False):
-                views = [(tree_view.id, "tree")]
-                views.extend(view for view in action["views"] if view[1] != "tree")
-                action["views"] = views
+        elif tree_view := self.env.ref("calendar.view_calendar_event_tree", raise_if_not_found=False):
+            views = [(tree_view.id, "tree")]
+            views.extend(view for view in action["views"] if view[1] != "tree")
+            action["views"] = views
         return action
 
     def pickings_layouted(self):

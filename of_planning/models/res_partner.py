@@ -73,11 +73,14 @@ class ResPartner(models.Model):
     # ----------------------------------------------------------------------------
 
     def action_button_view_intervention(self):
+        events = self.mapped("of_intervention_ids")
         action = self.env.ref("of_planning.action_calendar_event").sudo().read()[0]
         action["domain"] = [("of_partner_id", "child_of", self.ids), ("of_address_id", "child_of", self.ids)]
-        if len(self._ids) == 1:
+        if len(self.ids) == 1:
             action["context"] = self._get_action_view_intervention_context(safe_eval(action["context"]))
-        action = self.mapped("of_intervention_ids")._get_calendar_event_action_views(action)
+            if len(events) == 1:
+                action["res_id"] = events[0].id
+        action = events._get_calendar_event_action_views(action)
         return action
 
     # ----------------------------------------------------------------------------

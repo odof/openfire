@@ -30,8 +30,9 @@ class SaleOrder(models.Model):
             )
 
     def action_button_view_intervention(self):
+        events = self.mapped("of_intervention_ids")
         action = self.env.ref("of_planning.action_calendar_event").sudo().read()[0]
-        if len(self._ids) == 1:
+        if len(self.ids) == 1:
             picking_ids = self.picking_ids.ids
             context = safe_eval(action["context"])
             context.update(
@@ -48,7 +49,9 @@ class SaleOrder(models.Model):
             domain = safe_eval(action["domain"]) if action.get("domain") else []
             domain += [("of_order_id", "=", self.id)]
             action["domain"] = domain
-        action = self.mapped("of_intervention_ids")._get_calendar_event_action_views(action)
+            if len(events) == 1:
+                action["res_id"] = events[0].id
+        action = events._get_calendar_event_action_views(action)
         return action
 
     def _get_report_sheet_base_filename(self):

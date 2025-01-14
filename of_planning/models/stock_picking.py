@@ -25,8 +25,9 @@ class StockPicking(models.Model):
             picking.of_intervention_count = len(interventions)
 
     def action_button_view_interventions(self):
+        events = self.mapped("of_intervention_ids")
         action = self.env.ref("of_planning.action_calendar_event").sudo().read()[0]
-        if len(self._ids) == 1:
+        if len(self.ids) == 1:
             context = safe_eval(action["context"])
             orders = self.mapped("sale_id")
             context.update(
@@ -38,7 +39,9 @@ class StockPicking(models.Model):
             )
             action["context"] = context
             action["domain"] = [("of_picking_manual_ids", "in", self.ids)]
-        action = self.mapped("of_intervention_ids")._get_calendar_event_action_views(action)
+            if len(events) == 1:
+                action["res_id"] = events[0].id
+        action = events._get_calendar_event_action_views(action)
         return action
 
     def action_button_open_picking_manual(self):
