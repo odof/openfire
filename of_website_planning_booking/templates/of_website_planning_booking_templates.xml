@@ -2,10 +2,10 @@
 <odoo>
 
     <template id="booking" name="Prise de RDV en ligne">
-        <t t-call="website.layout">
+        <t t-call="of_website_planning_booking.booking_survey_layout">
             <div id="wrap">
                 <div class="oe_structure"/>
-                <div class="container of_booking of_booking_main">
+                <div class="container of_booking of_booking_main mb40">
                     <div class="page o_cc o_cc2 mt40 bg-transparent">
                         <h1 t-att-class="'col-10 border-bottom mt40 pb-2 ' + ((not logged) and 'mb-4' or 'mb-5')">
                             Make an appointment
@@ -22,7 +22,7 @@
                             <div class="card-header" role="tab">
                                 <div class="card-title">
                                     <a class="collapsed text-decoration-none" role="button" data-bs-toggle="collapse" data-bs-target="#myCollapseTabBookingService" aria-expanded="false">
-                                        <h2>Service...</h2>
+                                        <h2>Service</h2>
                                     </a>
                                 </div>
                             </div>
@@ -35,7 +35,9 @@
                                         <select id="service_id" name="service_id" class="form-select">
                                             <option value="">Service selection...</option>
                                             <t t-foreach="service_list" t-as="s">
-                                                <option t-att-value="'%s,%s' % (s['id'], s['fixed'])">
+                                                <option t-att-value="s['id']"
+                                                    t-att-data-fixed="s['fixed']"
+                                                    t-att-data-survey-id="s['survey_id']">
                                                     <t t-esc="s['name']"/>
                                                 </option>
                                             </t>
@@ -57,7 +59,7 @@
                             <div class="card-header" role="tab">
                                 <div class="card-title">
                                     <a class="collapsed text-decoration-none" role="button" data-bs-toggle="collapse" data-bs-target="#myCollapseTabBookingContract" aria-expanded="false">
-                                        <h2>Contract...</h2>
+                                        <h2>Contract</h2>
                                     </a>
                                 </div>
                             </div>
@@ -92,7 +94,7 @@
                             <div class="card-header" role="tab">
                                 <div class="card-title">
                                     <a class="collapsed text-decoration-none" role="button" data-bs-toggle="collapse" data-bs-target="#myCollapseTabBookingAddress" aria-expanded="false">
-                                        <h2>Address...</h2>
+                                        <h2>Address and contact details</h2>
                                     </a>
                                 </div>
                             </div>
@@ -184,7 +186,7 @@
                             <div class="card-header" role="tab">
                                 <div class="card-title">
                                     <a class="collapsed text-decoration-none" role="button" data-bs-toggle="collapse" data-bs-target="#myCollapseTabBookingSlot" aria-expanded="false">
-                                        <h2>Date...</h2>
+                                        <h2>Date</h2>
                                     </a>
                                 </div>
                             </div>
@@ -243,6 +245,19 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="clearfix"/>
+                        <div class="card mb-4" id="survey_card" style="display: none;">
+                            <div class="card-header" role="tab">
+                                <div class="card-title">
+                                    <a class="collapsed text-decoration-none" role="button" data-bs-toggle="collapse" data-bs-target="#myCollapseTabBookingSurvey" aria-expanded="false">
+                                        <h2>Additional information</h2>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="collapse" id="myCollapseTabBookingSurvey" aria-expanded="false" style="height: 0px;">
+                                <div class="card-body row gx-0 pb40" id="of_booking_survey"/>
+                            </div>
+                        </div>
                     </div>
                     <div class="spinner-popup" id="spinner-popup">
                         <span class="popup-text" id="popup-text" name="popup-text"/>
@@ -257,11 +272,146 @@
         </t>
     </template>
 
+    <template id="booking_survey_layout" name="OF Booking Survey Layout" inherit_id="website.layout" primary="True">
+        <xpath expr="//head/t[@t-call-assets][last()]" position="after">
+            <t t-call-assets="of_survey.survey_assets" lazy_load="True"/>
+            <t t-call-assets="of_website_planning_booking.survey_assets" lazy_load="True"/>
+        </xpath>
+        <xpath expr="//header" position="after">
+            <div id="wrap" class="oe_structure oe_empty"/>
+        </xpath>
+    </template>
+
+    <template id="booking_survey_fill_form_in_progress" name="Prise de RDV en ligne - Questionnaire - Formulaire">
+        <div class="o_survey_form_content_data d-none"
+            t-att-data-question-time-limit-reached="False"
+            t-att-data-has-answered="bool(has_answered)"
+            t-att-data-is-page-description="bool(question and question.is_page and not is_html_empty(question.description))"
+            t-att-data-server-time="server_time"
+            t-att-data-timer="timer_start"
+            t-att-data-time-limit-minutes="time_limit_minutes"/>
+        <t t-if="survey.questions_layout == 'one_page'">
+            <t t-foreach='survey.question_and_page_ids.filtered(lambda r: (r.is_from_planning_booking if not r.is_page else any(question.is_from_planning_booking for question in r.question_ids)))' t-as='question'>
+                <h2 t-if="question.is_page" t-field='question.title' class="o_survey_title pb16 text-break" />
+                <div t-if="question.is_page" t-field='question.description' class="text-break"/>
+                <t t-if="not question.is_page and question in answer.predefined_question_ids" t-call="of_survey.of_question_container"/>
+            </t>
+
+            <div class="text-center mt16">
+                <button type="submit" value="finish" class="btn btn-primary disabled">Submit</button>
+            </div>
+        </t>
+
+        <t t-if="survey.questions_layout == 'page_per_section'">
+            <h2 t-field='page.title' class="o_survey_title pb16 text-break" />
+            <div t-field='page.description' class="oe_no_empty text-break"/>
+
+            <input type="hidden" name="page_id" t-att-value="page.id" />
+            <t t-foreach='page.question_ids.filtered(lambda r: r.is_from_planning_booking)' t-as='question'>
+                <t t-if="question in answer.predefined_question_ids" t-call="of_survey.of_question_container"/>
+            </t>
+
+            <div class="row">
+                <div class="col-12 text-center mt16">
+                    <button type="submit" t-att-value="'next' if not survey_last else 'finish'" class="btn btn-primary disabled">
+                        <t t-if="not survey_last">Continue</t>
+                        <t t-else="">Submit</t>
+                    </button>
+                </div>
+            </div>
+        </t>
+
+        <!-- If we have a choice question and less than 6 options, we want minimized display.
+            Minimized display means we display the choices vertically (instead of optimized based on screen space).
+            An exception is made for options with images, where we always want to optimize screen space.
+            Numeric, date and datetime questions are also displayed "minimized", with a smaller screen width.-->
+        <t t-set="minimized_display" t-value="survey.questions_layout == 'page_per_question' and len(question.suggested_answer_ids) &lt;= 5 and not any(suggestion.value_image for suggestion in question.suggested_answer_ids)" />
+        <div t-if="survey.questions_layout == 'page_per_question'" t-attf-class="o_survey_page_per_question o_survey_#{question.question_type} #{'o_survey_minimized_display' if minimized_display else ''}">
+            <input type="hidden" name="question_id" t-att-value="question.id" />
+
+            <div class="mt-5">
+                <t t-call="of_survey.of_question_container"/>
+            </div>
+
+            <div class="row">
+                <div class="col-12 text-center mt16">
+                    <button type="submit" t-att-value="'next' if not survey_last else 'finish'" class="btn btn-primary disabled">
+                        <t t-if="survey_last">Submit</t>
+                        <t t-else="">Continue</t>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="booking_survey" name="Prise de RDV en ligne - Questionnaire">
+        <div class="wrap o_survey_wrap d-flex">
+            <div class="container o_survey_form d-flex flex-column mb-5" style="min-height: 0px;">
+                <t t-set="background_image_url" t-value="question.background_image_url
+                                if question else page.background_image_url
+                                if page else survey.background_image_url
+                                if survey.background_image_url else False"/>
+                <form role="form" method="post" t-att-name="survey.id" class="d-flex flex-grow-1 align-items-center"
+                    t-att-data-user-input-id="answer.id"
+                    t-att-data-answer-token="answer.access_token"
+                    t-att-data-survey-token="survey.access_token"
+                    t-att-data-users-can-go-back="survey.users_can_go_back and not answer.is_session_answer"
+                    t-att-data-session-in-progress="answer.is_session_answer"
+                    t-att-data-is-start-screen="answer.state == 'new'"
+                    t-att-data-readonly="survey_form_readonly"
+                    t-att-data-has-answered="bool(has_answered)"
+                    t-att-data-is-page-description="bool(question and question.is_page and not is_html_empty(question.description))"
+                    t-att-data-questions-layout="survey.questions_layout"
+                    t-att-data-refresh-background="any(page.background_image for page in survey.page_ids)">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="token" t-att-value="answer.access_token" />
+                    <input type="hidden" name="from_planning_booking" value="1"/>
+                    <input type="hidden" name="service_id" t-att-value="service_id" />
+                    <input type="hidden" name="contract_id" t-att-value="contract_id" />
+                    <input type="hidden" name="partner_id" t-att-value="partner_id" />
+                    <input type="hidden" name="slot_id" t-att-value="slot_id" />
+                    <div class="o_survey_error alert alert-danger d-none" role="alert">
+                        <p>There was an error during the validation of the survey.</p>
+                    </div>
+
+                    <div class="o_survey_form_content w-100">
+                        <t t-call="of_website_planning_booking.booking_survey_fill_form_in_progress" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="page o_cc o_cc2 bg-transparent">
+            <div class="row gx-0">
+                <div name="buttons">
+                    <div class="m-0 p-0 float-end">
+                        <div class="o_survey_progress_wrapper d-inline-block pe-1 text-start">
+                            <t t-call="of_survey.survey_progression"
+                                t-if="survey and survey.questions_layout != 'one_page' and answer and answer.state == 'in_progress' and (not question or not question.is_page) and not survey_form_readonly">
+                                <t t-if="survey.questions_layout == 'page_per_section'">
+                                    <t t-set="page_ids" t-value="survey.page_ids.ids"/>
+                                    <t t-set="page_number" t-value="page_ids.index(page.id) + (1 if survey.progression_mode == 'number' else 0)"/>
+                                </t>
+                                <t t-else="">
+                                    <t t-set="page_ids" t-value="answer.predefined_question_ids.ids"/>
+                                    <t t-set="page_number" t-value="page_ids.index(question.id)"/>
+                                </t>
+                            </t>
+                        </div>
+                        <div class="o_survey_brand_message float-end rounded me-3 border">
+                            <div class="o_survey_navigation_wrapper d-inline-block" t-call="of_survey.of_survey_navigation">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
     <template id="booking_confirmation" name="Prise de RDV en ligne - Confirmation">
         <t t-call="website.layout">
             <div id="wrap">
                 <div class="oe_structure"/>
-                <div class="container of_booking">
+                <div class="container of_booking of_booking_confirm">
                     <div class="page o_cc o_cc2 mt40 bg-transparent">
                         <h1 class="col-10 border-bottom pb-2 mt40 mb-5">
                             Confirm your appointment
@@ -291,11 +441,17 @@
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <h2 class="col-lg-10">Address</h2>
+                                <t t-if="is_fixed_meeting">
+                                    <h2 class="col-lg-10">Contact details</h2>
+                                </t>
+                                <t t-else="">
+                                    <h2 class="col-lg-10">Address and contact details</h2>
+                                </t>
                                 <div class="col-lg-10">
                                     <div class="card of-border-primary" style="min-height: 160px;">
                                         <div class="card-body row d-flex" style="overflow: clip;">
-                                            <t t-esc="partner" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'mobile'], no_marker=True)"/>
+                                            <t t-if="is_fixed_meeting" t-esc="partner" t-options="dict(widget='contact', fields=['name', 'email', 'mobile'], no_marker=True)"/>
+                                            <t t-else="" t-esc="partner" t-options="dict(widget='contact', fields=['name', 'address', 'email', 'mobile'], no_marker=True)"/>
                                         </div>
                                     </div>
                                 </div>
@@ -315,14 +471,15 @@
                                     <textarea name="comment" class="form-control"/>
                                 </div>
                                 <div class="clearfix"/>
-                                <div t-attf-class="#{error_dict.get('terms') and 'is-invalid' or ''} col-lg-12">
-                                    <input type="checkbox" name="terms" t-att-checked="'checked' if terms else None"/>
+                                <br/>
+                                <div t-attf-class="#{error_dict.get('terms') and 'text-danger' or ''} col-lg-12">
+                                    <input t-attf-class="#{error_dict.get('terms') and 'is-invalid' or ''} form-check-input" type="checkbox" name="terms" t-att-checked="'checked' if terms else None"/>
                                     <label class="col-form-label col-sm-auto s_website_form_label label-optional" for="terms" style="display: inline;">
                                         I accept the <a t-attf-href="/web/content?model=website&amp;field=of_booking_terms_file&amp;id={{request.website.id}}&amp;filename={{request.website.of_booking_terms_filename}}&amp;download=true">General terms and conditions</a> of <t t-esc="company.name"/>
                                     </label>
                                 </div>
-                                <div t-attf-class="#{error_dict.get('opt_in') and 'is-invalid' or ''} col-lg-12">
-                                    <input type="checkbox" name="opt_in" t-att-checked="'checked' if opt_in else None"/>
+                                <div t-attf-class="#{error_dict.get('opt_in') and 'text-danger' or ''} col-lg-12">
+                                    <input t-attf-class="#{error_dict.get('opt_in') and 'is-invalid' or ''} form-check-input" type="checkbox" name="opt_in" t-att-checked="'checked' if opt_in else None"/>
                                     <label class="col-form-label col-sm-auto s_website_form_label label-optional" for="opt_in" style="display: inline;">
                                         I agree to be contacted by <span t-esc="company.name"/>
                                     </label>
@@ -331,7 +488,7 @@
                                 <div class="mt40" name="buttons">
                                     <a class="btn btn-secondary" href="/booking?of_return=1">
                                         <span class="fa fa-long-arrow-left"/>
-                                        Back
+                                        Change your choices
                                     </a>
                                     <span name="buttons_right" class="float-end">
                                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>

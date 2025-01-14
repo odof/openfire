@@ -502,14 +502,8 @@ odoo.define("of_survey.form", function (require) {
                                 // quelle question est sélectionnée ou pas
                                 // Le plus simple (et plus bourrin) c'est de cacher d'abord toutes les questions conditionnelles et afficher uniquement la ou les bonnes
                                 self._rpc({
-                                    model: "of.survey.conditional.question",
-                                    method: "search_read",
-                                    args: [
-                                        [
-                                            ['triggering_question_id', '=', parseInt($question_id)]
-                                        ],
-                                        ['question_id'],
-                                    ],
+                                    route: '/of_survey/conditional-questions-from-trigger',
+                                    params: { triggering_question_id: $question_id },
                                 })
                                 .then(function(res) {
 
@@ -630,14 +624,8 @@ odoo.define("of_survey.form", function (require) {
                                         // et toutes les cacher
                                         if (results.length == 0) {
                                             self._rpc({
-                                                model: "of.survey.conditional.question",
-                                                method: "search_read",
-                                                args: [
-                                                    [
-                                                        ['triggering_question_id', '=', parseInt($question_id)]
-                                                    ],
-                                                    ['question_id'],
-                                                ],
+                                                route: '/of_survey/conditional-questions-from-trigger',
+                                                params: { triggering_question_id: $question_id },
                                             })
                                             .then(function(res) {
                                                 res.map((question) => {

@@ -22,7 +22,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 value !== undefined &&
                 value !== "" &&
                 value !== false &&
-                !Number.isNaN(value)
+                !isNaN(value)
             );
         },
 
@@ -38,6 +38,9 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             this.no_slot_div = false;
             this.booking_slots_div = false;
             this.slot_error = false;
+            this.survey_card = false;
+            this.booking_survey_div = false;
+            this.surveyFormWidget = false;
             this.popup_text = false;
             this.service_selector = false;
             this.contract_selector = false;
@@ -61,14 +64,19 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             this.session_contract_id = false;
             this.session_partner_id = false;
             this.session_from_date = false;
+            this.session_search_slots_result = false;
+            this.session_slot_id = false;
+            this.session_survey_id = false;
             this.params = false;
         },
 
         start() {
             const def = this._super(...arguments);
 
+            // Initialisation de toutes les variables de la page
             const self = this;
 
+            // Blocs principaux HTML de la page
             self.service_card = self.$("div#service_card");
             self.contract_card = self.$("div#contract_card");
             self.address_card = self.$("div#address_card");
@@ -78,9 +86,12 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             self.no_slot_div = self.$("div#no_slot_div");
             self.booking_slots_div = self.$("div#of_booking_slots");
             self.slot_error = self.$("div#slot_error");
+            self.survey_card = self.$("div#survey_card");
+            self.booking_survey_div = self.$("div#of_booking_survey");
 
             self.popup_text = $("span#popup-text");
 
+            // Champs des formulaires et blocs associés
             self.service_selector = self.$("select#service_id");
 
             self.contract_selector = self.$("select#contract_id");
@@ -99,6 +110,9 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             self.city_div = self.$("div#div_city");
 
             self.from_date_input = self.$("input#from_date");
+            const minDate = new Date();
+            minDate.setDate(minDate.getDate() + 1);
+            self.from_date_input.attr("min", minDate.toISOString().slice(0, 10));
 
             self.logged_partner_id = self.$("input#logged_partner_id").val() || 0;
 
@@ -112,7 +126,9 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 $(this).siblings(".card-header").removeClass("active");
             });
 
+            // Gestion des informations conservées en session
             if (self.params.get("of_return") === "1") {
+                // En cas de retour arrière depuis la page de confirmation, on récupère les informations de session
                 self.session_mode = sessionStorage.getItem("of_booking_mode");
                 self.session_service_id = sessionStorage.getItem(
                     "of_booking_service_id"
@@ -127,12 +143,18 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     "of_booking_partner_id"
                 );
                 self.session_from_date = sessionStorage.getItem("of_booking_from_date");
+                self.session_search_slots_result = JSON.parse(
+                    sessionStorage.getItem("of_booking_search_slots_result")
+                );
+                self.session_slot_id = sessionStorage.getItem("of_booking_slot_id");
+                self.session_survey_id = sessionStorage.getItem("of_booking_survey_id");
 
                 const newUrl = new URL(window.location.href);
                 newUrl.searchParams.delete("of_return");
                 history.replaceState({}, null, newUrl.href);
             } else {
-                // On ne retire pas du cache of_booking_partner_id pour éviter la création de doublons de partenaire
+                // Arrivée sur la page, on réinitialise les informations de session.
+                // Cependant, on ne retire pas du cache of_booking_partner_id pour éviter la création de doublons de partenaire
                 sessionStorage.removeItem("of_booking_mode");
                 sessionStorage.removeItem("of_booking_service_id");
                 sessionStorage.removeItem("of_booking_service_fixed");
@@ -141,8 +163,12 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     "of_booking_partner_id"
                 );
                 self.session_from_date = sessionStorage.getItem("of_booking_from_date");
+                sessionStorage.removeItem("of_booking_search_slots_result");
+                sessionStorage.removeItem("of_booking_slot_id");
+                sessionStorage.removeItem("of_booking_survey_id");
             }
 
+            // On détermine le mode de départ (Prestation ou Contrat)
             if (
                 self.session_mode === null ||
                 self.session_mode === undefined ||
@@ -160,14 +186,14 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 sessionStorage.setItem("of_booking_mode", self.session_mode);
             }
 
+            // Initialisation des différents blocs de la page en fonction des informations de session
             if (self.session_mode === "service") {
+                // Initialisation du bloc Prestation
                 self.contract_card.hide();
                 self.service_card.show();
 
                 if (self._isValid(self.session_service_id)) {
-                    self.service_selector.val(
-                        `${self.session_service_id},${self.session_service_fixed}`
-                    );
+                    self.service_selector.val(self.session_service_id);
                     self.service_card.find(".collapse").collapse("hide");
                     self.address_card.show();
                     if (!self._isValid(self.session_partner_id)) {
@@ -178,6 +204,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     self.service_selector.val("");
                 }
 
+                // Initialisation du bloc Adresse et Coordonnées
                 if (self.$("select#address_id option").length > 1) {
                     self.address_select.show();
                 } else {
@@ -185,17 +212,24 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 }
 
                 if (self.session_service_fixed === "1") {
+                    self.address_card
+                        .find(".card-header h2")
+                        .html(_t("Contact details"));
                     self.street_div.hide();
                     self.street2_div.hide();
                     self.zip_div.hide();
                     self.city_div.hide();
                 } else {
+                    self.address_card
+                        .find(".card-header h2")
+                        .html(_t("Address and contact details"));
                     self.street_div.show();
                     self.street2_div.show();
                     self.zip_div.show();
                     self.city_div.show();
                 }
             } else if (self.session_mode === "contract") {
+                // Initialisation du bloc Contrat
                 self.contract_card.show();
                 self.service_card.hide();
 
@@ -211,13 +245,18 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     self.contract_selector.val("");
                 }
 
+                // Initialisation du bloc Adresse et Coordonnées
                 self.address_select.hide();
+                self.address_card
+                    .find(".card-header h2")
+                    .html(_t("Address and contact details"));
                 self.street_div.show();
                 self.street2_div.show();
                 self.zip_div.show();
                 self.city_div.show();
             }
 
+            // Initialisation du champ Date
             if (
                 self.session_from_date !== null &&
                 self.session_from_date !== undefined &&
@@ -231,6 +270,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.from_date_input.val(tomorrow_str);
             }
 
+            // Récupération des informations du client
             if (
                 self._isValid(self.session_partner_id) &&
                 self._isValid(self.session_service_id || self.session_contract_id)
@@ -248,19 +288,29 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     hideAddressCard: true,
                     showSlotCard: showSlotCard,
                 });
+
+                // Initialisation du bloc Informations complémentaires
+                if (self._isValid(self.session_survey_id)) {
+                    self._fetchSurveyAndUpdateUI(self.session_slot_id);
+                }
             }
 
+            // Clic sur le bouton Mes contrats
             self.$("#my_contracts").on("click", function (event) {
                 self.session_mode = "contract";
                 sessionStorage.setItem("of_booking_mode", self.session_mode);
                 sessionStorage.removeItem("of_booking_service_id");
                 sessionStorage.removeItem("of_booking_service_fixed");
+                self.session_service_id = false;
                 self.service_selector.val("");
                 self.service_card.hide();
                 self.service_card.find(".collapse").collapse("hide");
                 self.contract_card.show();
                 self.contract_card.find(".collapse").collapse("show");
                 self.address_select.hide();
+                self.address_card
+                    .find(".card-header h2")
+                    .html(_t("Address and contact details"));
                 self.street_div.show();
                 self.street2_div.show();
                 self.zip_div.show();
@@ -269,12 +319,19 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.address_card.find(".collapse").collapse("hide");
                 self.slot_card.hide();
                 self.slot_card.find(".collapse").collapse("hide");
+                sessionStorage.removeItem("of_booking_survey_id");
+                self.session_survey_id = false;
+                self.booking_survey_div.empty();
+                self.survey_card.hide();
+                self.survey_card.find(".collapse").collapse("hide");
             });
 
+            // Clic sur le bouton Autres prestations
             self.$("#other_services").on("click", function (event) {
                 self.session_mode = "service";
                 sessionStorage.setItem("of_booking_mode", self.session_mode);
                 sessionStorage.removeItem("of_booking_contract_id");
+                self.session_contract_id = false;
                 self.contract_selector.val("");
                 self.service_card.show();
                 self.service_card.find(".collapse").collapse("show");
@@ -289,67 +346,84 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 self.address_card.find(".collapse").collapse("hide");
                 self.slot_card.hide();
                 self.slot_card.find(".collapse").collapse("hide");
+                sessionStorage.removeItem("of_booking_survey_id");
+                self.session_survey_id = false;
+                self.booking_survey_div.empty();
+                self.survey_card.hide();
+                self.survey_card.find(".collapse").collapse("hide");
             });
 
+            // Sélection d'une prestation
             self.service_selector.on("change", function (event) {
-                const service_info = self.service_selector.find(":selected").val();
-                if (
-                    service_info !== null &&
-                    service_info !== undefined &&
-                    service_info !== ""
-                ) {
-                    const service_id = service_info.split(",")[0];
-                    const service_fixed = service_info.split(",")[1];
+                const service_id = self.service_selector.find(":selected").val();
+                if (self._isValid(service_id)) {
+                    const service_fixed = self.service_selector
+                        .find(":selected")
+                        .data("fixed");
+                    const survey_id = self.service_selector
+                        .find(":selected")
+                        .data("surveyId");
 
-                    if (self._isValid(service_id)) {
-                        sessionStorage.setItem("of_booking_service_id", service_id);
-                        sessionStorage.setItem(
-                            "of_booking_service_fixed",
-                            service_fixed
-                        );
-                        self.session_service_id = service_id;
-                        self.session_service_fixed = service_fixed;
+                    sessionStorage.setItem("of_booking_service_id", service_id);
+                    sessionStorage.setItem("of_booking_service_fixed", service_fixed);
+                    sessionStorage.setItem("of_booking_survey_id", survey_id);
+                    self.session_service_id = service_id;
+                    self.session_service_fixed =
+                        service_fixed && service_fixed.toString();
+                    self.session_survey_id = survey_id;
 
-                        sessionStorage.removeItem("of_booking_contract_id");
+                    sessionStorage.removeItem("of_booking_contract_id");
 
-                        self.service_selector.removeClass("is-invalid");
-                        self.service_card.find(".collapse").collapse("hide");
+                    self.service_selector.removeClass("is-invalid");
+                    self.service_card.find(".collapse").collapse("hide");
 
-                        if (self.session_service_fixed === "1") {
-                            self.street_div.hide();
-                            self.street2_div.hide();
-                            self.zip_div.hide();
-                            self.city_div.hide();
-                        } else {
-                            self.street_div.show();
-                            self.street2_div.show();
-                            self.zip_div.show();
-                            self.city_div.show();
-                        }
-
-                        self.address_card.show();
-                        self.address_card.find(".collapse").collapse("show");
-
-                        if (
-                            !self._isValid(self.session_partner_id) &&
-                            self.logged_partner_id !== 0
-                        ) {
-                            self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
-                                partner_id: self.logged_partner_id,
-                            });
-                        } else if (self._isValid(self.session_partner_id)) {
-                            self._fetchPartnerAndUpdateUI(self.session_partner_id, {
-                                partner_id: self.session_partner_id,
-                            });
-                        }
-                        self.slots_div.hide();
-                        self.no_slot_div.hide();
+                    // Gestion des RDV fixes
+                    if (self.session_service_fixed === "1") {
+                        self.address_card
+                            .find(".card-header h2")
+                            .html(_t("Contact details"));
+                        self.street_div.hide();
+                        self.street2_div.hide();
+                        self.zip_div.hide();
+                        self.city_div.hide();
+                    } else {
+                        self.address_card
+                            .find(".card-header h2")
+                            .html(_t("Address and contact details"));
+                        self.street_div.show();
+                        self.street2_div.show();
+                        self.zip_div.show();
+                        self.city_div.show();
                     }
+
+                    self.address_card.show();
+                    self.address_card.find(".collapse").collapse("show");
+
+                    // Récupération des informations du client
+                    if (
+                        !self._isValid(self.session_partner_id) &&
+                        self.logged_partner_id !== 0
+                    ) {
+                        self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
+                            partner_id: self.logged_partner_id,
+                        });
+                    } else if (self._isValid(self.session_partner_id)) {
+                        self._fetchPartnerAndUpdateUI(self.session_partner_id, {
+                            partner_id: self.session_partner_id,
+                        });
+                    }
+                    self.slots_div.hide();
+                    self.no_slot_div.hide();
+
+                    self.booking_survey_div.empty();
+                    self.survey_card.hide();
+                    self.survey_card.find(".collapse").collapse("hide");
                 } else {
                     self.service_selector.addClass("is-invalid");
                 }
             });
 
+            // Sélection d'un contrat
             self.contract_selector.on("change", function (event) {
                 const contract_id = self.contract_selector.find(":selected").val();
                 if (self._isValid(contract_id)) {
@@ -364,6 +438,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     self.address_card.show();
                     self.address_card.find(".collapse").collapse("show");
 
+                    // Récupération des informations du client
                     self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
                         partner_id: self.logged_partner_id,
                         contract_id: self.session_contract_id,
@@ -371,11 +446,16 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
 
                     self.slots_div.hide();
                     self.no_slot_div.hide();
+
+                    self.booking_survey_div.empty();
+                    self.survey_card.hide();
+                    self.survey_card.find(".collapse").collapse("hide");
                 } else {
                     self.contract_selector.addClass("is-invalid");
                 }
             });
 
+            // Sélection d'une adresse existante
             self.address_selector.on("change", function (event) {
                 const address_id = self.address_selector.find(":selected").val() || 0;
                 if (self._isValid(address_id)) {
@@ -385,17 +465,20 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 }
             });
 
+            // Clic sur le bouton Nouvelle adresse
             self.$("#new_address").on("click", function (event) {
                 self._fetchPartnerAndUpdateUI(self.logged_partner_id, {
                     resetAddress: true,
                 });
             });
 
+            // Validation du formulaire Adresse et Coordonnées
             self.$("#address_submit").on("click", function (event) {
                 const session_partner_id = sessionStorage.getItem(
                     "of_booking_partner_id"
                 );
 
+                // Contrôle des informations saisies
                 const name = self.name_input.val();
                 let name_ok = false;
                 const email = self.email_input.val();
@@ -477,6 +560,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                         )
                     );
 
+                    // Création ou mise à jour du contact
                     ajax.jsonRpc("/booking/create_update_partner", "call", {
                         partner_id: session_partner_id,
                         name: name,
@@ -489,6 +573,8 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     })
                         .then(function (partner_id) {
                             sessionStorage.setItem("of_booking_partner_id", partner_id);
+
+                            // Mise à jour du sélecteur d'adresse si nécessaire
                             if (
                                 self.$(
                                     `select#address_id option[value="${partner_id}"]`
@@ -507,6 +593,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                             self.slot_card.find(".collapse").collapse("show");
                             self.slot_card[0].scrollIntoView();
 
+                            // Déclenchement de la recherche de créneaux
                             self.from_date_input.change();
                         })
                         .catch((error) => {
@@ -515,6 +602,7 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                 }
             });
 
+            // Modification du champ date
             self.from_date_input.on("change", function (event) {
                 if (!$(".container").hasClass("show-popup")) {
                     // Show spinner popup
@@ -534,88 +622,13 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     "of_booking_partner_id"
                 );
 
-                ajax.jsonRpc("/booking/search_slots", "call", {
-                    service_id: self.session_service_id,
-                    contract_id: self.session_contract_id,
-                    partner_id: self.session_partner_id,
-                    from_date: self.session_from_date,
-                })
-                    .then(function (result) {
-                        self.booking_slots_div.html("");
-                        $("#search_more_submit").show();
-                        $("#slot_submit").show();
+                self.slot_error.hide();
 
-                        const slots = result[0];
-                        const searchMore = result[1];
-                        let lastDay = "";
-                        let lastDesc = "";
-
-                        for (let i = 0; i < slots.length; i++) {
-                            const slot = slots[i];
-                            const $slotDiv = $(
-                                QWeb.render("of_website_planning_booking.slot_kanban", {
-                                    title: slot.name,
-                                    extra_info: slot.description,
-                                    slot_id: slot.id,
-                                })
-                            );
-                            if (slot.description === _t("Morning")) {
-                                if (lastDesc === _t("Morning")) {
-                                    self.booking_slots_div.append(
-                                        self._createUnavailableSlotDiv("float-end")
-                                    );
-                                }
-                                self._appendClearfix(self.booking_slots_div);
-                                $slotDiv.addClass("float-start");
-                            } else {
-                                if (slot.name !== lastDay) {
-                                    if (lastDesc === _t("Morning")) {
-                                        self.booking_slots_div.append(
-                                            self._createUnavailableSlotDiv("float-end")
-                                        );
-                                    }
-                                    self._appendClearfix(self.booking_slots_div);
-                                    self.booking_slots_div.append(
-                                        self._createUnavailableSlotDiv("float-start")
-                                    );
-                                }
-                                $slotDiv.addClass("float-end");
-                            }
-                            $slotDiv.on("click", self._onClickSlot);
-                            self.booking_slots_div.append($slotDiv);
-                            if (slot.description === _t("Afternoon")) {
-                                self._appendClearfix(self.booking_slots_div);
-                            }
-                            lastDay = slot.name;
-                            lastDesc = slot.description;
-                        }
-
-                        if (lastDesc === _t("Morning")) {
-                            self.booking_slots_div.append(
-                                self._createUnavailableSlotDiv("float-end")
-                            );
-                        }
-
-                        if (searchMore === false) {
-                            $("#search_more_submit").hide();
-                        }
-
-                        if (slots.length === 0) {
-                            self.slots_div.hide();
-                            self.no_slot_div.show();
-                        } else {
-                            self.slots_div.show();
-                            self.no_slot_div.hide();
-                        }
-
-                        // Hide spinner popup
-                        $(".container").removeClass("show-popup");
-                    })
-                    .catch((error) => {
-                        window.location.href = "/booking/error";
-                    });
+                // Appel de la recherche de créneaux
+                self._fetchSlotAndUpdateUI();
             });
 
+            // Clic sur le bouton Chercher plus
             $("#search_more_submit").on("click", function (event) {
                 // Show spinner popup
                 $(".container").addClass("show-popup");
@@ -623,97 +636,43 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
                     _t("One moment please, we are looking for additional slots.")
                 );
 
-                ajax.jsonRpc("/booking/search_slots", "call", {
-                    service_id: self.session_service_id,
-                    contract_id: self.session_contract_id,
-                    partner_id: self.session_partner_id,
-                    from_date: self.session_from_date,
-                    search_more: true,
-                })
-                    .then(function (result) {
-                        self.booking_slots_div.html("");
+                self.slot_error.hide();
 
-                        const slots = result[0];
-                        const searchMore = result[1];
-                        let lastDay = "";
-                        let lastDesc = "";
-
-                        for (let i = 0; i < slots.length; i++) {
-                            const slot = slots[i];
-                            const $slotDiv = $(
-                                QWeb.render("of_website_planning_booking.slot_kanban", {
-                                    title: slot.name,
-                                    extra_info: slot.description,
-                                    slot_id: slot.id,
-                                })
-                            );
-                            if (slot.description === _t("Morning")) {
-                                if (lastDesc === _t("Morning")) {
-                                    self.booking_slots_div.append(
-                                        self._createUnavailableSlotDiv("float-end")
-                                    );
-                                }
-                                self._appendClearfix(self.booking_slots_div);
-                                $slotDiv.addClass("float-start");
-                            } else {
-                                if (slot.name !== lastDay) {
-                                    if (lastDesc === _t("Morning")) {
-                                        self.booking_slots_div.append(
-                                            self._createUnavailableSlotDiv("float-end")
-                                        );
-                                    }
-                                    self._appendClearfix(self.booking_slots_div);
-                                    self.booking_slots_div.append(
-                                        self._createUnavailableSlotDiv("float-start")
-                                    );
-                                }
-                                $slotDiv.addClass("float-end");
-                            }
-                            $slotDiv.on("click", self._onClickSlot);
-                            self.booking_slots_div.append($slotDiv);
-                            if (slot.description === _t("Afternoon")) {
-                                self._appendClearfix(self.booking_slots_div);
-                            }
-                            lastDay = slot.name;
-                            lastDesc = slot.description;
-                        }
-
-                        if (lastDesc === _t("Morning")) {
-                            self.booking_slots_div.append(
-                                self._createUnavailableSlotDiv("float-end")
-                            );
-                        }
-
-                        if (searchMore === false) {
-                            $("#search_more_submit").hide();
-                        }
-
-                        // Hide spinner popup
-                        $(".container").removeClass("show-popup");
-                    })
-                    .catch((error) => {
-                        window.location.href = "/booking/error";
-                    });
+                // Appel de la recherche de créneaux
+                self._fetchSlotAndUpdateUI({ search_more: true });
             });
 
+            // Validation du créneau sélectionné
             $("#slot_submit").on("click", function (event) {
                 const selectedSlot = self.booking_slots_div.find(
                     ".card.of-border-primary"
                 );
-                const selectedSlotId = selectedSlot.find("input#slot_id").val() || 0;
+                const selectedSlotId = selectedSlot.find("input#slot_id").val();
 
                 if (self._isValid(selectedSlotId)) {
+                    sessionStorage.setItem("of_booking_slot_id", selectedSlotId);
+
                     self.slot_error.hide();
 
-                    return wUtils.sendRequest("/booking/confirm", {
-                        csrf_token: core.csrf_token,
-                        service_id: self.session_service_id,
-                        contract_id: self.session_contract_id,
-                        partner_id: self.session_partner_id,
-                        slot_id: selectedSlotId,
-                    });
+                    // Affichage de l'étape Informations complémentaires ou redirection vers la page de confirmation
+                    if (
+                        self._isValid(self.session_service_id) &&
+                        self._isValid(self.session_survey_id)
+                    ) {
+                        self._fetchSurveyAndUpdateUI(selectedSlotId, { showSurvey: true });
+                    } else {
+                        // Redirection vers la page de confirmation
+                        return wUtils.sendRequest("/booking/confirm", {
+                            csrf_token: core.csrf_token,
+                            service_id: self.session_service_id,
+                            contract_id: self.session_contract_id,
+                            partner_id: self.session_partner_id,
+                            slot_id: selectedSlotId,
+                        });
+                    }
+                } else {
+                    self.slot_error.show();
                 }
-                self.slot_error.show();
             });
 
             return def;
@@ -755,15 +714,96 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
 
             if (options.showSlotCard) {
                 this.slot_card.show();
-                this.slot_card.find(".collapse").collapse("show");
-                this.from_date_input.change();
+
+                var self = this;
+
+                if (self._isValid(self.session_slot_id)) {
+                    self.booking_slots_div.html("");
+                    const result = self.session_search_slots_result;
+
+                    $("#search_more_submit").show();
+                    $("#slot_submit").show();
+
+                    const slots = result[0];
+                    const searchMore = result[1];
+                    let lastDay = "";
+                    let lastDesc = "";
+
+                    for (let i = 0; i < slots.length; i++) {
+                        const slot = slots[i];
+                        const $slotDiv = $(
+                            QWeb.render("of_website_planning_booking.slot_kanban", {
+                                title: slot.name,
+                                extra_info: slot.description,
+                                slot_id: slot.id,
+                            })
+                        );
+                        if (slot.description === _t("Morning")) {
+                            if (lastDesc === _t("Morning")) {
+                                self.booking_slots_div.append(
+                                    self._createUnavailableSlotDiv("float-end")
+                                );
+                            }
+                            self._appendClearfix(self.booking_slots_div);
+                            $slotDiv.addClass("float-start");
+                        } else {
+                            if (slot.name !== lastDay) {
+                                if (lastDesc === _t("Morning")) {
+                                    self.booking_slots_div.append(
+                                        self._createUnavailableSlotDiv("float-end")
+                                    );
+                                }
+                                self._appendClearfix(self.booking_slots_div);
+                                self.booking_slots_div.append(
+                                    self._createUnavailableSlotDiv("float-start")
+                                );
+                            }
+                            $slotDiv.addClass("float-end");
+                        }
+                        $slotDiv.on("click", self._onClickSlot);
+                        self.booking_slots_div.append($slotDiv);
+                        if (slot.description === _t("Afternoon")) {
+                            self._appendClearfix(self.booking_slots_div);
+                        }
+                        lastDay = slot.name;
+                        lastDesc = slot.description;
+                    }
+
+                    if (lastDesc === _t("Morning")) {
+                        self.booking_slots_div.append(
+                            self._createUnavailableSlotDiv("float-end")
+                        );
+                    }
+
+                    if (searchMore === false) {
+                        $("#search_more_submit").hide();
+                    }
+
+                    if (slots.length === 0) {
+                        self.slots_div.hide();
+                        self.no_slot_div.show();
+                    } else {
+                        self.slots_div.show();
+                        self.no_slot_div.hide();
+                    }
+
+                    // Select slot
+                    const selectedSlot = self.booking_slots_div
+                        .find('input[value="' + self.session_slot_id + '"]')
+                        .closest(".card.of_js_slot_change");
+                    selectedSlot.removeClass("of_js_slot_change");
+                    selectedSlot.addClass("of-border-primary");
+                } else {
+                    this.slot_card.find(".collapse").collapse("show");
+                    this.from_date_input.change();
+                }
             }
         },
 
         /**
          * Get Partner data from Odoo and updates UI depending on values fetched and options.
          *
-         * @param {Interger} partner_id
+         * @param {Integer} partner_id
          * @param {Objet} options
          */
         _fetchPartnerAndUpdateUI: function (partner_id, options = {}) {
@@ -828,6 +868,194 @@ odoo.define("of_website_planning_booking.of_booking", function (require) {
             newSlotDiv.find(".btn-ship").toggle();
             newSlotDiv.removeClass("of_js_slot_change");
             newSlotDiv.addClass("of-border-primary");
+        },
+
+        /**
+         * Updates Slots div of the UI.
+         *
+         * @param {Object} result
+         * @param {Object} options
+         */
+        _updateSlotUI: function (result, options = {}) {
+            const self = this;
+
+            self.booking_slots_div.html("");
+            $("#search_more_submit").show();
+            $("#slot_submit").show();
+
+            const slots = result[0];
+            const searchMore = result[1];
+            let lastDay = "";
+            let lastDesc = "";
+
+            for (let i = 0; i < slots.length; i++) {
+                const slot = slots[i];
+                const $slotDiv = $(
+                    QWeb.render("of_website_planning_booking.slot_kanban", {
+                        title: slot.name,
+                        extra_info: slot.description,
+                        slot_id: slot.id,
+                    })
+                );
+                if (slot.description === _t("Morning")) {
+                    if (lastDesc === _t("Morning")) {
+                        self.booking_slots_div.append(
+                            self._createUnavailableSlotDiv("float-end")
+                        );
+                    }
+                    self._appendClearfix(self.booking_slots_div);
+                    $slotDiv.addClass("float-start");
+                } else {
+                    if (slot.name !== lastDay) {
+                        if (lastDesc === _t("Morning")) {
+                            self.booking_slots_div.append(
+                                self._createUnavailableSlotDiv("float-end")
+                            );
+                        }
+                        self._appendClearfix(self.booking_slots_div);
+                        self.booking_slots_div.append(
+                            self._createUnavailableSlotDiv("float-start")
+                        );
+                    }
+                    $slotDiv.addClass("float-end");
+                }
+                $slotDiv.on("click", self._onClickSlot);
+                self.booking_slots_div.append($slotDiv);
+                if (slot.description === _t("Afternoon")) {
+                    self._appendClearfix(self.booking_slots_div);
+                }
+                lastDay = slot.name;
+                lastDesc = slot.description;
+            }
+
+            if (lastDesc === _t("Morning")) {
+                self.booking_slots_div.append(
+                    self._createUnavailableSlotDiv("float-end")
+                );
+            }
+
+            if (searchMore === false) {
+                $("#search_more_submit").hide();
+            }
+
+            if (!options.search_more) {
+                if (slots.length === 0) {
+                    self.slots_div.hide();
+                    self.no_slot_div.show();
+                } else {
+                    self.slots_div.show();
+                    self.no_slot_div.hide();
+                }
+            }
+
+            // Hide spinner popup
+            $(".container").removeClass("show-popup");
+        },
+
+        /**
+         * Get Slots data from Odoo and updates UI depending on result fetched and options.
+         *
+         * @param {Objet} options
+         */
+        _fetchSlotAndUpdateUI: function (options = {}) {
+            const self = this;
+            const params = {
+                service_id: self.session_service_id,
+                contract_id: self.session_contract_id,
+                partner_id: self.session_partner_id,
+                from_date: self.session_from_date,
+            };
+            if (options.search_more) {
+                params.search_more = true;
+            }
+
+            ajax.jsonRpc("/booking/search_slots", "call", params)
+                .then(function (result) {
+                    sessionStorage.setItem(
+                        "of_booking_search_slots_result",
+                        JSON.stringify(result)
+                    );
+
+                    self._updateSlotUI(result, options);
+                })
+                .catch((error) => {
+                    window.location.href = "/booking/error";
+                });
+        },
+
+        /**
+         * Updates Survey div of the UI and initialize Survey widget.
+         *
+         * @param {String} html
+         * @param {Object} options
+         */
+        _updateSurveyUI: function (html, options = {}) {
+            const self = this;
+
+            self.booking_survey_div.empty();
+            self.booking_survey_div.html(html);
+
+            // Initialisation du widget Survey
+            if (self.surveyFormWidget) {
+                self.surveyFormWidget.destroy();
+                delete self.surveyFormWidget;
+            }
+            self.surveyFormWidget = new publicWidget.registry.OFSurveyFormWidget(self);
+            self.surveyFormWidget.attachTo(self.$(".o_survey_form"));
+
+            self.survey_card.show();
+
+            if (options.showSurvey) {
+                self.slot_card.find(".collapse").collapse("hide");
+                self.survey_card.find(".collapse").collapse("show");
+                self.slot_card[0].scrollIntoView();
+            }
+        },
+
+        /**
+         * Get Survey data from Odoo and updates UI depending on result fetched and options.
+         *
+         * @param {Integer} slot_id
+         */
+        _fetchSurveyAndUpdateUI: function (slot_id, options = {}) {
+            const self = this;
+            const params = {
+                csrf_token: core.csrf_token,
+                service_id: self.session_service_id,
+                contract_id: self.session_contract_id,
+                partner_id: self.session_partner_id,
+                slot_id: slot_id,
+            };
+
+            // Appel de la route initiale de gestion du questionnaire
+            ajax.jsonRpc("/booking/survey", "call", params)
+                .then(function (result) {
+                    if ("error" in result) {
+                        window.location.href = "/booking/error";
+                    } else {
+                        // Affichage du questionnaire
+                        self._updateSurveyUI(result.html, options);
+                    }
+                })
+                .catch((error) => {
+                    window.location.href = "/booking/error";
+                });
+        },
+    });
+
+    publicWidget.registry.OFWebsiteBookingConfirm = publicWidget.Widget.extend({
+        selector: ".of_booking_confirm",
+        start() {
+            const def = this._super(...arguments);
+
+            // Modification du comportement standard du bouton arrière du navigateur web afin
+            // d'appeler l'URL "/booking?of_return=1" permettant de correctement recharger les données
+            window.history.pushState(null, null, window.location.href);
+            window.addEventListener("popstate", () => {
+                window.location.href = "/booking?of_return=1";
+            });
+
+            return def;
         },
     });
 });

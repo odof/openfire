@@ -563,7 +563,7 @@ class OFSurvey(http.Controller):
 
             answer_sudo.write({"last_displayed_page_id": page_or_question_id})
 
-        return self._prepare_question_html(survey_sudo, answer_sudo)
+        return self._prepare_question_html(survey_sudo, answer_sudo, **post)
 
     def _extract_comment_from_answers(self, question, answers):
         """Answers is a custom structure depending of the question type
@@ -610,7 +610,7 @@ class OFSurvey(http.Controller):
     )
     def survey_questions_from_answer(self, user_input, **post):
         """Retourne la liste des id des questions suite à l'ajout des réponses"""
-        new_user_input = user_input.copy()
+        new_user_input = user_input.sudo().copy()
 
         # on reçoit la liste des questions et réponses répondus en ligne par l'utilisateur
         questions_answers = request.params.get("questions_answers")
@@ -654,6 +654,19 @@ class OFSurvey(http.Controller):
         return inactive_questions.ids if len(inactive_questions) > 0 else []
 
     @http.route(
+        "/of_survey/conditional-questions-from-trigger",
+        type="json",
+        auth="public",
+        website=True,
+    )
+    def survey_questions_from_trigger(self, **post):
+        return (
+            request.env["of.survey.conditional.question"]
+            .sudo()
+            .search_read([("triggering_question_id", "=", int(post["triggering_question_id"]))], ["question_id"])
+        )
+
+    @http.route(
         '/of_survey/images/<model("of.survey.user_input"):user_input>', type="json", auth="public", website=True
     )
     def survey_images(self, user_input, **post):
@@ -661,7 +674,7 @@ class OFSurvey(http.Controller):
         Retrieve survey images for each question in the user input.
         """
         images = {}
-        for line in user_input.user_input_line_ids:
+        for line in user_input.sudo().user_input_line_ids:
             if line.question_id not in images:
                 images[line.question_id.id] = []
 

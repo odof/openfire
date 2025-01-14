@@ -17,6 +17,9 @@ Mise en place d'un outil de prise de RDV en autonomie accessible via le site web
   - Choix d'une prestation à réaliser ou récupération d'un contrat existant (DI récurrente)
   - Saisie de l'adresse du client, et de sous-adresses pour les clients avec accès portail
   - Choix d'un créneau disponible à la demi-journée
+  - Réponse au questionnaire :
+    - Si la prestation choisie contient un questionnaire avec au moins une question définie comme devant être posée durant la prise de RDV en ligne, un bloc pour y répondre s'affiche
+    - Saisie des réponses à toutes les questions définie comme devant être posée durant la prise de RDV en ligne, en une ou plusieurs étapes en fonction de la configuration du questionnaire
 
 * Étape de confirmation :
 
@@ -72,6 +75,11 @@ Mise en place d'une nouvelle notion sur l'assistant de recherche de créneaux po
 * À chaque proposition de créneau pour le site web, est rattaché plusieurs propositions de créneaux correspondant au résultat de la recherche
 * Lors de la validation du processus de prise de RDV, les propositions de créneaux rattachées au choix de créneau pour le site web sont triés par distance utile.
   Une tentative de création de RDV est ensuite effectuée sur la première proposition de créneau, si entre-temps le créneau n'est plus disponible, le système passe à la proposition suivante.
+
+Question du Questionnaire (`of.survey.question`)
+------------------------------------------------
+
+Ajout d'un champ **Depuis la prise de RDV en ligne ?** sur les questions de questionnaire. Si ce champ est coché, alors la question sera posée lors du processus de prise de RDV en ligne.
 
 Paramètres de configuration
 ###########################

@@ -11,6 +11,7 @@
     "depends": [
         "of_planning_tour",
         "of_service",
+        "of_planning_survey",
         "website",
     ],
     "data": [
@@ -24,6 +25,7 @@
         "views/of_planning_available_slot_views.xml",
         "views/of_planning_intervention_template_views.xml",
         "views/of_planning_tour_views.xml",
+        "views/of_survey_question_views.xml",
         "views/res_config_settings_views.xml",
     ],
     "assets": {
@@ -34,6 +36,9 @@
             "of_website_planning_booking/static/src/xml/of_booking_slot_kanban.xml",
             "of_website_planning_booking/static/src/js/of_website_planning_booking.js",
             "of_website_planning_booking/static/src/scss/of_website_planning_booking.scss",
+        ],
+        "of_website_planning_booking.survey_assets": [
+            "of_website_planning_booking/static/src/js/of_survey_form.js",
         ],
     },
     "installable": True,

@@ -6,6 +6,9 @@ from . import ir_http
 from . import of_planning_available_slot
 from . import of_planning_intervention_template
 from . import of_planning_tour
+from . import of_survey_question
+from . import of_survey_survey
+from . import of_survey_user_input
 from . import res_company
 from . import res_config_settings
 from . import resource_calendar

@@ -6,14 +6,16 @@ import logging
 from datetime import datetime, timedelta
 
 import pytz
+import werkzeug
 from markupsafe import Markup
 
 from odoo import Command, _, fields, http
 from odoo.http import request
-from odoo.tools import plaintext2html
+from odoo.tools import format_date, format_datetime, is_html_empty, plaintext2html
 from odoo.tools.float_utils import float_compare
 
 from odoo.addons.of_planning_tour.models.of_planning_tour import DEFAULT_AM_LIMIT_FLOAT
+from odoo.addons.of_survey.controllers.main import OFSurvey
 from odoo.addons.resource.models.resource import float_to_time
 
 _logger = logging.getLogger(__name__)
@@ -44,6 +46,10 @@ class OFWebsitePlanningBooking(http.Controller):
                 # -> on le redirige sur la page de connexion
                 return request.redirect("/web/login")
 
+        # Supression du cache pour les réponses au questionnaire
+        if "of_booking_user_input_id" in request.session:
+            request.session.pop("of_booking_user_input_id")
+
         partner = request.env.user.partner_id
         pricelist = partner.property_product_pricelist or request.env.ref("product.list0", False)
         if booking_company.of_booking_specific:
@@ -58,6 +64,11 @@ class OFWebsitePlanningBooking(http.Controller):
                 "id": template.id,
                 "name": template.website_name or template.name,
                 "fixed": 1 if template.is_fixed_meeting else 0,
+                "survey_id": (
+                    template.sudo().survey_id.id
+                    if any(question.is_from_planning_booking for question in template.sudo().survey_id.question_ids)
+                    else False
+                ),
             }
             if display_price:
                 price = self._get_service_price(template.sudo(), False, partner, pricelist.sudo())
@@ -153,6 +164,70 @@ class OFWebsitePlanningBooking(http.Controller):
         )
         return [[{"name": slot.name, "description": slot.description, "id": slot.id} for slot in result[0]], result[1]]
 
+    @http.route(["/booking/survey"], type="json", auth="public", website=True)
+    def survey(self, **kw):
+        values = kw
+
+        request.session["of_booking_user_input_id"] = False
+
+        if values.get("service_id") and values.get("service_id") not in ("false", "null"):
+            template = request.env["of.planning.intervention.template"].sudo().browse(int(values["service_id"]))
+            partner = request.env["res.partner"].sudo().browse(int(values["partner_id"]))
+
+            answer = request.env["of.survey.user_input"].sudo()
+            existing_answers = answer.search(
+                [
+                    ("survey_id", "=", template.survey_id.id),
+                    ("partner_id", "=", partner.id),
+                    ("is_from_planning_booking", "=", True),
+                ]
+            )
+            if existing_answers:
+                answer = existing_answers[0]
+            else:
+                answer = template.survey_id._create_answer(partner=partner, check_attempts=False)
+                answer.is_from_planning_booking = True
+            answer._mark_in_progress()
+
+            values["url"] = "%s?%s" % (
+                template.survey_id.get_start_url(),
+                werkzeug.urls.url_encode({"answer_token": answer and answer.access_token or None}),
+            )
+
+            survey_sudo = template.survey_id.sudo()
+            answer_sudo = answer.sudo()
+
+            request.session["of_booking_user_input_id"] = answer_sudo.id
+
+            data = {
+                "is_html_empty": is_html_empty,
+                "survey": survey_sudo,
+                "answer": answer_sudo,
+                "breadcrumb_pages": [
+                    {
+                        "id": page.id,
+                        "title": page.title,
+                    }
+                    for page in survey_sudo.page_ids
+                ],
+                "format_datetime": lambda dt: format_datetime(request.env, dt, dt_format=False),
+                "format_date": lambda date: format_date(request.env, date),
+                "server_time": fields.Datetime.now(),
+            }
+
+            page_or_question_key = "question" if survey_sudo.questions_layout == "page_per_question" else "page"
+
+            next_page_or_question = survey_sudo._get_pages_or_questions(answer_sudo)
+            data[page_or_question_key] = (
+                next_page_or_question[0] if next_page_or_question else request.env["of.survey.question"]
+            )
+
+            values.update(data)
+
+            return {"html": request.env["ir.qweb"]._render("of_website_planning_booking.booking_survey", values)}
+
+        return {"error": 1}
+
     @http.route(["/booking/confirm"], type="http", auth="public", website=True, methods=["POST"])
     def confirm(self, **kw):
         values = kw
@@ -231,6 +306,7 @@ class OFWebsitePlanningBooking(http.Controller):
         values["company"] = request.env["res.company"].sudo().browse(booking_company_id)
         values["partner"] = partner
         values["service_name"] = service_name
+        values["is_fixed_meeting"] = template.is_fixed_meeting
         values["display_price"] = display_price
         values["price"] = price
         values["slot"] = slot
@@ -606,6 +682,10 @@ class OFWebsitePlanningBooking(http.Controller):
             vals = self._get_intervention_vals(website_line, line)
             try:
                 intervention = request.env["calendar.event"].sudo().create(vals)
+                # Mise à jour de la réponse au questionnaire
+                if request.session.get("of_booking_user_input_id"):
+                    intervention.of_survey_user_input_id.res_model = intervention._name
+                    intervention.of_survey_user_input_id.res_id = intervention.id
                 created = True
             except Exception as e:
                 # Si jamais une erreur survient lors de la création de l'intervention, on retire le créneau de la liste
@@ -659,5 +739,82 @@ class OFWebsitePlanningBooking(http.Controller):
                 vals["start"] = calendar_tz.localize(datetime.combine(start_date.date(), start_time)).astimezone(
                     pytz.utc
                 )
+        # Questionnaire
+        if request.session.get("of_booking_user_input_id"):
+            survey_user_input = (
+                request.env["of.survey.user_input"].sudo().browse(int(request.session["of_booking_user_input_id"]))
+            )
+            survey_user_input.is_from_planning_booking = False
+            survey_user_input.redirect_action_id = request.env.ref("of_planning.action_calendar_event").id
+            survey_user_input.menu_id = request.env.ref("of_planning.menu_of_planning_main").id
+            vals["of_survey_user_input_id"] = survey_user_input.id
 
         return vals
+
+
+class OFWebsitePlanningBookingSurvey(OFSurvey):
+    def _prepare_question_html(self, survey_sudo, answer_sudo, **post):
+        """Survey page navigation is done in AJAX. This function prepare the 'next page' to display in html
+        and send back this html to the survey_form widget that will inject it into the page.
+        Background url must be given to the caller in order to process its refresh as we don't have the next question
+        object at frontend side."""
+
+        if "from_planning_booking" not in post:
+            return super()._prepare_question_html(survey_sudo, answer_sudo, **post)
+
+        survey_data = self._prepare_survey_data(survey_sudo, answer_sudo, **post)
+
+        # Lorsque les réponses au questionnaire sont terminées, on redirige vers la page de confirmation
+        if answer_sudo.state == "done":
+            survey_content = ""
+            booking_confirm = 1
+        else:
+            survey_content = request.env["ir.qweb"]._render(
+                "of_website_planning_booking.booking_survey_fill_form_in_progress", survey_data
+            )
+            booking_confirm = 0
+
+        survey_progress = False
+        if (
+            answer_sudo.state == "in_progress"
+            and not survey_data.get("question", request.env["of.survey.question"]).is_page
+        ):
+            if survey_sudo.questions_layout == "page_per_section":
+                page_ids = survey_sudo.page_ids.ids
+                survey_progress = request.env["ir.qweb"]._render(
+                    "of_survey.survey_progression",
+                    {
+                        "survey": survey_sudo,
+                        "page_ids": page_ids,
+                        "page_number": page_ids.index(survey_data["page"].id)
+                        + (1 if survey_sudo.progression_mode == "number" else 0),
+                    },
+                )
+            elif survey_sudo.questions_layout == "page_per_question":
+                page_ids = (
+                    survey_sudo.question_ids.ids
+                    if answer_sudo.is_session_answer
+                    else answer_sudo.predefined_question_ids.ids
+                )
+                survey_progress = request.env["ir.qweb"]._render(
+                    "of_survey.survey_progression",
+                    {
+                        "survey": survey_sudo,
+                        "page_ids": page_ids,
+                        "page_number": page_ids.index(survey_data["question"].id),
+                    },
+                )
+
+        background_image_url = survey_sudo.background_image_url
+        if "question" in survey_data:
+            background_image_url = survey_data["question"].background_image_url
+        elif "page" in survey_data:
+            background_image_url = survey_data["page"].background_image_url
+
+        return {
+            "survey_content": survey_content,
+            "survey_progress": survey_progress,
+            "survey_navigation": request.env["ir.qweb"]._render("of_survey.of_survey_navigation", survey_data),
+            "background_image_url": background_image_url,
+            "booking_confirm": booking_confirm,
+        }

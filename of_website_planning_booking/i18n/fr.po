@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-12 12:48+0000\n"
-"PO-Revision-Date: 2024-12-12 12:48+0000\n"
+"POT-Creation-Date: 2025-01-08 15:36+0000\n"
+"PO-Revision-Date: 2025-01-08 15:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -232,10 +232,10 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
 msgid ""
 "<span class=\"fa fa-long-arrow-left\"/>\n"
-"                                        Back"
+"                                        Change your choices"
 msgstr ""
 "<span class=\"fa fa-long-arrow-left\"/>\n"
-"                                        Retour"
+"                                        Modifier vos choix"
 
 #. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
@@ -327,6 +327,11 @@ msgid "<strong>Zip *</strong>"
 msgstr "<strong>Code Postal *</strong>"
 
 #. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
+msgid "Additional information"
+msgstr "Informations complémentaires"
+
+#. module: of_website_planning_booking
 #. odoo-python
 #: code:addons/of_website_planning_booking/controllers/main.py:0
 #, python-format
@@ -334,19 +339,25 @@ msgid "Additional notes from customer: <br/>%s"
 msgstr "Commentaires additionnels du client : <br/>%s"
 
 #. module: of_website_planning_booking
-#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.of_planning_intervention_template_view_form
 msgid "Address"
 msgstr "Adresse"
 
 #. module: of_website_planning_booking
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
-msgid "Address..."
-msgstr "Adresse..."
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+#, python-format
+msgid "Address and contact details"
+msgstr "Adresse et coordonnées"
 
 #. module: of_website_planning_booking
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
 #: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
 #: code:addons/of_website_planning_booking/wizards/of_tour_appointment_wizard.py:0
@@ -484,9 +495,23 @@ msgid "Confirmed"
 msgstr "Confirmé"
 
 #. module: of_website_planning_booking
+#. odoo-javascript
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
+#, python-format
+msgid "Contact details"
+msgstr "Coordonnées"
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_survey_fill_form_in_progress
+msgid "Continue"
+msgstr "Continuer"
+
+#. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
-msgid "Contract..."
-msgstr "Contrat..."
+msgid "Contract"
+msgstr "Contrat"
 
 #. module: of_website_planning_booking
 #: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__create_uid
@@ -505,12 +530,8 @@ msgstr "Créé le"
 
 #. module: of_website_planning_booking
 #: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__date
-msgid "Date"
-msgstr ""
-
-#. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
-msgid "Date..."
+msgid "Date"
 msgstr ""
 
 #. module: of_website_planning_booking
@@ -597,6 +618,12 @@ msgstr "Adresse fixe"
 #: model:ir.model.fields,field_description:of_website_planning_booking.field_of_planning_intervention_template__is_fixed_meeting
 msgid "Fixed meeting"
 msgstr "RDV fixe"
+
+#. module: of_website_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_survey_question__is_from_planning_booking
+#: model:ir.model.fields,field_description:of_website_planning_booking.field_of_survey_user_input__is_from_planning_booking
+msgid "From Planning Booking?"
+msgstr "Depuis la prise de RDV en ligne ?"
 
 #. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
@@ -714,8 +741,8 @@ msgid "More..."
 msgstr "Chercher plus..."
 
 #. module: of_website_planning_booking
-#. odoo-python
 #. odoo-javascript
+#. odoo-python
 #: code:addons/of_website_planning_booking/controllers/main.py:0
 #: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
 #: code:addons/of_website_planning_booking/static/src/js/of_website_planning_booking.js:0
@@ -925,8 +952,8 @@ msgstr "Créneau sélectionné"
 
 #. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking
-msgid "Service..."
-msgstr "Prestation..."
+msgid "Service"
+msgstr "Prestation"
 
 #. module: of_website_planning_booking
 #: model:ir.model.fields,field_description:of_website_planning_booking.field_of_tour_appointment_line_website_wizard__description
@@ -942,6 +969,26 @@ msgstr "Désolé"
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.res_config_settings_view_form
 msgid "Specifies the company on which to create appointments made online."
 msgstr "Spécifie la société sur laquelle créer les RDV pris en ligne."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_survey_fill_form_in_progress
+msgid "Submit"
+msgstr "Soumettre"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_survey_survey
+msgid "Survey"
+msgstr "Questionnaire"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_survey_question
+msgid "Survey Question"
+msgstr "Question du Questionnaire"
+
+#. module: of_website_planning_booking
+#: model:ir.model,name:of_website_planning_booking.model_of_survey_user_input
+msgid "Survey User Input"
+msgstr "Entrée utilisateur du Questionnaire"
 
 #. module: of_website_planning_booking
 #: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_confirmation
@@ -981,6 +1028,11 @@ msgid ""
 msgstr ""
 "Le nombre de jours ouverts à la réservation doit être positif et ne pas "
 "dépasser 180."
+
+#. module: of_website_planning_booking
+#: model_terms:ir.ui.view,arch_db:of_website_planning_booking.booking_survey
+msgid "There was an error during the validation of the survey."
+msgstr "Une erreur s'est produite lors de la validation du questionnaire."
 
 #. module: of_website_planning_booking
 #: model:ir.model,name:of_website_planning_booking.model_of_planning_tour

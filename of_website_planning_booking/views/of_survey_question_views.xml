@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="of_survey_question_view_form" model="ir.ui.view">
+        <field name="name">of.survey.question.view.form</field>
+        <field name="model">of.survey.question</field>
+        <field name="inherit_id" ref="of_survey.of_survey_question_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='is_conditional']" position="before">
+                <field name="is_from_planning_booking"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
