@@ -21,6 +21,7 @@ class Partner(OdooObjectType):
     name = graphene.String(required=True)
     lastname = graphene.String(description="Nom du partner")
     firstname = graphene.String(description="Prénom du partner")
+    company_name = graphene.String(description="Nom de l'entreprise")
     title = graphene.Field(PartnerTitle)
     parent = graphene.Field(lambda: Partner)
     street = graphene.String()

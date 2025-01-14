@@ -21,6 +21,9 @@ class ResPartner(models.Model):
         if lastname := args.get("lastname"):
             mutation["lastname"] = lastname
 
+        if company_name := args.get("company_name"):
+            mutation["of_company_name"] = company_name
+                    
         if street := args.get("street"):
             mutation["street"] = street
 
