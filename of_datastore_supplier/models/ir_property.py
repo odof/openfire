@@ -11,7 +11,7 @@ class IrProperty(models.Model):
         if (
             model == "product.product"
             and name == "standard_price"
-            and (of_product_user_id := "of_product_user_id" in self.env.context)
+            and (of_product_user_id := self.env.context.get("of_product_user_id"))
         ):
             # Distributors can't read the standard price if they do not belong to the margin group
             group = self.env.ref("of_sale.of_group_sale_responsible", raise_if_not_found=False)
