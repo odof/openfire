@@ -1,0 +1,5 @@
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+from . import product_template
+from . import of_fluid_nature
+from . import of_graphql
