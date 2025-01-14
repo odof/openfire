@@ -22,7 +22,7 @@ class OfDatastoreCache(models.TransientModel):
 
     model = fields.Char(string='Model', required=True)
     res_id = BigInteger(string='Resource id', required=True)
-    company_id = fields.Many2one('res.company', string=u"Société", required=True)
+    company_id = fields.Many2one('res.company', string=u"Société", required=True, ondelete="cascade")
     vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
 
     @contextmanager
