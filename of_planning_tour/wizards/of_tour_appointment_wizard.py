@@ -1060,6 +1060,7 @@ class OFTourAppointmentLineMixin(models.AbstractModel):
             "selected_line_id": selected_line_id,
             "map_line_id": selected_line_id,
             "map_tour_id": self.tour_id.id or False,
+            "planning_end_date": self.wizard_id.request_id.end_date or False,
         }
 
 

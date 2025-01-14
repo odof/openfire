@@ -243,8 +243,6 @@ class OFServiceRequest(models.Model):
     last_next_date = fields.Date(help="Field to keep rollback capability")
     end_date = fields.Date(
         string="Planning end date",
-        compute="_compute_end_date",
-        store=True,
         readonly=False,
         help="Planning end date of service request.\n"
         'After this date, the service request changes status to "In planning delay".\n'
@@ -503,11 +501,6 @@ class OFServiceRequest(models.Model):
             if request.task_id and not request.duration:
                 request.duration = request.task_id.duration
 
-    @api.depends("task_id", "next_date")
-    def _compute_end_date(self):
-        for request in self:
-            request.end_date = request._get_end_date()
-
     @api.depends(
         "duration",
         "intervention_ids",
@@ -706,6 +699,11 @@ class OFServiceRequest(models.Model):
     # --------------------------------------------------------------------------
     # Onchange methods
     # --------------------------------------------------------------------------
+
+    @api.onchange("task_id", "next_date")
+    def _onchange_end_date(self):
+        for request in self:
+            request.end_date = request._get_end_date()
 
     @api.onchange("fiscal_position_id")
     def _onchange_fpos_id_show_update_fpos(self):
