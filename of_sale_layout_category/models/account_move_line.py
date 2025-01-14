@@ -11,3 +11,4 @@ class AccountMoveLine(models.Model):
     of_parent_node_id = fields.Integer(string="Parent Node ID")
     of_position_node = fields.Integer(string="Node's Position")
     of_level = fields.Integer(string="Level")
+    of_show = fields.Boolean(string="Show line", default=True)

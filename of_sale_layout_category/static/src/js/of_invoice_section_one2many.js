@@ -1,14 +1,15 @@
 /** @odoo-module **/
-
 import { registry } from "@web/core/registry";
-const { Component, useEffect, useState, useRef, EventBus } = owl;
 import { ListRenderer } from "@web/views/list/list_renderer";
 import { X2ManyField } from "@web/views/fields/x2many/x2many_field";
-import { usePopover } from "@web/core/popover/popover_hook";
-
-import { PopupoverInfo, PopupoverDelete } from "./popupover";
 import { Field } from "@web/views/fields/field";
-
+import { TreeRecord } from "./tree_record";
+import { PopupoverInfo, PopupoverDelete } from "./popupover";
+import { makeContext } from "@web/core/context";
+import { usePopover } from "@web/core/popover/popover_hook";
+const { Component, useEffect, useRef, onWillUpdateProps, EventBus, useState } = owl;
+import { _t } from 'web.core';
+import { useBus } from "@web/core/utils/hooks";
 export class OFInvoiceSectionLine extends Component {
     static template = "of_sale_layout_category.OFInvoiceSectionLine";
     static components = {
@@ -16,24 +17,44 @@ export class OFInvoiceSectionLine extends Component {
         PopupoverInfo,
         PopupoverDelete
     }
-
     setup() {
-        this.state = useState({
-            nbColumns: this.props.columns.length,
-        });
+        this.nbColumns = this.props.columns.length;
         this.section_column = this.props.columns.find((c) => c.name === "name");
-        this.section_class = this.section_column && this.section_column.rawAttrs && this.section_column.rawAttrs.class;
+        this.section_class = this.section_column.rawAttrs && this.section_column.rawAttrs.class;
         this.handle_column = this.props.columns.find((c) => c.name === "sequence");
-        this.input_section_ref = useRef('inputSection');
+        this.section_name_ref = useRef('section_name');
         this.popover = usePopover();
         this.bus = new EventBus();
-
+        this.tableRef = this.__owl__.parent.component.tableRef;
+        this.state = useState({
+            'section_name': this.props.record.data.name,
+            'active_layout_category': true,
+            'nbColumns': this.props.columns.length,
+            'show_products': true,
+        })
         useEffect(
-            () => {this.state.nbColumns = this.props.columns.length;},
+            () => { this.state.nbColumns = this.props.columns.length; },
             () => [this.props.columns]
         )
+        useEffect(
+            () => {
+                this.state.active_layout_category = this.props.record.model.root.data.of_layout_category_active
+            },
+            () => [this.props.record.model.root.data.of_layout_category_active]
+        )
+        onWillUpdateProps(nextProps => {
+            nextProps.list.records.sort(
+                (r1, r2) =>
+                r1.data.sequence - r2.data.sequence ||
+                r1.data.of_position_node - r2.data.of_position_node
+            );
+        })
+        useBus(this.env.bus, "toggle_section", async (ev) => {
+            if (ev.detail.datapointId == this.props.record.id) {
+                this.state.show_products = ev.detail.show_products;
+            }
+        });
     }
-
     showPopup(ev, popover, options) {
         this.closePopover = this.popover.add(
             ev.currentTarget,
@@ -43,26 +64,224 @@ export class OFInvoiceSectionLine extends Component {
         );
         this.bus.addEventListener('close-popover', this.closePopover);
     }
-
     getSectionColumn() {
         return this.section_column;
     }
-
     getSectionClass() {
         return this.section_class;
     }
-
     getHandleColumn() {
         return this.handle_column;
     }
-
-    async delete(evt) {
-        await this.props.list.delete(this.props.record.id);
+    async onCellClicked(record) {
+        this.props.list.editedRecord = record;
+        await record.switchMode("edit");
+    }
+    focusToSection(record) {
+        let tr = this.tableRef.el.querySelector(`tr[data-id='${record.id}']`);
+        let input = tr.querySelector("input");
+        $(input).focus();
+    }
+    setDirty(isDirty) {
+        this.lastIsDirty = isDirty;
+    }
+    getNewNodeID() {
+        if (this.props.list.records.length == 0) {
+            return 1;
+        } else {
+            const maxId = Math.max(...this.props.list.records.map(item => item.data.of_node_id));
+            return maxId + 1;
+        }
+    }
+    async add(recordValue) {
+        // D'abord on calcule sa position selon les autres possibles enfants du record auquel on ajoute celui ci
+        let children = this.props.list.records.filter((record) => record.data.of_parent_node_id == this.props.record.data.of_node_id);
+        let index = 0;
+        if (children) {
+            index = children.length;
+        }
+        let context = {
+            'default_of_node_id': this.getNewNodeID(),
+            'default_of_parent_node_id': this.props.record.data.of_node_id,
+            'default_of_position_node': index,
+        }
+        let newRecord = await this.props.list.addNew({ mode: "edit", position: 'bottom', 'context': context });
+        await newRecord.update(recordValue);
+        await newRecord.model.notify();
+        return newRecord;
+    }
+    async remove(datapointId) {
+        await this.props.list.delete(datapointId);
         await this.props.record.model.notify();
     }
+    sortAsc() {
+        this.props.list.records.sort(
+            (r1, r2) =>
+            r1.data.sequence - r2.data.sequence ||
+            r1.data.of_position_node - r2.data.of_position_node
+        );
+    }
+    async resequence() {
+        // Le principe ici c'est de générer à la volée le treeRecord suivant les données des records odoo
+        // on utilise dans la class TreeRecord les champs of_node_id et of_parent_node_id pour créer
+        // la hierarchie
+        let treeRecord = new TreeRecord(this.props.list);
+        for (let data of Object.entries(treeRecord.data)) {
+            if (data[0] != "Root") {
+                let record = this.props.list.records.find((record) => record.id == data[0]);
+                if (record) {
+                    await record.update(data[1]);
+                } else {
+                    console.log("Hmmm something went wrong in resequence");
+                }
+            }
+        }
+        this.sortAsc();
+        await this.props.record.model.notify();
+    }
+    /* Gestion des produits */
+    async addProduct(evt) {
+        let recordValue = { 'of_parent_node_id': this.props.record.data.of_node_id };
+        let record = await this.add(recordValue);
+        await this.resequence();
+    }
+    /* Fin gestion des produits */
+    /* Gestion des sections */
+    async addSection(evt) {
+        let recordValue = { 'display_type': 'line_section', 'name': 'Section', 'of_parent_node_id': this.props.record.data.of_node_id };
+        let record = await this.add(recordValue);
+        await this.resequence();
+        this.focusToSection(record);
+    }
+    async duplicate(evt) {
+        // Le principe c'est de générer le treeRecord, pour récupérer la liste des enfants
+        // de la section à dupliquer et de faire un simple add sur chacun des enfants
+        // on va chercher les enfants (même of_node_parent_id dans les records)
+        let children = this.props.list.records.filter((record) => record.data.of_parent_node_id == this.props.record.data.of_node_id);
+        // D'abord, on duplique le node en cours, c'est un add avec des différences
+        let recordValue = this.props.record.data;
+        recordValue['of_node_id'] = this.getNewNodeID();
+        recordValue['of_parent_node_id'] = this.props.record.data.of_parent_node_id;
+        recordValue['name'] = recordValue['name'] + _t(" (copy)");
+        let newRecord = await this.add(recordValue);
+        if (children.length > 0) {
+            await this.duplicateRecursive(newRecord, children);
+        }
+        // A la fin on lance un resequence pour calculer la séquence et le nom des sections
+        await this.resequence();
+    }
+    async duplicateRecursive(parentRecord, children) {
+        for (const child of children) {
+            // on va chercher les enfants (même of_node_parent_id dans les records)
+            let childs = this.props.list.records.filter((record) => record.data.of_parent_node_id == child.data.of_node_id);
+            // on duplique le child
+            let recordValue = child.data;
+            let taxes = child.data.tax_ids.records;
+            recordValue['of_node_id'] = this.getNewNodeID();
+            recordValue['of_parent_node_id'] = parentRecord.data.of_node_id;
+            if (recordValue.display_type == 'line_section') {
+                recordValue['name'] = recordValue['name'] + _t(" (copy)");
+            }
+            let newRecord = await this.add(recordValue);
+            // on les duplique récursivement s'il y en a
+            if (childs.length > 0) {
+                await this.duplicateRecursive(newRecord, childs);
+            }
+        };
+    }
+    deleteAsk(evt) {
+        var options = { line: this, record: this.props.record };
+        this.showPopup(evt, this.constructor.components.PopupoverDelete, options);
+    }
+    async delete(evt) {
+        // le principe c'est de générer le treeRecord, pour récupérer la liste des enfants
+        // de la section à supprimer et de faire un simple remove sur chacun des enfants
+        let treeRecord = new TreeRecord(this.props.list);
+        let node = treeRecord.find(this.props.record.id);
+        for (let child of Object.entries(treeRecord.allChildren(node))) {
+            if (child[0] != "Root") {
+                await this.remove(child[0]);
+            }
+        }
+        // on finit par supprimer le node restant
+        await this.remove(this.props.record.id);
+        // A la fin on lance un resequence pour calculer la sequence et le nom des sections
+        await this.resequence();
+    }
+    async toggleSection(evt, show_products) {
+        let treeRecord = new TreeRecord(this.props.list);
+        let node = treeRecord.find(this.props.record.id);
+        for (let child of Object.entries(treeRecord.allChildren(node))) {
+            await this.toggleRecord(child[0], show_products);
+        }
+    }
+    async toggleRecord(datapointId, show_products) {
+        let record = this.props.list.records.find((record) => record.id == datapointId);
+        // si on est sur une ligne de produit ou une note, on la cache
+        if (record.data.display_type != 'line_section') {
+            if (show_products) {
+                $(`tr[data-id="${record.id}"]`).show();
+            } else {
+                $(`tr[data-id="${record.id}"]`).hide();
+            }
+        } else {
+            // sinon, c'est une section, on change juste l'icône oeil
+            await this.env.bus.trigger("toggle_section", {
+                datapointId: datapointId,
+                show_products: show_products,
+            });
+        }
+    }
+    /* Fin gestion des sections */
+    /* Actions sur les sections */
+    async moveUp(evt) {
+        // L'idée ici c'est de remonter le record en cours d'un niveau
+        // C'est à dire qu'on va lui donner le parent de son parent comme parent
+        let parentCurrentRecord = this.props.list.records.find((record) => record.data.of_node_id == this.props.record.data.of_parent_node_id);
+        let parent_node_id = 0; // valeur par défaut, c'est la racine des records
+        if (parentCurrentRecord) {
+            parent_node_id = parentCurrentRecord.data.of_parent_node_id;
+        }
+        // on place ce record en dernier des enfants du record parent
+        let index = 0;
+        if (parentCurrentRecord) {
+            let children = this.props.list.records.find((record) => record.data.of_node_id == parentCurrentRecord.data.of_parent_node_id);
+            if (children) {
+                index = children.length;
+            }
+        }
+        await this.props.record.update({
+            'of_parent_node_id': parent_node_id,
+            'of_position_node': index
+        })
+        this.props.record.model.notify();
+        // A la fin on lance un resequence pour calculer la sequence et le nom des sections
+        await this.resequence();
+    }
+    async moveDown(evt) {
+        // L'idée ici c'est de descendre le record d'un niveau
+        // C'est à dire qu'il va devenir l'enfant de son frère précédent (uniquement si c'est une section)
+        let brothers = this.props.list.records.filter((record) => record.data.of_parent_node_id == this.props.record.data.of_parent_node_id && record.data.display_type == "line_section");
+        let indexRecord = brothers.indexOf(this.props.record);
+        if (indexRecord > 0) {
+            let previousRecord = brothers[indexRecord - 1];
+            // on le place à la fin des enfants possibles de ce previousRecord
+            let index = 0;
+            let children = this.props.list.records.filter((record) => record.data.of_parent_node_id == previousRecord.data.of_node_id);
+            if (children) {
+                index = children.length;
+            }
+            await this.props.record.update({
+                'of_parent_node_id': previousRecord.data.of_node_id,
+                'of_position_node': index
+            })
+            this.props.record.model.notify();
+            // A la fin on lance un resequence pour calculer la sequence et le nom des sections
+            await this.resequence();
+        }
+    }
+    /* Fin des actions sur les sections */
 }
-
-
 export class OFInvoiceSectionListRenderer extends ListRenderer {
     static template = "of_sale_layout_category.OFInvoiceSectionListRenderer";
     static recordRowTemplate = "of_sale_layout_category.InvoiceListRenderer.RecordRow";
@@ -70,46 +289,27 @@ export class OFInvoiceSectionListRenderer extends ListRenderer {
         Section: OFInvoiceSectionLine,
         ...ListRenderer.components,
     }
-
     setup() {
         super.setup();
         this.titleField = "name";
         this.titleFields = ["name", "of_section_name"];
-
-        useEffect(
-            () => this.focusToName(this.props.list.editedRecord),
-            () => [this.props.list.editedRecord]
-        )
     }
-
-    focusToName(editRec) {
-        if (editRec && editRec.isVirtual && this.isSectionOrNote(editRec)) {
-            const col = this.state.columns.find((c) => c.name === this.titleField);
-            this.focusCell(col, null);
-        }
-    }
-
     isSectionOrNote(record = null) {
         record = record || this.record;
         return ['line_section', 'line_note'].includes(record.data.display_type);
     }
-
     isSection(record = null) {
         record = record || this.record;
         return 'line_section' == record.data.display_type;
     }
-
     isNote(record = null) {
         record = record || this.record;
         return 'line_note' == record.data.display_type;
     }
-
     getRowClass(record) {
         const existingClasses = super.getRowClass(record);
         return `${existingClasses} o_is_${record.data.display_type} brighter-${record.data.of_level}`;
-
     }
-
     getColumns(record) {
         const columns = super.getColumns(record);
         if (this.isNote(record)) {
@@ -117,7 +317,6 @@ export class OFInvoiceSectionListRenderer extends ListRenderer {
         }
         return columns;
     }
-
     getNoteColumns(columns) {
         const noteCols = columns.filter((col) => col.widget === "handle" || col.type === "field" && col.name === "name");
         return noteCols.map((col) => {
@@ -128,15 +327,142 @@ export class OFInvoiceSectionListRenderer extends ListRenderer {
             }
         });
     }
+    sortAsc() {
+        this.props.list.records.sort(
+            (r1, r2) =>
+            r1.data.sequence - r2.data.sequence ||
+            r1.data.of_position_node - r2.data.of_position_node
+        );
+    }
+    async resequence() {
+        // Le principe ici c'est de générer à la volée le treeRecord suivant les données des records odoo
+        // on utilise dans la class TreeRecord les champs of_node_id et of_parent_node_id pour créer
+        // la hierarchie
+        // TODO : il pourrait être intéressant de trouver comment mettre d'un coup tous les records à jour
+        // sans le faite un par un, on gagnerait en rapidité
+        let treeRecord = new TreeRecord(this.props.list);
+        for (let data of Object.entries(treeRecord.data)) {
+            if (data[0] != "Root") {
+                let record = this.props.list.records.find((record) => record.id == data[0]);
+                if (record) {
+                    await record.update(data[1]);
+                } else {
+                    console.log("Hmmm something went wrong in resequence");
+                }
+            }
+        }
+        this.sortAsc();
+    }
+    sortStart({ element }) {
+        const table = this.tableRef.el;
+        // on va chercher les éléments qui ont le même parent, pour changer la couleur
+        let elementData = $(element).data();
+        let currentRecord = this.props.list.records.find((record) => record.id == elementData.id);
+        // on ne le fait que si c'est une section que l'on bouge
+        if (currentRecord.data.display_type == "line_section") {
+            let brothers = this.props.list.records.filter((record) => record.data.of_parent_node_id == currentRecord.data.of_parent_node_id);
+            brothers.map((record) => {
+                let elements = $(table).find('tr[data-id="' + record.id + '"]');
+                elements.each(function(index) {
+                    elements[index].classList.add("o_dragged_section");
+                });
+            })
+        } else {
+            super.sortStart({ element });
+        }
+    }
+    sortStop({ element }) {
+        const table = this.tableRef.el;
+        let elements = $(table).find(".o_dragged_section");
+        elements.each((index) => {
+            elements[index].classList.remove("o_dragged_section");
+        });
+        super.sortStop({ element });
+    }
+    async sortDrop(dataRowId, { element, previous }) {
+        await super.sortDrop(dataRowId, { element, previous });
+        // On doit vérifier deux cas, soit l'élément déplacé est une section
+        // Soit c'est un article/note
+        // Si c'est une section, on modifie la of_position_node et une resequence pour la placer au bon endroit
+        // sinon, on modifie le of_parent_node_id de l'élément pour lui donner celui de son prédécesseur
+        let record = this.props.list.records.find((record) => record.id == dataRowId);
+        if (record.data.display_type == 'line_section') {
+            // on récupère l'ordre des enfants
+            let brothers = this.props.list.records.filter((r) => r.data.of_parent_node_id == record.data.of_parent_node_id);
+            await Promise.all(brothers.map(async (r, index) => {
+                await r.update({ 'of_position_node': index });
+            }));
+            await this.resequence();
+        } else {
+            let indexRecord = this.props.list.records.indexOf(record);
+            if (indexRecord == 0) {
+                await record.update({
+                    'of_parent_node_id': 0, // le parent est forcément la racine
+                    'of_position_node': this.props.list.records.length
+                })
+            } else {
+                // Il faut prendre le record d'avant qui est une section
+                let previousSectionRecords = this.props.list.records.filter((record) => record.data.display_type == 'line_section');
+                let previousSectionRecord = false;
+                previousSectionRecords.map((r) => {
+                    if (r.data.sequence < record.data.sequence) {
+                        previousSectionRecord = r;
+                    }
+                })
+                let index = 0;
+                let of_node_id = 0;
+                if (previousSectionRecord) {
+                    of_node_id = previousSectionRecord.data.of_node_id
+                }
+                let children = this.props.list.records.filter((record) => record.data.of_parent_node_id == of_node_id);
+                if (children) {
+                    index = children.length;
+                }
+                await record.update({
+                    'of_parent_node_id': of_node_id,
+                    'of_position_node': index,
+                })
+            }
+        }
+    }
 }
-
 export class OFInvoiceSectionOne2Many extends X2ManyField {
     static additionalClasses = ['o_field_one2many'];
     static components = {
         ...X2ManyField.components,
         ListRenderer: OFInvoiceSectionListRenderer,
     };
-
+    getNewNodeID() {
+        if (this.list.records.length == 0) {
+            return 1;
+        } else {
+            const maxId = Math.max(...this.list.records.map(item => item.data.of_node_id));
+            return maxId + 1;
+        }
+    }
+    onAdd({ context, editable } = {}) {
+        // on extrait le contexte pour avoir un dictionnaire
+        context = makeContext([context]);
+        if (context.default_display_type && context.default_display_type == 'line_section') {
+            context['default_of_node_id'] = this.getNewNodeID();
+            context['default_of_parent_node_id'] = 0;
+            context['default_of_section_name'] = this.list.records.filter((record) => record.data.of_parent_node_id == 0 && record.data.display_type == 'line_section').length + 1;
+            context['default_sequence'] = this.list.records.length + 1;
+            context['default_name'] = 'Section';
+            context['default_of_position_node'] = this.list.records.filter((record) => record.data.of_parent_node_id == 0).length;
+            context['default_of_level'] = 0;
+        }
+        // Si on ajoute un produit et qu'il existe déjà au moins une section, on doit mettre
+        // le produit dans la section la plus profonde
+        if (!context.default_display_type) {
+            let sections = this.list.records.filter((record) => record.data.display_type == 'line_section');
+            if (sections.length > 0) {
+                let section = sections.slice(-1)[0];
+                context['default_of_parent_node_id'] = section.data.of_node_id;
+                context['default_of_node_id'] = this.getNewNodeID();
+            }
+        }
+        return super.onAdd({ context, editable });
+    }
 }
-
 registry.category("fields").add("of_invoice_section_one2many", OFInvoiceSectionOne2Many);

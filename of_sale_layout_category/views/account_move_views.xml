@@ -9,12 +9,21 @@
             <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
                 <attribute name="widget">of_invoice_section_one2many</attribute>
             </xpath>
+            <xpath expr="//field[@name='invoice_line_ids']" position="before">
+                <div class="row mb-2">
+                    <div class="col-3">
+                        <label for="of_layout_category_active">Layout Category</label>
+                        <field name="of_layout_category_active" widget="boolean_toggle" class="ms-2"/>
+                    </div>
+                </div>
+            </xpath>
             <xpath expr="//tree/field[@name='display_type']" position="after">
                 <field name="of_section_name" invisible="1"/>
                 <field name="of_node_id" invisible="1"/>
                 <field name="of_parent_node_id" invisible="1"/>
                 <field name="of_position_node" invisible="1"/>
                 <field name="of_level" invisible="1"/>
+                <field name="of_show" invisible="1"/>
             </xpath>
             <!-- Limite arbitraire de 1000 lignes pour gérer correctement les sections -->
             <xpath expr="//tree" position="attributes">

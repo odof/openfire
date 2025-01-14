@@ -8,20 +8,85 @@
     </t>
 
     <t t-name="of_sale_layout_category.OFInvoiceSectionLine" owl="1">
+        <td class="o_data_cell cursor-pointer o_field_cell o_list_number o_handle_cell" data-tooltip-delay="1000" tabindex="-1" name="sequence">
+           <t t-set="handle_column" t-value="getHandleColumn()"/>
+           <div
+                t-on-click="(ev) => this.onCellClicked(props.record)"
+                class="o_data_cell cursor-pointer"
+                name="name"
+                tabindex="-1">
+               <Field name="handle_column.name" record="props.record" type="handle_column.widget" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+           </div>
+        </td>
         <td t-att-colspan="state.nbColumns">
-            <div class="row">
-                <div class="col-1">
-                    <t t-esc="props.record.data.of_section_name"/>
+            <t t-if="state.active_layout_category">
+                <div class="row">
+                    <div class="col-1">
+                        <a href="#" t-on-click.stop.prevent="moveUp">
+                            <i class="fa fa-caret-left me-2" title="Caret Left"/>
+                        </a>
+                        <t t-esc="props.record.data.of_section_name"/>
+                        <a href="#" t-on-click.stop.prevent="moveDown">
+                            <i class="fa fa-caret-right ms-2" title="Caret Right"/>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <t t-set="section_column" t-value="getSectionColumn()"/>
+                        <t t-set="section_class" t-value="getSectionClass()"/>
+                        <div
+                            t-on-click="(ev) => this.onCellClicked(props.record)"
+                            class="o_data_cell cursor-pointer"
+                            name="name"
+                            tabindex="-1"
+                            t-ref="section_name">
+                            <Field name="section_column.name" record="props.record" type="section_column.widget" class="section_class" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+                        </div>
+                    </div>
+                    <div class="col text-end section_action">
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.addProduct(ev)" class="me-2">
+                            Add Product
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.duplicate(ev)" data-tooltip="Duplicate this section">
+                            <i class="fa fa-copy me-2" title="Copy"/>
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.addSection(ev)" data-tooltip="Add Section">
+                            <i class="fa fa-plus me-2" title="Plus"/>
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.toggleSection(ev, !state.show_products)">
+                            <t t-if="state.show_products">
+                                <i class="fa fa-eye me-2" title="Eye" data-tooltip="Hide order line from this section"/>
+                            </t>
+                            <t t-if="!state.show_products">
+                                <i class="fa fa-eye-slash me-2" title="Eye Slash" data-tooltip="Show order line from this section"/>
+                            </t>
+                        </a>
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.deleteAsk(ev)" data-tooltip="Delete this section">
+                            <i class="fa fa-trash-o me-2" title="Trash"/>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <t t-esc="props.record.data.name"/>
+            </t>
+            <t t-else="">
+                <div class="row">
+                    <div class="col-6">
+                        <t t-set="section_column" t-value="getSectionColumn()"/>
+                        <t t-set="section_class" t-value="getSectionClass()"/>
+                        <div
+                            t-on-click="(ev) => this.onCellClicked(props.record)"
+                            class="o_data_cell cursor-pointer"
+                            name="name"
+                            tabindex="-1"
+                            t-ref="section_name">
+                            <Field name="section_column.name" record="props.record" type="section_column.widget" class="section_class" setDirty="(isDirty) => this.setDirty(isDirty)"/>
+                        </div>
+                    </div>
+                    <div class="col text-end section_action">
+                        <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
+                            <i class="fa fa-trash-o me-2" title="Trash"/>
+                        </a>
+                    </div>
                 </div>
-                <div class="col text-end section_action">
-                    <a href="#" t-on-click.stop.prevent="(ev) => this.delete(ev)">
-                        <i class="fa fa-trash-o me-2"/>
-                    </a>
-                </div>
-            </div>
+            </t>
         </td>
     </t>
 
