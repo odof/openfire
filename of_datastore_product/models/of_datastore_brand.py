@@ -108,7 +108,12 @@ class OFDatastoreBrand(models.Model):
 
         supplier_obj = self.env['of.datastore.supplier']
         supplier = supplier_obj.search([('db_name', '=', self.db_name)])
-        if not supplier:
+        if supplier:
+            supplier.write({
+                'login': login,
+                'password': password,
+            })
+        else:
             supplier = supplier_obj.create({
                 'db_name': self.db_name,
                 'server_address': 'https://' + self.db_name + '.openfire.fr',

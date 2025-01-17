@@ -31,30 +31,29 @@ class Users(models.Model):
             return ['|', ('of_user_profile_id', '=', False), ('of_user_profile_id', '!=', profile.id)]
 
     @api.model
-    def of_create_new_distributor(self, login, password, name):
+    def of_create_new_distributor(self, login, password, user_vals):
         """
         Cette fonction crée/met à jour un utilisateur en fonction de l'identifiant fourni.
         Sa vocation est d'être appelée en xmlrpc pour alimenter dynamiquement la base fournisseur depuis notre
-          base de gestion.
+        base de gestion.
+        user_vals: dict{name, street, street2, zip, city, email, brand_id}
         """
         user = self.with_context(of_distributor_test=False, active_test=False).search([('login', '=', login)])
+        user_vals['password'] = password  # On met à jour le mot de passe du user dans tous les cas
+
+        if 'of_brand_distributeur_ids' in self.env['res.users']._fields:
+            # Le champ est présent, i.e le module ofab_crm est installé sur la base fournisseur
+            user_vals['of_brand_distributeur_ids'] = [(4, user_vals['brand_id'])]
+        del user_vals['brand_id']
+
         if user:
-            # L'utilisateur existe déjà, on met à jour son mot de passe et son nom au besoin
-            vals = {}
-            if not self._crypt_context().verify(password, user.password_crypt):
-                vals['password'] = password
-            if name != user.name:
-                vals['name'] = name
-            if vals:
-                user.write(vals)
+            # L'utilisateur existe déjà, on met à jour son mot de passe et ses informations
+            user.write(user_vals)
         else:
             profile = self.env.ref('of_datastore_supplier.user_profile_distributor', raise_if_not_found=False)
-            self.create({
-                'login': login,
-                'name': name,
-                'of_user_profile_id': profile.id,
-                'password': password,
-            })
+            user_vals['of_user_profile_id'] = profile.id
+            user_vals['login'] = login
+            self.create(user_vals)
         return True
 
     # Fonctions permettant de traiter les distributeurs comme des utilisateurs inactifs (many2one, etc.)
