@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
-
 from of_datastore_product import DATASTORE_IND
+
+from odoo import api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 
 class OfProductBrand(models.Model):
@@ -140,16 +140,14 @@ class OfProductBrand(models.Model):
 
         suppliers_data = {}
         for supplier, brand_ids in suppliers_brands.iteritems():
-            client = supplier.of_datastore_connect()
-            if isinstance(client, basestring):
-                suppliers_data[supplier] = u"Échec de la connexion à la base centrale\n\n" + client
-                continue
-            ds_brand_obj = supplier.of_datastore_get_model(client, 'of.product.brand')
-            ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [('id', 'in', brand_ids)])
-            suppliers_data[supplier] = {
-                data['id']: (data['note_maj'], data['product_count'])
-                for data in supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, ['note_maj', 'product_count'])
-            }
+            ds_brand_data = self.datastore_read(supplier, ['note_maj', 'product_count'], ds_brand_ids=brand_ids)
+            if isinstance(ds_brand_data, basestring):
+                suppliers_data[supplier] = u"Échec de la connexion à la base centrale\n\n" + ds_brand_data
+            else:
+                suppliers_data[supplier] = {
+                    data['id']: (data['note_maj'], data['product_count'])
+                    for data in ds_brand_data
+                }
 
         for brand in self:
             product_count = 0
@@ -165,7 +163,7 @@ class OfProductBrand(models.Model):
             brand.datastore_product_count = product_count
 
     @api.multi
-    def datastore_match(self, client, obj, res_id, res_name, product, match_dicts, create=True):
+    def datastore_match(self, client, version, obj, res_id, res_name, product, match_dicts, create=True):
         """ Tente d'associer un objet de la base centrale à un id de la base de l'utilisateur
         @param client: client connecté à la base du fournisseur
         @param obj: nom de l'objet à faire correspondre
@@ -178,14 +176,15 @@ class OfProductBrand(models.Model):
             @warning: Cette façon de faire est dangereuse car les éléments ont pu être modifiés à la main,
                       ne l'utiliser que pour de rares modèles.
             """
-            model_ids = ds_supplier_obj.of_datastore_search(
-                ds_model_obj, [('model', '=', obj_name), ('res_id', '=', obj_id)])
-            if not model_ids:
-                return self.env[obj_name]
-            model = ds_supplier_obj.of_datastore_read(ds_model_obj, model_ids, ['module', 'name'])[0]
-            res_id = model_obj.search([('module', '=', model['module']), ('name', '=', model['name'])]).res_id
-            # Dans certains cas, un objet a pu être supprimé en DB mais pas sa référence dans ir_model_data
-            return self.env[obj_name].search([('id', '=', res_id)])
+            # Utilisation de la fonction get_metadata pour récupérer le xml_id de l'objet
+            # On ne peut appeler directement ir.model.data car les droits de l'utilisateur sont insuffisants en v16+
+            # On ne peut utiliser la fonction get_external_id car le format de retour est incompatible avec le xmlrpc
+            metadata = ds_supplier_obj.of_datastore_func(ds_obj_obj, 'get_metadata', [obj_id], [])
+            xml_id = metadata and metadata[0]['xmlid']
+            # Matching v16
+            if xml_id and xml_id.startswith("uom."):
+                xml_id = "product" + xml_id[3:]
+            return xml_id and model_obj.xmlid_to_object(xml_id) or self.env[obj_name]
         # --- Gestion des cas particuliers ---
         if obj == self._name:
             return self
@@ -201,8 +200,14 @@ class OfProductBrand(models.Model):
         # Recherche de correspondance dans les identifiants externes (ir_model_data)
         model_obj = self.env['ir.model.data']
         ds_supplier_obj = self.env['of.datastore.supplier']
-        ds_model_obj = ds_supplier_obj.of_datastore_get_model(client, 'ir.model.data')
-        ds_obj_obj = ds_supplier_obj.of_datastore_get_model(client, obj)
+        if version == 10:
+            ds_obj_obj = ds_supplier_obj.of_datastore_get_model(client, obj)
+        else:
+            obj_match = {
+                'product.uom': 'uom.uom',
+                'product.uom.categ': 'uom.category',
+            }
+            ds_obj_obj = ds_supplier_obj.of_datastore_get_model(client, obj_match.get(obj, obj))
         result = False
 
         # Calcul de correspondance en fonction de l'objet
@@ -228,18 +233,16 @@ class OfProductBrand(models.Model):
                         # Pour eviter des effets de bord, on met une valeur negative
                         result = obj_obj.browse(-(res_id + self.datastore_supplier_id.id * DATASTORE_IND))
         elif obj == 'product.uom.categ':
-            result = datastore_matching_model(obj, res_id)
-            if not result:
-                result = obj_obj.search([('name', '=', res_name)], limit=1)
-                if not result:
-                    raise ValidationError(u"Catégorie d'UDM inexistante : " + res_name)
+            # En v10 on force toutes les unités de mesure dans la catégorie "Unité"
+            result = self.env.ref("product.product_uom_categ_unit")
         elif obj == 'product.uom':
             # Etape 1 : Déterminer la catégorie d'udm
             ds_obj = ds_supplier_obj.of_datastore_read(
                 ds_obj_obj, [res_id], ['category_id', 'factor', 'uom_type', 'rounding'])[0]
 
             categ = self.datastore_match(
-                client, 'product.uom.categ', ds_obj['category_id'][0], ds_obj['category_id'][1], product, match_dicts)
+                client, version, 'product.uom.categ', ds_obj['category_id'][0], ds_obj['category_id'][1], product,
+                match_dicts)
 
             # Etape 2 : Vérifier si l'unité de mesure existe
             uoms = obj_obj.search(
@@ -335,3 +338,46 @@ class OfProductBrand(models.Model):
         if new_products:
             new_products.of_action_update_from_brand()
         return res
+
+    @api.multi
+    def datastore_read(self, supplier, fields, ds_brand_ids=None):
+        """ Lecture des informations de la marque sur la base TC
+        :param supplier: object of.datastore.supplier utilisé pour la connexion distante
+        :param fields: champs à lire
+        :param ds_brand_ids: si renseigné, id des marques distantes sur lesquelles effectuer la lecture
+            sinon, si self n'est pas vide, lecture distante des marques de self connectées à supplier
+            sinon, lecture de toutes les marques de supplier
+        """
+        client = supplier.of_datastore_connect()
+        if isinstance(client, basestring):
+            return client
+        version = supplier.odoo_version
+        ds_brand_obj = supplier.of_datastore_get_model(client, 'of.product.brand')
+        if ds_brand_ids is None:
+            if self:
+                ds_brand_ids = self.filtered(lambda b: b.datastore_supplier_id == supplier).mapped('datastore_brand_id')
+            else:
+                ds_brand_ids = supplier.of_datastore_search(ds_brand_obj, [])
+        else:
+            pass
+        matching_fields = {}
+        if version != 10:
+            matching_fields = {
+                field10: field16
+                for field10, field16 in self.get_v16_matching_fields().iteritems()
+                if field10 in fields
+            }
+            fields = [matching_fields.get(f, f) for f in fields]
+        ds_brand_data = supplier.of_datastore_read(ds_brand_obj, ds_brand_ids, fields)
+        if matching_fields:
+            for ds_brand in ds_brand_data:
+                for field10, field16 in matching_fields.iteritems():
+                    ds_brand[field10] = ds_brand.pop(field16)
+        return ds_brand_data
+
+    @api.model
+    def get_v16_matching_fields(self):
+        return {
+            'note_maj': 'update_note',
+            'prices_date': 'price_date',
+        }

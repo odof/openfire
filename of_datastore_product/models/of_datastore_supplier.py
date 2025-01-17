@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from of_datastore_product import DATASTORE_IND
+
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.safe_eval import safe_eval
-
-from of_datastore_product import DATASTORE_IND
 
 
 class OfDatastoreSupplier(models.Model):
@@ -67,26 +67,32 @@ class OfDatastoreSupplier(models.Model):
     @api.multi
     def button_import_brands(self):
         self.ensure_one()
+        brand_obj = self.env['of.product.brand']
         wizard_obj = self.env['of.datastore.import.brand']
-        client = self.of_datastore_connect()
-        if isinstance(client, basestring):
-            raise UserError(u'Échec de la connexion à la base centrale')
-        ds_brand_obj = self.of_datastore_get_model(client, 'of.product.brand')
-        ds_brand_ids = self.of_datastore_search(ds_brand_obj, [])
-        ds_brand_data = self.of_datastore_read(ds_brand_obj, ds_brand_ids, ['name', 'code', 'logo', 'note_maj'])
-        brand_names = self.env['of.product.brand'].search([]).mapped('name')
+
+        ds_brand_data = brand_obj.datastore_read(self, ['name', 'code', 'logo', 'note_maj'])
+        if isinstance(ds_brand_data, basestring):
+            raise UserError(u"Échec de la connexion à la base centrale")
+        brand_names = brand_obj.search([]).mapped('name')
 
         wizard = wizard_obj.create({
             'datastore_supplier_id': self.id,
-            'line_ids': [(0, 0, {
-                'datastore_brand_id': ds_brand['id'],
-                'name': ds_brand['name'],
-                'code': ds_brand['code'],
-                'logo': ds_brand['logo'],
-                'note_maj': ds_brand['note_maj'],
-                'state': 'done' if ds_brand['name'] in brand_names else 'do',
-                }) for ds_brand in ds_brand_data]
-            })
+            'line_ids': [
+                (
+                    0,
+                    0,
+                    {
+                        'datastore_brand_id': ds_brand['id'],
+                        'name': ds_brand['name'],
+                        'code': ds_brand['code'],
+                        'logo': ds_brand['logo'],
+                        'note_maj': ds_brand['note_maj'],
+                        'state': 'done' if ds_brand['name'] in brand_names else 'do',
+                    }
+                )
+                for ds_brand in ds_brand_data
+            ]
+        })
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -129,7 +135,7 @@ class OfDatastoreSupplier(models.Model):
 
     @api.multi
     def read(self, fields=None, load='_classic_read'):
-        if fields and all(field in ('brand_ids', 'db_name') for field in fields):
+        if fields and all(field in ('brand_ids', 'db_name', 'odoo_version') for field in fields):
             # Un utilisateur non admin ne doit avoir accès qu'aux marques et db_name du connecteur TC
             # (surtout pas aux accès login/password)
             self = self.sudo()

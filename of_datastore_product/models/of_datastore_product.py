@@ -169,10 +169,13 @@ class OfDatastoreCentralized(models.AbstractModel):
         unused_fields = self._get_datastore_unused_fields() + self._of_get_datastore_computed_fields()
         if not create_mode:
             # Pour la lecture classique, on veut stocker tous les champs en cache pour éviter de futurs accès distants
-            for field in fields_to_read:
-                if field not in unused_fields:
-                    fields_to_read += [field for field in self._fields if field not in fields_to_read]
-                    break
+            if any(field not in unused_fields for field in fields_to_read):
+                fields_to_read += [
+                    field
+                    for field in self._fields
+                    if field not in fields_to_read
+                    and field not in unused_fields
+                ]
 
         if 'id' in fields_to_read:  # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
             fields_to_read.remove('id')
@@ -197,6 +200,11 @@ class OfDatastoreCentralized(models.AbstractModel):
             # Attention, l'ordre des deux lignes suivantes est important
             ('of_seller_product_code',          lambda: vals['default_code']),
             ('default_code',                    lambda: default_code_func[brand](vals['default_code'])),
+            # Champ lst_price inexistant dans product.template en v16
+            (
+                'lst_price',
+                lambda: vals['lst_price'] if version == 10 or self._name == 'product.product' else vals['list_price']
+            ),
         ]
 
         fields_defaults = [(k, v) for k, v in fields_defaults if k in fields_to_read]
@@ -241,10 +249,43 @@ class OfDatastoreCentralized(models.AbstractModel):
                 continue
             supplier = supplier_obj.browse(supplier_id)
             client = supplier.of_datastore_connect()
+            version = supplier.odoo_version
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
+
+            # Conversion des champs v10->v16 avant lecture
+            matching_fields = False
+            if version != 10:
+                matching_fields = {
+                    field10: field16
+                    for field10, field16 in self.get_v16_matching_fields().iteritems()
+                    if field10 in datastore_fields
+                }
+                datastore_fields = [matching_fields.get(f, f) for f in datastore_fields]
 
             datastore_product_data = supplier_obj.of_datastore_read(
                 ds_product_obj, product_ids, datastore_fields, '_classic_read')
+
+            # Conversion des champs v16->v10 après lecture
+            if matching_fields:
+                for ds_product in datastore_product_data:
+                    for field10, field16 in matching_fields.iteritems():
+                        ds_product[field10] = ds_product.pop(field16)
+                if 'pack_component_price' in datastore_fields:
+                    vals_match = {
+                        'ignored': 'fixed',
+                        'totalized': 'computed',
+                    }
+                    for ds_product in datastore_product_data:
+                        ds_product['of_pricing'] = vals_match.get(ds_product['of_pricing'], ds_product['of_pricing'])
+            if 'of_product_type' in datastore_fields:
+                vals_match = {
+                    'wood': 'bois',
+                    'gas': 'gaz',
+                    'mixed': 'mixte',
+                }
+                for ds_product in datastore_product_data:
+                    ds_product['of_product_type'] = ds_product.get('of_product_type', False) and vals_match.get(
+                        ds_product['of_product_type'], ds_product['of_product_type'])
 
             if not create_mode:
                 # Les champs manquants dans la table du fournisseur ne sont pas renvoyés, sans générer d'erreur
@@ -305,7 +346,8 @@ class OfDatastoreCentralized(models.AbstractModel):
                     if vals[field]:
                         obj = self._fields[field].comodel_name
                         res = brand.datastore_match(
-                            client, obj, vals[field][0], vals[field][1], product, match_dicts, create=create_mode)
+                            client, version, obj, vals[field][0], vals[field][1], product, match_dicts,
+                            create=create_mode)
                         if field in ('categ_id', 'uom_id', 'uom_po_id'):
                             obj_dict[field] = res
                         if res:
@@ -321,9 +363,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
                 # --- Champs x2many ---
                 for field in o2m_fields:
-                    if field not in datastore_fields:
-                        continue
-                    if not vals[field]:
+                    if not vals.get(field):
                         continue
                     line_ids = [-(line_id + supplier_value) for line_id in vals[field]]
                     if create_mode:

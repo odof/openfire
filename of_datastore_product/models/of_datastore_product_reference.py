@@ -76,6 +76,17 @@ class OfProductKitLine(models.Model):
         brand_obj = self.env['of.product.brand']
         product_obj = self.env['product.product']
         res = []
+        product_fields_rel = {
+            'standard_price': ('product_id', 'product_cost'),
+            'list_price': ('product_id', 'product_price'),
+            'uom_id': ('product_id', 'product_uom_id'),
+            'kit_id': ('kit_id', 'product_tmpl_id'),
+        }
+        product_fields = [
+            product_field
+            for product_field, (_, kit_field) in product_fields_rel.iteritems()
+            if kit_field in fields_to_read
+        ]
 
         # Kits par fournisseur
         datastore_kit_ids = {}
@@ -85,19 +96,55 @@ class OfProductKitLine(models.Model):
 
         for supplier in supplier_obj.browse(datastore_kit_ids):
             client = supplier.of_datastore_connect()
-            ds_kit_obj = supplier.of_datastore_get_model(client, 'of.product.kit.line')
+            version = supplier.odoo_version
+            ds_kit_model_name = 'of.product.kit.line' if version == 10 else 'product.pack.line'
+            ds_kit_obj = supplier.of_datastore_get_model(client, ds_kit_model_name)
 
             # Données de la base fournisseur
             kits_data = supplier.of_datastore_read(ds_kit_obj, datastore_kit_ids[supplier.id], [])
-            ds_product_ids = [kit['product_id'][0] for kit in kits_data]
+            ds_product_ids = set(kit['product_id'][0] for kit in kits_data)
+            if version != 10:
+                # Correspondance de champs v16-v10
+                kits_data = [
+                    {
+                        'id': kit['id'],
+                        'create_date': kit['create_date'],
+                        'write_date': kit['write_date'],
+                        'create_uid': kit['create_uid'],
+                        'write_uid': kit['write_uid'],
+                        'kit_id': kit['parent_product_id'],
+                        'product_id': kit['product_id'],
+                        'product_qty': kit['quantity'],
+                        'sequence': 10,
+                    }
+                    for kit in kits_data
+                ]
+                if product_fields:
+                    ds_product_obj = supplier.of_datastore_get_model(client, 'product.product')
+                    ds_all_product_ids = ds_product_ids | set(kit['kit_id'][0] for kit in kits_data)
+                    products_data = {
+                        data['id']: data
+                        for data in supplier.of_datastore_read(ds_product_obj, list(ds_all_product_ids), product_fields)
+                    }
+                    for kit in kits_data:
+                        product_data = {
+                            'kit_id': products_data.get(kit['kit_id'][0], {}),
+                            'product_id': products_data.get(kit['product_id'][0], {}),
+                        }
+                        for field in product_fields:
+                            product_ref, kit_field = product_fields_rel[field]
+                            kit[kit_field] = product_data[product_ref][field]
 
             # Détection des composants du kit déjà importés
             # Attention de bien détecter les articles archivés (pourrait sinon provoquer des erreurs lors de l'import)
             products = product_obj.with_context(active_test=False).search(
-                [('brand_id', 'in', supplier.brand_ids.ids),
-                 ('of_datastore_res_id', 'in', ds_product_ids)])
+                [
+                    ('brand_id', 'in', supplier.brand_ids.ids),
+                    ('of_datastore_res_id', 'in', list(ds_product_ids))
+                ]
+            )
 
-            product_match = {product.of_datastore_res_id: product.id for product in products}
+            product_match = {product.of_datastore_res_id: product for product in products}
             product_names = dict(products.name_get())
 
             # Affectation des ids des champs relationnels
@@ -106,10 +153,11 @@ class OfProductKitLine(models.Model):
             for kit in kits_data:
                 # Articles
                 product_id, product_name = kit['product_id']
-                if product_id in product_match:
+                product = product_match.get(product_id)
+                if product:
                     # Composant déjà importé
-                    product_id = product_match[product_id]
-                    product_name = product_names[product_id]
+                    product_id = product.id
+                    product_name = product_names[product.id]
                 else:
                     # Composant virtuel
                     product_id = -(product_id + supplier_value)
@@ -119,8 +167,9 @@ class OfProductKitLine(models.Model):
                 # Unités de mesure
                 uom_id, uom_name = kit['product_uom_id']
                 uom_id = brand_obj.datastore_match(
-                    client, 'product.uom', uom_id, uom_name, False, match_dicts, create=create_mode).id
+                    client, version, 'product.uom', uom_id, uom_name, False, match_dicts, create=create_mode).id
                 kit['product_uom_id'] = (uom_id, uom_name)
+
             res += kits_data
         return res
 

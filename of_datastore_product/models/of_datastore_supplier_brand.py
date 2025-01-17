@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
-
 from of_datastore_product import DATASTORE_IND
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 
 class OfDatastoreSupplierBrand(models.AbstractModel):
@@ -40,12 +41,11 @@ class OfDatastoreSupplierBrand(models.AbstractModel):
                 'product_count': False,
             }
 
-            ds_supplier = ds_supplier_obj.browse(ds_supplier_id)
-            client = ds_supplier.of_datastore_connect()
-            if not isinstance(client, basestring):
-                ds_brand_obj = ds_supplier.of_datastore_get_model(client, 'of.product.brand')
-                ds_brand_data = ds_supplier.of_datastore_read(
-                    ds_brand_obj, [ds_brand_id], ['name', 'prices_date', 'note_maj', 'product_count'])[0]
+            ds_brand_data = brand_obj.datastore_read(
+                ds_supplier_obj.browse(ds_supplier_id),
+                ['name', 'prices_date', 'note_maj', 'product_count'],
+                ds_brand_ids=[ds_brand_id])[0]
+            if not isinstance(ds_brand_data, basestring):
                 del ds_brand_data['id']
                 vals.update(ds_brand_data)
 

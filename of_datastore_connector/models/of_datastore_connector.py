@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import requests
 import threading
 import xmlrpclib
 # import socket  # Ne pas supprimer cette ligne, voir fonction connect()
@@ -31,11 +32,17 @@ class OfDatastoreConnector(models.AbstractModel):
         string='Set Password', compute='_compute_new_password', inverse='_inverse_new_password',
         help="Specify a value only when changing the password, otherwise leave empty")
     error_msg = fields.Char(string='Error', compute='_compute_error_msg')
+    odoo_version = fields.Integer(string="Odoo version", compute='_compute_odoo_version')
 
     @api.depends()
     def _compute_new_password(self):
-        for supplier in self:
-            supplier.new_password = ''
+        for connector in self:
+            connector.new_password = ''
+
+    @api.depends('server_address')
+    def _compute_odoo_version(self):
+        for connector in self:
+            connector.odoo_version = self.get_version(connector.sudo().server_address)
 
     # Fonctions récupérées depuis le champ new_password défini pour res_users.
     def _inverse_new_password(self):
@@ -68,8 +75,24 @@ class OfDatastoreConnector(models.AbstractModel):
         return {key: val for key, val in self._context.iteritems() if key in ('lang', 'tz', 'active_test')}
 
     @api.model
+    def get_version(self, url):
+        try:
+            req = requests.get(
+                url + "/web/webclient/version_info",
+                data="{}",
+                headers={'Content-type': 'application/json'}
+            )
+            version = req.json()['result']['server_version_info'][0]
+        except:
+            version = False
+        return version
+
+    @api.model
     def get_connector(self, url, db_name, login, password):
-        # Connexion à la base du fournisseur
+        """ Connexion à la base distante
+        :return: une connexion openerplib.
+            Si la connexion à la base échoue, retourne le message d'erreur
+        """
         # Utilisation d'un thread pour stopper une connexion trop longue
         class FuncThread(threading.Thread):
             def __init__(self):

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
-import odoo.addons.decimal_precision as dp
+from of_datastore_product import DATASTORE_IND, _of_datastore_is_computed_field
 
-from of_datastore_product import _of_datastore_is_computed_field, DATASTORE_IND
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
+
+import odoo.addons.decimal_precision as dp
 
 
 class ProductTemplate(models.Model):
@@ -85,6 +86,47 @@ class ProductTemplate(models.Model):
                     product_obj, [('product_tmpl_id', 'in', datastore_product_ids[supplier.id])])]
 
         return self.env['product.product'].browse(product_ids).of_datastore_import().mapped('product_tmpl_id')
+
+    @api.model
+    def get_v16_matching_fields(self):
+        return {
+            # of_product
+            'modele': 'of_model',
+            'marge': 'of_margin',
+            'of_seller_remise': 'of_seller_discount',
+            'of_seller_pp_ht': 'of_seller_pp_untaxed',
+            'date_tarif': 'of_cost_date',
+            'description_fabricant': 'of_manufacturer_description',
+            # of_datastore_supplier
+            'date_prochain_tarif': 'of_next_price_list_date',
+            'prochain_tarif': 'of_next_price_list',
+            # of_product_brand
+            'of_seller_name': 'of_seller_partner_id',
+            # of_sale_norme
+            'description_norme': 'of_standard_description',
+            'norme_id': 'of_standard_id',
+            # of_kit
+            'of_is_kit': 'pack_ok',
+            'kit_line_ids': 'pack_line_ids',
+            # Attention, les valeurs ne sont pas les mêmes entre of_pricing et pack_component_price
+            'of_pricing': 'pack_component_price',
+            # of_connecteur_poujoulat
+            'of_pou_artas400': 'of_poujoulat_artas400',
+            'of_pou_variante': 'of_poujoulat_variant',
+            'of_pou_cond': 'of_poujoulat_cond_unit',
+            # of_product_chem
+            'of_equivalence_flamme_verte': 'of_flamme_verte_equivalence',
+            'of_puissance_nom': 'of_power_rating',
+            'of_rendement': 'of_yield',
+            'of_emission_co': 'of_co_emission',
+            'of_emission_co_mg': 'of_co_mg_emission',
+            'of_emission_poussiere': 'of_dust_emission',
+            'of_emission_nox': 'of_nox_emission',
+            'of_cog_emission': 'of_goc_emission',
+            'of_cov_emission': 'of_voc_emission',
+            'of_indice_i': 'of_i_index',
+            'of_efficacite_saison': 'of_season_efficiency',
+        }
 
 
 class ProductProduct(models.Model):
@@ -235,6 +277,9 @@ class ProductProduct(models.Model):
             orderpoints_to_activate.write({'active': True})
         return res
 
+    @api.model
+    def get_v16_matching_fields(self):
+        return self.env['product.template'].get_v16_matching_fields()
 
 class ProductSupplierInfo(models.Model):
     _inherit = 'product.supplierinfo'
@@ -244,3 +289,10 @@ class ProductSupplierInfo(models.Model):
     @api.model
     def _of_datastore_is_computed_field(self, field_name):
         return _of_datastore_is_computed_field(self, field_name)
+
+    @api.model
+    def get_v16_matching_fields(self):
+        return {
+            'pp_ht': 'of_public_price_untaxed',
+            'remise': 'of_discount',
+        }
