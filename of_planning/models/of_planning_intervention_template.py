@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models, fields, SUPERUSER_ID, _
-from odoo.exceptions import UserError
-import odoo.addons.decimal_precision as dp
-import os
 import base64
+import os
 import tempfile
+
+from odoo import SUPERUSER_ID, _, api, fields, models
+from odoo.exceptions import UserError
+
+import odoo.addons.decimal_precision as dp
 
 
 class OfPlanningInterventionTemplate(models.Model):
@@ -206,13 +208,13 @@ class OfPlanningInterventionTemplate(models.Model):
 
     def _inverse_code(self):
         sequence_obj = self.env['ir.sequence']
+        sequence_code = self._name
         for template in self:
             if not template.code:
                 continue
             sequence_name = u"Modèle d'intervention " + template.code
-            sequence_code = self._name
             # Si une séquence existe déjà avec ce code, on la reprend
-            sequence = sequence_obj.search([('code', '=', sequence_code), ('prefix', '=', self.code)])
+            sequence = sequence_obj.search([('code', '=', sequence_code), ('prefix', '=', template.code)])
             if sequence:
                 template.sequence_id = sequence
                 continue
