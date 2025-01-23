@@ -658,7 +658,7 @@ class OFPlanningIntervention(models.Model):
         Only tours that are not done and that are in the future are updated.
         """
         tours = self.mapped('tournee_ids').filtered(lambda t: t.date >= fields.Date.today())
-        tours.mapped('tour_line_ids').filtered(lambda l: l.intervention_id in self).unlink()
+        tours.mapped('tour_line_ids').filtered(lambda l: l.intervention_id in self).sudo().unlink()
         tours.action_compute_osrm_data()
 
     @api.multi
