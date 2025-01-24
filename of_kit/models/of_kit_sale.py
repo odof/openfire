@@ -4,6 +4,7 @@ import math
 from datetime import datetime, timedelta
 
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, float_compare, float_is_zero
 
 import odoo.addons.decimal_precision as dp
@@ -996,3 +997,12 @@ class OfSaleOrderKitLine(models.Model):
         if res.order_id.state == 'sale':
             res._action_procurement_create()
         return res
+
+    @api.multi
+    def unlink(self):
+        if self.filtered(lambda x: x.kit_id.order_line_id.order_id.state in ('sale', 'done')):
+            raise UserError(
+                u"Vous ne pouvez pas supprimer un composant d'un kit dans une commande confirmée. \n"
+                u"Essayez de configurer les quantités à 0."
+            )
+        return super(OfSaleOrderKitLine, self).unlink()
