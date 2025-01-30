@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _, SUPERUSER_ID
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError
 
 
@@ -10,16 +10,16 @@ class OfAccountPaymentBankDeposit(models.Model):
 
     @api.multi
     def _default_payment_ids(self):
-        res = []
+        res = [(5, )]
         if self._context.get('active_model', '') == 'account.payment':
             # Allow only payments that have not been already deposited
             payments = self.env['account.payment'].search(
                 [('id', 'in', self._context['active_ids']), ('of_deposit_id', '=', False)])
-            res = [(4, payment.id) for payment in payments]
+            res += [(4, payment.id) for payment in payments]
         return res
 
     name = fields.Char('Deposit code', required=True, help='Deposit code')
-    date = fields.Date('Date', required=True, default=fields.Date.context_today)
+    date = fields.Date('Date', required=True, copy=False, default=fields.Date.context_today)
     payment_ids = fields.One2many(
         'account.payment', 'of_deposit_id', 'Payments', copy=False,
         default=lambda s: s._default_payment_ids())
@@ -30,7 +30,7 @@ class OfAccountPaymentBankDeposit(models.Model):
     currency_id = fields.Many2one(
         comodel_name='res.currency', string='Devise', required=True,
         default=lambda self: self.env.user.company_id.currency_id)
-    move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict')
+    move_id = fields.Many2one('account.move', 'Account move', readonly=True, ondelete='restrict', copy=False)
     state = fields.Selection(
         [('draft', 'Unposted'), ('posted', 'Posted')],
         string='Status', required=True, readonly=True, copy=False, default='draft')
