@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime, timedelta
-from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
 
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 AVAILABLE_PRIORITIES = [
     ('0', 'Normal'),
@@ -41,44 +41,6 @@ class SaleOrder(models.Model):
                 "WHERE table_name = '%s' "
                 "AND column_name = 'of_canvasser_id'" % self._table)
             new_canvasser_field = not bool(cr.fetchall())
-            # les colonnes reste à facturer n'existent pas, on veut calculer manuellement
-            cr.execute(
-                "SELECT * "
-                "FROM information_schema.columns "
-                "WHERE table_name = '%s' "
-                "AND column_name = 'of_amount_to_invoice'" % self._table)
-            if not bool(cr.fetchall()):
-                cr.execute(
-                    "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice numeric; "
-                    "ALTER TABLE sale_order ADD COLUMN of_amount_to_invoice_no_deposit numeric;"
-                )
-                # Reste à facturer
-                cr.execute(
-                    "WITH sub AS ( "
-                    "    SELECT sol.order_id, SUM(sol.of_amount_to_invoice) AS of_amount_to_invoice "
-                    "    FROM sale_order_line AS sol "
-                    "    GROUP BY sol.order_id "
-                    ") "
-                    "UPDATE sale_order AS so "
-                    "SET of_amount_to_invoice = sub.of_amount_to_invoice "
-                    "FROM sub "
-                    "WHERE sub.order_id=so.id"
-                )
-                # Reste à facturer hors acompte
-                cr.execute(
-                    "WITH sub AS ("
-                    "    SELECT sol.order_id, SUM(sol.of_amount_to_invoice) AS of_amount_to_invoice "
-                    "    FROM sale_order_line AS sol "
-                    "      LEFT JOIN product_product AS pp ON pp.id=sol.product_id "
-                    "      LEFT JOIN product_template AS pt ON pt.id=pp.product_tmpl_id "
-                    "    WHERE pt.categ_id != %s "
-                    "    GROUP BY sol.order_id "
-                    ") "
-                    "UPDATE sale_order AS so "
-                    "SET of_amount_to_invoice_no_deposit = sub.of_amount_to_invoice "
-                    "FROM sub "
-                    "WHERE sub.order_id=so.id", (categ_id,)
-                )
 
         res = super(SaleOrder, self)._auto_init()
 
