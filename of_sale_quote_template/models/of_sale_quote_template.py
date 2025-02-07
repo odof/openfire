@@ -943,11 +943,11 @@ class SaleOrder(models.Model):
                 if self.pricelist_id:
                     price = self.pricelist_id.with_context(uom=line.product_uom_id.id).get_product_price(
                         line.product_id, 1, False)
-                    if self.pricelist_id.discount_policy == 'without_discount' and line.price_unit:
-                        discount = (line.price_unit - price) / line.price_unit * 100
-                        price = line.price_unit
+                    if self.pricelist_id.discount_policy == 'without_discount' and line.product_id.lst_price:
+                        discount = (line.product_id.lst_price - price) / line.product_id.lst_price * 100
+                        price = line.product_id.lst_price
                 else:
-                    price = line.price_unit
+                    price = line.product_id.lst_price
 
                 if line.product_id.sale_line_warn == 'block':
                     product_block_ids |= line.product_id
