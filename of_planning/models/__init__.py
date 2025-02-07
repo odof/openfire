@@ -7,3 +7,4 @@ from . import of_res_config
 from . import report
 from . import res_groups
 from . import res_partner
+from . import res_company

@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
+
+from odoo import fields, models
+
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+
+    email = fields.Char(compute_sudo=True)
