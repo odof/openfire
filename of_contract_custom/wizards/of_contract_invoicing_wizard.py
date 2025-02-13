@@ -193,6 +193,7 @@ class OFContractInvoicingWizard(models.TransientModel):
                     for invoice_line in invoice.invoice_line_ids:
                         invoice_line.quantity = -invoice_line.quantity
                 invoice.compute_taxes()
+                invoice._onchange_payment_term_id()
                 invoices |= invoice
                 services.write({'contract_invoice_id': invoice.id})
         if single_lines:
@@ -258,6 +259,7 @@ class OFContractInvoicingWizard(models.TransientModel):
             for invoice_line in invoice.invoice_line_ids:
                 invoice_line.quantity = -invoice_line.quantity
         invoice.compute_taxes()
+        invoice._onchange_payment_term_id()
         services.write({'contract_invoice_id': invoice.id})
         return invoice, exception_lines
 
