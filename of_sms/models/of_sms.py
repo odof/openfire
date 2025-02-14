@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from odoo.exceptions import UserError
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
-from odoo import api, fields, models
 import re
+import urllib
+from datetime import datetime, timedelta
+
 import requests
 from HTMLParser import HTMLParser
-import urllib
-import json
+
+from odoo import api, fields, models
+from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+
 from odoo.addons.of_base.models.partner import convert_phone_number
 
 _logger = logging.getLogger(__name__)
@@ -182,6 +184,7 @@ class OFSmsMessage(models.Model):
     def process_sms_queue(self, queue_limit):
         for queued_sms in self.search(
                 [('status_code', '=', 'queued'),
+                 ('account_id', '!=', False),
                  ('message_date', '<=', datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT))],
                 limit=queue_limit):
             my_sms = queued_sms.account_id.send_message(
