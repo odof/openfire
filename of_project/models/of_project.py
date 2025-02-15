@@ -302,6 +302,7 @@ class ProjectTask(models.Model):
             stage = self.env['project.task.type'].browse(vals['stage_id'])
             if stage.state == 'done':
                 vals.update({'date_end': datetime.now()})
+        res = super(ProjectTask, self).write(vals)
         if 'of_user_ids' in vals or 'user_id' in vals:
             user_obj = self.env['res.users']
             user_ids = []
@@ -314,7 +315,7 @@ class ProjectTask(models.Model):
                 for task in self:
                     if any(user.id not in task.project_id.members.ids for user in users):
                         task.project_id.members = [(6, 0, task.project_id.members.ids + users.ids)]
-        return super(ProjectTask, self).write(vals)
+        return res
 
 
 class ProjectTaskType(models.Model):
