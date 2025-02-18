@@ -12,7 +12,7 @@ class StockMove(models.Model):
         readonly=True
     )
     of_analytic_account_id = fields.Many2one(
-        comodel_name='account.analytic.account', related='procurement_id.sale_line_id.order_id.project_id',
+        comodel_name='account.analytic.account', compute='_compute_of_analytic_account_id',
         readonly=True
     )
     of_outlay_analysis_selected = fields.Boolean(
@@ -20,6 +20,11 @@ class StockMove(models.Model):
     )
     of_quant_price_unit = fields.Float(u"Valeur unitaire des quants", compute='_compute_quant_values')
     of_quant_price_total = fields.Float(u"Valeur des quants", compute='_compute_quant_values')
+
+    def _compute_of_analytic_account_id(self):
+        for move in self:
+            sale_order = move.procurement_id._get_sale_order()
+            move.of_analytic_account_id = sale_order and sale_order.project_id
 
     def _compute_quant_values(self):
         for move in self:
