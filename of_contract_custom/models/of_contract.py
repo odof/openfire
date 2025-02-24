@@ -1064,9 +1064,8 @@ class OfContractLine(models.Model):
                             next_date = base_date + relativedelta(months=1, day=1, days=-1)
                         line.next_date = next_date
             else:
-                invoice_lines = line.invoice_line_ids.filtered(lambda l: l.invoice_id.state != 'cancel')
-                if not invoice_lines:
-                    base_date = fields.Date.from_string(last_invoice_date or line.date_contract_start)
+                if not last_invoice_date:
+                    base_date = fields.Date.from_string(line.date_contract_start)
                     end = fields.Date.from_string(line.date_contract_end)
                     next_date = False
                     if line.recurring_invoicing_payment_id.code == 'pre-paid':
