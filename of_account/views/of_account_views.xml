@@ -263,7 +263,8 @@
         <field name="inherit_id" ref="account.view_account_move_line_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tax_ids']" position="after">
-                <field name="debit" string="Montant" filter_domain="['|',('debit','=',self),('credit','=',self)]"/>
+                <field name="debit" string="Montant"
+                    filter_domain="['|','&amp;',('debit','>',self-0.005),('debit','&lt;',self+0.005),'&amp;',('credit','>',self-0.005),('credit','&lt;',self+0.005)]"/>
                 <separator/>
                 <filter string="Mois en cours" name="this_month"
                         domain="[('date', u'&gt;=', context_today().strftime('%Y-%m-01')),
