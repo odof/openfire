@@ -6,8 +6,7 @@
             string="Rapport d'intervention"
             model="of.planning.intervention"
             report_type="qweb-pdf"
-            name="of_planning.of_planning_rapport_intervention_report_template"
-            paperformat="report.paperformat_euro">
+            name="of_planning.of_planning_rapport_intervention_report_template">
     </report>
 
     <data noupdate="1">

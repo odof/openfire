@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class OFPlanningInterventionHook(models.AbstractModel):
@@ -69,3 +69,14 @@ WHERE picking_id IS NOT NULL""")
             for rule in rules:
                 if rule:
                     rule.unlink()
+
+    @api.model
+    def _post_update_hook_v10_0_1_4_0(self):
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_planning')])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < "10.0.1.4.0"
+        if actions_todo:
+            report = self.env.ref('of_planning.of_planning_raport_intervention_report', raise_if_not_found=False)
+            paperformat = self.env.ref('report.paperformat_euro', raise_if_not_found=False)
+            if not report or not paperformat or report.paperformat_id != paperformat:
+                return
+            report.write({'paperformat_id': False})
