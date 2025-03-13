@@ -80,3 +80,21 @@ WHERE picking_id IS NOT NULL""")
             if not report or not paperformat or report.paperformat_id != paperformat:
                 return
             report.write({'paperformat_id': False})
+
+    @api.model
+    def _post_update_hook_v10_0_1_4_1(self):
+        """ Deleting all old ir.rules """
+        module_self = self.env['ir.module.module'].search([('name', '=', 'of_planning')])
+        actions_todo = module_self and module_self.latest_version and module_self.latest_version < "10.0.1.4.1"
+        if actions_todo:
+            record = self.env.ref('of_planning.of_planning_raport_intervention_report', raise_if_not_found=False)
+            if not record:
+                return
+            record.write(
+                {
+                    "print_report_name": (
+                        "((object.tache_id.name + ' - ' + (object.partner_id.display_name or '')"
+                        " + ' ' + object.date_localized or '').replace('/','-') or 'compte-rendu')+'.pdf'"
+                    )
+                }
+            )

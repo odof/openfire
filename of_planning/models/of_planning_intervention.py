@@ -433,6 +433,7 @@ class OfPlanningIntervention(models.Model):
     date = fields.Datetime(string=u"Date de début", required=True, track_visibility='always')
     date_date = fields.Date(
         string="Jour intervention", compute='_compute_date_date', search='_search_date_date', readonly=True)
+    date_localized = fields.Datetime(string="Date avec localisation", compute='_compute_date_date', readonly=True)
     duree = fields.Float(string=u"Durée intervention", required=True, digits=(12, 5), track_visibility='always')
     duree_debut_fin = fields.Float(
         string=u"Durée entre le début et la fin", compute="_compute_duree_debut_fin",
@@ -593,8 +594,12 @@ class OfPlanningIntervention(models.Model):
 
     @api.depends('date')
     def _compute_date_date(self):
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz)
         for interv in self:
-            interv.date_date = interv.date
+            current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(interv.date))
+            current_date_local_dt = current_date_utc_dt.astimezone(timezone)
+            interv.date_date = current_date_local_dt
+            interv.date_localized = current_date_local_dt
 
     @api.depends('date', 'date_deadline', 'duree')
     def _compute_duree_debut_fin(self):
@@ -1737,7 +1742,9 @@ class OfPlanningIntervention(models.Model):
 
     @api.multi
     def of_get_report_date(self, docs):
-        planning_date = fields.Datetime.from_string(self.date)
+        timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz)
+        current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(self.date))
+        planning_date = current_date_utc_dt.astimezone(timezone)
         lang = self.env['res.lang']._lang_get(self.env.lang or 'fr_FR')
         return planning_date.strftime(lang.date_format)
 
