@@ -596,6 +596,10 @@ class OfPlanningIntervention(models.Model):
     def _compute_date_date(self):
         timezone = pytz.timezone(self._context.get('tz') or self.env.user.tz)
         for interv in self:
+            if not interv.date:
+                interv.date_date = False
+                interv.date_localized = False
+                continue
             current_date_utc_dt = pytz.utc.localize(fields.Datetime.from_string(interv.date))
             current_date_local_dt = current_date_utc_dt.astimezone(timezone)
             interv.date_date = current_date_local_dt
