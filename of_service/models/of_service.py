@@ -215,7 +215,7 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
     address_mobile = fields.Char(related='address_id.mobile', string=u"Mobile", readonly=1)
     address_email = fields.Char(related='address_id.email', string=u"Courriel", readonly=1)
     secteur_tech_id = fields.Many2one(
-        related='address_id.of_secteur_tech_id', readonly=True, store=True)
+        related='address_id.of_secteur_tech_id', readonly=True, compute_sudo=True, store=True)
     department_id = fields.Many2one(
         comodel_name='res.country.department', string=u"Département", compute='_compute_department_id',
         readonly=True, store=True, compute_sudo=True)
