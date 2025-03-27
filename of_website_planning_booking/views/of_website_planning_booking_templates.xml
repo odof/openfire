@@ -8,69 +8,6 @@
         </xpath>
     </template>
 
-    <!-- Portal -->
-
-    <template id="of_website_planning_booking_portal_my_home_menu" name="OF Website Planning Booking Portal Home Menu"
-              inherit_id="website_portal.portal_layout" priority="30">
-        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
-            <li t-if="'installed_park' in tabs">
-                <a href="/my/of_installed_parks">Parcs installés</a>
-            </li>
-        </xpath>
-    </template>
-
-    <template id="of_website_planning_booking_portal_my_home" name="OF Website Planning Booking Portal Home"
-              inherit_id="website_portal.portal_my_home" priority="30">
-        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
-            <h3 class="page-header" t-if="'installed_park' in tabs">
-                <a href="/my/of_installed_parks">Vos parcs installés
-                    <small class="ml8">
-                        <t t-if="installed_park_count">
-                            <span class='badge'><t t-esc="installed_park_count"/></span>
-                        </t>
-                        <t t-if="not installed_park_count">
-                            Il n'y a actuellement pas de parcs installés associés à votre compte.
-                        </t>
-                    </small>
-                </a>
-            </h3>
-        </xpath>
-    </template>
-
-    <!-- Portal - OF My Installed Parks -->
-
-    <template id="of_website_planning_booking_portal_my_home_of_installed_parks" name="OF My Installed Parks">
-        <t t-call="website_portal.portal_layout">
-            <h3 class="page-header">Vos parcs installés</h3>
-            <t t-if="not installed_parks">
-                <p>Il n'y a actuellement pas de parcs installés associé à votre compte.</p>
-            </t>
-            <t t-if="installed_parks">
-                <table class="table table-hover o_my_status_table">
-                    <thead>
-                        <tr class="active">
-                            <th>Marque - Modèle</th>
-                            <th>N° de série</th>
-                        </tr>
-                    </thead>
-                    <t t-foreach="installed_parks" t-as="installed_park">
-                        <tr>
-                            <td>
-                                <span t-esc="installed_park.brand_id.sudo().name"/> - <span t-esc="installed_park.modele"/>
-                            </td>
-                            <td>
-                                <span t-esc="installed_park.name or '-'"/>
-                            </td>
-                        </tr>
-                    </t>
-                </table>
-                <div t-if="pager" class="o_portal_pager text-center">
-                    <t t-call="website.pager" />
-                </div>
-            </t>
-        </t>
-    </template>
-
     <!-- OF Website Planning Booking -->
 
     <!-- OF Website Planning Booking - Breadcrumb Trail -->

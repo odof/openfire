@@ -43,6 +43,7 @@ Module OpenFire pour le portail du site internet
         'templates/website_portal_sale_views.xml',
         'templates/website_portal_bank_details.xml',
         'templates/website_portal_crm_lead.xml',
+        'templates/website_portal_parc_installe_templates.xml',
         'reports/report_stock_picking.xml',
         'data/post_update.xml',
     ],

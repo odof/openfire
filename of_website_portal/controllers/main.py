@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import http, tools, fields, _
-from odoo.http import request
+from odoo import _, fields, http, tools
 from odoo.exceptions import AccessError
-from odoo.addons.website_portal.controllers.main import website_account
+from odoo.http import request
+
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
-from odoo.addons.base_iban.models.res_partner_bank import normalize_iban, _map_iban_template
+from odoo.addons.base_iban.models.res_partner_bank import _map_iban_template, normalize_iban
+from odoo.addons.website_portal.controllers.main import website_account
 
 
 class WebsiteAccount(website_account):
@@ -121,14 +122,17 @@ class WebsiteAccount(website_account):
             ('address_id', 'child_of', request.env.user.partner_id.id)
         ])
         leads = request.env['crm.lead'].search([('user_id', '=', request.env.user.id)])
-        values.update({
-            'recurrent_count': len(recurrent_ids),
-            'service_count': len(service_ids),
-            'delivery_count': len(delivery_ids),
-            'rdv_count': len(rdv_ids),
-            'opportunity_count': len(leads),
-            'tabs': request.env.user.of_tab_ids.mapped('code'),
-        })
+        values.update(
+            {
+                'recurrent_count': len(recurrent_ids),
+                'service_count': len(service_ids),
+                'delivery_count': len(delivery_ids),
+                'rdv_count': len(rdv_ids),
+                'opportunity_count': len(leads),
+                'installed_park_count': request.env.user.partner_id.of_parc_installe_count,
+                'tabs': request.env.user.of_tab_ids.mapped('code'),
+            }
+        )
         return values
 
     @http.route(['/my', '/my/home'], type='http', auth='user', website=True)
@@ -327,6 +331,17 @@ class WebsiteAccount(website_account):
             'leads': leads,
         })
         return request.render('of_website_portal.display_opportunities', values)
+
+    @http.route(['/my/of_installed_parks'], type='http', auth='user', website=True)
+    def portal_my_of_installed_parks(self):
+        values = self._prepare_portal_layout_values()
+        values.update(
+            {
+                'partner': request.env.user.partner_id,
+                'installed_parks': request.env.user.partner_id.of_parc_installe_ids,
+            }
+        )
+        return request.render('of_website_portal.of_installed_parks_portal_template', values)
 
 
 class SignupVerifyEmail(AuthSignupHome):

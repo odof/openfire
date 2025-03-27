@@ -12,7 +12,6 @@ from odoo.http import request
 from odoo.exceptions import ValidationError, AccessError
 from odoo.tools.float_utils import float_compare
 from odoo.addons.of_utils.models.of_utils import hours_to_strs
-from odoo.addons.website_portal.controllers.main import website_account
 
 _logger = logging.getLogger(__name__)
 
@@ -29,26 +28,6 @@ STEP_NAME_NUMBER = {
     'confirmation': 60,
     'thank_you': 70,
 }
-
-
-class WebsiteAccount(website_account):
-
-    def _prepare_portal_layout_values(self):
-        values = super(WebsiteAccount, self)._prepare_portal_layout_values()
-        values.update({
-            'installed_park_count': request.env.user.partner_id.of_parc_installe_count,
-        })
-        return values
-
-    @http.route(['/my/of_installed_parks'], type='http', auth='user', website=True)
-    def portal_my_of_installed_parks(self):
-        values = self._prepare_portal_layout_values()
-        values.update({
-            'partner': request.env.user.partner_id,
-            'installed_parks': request.env.user.partner_id.of_parc_installe_ids,
-        })
-        return request.render(
-            'of_website_planning_booking.of_website_planning_booking_portal_my_home_of_installed_parks', values)
 
 
 class OFWebsitePlanningBooking(http.Controller):
