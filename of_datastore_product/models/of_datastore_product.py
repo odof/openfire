@@ -203,7 +203,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             # Champ lst_price inexistant dans product.template en v16
             (
                 'lst_price',
-                lambda: vals['lst_price'] if version == 10 or self._name == 'product.product' else vals['list_price']
+                lambda: vals['lst_price'] if version == 10 and self._name == 'product.template' else vals['list_price']
             ),
         ]
 
