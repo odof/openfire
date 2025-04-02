@@ -174,7 +174,6 @@ class OfDatastoreCentralized(models.AbstractModel):
                     field
                     for field in self._fields
                     if field not in fields_to_read
-                    and field not in unused_fields
                 ]
 
         if 'id' in fields_to_read:  # Le champ id sera de toute façon ajouté, le laisser génèrera des erreurs
