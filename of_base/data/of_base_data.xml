@@ -31,12 +31,12 @@
 
     <record id="of_config_parameter_documentation" model="ir.config_parameter">
         <field name="key">of.documentation</field>
-        <field name="value">https://documentation.openfire.fr/</field>
+        <field name="value">https://support-10.openfire.fr/hc/fr</field>
     </record>
 
     <record id="of_config_parameter_support" model="ir.config_parameter">
         <field name="key">of.support</field>
-        <field name="value">https://openfire.zendesk.com/hc/fr/requests/new</field>
+        <field name="value">https://support-10.openfire.fr/hc/fr</field>
     </record>
 
 </odoo>
