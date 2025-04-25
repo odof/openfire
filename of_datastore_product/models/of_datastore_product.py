@@ -264,6 +264,12 @@ class OfDatastoreCentralized(models.AbstractModel):
             datastore_product_data = supplier_obj.of_datastore_read(
                 ds_product_obj, product_ids, datastore_fields, '_classic_read')
 
+            # Retrait de la conversion des champs v16 qui n'ont pas été trouvés lors de la lecture
+            matching_fields = {
+                field10: field16
+                for field10, field16 in matching_fields.iteritems()
+                if field16 in datastore_product_data[0]
+            }
             # Conversion des champs v16->v10 après lecture
             if matching_fields:
                 for ds_product in datastore_product_data:
