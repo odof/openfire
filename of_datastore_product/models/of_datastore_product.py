@@ -252,7 +252,7 @@ class OfDatastoreCentralized(models.AbstractModel):
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
 
             # Conversion des champs v10->v16 avant lecture
-            matching_fields = False
+            matching_fields = {}
             if version != 10:
                 matching_fields = {
                     field10: field16
