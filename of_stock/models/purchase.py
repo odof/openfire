@@ -36,6 +36,7 @@ class PurchaseOrder(models.Model):
 
     @api.onchange('picking_type_id')
     def _onchange_picking_type_id(self):
+        super(PurchaseOrder, self)._onchange_picking_type_id()
         self.of_transporter_id = self.picking_type_id.warehouse_id.partner_id.id
 
     @api.multi
