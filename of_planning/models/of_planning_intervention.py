@@ -1458,10 +1458,13 @@ class OfPlanningIntervention(models.Model):
 
         if 'employee_ids' in vals:
             for rdv in self:
-                rdv.message_post(body=_(u"Intervenants: %s => %s") % (
-                    ', '.join(employee_before[rdv].mapped('name')),
-                    ', '.join(rdv.employee_ids.mapped('name'))
-                ))
+                old_emps = employee_before[rdv].ids
+                new_emps = rdv.employee_ids.ids
+                if old_emps != new_emps:
+                    rdv.message_post(body=_(u"Intervenants: %s => %s") % (
+                        ', '.join(employee_before[rdv].mapped('name')),
+                        ', '.join(rdv.employee_ids.mapped('name'))
+                    ))
 
         return result
 
