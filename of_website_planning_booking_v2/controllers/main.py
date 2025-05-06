@@ -173,11 +173,11 @@ class OFWebsitePlanningBooking(http.Controller):
             # Mise à jour du paramètre opt_out du partenaire
             if partner.opt_out:
                 partner.sudo().opt_out = False
-            intervention = False
+            intervention = request.env['of.planning.intervention'].sudo().with_context(tz='Europe/Paris')
             update = False
             if values.get('intervention_id'):
                 # Mise à jour du RDV
-                intervention = request.env['of.planning.intervention'].sudo().browse(int(values['intervention_id']))
+                intervention = intervention.browse(int(values['intervention_id']))
                 update = True
             intervention = self._create_update_intervention(intervention, template, service, partner, slot)
             if update:
@@ -401,7 +401,7 @@ class OFWebsitePlanningBooking(http.Controller):
             wizard.date_recherche_fin = min(new_search_end_date.strftime('%Y-%m-%d'), max_search_date)
             wizard.compute(sudo=True, mode='more')
             valid_lines = self._filter_slots(
-                wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, empty_days_search_type, 
+                wizard.planning_ids, search_type, max_search_criteria, allow_empty_days, empty_days_search_type,
                 empty_days_max_search_criteria, wizard.duree)
 
         if valid_lines:
@@ -510,10 +510,11 @@ class OFWebsitePlanningBooking(http.Controller):
 
             vals = self._get_intervention_vals(slot, backend_slot, template, service, partner)
             try:
+                # intervention est un browse record potentiellement vide avec un contexte spécifique pour ajouter la tz
                 if intervention:
                     intervention.write(vals)
                 else:
-                    intervention = request.env['of.planning.intervention'].sudo().create(vals)
+                    intervention = intervention.create(vals)
                 intervention.onchange_company_id()
                 if intervention.service_id:
                     intervention = intervention.with_context(of_import_service_lines=True)
