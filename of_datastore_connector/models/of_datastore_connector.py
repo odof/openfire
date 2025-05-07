@@ -6,6 +6,7 @@ import xmlrpclib
 # import socket  # Ne pas supprimer cette ligne, voir fonction connect()
 
 from odoo import models, fields, api, _
+from odoo.tools import OrderedSet
 
 _logger = logging.getLogger(__name__)
 
@@ -205,7 +206,15 @@ class OfDatastoreConnector(models.AbstractModel):
 
     @api.model
     def of_datastore_read_group(
-            self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None):
+            self, ds_model, domain, fields, groupby, offset=None, limit=None, orderby=None, lazy=None,
+            check_fields=True):
+        if check_fields:
+            ds_fields = ds_model.fields_get_keys()
+            fields = [f for f in fields if f in ds_fields]
+            groupby = [groupby] if isinstance(groupby, basestring) else list(OrderedSet(groupby))
+            groupby_list = groupby[:1] if lazy else groupby
+            if any(gb not in fields for gb in groupby_list):
+                return []
         kwargs = {
             key: val
             for key, val in [('offset', offset),
