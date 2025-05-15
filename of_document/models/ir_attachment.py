@@ -154,7 +154,9 @@ class IrAttachment(models.Model):
             id = args[0][2]
             self._cr.execute("""SELECT id, res_model, res_id FROM ir_attachment WHERE id = %s""", [id])
             row = self._cr.dictfetchone()
-            if row and row['res_model'] == 'mail.compose.message' and row['res_id'] == 0:
+            if row and row['res_model'] and not row['res_id']:
+                if not self.env[row['res_model']].check_access_rights('read', False):
+                    return self.browse()
                 return super(IrAttachment, self.sudo())._search(
                     args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
 
