@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from itertools import groupby
-from odoo import api, fields, models, _
+
+from odoo import _, api, fields, models
+
 import odoo.addons.decimal_precision as dp
 
 # Les classes sale.quote.template et sale.quote.line proviennent du module Odoo 11 website_quote/models/sale_quote.py
@@ -465,7 +467,6 @@ class OfSaleOrderLayoutCategory(models.Model):
     _description = u"Ligne de sections"
     _order = 'sequence'
 
-
     @api.multi
     def prepare_sqt_section_vals(self, quote_id):
         self.ensure_one()
@@ -481,14 +482,10 @@ class OfSaleOrderLayoutCategory(models.Model):
             }
             lines_to_create.append((0, 0, line_vals))
         sale_quote_template_obj = self.env['of.sale.quote.template.layout.category']
-        section_line_new = sale_quote_template_obj.new({
-            'sequence': self.sequence,
-            'name': self.name,
-            'parent_id': self.parent_id.id,
-            'quote_line_ids': lines_to_create
-        })
+        section_line_new = sale_quote_template_obj.new(
+            {'sequence': self.sequence, 'name': self.name, 'quote_line_ids': lines_to_create}
+        )
         return section_line_new._convert_to_write(section_line_new._cache)
-
 
     @api.model
     def _get_domain_parent_id(self):
@@ -1305,32 +1302,55 @@ class SaleOrder(models.Model):
     def make_sale_quote_template(self):
         self.ensure_one()
         sale_quote_template = self.env['sale.quote.template']
+
+        # Création du record temporaire pour récupérer les valeurs initiales
         sale_quote_template_new = sale_quote_template.new(self._get_sale_quote_template_values())
         quote_template_values = sale_quote_template_new._convert_to_write(sale_quote_template_new._cache)
 
+        # Préparation des lignes sans catégorie de mise en page
         lines_to_create = []
         for line in self.order_line:
             if not line.of_layout_category_id:
                 line_vals = line.prepare_sqt_line_vals()
                 lines_to_create.append((0, 0, line_vals))
 
+        # Préparation des activités liées
         activities_to_create = []
         for line in self.of_crm_activity_ids:
             activity_vals = line.prepare_sqt_activity_vals()
             activities_to_create.append((0, 0, activity_vals))
 
+        # Mise à jour des valeurs du modèle de devis
         quote_template_values.update({
             'quote_line': lines_to_create,
             'of_sale_quote_tmpl_activity_ids': activities_to_create,
         })
-        sale_quote_template = self.env['sale.quote.template'].create(quote_template_values)
-        sections_to_create = []
+
+        # Création du modèle de devis
+        sale_quote_template = sale_quote_template.create(quote_template_values)
+
+        # Étape 1 : création des sections sans parent_id pour éviter l’erreur FK
+        old_to_new_section = {}
         for section in self.of_layout_category_ids:
+            # Préparation des valeurs sans parent_id
             sections_vals = section.prepare_sqt_section_vals(sale_quote_template.id)
-            sections_to_create.append((0, 0, sections_vals))
-        sale_quote_template.write({
-            'of_section_line_ids': sections_to_create,
-        })
+            new_section = self.env['of.sale.quote.template.layout.category'].create(sections_vals)
+            old_to_new_section[section.id] = new_section
+
+        # Étape 2 : mise à jour des parent_id avec les nouveaux ids créés
+        for section in self.of_layout_category_ids:
+            if section.parent_id and section.id in old_to_new_section:
+                new_section = old_to_new_section[section.id]
+                new_parent = old_to_new_section.get(section.parent_id.id)
+                if new_parent:
+                    new_section.write({'parent_id': new_parent.id})
+
+        # Étape 3 : liaison des sections au modèle de devis
+        sale_quote_template.write(
+            {
+                'of_section_line_ids': [(6, 0, [section.id for section in old_to_new_section.itervalues()])],
+            }
+        )
 
         return {
             'name': u"Modèle de devis",
