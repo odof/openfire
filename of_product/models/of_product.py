@@ -239,12 +239,16 @@ class ProductProduct(models.Model):
 
     @api.depends('list_price', 'price_extra', 'of_forced_lst_price')
     def _compute_product_lst_price(self):
+        if self._context.get('uom') is False:
+            new_context = dict(self._context)
+            new_context.pop('uom')
+            self.env.context = new_context
+
         if not self.env.user.has_group('of_product.group_product_variant_specific_price'):
             return super(ProductProduct, self)._compute_product_lst_price()
         to_uom = None
         if 'uom' in self._context:
             to_uom = self.env['product.uom'].browse([self._context['uom']])
-
         for product in self:
             list_price = product.of_forced_lst_price or product.list_price
             if to_uom:
