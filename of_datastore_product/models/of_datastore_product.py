@@ -674,6 +674,14 @@ class OfDatastoreCentralized(models.AbstractModel):
             # Dans ce cas, on ne veut pas les autres marques du fournisseur
             args = ['&', ('brand_id', 'in', brands.mapped('datastore_brand_id'))] + args
 
+            if supplier.odoo_version != 10:
+                match_dict = self.get_v16_matching_fields()
+                for i, leaf in enumerate(args):
+                    if not isinstance(leaf, (list, tuple)):
+                        continue
+                    if leaf[0] in match_dict:
+                        args[i] = (match_dict[leaf[0]], leaf[1], leaf[2])
+
             supplier_obj = self.env['of.datastore.supplier']
 
             # Exécution de la requête sur la base du fournisseur
@@ -749,6 +757,15 @@ class OfDatastoreCentralized(models.AbstractModel):
                 for pid, pname in res2
             ]
         return res
+
+    @api.model
+    def get_v16_matching_fields(self):
+        """
+        Retourne un dictionnaire de correspondance des champs v10/v16 lorsque leur dénomination est différente
+        Fonction à surcharger au besoin dans les classes qui héritent de 'of.datastore.centralized'
+        :return: {"champ_v10": "champ_v16"}
+        """
+        return {}
 
 
 class Property(models.Model):
