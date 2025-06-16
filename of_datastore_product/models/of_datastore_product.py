@@ -640,6 +640,19 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             supplier_obj = self.env['of.datastore.supplier']
 
+            if supplier.odoo_version != 10:
+                match_dict = self.get_v16_matching_fields()
+                for i, leaf in enumerate(domain):
+                    if not isinstance(leaf, (list, tuple)):
+                        continue
+                    if leaf[0] in match_dict:
+                        domain[i] = (match_dict[leaf[0]], leaf[1], leaf[2])
+                fields = [match_dict.get(field, field) for field in fields]
+                groupby = [match_dict.get(field, field) for field in groupby]
+                if isinstance(orderby, basestring):
+                    for field_10, field_16 in match_dict.iteritems():
+                        orderby = orderby.replace(field_10, field_16)
+
             # Exécution de la requête sur la base du fournisseur
             client = supplier.of_datastore_connect()
             if isinstance(client, basestring):
@@ -648,9 +661,25 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
             res = supplier_obj.of_datastore_read_group(ds_product_obj, domain, fields, groupby, offset, limit, orderby, lazy)
+            if supplier.odoo_version != 10:
+                reverse_match_dict = {val: key for key, val in match_dict.iteritems()}
+                for row in res:
+                    for arg in row['__domain']:
+                        # Les tuples sont convertis en list lors du passage par le xmlrpc, donc pas de tuples à gérer
+                        if isinstance(arg, list):
+                            arg[0] = reverse_match_dict.get(arg[0], arg[0])
+                    row['__range'] = {
+                        reverse_match_dict.get(key, key): val
+                        for key, val in row['__range'].iteritems()
+                    }
+                    for key in row:
+                        if key in reverse_match_dict:
+                            row[reverse_match_dict[key]] = row.pop(key)
+                    if groupby[0] in reverse_match_dict:
+                        row["%s_count" % reverse_match_dict[groupby[0]]] = row.pop("%s_count" % groupby[0])
             for row in res:
                 for arg in row['__domain']:
-                    if isinstance(arg, (list, tuple)):
+                    if isinstance(arg, list):
                         arg[0] = 'ds_' + arg[0]
                 row['__domain'] = [
                     'of_datastore_product_search',
@@ -681,6 +710,10 @@ class OfDatastoreCentralized(models.AbstractModel):
                         continue
                     if leaf[0] in match_dict:
                         args[i] = (match_dict[leaf[0]], leaf[1], leaf[2])
+                if isinstance(order, basestring):
+                    for field_10, field_16 in match_dict.iteritems():
+                        order = order.replace(field_10, field_16)
+
 
             supplier_obj = self.env['of.datastore.supplier']
 

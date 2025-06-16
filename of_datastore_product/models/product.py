@@ -97,6 +97,9 @@ class ProductTemplate(models.Model):
             'of_seller_pp_ht': 'of_seller_pp_untaxed',
             'date_tarif': 'of_cost_date',
             'description_fabricant': 'of_manufacturer_description',
+            'image': 'image_1920',
+            'image_medium': 'image_512',
+            'image_small': 'image_128',
             # of_datastore_supplier
             'date_prochain_tarif': 'of_next_price_list_date',
             'prochain_tarif': 'of_next_price_list',
