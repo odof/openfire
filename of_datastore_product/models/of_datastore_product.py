@@ -767,8 +767,17 @@ class OfDatastoreCentralized(models.AbstractModel):
         new_args = [('brand_id', 'in', brands.mapped('datastore_brand_id')),
                     ('id', 'not in', orig_ids)] + list(args or [])
 
+        # Correspondance des champs v16
+        if supplier.odoo_version != 10:
+            match_dict = self.get_v16_matching_fields()
+            for i, leaf in enumerate(new_args):
+                if not isinstance(leaf, (list, tuple)):
+                    continue
+                if leaf[0] in match_dict:
+                    new_args[i] = (match_dict[leaf[0]], leaf[1], leaf[2])
+
         ds_product_obj = supplier.of_datastore_get_model(client, self._name)
-        res2 = supplier.of_datastore_name_search(ds_product_obj, name, new_args, operator, limit-len(res))
+        res2 = supplier.of_datastore_name_search(ds_product_obj, name, new_args, operator, limit - len(res))
         supplier_ind = DATASTORE_IND * supplier['id']
 
         default_code_func = supplier.get_product_code_convert_func(client)
