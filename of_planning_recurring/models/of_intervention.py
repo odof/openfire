@@ -579,7 +579,8 @@ class OFPlanningIntervention(models.Model):
         if values.get('rrule'):
             data = self._rrule_default_values()
             data['recurrency'] = True
-            data.update(self._rrule_parse(values['rrule'], data, values['date']))
+            start_date = values.get('date') or self[0].date
+            data.update(self._rrule_parse(values['rrule'], data, start_date))
             values.update(data)
             # sometimes final_date is a datetime instead of a date
             if values.get('final_date'):
@@ -1201,7 +1202,7 @@ class OFPlanningIntervention(models.Model):
             elif 'google_internal_event_id' not in data:
                 data['google_internal_event_id'] = False
 
-            detached_meeting = meeting_origin.copy(default=data)
+            detached_meeting_data = meeting_origin.copy_data(default=data)[0]
 
             # si on a choisi "modifier ce RDV et les suivants"
             if not only_one:
@@ -1211,7 +1212,7 @@ class OFPlanningIntervention(models.Model):
                 if meeting_origin.end_type == 'count':
                     # réduire le compteur du RDV détaché
                     count_before_this = self.search_count([('id', '=', real_id), ('date_prompt', '<=', date_last_str)])
-                    detached_meeting.count = detached_meeting.count - count_before_this
+                    detached_meeting_data['count'] = detached_meeting_data['count'] - count_before_this
                 # arrêter la récurrence du RDV d'origine
                 new_rec_vals = {'end_type': 'end_date', 'final_date': date_last_str}
                 new_rrule = meeting_origin._rrule_serialize(new_rec_vals)
@@ -1220,6 +1221,6 @@ class OFPlanningIntervention(models.Model):
                 # de nombreuses heures de debugging ont données lieu à ce contournement, à manipuler avec précaution
                 new_rec_vals['rrule'] = new_rrule
                 meeting_origin.write(new_rec_vals)
-            return detached_meeting
+            return self.create(detached_meeting_data)
         # workaround pour le connecteur google agenda
         return meeting_origin.copy(default=data)
