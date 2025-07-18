@@ -167,6 +167,8 @@
                                         </td>
                                         <td>
                                             <span t-field="line.address_id.display_name"/>
+                                            <br/>
+                                            <span t-esc="line.address_id._format_partner_address()" t-options="{'widget': 'text'}"/>
                                         </td>
                                         <td>
                                             <span t-field="line.tache_id"/>
@@ -226,8 +228,61 @@
                         </div>
                     </div>
                 </div>
-<!--                </div>-->
 
+                <!-- Les équipements -->
+                <div t-if="o.line_ids.filtered(lambda l: l.state == 'validated' and l.parc_installe_id)" name="equipments">
+                    <div class="row h4 mb4" name="title_equipments">
+                        <div class="col-xs-12">
+                            <strong>Vos équipements</strong>
+                        </div>
+                    </div>
+
+                    <div class="row" style="border: 1px solid lightgray; border-top: 2px solid black;">
+                        <table name="equipments" class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th name="num_ligne">Ligne de contrat</th>
+                                    <th name="name">N° de série</th>
+                                    <th name="product_id">Produit</th>
+                                    <th name="brand_id">Marque</th>
+                                    <th name="product_category_id">Catégorie</th>
+                                    <th name="modele">Modèle</th>
+                                    <th name="state">État</th>
+                                </tr>
+                            </thead>
+                            <tbody class="sale_tbody">
+                                <t t-foreach="o.line_ids.filtered(lambda l: l.state == 'validated')" t-as="line">
+                                    <t t-if="line.parc_installe_id">
+                                        <tr>
+                                            <td>
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.product_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.brand_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.product_category_id.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.modele"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.parc_installe_id.state"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Fin d'affichage des équipements -->
 
                 <div t-if="o.commentaires" name="contract_comments">
                     <div name="title_comments" class="row h4 mb4">

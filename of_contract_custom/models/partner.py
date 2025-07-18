@@ -50,6 +50,30 @@ class ResPartner(models.Model):
                 self.of_secteur_com_id = self.of_secteur_tech_id.id
 
     @api.multi
+    def _format_partner_address(self):
+        self.ensure_one()
+        lines = []
+
+        if self.street:
+            lines.append(self.street.strip())
+
+        if self.street2:
+            lines.append(self.street2.strip())
+
+        city_line = ''
+        if self.zip:
+            city_line += self.zip.strip()
+        if self.city:
+            if city_line:
+                city_line += ' '
+            city_line += self.city.strip()
+
+        if city_line:
+            lines.append(city_line)
+
+        return u'\n'.join(lines)
+
+    @api.multi
     def action_view_contract(self):
         action = self.env.ref('of_contract_custom.of_contract_custom_open_contrat').read()[0]
         action['domain'] = [('partner_id', 'in', self._ids)]
