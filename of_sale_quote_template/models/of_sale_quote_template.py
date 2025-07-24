@@ -1080,6 +1080,7 @@ class SaleOrder(models.Model):
             new_section = order_layout_category_obj.create({
                 'name': section.name,
                 'order_id': self.id,
+                'sequence': section.sequence,
                 'sequence_name': section.sequence_name,
                 'quote_section_line_id': section.id,
             })
