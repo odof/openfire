@@ -551,9 +551,11 @@ WHERE os.partner_id = rp.id AND os.company_id IS NULL AND rp.company_id IS NOT N
                 service.spec_date = u"Réalisée le %s" % format_date(service.intervention_ids[-1].date_date, lang)
             elif interventions:
                 service.spec_date = u"Prévue le %s" % format_date(service.intervention_ids[-1].date_date, lang)
-            else:
+            elif service.date_fin:
                 service.spec_date = u"Prévue entre %s et %s" % (
                     format_date(service.date_next, lang), format_date(service.date_fin, lang))
+            else:
+                service.spec_date = u"Prévue à partir de %s" % (format_date(service.date_next, lang))
 
     @api.depends()
     def _compute_last_attachment_id(self):
