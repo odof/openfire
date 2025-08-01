@@ -2313,6 +2313,7 @@ class OfPlanningInterventionLine(models.Model):
             'discount': self.discount,
             'uom_id': product.uom_id.id,
             'product_id': product.id,
+            'layout_category_id': product.of_layout_category_id.id,
             'invoice_line_tax_ids': [(6, 0, taxes._ids)],
             'of_intervention_line_id': self.id
         }, ""

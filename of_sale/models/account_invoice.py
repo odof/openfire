@@ -342,6 +342,7 @@ class AccountInvoiceLine(models.Model):
         )
         if product and product.description_fabricant and afficher:
             self.name += '\n' + product.description_fabricant
+        self.layout_category_id = self.product_id.of_layout_category_id.id
         return res
 
     @api.multi
