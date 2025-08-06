@@ -1594,7 +1594,7 @@ class OfContractLine(models.Model):
                     years=int(date_start_da.month > num_mois), month=num_mois, day=1)
                 date_service = fields.Date.to_string(service_da)
                 month_service_end = fields.Date.to_string(service_da + relativedelta(months=1))
-                if line.date_end and date_service > line.date_end:
+                if line.date_contract_end and date_service > line.date_contract_end:
                     break
                 if len(line.service_ids.filtered(
                         lambda s: date_service <= s.date_next < month_service_end)) >= round(ratio):
