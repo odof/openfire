@@ -139,11 +139,20 @@ class AccountAccount(models.Model):
 
     @api.multi
     def write(self, vals):
+        move_line_obj = self.env['account.move.line'].sudo()
+        # La sauvegarde de la page configuration de comptabilité peut tenter de changer les codes de comptes de banque
+        # et de caisse. Pour ne pas bloquer la sauvegarde ET éviter à admin de modifier les comptes sans le vouloir, on
+        # vide la valeur pour code si le contexte `reflect_code_change` est présent et qu'un des compte a des écritures
+        # comptables.
+        if self.env.context.get('reflect_code_change') and 'code' in vals:
+            for account in self:
+                if vals['code'] != account.code and move_line_obj.search([('account_id', '=', account.id)], limit=1):
+                    del vals['code']
+                    break
         # Interdiction de modifier le code d'un compte comprenant des écritures, sauf pour l'admin.
         if 'code' in vals and self._uid != SUPERUSER_ID:
-            move_line_obj = self.env['account.move.line'].sudo()
             for account in self:
-                if vals['code'] != account.code and move_line_obj.search([('account_id', '=', account.id)]):
+                if vals['code'] != account.code and move_line_obj.search([('account_id', '=', account.id)], limit=1):
                     raise UserError(
                         u"Vous ne pouvez pas changer le code d'un compte ayant déjà des écritures. : %s"
                         % account.code)

@@ -5,3 +5,4 @@ from . import account_journal
 from . import account_payment_term
 from . import of_account
 from . import partner
+from . import res_company
