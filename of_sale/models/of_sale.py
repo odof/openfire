@@ -1340,6 +1340,11 @@ class SaleOrderLine(models.Model):
         Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
         car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
         """
+        has_group = self.env.user.has_group('of_sale.group_of_can_modify_sale_purchase_price')
+        # Certains onchange vont mettre le purchase_price a 0 si le champ est en readonly
+        # le module sale_margin s'assure de calculer un purchase_price si il n'est pas présent
+        if not has_group and 'purchase_price' in vals and not vals['purchase_price']:
+            del vals['purchase_price']
         if vals.get('layout_category_id') and 'sequence' not in vals:
             order = self.env['sale.order'].browse(vals['order_id'])
             max_sequence = order._of_get_max_or_min_seq_by_layout().get(vals['layout_category_id'], 0)
