@@ -66,7 +66,7 @@ class AssignManualQuants(models.TransientModel):
             # Nettoyage de la réservation des quants
             quants_to_unreserve.write({'reservation_id': False})
             # Correction de l'état des mouvements de stock
-            moves.filtered(lambda m: not m.reserved_quant_ids).write({'partially_available': False})
+            moves.filtered(lambda m: not m.reserved_quant_ids).recalculate_move_state()
 
         for pack_op in pack_ops_to_recompute:
             # On a retiré des sources à ces opérations, on recalcule donc leur quantité
