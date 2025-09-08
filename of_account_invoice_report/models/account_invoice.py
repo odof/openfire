@@ -331,6 +331,12 @@ class AccountInvoice(models.Model):
         return result
 
     @api.multi
+    def button_compute_of_echeances(self):
+        self.ensure_one()
+        if self.payment_term_id:
+            self.of_echeance_line_ids = self._of_compute_echeances()
+
+    @api.multi
     def of_recompute_echeance_last(self):
         for invoice in self:
             if not invoice.of_echeance_line_ids or invoice.state in ('open', 'paid'):
