@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, api
+from odoo import api, models
 
 FIELDS_NAMES_SYNC_TRIGGER = ['view_access', 'rule_groups', 'model_access']
 PORTAL_TO_B2C_FIELDS_LIST = ['name', 'model_id', 'perm_read', 'perm_write', 'perm_create', 'perm_unlink']
@@ -25,9 +25,14 @@ class ResUsers(models.Model):
                     user.partner_id.property_product_pricelist = user.of_pricelist_id
                     user.partner_id.property_account_position_id = user.of_fiscal_position_id
                     # On supprime l'utilisateur du groupe b2b et des groupes impliqués
-                    group_portal_b2b.users = [(3, user.id)]
-                    for group in group_portal_b2b.implied_ids:
-                        group.users = [(3, user.id)]
+                    if 'groups_id' not in user.of_user_profile_id.of_field_ids.mapped("name"):
+                        groups = [
+                            (3, group.id)
+                            for group in group_portal_b2b + group_portal_b2b.implied_ids
+                            if group in user.groups_id
+                        ]
+                        if groups:
+                            user.write({"groups_id": groups})
 
                 # On teste si on ajoute le groupe b2b sur l'utilisateur
                 if group_portal_b2b.id == values['groups_id'][0][1] and values['groups_id'][0][0] == 4:
@@ -36,9 +41,14 @@ class ResUsers(models.Model):
                     user.partner_id.property_product_pricelist = user.of_pricelist_id
                     user.partner_id.property_account_position_id = user.of_fiscal_position_id
                     # On supprime l'utilisateur du groupe b2c et des groupes impliqués
-                    group_portal_b2c.users = [(3, user.id)]
-                    for group in group_portal_b2c.implied_ids:
-                        group.users = [(3, user.id)]
+                    if 'groups_id' not in user.of_user_profile_id.of_field_ids.mapped("name"):
+                        groups = [
+                            (3, group.id)
+                            for group in group_portal_b2c + group_portal_b2c.implied_ids
+                            if group in user.groups_id
+                        ]
+                        if groups:
+                            user.write({"groups_id": groups})
 
         return super(ResUsers, self).write(values)
 
