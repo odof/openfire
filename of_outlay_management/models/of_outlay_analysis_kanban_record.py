@@ -242,6 +242,7 @@ class OFOutlayAnalysisKanbanRecord(models.Model):
         # Involved budget
         inv_budget_categ = '03_involved'
         inv_budget_color = '#85d3c4'
+        inv_expenses = sum(analysis_lines['all_expense'].mapped('amount_engaged'))
         self.create({
             'analysis_id': analysis.id,
             'type': '01_income',
@@ -269,7 +270,7 @@ class OFOutlayAnalysisKanbanRecord(models.Model):
             'category': inv_budget_categ,
             'main_color': inv_budget_color,
             'value1': self.format_number(
-                sum(analysis_lines['all_expense'].mapped('amount_engaged')),
+                inv_expenses,
                 lang, currency=currency),
             'label3': u"Dont achats :",
             'value3': self.format_number(
@@ -288,12 +289,12 @@ class OFOutlayAnalysisKanbanRecord(models.Model):
             'label1': u"Réelle",
             'value1':
                 self.format_number(
-                    sale_totals[0] and 100.0 * (sale_totals[0] - sale_cost_totals[0]) / sale_totals[0], lang)
+                    sale_totals[0] and 100.0 * (sale_totals[0] - inv_expenses) / sale_totals[0], lang)
                 + u" %",
             'label2': u"Obj.",
             'value2': self.format_number(analysis.expected_margin_pct, lang) + u" %",
             'label3': u"Réelle :",
-            'value3': self.format_number(sale_totals[0] - sale_cost_totals[0], lang, currency=currency),
+            'value3': self.format_number(sale_totals[0] - inv_expenses, lang, currency=currency),
             'label4': u"Obj. :",
             'value4': self.format_number(analysis.expected_margin, lang, currency=currency),
         })
