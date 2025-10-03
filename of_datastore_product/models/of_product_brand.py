@@ -264,7 +264,7 @@ class OfProductBrand(models.Model):
                     # Ajout d'un filtre sur la précision de l'arrondi pour préciser la recherche
                     uoms = obj_obj.search([('id', 'in', uoms.ids), ('rounding', '=', ds_obj['rounding'])]) or uoms
                 result = uoms[0]
-            elif create:
+            else:
                 # Etape 3 : Créer l'unité de mesure
                 uom_data = {
                     'name':        res_name,

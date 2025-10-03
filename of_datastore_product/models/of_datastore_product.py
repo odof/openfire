@@ -152,6 +152,19 @@ class OfDatastoreCentralized(models.AbstractModel):
         product_tmpl_obj = self.env['product.template']
         result = []
 
+        if len(self) == 1 and fields_to_read == ["active"]:
+            # Cas particuler du test "est_actif" de of_web_widget
+            # On ne va tester que le paramètre actif pour éviter des erreurs dues au fait
+            # que le js appelle est_actif en parallèle des appels onchange (erreur liées à la création d'udm)
+            supplier_id = -self.id / DATASTORE_IND
+            product_id = (-self.id) % DATASTORE_IND
+            client = supplier_obj.browse(supplier_id).of_datastore_connect()
+            ds_product_obj = supplier_obj.of_datastore_get_model(client, self._name)
+            ds_product = supplier_obj.of_datastore_search(
+                ds_product_obj, [('active', '=', True), ('id', '=', product_id)]
+            )
+            return [{'id': self.id, 'active': bool(ds_product)}]
+
         # Certains champs sont nécessaires pour le calcul d'autres champs :
         # - brand_id : La marque, depuis laquelle on extrait les règles de lecture
         # - categ_id : La catégorie, qui peut correspondre à des règles de lecture plus spécifiques dans la marque

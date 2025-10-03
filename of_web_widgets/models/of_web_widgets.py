@@ -12,4 +12,4 @@ class OFWebWidgetsUtils(models.Model):
         model_obj = self.env[model_name]
         if 'active' not in model_obj._fields:
             return True
-        return model_obj.browse(record_id).active
+        return model_obj.browse(record_id).with_context(prefetch_fields=False).active
