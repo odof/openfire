@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api, registry
-from odoo.tools.safe_eval import safe_eval
-from odoo.addons.of_utils.models.of_utils import BigInteger
-
 from contextlib import contextmanager
-from threading import Lock
+
+from psycopg2 import OperationalError
+
+from odoo import api, fields, models, registry
+from odoo.tools.safe_eval import safe_eval
+
+from odoo.addons.of_utils.models.of_utils import BigInteger
 
 
 class OfDatastoreCache(models.TransientModel):
@@ -18,7 +20,6 @@ class OfDatastoreCache(models.TransientModel):
     # Faute de retravailler le javascript, nous allons mettre les données recueillies dans un cache, ce qui limitera les
     #   appels aux bases centrales
     _name = 'of.datastore.cache'
-    _datastore_cache_locks = {'main': Lock()}
 
     model = fields.Char(string='Model', required=True)
     res_id = BigInteger(string='Resource id', required=True)
@@ -26,7 +27,7 @@ class OfDatastoreCache(models.TransientModel):
     vals = fields.Char(string='Values', help="Dictionnary of values for this object", required=True)
 
     @contextmanager
-    def _get_cache_token(self, key, blocking=True):
+    def _get_cache_token(self, blocking=True):
         """
         Fonction de jeton permettant d'éviter à différents threads d'accéder simultanément à la même clef.
         Ainsi, si plusieurs threads veulent récupérer les mêmes données sur une base centrale,
@@ -37,26 +38,30 @@ class OfDatastoreCache(models.TransientModel):
                          si faux la fonction renverra faux si le jeton n'est pas disponible.
         @return: Le modèle 'of.datastore.cache' avec un nouveau cursor si le jeton a pu être obtenu, faux sinon
         """
-        if key not in self._datastore_cache_locks:
-            self._datastore_cache_locks['main'].acquire()
-            if key not in self._datastore_cache_locks:
-                self._datastore_cache_locks[key] = Lock()
-            self._datastore_cache_locks['main'].release()
-
-        acquired = self._datastore_cache_locks[key].acquire(blocking)
+        cr = registry(self._cr.dbname).cursor()
         try:
-            if acquired:
-                cr = registry(self._cr.dbname).cursor()
+            # Acquisition d'un verrou d'exclusivité sur la table
+            # Ce verrou n'empêche pas la lecture sur la table par les autres connexions postgres,
+            # mais empêche l'écriture ainsi que l'acquisition d'un autre verrou
+            query = "LOCK TABLE of_datastore_cache IN EXCLUSIVE MODE"
+            result = None
+            if blocking:
+                cr.execute(query)
+            else:
+                try:
+                    cr.execute(query + " NOWAIT")
+                except OperationalError:
+                    result = False
+                    cr.rollback()
+            if result is not False:
                 result = self.env(cr=cr)['of.datastore.cache']
             yield result
             cr.commit()
         finally:
-            if acquired:
-                try:
-                    cr.close()
-                except Exception:
-                    pass
-                self._datastore_cache_locks[key].release()
+            try:
+                cr.close()
+            except Exception:
+                pass
 
     @api.model
     def store_values(self, model, vals):

@@ -487,7 +487,7 @@ class OfDatastoreCentralized(models.AbstractModel):
 
             res = {vals['id']: vals for vals in res}
             for supplier_id, datastore_ids in datastore_product_ids.iteritems():
-                with self.env['of.datastore.cache']._get_cache_token(supplier_id) as of_cache:
+                with self.env['of.datastore.cache']._get_cache_token() as of_cache:
                     # Vérification des données dans notre cache
                     cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
 
