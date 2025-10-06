@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+import logging
 from contextlib import contextmanager
 
 from psycopg2 import OperationalError
@@ -9,6 +10,8 @@ from odoo import api, fields, models, registry
 from odoo.tools.safe_eval import safe_eval
 
 from odoo.addons.of_utils.models.of_utils import BigInteger
+
+_logger = logging.getLogger(__name__)
 
 
 class OfDatastoreCache(models.TransientModel):
@@ -74,11 +77,19 @@ class OfDatastoreCache(models.TransientModel):
         if hasattr(company, 'accounting_company_id'):
             # Utilisation de la société comptable si le module of_base_multicompany est installé
             company = company.accounting_company_id
-        stored = {
-            ds_cache.res_id: ds_cache
-            for ds_cache in self.search(
-                [('model', '=', model), ('company_id', '=', company.id), ('res_id', 'in', res_ids)])
-        }
+        stored = {}
+        to_unlink = self.browse()
+        for ds_cache in self.search(
+            [('model', '=', model), ('company_id', '=', company.id), ('res_id', 'in', res_ids)],
+            order="id desc"
+        ):
+            if ds_cache.res_id in stored:
+                to_unlink += ds_cache
+            else:
+                stored[ds_cache.res_id] = ds_cache
+        if to_unlink:
+            _logger.warning(u"Présence de doublon dans le cache TC")
+            to_unlink.unlink()
         for v in vals:
             # Les champs calculés ne doivent pas être stockés
             v = {key: val for key, val in v.iteritems() if not model_obj._of_datastore_is_computed_field(key)}
