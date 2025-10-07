@@ -71,6 +71,8 @@ class OfDatastoreCache(models.TransientModel):
         """ Fonction de mise à jour du cache.
         Cette fonction ne devrait jamais être appelée sans avoir au préalable acquis un token avec _get_cache_token
         """
+        # sudo() car Odoo ajoute sinon une contrainte `('create_uid', '=', self._uid)` sur les TransientModel
+        self = self.sudo()
         model_obj = self.env[model]
         res_ids = [v['id'] for v in vals]
         company = self.env.user.company_id
@@ -87,9 +89,6 @@ class OfDatastoreCache(models.TransientModel):
                 to_unlink += ds_cache
             else:
                 stored[ds_cache.res_id] = ds_cache
-        if to_unlink:
-            _logger.warning(u"Présence de doublon dans le cache TC")
-            to_unlink.unlink()
         for v in vals:
             # Les champs calculés ne doivent pas être stockés
             v = {key: val for key, val in v.iteritems() if not model_obj._of_datastore_is_computed_field(key)}
@@ -109,6 +108,13 @@ class OfDatastoreCache(models.TransientModel):
                     'company_id': company.id,
                     'vals': str(v),
                 })
+        # Suppressions d'éventuels doublons dans le cache, même si ce cas ne devrait pas se produire
+        if to_unlink:
+            _logger.warning(u"Présence de doublon dans le cache TC")
+            # Suppression en SQL et pas par appel unlink()
+            # On est potentiellement dans un onchange, on ne veut pas que le unlink() vienne invalider le cache
+            # et vider tous les champs de l'objet en cours d'édition
+            self.env.cr.execute("DELETE FROM of_datastore_cache WHERE id IN %s", (to_unlink._ids, ))
 
     @api.model
     def apply_values(self, record):
@@ -131,5 +137,7 @@ class OfDatastoreCache(models.TransientModel):
         vals = cr.fetchall()
         cr.close()
         if vals:
-            vals = safe_eval(vals[0][0])
+            # Il n'y a normalement qu'une seule valeur
+            # Si par erreur il y en a plusieurs, on prend la plus récente
+            vals = safe_eval(vals[-1][0])
             record._cache.update(record._convert_to_cache(vals, validate=False))
