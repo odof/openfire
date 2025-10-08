@@ -489,7 +489,14 @@ class OfDatastoreCentralized(models.AbstractModel):
             for supplier_id, datastore_ids in datastore_product_ids.iteritems():
                 with self.env['of.datastore.cache']._get_cache_token() as of_cache:
                     # Vérification des données dans notre cache
-                    cached_products = of_cache.search([('model', '=', self._name), ('res_id', 'in', datastore_ids)])
+                    # Société, utilisée dans la clef en raison des champs company-dependent
+                    company = self.env.user.company_id
+                    if hasattr(company, 'accounting_company_id'):
+                        # Utilisation de la société comptable si le module of_base_multicompany est installé
+                        company = company.accounting_company_id
+                    cached_products = of_cache.sudo().search(
+                        [('model', '=', self._name), ('company_id', '=', company.id), ('res_id', 'in', datastore_ids)]
+                    )
 
                     # Les articles non en cache sont à lire
                     new_ids = set(datastore_ids) - set(cached_products.mapped('res_id'))

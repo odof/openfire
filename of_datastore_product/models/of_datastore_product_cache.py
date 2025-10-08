@@ -71,8 +71,6 @@ class OfDatastoreCache(models.TransientModel):
         """ Fonction de mise à jour du cache.
         Cette fonction ne devrait jamais être appelée sans avoir au préalable acquis un token avec _get_cache_token
         """
-        # sudo() car Odoo ajoute sinon une contrainte `('create_uid', '=', self._uid)` sur les TransientModel
-        self = self.sudo()
         model_obj = self.env[model]
         res_ids = [v['id'] for v in vals]
         company = self.env.user.company_id
@@ -81,7 +79,8 @@ class OfDatastoreCache(models.TransientModel):
             company = company.accounting_company_id
         stored = {}
         to_unlink = self.browse()
-        for ds_cache in self.search(
+        # sudo() car Odoo ajoute sinon une contrainte `('create_uid', '=', self._uid)` sur les TransientModel
+        for ds_cache in self.sudo().search(
             [('model', '=', model), ('company_id', '=', company.id), ('res_id', 'in', res_ids)],
             order="id desc"
         ):
