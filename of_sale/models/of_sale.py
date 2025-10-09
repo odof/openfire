@@ -1357,18 +1357,36 @@ class SaleOrderLine(models.Model):
     @api.multi
     def write(self, vals):
         """
-        Si un des champ de blocked est présent ET une ligne modifiée ne doit pas avoir de modification alors renvoi une
+        Si un des champ de blocked est présent ET une ligne modifiée ne doit pas avoir de modification alors renvoie une
         erreur. Le champ of_discount_formula est dans le module of_sale_discount, la façon dont on vérifie la présence
         des champs dans vals ne provoque pas d'erreur si le module n'est pas installé.
         TODO: Permettre de modifier le montant si modification viens de la facture d'acompte
         """
         force = self._context.get('force_price')
-        blocked = [x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula')
-                   if x in vals.keys()]
-        for line in self:
-            locked_invoice_lines = line.mapped('invoice_lines').filtered(lambda l: l.of_is_locked)
-            if locked_invoice_lines and blocked and not force:
-                raise UserError(u"""Cette ligne ne peut être modifiée : %s""" % line.name)
+        blocked_fields = (
+            not force
+            and [
+                x for x in ('price_unit', 'product_uom_qty', 'product_uom', 'discount', 'of_discount_formula')
+                if x in vals
+            ]
+        )
+        if blocked_fields:
+            for line in self:
+                if not any(inv_line.of_is_locked for inv_line in line.invoice_lines):
+                    continue
+                for field in blocked_fields:
+                    old_val = line[field]
+                    new_val = vals[field]
+                    if field == 'product_uom':
+                        val_changed = new_val != old_val.id
+                    elif hasattr(self._fields[field], "digits"):
+                        digits = self._fields[field].digits
+                        digits = digits[1] if digits else 5
+                        val_changed = float_compare(new_val, old_val, precision_digits=digits)
+                    else:
+                        val_changed = new_val != old_val
+                    if val_changed:
+                        raise UserError(u"Cette ligne ne peut être modifiée : %s" % line.name)
 
         # Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées, car
         # renseignées par un onchange et affichage en vue en kanban. Du coup, on surcharge le write
