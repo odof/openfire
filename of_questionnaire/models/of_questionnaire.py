@@ -266,7 +266,7 @@ class OfPlanningIntervention(models.Model):
     @api.multi
     def _write(self, vals):
         res = super(OfPlanningIntervention, self)._write(vals)
-        if vals.get('state', '') == 'done':
+        if vals.get('state', '') == 'done' and not self._context.get("of_skip_questionnaire", False):
             self.recompute_questions_condition_unmet()
             for intervention in self:
                 if any(
