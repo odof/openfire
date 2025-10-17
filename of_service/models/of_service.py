@@ -1532,15 +1532,10 @@ class OfServiceLine(models.Model):
         Calcule le montant de la ligne.
         """
         for line in self:
-            company = line.service_id.company_id
-            # arrondir est le fonctionnement par défaut
-            with_round = not company or company.tax_calculation_rounding_method != 'round_globally'
             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-            taxes = line.taxe_ids.with_context(round=with_round).compute_all(
-                price, line.currency_id, line.qty, product=line.product_id, partner=line.service_id.address_id)
-            if not with_round:
-                # on fait une troncature ici, car le "update" arrondi automatiquement
-                taxes['total_included'] = int(taxes['total_included'] * 100) / 100.0
+            taxes = line.taxe_ids.compute_all(
+                price, line.currency_id, line.qty, product=line.product_id, partner=line.service_id.address_id
+            )
             line.update({
                 'price_tax': taxes['total_included'] - taxes['total_excluded'],
                 'price_total': taxes['total_included'],
