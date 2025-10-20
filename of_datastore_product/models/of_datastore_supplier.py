@@ -70,7 +70,7 @@ class OfDatastoreSupplier(models.Model):
         brand_obj = self.env['of.product.brand']
         wizard_obj = self.env['of.datastore.import.brand']
 
-        ds_brand_data = brand_obj.datastore_read(self, ['name', 'code', 'logo', 'note_maj'])
+        ds_brand_data = brand_obj.datastore_read(self, ['name', 'code', 'image_1920', 'note_maj'])
         if isinstance(ds_brand_data, basestring):
             raise UserError(u"Échec de la connexion à la base centrale")
         brand_names = brand_obj.search([]).mapped('name')
@@ -85,7 +85,7 @@ class OfDatastoreSupplier(models.Model):
                         'datastore_brand_id': ds_brand['id'],
                         'name': ds_brand['name'],
                         'code': ds_brand['code'],
-                        'logo': ds_brand['logo'],
+                        'logo': ds_brand['image_1920'],
                         'note_maj': ds_brand['note_maj'],
                         'state': 'done' if ds_brand['name'] in brand_names else 'do',
                     }
