@@ -144,7 +144,7 @@ class PurchaseOrder(models.Model):
                 product_id = product_divers_id
 
             ds_product_data = datastore_purchase.of_datastore_read(
-                ds_product_obj, [product_id], ['uom_id', 'list_price', 'taxes_id'])[0]
+                ds_product_obj, [product_id], ['uom_id', 'list_price', 'taxes_id', 'of_seller_price'])[0]
 
             tax_ids = ds_product_data['taxes_id']
             line_tax_ids = []
@@ -170,6 +170,7 @@ class PurchaseOrder(models.Model):
                     'product_id': product_id,
                     'product_uom': ds_product_data['uom_id'][0],
                     'price_unit': ds_product_data['list_price'],
+                    'of_seller_price': ds_product_data['of_seller_price'],
                     'tax_id': [(6, 0, line_tax_ids)],
                 }
             )
@@ -243,8 +244,9 @@ class PurchaseOrderLine(models.Model):
             'product_uom': base_vals.get('product_uom'),
             'product_uom_qty': self.product_qty,
             'price_unit': base_vals.get('price_unit'),
+            'of_seller_price': base_vals.get('of_seller_price'),
             'tax_id': base_vals.get('tax_id'),
-            }
+        }
         if self.order_id.of_datastore_dropshipping:
             values['of_datastore_line_id'] = self.id
         return values
