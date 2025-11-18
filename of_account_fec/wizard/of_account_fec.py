@@ -349,7 +349,7 @@ class OFAccountFrFec(models.TransientModel):
         fecvalue = fecfile.getvalue()
         # venant du fichier est toujours en utf-8
         if self.of_encoding != 'utf-8':
-            fecvalue = fecvalue.decode('utf-8').encode(self.of_encoding)
+            fecvalue = fecvalue.decode('utf-8').encode(self.of_encoding, errors='replace')
         self.write({
             'fec_data': base64.encodestring(fecvalue),
             'filename': '%sFEC%s.%s' % (siren, end_date, self.of_extension),
