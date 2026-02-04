@@ -1725,7 +1725,7 @@ function lazySegBind(container, segs, bindHandlers) {
             e = parent;
             parent = parent.parentNode;
         }
-        if ((i = e._fci) !== undefined) {
+        if (e !== undefined && (i = e._fci) !== undefined) {
             e._fci = undefined;
             seg = segs[i];
             bindHandlers(seg.event, seg.element, seg);
