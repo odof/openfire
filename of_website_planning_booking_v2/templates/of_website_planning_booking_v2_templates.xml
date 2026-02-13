@@ -265,7 +265,7 @@
         <t t-call="website.layout">
             <div id="wrap">
                 <div class="oe_structure"/>
-                <div class="container of_booking">
+                <div class="container of_booking of_booking_confirmation">
                     <div class="row" style="margin-top: 40px;">
                         <h1 class="col-md-10 page-header theme-text">
                             Confirmez votre rendez-vous
@@ -308,7 +308,7 @@
                         </div>
                         <div class="clearfix"/>
                         <br/>
-                        <form action="/booking/confirm" method="post">
+                        <form id="form_confirmation" action="/booking/confirm" method="post">
                             <div class="form-group col-md-10">
                                 <label class="control-label label-optional" for="comment">Commentaires additionnels</label>
                                 <textarea name="comment" class="form-control"/>
@@ -340,7 +340,7 @@
                                         <input type="hidden" name="partner_id" t-att-value="partner_id"/>
                                         <input type="hidden" name="slot_id" t-att-value="slot_id"/>
                                         <input type="hidden" name="submitted" value="1"/>
-                                        <button type="submit" class="btn btn-default">
+                                        <button id="button_confirmation" type="submit" class="btn btn-default">
                                             Valider
                                             <span class="fa fa-long-arrow-right"/>
                                         </button>

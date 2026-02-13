@@ -11,8 +11,8 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
         return value != null && value != undefined && value != "" && !Number.isNaN(value);
     }
 
-    if(!$('.of_booking_main').length) {
-        return $.Deferred().reject("DOM doesn't contain '.of_booking_main'");
+    if(!$('.of_booking_main').length && !$('.of_booking_confirmation').length) {
+        return $.Deferred().reject("DOM doesn't contain '.of_booking_main' or '.of_booking_confirmation'");
     }
 
     $('.of_booking_main').each(function () {
@@ -684,6 +684,16 @@ odoo.define('of_website_planning_booking_v2.of_booking', function (require) {
             new_slot.removeClass('of_js_slot_change');
             new_slot.addClass('of-border-primary');
         };
+
+    });
+
+    $('.of_booking_confirmation').each(function () {
+
+        // Prevent double click on final validation
+        $('#button_confirmation').on('click', function (event) {
+            $(this).prop('disabled', true);
+            $('#form_confirmation').submit();
+        });
 
     });
 });
