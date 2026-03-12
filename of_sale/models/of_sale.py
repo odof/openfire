@@ -942,6 +942,7 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _name = 'sale.order.line'
     _inherit = ['sale.order.line', 'of.readgroup']
+    _OF_PRICE_IMPACT_FIELDS = ('product_id', 'product_uom', 'order_id')
 
     price_unit = fields.Float(digits=False, help="""
     Prix unitaire de l'article.
@@ -1335,12 +1336,47 @@ class SaleOrderLine(models.Model):
         return super(SaleOrderLine, self).unlink()
 
     @api.model
+    def _of_get_price_unit_from_vals(self, vals, line=False):
+        """
+        Calcule un prix unitaire depuis 'vals'
+
+        Ce helper sert de filet de sécurité quand ça envoie 'price_unit=0'
+        (Cas : profils sans droit de modification de prix unitaire).
+        """
+        product_id = vals.get('product_id') or (line and line.product_id.id)
+        order_id = vals.get('order_id') or (line and line.order_id.id)
+        if not product_id or not order_id:
+            return vals.get('price_unit', 0.0)
+
+        product = self.env['product.product'].browse(product_id)
+        product_uom_id = vals.get('product_uom') or (line and line.product_uom.id) or product.uom_id.id
+        product_uom_qty = vals.get('product_uom_qty')
+        if product_uom_qty is None:
+            product_uom_qty = line.product_uom_qty if line else 1.0
+
+        line_new = self.new({
+            'order_id': order_id,
+            'product_id': product_id,
+            'product_uom': product_uom_id,
+            'product_uom_qty': product_uom_qty,
+        })
+        line_new.product_id_change()
+        return line_new.of_get_price_unit()
+
+    @api.model
     def create(self, vals):
         """
         Au moment de la sauvegarde de la commande, les images articles ne sont pas toujours sauvegardées
         car renseignées par un onchange et affichage en vue en kanban, du coup on surcharge le create
         """
         has_group = self.env.user.has_group('of_sale.group_of_can_modify_sale_purchase_price')
+        can_modify_sale_price_unit = self.env.user.has_group('of_sale.group_of_can_modify_sale_price_unit')
+        # Sans droit de modification de prix unitaire, on corrige les cas où le client envoie un prix nul.
+        if not can_modify_sale_price_unit:
+            price_unit = vals.get('price_unit')
+            if price_unit is None or float_is_zero(price_unit, precision_digits=2):
+                vals['price_unit'] = self._of_get_price_unit_from_vals(vals)
+
         # Certains onchange vont mettre le purchase_price a 0 si le champ est en readonly
         # le module sale_margin s'assure de calculer un purchase_price si il n'est pas présent
         if not has_group and 'purchase_price' in vals and not vals['purchase_price']:
@@ -1363,6 +1399,12 @@ class SaleOrderLine(models.Model):
         TODO: Permettre de modifier le montant si modification viens de la facture d'acompte
         """
         force = self._context.get('force_price')
+        can_modify_sale_price_unit = self.env.user.has_group('of_sale.group_of_can_modify_sale_price_unit')
+        if not force and not can_modify_sale_price_unit and len(self) == 1:
+            # Ne pas écraser un prix unitaire existant modifié manuellement, ne recalculer qu'aux cas utiles.
+            if any(field in vals for field in self._OF_PRICE_IMPACT_FIELDS):
+                vals['price_unit'] = self._of_get_price_unit_from_vals(vals, self)
+
         blocked_fields = (
             not force
             and [
