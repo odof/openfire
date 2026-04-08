@@ -177,10 +177,14 @@ class ProductProduct(models.Model):
         unused_fields = self._get_datastore_unused_fields()
         computed_fields = self._of_get_datastore_computed_fields()
         import_fields = [
-            f for f in self._fields
+            f for f, f_obj in self._fields.iteritems()
             if f not in computed_fields
             and f not in unused_fields
             and f != 'product_tmpl_id'
+            and (
+                not f_obj.groups
+                or self.env.user.user_has_groups(f_obj.groups)
+            )
         ]
 
         import_fields += [
