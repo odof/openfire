@@ -41,6 +41,13 @@ class OFStockInventoryValuation(models.TransientModel):
     location_ids = fields.Many2many(
         comodel_name='stock.location', string="Emplacements", required=True,
         domain="[('usage', '=', 'internal'), ('company_id', '=', company_id)]")
+    do_aggregate_locations = fields.Boolean(
+        string=u"Regrouper les emplacements",
+        help=(
+            u"Si plusieurs emplacements de stock sont sélectionnés ils seront traités comme un seul.\n"
+            u"Les quantités seront additionnées.\n"
+        )
+    )
 
     def _compute_allowed_company_ids(self):
         companies = self.env['stock.location'].search([('usage', '=', 'internal')]).mapped('company_id')
@@ -147,6 +154,7 @@ class OFStockInventoryValuation(models.TransientModel):
         product_obj = self.env['product.product']
 
         # Requêtes SQL basées sur la vue stock_history du module stock_account
+
         query_in = """
             SELECT
                 stock_move.location_dest_id AS location_id,
@@ -170,8 +178,7 @@ class OFStockInventoryValuation(models.TransientModel):
                 quant.qty>0
                 AND stock_move.state = 'done'
                 AND stock_move.date <= %(date)s
-                AND stock_move.location_dest_id IN %(location_ids)s
-                AND stock_move.location_dest_id != stock_move.location_id"""
+                AND stock_move.location_dest_id IN %(location_ids)s"""
         query_out = """
             SELECT
                 stock_move.location_id AS location_id,
@@ -195,8 +202,7 @@ class OFStockInventoryValuation(models.TransientModel):
                 quant.qty>0
                 AND stock_move.state = 'done'
                 AND stock_move.date <= %(date)s
-                AND stock_move.location_id IN %(location_ids)s
-                AND stock_move.location_id != stock_move.location_dest_id"""
+                AND stock_move.location_id IN %(location_ids)s"""
 
         query_params = {
             'date': self.date,
@@ -214,10 +220,24 @@ class OFStockInventoryValuation(models.TransientModel):
             query_in += query_brand
             query_out += query_brand
             query_params['categ_ids'] = self.categ_ids._ids
+        if self.do_aggregate_locations:
+            query_in += """
+                AND stock_move.location_id NOT IN %(location_ids)s"""
+            query_out += """
+                AND stock_move.location_dest_id NOT IN %(location_ids)s"""
+            query_group_by = "product_id, of_internal_serial_number"
+            query_select_location = "%s AS location_id," % self.location_ids.ids[0]
+        else:
+            query_in += """
+                AND stock_move.location_dest_id != stock_move.location_id"""
+            query_out += """
+                AND stock_move.location_dest_id != stock_move.location_id"""
+            query_group_by = "location_id, product_id, of_internal_serial_number"
+            query_select_location = "location_id,"
 
         query = """
             SELECT
-                location_id,
+                """ + query_select_location + """
                 product_id,
                 SUM(quantity) as quantity,
                 COALESCE(SUM(price_unit_on_quant * quantity), 0) AS price,
@@ -227,7 +247,7 @@ class OFStockInventoryValuation(models.TransientModel):
                 ) UNION ALL
                 (""" + query_out + """
                 )) AS foo
-            GROUP BY location_id, product_id, of_internal_serial_number"""
+            GROUP BY """ + query_group_by
 
         self.env.cr.execute(query, query_params)
 

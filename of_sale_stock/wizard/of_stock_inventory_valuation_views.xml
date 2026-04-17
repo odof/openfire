@@ -10,6 +10,7 @@
                     <field name="allowed_company_ids" widget="many2many_tags" invisible="1"/>
                     <field name="company_id" options="{'no_open':True, 'no_create':True}"/>
                     <field name="location_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="do_aggregate_locations"/>
                     <field name="date"/>
                     <field name="brand_ids" widget="many2many_tags" options="{'no_create': True}"/>
                     <field name="categ_ids" widget="many2many_tags" options="{'no_create': True}"/>
