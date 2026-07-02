@@ -36,7 +36,7 @@
 
     <record id="of_config_parameter_support" model="ir.config_parameter">
         <field name="key">of.support</field>
-        <field name="value">https://support-10.openfire.fr/hc/fr</field>
+        <field name="value">https://back.openfire.fr/helpdesk/team-support-1</field>
     </record>
 
 </odoo>
