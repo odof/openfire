@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': "OpenFire / Comptabilité",
-    'version': "10.0.2.0.0",
+    'version': "10.0.2.1.0",
     'author': "OpenFire",
     'license': '',
     'website': "www.openfire.fr",
@@ -34,7 +34,8 @@ Module de comptabilité OpenFire.
         'security/of_account_security.xml',
         'views/of_account_views.xml',
         'views/partner_views.xml',
-        'wizards/wizard_edit_export_view.xml'
+        'wizards/wizard_edit_export_view.xml',
+        'hooks/hook.xml',
     ],
     'installable': True,
 }
