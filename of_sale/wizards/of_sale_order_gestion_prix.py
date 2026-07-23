@@ -44,7 +44,7 @@ class GestionPrix(models.TransientModel):
     discount_mode = fields.Selection([
         ('line', "Appliquer la gestion de prix dans les lignes"),
         ('total', "Appliquer la gestion de prix dans les totaux"),
-        ], string="Mode de remise", required=True, default='line')
+    ], string="Mode de remise", required=True, default='line')
     discount_product_id = fields.Many2one(comodel_name='product.product', string="Article de remise")
     methode_remise = fields.Selection(
         selection=_get_selection_mode_calcul, default='prix_ttc_cible', string=u"Mode de calcul",
@@ -585,7 +585,7 @@ class GestionPrixLine(models.TransientModel):
                 'price_unit': price_unit,
                 'of_price_management_variation': 0.0,
                 'purchase_price': order_line.product_id.get_cost(),
-             }},
+            }},
             taxes)
 
     @api.multi
