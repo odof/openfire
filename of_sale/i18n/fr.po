@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-25 09:12+0000\n"
-"PO-Revision-Date: 2023-01-25 09:12+0000\n"
+"POT-Creation-Date: 2026-07-24 07:59+0000\n"
+"PO-Revision-Date: 2026-07-24 07:59+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -566,11 +566,6 @@ msgstr "Courrier"
 #: model:ir.ui.view,arch_db:of_sale.of_report_saleorder_gestion_prix
 msgid "Coût"
 msgstr "Coût"
-
-#. module: of_sale
-#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cout_total_ht_simul
-msgid "Coût Total HT simulé"
-msgstr "Coût Total HT simulé"
 
 #. module: of_sale
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_line_cout_total_ht
@@ -2034,6 +2029,16 @@ msgstr "Total TTC initial"
 #: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_montant_total_ttc_simul
 msgid "Total TTC simulé"
 msgstr "Total TTC simulé"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cout_total_ht_initial
+msgid "Total coût initial"
+msgstr "Total coût initial"
+
+#. module: of_sale
+#: model:ir.model.fields,field_description:of_sale.field_of_sale_order_gestion_prix_cout_total_ht_simul
+msgid "Total coût simulé"
+msgstr "Total coût simulé"
 
 #. module: of_sale
 #: model:ir.ui.view,arch_db:of_sale.of_view_sale_order_gestion_prix

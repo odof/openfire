@@ -70,6 +70,8 @@
                     <field name="montant_total_ht_simul"/>
                     <field name="montant_total_ttc_initial"/>
                     <field name="montant_total_ttc_simul"/>
+                    <field name="cout_total_ht_initial" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
+                    <field name="cout_total_ht_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                     <field name="marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                     <field name="marge_simul" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>
                     <field name="pc_marge_initiale" groups="of_sale.of_group_sale_marge_manager" attrs="{'invisible': [('of_client_view', '=', True)]}"/>

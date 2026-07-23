@@ -73,8 +73,10 @@ class GestionPrix(models.TransientModel):
         string=u'Total TTC simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     montant_total_ht_simul = fields.Monetary(
         string=u'Total HT simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+    cout_total_ht_initial = fields.Monetary(
+        string=u'Total coût initial', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     cout_total_ht_simul = fields.Monetary(
-        string=u'Coût Total HT simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
+        string=u'Total coût simulé', digits=dp.get_precision('Sale Price'), compute='_compute_montant_simul')
     afficher_remise = fields.Boolean(
         string='Afficher dans notes',
         help=u"Affiche le montant de la remise effectuée dans les notes du devis/de la commande.")
@@ -98,7 +100,9 @@ class GestionPrix(models.TransientModel):
     ], default='price', required=True, string=u"Prorata")
     of_client_view = fields.Boolean(string='Vue client/vendeur', related="order_id.of_client_view")
 
-    @api.depends('line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul', 'line_ids.cout_total_ht_simul')
+    @api.depends(
+        'line_ids.prix_total_ttc_simul', 'line_ids.prix_total_ht_simul',
+        'line_ids.cout_total_ht', 'line_ids.cout_total_ht_simul')
     def _compute_montant_simul(self):
         for wizard in self:
             lines = wizard.line_ids
@@ -109,6 +113,7 @@ class GestionPrix(models.TransientModel):
             wizard.pc_marge_simul = 100 * (1 - total_achat / total_vente) if total_vente else -100
             wizard.montant_total_ttc_simul = sum(lines.mapped('prix_total_ttc_simul'))
             wizard.montant_total_ht_simul = sum(lines.mapped('prix_total_ht_simul'))
+            wizard.cout_total_ht_initial = sum(lines.mapped('cout_total_ht'))
             wizard.cout_total_ht_simul = sum(lines.mapped('cout_total_ht_simul'))
 
     @api.multi
