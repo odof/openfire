@@ -158,6 +158,8 @@ class AccountFiscalPosition(models.Model):
         if not self:
             if self._context.get('website_id'):
                 return taxes
+            if self._context.get("fr_einvoicing_import"):
+                return taxes
             raise UserError(u"Veuillez renseigner une position fiscale")
         self.ensure_one()
         if not taxes:
