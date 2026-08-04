@@ -203,7 +203,15 @@ class ResPartner(models.Model):
             vals['geocoding'] = "manual"
             vals['geocodeur'] = "manual"
             vals['precision'] = "manual"
-            vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.datetime.now())
+            vals['date_last_localization'] = fields.Datetime.context_timestamp(self, fields.Datetime.now())
+        # Cas particulier lorsqu'on renseigne uniquement le pays alors qu'il était vide
+        elif vals.get("country_id") and not any(
+            field in vals for field in ("street", "street2", "zip", "city", "state_id")
+        ):
+            for partner in self:
+                if partner.country_id:
+                    to_update |= partner
+                    break
         elif (
             any(field in vals for field in ('street', 'street2', 'zip', 'city', 'state_id', 'country_id')) and
             not any(field in vals for field in ('geocoding', 'geocodeur', 'date_last_localization', 'precision'))
