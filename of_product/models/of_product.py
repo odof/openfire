@@ -296,6 +296,11 @@ class ProductProduct(models.Model):
         else:
             return self.of_theoretical_cost
 
+    @api.multi
+    def of_purchase_coeff_cost_propagation(self, cost):
+        # Fonction surchargée dans le module of_purchase
+        pass
+
     @api.model
     def create(self, vals):
         product = super(ProductProduct, self).create(vals)
