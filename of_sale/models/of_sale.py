@@ -359,6 +359,20 @@ class SaleOrder(models.Model):
             result[-1][2]['percent'] = pct_left
         return result
 
+    @api.multi
+    def _of_ensure_echeances(self):
+        # Filet de sécurité : crée l'échéancier quand il est totalement absent, pour les commandes créées ou
+        # modifiées hors du formulaire (onchange non déclenché), comme c'est déjà fait pour les factures.
+        # Ne touche jamais un échéancier déjà présent, même désynchronisé : ce cas-là est la responsabilité de
+        # of_recompute_echeance_last (write) ou de l'onchange du formulaire, qui eux préservent les lignes
+        # existantes (dates, montants ou noms modifiés à la main) au lieu de tout regénérer depuis le mode de
+        # paiement.
+        for order in self:
+            if order.of_echeance_line_ids:
+                continue
+            if order.payment_term_id and order.amount_total:
+                order.of_echeance_line_ids = order._of_compute_echeances()
+
     @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status')
     def _get_invoiced(self):
         # Appel du super dans tous les cas pour le calcul de invoice_count et invoice_ids
@@ -487,6 +501,8 @@ class SaleOrder(models.Model):
     @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
+        # Dernier filet avant facturation : s'assurer que l'échéancier existe avant d'en recaler les dates.
+        self._of_ensure_echeances()
         self.of_update_dates_echeancier()
         return res
 
@@ -512,6 +528,8 @@ class SaleOrder(models.Model):
     def create(self, vals):
         mail_subtype = self.env.ref('of_base.mail_message_subtype_mail', raise_if_not_found=False)
         record = super(SaleOrder, self).create(vals)
+        # Cas des commandes créées avec lignes et mode de paiement déjà renseignés (hors formulaire/onchange).
+        record._of_ensure_echeances()
         if mail_subtype:
             record.message_subscribe(partner_ids=[vals['partner_id']], subtype_ids=[mail_subtype.id], force=False)
         return record
@@ -545,6 +563,9 @@ class SaleOrder(models.Model):
                 record.message_subscribe(partner_ids=new_partners.ids, subtype_ids=[mail_subtype.id], force=False)
                 message_followers = record.message_follower_ids
                 message_followers.sudo().filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
+        # Cas des commandes créées vides puis complétées ensuite (lignes/mode de paiement ajoutés après coup) :
+        # of_recompute_echeance_last ne fait qu'ajuster un échéancier déjà existant, il ne le crée jamais.
+        self._of_ensure_echeances()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
