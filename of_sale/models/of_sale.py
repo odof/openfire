@@ -1204,8 +1204,7 @@ class SaleOrderLine(models.Model):
         # Remise interdite
 
         if self.product_id:
-            self.of_product_forbidden_discount = self.product_id.of_forbidden_discount or not self.env.user.has_group(
-                'of_sale.group_of_can_modify_sale_price_unit')
+            self.of_product_forbidden_discount = self.product_id.of_forbidden_discount
             if self.product_id.of_forbidden_discount and self.of_discount_formula:
                 self.of_discount_formula = False
             if self.product_id.categ_id:

@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+<!--
+Structure des vues form de sale.order dans ce fichier
+`vue héritée d'un autre module`
+    `vue de ce module`
+        `sous-vue de ce module`
+
+of_sale_discount.of_sale_discount_view_order_form
+    of_sale_view_order_form
+        of_sale_order_manager_form_view
+        of_sale_order_can_modify_sale_price_unit_view_form
+        of_sale_order_form_fiscal_position_required - noupdate
+
+sale_crm.sale_view_inherit123
+    of_sale_view_devis
+
+sale_margin.sale_margin_sale_order_line_form
+    of_sale_margin_sale_order_line_form
+
+sale_margin.sale_margin_sale_order_line
+    of_sale_margin_sale_order_line
+        of_sale_order_manager_purchase_price_form_view
+
+sale_margin.sale_margin_sale_order
+    of_sale_margin_sale_order
+
+sale.view_order_form
+    of_sale_obsolete_sale_order_form_view
+        of_sale_order_price_unit_no_readonly_view_form
+            of_sale_order_manager2_form_view
+-->
+
     <!-- Ajout du champ of_mail_template_ids pour ir.actions.report.xml -->
     <record id="of_sale_ir_actions_report_xml_form_view" model="ir.ui.view">
         <field name="name">of.sale.ir.actions.report.xml.form.view</field>
@@ -115,13 +146,13 @@
                     <field name="of_product_forbidden_discount" groups="sales_team.group_sale_manager"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="before">
-                    <field name="of_price_unit_display" attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
+                    <field name="of_price_unit_display"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']//form//field[@name='of_discount_formula']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
                 <!-- prix unitaire HT dans la vue form des lignes de commande -->
                 <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="before">
@@ -231,6 +262,26 @@
                     <attribute name="attrs">{'invisible': [('state','in',['draft', 'sent', 'cancel']),('confirmation_date', '=', False)],
 'required': [('state','not in',['draft', 'sent', 'cancel']),('confirmation_date','=',False)]}</attribute>
                     <attribute name="readonly">0</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="of_sale_order_can_modify_sale_price_unit_view_form" model="ir.ui.view">
+            <field name="name">of.sale.order.can.modify.sale.price.unit.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_view_order_form"/>
+            <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_price_unit'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']//form//field[@name='price_unit']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//form//field[@name='of_price_unit_display']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', False)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//form//field[@name='of_discount_formula']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
                 </xpath>
             </field>
         </record>
@@ -374,9 +425,8 @@
                     <label for="price_unit"/>
                     <div>
                         <field name="price_unit" class="oe_inline" style="max-width: 150px;"
-                               attrs="{'invisible': [('of_product_forbidden_discount', '=', True)]}" readonly="1"/>
-                        <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"
-                               attrs="{'invisible': [('of_product_forbidden_discount', '=', False)]}"/>
+                            invisible="1" readonly="1"/>
+                        <field name="of_price_unit_display" class="oe_inline" style="max-width: 150px;"/>
                         (<field name="of_date_tarif" class="oe_inline"/>
                         <span attrs="{'invisible': [('of_date_tarif', '!=', False)]}">Non daté</span>)
                         <br/>
@@ -419,10 +469,32 @@
             </field>
         </record>
 
+        <record id="of_sale_order_price_unit_no_readonly_view_form" model="ir.ui.view">
+            <field name="name">of.sale.order.price.unit.view.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
+            <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_price_unit')), (4, ref('sales_team.group_sale_manager'))]"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form//field[@name='of_price_unit_display']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                    <attribute name="attrs">{'invisible': [('of_product_forbidden_discount', '=', False)]}</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
         <record id="of_sale_order_manager2_form_view" model="ir.ui.view">
             <field name="name">of.sale.order.manager2.form.view</field>
             <field name="model">sale.order</field>
-            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
+            <field name="inherit_id" ref="of_sale.of_sale_order_price_unit_no_readonly_view_form"/>
             <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
             <field name="arch" type="xml">
                 <!-- Permettre la modification direct du prix pour les remises interdites -->
@@ -432,21 +504,6 @@
                 <xpath expr="//field[@name='of_price_unit_display']" position="attributes">
                     <attribute name="attrs"/>
                     <attribute name="invisible">1</attribute>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="of_sale_order_price_unit_no_readonly_view_form" model="ir.ui.view">
-            <field name="name">of.sale.order.price.unit.view.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="of_sale.of_sale_obsolete_sale_order_form_view"/>
-            <field name="groups_id" eval="[(4, ref('of_sale.group_of_can_modify_sale_price_unit'))]"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="attributes">
-                    <attribute name="readonly">0</attribute>
-                </xpath>
-                <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
-                    <attribute name="readonly">0</attribute>
                 </xpath>
             </field>
         </record>
