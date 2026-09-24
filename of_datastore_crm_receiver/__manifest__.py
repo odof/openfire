@@ -2,7 +2,7 @@
 
 {
     'name': u"OpenFire / Connecteur CRM - Base fille",
-    'version': "10.0.1.0.0",
+    'version': "10.0.1.1.0",
     'author': "OpenFire",
     'website': "http://www.openfire.fr",
     'category': "Openfire",
