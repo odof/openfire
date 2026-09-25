@@ -370,7 +370,7 @@ class SaleOrder(models.Model):
         for order in self:
             if order.of_echeance_line_ids:
                 continue
-            if order.payment_term_id and order.amount_total:
+            if order.payment_term_id.line_ids and order.amount_total:
                 order.of_echeance_line_ids = order._of_compute_echeances()
 
     @api.depends('state', 'order_line.invoice_status', 'of_force_invoice_status')
