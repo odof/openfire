@@ -565,7 +565,8 @@ class SaleOrder(models.Model):
                 message_followers.sudo().filtered(lambda r: r.partner_id.id not in new_partners.ids).unlink()
         # Cas des commandes créées vides puis complétées ensuite (lignes/mode de paiement ajoutés après coup) :
         # of_recompute_echeance_last ne fait qu'ajuster un échéancier déjà existant, il ne le crée jamais.
-        self._of_ensure_echeances()
+        if 'order_line' in vals or 'payment_term_id' in vals:
+            self._of_ensure_echeances()
         # Recalcul de la dernière échéance si besoin
         self.filtered('of_echeances_modified').of_recompute_echeance_last()
         return res
